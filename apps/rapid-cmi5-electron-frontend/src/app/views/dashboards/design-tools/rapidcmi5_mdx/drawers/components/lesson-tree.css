@@ -1,0 +1,11 @@
+.directory .tree-node:hover {
+  background: transparent;
+}
+
+.directory .tree .tree-node--focused {
+  background: transparent;
+}
+
+.directory .tree .tree-node--selected {
+  background: transparent;
+}

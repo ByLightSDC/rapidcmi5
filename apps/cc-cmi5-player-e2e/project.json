@@ -1,0 +1,30 @@
+{
+  "name": "cc-cmi5-player-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/cc-cmi5-player-e2e/src",
+  "projectType": "application",
+  "tags": [],
+  "implicitDependencies": ["cc-cmi5-player"],
+  "targets": {
+    "e2e": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/cc-cmi5-player-e2e/cypress.config.ts",
+        "devServerTarget": "cc-cmi5-player:serve:development",
+        "testingType": "e2e"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "cc-cmi5-player:serve:production"
+        },
+        "ci": {
+          "devServerTarget": "cc-cmi5-player:serve-static"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    }
+  }
+}

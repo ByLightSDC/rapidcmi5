@@ -1,0 +1,42 @@
+{
+  "name": "frontend-clients-devops-api",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/clients/devops-api/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/rollup:rollup",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/frontend/clients/devops-api",
+        "tsConfig": "libs/frontend/clients/devops-api/tsconfig.lib.json",
+        "project": "libs/frontend/clients/devops-api/package.json",
+        "entryFile": "libs/frontend/clients/devops-api/src/index.ts",
+        "external": ["react/jsx-runtime"],
+        "rollupConfig": "@nx/react/plugins/bundle-rollup",
+        "compiler": "babel",
+        "assets": [
+          {
+            "glob": "libs/frontend/clients/devops-api/README.md",
+            "input": ".",
+            "output": "."
+          }
+        ],
+        "babelUpwardRootMode": true,
+        "updateBuildableProjectDepsInPackageJson": true
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/clients/devops-api"],
+      "options": {
+        "jestConfig": "libs/frontend/clients/devops-api/jest.config.ts"
+      }
+    }
+  }
+}

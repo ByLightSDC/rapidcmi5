@@ -1,0 +1,29 @@
+{
+  "name": "cmi5-build-common",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/cmi5-build/common/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/cmi5-build/common",
+        "main": "libs/cmi5-build/common/src/index.ts",
+        "tsConfig": "libs/cmi5-build/common/tsconfig.lib.json",
+        "assets": ["libs/cmi5-build/common/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/cmi5-build/common/jest.config.ts"
+      }
+    }
+  }
+}

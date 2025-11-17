@@ -1,0 +1,18 @@
+{
+  "auName": "Test Config",
+  "assetsPath": "",
+  "backgroundImage": "",
+  "rangeosScenarioName": "Testing - Auto Grader",
+  "slides": [
+    {
+      "slideTitle": "Slide 1",
+      "type": "markdown",
+      "filepath": "test/test/slide-1.md",
+      "content": "## AI With Class Id\n\n:::scenario\n```json\n{\n \"uuid\": \"9a277b3c-33fa-4792-ae34-2135f3e1138e\",\n \"name\": \"Testing - Auto Grader\",\n \"promptClass\": true\n}\n```\n:::"
+    }
+  ],
+  "dirPath": "test/test",
+  "rangeosScenarioUUID": "9a277b3c-33fa-4792-ae34-2135f3e1138e",
+  "promptClassId": false,
+  "teamSSOEnabled": false
+}

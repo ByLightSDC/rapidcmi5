@@ -1,0 +1,165 @@
+/* You can add global styles to this file, and also import other style files */
+
+.inline-code {
+  display: inline-block;
+  padding: 2px 4px;
+  color: #eeeeee;
+  background-color: #272822;
+  border-radius: 3px;
+}
+
+.slide-link:hover {
+  color: #6f96ff;
+}
+
+.toc-link:hover {
+  color: #6f96ff;
+}
+
+a {
+  color: #6f96ff;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #8cadfa;
+}
+
+a:visited {
+  color: #6f96ff;
+}
+
+/* Activity Styles */
+.paper-activity {
+  padding: 4;
+  margin-top: '4px';
+  margin-bottom: '4px';
+  margin-left: 'auto';
+  margin-right: 'auto';
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.16),
+    0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+/* Audio Player Styles for Dark Theme */
+audio {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+  padding: 4px;
+  margin: 8px 0;
+}
+
+audio::-webkit-media-controls-panel {
+  background-color: #2d3748;
+  filter: brightness(1.5);
+}
+
+audio::-webkit-media-controls-enclosure {
+  filter: brightness(1.5);
+}
+
+/* Make all control buttons white */
+audio::-webkit-media-controls-play-button {
+  filter: brightness(0) invert(1);
+}
+
+audio::-webkit-media-controls-mute-button {
+  filter: brightness(0) invert(1);
+}
+
+audio::-webkit-media-controls-overflow-button {
+  filter: brightness(0) invert(1) !important;
+  -webkit-filter: brightness(0) invert(1) !important;
+  opacity: 1 !important;
+  background-color: transparent !important;
+}
+
+audio::-webkit-media-controls-toggle-closed-captions-button {
+  filter: brightness(0) invert(1) !important;
+  -webkit-filter: brightness(0) invert(1) !important;
+}
+
+/* Try to catch any button elements */
+audio::-internal-media-controls-overflow-button {
+  filter: brightness(0) invert(1) !important;
+}
+
+/* Time display - white text */
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display {
+  color: #ffffff;
+}
+
+/* Style the timeline/scrubber with subtle white/gray */
+audio::-webkit-media-controls-timeline {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 25px;
+  padding: 0;
+}
+
+/* Slider thumb (the draggable circle) */
+audio::-webkit-media-slider-thumb {
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Volume slider */
+audio::-webkit-media-controls-volume-slider {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 25px;
+}
+
+/* Firefox */
+audio::-moz-media-controls {
+  background-color: #2d3748;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.btn-rangeos {
+  @apply bg-blue-500 text-white font-bold py-1 px-4 rounded transition-all duration-300 ease-in-out transform;
+}
+
+.btn-rangeos:disabled {
+  @apply bg-gray-500 pointer-events-none;
+}
+
+.btn-rangeos:hover {
+  @apply bg-blue-600 shadow-lg;
+}
+
+.btn-rangeos:active {
+  @apply bg-blue-700 scale-95;
+}
+
+.option-rangeos {
+  @apply rounded-xl px-6 my-4 prose-p:my-0 prose-li:my-0 prose-h1:my-1 prose-h2:my-1 py-2 w-full;
+}
+
+.option-rangeos:disabled {
+  @apply bg-gray-500 pointer-events-none;
+}
+
+.option-rangeos:hover {
+  @apply bg-blue-600 shadow-lg;
+}
+
+.slide-rangeos {
+  @apply prose prose-invert prose-xl w-full mx-auto px-4;
+}
+
+@layer base {
+  html,
+  body {
+    @apply w-full overflow-x-hidden overflow-y-hidden antialiased;
+  }
+  .container {
+    @apply mx-auto px-4 sm:px-6 md:px-8;
+  }
+}

@@ -1,0 +1,69 @@
+/* CLONE */
+
+import { useContext, useEffect } from 'react';
+import { gql } from 'graphql-request';
+
+import {
+  graphqlVmFields,
+  useSubscription,
+  Topic,
+} from '@rangeos-nx/ui/api/hooks';
+import { RangeVM } from '@rangeos-nx/frontend/clients/devops-api';
+import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
+
+/**
+ * Queries graph for vm updates
+ * Pushes updates to ScenarioUpdatesContext
+ * @param param0
+ * @returns
+ */
+export default function VMSubscription({
+  rangeId,
+  scenarioId,
+}: {
+  rangeId: string;
+  scenarioId: string;
+}) {
+  const { setUpdate } = useContext(ScenarioUpdatesContext);
+
+  /**
+   * Listen for realtime range VM updates
+   * Fires when status of the VM changes (when start/stop)
+   */
+  const rangeVMsUpdatedQuery = gql`
+  subscription RangeVMsUpdated($rangeId: String!, $scenarioId: String!) {
+    rangeVMsUpdated(rangeId: $rangeId, scenarioId: $scenarioId) {
+      ${graphqlVmFields}
+    }
+  }
+`;
+
+  const queryParamsRangeVMUpdates = {
+    operationName: 'RangeVMsUpdated',
+    query: rangeVMsUpdatedQuery,
+    variables: {
+      rangeId: rangeId,
+      scenarioId: scenarioId,
+    },
+  };
+
+  const updateVMsSubscription = useSubscription(queryParamsRangeVMUpdates, {
+    data: { rangeVMsUpdated: {} },
+  });
+
+  /** UE handles subscription update for VM */
+  useEffect(() => {
+    if (Object.keys(updateVMsSubscription.data).length > 0) {
+      if (updateVMsSubscription?.data?.data?.rangeVMsUpdated) {
+        const vm = updateVMsSubscription.data.data
+          .rangeVMsUpdated as Partial<RangeVM>;
+        if (Object.keys(vm).length > 0 && vm.uuid) {
+          setUpdate(vm, Topic.ResourceVM);
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updateVMsSubscription.data]);
+
+  return <div />;
+}

@@ -1,0 +1,51 @@
+.videoWrapper {
+  position: relative;
+  display: inline-block;
+  margin: 8px 0;
+}
+
+.videoWrapper video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.focusedVideo {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.videoResizer {
+  position: absolute;
+  cursor: nwse-resize;
+  width: 10px;
+  height: 10px;
+  background-color: #1976d2;
+  border: 1px solid white;
+  border-radius: 2px;
+}
+
+.videoResizer.topLeft {
+  top: -5px;
+  left: -5px;
+  cursor: nwse-resize;
+}
+
+.videoResizer.topRight {
+  top: -5px;
+  right: -5px;
+  cursor: nesw-resize;
+}
+
+.videoResizer.bottomLeft {
+  bottom: -5px;
+  left: -5px;
+  cursor: nesw-resize;
+}
+
+.videoResizer.bottomRight {
+  bottom: -5px;
+  right: -5px;
+  cursor: nwse-resize;
+}

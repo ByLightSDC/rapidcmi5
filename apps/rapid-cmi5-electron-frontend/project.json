@@ -1,0 +1,166 @@
+{
+  "name": "rapid-cmi5-electron-frontend",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/rapid-cmi5-electron-frontend/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "defaultConfiguration": "production",
+      "options": {
+        "postcssConfig": "apps/rapid-cmi5-electron-frontend/postcss.config.js",
+        "compiler": "babel",
+        "outputPath": "dist/apps/rapid-cmi5-electron-frontend",
+        "index": "apps/rapid-cmi5-electron-frontend/src/index.html",
+        "main": "apps/rapid-cmi5-electron-frontend/src/main.tsx",
+        "polyfills": "apps/rapid-cmi5-electron-frontend/src/polyfills.ts",
+        "tsConfig": "apps/rapid-cmi5-electron-frontend/tsconfig.app.json",
+        "assets": [
+          "apps/rapid-cmi5-electron-frontend/src/favicon.ico",
+          "apps/rapid-cmi5-electron-frontend/src/assets",
+          "apps/rapid-cmi5-electron-frontend/src/mockServiceWorker.js",
+          {
+            "input": "libs/ui/components/branded/src/assets/rapid-cmi5",
+            "glob": "**/*",
+            "output": "assets/rapid-cmi5"
+          },
+          {
+            "input": "apps/rapid-cmi5-electron-frontend/src/assets/fonts",
+            "glob": "**/*",
+            "output": "assets/fonts"
+          }
+        ],
+        "styles": [
+          "apps/rapid-cmi5-electron-frontend/src/styles.css"
+        ],
+        "scripts": [],
+        "webpackConfig": "apps/rapid-cmi5-electron-frontend/webpack.config.js",
+        "memoryLimit": 4096
+      },
+      "configurations": {
+        "production": {
+          "baseHref": "./",
+          "fileReplacements": [
+            {
+              "replace": "apps/rapid-cmi5-electron-frontend/src/environments/environment.ts",
+              "with": "apps/rapid-cmi5-electron-frontend/src/environments/environment.prod.ts"
+            }
+          ],
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false
+        },
+        "development": {
+          "baseHref": "/",
+          "extractLicenses": false,
+          "optimization": false,
+          "sourceMap": true,
+          "vendorChunk": true
+        },
+        "windows": {
+          "baseHref": "./",
+          "fileReplacements": [
+            {
+              "replace": "apps/rapid-cmi5-electron-frontend/src/environments/environment.ts",
+              "with": "apps/rapid-cmi5-electron-frontend/src/environments/environment.prod.ts"
+            }
+          ],
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/webpack:dev-server",
+      "options": {
+        "buildTarget": "rapid-cmi5-electron-frontend:build",
+        "hmr": true
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "rapid-cmi5-electron-frontend:build:production",
+          "hmr": false
+        },
+        "development": {
+          "buildTarget": "rapid-cmi5-electron-frontend:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": [
+        "{options.outputFile}"
+      ]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/rapid-cmi5-electron-frontend"
+      ],
+      "options": {
+        "jestConfig": "apps/rapid-cmi5-electron-frontend/jest.config.ts"
+      }
+    },
+    "storybook": {
+      "executor": "@nx/storybook:storybook",
+      "options": {
+        "port": 4400,
+        "configDir": "apps/rapid-cmi5-electron-frontend/.storybook"
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "build-storybook": {
+      "executor": "@nx/storybook:build",
+      "outputs": [
+        "{options.outputDir}"
+      ],
+      "options": {
+        "outputDir": "dist/storybook/rapid-cmi5-electron-frontend",
+        "configDir": "apps/rapid-cmi5-electron-frontend/.storybook"
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "test-storybook": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "test-storybook -c apps/rapid-cmi5-electron-frontend/.storybook --url=http://localhost:4400"
+      }
+    },
+    "static-storybook": {
+      "executor": "@nx/web:file-server",
+      "dependsOn": [
+        "build-storybook"
+      ],
+      "options": {
+        "buildTarget": "rapid-cmi5-electron-frontend:build-storybook",
+        "staticFilePath": "dist/storybook/rapid-cmi5-electron-frontend",
+        "spa": true
+      },
+      "configurations": {
+        "ci": {
+          "buildTarget": "rapid-cmi5-electron-frontend:build-storybook:ci"
+        }
+      }
+    }
+  }
+}

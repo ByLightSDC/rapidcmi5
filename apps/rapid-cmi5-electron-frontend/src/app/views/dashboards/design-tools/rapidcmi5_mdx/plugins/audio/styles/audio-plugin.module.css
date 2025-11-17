@@ -1,0 +1,20 @@
+.audioNode {
+  cursor: pointer;
+  display: block;
+  max-width: 100%;
+  margin: 8px 0;
+}
+
+.focusedAudio {
+  outline: 2px solid rgb(60, 132, 244);
+  border-radius: 4px;
+}
+
+.audioPlaceholder {
+  background-color: #f0f0f0;
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  padding: 20px;
+  text-align: center;
+  color: #666;
+}

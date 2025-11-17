@@ -1,0 +1,5 @@
+/.vscode
+/libs
+/node_modules
+/tools
+/dist/apps/auto-grader/assets/js-template/node_modules

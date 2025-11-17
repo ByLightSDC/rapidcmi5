@@ -1,0 +1,6 @@
+{
+    "slideTitle": "Testing jobe",
+    "description": "Test jobe",
+    "evaluator": "def function_test():\n    return true",
+    "student": "def function_test():\n    return true"
+  }

@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch cc-cmi5-player debugger",
+      "request": "launch",
+      "type": "chrome",
+      "url": "http://localhost:4200",
+      "userDataDir": true,
+      "webRoot": "${workspaceFolder}/apps/cc-cmi5-player",
+      "sourceMapPathOverrides": {
+        "webpack:///./*": "${webRoot}/*",
+        "webpack://apps/*": "${webRoot}/apps/*",
+        "webpack:///src/*": "${workspaceFolder}/apps/cc-cmi5-player/src/*",
+        "webpack:///./src/*": "${workspaceFolder}/apps/cc-cmi5-player/src/*",
+        "webpack:///apps/libs/*": "${workspaceFolder}/libs/*", // Add this
+        "webpack://*/libs/*": "${workspaceFolder}/libs/*", // And this as a catch-all
+        "webpack://*/apps/libs/*": "${workspaceFolder}/libs/*" // And this
+      }
+    }
+  ]
+}

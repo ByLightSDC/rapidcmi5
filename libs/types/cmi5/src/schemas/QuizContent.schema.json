@@ -1,0 +1,207 @@
+{
+  "$ref": "#/definitions/QuizContent",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "BasicResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "correctAnswer": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "grading": {
+          "$ref": "#/definitions/QuestionGrading"
+        },
+        "matching": {
+          "items": {
+            "$ref": "#/definitions/MatchingOption"
+          },
+          "type": "array"
+        },
+        "options": {
+          "items": {
+            "$ref": "#/definitions/QuizOption"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "correctAnswer",
+        "grading"
+      ],
+      "type": "object"
+    },
+    "KSATElement": {
+      "additionalProperties": false,
+      "properties": {
+        "doc_identifier": {
+          "type": "string"
+        },
+        "element_identifier": {
+          "type": "string"
+        },
+        "element_type": {
+          "enum": [
+            "task",
+            "knowledge",
+            "skill"
+          ],
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "element_identifier",
+        "element_type",
+        "title",
+        "text",
+        "doc_identifier"
+      ],
+      "type": "object"
+    },
+    "MatchingOption": {
+      "additionalProperties": false,
+      "properties": {
+        "option": {
+          "type": "string"
+        },
+        "response": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "option",
+        "response"
+      ],
+      "type": "object"
+    },
+    "MoveOnCriteriaEnum": {
+      "enum": [
+        "completed",
+        "passed",
+        "completed-and-passed",
+        "not-applicable"
+      ],
+      "type": "string"
+    },
+    "QuestionGrading": {
+      "enum": [
+        "none",
+        "exact"
+      ],
+      "type": "string"
+    },
+    "QuestionResponse": {
+      "enum": [
+        "freeResponse",
+        "number",
+        "multipleChoice",
+        "matching",
+        "trueFalse",
+        "selectAll"
+      ],
+      "type": "string"
+    },
+    "QuizCompletionEnum": {
+      "enum": [
+        "attempted",
+        "passed",
+        "completed",
+        "completed-and-passed",
+        "not-applicable"
+      ],
+      "type": "string"
+    },
+    "QuizContent": {
+      "additionalProperties": false,
+      "properties": {
+        "cmi5QuizId": {
+          "type": "string"
+        },
+        "completionRequired": {
+          "$ref": "#/definitions/QuizCompletionEnum"
+        },
+        "ksats": {
+          "items": {
+            "$ref": "#/definitions/KSATElement"
+          },
+          "type": "array"
+        },
+        "metadata": {
+          "type": "string"
+        },
+        "moveOnCriteria": {
+          "$ref": "#/definitions/MoveOnCriteriaEnum"
+        },
+        "passingScore": {
+          "type": "number"
+        },
+        "questions": {
+          "items": {
+            "$ref": "#/definitions/QuizQuestion"
+          },
+          "type": "array"
+        },
+        "rc5id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cmi5QuizId",
+        "passingScore",
+        "questions"
+      ],
+      "type": "object"
+    },
+    "QuizOption": {
+      "additionalProperties": false,
+      "properties": {
+        "correct": {
+          "type": "boolean"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "correct"
+      ],
+      "type": "object"
+    },
+    "QuizQuestion": {
+      "additionalProperties": false,
+      "properties": {
+        "cmi5QuestionId": {
+          "type": "string"
+        },
+        "question": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/QuestionResponse"
+        },
+        "typeAttributes": {
+          "$ref": "#/definitions/BasicResponse"
+        }
+      },
+      "required": [
+        "question",
+        "type",
+        "typeAttributes",
+        "cmi5QuestionId"
+      ],
+      "type": "object"
+    }
+  }
+}

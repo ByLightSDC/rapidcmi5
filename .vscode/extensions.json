@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "streetsidesoftware.code-spell-checker",
+    "usernamehw.errorlens",
+    "dbaeumer.vscode-eslint",
+    "eamodio.gitlens",
+    "firsttris.vscode-jest-runner",
+    "nrwl.angular-console",
+    "esbenp.prettier-vscode",
+    "snyk-security.snyk-vulnerability-scanner",
+    "gruntfuggly.todo-tree",
+    "mike-co.import-sorter",
+    "vscode-icons-team.vscode-icons"
+  ]
+}

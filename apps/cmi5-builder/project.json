@@ -1,0 +1,78 @@
+{
+  "name": "cmi5-builder",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/cmi5-builder/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/cmi5-builder",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "apps/cmi5-builder/src/main.ts",
+        "tsConfig": "apps/cmi5-builder/tsconfig.app.json",
+        "assets": [
+          "apps/cmi5-builder/src/assets",
+          {
+            "glob": "**/*.json",
+            "input": "libs/types/cmi5/src/schemas",
+            "output": "libs/types/cmi5/src/schemas"
+          }
+        ],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": true,
+            "outExtension": {
+              ".js": ".js"
+            },
+            "loader": {
+              ".json": "json"
+            }
+          }
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "cmi5-builder:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "cmi5-builder:build:development"
+        },
+        "production": {
+          "buildTarget": "cmi5-builder:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/cmi5-builder/jest.config.ts"
+      }
+    }
+  }
+}

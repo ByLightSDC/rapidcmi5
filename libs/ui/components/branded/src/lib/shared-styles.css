@@ -1,0 +1,338 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Toaster */
+.SnackbarItem-message {
+  white-space: pre-line;
+}
+
+body {
+  /*Prevents useless scrollbar from appearing when root is 100vh*/
+  margin: 0;
+}
+
+div#root {
+  /*background-color: rgb(252, 1, 201);*/
+  overflow: hidden;
+  width: auto;
+  height: 100vh;
+  display: flex;
+}
+
+/* Right Side */
+div#app-views {
+  /*background-color: rgb(246, 199, 248);*/
+  display: flex;
+  flex-direction: column;
+  /* use 100% instead of 100vh to make this always fit within the root element */
+  height: 100%;
+}
+
+/* Wraps Routes */
+div#app-routes {
+  display: flex;
+}
+
+/* Route Content under App Header*/
+div#app-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Align buttons to the right*/
+div#button-container-right {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-end;
+  margin: 12;
+  padding: 12;
+  height: auto;
+}
+
+/* Align buttons center*/
+div#button-container-center {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin: 12;
+  padding: 12;
+  height: auto;
+}
+
+/* Vertical Padding 2 ps in a row will render 12px vert space */
+p {
+  margin: 12px 0 0 0;
+}
+
+p:first-child {
+  margin: 0;
+}
+
+/* Horizontal Padding */
+div#horizontalgap {
+  float: left;
+  overflow: hidden;
+  height: 1px;
+  width: 0px;
+}
+
+kbd {
+  background-color: hsla(225deg, 15%, 90%, 0.12);
+  border: 0.1rem;
+  box-shadow:
+    0 0.1rem 0 0.05rem hsla(225deg, 15%, 14%, 1),
+    0 0.1rem 0 hsla(225deg, 15%, 14%, 1),
+    0 -0.1rem 0.2rem hsla(225deg, 15%, 90%, 0.2) inset;
+}
+
+/*REF  Scrollbar Styles
+Moved to theme
+*/
+
+/*::-webkit-scrollbar {
+
+}
+
+::-webkit-scrollbar-track {
+
+}
+
+::-webkit-scrollbar-thumb {
+
+}
+
+::-webkit-scrollbar-corner {
+	background-color: transparent;
+}
+*/
+
+.sb-main-padded {
+  padding: 0;
+}
+
+.sb-show-main {
+  padding: 0;
+}
+
+.sb-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* width: 100vw;
+  height: 100vw; 
+  width: '100%';
+  height: '100%';*/
+  margin: 0;
+  overflow: auto;
+  padding: 0;
+}
+
+/* Activity Styles */
+.paper-activity {
+  padding: 4;
+  margin-top: '4px';
+  margin-bottom: '4px';
+  margin-left: 'auto';
+  margin-right: 'auto';
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.16),
+    0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+/* Form Styles */
+
+.paper-form {
+  overflow: hidden;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: auto;
+  min-height: 320;
+  padding: 24px;
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.16),
+    0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.no-paper-form {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: auto;
+  min-height: 320;
+  padding: 24px;
+}
+
+.form {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-fields-container {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  display: flex;
+}
+
+.content-header-text {
+  overflow: clip;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.clipped-text {
+  overflow: clip;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.crumb-text {
+  font-size: 16px;
+  overflow: clip;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+}
+
+/* Content style to allow a scrolled area within it */
+
+.contentBox {
+  /* top: 8px - others 12px */
+  padding: 8px 12px 12px;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-nav {
+  margin: 8px 0px 0px;
+}
+
+/* Dashboard Styles */
+
+.dashboard {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  display: flex;
+}
+
+.list-container {
+  max-height: 100%;
+  width: 100%;
+  display: flex;
+  height: inherit;
+}
+
+.scrollingDiv {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.paper-card {
+  background-color: rgb(0, 208, 255);
+  border-radius: 12px;
+  border-width: 2px;
+  display: flex;
+  height: 160px;
+  width: 220px;
+  min-height: 100px;
+  min-width: 100px;
+  margin: 8px;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px;
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.16),
+    0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.paper-card:hover {
+  cursor: pointer;
+}
+
+/* List Styles */
+.list-item-spread {
+  min-width: 800px;
+}
+
+/* Route Content under App Header*/
+.list_column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Modal Styles */
+
+.paper-message {
+  border-radius: 6px;
+  border-width: 2px;
+  display: flex;
+  height: auto;
+  width: 540px;
+  margin: 8px 0px 8px 32px;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 24px;
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.16),
+    0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.box-message {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: auto;
+  min-height: 200px;
+}
+
+.content-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.content-row-icons {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.content-row-icons-end {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.content-row-stretch {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-content: center;
+  align-items: center;
+  width: 100%;
+}

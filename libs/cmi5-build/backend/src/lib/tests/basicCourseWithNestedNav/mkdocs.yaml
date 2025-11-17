@@ -1,0 +1,129 @@
+nav:
+  - Home: index.md
+  - Modules:
+    - Operating Systems:
+      - Test Point Breakdown: Modules/001_Operating_Systems/examinfo.md
+      - Daily Point Breakdown: Modules/001_Operating_Systems/activity_point_breakdown.md
+
+
+########################################
+# ONLY EDIT WHEN CREATING A NEW SITE IN A NEW REPO
+########################################
+use_directory_urls: false
+site_name: CCTC - OS
+site_dir: public
+strict: false
+repo_url: https://git.cybbh.space/cted/tech-college/cttsb/cctc/os/os
+repo_name: /cted/tech-college/cttsb/cctc/os/os
+edit_uri: edit/main/docs/
+docs_dir: docs
+########################################
+# DO NOT EDIT BELOW THIS LINE
+########################################
+theme:
+  name: material
+  language: en
+  # favicon: _images/favicon.jpeg
+  # icon:
+  #   repo: fontawesome/brands/gitlab
+  #   edit: material/pencil
+  #   view: material/eye
+  # logo: _images/cyber_school.jpeg
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    # - navigation.tabs
+    # - navigation.tabs.sticky
+    # - navigation.sections
+    # - navigation.expand
+    - navigation.footer
+    - navigation.indexes
+    - navigation.prune
+    # - navigation.top
+    - toc.follow
+    # - toc.integrate
+    - search.suggest
+    # - search.share
+    # - header.autohide
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    # - content.tabs.link
+    - content.tooltips
+    - search.highlight
+
+plugins:
+  - search:
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
+      lang: en
+  - glightbox:
+       touchNavigation: false
+       loop: true
+       effect: zoom
+      #  slide_effect: slide
+       width: 100%
+       height: auto
+       zoomable: true
+       draggable: true
+       skip_classes:
+         - custom-skip-class-name
+       auto_caption: false
+       caption_position: bottom
+  # - blog:
+  # - git-revision-date-localized:
+  #     enable_creation_date: true
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      # toc_depth: 2
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      linenums: true
+      linenums_style: table
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  #- pymdownx.emoji:
+    #  emoji_generator: !!python/name:materialx.emoji.to_svg
+    #  emoji_index: !!python/name:materialx.emoji.twemoji
+  - pymdownx.arithmatex:
+      generic: true
+########################################
+# DO NOT EDIT ABOVE THIS LINE
+########################################

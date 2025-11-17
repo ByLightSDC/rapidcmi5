@@ -1,0 +1,363 @@
+{
+  "locations": [
+    {
+      "name": "test",
+      "url": "http://localhost:4200",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.develop-cp.rangeos.engineering",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.develop-cp.rangeos.engineering/",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.develop-cp.rangeos.engineering"
+      }
+    },
+    {
+      "name": "test",
+      "url": "http://localhost:4300",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.develop-cp.rangeos.engineering",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.develop-cp.rangeos.engineering/",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.develop-cp.rangeos.engineering"
+      }
+    },
+    {
+      "name": "test",
+      "url": "http://127.0.0.1:4200",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.develop-cp.rangeos.engineering",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.develop-cp.rangeos.engineering/",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.develop-cp.rangeos.engineering"
+      }
+    },
+    {
+      "name": "test",
+      "url": "http://127.0.0.1:4300",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.develop-cp.rangeos.engineering",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.develop-cp.rangeos.engineering/",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.develop-cp.rangeos.engineering"
+      }
+    },
+    {
+      "name": "pcte",
+      "url": "https://dash.ent0.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent0.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent0.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent0.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "pcte",
+      "url": "https://dash.ent1.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent1.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent1.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent1.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent2",
+      "url": "https://dash.ent2.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent2.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent2.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent2.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent3",
+      "url": "https://dash.ent3.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent3.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent3.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent3.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent4",
+      "url": "https://dash.ent4.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent4.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent4.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent4.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent5",
+      "url": "https://dash.ent5.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent5.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent5.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent5.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent6",
+      "url": "https://dash.ent6.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent6.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent6.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent6.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent7",
+      "url": "https://dash.ent7.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent7.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent7.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent7.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent8",
+      "url": "https://dash.ent8.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent8.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent8.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent8.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent9",
+      "url": "https://dash.ent9.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent9.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent9.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent9.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent10",
+      "url": "https://dash.ent10.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent10.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent10.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent10.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent11",
+      "url": "https://dash.ent11.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent11.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent11.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent11.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent12",
+      "url": "https://dash.ent12.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent12.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent12.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent12.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent13",
+      "url": "https://dash.ent13.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent13.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent13.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent13.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent14",
+      "url": "https://dash.ent14.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent14.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent14.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent14.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent15",
+      "url": "https://dash.ent15.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent15.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent15.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent15.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent16",
+      "url": "https://dash.ent16.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent16.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent16.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent16.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent17",
+      "url": "https://dash.ent17.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent17.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent17.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent17.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent18",
+      "url": "https://dash.ent18.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent18.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent18.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent18.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent19",
+      "url": "https://dash.ent19.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent19.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent19.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent19.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ent20",
+      "url": "https://dash.ent20.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent20.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent20.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent20.pcte.mil",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+      }
+    },
+    {
+      "name": "ccoe",
+      "url": "https://dash.ent1.pcte.mil",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.ent1.pcte.mil",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.ent1.pcte.mil",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent1.pcte.mil",
+        "SLIDE_BACKGROUND": "../../../assets/ccoe/slide_title_blk.png",
+        "SLIDE_LOGO": "../../../assets/ccoe/ccoe.png"
+      }
+    },
+    {
+      "name": "ccoe-develop",
+      "url": "https://app.training.opendash360.us",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.develop-cp.rangeos.engineering",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.develop-cp.rangeos.engineering/",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.develop-cp.rangeos.engineering",
+        "SLIDE_BACKGROUND": "./assets/ccoe/slide_title_blk.png",
+        "SLIDE_LOGO": "./assets/ccoe/ccoe.png",
+        "LOGGING_ENABLED": true,
+        "LOGGING_LEVEL": "DEBUG",
+        "LOGGING_COMPONENTS": {
+          "all": true,
+          "auManager": true,
+          "cmi5": true,
+          "redux": false,
+          "navigation": false,
+          "hooks": false,
+          "api": false,
+          "performance": false,
+          "lms": true
+        }
+      }
+    },
+    {
+      "name": "bylight-develop",
+      "url": "https://cpt-player.develop-cp.rangeos.engineering",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.develop-cp.rangeos.engineering",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.develop-cp.rangeos.engineering/",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.develop-cp.rangeos.engineering",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "./assets/bylight/RangeOS_Logo_White.png",
+        "LOGGING_ENABLED": true,
+        "LOGGING_LEVEL": "DEBUG",
+        "LOGGING_COMPONENTS": {
+          "all": true,
+          "auManager": true,
+          "cmi5": true,
+          "redux": false,
+          "navigation": false,
+          "hooks": false,
+          "api": false,
+          "performance": false,
+          "lms": true
+        }
+      }
+    },
+    {
+      "name": "bylight-demo",
+      "url": "https://cpt-player.demo-cp.rangeos.engineering",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.demo-cp.rangeos.engineering",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.demo-cp.rangeos.engineering/",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.demo-cp.rangeos.engineering",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "./assets/bylight/RangeOS_Logo_White.png"
+      }
+    },
+    {
+      "name": "bylight-prod",
+      "url": "https://cpt-player.prod-cp.rangeos.engineering",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.prod-cp.rangeos.engineering",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.prod-cp.rangeos.engineering/",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.prod-cp.rangeos.engineering",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "./assets/bylight/RangeOS_Logo_White.png"
+      }
+    },
+    {
+      "name": "bylight-argos",
+      "url": "https://cpt-player.argos-cp.rangeos.engineering",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.argos-cp.rangeos.engineering",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.argos-cp.rangeos.engineering/",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.argos-cp.rangeos.engineering",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "./assets/bylight/RangeOS_Logo_White.png"
+      }
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "plugins": [
+    {
+      "isVisible": true,
+      "id": "devops-portal",
+      "description": "Deploy and manage cyber ranges, environments, and training scenarios",
+      "iconUrl": "/assets/icons/build_24dp.svg",
+      "shouldIFrame": false,
+      "title": "RangeOS",
+      "url": "localhost:4200"
+    },
+    {
+      "isVisible": true,
+      "id": "docs",
+      "description": "RangeOS Documentation",
+      "iconUrl": "/assets/icons/menu_book.svg",
+      "shouldIFrame": false,
+      "title": "User Guide",
+      "url": ""
+    },
+    {
+      "isVisible": true,
+      "id": "grafana",
+      "description": "Grafana",
+      "iconUrl": "/assets/icons/grafana.svg",
+      "shouldIFrame": false,
+      "title": "Grafana",
+      "url": ""
+    },
+    {
+      "isVisible": true,
+      "id": "lms",
+      "description": "Learning Management System",
+      "iconUrl": "/assets/icons/school.svg",
+      "shouldIFrame": false,
+      "title": "LMS",
+      "url": ""
+    },
+    {
+      "isVisible": true,
+      "id": "rancher",
+      "description": "Rancher",
+      "iconUrl": "/assets/icons/rancher.svg",
+      "shouldIFrame": false,
+      "title": "Rancher",
+      "url": ""
+    },
+    {
+      "isVisible": true,
+      "id": "keycloak",
+      "description": "KeyCloak",
+      "iconUrl": "/assets/icons/keycloak.svg",
+      "shouldIFrame": false,
+      "title": "KeyCloak",
+      "url": ""
+    },
+    {
+      "isVisible": true,
+      "id": "swagger",
+      "description": "Swagger",
+      "iconUrl": "/assets/icons/swagger.svg",
+      "shouldIFrame": false,
+      "title": "Swagger",
+      "url": ""
+    },
+    {
+      "isVisible": false,
+      "id": "platform-services",
+      "description": "Access Platform Services and Monitor Status. ",
+      "iconUrl": "/assets/icons/miscellaneous_services_24dp.svg",
+      "shouldIFrame": true,
+      "title": "Platform Services",
+      "url": "http://localhost:3000/"
+    },
+    {
+      "isVisible": false,
+      "id": "content-builder",
+      "description": "Build a CMI5 Course with Content Builder",
+      "iconUrl": "/assets/icons/miscellaneous_services_24dp.svg",
+      "shouldIFrame": true,
+      "title": "Content Builder",
+      "url": "http://localhost:4200//design_tools/rapid_cmi5"
+    }
+  ]
+}
