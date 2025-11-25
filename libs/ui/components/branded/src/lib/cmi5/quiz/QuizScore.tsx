@@ -1,7 +1,6 @@
 import { Box, CircularProgress, Stack, Typography } from '@mui/material';
 import { QuizCompletionEnum, QuizContent } from '@rangeos-nx/types/cmi5';
 import SportsScoreIcon from '@mui/icons-material/SportsScore';
-import { PieChart } from '@mui/x-charts/PieChart';
 import CircleIcon from '@mui/icons-material/Circle';
 
 export function QuizScore({
