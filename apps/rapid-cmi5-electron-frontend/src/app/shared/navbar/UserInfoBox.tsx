@@ -1,8 +1,7 @@
-import { AppDispatch } from '../../redux/store';
+import { AppDispatch } from '@rangeos-nx/rapid-cmi5';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { modal, setModal, themeColor, setTheme } from '@rangeos-nx/ui/redux';
-import { config } from '@rangeos-nx/frontend/environment';
 
 import { useLogOut } from '../../hooks/useLogOut';
 
@@ -25,15 +24,9 @@ import Typography from '@mui/material/Typography';
 /* Icons */
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import Brightness6Icon from '@mui/icons-material/Brightness6';
-import ContactSupportIcon from '@mui/icons-material/ContactSupport';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 import { useState } from 'react';
 
-import {
-  queryKeyBuildVersion,
-  useGetBuildVersion,
-} from '@rangeos-nx/ui/api/hooks';
 import { BuildVersionInfo } from '@rangeos-nx/frontend/clients/devops-api';
 
 /**
@@ -135,17 +128,7 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
   return (
     <section aria-label="user info">
       {/* dont fetch until the menu opens (anchor defined) to ensure that the authToken is set in queryHooksConfig */}
-      {anchorEl && (
-        <DataCacheOrFetcher
-          apiHook={useGetBuildVersion}
-          payload={{ id: 'buildVersion' }}
-          queryKey={queryKeyBuildVersion}
-          queryId={'buildVersion'}
-          shouldSuppressToaster={true}
-          onDataLoad={handleInitialDataLoad}
-          onError={handleInitialDataError}
-        />
-      )}
+
       <div data-testid="modals">
         <AboutBuildVersionDialog
           appThemeColor={appThemeColor}

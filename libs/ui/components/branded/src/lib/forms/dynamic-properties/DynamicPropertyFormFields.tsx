@@ -43,11 +43,6 @@ import {
   propertiesKey,
 } from './DynamicPropertyContext';
 
-/* API */
-import {
-  useGetRangeVolume,
-  queryKeyRangeVolumes,
-} from '@rangeos-nx/ui/api/hooks';
 
 import { xReplaceTimeFields } from './constants';
 
@@ -857,56 +852,6 @@ function DPFormField({
           sxProps={textFieldSxProps}
           props={{ fullWidth: true, disabled: true }}
         />
-      )}
-      {fieldType === fieldTypeVolumePicker && (
-        // need fragment to do nested test for pickerbutton...
-        // eslint-disable-next-line react/jsx-no-useless-fragment
-        <>
-          {isPickerButtonVisible ? (
-            <Grid
-              item
-              xs={11}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                flexGrow: 1,
-                marginLeft: level * 2,
-                marginTop: '8px', //not sure why this doesnt match the other properties, but this is needed
-              }}
-            >
-              <DynamicSelectorFieldGroup
-                crudType={crudType}
-                itemLabel={fieldLabel}
-                formProps={{
-                  formMethods,
-                  fieldName: fieldName,
-                  indexedArrayField: fieldName,
-                  indexedErrors: fieldErrors,
-                  isModal: sharedFormProps.isModal,
-                  isValid: sharedFormProps.isValid,
-                  placeholder: '',
-                  readOnly: crudType === FormCrudType.view,
-                }}
-                allowClear={true}
-                apiHook={useGetRangeVolume}
-                inspectorProps={{
-                  editRoute: TopicRoutesDPVolume,
-                }}
-                selectionFilters={meta ? meta['filters'] : undefined}
-                selectionTargetId={TopicDPVolume}
-                shouldApplySelections={true}
-                shouldShowButtonText={false}
-                shouldShowLabelText={true}
-                queryKey={queryKeyRangeVolumes}
-                textFieldProps={{
-                  disabled: crudType === FormCrudType.view,
-                  required: required,
-                }}
-                topicId={TopicDPVolume}
-              />
-            </Grid>
-          ) : null}
-        </>
       )}
     </>
   );

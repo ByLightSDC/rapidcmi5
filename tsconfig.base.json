@@ -130,7 +130,9 @@
       "@rangeos-nx/ui/branded": ["libs/ui/components/branded/src/index.ts"],
       "@rangeos-nx/ui/keycloak": ["libs/ui/auth/keycloak/src/index.ts"],
       "@rangeos-nx/ui/redux": ["libs/ui/redux/src/index.ts"],
-      "@rangeos-nx/ui/validation": ["libs/ui/validation/src/index.ts"]
+      "@rangeos-nx/ui/validation": ["libs/ui/validation/src/index.ts"],
+      "@rangeos-nx/rapid-cmi5": ["libs/rapid-cmi5/src/index.ts"]
+
     }
   },
   "exclude": ["**/node_modules", "**/.*/", "tmp"]

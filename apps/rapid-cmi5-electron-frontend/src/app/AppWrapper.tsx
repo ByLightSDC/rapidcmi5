@@ -2,8 +2,8 @@
 import { QueryClient, QueryClientProvider } from 'react-query';
 import App from './app';
 import { Provider } from 'react-redux';
-import { store } from './redux/store';
-import { persistor } from './redux/store';
+import { store } from '@rangeos-nx/rapid-cmi5';
+import { persistor } from '@rangeos-nx/rapid-cmi5';
 import { StrictMode } from 'react';
 import { PersistGate } from 'redux-persist/integration/react';
 
@@ -19,7 +19,6 @@ export default function AppWrapper() {
         <PersistGate loading={null} persistor={persistor}>
           <QueryClientProvider client={queryClient}>
             <App />
-            {/*REF <ReactQueryDevtools initialIsOpen={false} /> */}
           </QueryClientProvider>
         </PersistGate>
       </StrictMode>
