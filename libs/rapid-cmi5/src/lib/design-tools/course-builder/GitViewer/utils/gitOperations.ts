@@ -1,4 +1,4 @@
-import { getFileStatus, mapGitStatus } from './StatusMatrix';
+import { FileStatus, getFileStatus, mapGitStatus } from './StatusMatrix';
 import { gitCache, GitFS } from './fileSystem';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import * as git from 'isomorphic-git';
@@ -6,11 +6,7 @@ import http from 'isomorphic-git/http/web';
 import { GitConfigType } from '../../CourseBuilderApiTypes';
 import { debugLog, debugLogError } from '@rangeos-nx/ui/branded';
 import path, { join } from 'path-browserify';
-import { getFileContent } from '../hooks/files';
-import {
-  fsType,
-  RepoAccessObject,
-} from '../../../../redux/repoManagerReducer';
+import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
 
 const AuthenticationErrorMessage =
   'The credentials provided are invalid; authentication has failed.';
@@ -31,7 +27,11 @@ export class GitOperations {
 
   listRepos = async (fileSystem: fsType): Promise<string[]> => {
     try {
-      return await this.gitFs.fs.promises.readdir('/' + fileSystem.toString());
+      const raw = await this.gitFs.fs.promises.readdir(
+        '/' + fileSystem.toString(),
+      );
+      const repos = raw.map((repo) => repo.toString());
+      return repos;
     } catch (error: any) {
       debugLogError(`Could not list repos ${error}`);
       return [];
@@ -78,8 +78,7 @@ export class GitOperations {
     const dir = getRepoPath(r);
 
     try {
-      // await this.gitFs.fs.promises.mkdir(dir, { recursive: true });
-      if (this.gitFs.isElectron) {
+      if (this.gitFs?.isElectron) {
         await window.fsApi.gitInitRepo(dir, defaultBranch);
       } else {
         await git.init({ fs: this.gitFs.fs, dir, defaultBranch });
@@ -140,7 +139,7 @@ export class GitOperations {
     }
   };
 
-  gitCommits = async (r: RepoAccessObject) => {
+  gitCommits = async (r: RepoAccessObject): Promise<git.ReadCommitResult[]> => {
     const dir = getRepoPath(r);
     try {
       if (this.gitFs.isElectron) {
@@ -272,7 +271,10 @@ export class GitOperations {
       throw error;
     }
   };
-  gitRepoStatus = async (r: RepoAccessObject, changedFiles?: string[]) => {
+  gitRepoStatus = async (
+    r: RepoAccessObject,
+    changedFiles?: string[],
+  ): Promise<{ name: string; status: FileStatus }[]> => {
     const dir = getRepoPath(r);
 
     try {
@@ -291,19 +293,14 @@ export class GitOperations {
 
       if (status === undefined) return [];
 
-      return (
-        status
-          // @ts-ignore
-
-          .map(([file, HEAD, WORKDIR, STAGE]) => ({
-            name: file,
-            status: getFileStatus(HEAD, WORKDIR, STAGE),
-          }))
-          .filter(
-            // @ts-ignore
-            (file) => file.status !== 'unmodified' && file.status !== 'unknown',
-          )
-      );
+      return status
+        .map(([file, HEAD, WORKDIR, STAGE]) => ({
+          name: file,
+          status: getFileStatus(HEAD, WORKDIR, STAGE),
+        }))
+        .filter(
+          (file) => file.status !== 'unmodified' && file.status !== 'unknown',
+        );
     } catch (error: any) {
       return [];
     }
@@ -955,7 +952,7 @@ export class GitOperations {
     });
 
     const oldFile = new TextDecoder('utf-8').decode(blob);
-    const newBlob = await getFileContent(r, filepath);
+    const newBlob = await this.gitFs.getFileContent(r, filepath);
     if (!newBlob)
       return {
         oldFile,

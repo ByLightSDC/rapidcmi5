@@ -20,9 +20,6 @@ export let queryHooksConfig: any = {
   headers: { Authorization: `Bearer <put the token here>` },
 };
 
-export function getIsMSWMock(): boolean {
-  return config.MSW_MOCK || false;
-}
 
 export function getGraphQLUrl(): string {
   return config.DEVOPS_GQL_URL || 'http://localhost';
@@ -32,9 +29,6 @@ export function getGraphQLSubscriptionsUrl(): string {
   return config.DEVOPS_GQL_SUBSCRIPTIONS_URL || 'http://localhost';
 }
 
-export function getKASMUrl(): string {
-  return config.KASM_API_URL || 'http://localhost';
-}
 
 export const infiniteRecordLimit = 9999;
 

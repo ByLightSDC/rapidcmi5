@@ -315,6 +315,7 @@ export const LessonDrawer = () => {
           disabled={!currentRepo}
           sxProps={{}}
           onClick={onCreateLesson}
+          data-testid="create-lesson-button"
         >
           Lesson
         </ButtonMinorUi>
@@ -323,6 +324,7 @@ export const LessonDrawer = () => {
           disabled={!currentRepo}
           sxProps={{ height: '30px' }}
           onClick={promptCreateCourse}
+          data-testid="create-course-button"
         >
           Course
         </ButtonMinorUi>
@@ -359,26 +361,6 @@ export const LessonDrawer = () => {
         handleChangeFileSystem={handleChangeFileSystem}
         handleChangeRepo={handleChangeRepo}
       />
-
-      <Stack
-        direction="row"
-        sx={{
-          margin: '12px',
-          marginBottom: 0,
-          display: 'flex',
-          alignItems: 'flex-end',
-        }}
-      >
-        {/*REF <IconButton
-          disabled={currentCourse?.name ? false : true}
-          color="inherit"
-          onClick={onCreateLesson}
-        >
-          <Tooltip arrow title="Create Lesson" {...tooltipStyle}>
-            <AddBoxIcon />
-          </Tooltip>
-        </IconButton> */}
-      </Stack>
 
       {courseData?.courseTitle ? (
         <>

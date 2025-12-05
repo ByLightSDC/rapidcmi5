@@ -246,6 +246,7 @@ export function ModalDialog(props: ModalDialogProps) {
               if (index === buttons.length - 1) {
                 return (
                   <ButtonLoadingUi
+                    data-testid={'modal_button_' + button}
                     key={'button_' + index}
                     startIcon={buttonIcon}
                     onClick={(event) => {
@@ -265,6 +266,7 @@ export function ModalDialog(props: ModalDialogProps) {
               return (
                 <Fragment key={`button_${index}`}>
                   <ButtonModalCancelUi
+                    data-testid={'modal_button_' + button}
                     startIcon={buttonIcon}
                     onClick={(event) => {
                       //  solves issue where click on modal button fires an action row click

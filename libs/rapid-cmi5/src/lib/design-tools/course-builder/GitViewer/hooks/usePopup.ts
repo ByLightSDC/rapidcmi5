@@ -45,11 +45,10 @@ export const usePopup = () => {
     const basePath = parsedPath.dir;
     const name = parsedPath.name;
     if (!repoAccessObject) return;
-    const repoPath = getRepoPath(repoAccessObject);
     const uniquePath = await handleGetUniqueDirPath(
       repoAccessObject,
-      basePath,
       name,
+      basePath,
     );
 
     await handleCreateFile(uniquePath, true);
@@ -68,11 +67,10 @@ export const usePopup = () => {
     const extension = parsedPath.ext;
 
     if (!repoAccessObject) return;
-    const repoPath = getRepoPath(repoAccessObject);
     const uniquePath = await handleGetUniqueFilePath(
       repoAccessObject,
-      basePath,
       name,
+      basePath,
       extension,
     );
 

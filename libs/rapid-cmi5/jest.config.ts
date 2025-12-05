@@ -1,19 +1,19 @@
 /* eslint-disable */
 export default {
-  displayName: 'cmi5-build-common',
-  preset: '../../../jest.preset.js',
+  displayName: 'rapid-cmi5',
+  preset: '../../jest.preset.js',
   globals: {},
-  testEnvironment: 'node',
   transform: {
-    '^.+\\.[tj]sx?$': [
-      'ts-jest',
-      {
-        tsconfig: '<rootDir>/tsconfig.spec.json',
-        isolatedModules: true,
-      },
-    ],
+    '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',
+    '^.+\\.[tj]sx?$': ['babel-jest', { presets: ['@nx/react/babel'] }],
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!ol)*',
+    'node_modules/(?!cidr-tools)*',
+    'node_modules/(?!@mdxeditor)*',
+  ],
+
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/cmi5-build/common',
+  coverageDirectory: '../../../coverage/libs/rapid-cmi5',
   setupFiles: ['./src/setupTests.js'],
 };

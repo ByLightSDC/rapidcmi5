@@ -11,15 +11,16 @@ import { IndexedDB, WebAccess } from '@zenfs/dom';
 import { RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { set, get } from 'idb-keyval';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
-import { getFileContent } from '../hooks/files';
-import { debugLogError } from '@rangeos-nx/ui/branded';
+import { debugLog, debugLogError } from '@rangeos-nx/ui/branded';
 import { electronFs } from './ElectronFsApi';
 import { CourseData } from '@rangeos-nx/types/cmi5';
+import { IFs } from 'memfs';
+import { getFsInstance } from './gitFsInstance';
 
 export const getRepoPath = (r: RepoAccessObject) =>
   `/${r.fileSystemType}/${r.repoName}`;
 
-export type FileSystemObject = typeof zenFs | typeof electronFs;
+export type FileSystemObject = typeof zenFs | typeof electronFs | IFs;
 
 export const gitCache = `/gitfs/gittemp`;
 export const modifiedFileCache = 'rc5ModifiedFiles.json';
@@ -108,7 +109,7 @@ export class GitFS {
   readModifiedFiles = async (
     r: RepoAccessObject,
   ): Promise<string[] | undefined> => {
-    const res = await getFileContent(r, modifiedFileCache);
+    const res = await this.getFileContent(r, modifiedFileCache);
     if (res === null) return;
     return JSON.parse(res.content) as string[];
   };
@@ -485,17 +486,19 @@ export class GitFS {
         const stat = await this.fs.promises.stat(itemPath);
 
         const id = itemPath.split('/').slice(3).join('/');
-        const node: FolderStruct = { id: id, name: item, isBranch: true };
+        const name = item.toString();
+        const node: FolderStruct = { id, name, isBranch: true };
 
         if (stat.isFile()) {
           node.isBranch = false;
           if (getContents || zip) {
-            const content = await this.fs.promises.readFile(itemPath);
-            const text = Buffer.from(content).toString('utf-8');
+            const raw = await this.fs.promises.readFile(itemPath);
+            const array = Uint8Array.from(raw as any);
+            const text = new TextDecoder().decode(array);
 
             node.content = text;
             if (zip) {
-              zip.file(item, text);
+              zip.file(name, text);
             }
           }
         } else if (stat.isDirectory()) {
@@ -504,7 +507,7 @@ export class GitFS {
           node.children = await this.getFolderStructureRec(
             itemPath,
             getContents,
-            zip?.folder(item),
+            zip?.folder(name),
           );
         }
 
@@ -676,7 +679,10 @@ export class GitFS {
       Promise.resolve();
       await Promise.all(
         entries.map((name) =>
-          this.copyRecursive(join(src, name), join(dest, name)),
+          this.copyRecursive(
+            join(src, name.toString()),
+            join(dest, name.toString()),
+          ),
         ),
       );
     } else {
@@ -903,6 +909,54 @@ export class GitFS {
       return null;
     }
   };
+
+  getFileContent = async (
+    r: RepoAccessObject,
+    filePath: string,
+  ): Promise<FileContent | null> => {
+    try {
+      const res = await this.readFileContent(r, filePath);
+      if (res === null) {
+        return null;
+      }
+      const content = res.content;
+
+      let fileType: string;
+      let fileContent: string | Uint8Array = '';
+
+      // Detect file type
+      if (filePath.endsWith('.json')) {
+        fileType = 'json';
+      } else if (/\.(png|jpg|jpeg|gif)$/i.test(filePath)) {
+        fileType = 'image';
+      } else {
+        fileType = 'plaintext';
+      }
+
+      if (fileType === 'image') {
+        if (content instanceof Uint8Array) {
+          const blob = new Blob([new Uint8Array(content)], {
+            type: 'image/png',
+          });
+          const imageUrl = URL.createObjectURL(blob);
+          fileContent = imageUrl;
+        }
+      } else {
+        // Ensure content is in the right format for text
+        if (typeof content === 'string') {
+          fileContent = content; // Already a string, no decoding needed
+        } else {
+          fileContent = new TextDecoder().decode(content);
+        }
+      }
+      const file: FileContent = { content: fileContent, type: fileType };
+
+      return file;
+    } catch (error) {
+      debugLog('Error reading file:', error);
+      return { content: '', type: 'plaintext' };
+    }
+  };
 }
 export async function verifyHandlePermission(
   fileHandle: FileSystemDirectoryHandle,
@@ -917,5 +971,14 @@ export async function verifyHandlePermission(
   // The user didn't grant permission, so return false.
   return false;
 }
+
+export function createFS(isElectron: boolean) {
+  return new GitFS(isElectron);
+}
+
+export type FileContent = {
+  content: string;
+  type: string;
+};
 
 export const MAX_FS_SLUG_LENGTH = 100;

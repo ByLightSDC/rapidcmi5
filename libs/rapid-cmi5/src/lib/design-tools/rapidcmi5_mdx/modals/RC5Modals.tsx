@@ -43,14 +43,28 @@ export default function RC5Modals() {
 
   // #region delete confirmation
   const [confirmationName, setConfirmationName] = useState('');
+  const [hasInteracted, setHasInteracted] = useState(false);
+
+  // Reset when modal opens
+  useEffect(() => {
+    if (modalObj.type === deleteRepoModalId) {
+      setConfirmationName('');
+      setHasInteracted(false);
+    }
+  }, [modalObj.type]);
+
   const isNameMatch =
     confirmationName.toLowerCase() === modalObj?.name?.toLowerCase();
+
   const forceDisableSubmit = modalObj?.meta?.confirmNameOnDelete
     ? !isNameMatch
     : false;
-  const nameConfirmedError = isNameMatch
-    ? ''
-    : 'You must enter name to match item ...';
+
+  // Only show error after user has started typing
+  const nameConfirmedError =
+    hasInteracted && !isNameMatch && confirmationName.length > 0
+      ? 'You must enter name to match item ...'
+      : '';
 
   /**
    * Format message for named delete item
@@ -89,6 +103,7 @@ export default function RC5Modals() {
                     </Typography>
                   }
                   name="copy-name"
+                  data-testid="copy-name"
                   text={itemName}
                   tooltip={'Copy Name'}
                   iconColor="primary"
@@ -330,6 +345,9 @@ export default function RC5Modals() {
                 onChange={(event) => {
                   const newEntry = event.target.value;
                   setConfirmationName(newEntry);
+                  if (!hasInteracted) {
+                    setHasInteracted(true);
+                  }
                 }}
                 onKeyDown={(event) => {
                   if (event.code === 'Enter') {

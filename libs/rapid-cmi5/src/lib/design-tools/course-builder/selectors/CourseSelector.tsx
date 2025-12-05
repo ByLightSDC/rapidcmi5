@@ -57,6 +57,7 @@ export default function CourseSelector({
   return (
     <AnySelector
       id="courses"
+      data-testid='course-selector'
       theValue={currentCoursePath || ''}
       onChange={handleSelect}
       topicLabel="Course"

@@ -28,15 +28,12 @@ import { useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { RC5Context } from '../contexts/RC5Context';
-import { CourseAU, Operation } from '@rangeos-nx/types/cmi5';
+import { Operation } from '@rangeos-nx/types/cmi5';
 import { CreateLessonType } from '../../course-builder/CourseBuilderApiTypes';
-import { join } from 'path-browserify';
-import {
-  createUniquePath,
-  slugifyPath,
-} from '../../course-builder/GitViewer/session/useCourseOperations';
+
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
-import { getRepoPath } from '../../course-builder/GitViewer/utils/fileSystem';
+import { createLesson } from '../../course-builder/GitViewer/session/useCourseOperationsUtils';
+import { getFsInstance } from '../../course-builder/GitViewer/utils/gitFsInstance';
 
 /**
  * Hook for dealing with course data
@@ -50,8 +47,7 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
   const currentSlideIndex = useSelector(currentSlideNum);
   const isLessonMountedSel = useSelector(isLessonMounted);
 
-  const { currentCourse, syncCurrentCourseWithGit, handleGetUniqueDirPath } =
-    useContext(GitContext);
+  const { currentCourse, syncCurrentCourseWithGit } = useContext(GitContext);
 
   const repoAccessObject = useSelector(currentRepoAccessObjectSel);
 
@@ -91,77 +87,35 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
   const handleCreateLesson = async (req: CreateLessonType) => {
     // TODO lesson name must be unique
     if (!repoAccessObject) return;
-    let whichBlockIndex = courseData.blocks.findIndex(
+    const fsInstance = getFsInstance();
+
+    let blockIndex = courseData.blocks.findIndex(
       (block) => block.blockName === req.blockName,
     );
-    const repoPath = getRepoPath(repoAccessObject);
 
-    const auDirPath = slugifyPath(req.auName);
-    if (!currentCourse?.basePath) {
-      throw Error('Current course does not exist');
-    }
-    const uniqueAuPath = await handleGetUniqueDirPath(
-      repoAccessObject,
-      auDirPath,
-      currentCourse.basePath,
-    );
-
-    let whichAuIndex = -1;
-    const theBlocks = [...courseData.blocks];
-
-    // This will be the first file created in the directory, so we know its unique
-    const filepath = join(
-      uniqueAuPath,
-      slugifyPath(defaultEmptySlide.slideTitle) + '.md',
-    );
-    dispatch(addCourseOperation({ filepath, operation: Operation.Add }));
-    const theNewLesson = {
-      ...defaultCourseData.blocks[0].aus[0],
+    const newCourseData = await createLesson({
       auName: req.auName,
-      dirPath: uniqueAuPath,
-      slides: [
-        {
-          ...defaultEmptySlide,
-          filepath,
-        },
-      ],
-    } as CourseAU;
+      blockIndex: blockIndex,
+      courseData: courseData,
+      coursePath: req.coursePath,
+      fsInstance: fsInstance,
+      r: repoAccessObject,
+    });
 
-    if (whichBlockIndex < 0) {
-      // block not found, create a block and a new lesson
-      theBlocks.push({
-        ...defaultCourseData.blocks[0],
-        blockName: req.blockName,
-        aus: [theNewLesson],
-      });
-      whichBlockIndex = theBlocks.length - 1;
-      whichAuIndex = 0;
-    } else {
-      // block found, insert lesson into found block
-      // if block only has a default lesson, replace it
-      if (
-        theBlocks[whichBlockIndex]?.aus?.length === 1 &&
-        theBlocks[whichBlockIndex].aus[0]?.auName === ''
-      ) {
-        theBlocks[whichBlockIndex] = {
-          ...theBlocks[whichBlockIndex],
-          aus: [{ ...theBlocks[whichBlockIndex].aus[0], auName: req.auName }],
-        };
-        whichAuIndex = 0;
-      } else {
-        // add lesson to found block
-        theBlocks[whichBlockIndex] = {
-          ...theBlocks[whichBlockIndex],
-          aus: [...theBlocks[whichBlockIndex].aus].concat(theNewLesson),
-        };
-        whichAuIndex = theBlocks[whichBlockIndex].aus.length - 1;
-      }
+    if (!newCourseData) {
+      throw Error('Could not create a new lesson');
     }
 
-    const newCourseData = { ...courseData, blocks: theBlocks };
+    dispatch(
+      addCourseOperation({
+        filepath: newCourseData?.blocks[0].aus[0].slides[0].filepath,
+        operation: Operation.Add,
+      }),
+    );
+
     dispatch(updateCourseData(newCourseData));
-    dispatch(updateAuIndex(whichAuIndex));
-    dispatch(updateBlockIndex(whichBlockIndex));
+    dispatch(updateAuIndex(newCourseData.blocks[blockIndex].aus.length - 1));
+    dispatch(updateBlockIndex(blockIndex));
     dispatch(setIsLessonMounted(false));
     dispatch(updateDirtyDisplay({ reason: 'created lesson' }));
   };

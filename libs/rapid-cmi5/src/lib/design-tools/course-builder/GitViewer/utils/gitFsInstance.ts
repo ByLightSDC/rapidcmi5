@@ -1,10 +1,22 @@
 // gitFsInstance.ts
 
-import { GitFS } from "./fileSystem";
+import { GitFS } from './fileSystem';
 
 export function detectIsElectron(): boolean {
   // tweak this however you detect it
   return typeof window !== 'undefined' && !!(window as any).fsApi;
 }
 
-export const gitFs = new GitFS(detectIsElectron());
+let gitFs: GitFS;
+
+export function getFsInstance(isElectron? : boolean) {
+  if (!gitFs) {
+    gitFs = new GitFS(isElectron || detectIsElectron());
+  }
+  return gitFs;
+}
+
+export function createNewFsInstance(isElectron? : boolean) {
+  gitFs = new GitFS(isElectron || detectIsElectron());
+  return gitFs;
+}

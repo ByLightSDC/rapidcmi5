@@ -69,6 +69,7 @@ export const FileDrawer = () => {
     (selectedLessonFilter ? 1 : 0) + (selectedCourseFilter ? 1 : 0);
   return (
     <Stack
+      data-testid="file-drawer"
       spacing={2.5}
       sx={{
         backgroundColor: 'background.default',

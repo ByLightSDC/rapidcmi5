@@ -1,21 +1,36 @@
 import { GitFS } from '../utils/fileSystem';
-import {
-  createUniquePath,
-  slugifyPath,
-  updateAUPath,
-  updateSlidePaths,
-  updatePaths,
-} from '../session/useCourseOperations';
+
 import { MAX_FS_SLUG_LENGTH } from '../utils/fileSystem';
-import { CourseAU, CourseData, SlideTypeEnum } from '@rangeos-nx/types/cmi5';
 import {
+  CourseAU,
+  CourseData,
+  Operation,
+  SlideTypeEnum,
+} from '@rangeos-nx/types/cmi5';
+import {
+  FileState,
   fsType,
+  initFileState,
   RepoAccessObject,
 } from '../../../../redux/repoManagerReducer';
+import { createNewFsInstance } from './gitFsInstance';
+import {
+  computeCourseFromJsonFs,
+  createCourseInFs,
+  createLesson,
+  createUniquePath,
+  getCourseDataInFs,
+  slugifyPath,
+  updateAUPath,
+  updatePaths,
+  updateSlidePaths,
+} from '../session/useCourseOperationsUtils';
 
-const LightningFS = require('@isomorphic-git/lightning-fs');
+import { vol } from 'memfs';
+import { createFsFromVolume } from 'memfs';
+import { GitOperations } from './gitOperations';
 
-const fs = new LightningFS('testfs');
+const memfs = createFsFromVolume(vol);
 describe('useCourseLoader utility functions', () => {
   let instance: GitFS;
   const r: RepoAccessObject = {
@@ -24,9 +39,9 @@ describe('useCourseLoader utility functions', () => {
   };
 
   beforeEach(async () => {
-    const uniqueName = `test-fs-${Date.now()}-${Math.random()}`;
-    instance = new GitFS();
-    instance.fs = fs;
+    vol.reset();
+    instance = createNewFsInstance(false);
+    instance.fs = memfs;
     try {
       await instance.deleteRepo(r);
       console.log('Removing the old repo');
@@ -374,3 +389,4 @@ describe('useCourseLoader utility functions', () => {
     });
   });
 });
+

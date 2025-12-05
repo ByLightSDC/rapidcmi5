@@ -84,6 +84,7 @@ export default function AnySelector({
             notched={topicLabel ? true : false}
             labelId={`${id}-label`}
             id={id}
+            data-testid={`${id}-selector`}
             displayEmpty
             renderValue={(selected) => {
               if (selected?.length === 0) {

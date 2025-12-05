@@ -10,8 +10,7 @@ import {
   RepoState,
 } from '../../../../redux/repoManagerReducer';
 import { debugLog, debugLogError } from '@rangeos-nx/ui/branded';
-import { GitFS, modifiedFileCache } from '../utils/fileSystem';
-import { getFileContent } from '../hooks/files';
+import { GitFS } from '../utils/fileSystem';
 import { getRepoAccess } from './GitContext';
 import { failedMergePath, GitOperations } from '../utils/gitOperations';
 
@@ -149,7 +148,7 @@ export function useGitRepoStatus(
           await resolveStashStatus(r, status);
 
           try {
-            const res = await getFileContent(r, failedMergePath);
+            const res = await fsInstance.getFileContent(r, failedMergePath);
             const mergeFileExists = res != null;
             setIsInMerge(mergeFileExists);
             if (mergeFileExists) {
@@ -159,7 +158,7 @@ export function useGitRepoStatus(
                   file.status === 'staged_with_changes' ||
                   file.status === 'modified'
                 ) {
-                  const res = await getFileContent(r, file.name);
+                  const res = await fsInstance.getFileContent(r, file.name);
                   if (!res) continue;
 
                   const conflictRegex = /^<{7}[\s\S]*?={7}[\s\S]*?>{7}/m;

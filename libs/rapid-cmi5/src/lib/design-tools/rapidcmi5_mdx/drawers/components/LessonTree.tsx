@@ -43,14 +43,12 @@ import { Renamer } from './Renamer';
 import { MoveOnCriteriaForm } from './MoveOnCriteriaForm';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import {
-  createUniquePath,
-  slugifyPath,
-} from '../../../course-builder/GitViewer/session/useCourseOperations';
+
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 import { useToaster } from '@rangeos-nx/ui/branded';
 import { getRepoPath } from '../../../course-builder/GitViewer/utils/fileSystem';
 import { currentRepoAccessObjectSel } from '../../../../redux/repoManagerReducer';
+import { slugifyPath } from '../../../course-builder/GitViewer/session/useCourseOperationsUtils';
 
 const textColor = 'text.hint';
 
@@ -427,6 +425,7 @@ function LessonTree({
           <TreeView
             data={treeData}
             aria-label="directory tree"
+            data-testid="course-tree"
             onNodeSelect={handleNodeSelect}
             onExpand={handleNodeExpand}
             defaultExpandedIds={currentExpandedNodes.current}
@@ -448,6 +447,12 @@ function LessonTree({
               >
                 <LessonTreeNode
                   key={
+                    element.id.toString() +
+                    '/' +
+                    (element.parent || 0).toString()
+                  }
+                  data-testid={
+                    'slide-node-' +
                     element.id.toString() +
                     '/' +
                     (element.parent || 0).toString()

@@ -1,7 +1,6 @@
 import { useQuery } from 'react-query';
 import { AxiosRequestConfig } from 'axios';
 import qs from 'qs';
-import { LmsApiClient } from '@rangeos-nx/frontend/clients/lms-api';
 import { defaultQueryConfig, queryHooksConfig } from '../config';
 import { getErrorMessage } from '../errorMessages';
 
@@ -34,20 +33,21 @@ export const useGetKSATs = (reqOptions?: any) => {
         authToken: reqOptions?.authToken,
       };
 
-      const response = await LmsApiClient.ksaTsList(
-        undefined, // reqOptions?.element_type -- array must be set with paramsSerializer in options above
-        reqOptions?.element_identifier,
-        reqOptions?.title,
-        reqOptions?.text,
-        reqOptions?.offset,
-        reqOptions?.limit,
-        reqOptions?.search,
-        reqOptions?.sortBy || defaultKsatSortBy,
-        reqOptions?.sort || defaultKsatOrderBy,
-        options,
-      );
+      // const response = await LmsApiClient.ksaTsList(
+      //   undefined, // reqOptions?.element_type -- array must be set with paramsSerializer in options above
+      //   reqOptions?.element_identifier,
+      //   reqOptions?.title,
+      //   reqOptions?.text,
+      //   reqOptions?.offset,
+      //   reqOptions?.limit,
+      //   reqOptions?.search,
+      //   reqOptions?.sortBy || defaultKsatSortBy,
+      //   reqOptions?.sort || defaultKsatOrderBy,
+      //   options,
+      // );
 
-      return response.data;
+      // return response.data;
+      return {};
     } catch (error: any) {
       throw getErrorMessage(error, 'An error occurred retrieving KSATs');
     }

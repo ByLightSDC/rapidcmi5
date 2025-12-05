@@ -25,6 +25,7 @@ export default function DeleteRepoButton({
         <IconButton
           aria-label="design-view"
           color="primary"
+          data-testid="delete-repo-button"
           style={iconButtonStyle}
           onClick={() => promptDeleteRepo(currentRepo || '')} // to keep typescript happy
         >

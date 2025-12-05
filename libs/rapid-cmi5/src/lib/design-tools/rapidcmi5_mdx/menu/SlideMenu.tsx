@@ -37,12 +37,7 @@ import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
  * Icons
  */
 
-import {
-  createUniquePath,
-  slugifyPath,
-} from '../../course-builder/GitViewer/session/useCourseOperations';
 import { appHeaderVisible } from '@rangeos-nx/ui/redux';
-import { getRepoPath } from '../../course-builder/GitViewer/utils/fileSystem';
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
 
 /**
@@ -181,6 +176,7 @@ export const SlideMenu = () => {
         <IconButton
           aria-label="add-markdown-slide"
           color="primary"
+          data-testid="add-markdown-slide-button"
           size={iconButtonSize}
           style={iconButtonStyle}
           onClick={() => onAddSlide()}
@@ -193,6 +189,7 @@ export const SlideMenu = () => {
           <IconButton
             className={isDirty ? 'blink-animation' : undefined}
             aria-label="save-files"
+            data-testid="save-files-button"
             disabled={!isDirty}
             color="inherit"
             size={iconButtonSize}

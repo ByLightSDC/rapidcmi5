@@ -242,6 +242,7 @@ export const NavViewMenu = () => {
 
       <IconButton
         aria-label="select-git"
+        data-testid="code-editor-button"
         color="inherit"
         size={iconButtonSize}
         style={
@@ -274,6 +275,7 @@ export const NavViewMenu = () => {
       </IconButton>
       <IconButton
         aria-label="select-git"
+        data-testid="git-editor-button"
         color="inherit"
         size={iconButtonSize}
         style={

@@ -4,13 +4,17 @@ import {
   ReadOnlyTextField,
 } from '@rangeos-nx/ui/branded';
 
-import { Element } from '@rangeos-nx/frontend/clients/lms-api';
+// import { Element } from '@rangeos-nx/frontend/clients/lms-api';
 
 /**
  * @typedef tFormProps
  * @property {FormCrudType} topic Mode for displaying data*/
 type tProps = {
-  data: Partial<Element>;
+  data: {
+    title: string;
+    text: string;
+    element_identifier: string;
+  };
   formProps: Partial<tFormFieldRendererProps>;
 };
 

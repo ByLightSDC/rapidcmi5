@@ -2,11 +2,10 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { flattenTree, INode } from 'react-accessible-treeview';
 import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 import { resetPersistance } from '@rangeos-nx/ui/branded';
-import { getFileContent } from '../design-tools/course-builder/GitViewer/hooks/files';
 import { RootState } from './store';
 import { getRepoPath } from '../design-tools/course-builder/GitViewer/utils/gitOperations';
 import { CourseData } from '@rangeos-nx/types/cmi5';
-import { gitFs } from '../design-tools/course-builder/GitViewer/utils/gitFsInstance';
+import { getFsInstance } from '../design-tools/course-builder/GitViewer/utils/gitFsInstance';
 
 // this pair ensures we always know what file system type and what the repo name is
 // when acting upon the file system
@@ -197,6 +196,8 @@ export const recalculateFileTree = createAsyncThunk(
   'repoManager/recalculateFileTree',
   async (r: RepoAccessObject, { dispatch, getState, rejectWithValue }) => {
     try {
+      const gitFs = getFsInstance();
+
       const state = getState() as RootState;
       const selectedFile = state.repoManager.fileState.selectedFile;
 
@@ -204,7 +205,7 @@ export const recalculateFileTree = createAsyncThunk(
       // If we have a selected file we want to ensure it matches whats actually in the file if we do
       // a git pull, git stash, or git pop
       if (selectedFile) {
-        const fileContent = await getFileContent(r, selectedFile);
+        const fileContent = await gitFs.getFileContent(r, selectedFile);
         if (fileContent) {
           dispatch(setFileContent(fileContent));
         } else {
@@ -222,8 +223,8 @@ export const recalculateFileTree = createAsyncThunk(
 );
 
 const renderTree = async (r: RepoAccessObject) => {
-
   const repoPath = getRepoPath(r);
+  const gitFs = getFsInstance();
 
   const treeData = await gitFs.getFolderStructure(repoPath, repoPath);
 

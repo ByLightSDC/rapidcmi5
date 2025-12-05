@@ -37,6 +37,7 @@ export default function FileSystemLoader({
 
   return (
     <Box
+      data-testid="initializing-fs-modal"
       sx={{
         position: 'absolute',
         top: 0,

@@ -169,6 +169,7 @@ export default function RC5GitEditor({ top = '0px' }: { top?: string }) {
 
       {currentRepo && (
         <Box
+          data-testid='git-editor'
           sx={{
             marginTop: '12px',
             height: 'auto',

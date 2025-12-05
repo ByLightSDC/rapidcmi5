@@ -39,16 +39,13 @@ import { useGitRepoStatus } from './useGitRepoStatus';
 import { useGitOperations } from './useGitOperations';
 import { sandBoxName } from './constants';
 import {
-  createUniquePath,
-  slugifyPath,
   useCourseOperations,
 } from './useCourseOperations';
 import { usePublishActions } from './usePublishActions';
 import { useImageCache } from './useImageCache';
 import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 import { INode } from 'react-accessible-treeview';
-import { FileContent, getFileContent } from '../hooks/files';
-import { getRepoPath, GitFS } from '../utils/fileSystem';
+import { FileContent, getRepoPath, GitFS } from '../utils/fileSystem';
 import { GitOperations } from '../utils/gitOperations';
 import JSZip from 'jszip';
 import { FolderStruct } from '@rangeos-nx/cmi5-build/common';
@@ -58,6 +55,7 @@ import {
   setIsLessonMounted,
   setRepoViewScrollTop,
   changeViewMode,
+  courseOperations,
 } from '../../../../redux/courseBuilderReducer';
 import {
   RepoAccessObject,
@@ -76,7 +74,8 @@ import {
   Course,
 } from '../../../../redux/repoManagerReducer';
 import { AppDispatch, RootState } from '../../../../redux/store';
-import { gitFs } from '../utils/gitFsInstance';
+import { getFsInstance } from '../utils/gitFsInstance';
+import { createNewCourseInFs, createUniquePath, slugifyPath } from './useCourseOperationsUtils';
 
 interface IGitContext {
   currentCourse?: Course | null;
@@ -315,6 +314,7 @@ export const getRepoAccess = (repoAccessObject: RepoAccessObject | null) => {
 // in this context
 export const GitContextProvider: any = (props: tProviderProps) => {
   const { children, isElectron = false } = props;
+  const gitFs = getFsInstance();
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -381,6 +381,8 @@ export const GitContextProvider: any = (props: tProviderProps) => {
     resolveDir,
   } = useGitRepoStatus(repoAccessObject, isGitLoaded, gitFs);
 
+  const courseOperationsSet = useSelector(courseOperations);
+
   const {
     handleLoadCourse,
     handleAutoSelectCourse,
@@ -388,10 +390,14 @@ export const GitContextProvider: any = (props: tProviderProps) => {
     createCourse,
     syncCurrentCourseWithGit,
     deleteCourse,
-    createNewCourse,
     handleRenameCourse,
     getFirstCoursePath,
-  } = useCourseOperations(gitFs, repoAccessObject);
+  } = useCourseOperations(
+    gitFs,
+    repoAccessObject,
+    fileState,
+    courseOperationsSet,
+  );
 
   const {
     cloneRemoteRepo,
@@ -521,14 +527,11 @@ export const GitContextProvider: any = (props: tProviderProps) => {
   };
 
   const handleCreateCourse = async (req: CreateCourseType) => {
-    const cleanedName = slugifyPath(req.courseName);
-    req.courseName = cleanedName;
-
     const r = getRepoAccess(repoAccessObject);
 
-    await createCourse(req);
+    const course = await createCourse(req);
     const modifiedFiles: ModifiedFile[] = await gitOperator.gitRepoStatus(r, [
-      cleanedName,
+      course.basePath,
     ]);
     await handleStageAll(
       false,
@@ -676,7 +679,7 @@ export const GitContextProvider: any = (props: tProviderProps) => {
   const handleNavToFile = async (filePath: string) => {
     const r = getRepoAccess(repoAccessObject);
     dispatch(changeViewMode(ViewModeEnum.CodeEditor));
-    const fileContent = await getFileContent(r, filePath);
+    const fileContent = await gitFs.getFileContent(r, filePath);
     if (fileContent) {
       dispatch(setFileContent(fileContent));
       dispatch(setSelectedFile(filePath));
@@ -738,7 +741,7 @@ export const GitContextProvider: any = (props: tProviderProps) => {
   const handleGetFileContents = async (filePath: string) => {
     const r = getRepoAccess(repoAccessObject);
 
-    return await getFileContent(r, filePath);
+    return await gitFs.getFileContent(r, filePath);
   };
 
   const handleUpdateFile = async (filePath: string, data: string) => {
@@ -881,15 +884,17 @@ export const GitContextProvider: any = (props: tProviderProps) => {
     const r = { repoName: sandBoxName, fileSystemType };
     await gitOperator.initGitRepo(r);
 
-    await createNewCourse(
+    await createNewCourseInFs({
       r,
-      'sandbox',
-      'intro',
-      'A place to test CMI5 content',
-      'https://sandbox',
-      'Slide 1',
-      sandboxIntro,
-    );
+      fsInstance: gitFs,
+      courseTitle: 'sandbox',
+      coursePath: 'sandbox',
+      courseAu: 'intro',
+      courseDescription: 'A place to test CMI5 content',
+      courseId: 'https://sandbox',
+      baseSlideTitle: 'Slide 1',
+      baseSlideContent: sandboxIntro,
+    });
 
     await gitFs.copyGit(r);
     const modifiedFiles: ModifiedFile[] = await gitOperator.gitRepoStatus(r);

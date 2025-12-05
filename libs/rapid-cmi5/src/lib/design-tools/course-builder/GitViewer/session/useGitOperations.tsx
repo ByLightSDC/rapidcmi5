@@ -38,9 +38,9 @@ import {
 } from '../../../../redux/courseBuilderReducer';
 import JSZip from 'jszip';
 import { getRepoAccess } from './GitContext';
-import { slugifyPath } from './useCourseOperations';
 import { GitOperations } from '../utils/gitOperations';
 import { GitFS } from '../utils/fileSystem';
+import { slugifyPath } from './useCourseOperationsUtils';
 
 export const useGitOperations = (
   fsInstance: GitFS,
