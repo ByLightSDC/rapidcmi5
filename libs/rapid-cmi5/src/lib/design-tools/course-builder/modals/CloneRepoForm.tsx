@@ -19,7 +19,7 @@ import { UseFormReturn } from 'react-hook-form';
 
 import { GIT_URL_GROUP, NAME_GROUP } from '@rangeos-nx/ui/validation';
 import { CreateCloneType } from '../CourseBuilderApiTypes';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';
 const validationSchema = yup.object().shape({
   repoDirName: NAME_GROUP,
@@ -76,26 +76,26 @@ export function CloneRepoForm({
       /**
        * Defaults the repo name based on a valid repo url (if not already filled in)
        */
-      // const watchRepoUrl = watch('repoRemoteUrl');
+      const watchRepoUrl = watch('repoRemoteUrl');
 
-      // useEffect(() => {
-      //   const urlError = Boolean(errors['repoRemoteUrl']);
-      //   const repoName = getValues('repoDirName') || '';
-      //   if (
-      //     !urlError &&
-      //     watchRepoUrl &&
-      //     watchRepoUrl.endsWith('.git') && // to prevent timing issue between typed change and error change
-      //     repoName.length === 0
-      //   ) {
-      //     const lastSlash = watchRepoUrl.lastIndexOf('/');
-      //     const defaultName = watchRepoUrl
-      //       .substring(lastSlash + 1)
-      //       .replace('.git', '');
-      //     setValue('repoDirName', defaultName);
-      //     trigger('repoDirName');
-      //   }
-      //   // eslint-disable-next-line react-hooks/exhaustive-deps
-      // }, [watchRepoUrl, errors['repoRemoteUrl']]);
+      useEffect(() => {
+        const urlError = Boolean(errors['repoRemoteUrl']);
+        const repoName = getValues('repoDirName') || '';
+        if (
+          !urlError &&
+          watchRepoUrl &&
+          watchRepoUrl.endsWith('.git') && // to prevent timing issue between typed change and error change
+          repoName.length === 0
+        ) {
+          const lastSlash = watchRepoUrl.lastIndexOf('/');
+          const defaultName = watchRepoUrl
+            .substring(lastSlash + 1)
+            .replace('.git', '');
+          setValue('repoDirName', defaultName);
+          trigger('repoDirName');
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [watchRepoUrl, errors['repoRemoteUrl']]);
 
       return (
         <>

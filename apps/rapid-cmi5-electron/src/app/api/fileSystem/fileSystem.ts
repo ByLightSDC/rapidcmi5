@@ -74,11 +74,9 @@ export class ElectronFsHandler {
 
   constructor(isTestMode: boolean) {
     this.isTestMode = isTestMode;
-    console.log('=== ElectronFsHandler Constructor ===');
-    console.log('isTestMode:', isTestMode);
-    console.log('ELECTRON_IS_TEST env:', process.env.ELECTRON_IS_TEST);
 
     const base = getRapidBase(isTestMode);
+    // reset before each test run
     if (isTestMode) {
       clearDirectory(base);
     }
