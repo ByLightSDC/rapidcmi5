@@ -75,7 +75,7 @@ import {
 } from '../../../../redux/repoManagerReducer';
 import { AppDispatch, RootState } from '../../../../redux/store';
 import { getFsInstance } from '../utils/gitFsInstance';
-import { createNewCourseInFs, createUniquePath, slugifyPath } from './useCourseOperationsUtils';
+import { createNewCourseInFs, createUniquePath, slugifyPath } from '../utils/useCourseOperationsUtils';
 
 interface IGitContext {
   currentCourse?: Course | null;

@@ -67,7 +67,13 @@ export default function App() {
             <RouterWrapper>
               <Paper
                 elevation={0}
-                style={{ width: '100%', height: '100%', overflow: 'hidden' }}
+                style={{
+                  width: '100%',
+                  height: '100vh',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
               >
                 <SizingContextProvider>
                   <TimePickerProvider>

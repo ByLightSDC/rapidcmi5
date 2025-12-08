@@ -121,7 +121,7 @@ export function MiniForm({
     defaultValues: useMemo(() => {
       return initialData;
     }, [initialData]),
-    mode: 'all',
+    mode: 'onChange',
     resolver: yupResolver(validationSchema),
   });
 

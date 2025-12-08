@@ -48,7 +48,7 @@ import { GitContext } from '../../../course-builder/GitViewer/session/GitContext
 import { useToaster } from '@rangeos-nx/ui/branded';
 import { getRepoPath } from '../../../course-builder/GitViewer/utils/fileSystem';
 import { currentRepoAccessObjectSel } from '../../../../redux/repoManagerReducer';
-import { slugifyPath } from '../../../course-builder/GitViewer/session/useCourseOperationsUtils';
+import { slugifyPath } from '../../../course-builder/GitViewer/utils/useCourseOperationsUtils';
 
 const textColor = 'text.hint';
 

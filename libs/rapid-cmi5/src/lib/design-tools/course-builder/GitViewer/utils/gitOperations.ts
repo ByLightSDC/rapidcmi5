@@ -7,6 +7,8 @@ import { GitConfigType } from '../../CourseBuilderApiTypes';
 import { debugLog, debugLogError } from '@rangeos-nx/ui/branded';
 import path, { join } from 'path-browserify';
 import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
+import { slugifyPath } from './useCourseOperationsUtils';
+import { repoNameInUseMessage } from '../session/constants';
 
 const AuthenticationErrorMessage =
   'The credentials provided are invalid; authentication has failed.';
@@ -39,37 +41,53 @@ export class GitOperations {
   };
 
   cloneRepo = async (
-    r: RepoAccessObject,
+    repoDirName: string,
+    fileSystemType: fsType,
     repoRemoteUrl: string,
     branch: string,
     username: string,
     password: string,
     shallowClone: boolean,
-  ): Promise<void> => {
+  ): Promise<RepoAccessObject> => {
+    const cleanedName = slugifyPath(repoDirName);
+    const r: RepoAccessObject = { repoName: cleanedName, fileSystemType };
     const dir = getRepoPath(r);
 
-    if (this.gitFs.isElectron) {
-      await window.fsApi.cloneRepo(
-        dir,
-        repoRemoteUrl,
-        branch,
-        shallowClone,
-        username,
-        password,
-      );
-    } else {
-      await git.clone({
-        fs: this.gitFs.fs,
-        http,
-        dir,
-        url: repoRemoteUrl,
-        ref: branch,
-        depth: shallowClone ? 1 : undefined,
-        singleBranch: true,
-        onAuth: () => ({ username, password }),
-      });
-      await this.gitFs.copyGit(r);
+    // Should use several layers of protection to not overwrite a repo
+    if (await this.gitFs.dirExists(dir)) {
+      throw Error(repoNameInUseMessage);
     }
+
+    try {
+      if (this.gitFs.isElectron) {
+        await window.fsApi.cloneRepo(
+          dir,
+          repoRemoteUrl,
+          branch,
+          shallowClone,
+          username,
+          password,
+        );
+      } else {
+        await git.clone({
+          fs: this.gitFs.fs,
+          http,
+          dir,
+          url: repoRemoteUrl,
+          ref: branch,
+          depth: shallowClone ? 1 : undefined,
+          singleBranch: true,
+          onAuth: () => ({ username, password }),
+        });
+        await this.gitFs.copyGit(r);
+      }
+    } catch (err: any) {
+      // If there was an error lets clean up anything that was created
+      await this.gitFs.deleteRepo(r);
+      throw err;
+    }
+
+    return r;
   };
   initGitRepo = async (
     r: RepoAccessObject,
@@ -84,11 +102,11 @@ export class GitOperations {
         await git.init({ fs: this.gitFs.fs, dir, defaultBranch });
         await this.gitFs.copyGit(r);
       }
-    } catch (error: any) {
+    } catch (err: any) {
       debugLogError(
         `Git init failed for file system: ${r.fileSystemType}, repo: ${r.repoName}`,
       );
-      throw error;
+      throw err;
     }
   };
 
@@ -274,7 +292,7 @@ export class GitOperations {
   gitRepoStatus = async (
     r: RepoAccessObject,
     changedFiles?: string[],
-  ): Promise<{ name: string; status: FileStatus }[]> => {
+  ): Promise<ModifiedFile[]> => {
     const dir = getRepoPath(r);
 
     try {
@@ -810,10 +828,10 @@ export class GitOperations {
     const absPath = join(dir, filepath);
     try {
       let stat;
+      // if the file does not exist, we will try to remove it from the git index, assuming its a delete
       try {
         stat = await this.gitFs.fs.promises.stat(absPath);
       } catch (error: any) {
-        debugLogError('Could not state file during staging');
         if (error.code != 'ENOENT') throw error;
       }
       if (stat) {
@@ -871,7 +889,10 @@ export class GitOperations {
           filepath,
         });
       }
-    } catch (err) {}
+    } catch (err: any) {
+      debugLogError(err);
+      throw Error('Could not unstage file');
+    }
   }
 
   async resetBranch(
@@ -937,30 +958,34 @@ export class GitOperations {
   handleGetFileDiff = async (r: RepoAccessObject, filepath: string) => {
     const dir = getRepoPath(r);
 
-    const headOid = await git.resolveRef({
-      fs: this.gitFs.fs,
-      dir,
-      ref: 'HEAD',
-    });
+    try {
+      const headOid = await git.resolveRef({
+        fs: this.gitFs.fs,
+        dir,
+        ref: 'HEAD',
+      });
 
-    // Read the file's blob from HEAD
-    const { blob } = await git.readBlob({
-      fs: this.gitFs.fs,
-      dir,
-      oid: headOid,
-      filepath,
-    });
+      // Read the file's blob from HEAD
+      const { blob } = await git.readBlob({
+        fs: this.gitFs.fs,
+        dir,
+        oid: headOid,
+        filepath,
+      });
 
-    const oldFile = new TextDecoder('utf-8').decode(blob);
-    const newBlob = await this.gitFs.getFileContent(r, filepath);
-    if (!newBlob)
-      return {
-        oldFile,
-        newFile: '',
-      };
+      const oldFile = new TextDecoder('utf-8').decode(blob);
+      const newBlob = await this.gitFs.getFileContent(r, filepath);
+      if (!newBlob)
+        return {
+          oldFile,
+          newFile: '',
+        };
 
-    const newFile = newBlob.content;
+      const newFile = newBlob.content;
 
-    return { oldFile, newFile };
+      return { oldFile, newFile };
+    } catch (err: any) {
+      throw Error(`File diff is not available for ${filepath}`);
+    }
   };
 }

@@ -32,7 +32,7 @@ import { Operation } from '@rangeos-nx/types/cmi5';
 import { CreateLessonType } from '../../course-builder/CourseBuilderApiTypes';
 
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
-import { createLesson } from '../../course-builder/GitViewer/session/useCourseOperationsUtils';
+import { createLesson } from '../../course-builder/GitViewer/utils/useCourseOperationsUtils';
 import { getFsInstance } from '../../course-builder/GitViewer/utils/gitFsInstance';
 
 /**

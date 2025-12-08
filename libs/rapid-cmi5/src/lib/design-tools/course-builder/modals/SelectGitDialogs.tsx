@@ -275,8 +275,8 @@ export function SelectGitDialogs() {
         <CloneRepoForm
           defaultData={{
             ...defaultCloneRepoData,
-            authorEmail: currentAuth?.parsedUserToken?.email?.toLowerCase(),
-            authorName: currentAuth?.parsedUserToken?.name,
+            authorEmail: currentAuth?.parsedUserToken?.email?.toLowerCase() || '',
+            authorName: currentAuth?.parsedUserToken?.name || '',
             shallowClone: false,
           }}
           modalObj={modalObj}

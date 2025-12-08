@@ -6,8 +6,6 @@ import { useSelector } from 'react-redux';
 
 import {
   appHeaderVisible,
-  breadCrumbVisible,
-  isLoading,
   themeColor,
 } from '@rangeos-nx/ui/redux';
 import { useLogOut } from '../hooks/useLogOut';
@@ -17,18 +15,14 @@ import { AppLogo, AppHeaderDashboardMenu } from '@rangeos-nx/ui/branded';
 
 /* MUI */
 import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 
 /* Icons */
-import LogoffIcon from '@mui/icons-material/PowerSettingsNew';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 import UserInfoBox from './navbar/UserInfoBox';
-
-import { BuildVersionInfo } from '@rangeos-nx/frontend/clients/devops-api';
 
 /* Layout Notes
 height is determined by the toggle icon size in the Navbar , currently medium
@@ -89,7 +83,6 @@ export default function AppHeader() {
             container
             sx={{
               //we need this to avoid layout issue (see Scenario Designer drawers top alignment)
-              height: '45px',
               backgroundColor: (theme: any) => `${theme.header.default}`,
               alignItems: 'center',
               alignContent: 'center',
@@ -97,6 +90,7 @@ export default function AppHeader() {
             }}
           >
             <AppLogo
+
               assetId="rapid-cmi5"
               isNavOpen={false}
               appThemeColor={appThemeColor}
@@ -134,27 +128,11 @@ export default function AppHeader() {
                 anchorEl={settingsMenuAnchor}
                 onClose={() => setSettingsMenuAnchor(null)}
               />
-              <IconButton
-                data-testid="button-log-off"
-                aria-label="logout"
-                onClick={() => onAppIconClick(logoutKey)}
-                sx={appIconStyle}
-              >
-                <Tooltip
-                  arrow
-                  enterDelay={500}
-                  enterNextDelay={500}
-                  title="Logout"
-                  placement="bottom"
-                >
-                  <LogoffIcon />
-                </Tooltip>
-              </IconButton>
             </Box>
           </Grid>
         </Box>
       )}
-      <Box sx={{ height: 'auto', backgroundColor: 'background.paper' }}>
+      {/* <Box sx={{ height: 'auto', backgroundColor: 'background.paper' }}>
         <Divider
           orientation="horizontal"
           variant="fullWidth"
@@ -165,7 +143,7 @@ export default function AppHeader() {
             color: (theme: any) => `${theme.header.default}`,
           }}
         />
-      </Box>
+      </Box> */}
     </>
   );
 }

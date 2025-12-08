@@ -19,19 +19,26 @@ import { UseFormReturn } from 'react-hook-form';
 
 import { GIT_URL_GROUP, NAME_GROUP } from '@rangeos-nx/ui/validation';
 import { CreateCloneType } from '../CourseBuilderApiTypes';
-import { useContext, useEffect } from 'react';
+import { useCallback, useContext } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';
+const validationSchema = yup.object().shape({
+  repoDirName: NAME_GROUP,
+  repoRemoteUrl: GIT_URL_GROUP(),
+  repoBranch: NAME_GROUP,
+  repoUsername: NAME_GROUP,
+  repoPassword: NAME_GROUP,
+  authorName: NAME_GROUP,
+  authorEmail: NAME_GROUP,
+});
 
 export function CloneRepoForm({
   defaultData,
   modalObj,
-  shouldOpenRepoSelectAfterClone,
   handleCloseModal,
   handleModalAction,
 }: {
   defaultData: CreateCloneType;
   modalObj: CommonAppModalState;
-  shouldOpenRepoSelectAfterClone?: boolean;
   handleCloseModal: () => void;
   handleModalAction: (
     modalId: string,
@@ -40,16 +47,6 @@ export function CloneRepoForm({
   ) => void;
 }) {
   const { handleCloneRepo } = useContext(GitContext);
-
-  const validationSchema = yup.object().shape({
-    repoDirName: NAME_GROUP,
-    repoRemoteUrl: GIT_URL_GROUP(),
-    repoBranch: NAME_GROUP,
-    repoUsername: NAME_GROUP,
-    repoPassword: NAME_GROUP,
-    authorName: NAME_GROUP,
-    authorEmail: NAME_GROUP,
-  });
 
   const onCancel = () => {
     handleCloseModal();
@@ -71,130 +68,130 @@ export function CloneRepoForm({
    * @param {FormStateType} formState React hook form state fields (ex. errors, isValid)
    * @return {JSX.Element} Render elements
    */
-  const getFormFields = (
-    formMethods: UseFormReturn,
-    formState: FormStateType,
-  ): JSX.Element => {
-    const { control, getValues, setValue, trigger, watch } = formMethods;
-    const { errors } = formState;
+  const getFormFields = useCallback(
+    (formMethods: UseFormReturn, formState: FormStateType): JSX.Element => {
+      const { control, getValues, setValue, trigger, watch } = formMethods;
+      const { errors } = formState;
 
-    /**
-     * Defaults the repo name based on a valid repo url (if not already filled in)
-     */
-    const watchRepoUrl = watch('repoRemoteUrl');
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-      const urlError = Boolean(errors['repoRemoteUrl']);
-      const repoName = getValues('repoDirName') || '';
-      if (
-        !urlError &&
-        watchRepoUrl &&
-        watchRepoUrl.endsWith('.git') && // to prevent timing issue between typed change and error change
-        repoName.length === 0
-      ) {
-        const lastSlash = watchRepoUrl.lastIndexOf('/');
-        const defaultName = watchRepoUrl
-          .substring(lastSlash + 1)
-          .replace('.git', '');
-        setValue('repoDirName', defaultName);
-        trigger('repoDirName');
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [watchRepoUrl, errors['repoRemoteUrl']]);
+      /**
+       * Defaults the repo name based on a valid repo url (if not already filled in)
+       */
+      // const watchRepoUrl = watch('repoRemoteUrl');
 
-    return (
-      <>
-        <Grid item xs={12}>
-          <FormControlTextField
-            control={control}
-            error={Boolean(errors?.repoRemoteUrl)}
-            helperText={errors?.repoRemoteUrl?.message}
-            name="repoRemoteUrl"
-            required
-            label="Remote Repository URL"
-            multiline={true}
-            readOnly={false}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <FormControlTextField
-            control={control}
-            error={Boolean(errors?.repoDirName)}
-            helperText={errors?.repoDirName?.message}
-            name="repoDirName"
-            required
-            label="Repository Name"
-            readOnly={false}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <FormControlTextField
-            control={control}
-            error={Boolean(errors?.repoBranch)}
-            helperText={errors?.repoBranch?.message}
-            name="repoBranch"
-            required
-            label="Branch"
-            readOnly={false}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <FormControlTextField
-            control={control}
-            error={Boolean(errors?.repoUsername)}
-            helperText={errors?.repoUsername?.message}
-            name="repoUsername"
-            required
-            label="User Name"
-            readOnly={false}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <FormControlPassword
-            control={control}
-            error={Boolean(errors?.repoPassword)}
-            helperText={errors?.repoPassword?.message}
-            name="repoPassword"
-            required
-            label="Password"
-            readOnly={false}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <FormControlTextField
-            control={control}
-            error={Boolean(errors?.authorName)}
-            helperText={errors?.authorName?.message}
-            name="authorName"
-            required
-            label="Author Name"
-            readOnly={false}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <FormControlTextField
-            control={control}
-            error={Boolean(errors?.authorEmail)}
-            helperText={errors?.authorEmail?.message}
-            name="authorEmail"
-            required
-            label="Email"
-            readOnly={false}
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <FormControlCheckboxField
-            control={control}
-            name="shallowClone"
-            label="Shallow Clone"
-          />
-          <Typography>
-            This improves performance for very large repos
-          </Typography>
-        </Grid>
-      </>
-    );
-  };
+      // useEffect(() => {
+      //   const urlError = Boolean(errors['repoRemoteUrl']);
+      //   const repoName = getValues('repoDirName') || '';
+      //   if (
+      //     !urlError &&
+      //     watchRepoUrl &&
+      //     watchRepoUrl.endsWith('.git') && // to prevent timing issue between typed change and error change
+      //     repoName.length === 0
+      //   ) {
+      //     const lastSlash = watchRepoUrl.lastIndexOf('/');
+      //     const defaultName = watchRepoUrl
+      //       .substring(lastSlash + 1)
+      //       .replace('.git', '');
+      //     setValue('repoDirName', defaultName);
+      //     trigger('repoDirName');
+      //   }
+      //   // eslint-disable-next-line react-hooks/exhaustive-deps
+      // }, [watchRepoUrl, errors['repoRemoteUrl']]);
+
+      return (
+        <>
+          <Grid item xs={12}>
+            <FormControlTextField
+              control={control}
+              error={Boolean(errors?.repoRemoteUrl)}
+              helperText={errors?.repoRemoteUrl?.message}
+              name="repoRemoteUrl"
+              required
+              label="Remote Repository URL"
+              multiline={false}
+              readOnly={false}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <FormControlTextField
+              control={control}
+              error={Boolean(errors?.repoDirName)}
+              helperText={errors?.repoDirName?.message}
+              name="repoDirName"
+              required
+              label="Repository Name"
+              readOnly={false}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <FormControlTextField
+              control={control}
+              error={Boolean(errors?.repoBranch)}
+              helperText={errors?.repoBranch?.message}
+              name="repoBranch"
+              required
+              label="Branch"
+              readOnly={false}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <FormControlTextField
+              control={control}
+              error={Boolean(errors?.repoUsername)}
+              helperText={errors?.repoUsername?.message}
+              name="repoUsername"
+              required
+              label="User Name"
+              readOnly={false}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <FormControlPassword
+              control={control}
+              error={Boolean(errors?.repoPassword)}
+              helperText={errors?.repoPassword?.message}
+              name="repoPassword"
+              required
+              label="Password"
+              readOnly={false}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <FormControlTextField
+              control={control}
+              error={Boolean(errors?.authorName)}
+              helperText={errors?.authorName?.message}
+              name="authorName"
+              required
+              label="Author Name"
+              readOnly={false}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <FormControlTextField
+              control={control}
+              error={Boolean(errors?.authorEmail)}
+              helperText={errors?.authorEmail?.message}
+              name="authorEmail"
+              required
+              label="Email"
+              readOnly={false}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <FormControlCheckboxField
+              control={control}
+              name="shallowClone"
+              label="Shallow Clone"
+            />
+            <Typography>
+              This improves performance for very large repos
+            </Typography>
+          </Grid>
+        </>
+      );
+    },
+    [],
+  );
 
   return (
     <ModalDialog

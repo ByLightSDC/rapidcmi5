@@ -13,8 +13,8 @@ import {
   SlideTypeEnum,
   TeamConsolesContent,
 } from '@rangeos-nx/types/cmi5';
-import { courseNameInUseMessage, RC5_VERSION } from './constants';
-import { GitFS, MAX_FS_SLUG_LENGTH } from '../utils/fileSystem';
+import { courseNameInUseMessage, RC5_VERSION } from '../session/constants';
+import { GitFS, MAX_FS_SLUG_LENGTH } from './fileSystem';
 import {
   flattenFolders,
   generateCourseJson,
@@ -29,7 +29,7 @@ import {
 } from '@rangeos-nx/ui/branded';
 import { basename, dirname, join, normalize } from 'path-browserify';
 import JSZip from 'jszip';
-import { getRepoPath } from '../utils/gitOperations';
+import { getRepoPath } from './gitOperations';
 import slug from 'slug';
 
 export interface FsContextOptions {

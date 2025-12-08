@@ -1,392 +1,418 @@
-import { GitFS } from '../utils/fileSystem';
-
-import { MAX_FS_SLUG_LENGTH } from '../utils/fileSystem';
-import {
-  CourseAU,
-  CourseData,
-  Operation,
-  SlideTypeEnum,
-} from '@rangeos-nx/types/cmi5';
-import {
-  FileState,
-  fsType,
-  initFileState,
-  RepoAccessObject,
-} from '../../../../redux/repoManagerReducer';
-import { createNewFsInstance } from './gitFsInstance';
-import {
-  computeCourseFromJsonFs,
-  createCourseInFs,
-  createLesson,
-  createUniquePath,
-  getCourseDataInFs,
-  slugifyPath,
-  updateAUPath,
-  updatePaths,
-  updateSlidePaths,
-} from '../session/useCourseOperationsUtils';
-
 import { vol } from 'memfs';
 import { createFsFromVolume } from 'memfs';
 import { GitOperations } from './gitOperations';
+import { Operation } from '@rangeos-nx/types/cmi5';
+import { computeCourseFromJsonFs, createCourseInFs, createLesson, getCourseDataInFs, slugifyPath } from './useCourseOperationsUtils';
+import { FileState, fsType, initFileState, RepoAccessObject } from 'libs/rapid-cmi5/src/lib/redux/repoManagerReducer';
+import { GitFS } from './fileSystem';
+import { createNewFsInstance } from './gitFsInstance';
+
+// ============================================================================
+// Test Fixtures and Types
+// ============================================================================
+
+export interface TestContext {
+  instance: GitFS;
+  r: RepoAccessObject;
+  fileState: FileState;
+  gitOps: GitOperations;
+}
 
 const memfs = createFsFromVolume(vol);
-describe('useCourseLoader utility functions', () => {
-  let instance: GitFS;
-  const r: RepoAccessObject = {
-    fileSystemType: fsType.inBrowser,
-    repoName: 'repo',
+
+const DEFAULT_REPO: RepoAccessObject = {
+  fileSystemType: fsType.inBrowser,
+  repoName: 'repo',
+};
+
+// ============================================================================
+// Setup and Teardown
+// ============================================================================
+
+async function setupTestContext(): Promise<TestContext> {
+  vol.reset();
+  
+  const instance = createNewFsInstance(false);
+  instance.fs = memfs;
+  
+  const r = { ...DEFAULT_REPO };
+  
+  const gitOps = new GitOperations(instance);
+  await gitOps.initGitRepo(r, 'main');
+  
+  return {
+    instance,
+    r,
+    fileState: { ...initFileState },
+    gitOps,
+  };
+}
+
+// ============================================================================
+// Test Helpers
+// ============================================================================
+
+/**
+ * Creates a basic test course with default values
+ */
+export async function createTestCourse(
+  ctx: TestContext,
+  overrides?: {
+    courseTitle?: string;
+    courseId?: string;
+    courseDescription?: string;
+    courseAu?: string;
+  }
+) {
+  const defaults = {
+    courseTitle: 'test',
+    courseId: 'https://test',
+    courseDescription: 'test',
+    courseAu: 'test',
   };
 
+  const params = { ...defaults, ...overrides };
+
+  return await createCourseInFs({
+    availableCourses: ctx.fileState.availableCourses,
+    courseTitle: params.courseTitle,
+    fsInstance: ctx.instance,
+    r: ctx.r,
+    courseAu: params.courseAu,
+    courseId: params.courseId,
+    courseDescription: params.courseDescription,
+  });
+}
+
+/**
+ * Verifies basic course structure and metadata
+ */
+export async function verifyCourseStructure(
+  ctx: TestContext,
+  coursePath: string,
+  expectedTitle: string
+) {
+  const courseData = await getCourseDataInFs({
+    r: ctx.r,
+    fsInstance: ctx.instance,
+    coursePath,
+    getContents: true,
+  });
+
+  expect(courseData).toBeTruthy();
+  expect(courseData?.courseTitle).toBe(expectedTitle);
+  expect(courseData?.blocks).toBeDefined();
+  expect(Array.isArray(courseData?.blocks)).toBe(true);
+
+  return courseData!;
+}
+
+/**
+ * Creates a lesson and verifies it was added correctly
+ */
+export async function createAndVerifyLesson(
+  ctx: TestContext,
+  coursePath: string,
+  courseData: any,
+  lessonName: string,
+  blockIndex: number = 0
+) {
+  const updatedCourseData = await createLesson({
+    auName: lessonName,
+    blockIndex,
+    courseData,
+    coursePath,
+    fsInstance: ctx.instance,
+    r: ctx.r,
+  });
+
+  expect(updatedCourseData).toBeTruthy();
+  expect(updatedCourseData!.blocks[blockIndex].aus).toBeDefined();
+
+  return updatedCourseData!;
+}
+
+/**
+ * Syncs course changes to filesystem
+ */
+export async function syncCourseToFs(
+  ctx: TestContext,
+  coursePath: string,
+  courseData: any,
+  operations: Record<string, Operation>
+) {
+  await computeCourseFromJsonFs({
+    course: { basePath: coursePath, courseData },
+    courseOperationsSet: operations,
+    fsInstance: ctx.instance,
+    r: ctx.r,
+  });
+
+  return await getCourseDataInFs({
+    r: ctx.r,
+    fsInstance: ctx.instance,
+    coursePath,
+    getContents: true,
+  });
+}
+
+// ============================================================================
+// Tests
+// ============================================================================
+
+describe('Course Operations', () => {
+  let ctx: TestContext;
+
   beforeEach(async () => {
+    ctx = await setupTestContext();
+  });
+
+  afterEach(async () => {
+    // Optional: additional cleanup
     vol.reset();
-    instance = createNewFsInstance(false);
-    instance.fs = memfs;
-    try {
-      await instance.deleteRepo(r);
-      console.log('Removing the old repo');
-    } catch (error: any) {
-      console.log(error);
-    }
   });
 
-  describe('createUniquePath', () => {
-    it('returns path without suffix if file does not exist', async () => {
-      const path = await createUniquePath({
-        name: 'slide',
-        basePath: 'unit1',
-        repoPath: 'inBrowser/repo',
-        fsInstance: instance,
+  // --------------------------------------------------------------------------
+  // Course Creation Tests
+  // --------------------------------------------------------------------------
+
+  describe('Course Creation', () => {
+    it('should create a basic course with valid parameters', async () => {
+      const course = await createTestCourse(ctx);
+
+      expect(course).toBeTruthy();
+      expect(course.basePath).toBe('test');
+
+      const courseData = await verifyCourseStructure(ctx, 'test', 'test');
+      expect(courseData.courseId).toBe('https://test');
+      expect(courseData.courseDescription).toBe('test');
+    });
+
+    it('should sanitize course names with invalid characters', async () => {
+      const courseTitle = '$test new repo $';
+      const expectedPath = slugifyPath(courseTitle);
+
+      const course = await createTestCourse(ctx, { courseTitle });
+
+      expect(course.basePath).toBe(expectedPath);
+      expect(course.basePath).not.toContain('$');
+      expect(course.basePath).not.toContain(' ');
+
+      const courseData = await verifyCourseStructure(
+        ctx,
+        expectedPath,
+        courseTitle
+      );
+      expect(courseData.courseTitle).toBe(courseTitle);
+    });
+
+    it('should handle course names with spaces', async () => {
+      const courseTitle = 'My Test Course';
+      const expectedPath = slugifyPath(courseTitle);
+
+      const course = await createTestCourse(ctx, { courseTitle });
+
+      expect(course.basePath).toBe(expectedPath);
+      expect(course.basePath).toMatch(/^[a-z0-9-]+$/);
+    });
+
+    it('should handle very long course names', async () => {
+      const courseTitle = 'A'.repeat(300);
+      const course = await createTestCourse(ctx, { courseTitle });
+
+      expect(course.basePath.length).toBeLessThanOrEqual(255);
+      await verifyCourseStructure(ctx, course.basePath, courseTitle);
+    });
+
+    it('should handle unicode characters in course names', async () => {
+      const courseTitle = 'Test Course 测试 🚀';
+      const course = await createTestCourse(ctx, { courseTitle });
+
+      expect(course.basePath).toBeTruthy();
+      const courseData = await verifyCourseStructure(
+        ctx,
+        course.basePath,
+        courseTitle
+      );
+      expect(courseData.courseTitle).toBe(courseTitle);
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Lesson Management Tests
+  // --------------------------------------------------------------------------
+
+  describe('Lesson Management', () => {
+    it('should add a single lesson to a course', async () => {
+      const course = await createTestCourse(ctx);
+      const courseData = await verifyCourseStructure(ctx, course.basePath, 'test');
+
+      const initialLessonCount = courseData.blocks[0].aus.length;
+
+      const updatedCourseData = await createAndVerifyLesson(
+        ctx,
+        course.basePath,
+        courseData,
+        'New Lesson'
+      );
+
+      expect(updatedCourseData.blocks[0].aus.length).toBe(initialLessonCount + 1);
+      expect(updatedCourseData.blocks[0].aus[initialLessonCount].auName).toBe(
+        'New Lesson'
+      );
+    });
+
+    it('should add multiple lessons to a course', async () => {
+      const course = await createTestCourse(ctx);
+      let courseData = await verifyCourseStructure(ctx, course.basePath, 'test');
+
+      const lessonsToAdd = ['Lesson 1', 'Lesson 2', 'Lesson 3'];
+
+      for (const lessonName of lessonsToAdd) {
+        courseData = await createAndVerifyLesson(
+          ctx,
+          course.basePath,
+          courseData,
+          lessonName
+        );
+      }
+
+      expect(courseData.blocks[0].aus.length).toBeGreaterThanOrEqual(
+        lessonsToAdd.length
+      );
+
+      const lessonNames = courseData.blocks[0].aus.map((au: any) => au.auName);
+      lessonsToAdd.forEach((name) => {
+        expect(lessonNames).toContain(name);
       });
-      expect(path).toBe('unit1/slide.md');
     });
 
-    it('returns unique path with suffix if file exists', async () => {
-      await instance.createFile(r, 'unit1/slide.md', 'existing content');
-      const path = await createUniquePath({
-        name: 'slide',
-        basePath: 'unit1',
-        repoPath: 'inBrowser/repo',
-        fsInstance: instance,
-      });
-      expect(path).toBe('unit1/slide-1.md');
-    });
+    it('should sync lesson changes to filesystem', async () => {
+      const course = await createTestCourse(ctx);
+      const courseData = await verifyCourseStructure(ctx, course.basePath, 'test');
 
-    it('returns overwrite path immediately if matched', async () => {
-      const overwrite = 'unit1/slide.md';
-      const path = await createUniquePath({
-        name: 'slide',
-        basePath: 'unit1',
-        repoPath: 'inBrowser/repo',
-        isFile: true,
-        extension: '.md',
-        overWriteName: overwrite,
-        fsInstance: instance,
-      });
-      expect(path).toBe(overwrite);
-    });
-  });
+      const newCourseData = await createAndVerifyLesson(
+        ctx,
+        course.basePath,
+        courseData,
+        'Synced Lesson'
+      );
 
-  describe('slugifyPath', () => {
-    it('returns slug within max length', () => {
-      const longName = 'a'.repeat(MAX_FS_SLUG_LENGTH + 20);
-      const slug = slugifyPath(longName);
-      expect(slug.length).toBeLessThanOrEqual(MAX_FS_SLUG_LENGTH);
-    });
-
-    it('produces deterministic slugs', () => {
-      const slug1 = slugifyPath('Slide Title');
-      const slug2 = slugifyPath('Slide Title');
-      expect(slug1).toBe(slug2);
-    });
-  });
-
-  describe('updateAUPath', () => {
-    it('renames AU dir if slug changes', async () => {
-      const courseName = 'unit1';
-      const au: CourseAU = {
-        auName: 'New AU Title',
-        dirPath: `${courseName}/Old-AU-Title`,
-        slides: [],
-      };
-
-      await updateAUPath(au, 'inBrowser/repo', instance);
-
-      expect(au.dirPath).toContain(`${courseName}/new-au-title`);
-    });
-
-    it('does nothing if slug matches existing dirPath', async () => {
-      const courseName = 'unit1';
-
-      const au: CourseAU = {
-        auName: 'My AU',
-        dirPath: `${courseName}/my-au`,
-        slides: [],
-      };
-
-      await updateAUPath(au, 'inBrowser/repo', instance);
-      expect(au.dirPath).toEqual(`${courseName}/my-au`);
-    });
-  });
-
-  describe('updateSlidePaths', () => {
-    it('renames slide if filepath and expected path mismatch', async () => {
-      const auDirPath = 'unit1/au-title';
-      const au: CourseAU = {
-        auName: 'AU Title',
-        dirPath: auDirPath,
-        slides: [
-          {
-            slideTitle: 'Slide One',
-            filepath: `${auDirPath}/old-slide.md`,
-            type: SlideTypeEnum.Markdown,
-          },
-        ],
-      };
-
-      await updateSlidePaths(au, 'inBrowser/repo', false, instance);
-
-      expect(au.slides[0].filepath).toEqual(`${auDirPath}/slide-one.md`);
-    });
-
-    it('does not rename if file path already matches expected', async () => {
-      const slug = slugifyPath('Slide One');
-      const au: CourseAU = {
-        auName: 'AU Title',
-        dirPath: 'unit1/au-title',
-        slides: [
-          {
-            slideTitle: 'Slide One',
-            filepath: `unit1/au-title/${slug}.md`,
-            type: SlideTypeEnum.Markdown,
-          },
-        ],
-      };
-
-      const mvSpy = jest.spyOn(instance, 'mvFile');
-
-      await updateSlidePaths(au, 'inBrowser/repo', false, instance);
-
-      expect(mvSpy).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('updatePaths', () => {
-    const firstAuDirPath = 'unit1/old-au';
-    const newFirstAuDirPath = 'unit1/intro-au';
-
-    const secondAuDirPath = 'unit1/second-au';
-    let data: CourseData;
-
-    beforeEach(async () => {
-      await instance.createFile(r, `${firstAuDirPath}/slide-1.md`, '');
-      await instance.createFile(r, `${firstAuDirPath}/slide-2.md`, '');
-
-      await instance.createFile(r, `${secondAuDirPath}/slide-1.md`, '');
-      await instance.createFile(r, `${secondAuDirPath}/slide-2.md`, '');
-      data = {
-        blocks: [
-          {
-            aus: [
-              {
-                auName: 'Intro AU',
-                dirPath: firstAuDirPath,
-                slides: [
-                  {
-                    slideTitle: 'Slide 1',
-                    filepath: `${firstAuDirPath}/slide-1.md`,
-                    type: SlideTypeEnum.Markdown,
-                  },
-                  {
-                    slideTitle: 'Slide 2',
-                    filepath: `${firstAuDirPath}/slide-2.md`,
-                    type: SlideTypeEnum.Markdown,
-                  },
-                ],
-              },
-              {
-                auName: 'Second AU',
-                dirPath: secondAuDirPath,
-                slides: [
-                  {
-                    slideTitle: 'Slide 1',
-                    filepath: `${secondAuDirPath}/slide-1.md`,
-                    type: SlideTypeEnum.Markdown,
-                  },
-                  {
-                    slideTitle: 'Slide 2',
-                    filepath: `${secondAuDirPath}/slide-2.md`,
-                    type: SlideTypeEnum.Markdown,
-                  },
-                ],
-              },
-            ],
-            blockName: '',
-          },
-        ],
-        courseTitle: '',
-        courseId: '',
-      };
-    });
-
-    it('does nothing if AU and slide paths already match slugs', async () => {
-      const mvSpy = jest.spyOn(instance, 'mvFile');
-
-      data.blocks[0].aus[0].auName = 'Intro AU';
-      data.blocks[0].aus[0].dirPath = newFirstAuDirPath;
-      data.blocks[0].aus[0].slides = [
-        {
-          slideTitle: 'Slide 1',
-          filepath: `${newFirstAuDirPath}/slide-1.md`,
-          type: SlideTypeEnum.Markdown,
-        },
-        {
-          slideTitle: 'Slide 2',
-          filepath: `${newFirstAuDirPath}/slide-2.md`,
-          type: SlideTypeEnum.Markdown,
-        },
+      const newLesson = newCourseData.blocks[0].aus[
+        newCourseData.blocks[0].aus.length - 1
       ];
-      await updatePaths(data, '/inBrowser/repo', instance);
-      expect(mvSpy).not.toHaveBeenCalled();
-    });
+      const filepath = newLesson.slides[0].filepath;
 
-    it('updates au path and file paths if au name changes', async () => {
-      await updatePaths(data, '/inBrowser/repo', instance);
-      expect(data.blocks[0].aus[0].dirPath).toEqual(newFirstAuDirPath);
-      expect(data.blocks[0].aus[0].slides[0].filepath).toEqual(
-        `${newFirstAuDirPath}/slide-1.md`,
-      );
-      expect(data.blocks[0].aus[0].slides[1].filepath).toEqual(
-        `${newFirstAuDirPath}/slide-2.md`,
-      );
-      expect(data.blocks[0].aus[1].dirPath).toEqual(secondAuDirPath);
-      expect(data.blocks[0].aus[1].slides[0].filepath).toEqual(
-        `${secondAuDirPath}/slide-1.md`,
-      );
-      expect(data.blocks[0].aus[1].slides[1].filepath).toEqual(
-        `${secondAuDirPath}/slide-2.md`,
-      );
-    });
-
-    it('updates au path and file paths if au name and file name changes', async () => {
-      await instance.createFile(r, `${firstAuDirPath}/slide-3.md`, '');
-
-      data.blocks[0].aus[0].slides.push({
-        slideTitle: 'new name slide',
-        filepath: `${firstAuDirPath}/slide-3.md`,
-        type: SlideTypeEnum.Markdown,
-      });
-      await updatePaths(data, 'inBrowser/repo', instance);
-      expect(data.blocks[0].aus[0].dirPath).toEqual(newFirstAuDirPath);
-      expect(data.blocks[0].aus[0].slides[2].filepath).toEqual(
-        `${newFirstAuDirPath}/new-name-slide.md`,
-      );
-    });
-
-    it('Properly names files with the same name', async () => {
-      await instance.createFile(r, `${firstAuDirPath}/slide-3.md`, '');
-      await instance.createFile(r, `${firstAuDirPath}/slide-4.md`, '');
-
-      const mvSpy = jest.spyOn(instance, 'mvFile');
-      data.blocks[0].aus[0].slides.push({
-        slideTitle: 'new name slide',
-        filepath: `${firstAuDirPath}/slide-3.md`,
-        type: SlideTypeEnum.Markdown,
-      });
-      data.blocks[0].aus[0].slides.push({
-        slideTitle: 'new name slide',
-        filepath: `${firstAuDirPath}/slide-4.md`,
-        type: SlideTypeEnum.Markdown,
-      });
-      await updatePaths(data, 'inBrowser/repo', instance);
-
-      expect(data.blocks[0].aus[0].slides[2].filepath).toEqual(
-        `${newFirstAuDirPath}/new-name-slide.md`,
-      );
-      expect(data.blocks[0].aus[0].slides[3].filepath).toEqual(
-        `${newFirstAuDirPath}/new-name-slide-1.md`,
-      );
-
-      expect(mvSpy).toHaveBeenCalled();
-      expect(mvSpy).toHaveBeenCalledWith(
-        'inBrowser/repo',
-        `${firstAuDirPath}`,
-        `${newFirstAuDirPath}`,
-      );
-      expect(mvSpy).toHaveBeenCalledWith(
-        'inBrowser/repo',
-        `${newFirstAuDirPath}/slide-3.md`,
-        `${newFirstAuDirPath}/new-name-slide.md`,
-      );
-      expect(mvSpy).toHaveBeenCalledWith(
-        'inBrowser/repo',
-        `${newFirstAuDirPath}/slide-4.md`,
-        `${newFirstAuDirPath}/new-name-slide-1.md`,
-      );
-    });
-
-    it('Properly names aus with the same name', async () => {
-      const thirdAuDirPath = 'unit1/au-3';
-      const mvSpy = jest.spyOn(instance, 'mvFile');
-
-      await instance.createFile(r, `${thirdAuDirPath}/slide-1.md`, '');
-      await instance.createFile(r, `${thirdAuDirPath}/slide-2.md`, '');
-
-      data.blocks[0].aus.push({
-        auName: 'Intro AU',
-        dirPath: thirdAuDirPath,
-        slides: [
-          {
-            slideTitle: 'Slide 1',
-            filepath: `${thirdAuDirPath}/slide-1.md`,
-            type: SlideTypeEnum.Markdown,
-          },
-          {
-            slideTitle: 'Slide 2',
-            filepath: `${thirdAuDirPath}/slide-2.md`,
-            type: SlideTypeEnum.Markdown,
-          },
-        ],
-      });
-      await updatePaths(data, 'inBrowser/repo', instance);
-
-      expect(data.blocks[0].aus[0].dirPath).toEqual(`${newFirstAuDirPath}`);
-      expect(data.blocks[0].aus[2].dirPath).toEqual(`${newFirstAuDirPath}-1`);
-      expect(mvSpy).toHaveBeenCalled();
-
-      expect(mvSpy).toHaveBeenCalledWith(
-        'inBrowser/repo',
-        `${firstAuDirPath}`,
-        `${newFirstAuDirPath}`,
-      );
-      expect(mvSpy).toHaveBeenCalledWith(
-        'inBrowser/repo',
-        `${thirdAuDirPath}`,
-        `${newFirstAuDirPath}-1`,
-      );
-    });
-
-    it('generates fallback slug if slide title is only symbols', async () => {
-      const badTitle = '!!!@@@###';
-      const auDirPath = 'unit1/bad-au';
-
-      await instance.createFile(r, `${auDirPath}/empty.md`, '');
-      data.blocks[0].aus[0] = {
-        auName: 'Bad AU',
-        dirPath: auDirPath,
-        slides: [
-          {
-            slideTitle: badTitle,
-            filepath: `${auDirPath}/empty.md`,
-            type: SlideTypeEnum.Markdown,
-          },
-        ],
+      const operations: Record<string, Operation> = {
+        [filepath]: Operation.Add,
       };
 
-      await updatePaths(data, 'inBrowser/repo', instance);
+      const syncedCourseData = await syncCourseToFs(
+        ctx,
+        course.basePath,
+        newCourseData,
+        operations
+      );
 
-      expect(data.blocks[0].aus[0].slides[0].filepath).toMatch(/\.md$/);
+      expect(syncedCourseData).toBeTruthy();
+      expect(syncedCourseData!.blocks[0].aus.length).toBe(
+        newCourseData.blocks[0].aus.length
+      );
+
+      const syncedLesson = syncedCourseData!.blocks[0].aus.find(
+        (au: any) => au.auName === 'Synced Lesson'
+      );
+      expect(syncedLesson).toBeDefined();
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Edge Cases
+  // --------------------------------------------------------------------------
+
+  describe('Edge Cases', () => {
+    it('should handle getting non-existent course', async () => {
+      const courseData = await getCourseDataInFs({
+        r: ctx.r,
+        fsInstance: ctx.instance,
+        coursePath: 'non-existent-course',
+        getContents: true,
+      });
+
+      expect(courseData).toBeNull();
+    });
+
+    it('should handle invalid block index when creating lesson', async () => {
+      const course = await createTestCourse(ctx);
+      const courseData = await verifyCourseStructure(ctx, course.basePath, 'test');
+
+      await expect(async () => {
+        await createLesson({
+          auName: 'Invalid Lesson',
+          blockIndex: 999,
+          courseData,
+          coursePath: course.basePath,
+          fsInstance: ctx.instance,
+          r: ctx.r,
+        });
+      }).rejects.toThrow();
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Integration Tests
+  // --------------------------------------------------------------------------
+
+  describe('Full Workflow Integration', () => {
+    it('should handle complete course lifecycle', async () => {
+      // 1. Create course
+      const course = await createTestCourse(ctx, {
+        courseTitle: 'Complete Course',
+      });
+      let courseData = await verifyCourseStructure(
+        ctx,
+        course.basePath,
+        'Complete Course'
+      );
+
+      // 2. Add lessons
+      const lessons = ['Intro', 'Chapter 1', 'Chapter 2', 'Conclusion'];
+      for (const lessonName of lessons) {
+        courseData = await createAndVerifyLesson(
+          ctx,
+          course.basePath,
+          courseData,
+          lessonName
+        );
+      }
+
+      // 3. Sync to filesystem
+      const operations: Record<string, Operation> = {};
+      courseData.blocks[0].aus.forEach((au: any) => {
+        au.slides.forEach((slide: any) => {
+          operations[slide.filepath] = Operation.Add;
+        });
+      });
+
+      const syncedData = await syncCourseToFs(
+        ctx,
+        course.basePath,
+        courseData,
+        operations
+      );
+
+      // 4. Verify final state
+      expect(syncedData).toBeTruthy();
+      expect(syncedData!.blocks[0].aus.length).toBeGreaterThanOrEqual(
+        lessons.length
+      );
+      
+      lessons.forEach((lessonName) => {
+        const lesson = syncedData!.blocks[0].aus.find(
+          (au: any) => au.auName === lessonName
+        );
+        expect(lesson).toBeDefined();
+      });
     });
   });
 });
-

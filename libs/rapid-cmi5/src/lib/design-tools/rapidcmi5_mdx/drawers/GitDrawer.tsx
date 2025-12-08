@@ -294,6 +294,7 @@ export const GitDrawer = () => {
           tooltip="Clone a remote repository containing RapidCMI5 content"
           startIcon={<AddIcon />}
           onClick={promptCloneRepo}
+          data-testid="clone-repo-button"
         >
           Clone
         </ButtonMinorUi>

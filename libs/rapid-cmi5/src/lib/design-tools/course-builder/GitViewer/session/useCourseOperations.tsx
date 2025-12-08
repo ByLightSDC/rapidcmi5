@@ -46,7 +46,7 @@ import {
   getCourseDataInFs,
   readRC5Meta,
   updatePaths,
-} from './useCourseOperationsUtils';
+} from '../utils/useCourseOperationsUtils';
 
 export const useCourseOperations = (
   fsInstance: GitFS,

@@ -22,10 +22,7 @@ import {
   setSelectedFile,
 } from '../../../../redux/repoManagerReducer';
 import { debugLog, debugLogError } from '@rangeos-nx/ui/branded';
-import {
-  AppDispatch,
-  RootState,
-} from '../../../../redux/store';
+import { AppDispatch, RootState } from '../../../../redux/store';
 import {
   cloneFailMessage,
   importFailMessage,
@@ -40,14 +37,14 @@ import JSZip from 'jszip';
 import { getRepoAccess } from './GitContext';
 import { GitOperations } from '../utils/gitOperations';
 import { GitFS } from '../utils/fileSystem';
-import { slugifyPath } from './useCourseOperationsUtils';
+import { slugifyPath } from '../utils/useCourseOperationsUtils';
 
 export const useGitOperations = (
   fsInstance: GitFS,
   repoAccessObject: RepoAccessObject | null,
 ) => {
   const dispatch = useDispatch<AppDispatch>();
-  const gitOperator = new GitOperations(fsInstance)
+  const gitOperator = new GitOperations(fsInstance);
 
   const { availableRepos, currentBranch, fileSystemType }: RepoState =
     useSelector((state: RootState) => state.repoManager);
@@ -60,42 +57,38 @@ export const useGitOperations = (
   const cloneRemoteRepo = async (req: CreateCloneType) => {
     debugLog('clone repo', req);
     if (availableRepos.includes(req.repoDirName)) {
-      debugLogError(repoNameInUseMessage);
       throw Error(repoNameInUseMessage);
     }
 
-    const cleanedName = slugifyPath(req.repoDirName);
-
-    const r: RepoAccessObject = { repoName: cleanedName, fileSystemType };
     try {
-      await gitOperator.cloneRepo(
-        r,
+      const r = await gitOperator.cloneRepo(
+        req.repoDirName,
+        fileSystemType,
         req.repoRemoteUrl,
         req.repoBranch,
         req.repoUsername,
         req.repoPassword,
         req.shallowClone,
       );
+      
       await fsInstance.writeModifiedFiles(r, []);
-      debugLog('adding repo', cleanedName);
+      debugLog('adding repo', r.repoName);
       dispatch(setRepoViewScrollTop(0));
-      dispatch(addRepo(cleanedName));
-      // dispatch(setCurrentRepo(cleanedName));
-      // removeRepoFileSelection();
+      dispatch(addRepo(r.repoName));
+
       await setConfig(r, {
         authorEmail: req.authorEmail,
         authorName: req.authorName,
         remoteRepoUrl: req.repoRemoteUrl,
       });
     } catch (error: any) {
-      debugLog('Failed to add repo ', cleanedName);
+      debugLog('Failed to add repo ', req.repoDirName);
       let errorMessage = cloneFailMessage;
       if (error.data?.response) {
         errorMessage = error?.data?.response;
       } else if (error?.message) {
         errorMessage = error?.message;
       }
-      await fsInstance.deleteRepo(r);
       throw Error(errorMessage);
     }
   };
@@ -205,7 +198,12 @@ export const useGitOperations = (
         remoteRepoUrl: currentGitConfig.remoteRepoUrl,
       });
 
-      await gitOperator.gitCommit(r, req.commitMessage, req.authorEmail, req.authorName);
+      await gitOperator.gitCommit(
+        r,
+        req.commitMessage,
+        req.authorEmail,
+        req.authorName,
+      );
     },
     [repoAccessObject, currentGitConfig],
   );
