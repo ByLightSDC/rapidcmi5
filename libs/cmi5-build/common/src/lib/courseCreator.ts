@@ -39,7 +39,6 @@ export const generateCourseJson = (folderStructure: FolderStruct[]) => {
     content = metaFile.content.toString('utf8');
   } else if (typeof metaFile.content === 'string') {
     content = metaFile.content;
-
   } else {
     console.error(
       'metaFile.content is neither Buffer nor string',
@@ -64,57 +63,68 @@ export function generateCourseFromNav(
   folderStructure: FolderStruct[],
   courseData: CourseData,
 ) {
-  // make a flat tree to easily search files
-  const flatTree = flattenFolders(folderStructure);
+  try {
+    // make a flat tree to easily search files
+    const flatTree = flattenFolders(folderStructure);
 
-  for (const block of courseData.blocks) {
-    for (const au of block.aus) {
-      for (const slide of au.slides) {
-        const file = flatTree.find((node) => node.id.endsWith(slide.filepath));
-        if (file) {
-          slide.content = file.content?.toString() || '';
+    for (const block of courseData.blocks) {
+      for (const au of block.aus) {
+        for (const slide of au.slides) {
+          const file = flatTree.find((node) =>
+            node.id.endsWith(slide.filepath),
+          );
+          if (file) {
+            slide.content = file.content?.toString() || '';
+          }
         }
-      }
 
-      let scenarios: RC5ScenarioContent[] = [];
-      let teamExerciseConsoles: TeamConsolesContent[] = [];
+        let scenarios: RC5ScenarioContent[] = [];
+        let teamExerciseConsoles: TeamConsolesContent[] = [];
 
-      au.slides.map((slide) => {
-        if (slide.type === SlideTypeEnum.Markdown) {
-          //find scenarios
-          scenarios = scenarios.concat(
-            getScenarioDirectives(slide.content as string),
-          );
-          //find team exercise consoles
-          const theTeamConsoles = getScenarioDirectives(
-            slide.content as string,
-            'consoles',
-          );
+        au.slides.map((slide) => {
+          if (slide.type === SlideTypeEnum.Markdown) {
+            //find scenarios
+            try {
+              scenarios = scenarios.concat(
+                getScenarioDirectives(slide.content as string),
+              );
+            } catch {
+              scenarios = [];
+            }
 
-          teamExerciseConsoles = teamExerciseConsoles.concat(
-            getScenarioDirectives(
-              slide.content as string,
-              'consoles',
-            ) as TeamConsolesContent[],
-          );
+            //find team exercise consoles
+            try {
+              teamExerciseConsoles = teamExerciseConsoles.concat(
+                getScenarioDirectives(
+                  slide.content as string,
+                  'consoles',
+                ) as TeamConsolesContent[],
+              );
+            } catch {
+              teamExerciseConsoles = [];
+            }
+          }
+        });
+
+        //we only support one scenario
+        if (scenarios && scenarios.length > 0) {
+          const { uuid, name, promptClass } =
+            scenarios[0] as RC5ScenarioContent;
+          au.rangeosScenarioUUID = uuid;
+          au.rangeosScenarioName = name;
+          au.promptClassId = promptClass;
         }
-      });
 
-      //we only support one scenario
-      if (scenarios && scenarios.length > 0) {
-        const { uuid, name, promptClass } = scenarios[0] as RC5ScenarioContent;
-        au.rangeosScenarioUUID = uuid;
-        au.rangeosScenarioName = name;
-        au.promptClassId = promptClass;
+        //we support multiples, flag sso must be enabled
+        au.teamSSOEnabled =
+          teamExerciseConsoles && teamExerciseConsoles.length > 0;
       }
-
-      //we support multiples, flag sso must be enabled
-      au.teamSSOEnabled =
-        teamExerciseConsoles && teamExerciseConsoles.length > 0;
     }
+    return courseData;
+  } catch (err: any) {
+    console.error('Could not generate course json');
+    throw err;
   }
-
-  return courseData;
 }
 
 export function flattenFolders(folders: FolderStruct[]): FolderStruct[] {

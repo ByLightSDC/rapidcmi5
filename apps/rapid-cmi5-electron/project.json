@@ -6,17 +6,13 @@
   "targets": {
     "build": {
       "executor": "nx-electron:build",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "externalDependencies": "none",
         "outputPath": "dist/apps/rapid-cmi5-electron",
         "main": "apps/rapid-cmi5-electron/src/main.ts",
         "tsConfig": "apps/rapid-cmi5-electron/tsconfig.app.json",
-        "assets": [
-          "apps/rapid-cmi5-electron/src/assets"
-        ]
+        "assets": ["apps/rapid-cmi5-electron/src/assets"]
       },
       "configurations": {
         "production": {
@@ -54,9 +50,7 @@
           {
             "from": "dist/apps/rapid-cmi5-electron/assets",
             "to": "assets",
-            "filter": [
-              "**/*"
-            ]
+            "filter": ["**/*"]
           }
         ]
       }
@@ -76,9 +70,7 @@
           {
             "from": "dist/apps/rapid-cmi5-electron/assets",
             "to": "assets",
-            "filter": [
-              "**/*"
-            ]
+            "filter": ["**/*"]
           }
         ]
       }
@@ -86,18 +78,21 @@
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": [
-          "apps/rapid-cmi5-electron/**/*.ts"
-        ]
+        "lintFilePatterns": ["apps/rapid-cmi5-electron/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "apps/rapid-cmi5-electron/jest.config.ts"
+      }
+    },
+    "e2e": {
+      "executor": "@nx/playwright:playwright",
+      "outputs": ["{workspaceRoot}/dist/.playwright/apps/rapid-cmi5-electron"],
+      "options": {
+        "config": "apps/rapid-cmi5-electron/playwright.config.ts"
       }
     }
   }

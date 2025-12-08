@@ -8,12 +8,6 @@ import {
   setReceivedSharedRequest,
 } from './FrontendEnvironment.slice';
 import { useDispatch } from 'react-redux';
-import {
-  deploymentKey,
-  eventKey,
-  opendashUrl,
-} from './FrontendEnvironment.env';
-import { calculateApiUrl } from './FrontendEnvironment.env';
 
 type Message = {
   uuid?: string;
@@ -34,10 +28,7 @@ function isMessageForMe({
   messageEvent: MessageEvent<Message>;
   uuid: string | null;
 }) {
-  // Didn't come from correct domain
-  if (!messageEvent.origin.startsWith(`https://${opendashUrl}`)) {
-    return false;
-  }
+2
   // Check actually got a UUID
   if (uuid === null) {
     return false;
@@ -109,20 +100,10 @@ export function FrontendEnvironment() {
   useEffect(() => {
     // Get values from query and then env
     const urlParams = new URLSearchParams(window.location.search);
-    const apiUrlEnd = `${window.location.origin}:${window.location.port}`;
-    const deploymentKeyEnd = urlParams.get('deploymentKey') || deploymentKey;
-    const eventKeyEnd = urlParams.get('eventKey') || eventKey;
+
     uuid.current = urlParams.get('uuid');
     // Dispatch updates
-    if (apiUrlEnd !== null && calculateApiUrl) {
-      dispatch(setApiUrl(apiUrlEnd));
-    }
-    if (deploymentKeyEnd !== null) {
-      dispatch(setDeploymentKey(deploymentKeyEnd));
-    }
-    if (eventKeyEnd !== null) {
-      dispatch(setEventKey(eventKeyEnd));
-    }
+
   }, [dispatch]);
 
   // Add opendash support

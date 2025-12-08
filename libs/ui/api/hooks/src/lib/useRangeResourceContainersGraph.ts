@@ -4,7 +4,6 @@ import { useQuery } from 'react-query';
 import {
   defaultQueryConfig,
   getGraphQLUrl,
-  getIsMSWMock,
   infiniteRecordLimit,
   queryHooksConfig,
 } from './config';
@@ -65,15 +64,8 @@ export const useGetRangeResourceContainersGraph = (
       return response;
     } catch (error: any) {
       //Supports Mocking GraphQL Queries Using Rest Methods
-      if (getIsMSWMock()) {
-        if (error.response?.status === 200 && error.response) {
-          //Not really an error so return data is if there was no error
-          // eslint-disable-next-line no-prototype-builtins
-          if (error.response.hasOwnProperty('0')) {
-            return error.response['0'].data;
-          }
-        }
-      }
+     
+      
       throw getErrorMessage(
         error,
         'An error occurred retrieving the Range Scenario Containers',

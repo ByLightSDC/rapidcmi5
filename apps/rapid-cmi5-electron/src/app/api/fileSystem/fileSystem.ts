@@ -3,7 +3,6 @@ import { FolderStruct } from '@rangeos-nx/cmi5-build/common';
 import fs, { constants } from 'fs';
 
 import { app } from 'electron';
-import JSZip from 'jszip';
 
 import path from 'path';
 import git from 'isomorphic-git';
@@ -32,13 +31,16 @@ export interface DirEntry {
   isFile: boolean;
   isDirectory: boolean;
 }
-function getRapidBase() {
+function getRapidBase(isTestMode: boolean) {
   // Change this if you prefer another location
-  return path.join(app.getPath('userData'), 'RapidCMI5');
+  return path.join(
+    app.getPath('userData'),
+    isTestMode ? 'RapidCMI5Test' : 'RapidCMI5',
+  );
 }
 
-function resolveSafe(userPath: string): string {
-  const base = getRapidBase();
+function resolveSafe(userPath: string, isTestMode: boolean): string {
+  const base = getRapidBase(isTestMode);
 
   // Coerce to string
   const raw = String(userPath);
@@ -55,17 +57,36 @@ function resolveSafe(userPath: string): string {
 
   return resolved;
 }
+async function clearDirectory(dir: string) {
+  const entries = await fs.promises.readdir(dir);
+
+  await Promise.all(
+    entries.map(async (entry) => {
+      const fullPath = path.join(dir, entry);
+      await fs.promises.rm(fullPath, { recursive: true, force: true });
+    }),
+  );
+}
 
 export class ElectronFsHandler {
+  public isTestMode: boolean;
   private baseReady: Promise<void>;
-  constructor() {
-    const base = getRapidBase();
+
+  constructor(isTestMode: boolean) {
+    this.isTestMode = isTestMode;
+
+    const base = getRapidBase(isTestMode);
+    // reset before each test run
+    if (isTestMode) {
+      clearDirectory(base);
+    }
+
     this.baseReady = fsp.mkdir(base, { recursive: true }).then(() => {});
   }
 
   private async getFullPath(p: string): Promise<string> {
     await this.baseReady;
-    return resolveSafe(p);
+    return resolveSafe(p, this.isTestMode);
   }
 
   async writeFile(p: string, data: FileData) {
@@ -253,12 +274,11 @@ export class ElectronFsHandler {
             node.isBranch = false;
 
             const validExtensions = ['.md', '.yaml', '.json'];
-     
+
             if (getContents) {
               if (zip) {
                 const text = await fsp.readFile(itemPath);
                 node.content = text;
-             
               } else if (validExtensions.includes(extension)) {
                 const text = await fsp.readFile(itemPath, 'utf8');
                 node.content = text;

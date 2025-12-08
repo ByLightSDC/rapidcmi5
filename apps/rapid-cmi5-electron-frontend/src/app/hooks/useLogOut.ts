@@ -1,4 +1,4 @@
-import { AppDispatch } from '../redux/store';
+import { AppDispatch } from '@rangeos-nx/rapid-cmi5';
 import { useNavigate } from 'react-router';
 import { useDispatch } from 'react-redux';
 import { setIsLoggingOut } from '@rangeos-nx/ui/keycloak';

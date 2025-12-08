@@ -19,6 +19,14 @@ export default class App {
     return isEnvironmentSet ? getFromEnvironment : !environment.production;
   }
 
+  public static isTestMode() {
+    const isEnvironmentSet: boolean = 'ELECTRON_IS_TEST' in process.env;
+    const getFromEnvironment: boolean = process.env.ELECTRON_IS_TEST === 'true';
+
+    // Only use test mode if explicitly set to 'true'
+    return isEnvironmentSet && getFromEnvironment;
+  }
+
   private static onWindowAllClosed() {
     if (process.platform !== 'darwin') {
       App.application.quit();

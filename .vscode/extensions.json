@@ -10,6 +10,7 @@
     "snyk-security.snyk-vulnerability-scanner",
     "gruntfuggly.todo-tree",
     "mike-co.import-sorter",
-    "vscode-icons-team.vscode-icons"
+    "vscode-icons-team.vscode-icons",
+    "ms-playwright.playwright"
   ]
 }

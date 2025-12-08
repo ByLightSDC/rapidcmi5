@@ -4,7 +4,6 @@ import { useQuery } from 'react-query';
 import {
   defaultQueryConfig,
   getGraphQLUrl,
-  getIsMSWMock,
   queryHooksConfig,
 } from './config';
 import { request, gql } from 'graphql-request';
@@ -55,17 +54,7 @@ export const useGetRangeResources = ({ id }: { id: string }) => {
       return response;
     } catch (error: any) {
       //Supports Mocking GraphQL Queries Using Rest Methods
-      if (getIsMSWMock()) {
-        if (error.response?.status === 200 && error.response) {
-          //Not really an error so return data is if there was no error
-          if (error.response.hasOwnProperty('0')) {
-            return error.response['0'].data;
-          } else {
-            return null;
-          }
-        }
-        return error.response;
-      }
+     
       throw getErrorMessage(
         error,
         'An error occurred retrieving the range resources',

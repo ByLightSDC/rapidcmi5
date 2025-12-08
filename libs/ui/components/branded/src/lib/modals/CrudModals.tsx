@@ -153,6 +153,7 @@ export function CrudModals(props: CrudModalProps) {
                     </Typography>
                   }
                   name="copy-name"
+                  data-testid="copy-name"
                   text={modalObj.name}
                   tooltip={'Copy Name'}
                   iconColor="primary"

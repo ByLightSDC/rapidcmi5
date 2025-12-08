@@ -108,3 +108,18 @@ Run the following commands in order:
 - `npx nx run rapid-cmi5-electron:make`
 
 After the build completes, the packaged installers will appear under: `./dist/executables/`.
+
+## Automated tests
+
+### Unit testing
+
+`nx run-many --target=test --all `
+
+This will run all unit tests in rapid cmi5
+
+### E2E testing
+`npx nx serve rapid-cmi5-electron-frontend`
+`nx run rapid-cmi5-electron:e2e`
+
+For interactive tests run
+`nx run rapid-cmi5-electron:e2e --ui`
