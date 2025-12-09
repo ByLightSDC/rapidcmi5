@@ -5,6 +5,7 @@ import {
   NodeBoxType,
   // SwitchType,
   IModelBase,
+  LooseObject,
 } from './model-types';
 
 import {
@@ -24,7 +25,6 @@ import {
 //   getIsRouterFirewallSubnet,
 //   getDomainNetworkName,
 // } from '../utility';
-import { LooseObject } from 'libs/ui/api/hooks/src/lib/types';
 import { NodeBox } from './node-box';
 
 /* Node Model 

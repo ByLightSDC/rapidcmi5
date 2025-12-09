@@ -1,5 +1,7 @@
-/* eslint-disable react/jsx-no-useless-fragment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 /* MUI */
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
@@ -203,7 +205,7 @@ function FormPaperOrBox({
       className="paper-form"
       sx={{
         ...sxDisplayProps,
-        backgroundColor: (theme: any) => `${theme.palette.background.default}`,
+        backgroundColor: (theme: any) => `${theme?.form?.backgroundColor}`,
       }}
       elevation={elevation}
       variant={variant}

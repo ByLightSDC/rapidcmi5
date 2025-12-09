@@ -1,5 +1,4 @@
 /* Branded */
-import { ButtonTooltip } from '@rangeos-nx/ui/branded';
 
 /* MUI */
 import Box from '@mui/material/Box';

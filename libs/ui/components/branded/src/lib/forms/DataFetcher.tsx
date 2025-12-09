@@ -1,12 +1,15 @@
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 /* Reusable delayed fetcher using hooks
 
 */
 import { useState } from 'react';
 import { LoadingUi } from '@rangeos-nx/ui/branded';
-import { useToaster } from '@rangeos-nx/ui/branded';
 
 /* API Hooks & Types*/
-import { useQueryDetails } from '@rangeos-nx/ui/api/hooks';
+import { useQueryDetails, useToaster } from '@rangeos-nx/ui/api/hooks';
 import { SxProps } from '@mui/system';
 import { Box } from '@mui/material';
 

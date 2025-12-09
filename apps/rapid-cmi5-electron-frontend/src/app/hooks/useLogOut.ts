@@ -2,9 +2,7 @@ import { AppDispatch } from '@rangeos-nx/rapid-cmi5';
 import { useNavigate } from 'react-router';
 import { useDispatch } from 'react-redux';
 import { setIsLoggingOut } from '@rangeos-nx/ui/keycloak';
-/* Branded */
-import { resetPersistance } from '@rangeos-nx/ui/branded';
-
+import { resetPersistance } from '@rangeos-nx/ui/redux';
 /**
  * Hook resets persisted data and logs user out of keycloak
  */

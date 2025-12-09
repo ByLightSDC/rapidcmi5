@@ -1,7 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AppMenuConfigItem } from '@rangeos-nx/ui/branded';
+import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
+import { AppMenuConfigItem } from './utils/types';
 
-type tCommonAppTransState = {
+export type tCommonAppTransState = {
   appHeaderVisible: boolean;
   breadCrumbLeft: number;
   breadCrumbVisible: boolean;
@@ -20,7 +20,7 @@ export const initialCommonAppTransState: tCommonAppTransState = {
   plugins: [],
 };
 
-export const commonAppTransSlice = createSlice({
+export const commonAppTransSlice : Slice = createSlice({
   name: 'commonAppTrans',
   initialState: initialCommonAppTransState,
 

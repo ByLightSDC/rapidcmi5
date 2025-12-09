@@ -11,8 +11,8 @@ import {
   queryHooksConfig,
 } from './config';
 import { getErrorMessage } from './errorMessages';
-import { defaultSortByOptions } from '@rangeos-nx/ui/branded';
-import { ScenariosCreate1Request } from 'libs/frontend/clients/devops-api/src/lib';
+
+import { ScenariosCreate1Request } from '@rangeos-nx/frontend/clients/devops-api';
 
 export const queryKeyCMI5Scenarios = 'cmi5-scenarios';
 
@@ -39,7 +39,7 @@ export const useGetCMI5Scenarios = (reqOptions?: any) => {
         reqOptions?.offset,
         reqOptions?.limit,
         reqOptions?.search,
-        reqOptions?.sortBy || defaultSortByOptions,
+        reqOptions?.sortBy,
         reqOptions?.sort || defaultSortOrder,
         undefined, // includes
         options,

@@ -13,7 +13,8 @@
       "options": {
         "outputPath": "dist/libs/rapid-cmi5",
         "main": "libs/rapid-cmi5/src/index.ts",
-        "tsConfig": "libs/rapid-cmi5/tsconfig.lib.json"
+        "tsConfig": "libs/rapid-cmi5/tsconfig.lib.json",
+        "package.json" : "libs/rapid-cmi5//package.json"
       }
     },
     "lint": {

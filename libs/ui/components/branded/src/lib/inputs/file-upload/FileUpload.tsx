@@ -7,12 +7,9 @@ import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
 
-/* Branded */
-import {
-  ButtonModalCancelUi,
-  ButtonModalMinorUi,
-} from '../buttons/buttonsmodal';
+
 import { SxProps } from '@mui/system';
+import { ButtonModalMinorUi, ButtonModalCancelUi } from '../buttons/buttonsmodal';
 
 // Choose between folder or file upload with the onFileSelected or onFolderSelected functions
 type tFileUploadProps = {

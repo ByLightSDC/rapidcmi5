@@ -19,20 +19,17 @@ import Alert from '@mui/material/Alert';
 /*Icons */
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 
-/* Branded */
-import {
-  ButtonCopyText,
-  ButtonIcon,
-  ModalDialog,
-} from '@rangeos-nx/ui/branded';
 
 import { BulkDeleteActionContext } from './BulkDeleteActionContext';
 import {
   allowsBulkDelete,
   apiTopicsHookData,
+  ButtonCopyText,
+  ButtonIcon,
   Topic,
 } from '@rangeos-nx/ui/api/hooks';
 import { auth } from '@rangeos-nx/ui/keycloak';
+import ModalDialog from '../modals/ModalDialog';
 
 const confirmationDialogButtons = ['Cancel', 'Continue'];
 

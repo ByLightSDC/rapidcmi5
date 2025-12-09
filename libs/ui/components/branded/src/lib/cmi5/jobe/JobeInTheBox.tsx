@@ -16,9 +16,10 @@ import CheckIcon from '@mui/icons-material/Check';
 
 import useJobeGrader from './useJobeGrader';
 import { useEffect, useState } from 'react';
-import { ButtonMainUi } from '../../inputs/buttons/buttons';
+
 import { useSelector } from 'react-redux';
 import { dividerColor } from '@rangeos-nx/ui/redux';
+import { ButtonMainUi } from '@rangeos-nx/ui/api/hooks';
 
 export function JobeInTheBox({
   auProps,

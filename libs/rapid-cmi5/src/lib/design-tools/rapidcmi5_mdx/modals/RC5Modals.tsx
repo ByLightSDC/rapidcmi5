@@ -11,7 +11,6 @@ import {
   warningModalId,
 } from './constants';
 import {
-  ButtonCopyText,
   defaultCommitData,
   ModalDialog,
 } from '@rangeos-nx/ui/branded';
@@ -25,6 +24,7 @@ import { RootState } from '../../../redux/store';
 import { RepoState } from '../../../redux/repoManagerReducer';
 import SaveCourseForm from '../../course-builder/modals/SaveCourseForm';
 import { SuperSaveFormType } from '../../course-builder/CourseBuilderApiTypes';
+import { ButtonCopyText } from '@rangeos-nx/ui/api/hooks';
 
 export default function RC5Modals() {
   const modalObj = useSelector(modal);

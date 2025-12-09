@@ -4,9 +4,8 @@ import { useRef, useEffect, useState } from 'react';
 /* MUI */
 import Tooltip from '@mui/material/Tooltip';
 import Typography, { TypographyProps } from '@mui/material/Typography';
+import { ButtonCopyText } from '@rangeos-nx/ui/api/hooks';
 
-/* Branded */
-import { ButtonCopyText } from '@rangeos-nx/ui/branded';
 
 /**
  * @interface OverflowTypographyProps  Extended TypographyProps

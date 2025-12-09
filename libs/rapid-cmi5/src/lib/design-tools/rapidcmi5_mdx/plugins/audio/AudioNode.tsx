@@ -52,17 +52,17 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
   __rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
 
   /** @internal */
-  static getType(): string {
+  static override getType(): string {
     return 'audio';
   }
 
   /** @internal */
-  static clone(node: AudioNode): AudioNode {
+  static override clone(node: AudioNode): AudioNode {
     return new AudioNode(node.__src, node.__title, node.__rest, node.__key);
   }
 
   /** @internal */
-  static importJSON(serializedNode: SerializedAudioNode): AudioNode {
+  static override importJSON(serializedNode: SerializedAudioNode): AudioNode {
     const { title, src, rest } = serializedNode;
     const node = $createAudioNode({
       title,
@@ -73,7 +73,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  exportDOM(): DOMExportOutput {
+  override exportDOM(): DOMExportOutput {
     const element = document.createElement('audio');
     element.setAttribute('src', this.__src);
     element.setAttribute('controls', 'true');
@@ -84,7 +84,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  static importDOM(): DOMConversionMap | null {
+  static override importDOM(): DOMConversionMap | null {
     return {
       audio: () => ({
         conversion: convertAudioElement,
@@ -110,7 +110,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  exportJSON(): SerializedAudioNode {
+  override exportJSON(): SerializedAudioNode {
     return {
       title: this.getTitle(),
       src: this.getSrc(),
@@ -121,7 +121,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  createDOM(config: EditorConfig): HTMLElement {
+  override createDOM(config: EditorConfig): HTMLElement {
     const span = document.createElement('span');
     const theme = config.theme;
     const className = theme.audio;
@@ -132,7 +132,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  updateDOM(): false {
+  override updateDOM(): false {
     return false;
   }
 
@@ -168,7 +168,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  decorate(_parentEditor: LexicalEditor): JSX.Element {
+  override decorate(_parentEditor: LexicalEditor): JSX.Element {
     return (
       <AudioEditor
         src={this.getSrc()}

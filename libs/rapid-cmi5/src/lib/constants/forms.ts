@@ -5,32 +5,21 @@ import { lazy } from 'react';
 /* Branded */
 import {
   ascSortOrder,
-  authoredByMeFilter,
-  defaultCpeFilters,
-  defaultInputFilters,
-  defaultMetadataTags,
   defaultSearch,
   defaultSortBy,
-  defaultSortOrder,
   inputFilterType,
-  defaultUntaggedInputFilters,
-  uuidFilter,
 } from '@rangeos-nx/ui/branded';
 
 /* Topic */
 import {
   Topic,
-  TopicOverrideRoutes,
-  TopicRoutes,
 } from '@rangeos-nx/ui/api/hooks';
 import {
-  keyCloakUserSortBy,
   ksatElementTypeFilter,
-  ksatsSortBy,
-  resourceScenarioSortBy,
+  ksatsSortBy
 } from './filters';
+import ActionRowKsat from '../design-tools/rapidcmi5_mdx/editors/components/ActionRowKsat';
 
-import ActionRowKsat from '../views/dashboards/design-tools/rapidcmi5_mdx/editors/components/ActionRowKsat';
 
 /* Forms */
 

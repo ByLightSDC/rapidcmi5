@@ -835,13 +835,13 @@ export const UNIQUE_ARRAY_STRING_GROUP = (
 export const URL_GROUP = yup
   .string()
   .required(URL_BASE.requiredError)
-  .url(URL_BASE.urLError)
+  .url(URL_BASE.urlError)
   .strict(true);
 
 export const URL_GROUP_OPT = yup
   .string()
   .nullable()
-  .url(URL_BASE.urLError)
+  .url(URL_BASE.urlError)
   .strict(true);
 
 /**
@@ -878,7 +878,7 @@ export const HTTPS_URL_GROUP = (isRequired = true) => {
     ? yup
         .string()
         .required(REQUIRED_ERROR)
-        .url(URL_BASE.urLError)
+        .url(URL_BASE.urlError)
         .test(
           'test-https-url',
           'Must be Valid URL starting with https://',
@@ -893,7 +893,7 @@ export const HTTPS_URL_GROUP = (isRequired = true) => {
           ? yup.string().nullable()
           : yup
               .string()
-              .url(URL_BASE.urLError)
+              .url(URL_BASE.urlError)
               .test(
                 'test-https-url',
                 'Must be Valid URL starting with https://',
@@ -920,7 +920,7 @@ export const GIT_URL_GROUP = (isRequired = true) => {
     ? yup
         .string()
         .required(REQUIRED_ERROR)
-        .url(URL_BASE.urLError)
+        .url(URL_BASE.urlError)
         .test(
           'test-git-url',
           'Must be Valid URL starting with https:// and ending with .git',
@@ -935,7 +935,7 @@ export const GIT_URL_GROUP = (isRequired = true) => {
           ? yup.string().nullable()
           : yup
               .string()
-              .url(URL_BASE.urLError)
+              .url(URL_BASE.urlError)
               .test(
                 'test-git-url',
                 'Must be Valid URL starting with https:// and ending with .git',

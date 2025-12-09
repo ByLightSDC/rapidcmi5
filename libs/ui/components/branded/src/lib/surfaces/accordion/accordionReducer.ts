@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { resetPersistance } from '@rangeos-nx/ui/branded';
+import { resetPersistance } from '@rangeos-nx/ui/redux';
+import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 
 type tAccordionState = {
   touched: Record<string, boolean>;
@@ -13,7 +13,7 @@ const initialState: tAccordionState = {
   touched: {},
 };
 
-export const accordionSlice = createSlice({
+export const accordionSlice : Slice = createSlice({
   name: 'accordion',
   initialState,
   extraReducers: (builder) =>

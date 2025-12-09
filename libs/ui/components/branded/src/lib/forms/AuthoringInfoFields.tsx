@@ -1,14 +1,14 @@
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 import { Control } from 'react-hook-form';
 
 /* MUI */
 import Grid from '@mui/material/Grid';
-
-import {
-  FormControlCheckboxField,
-  FormControlDateDisplay,
-  FormControlTextField,
-} from '@rangeos-nx/ui/branded';
-import { FormCrudType } from './constants';
+import { FormCrudType } from '@rangeos-nx/ui/redux';
+import FormControlTextField from './FormControlTextField';
+import FormControlDateDisplay from './FormControlDateDisplay';
 
 export type tAuthoringInfoFieldProps = {
   crudType: FormCrudType;

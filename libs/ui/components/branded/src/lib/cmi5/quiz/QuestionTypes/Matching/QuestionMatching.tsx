@@ -4,8 +4,7 @@ import { Grid, Typography } from '@mui/material';
 
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
-
-import { SelectorMainUi } from '@rangeos-nx/ui/branded';
+import { SelectorMainUi } from '../../../../inputs/selectors/selectors';
 
 function Matching({
   question,

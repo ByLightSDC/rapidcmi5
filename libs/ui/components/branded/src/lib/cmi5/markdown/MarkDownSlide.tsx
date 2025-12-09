@@ -29,8 +29,8 @@ export function AuMarkDownSlide({
   isSplitPanelShown?: boolean;
   slideTop?: number;
   slideRight?: number;
-  slideWidth: number;
-  slideHeight: number;
+  slideWidth?: number;
+  slideHeight?: number;
 }) {
   // NOTE we pass content separately to force re-render when content string changes
 

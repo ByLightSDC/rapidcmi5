@@ -1,3 +1,7 @@
+/*
+ *   Copyright (c) 2025 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 import { ButtonModalMinorUi } from '../inputs/buttons/buttonsmodal';
 import { UseFormReturn } from 'react-hook-form';
 
@@ -127,7 +131,7 @@ export function AddButton({
             } else {
               watchValue = getValues(theIndexedField);
               valueToApply = cache ? cache.id : '';
-
+             
               if (arrayMethods?.replace) {
                 const arr = getValues(fieldName);
                 arr[rowIndex] = valueToApply;

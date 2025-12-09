@@ -1,7 +1,5 @@
 import { IconButton, Tooltip } from '@mui/material';
 
-import { ButtonMinorUi } from '@rangeos-nx/ui/branded';
-
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import {
   iconButtonStyle,
@@ -10,6 +8,7 @@ import {
 import { useContext } from 'react';
 import { GitContext } from '../../session/GitContext';
 import { useRC5Prompts } from '../../../../rapidcmi5_mdx/modals/useRC5Prompts';
+import { ButtonMinorUi } from '@rangeos-nx/ui/api/hooks';
 
 export default function DeleteRepoButton({
   isButtonStyleMinimized,

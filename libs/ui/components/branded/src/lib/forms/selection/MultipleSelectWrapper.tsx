@@ -1,3 +1,7 @@
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useSelector, useDispatch } from 'react-redux';
@@ -9,24 +13,10 @@ import {
   setMessage,
   useGetCacheMultipleSelection,
   useSetCacheMultipleSelection,
+  FormCrudType,
 } from '@rangeos-nx/ui/redux';
 
-/* Branded */
-import {
-  ActionRow,
-  ButtonMinorUi,
-  listStyles,
-  ModalDialog,
-  FormCrudType,
-  PaginationListView,
-  PaginationFiltersContextProvider,
-  BookmarksContext,
-  RowAction,
-  featureFlagRouteModals,
-  useCache,
-  inputFilterType,
-} from '@rangeos-nx/ui/branded';
-import { Topic } from '@rangeos-nx/ui/api/hooks';
+import { ButtonMinorUi, Topic, useCache } from '@rangeos-nx/ui/api/hooks';
 
 /* MUI */
 import Alert from '@mui/material/Alert';
@@ -42,6 +32,16 @@ import EditIcon from '@mui/icons-material/Edit';
 
 /* Constants */
 import { addBookmarkButtonId, rowsPerPageDefault } from './constants';
+import { listStyles } from '../../data-display/ListView';
+import ModalDialog from '../../modals/ModalDialog';
+import { BookmarksContext } from '../../navigation/bookmark/BookmarksContext';
+import {
+  inputFilterType,
+  PaginationFiltersContextProvider,
+} from '../../navigation/paging/PaginationFiltersContext';
+import PaginationListView from '../../navigation/paging/PaginationListView';
+import { RowAction } from '../../types/actionRowTypes';
+import ActionRow from './ActionRow';
 
 const featureFlagMultipleSelectShift = true;
 
@@ -586,22 +586,7 @@ export function MultipleSelectWrapper(props: tMultipleSelectWrapperProps) {
     route: string,
     data?: any,
   ) => {
-    if (!featureFlagRouteModals) {
-      if (topicId) {
-        dispatch(
-          setModal({
-            id: navCrud === FormCrudType.create ? null : data.uuid,
-            meta: data,
-            name: navCrud === FormCrudType.create ? null : data.name,
-            crudType: navCrud,
-            topic: topicId,
-            type: 'view',
-          }),
-        );
-      }
-    } else {
-      navigate(route);
-    }
+    navigate(route);
   };
 
   const titleChildren = (

@@ -14,13 +14,13 @@ import {
 
 import { ScenarioUpdatesContext } from './ScenarioUpdatesContext';
 import {
-  ButtonMainUi,
-  ButtonMinorUi,
   OverflowTypography,
   TabMainUi,
 } from '@rangeos-nx/ui/branded';
 import {
   AutoGraderEvent,
+  ButtonMainUi,
+  ButtonMinorUi,
   getScenarioStatusIcon,
   queryKeyRangeResourceContainers,
   Topic,

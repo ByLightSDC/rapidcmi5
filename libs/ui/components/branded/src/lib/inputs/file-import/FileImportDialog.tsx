@@ -3,14 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { modal, setModal, themeColor, setTheme } from '@rangeos-nx/ui/redux';
 
-/* Branded */
-import {
-  FileUpload,
-  ModalDialog,
-  resetPersistance,
-} from '@rangeos-nx/ui/branded';
+
 import { TextField } from '@mui/material';
 import { useState } from 'react';
+import ModalDialog from '../../modals/ModalDialog';
+import { FileUpload } from '../file-upload/FileUpload';
 
 export const importFileModalId = 'importFileModalId';
 

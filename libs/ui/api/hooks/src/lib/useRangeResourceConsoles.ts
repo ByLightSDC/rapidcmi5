@@ -7,7 +7,6 @@ import {
   queryHooksConfig,
 } from './config';
 import { getErrorMessage } from './errorMessages';
-import { DeployedRangeConsole } from '@rangeos-nx/frontend/clients/devops-api';
 
 export const queryKeyRangeResourceConsoles = 'range-resource-consoles';
 export const useGetRangeResourceConsoles = (reqOptions?: any) => {

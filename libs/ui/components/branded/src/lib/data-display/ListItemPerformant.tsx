@@ -1,8 +1,5 @@
-import React, { useEffect, useRef, useState, ReactNode } from 'react';
-import {
-  useItemVisibleInBounds,
-  useVariableItemHeight,
-} from '@rangeos-nx/ui/branded';
+import { useEffect, useRef, useState } from 'react';
+import { useItemVisibleInBounds, useVariableItemHeight } from '../..';
 
 // the height of the list item needs a default until the real height can be determined
 const DEFAULT_ITEM_HEIGHT = 38;

@@ -17,12 +17,12 @@ import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { filterTreePath } from '../../course-builder/GitViewer/Components/SelectedRepo/treeHelpers';
 import { useCourseData } from '../data-hooks/useCourseData';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { ButtonTooltip } from '@rangeos-nx/ui/branded';
 import ChangeRepoExpander from './components/ChangeRepoExpander';
 import { RepoState } from '../../../redux/repoManagerReducer';
 import { RootState } from '../../../redux/store';
 import { useSelector } from 'react-redux';
 import SectionLabel from '../../../shared/SectionLabel';
+import { ButtonTooltip } from '@rangeos-nx/ui/api/hooks';
 
 export const FileDrawer = () => {
   const {

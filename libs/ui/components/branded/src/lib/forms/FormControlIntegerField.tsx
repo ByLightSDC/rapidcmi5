@@ -1,12 +1,16 @@
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 import { Control, Controller } from 'react-hook-form';
 import ReadOnlyTextField from './ReadOnlyTextField';
-import { ButtonInfoField } from '../inputs/buttons/buttons';
 
 /* MUI */
 import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import { useEffect } from 'react';
 import { fieldMarginTop } from '../styles/muiTheme';
+import { ButtonInfoField } from '@rangeos-nx/ui/api/hooks';
 
 const leadingZeroRegex = /^([0][0-9]+)$|^([-][0][0-9]+)$/; // don't allow -0n or 0n at beginning
 
@@ -68,7 +72,7 @@ export function FormControlIntegerField(props: tFieldProps) {
     placeholder = '',
     readOnly = false,
     required = false,
-    sxProps = { marginTop: fieldMarginTop },
+    sxProps = {  marginTop: fieldMarginTop },
     onChange,
     setValue,
     trigger,

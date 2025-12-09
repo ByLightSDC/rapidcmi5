@@ -3,7 +3,6 @@ import {
   FormControlSelectField,
   FormControlTextField,
   FormControlUIProvider,
-  FormCrudType,
   FormStateType,
   MiniForm,
 } from '@rangeos-nx/ui/branded';
@@ -22,6 +21,7 @@ import {
 
 import { RC5ActivityTypeEnum } from '@rangeos-nx/types/cmi5';
 import LrsHeaderWithDetails from './LrsStatementHelper';
+import { FormCrudType } from '@rangeos-nx/ui/redux';
 
 export const TeamConsolesForm = ({
   crudType,

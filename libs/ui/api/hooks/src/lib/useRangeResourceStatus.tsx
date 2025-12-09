@@ -1,7 +1,6 @@
 import { RangeStatusEnum } from '@rangeos-nx/frontend/clients/devops-api';
 
 /* Branded */
-import { ButtonInfoField } from '@rangeos-nx/ui/branded';
 
 /* Icons*/
 import DangerousIcon from '@mui/icons-material/Dangerous';
@@ -12,6 +11,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import { ButtonInfoField } from './utils/buttons';
 
 //OLD - but used by User Portal
 //TODO -- maybe status.tsx in infrastructure portal should be moved to branded lib?

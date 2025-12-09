@@ -42,24 +42,15 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { fromMarkdown, type Options } from 'mdast-util-from-markdown';
 import { toMarkdown } from 'mdast-util-to-markdown';
 
-import {
-  getAdmonitionColor,
-  getAdmonitionHexColor,
-  getAdmonitionIcon,
-  getSeverityHexBorderColor,
-  getSeverityHexColor,
-} from 'libs/ui/components/branded/src/lib/cmi5/markdown/components/AdmonitionStyles';
-import {
-  debugLogError,
-  editorInPlayback$,
-  SelectorMainUi,
-} from '@rangeos-nx/ui/branded';
-
 import { AdmonitionTypeEnum } from '@rangeos-nx/types/cmi5';
 import { AdmonitionDirectiveNode } from './AdmonitionDirectiveDescriptor';
 import DeleteIconButton from '../components/DeleteIconButton';
 import SettingsIconButton from '../components/SettingsIconButton';
 import RightMenuContainer from '../components/RightMenuContainer';
+import { SelectorMainUi } from '../../../inputs/selectors/selectors';
+import { debugLogError } from '../../../utility/logger';
+import { getAdmonitionColor, getAdmonitionHexColor, getSeverityHexColor, getSeverityHexBorderColor, getAdmonitionIcon } from '../../markdown/components/AdmonitionStyles';
+import { editorInPlayback$ } from '../state/vars';
 
 export declare interface AdmonitionDirectiveEditorProps<
   T extends Directives = Directives,

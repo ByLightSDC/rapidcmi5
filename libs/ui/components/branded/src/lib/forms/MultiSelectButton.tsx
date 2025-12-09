@@ -1,3 +1,7 @@
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { UseFormReturn } from 'react-hook-form';
@@ -9,15 +13,11 @@ import {
   useSetCacheMultipleSelection,
 } from '@rangeos-nx/ui/redux';
 
-/* Branded */
-import {
-  ButtonMinorUi,
-  ButtonModalMinorUi,
-  tMultiSelectionMeta,
-} from '@rangeos-nx/ui/branded';
-
 /* Icons */
 import TouchAppIcon from '@mui/icons-material/TouchApp';
+import { ButtonMinorUi } from '@rangeos-nx/ui/api/hooks';
+import { ButtonModalMinorUi } from '../inputs/buttons/buttonsmodal';
+import { tMultiSelectionMeta } from './SharedFormWithProvider';
 
 export type MultiSelectButtonProps = {
   buttonText?: string;

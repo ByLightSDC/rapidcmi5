@@ -1,3 +1,8 @@
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
+
 import {
   useCallback,
   useContext,
@@ -18,9 +23,10 @@ import {
   tSelectionMeta,
   useGetCacheSelection,
   useGetCacheMultipleSelection,
+  FormCrudType,
 } from '@rangeos-nx/ui/redux';
 
-import { useQueryDetails } from '@rangeos-nx/ui/api/hooks';
+import { ButtonLoadingUi, useQueryDetails } from '@rangeos-nx/ui/api/hooks';
 import { setLoader } from '@rangeos-nx/ui/redux';
 import { ErrorMessageDetail, sanitizePayload } from '@rangeos-nx/ui/validation';
 
@@ -34,11 +40,9 @@ import RocketLaunch from '@mui/icons-material/RocketLaunch';
 import DesignServicesIcon from '@mui/icons-material/DesignServices';
 
 /* Branded */
-import AuthoringInfoFields, {
-  tAuthoringInfoFieldProps,
-} from './AuthoringInfoFields';
+
 import { BookmarksContext } from '../navigation/bookmark/BookmarksContext';
-import { ButtonLoadingUi } from '../inputs/buttons/buttons';
+
 import {
   ButtonModalCancelUi,
   ButtonModalMainUi,
@@ -46,18 +50,18 @@ import {
 } from '../inputs/buttons/buttonsmodal';
 import DataFetcher from './DataFetcher';
 import FileUpload from '../inputs/file-upload/FileUpload';
-import Form from './Form';
+
 import { FormControlUIContext } from './FormControlUIContext';
 import { StepperContext } from '../navigation/stepper/StepperContext';
 import StepperUi from '../navigation/stepper/Stepper';
 import { useNavigateAlias } from '../hooks/useNavigateAlias';
 
-/* Constants */
-import { FormCrudType } from './constants';
 import { FormStateType } from '../types/form';
 import { iListItemType } from '../dashboards/constants';
 import axios, { CancelTokenSource } from 'axios';
 import { debugLog } from '../utility/logger';
+import AuthoringInfoFields, { tAuthoringInfoFieldProps } from './AuthoringInfoFields';
+import Form from './Form';
 
 const defaultFormWidth = 800;
 

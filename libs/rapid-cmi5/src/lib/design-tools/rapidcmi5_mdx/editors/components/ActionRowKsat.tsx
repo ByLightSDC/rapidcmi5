@@ -1,4 +1,3 @@
-import { Element } from '@rangeos-nx/frontend/clients/lms-api';
 import {
   ActionRow,
   actionRowHeaderColor,
@@ -22,6 +21,7 @@ export default function ActionRowKsat(props: ActionRowProps) {
       <>
         <div style={{ ...listStyles.xxs }}>
           <OverflowTypography
+            //@ts-ignore
             title={rowData.element_identifier || ''}
             sxProps={{
               marginLeft: '8px',

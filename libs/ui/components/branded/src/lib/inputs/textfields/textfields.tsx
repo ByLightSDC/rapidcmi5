@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 
 /* MUI */
 import TextField, { StandardTextFieldProps } from '@mui/material/TextField';
-import { ButtonIcon, ButtonInfoField } from '../buttons/buttons';
 import { InputAdornment } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { ButtonIcon, ButtonInfoField } from '@rangeos-nx/ui/api/hooks';
 
 const leadingZeroRegex = /^([0][0-9]+)$|^([-][0][0-9]+)$/; // don't allow -0n or 0n at beginning
 

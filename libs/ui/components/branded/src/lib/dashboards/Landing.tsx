@@ -5,30 +5,9 @@
 import { useContext, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { setLoader, setModal, themeColor } from '@rangeos-nx/ui/redux';
+import { FormCrudType, setLoader, setModal, themeColor } from '@rangeos-nx/ui/redux';
 
-/* Branded */
-import {
-  ActionRow,
-  BookmarksContext,
-  BulkDeleteButton,
-  ButtonMainUi,
-  ButtonMinorUi,
-  ContentHeader,
-  CrudModals,
-  FormCrudType,
-  PaginationListView,
-  PaginationFiltersContextProvider,
-  RowAction,
-  iListItemType,
-  inputFilterType,
-  LoadingUi,
-  PaginationListViewProps,
-  useNavBar,
-  useNavigateAlias,
-  ButtonModalMinorUi,
-} from '@rangeos-nx/ui/branded';
-import { Topic } from '@rangeos-nx/ui/api/hooks';
+import { ButtonMainUi, Topic } from '@rangeos-nx/ui/api/hooks';
 
 import { brandedTheme } from '../styles/muiTheme';
 import { brandedThemeDark } from '../styles/muiThemeDark';
@@ -43,12 +22,20 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ExtensionIcon from '@mui/icons-material/Extension';
-
-/* Constants */
-import {
-  rowsPerPageDefault,
-  rowsPerPageOptionsDefault,
-} from '../forms/selection/constants';
+import { useNavBar } from '../hooks/useNavBar';
+import { useNavigateAlias } from '../hooks/useNavigateAlias';
+import { LoadingUi } from '../indicators/Loading';
+import CrudModals from '../modals/CrudModals';
+import { BookmarksContext } from '../navigation/bookmark/BookmarksContext';
+import { inputFilterType, PaginationFiltersContextProvider } from '../navigation/paging/PaginationFiltersContext';
+import PaginationListView, { PaginationListViewProps } from '../navigation/paging/PaginationListView';
+import { RowAction } from '../types/actionRowTypes';
+import BulkDeleteButton from './BulkDeleteButton';
+import { iListItemType } from './constants';
+import ContentHeader from './ContentHeader';
+import { ButtonModalMinorUi } from '../inputs/buttons/buttonsmodal';
+import ActionRow from '../forms/selection/ActionRow';
+import { rowsPerPageDefault, rowsPerPageOptionsDefault } from '../forms/selection/constants';
 
 /**
  * Default actions for a row

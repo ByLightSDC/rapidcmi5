@@ -8,7 +8,6 @@ import { NAME_GROUP } from '@rangeos-nx/ui/validation';
 /* Branded */
 import {
   FormControlTextField,
-  FormCrudType,
   FormStateType,
   SharedFormWithProvider,
 } from '@rangeos-nx/ui/branded';
@@ -27,6 +26,7 @@ import {
 
 import { ClassEntry, defaultClassEntryData } from '../session/constants';
 import { useEffect } from 'react';
+import { FormCrudType } from '@rangeos-nx/ui/redux';
 
 /**
  * @typedef {Object} tFormProps

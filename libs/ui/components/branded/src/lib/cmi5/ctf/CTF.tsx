@@ -44,12 +44,11 @@ import {
   resetCTFActivity as resetActivity,
   setCTFScore as setScore,
   setCurrentCTFAnswer as setCurrentAnswer,
-  ButtonInfoField,
-  ButtonMainUi,
   getAllCTFAnswers as getAllAnswers,
-  ButtonMinorUi,
-} from '@rangeos-nx/ui/branded';
+
+} from './ctfReducer';
 import { Box, Stack } from '@mui/system';
+import { ButtonInfoField, ButtonMainUi, ButtonMinorUi } from '@rangeos-nx/ui/api/hooks';
 
 const answerBoxGridSize = 3.8;
 const attemptedLabel = '#Attempted';

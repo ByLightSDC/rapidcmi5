@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* Branded */
-import { FormCrudType } from '@rangeos-nx/ui/branded';
 
+import { FormCrudType } from "@rangeos-nx/ui/redux";
+
+/* Branded */
 export type RangeResourceFormProps = {
   crudType: FormCrudType;
   dataCache?: any;

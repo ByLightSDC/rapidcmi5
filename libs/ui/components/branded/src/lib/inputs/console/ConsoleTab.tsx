@@ -1,4 +1,3 @@
-import { ConsolePopup, LoadingUi } from '@rangeos-nx/ui/branded';
 import { useParams } from 'react-router';
 import React, { useRef, useState } from 'react';
 import {
@@ -6,6 +5,8 @@ import {
   useQueryDetails,
 } from '@rangeos-nx/ui/api/hooks';
 import { Alert } from '@mui/material';
+import { LoadingUi } from '../../indicators/Loading';
+import ConsolePopup from './ConsolePopup';
 
 /**
  * Used in a tab to display a full screen console.

@@ -1,3 +1,7 @@
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 import { Control, Controller } from 'react-hook-form';
 import { useState } from 'react';
 
@@ -7,7 +11,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Box from '@mui/material/Box';
 import Checkbox, { CheckboxProps } from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
-import { ButtonInfoField } from '../inputs/buttons/buttons';
+import { ButtonInfoField } from '@rangeos-nx/ui/api/hooks';
 
 /** @constant
  * Decorator appended to the checkbox label

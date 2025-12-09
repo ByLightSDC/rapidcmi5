@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* Clone from GuacamoleTabLinkButton */
 /* Branded */
-import { ButtonMinorUi } from '@rangeos-nx/ui/branded';
 
 /* Icons */
 import TerminalIcon from '@mui/icons-material/Terminal';
@@ -12,6 +11,7 @@ import {
   DeployedRangeConsoleStatusEnum,
 } from '@rangeos-nx/frontend/clients/devops-api';
 import { SxProps } from '@mui/system';
+import { ButtonMinorUi } from '@rangeos-nx/ui/api/hooks';
 
 /**
  * @typedef {Object} tProps

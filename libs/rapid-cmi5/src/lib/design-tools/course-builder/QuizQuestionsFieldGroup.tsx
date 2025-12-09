@@ -12,11 +12,11 @@ import {
   FormControlCheckboxField,
   FormControlSelectField,
   FormControlTextField,
-  FormCrudType,
   FormFieldArray,
   tFormFieldRendererProps,
   useDisplayFocus,
 } from '@rangeos-nx/ui/branded';
+import { FormCrudType } from '@rangeos-nx/ui/redux';
 
 /**
  * @interface fieldGroupProps

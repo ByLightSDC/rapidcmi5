@@ -1,24 +1,10 @@
 import { setModal } from '@rangeos-nx/ui/redux';
 
-/* Branded */
-import {
-  appendBookmarkMetaData,
-  clearAllFormData,
-  clearBookmarkMetaData,
-  clearBookmarks,
-  clearFormData,
-  bookmarkCue,
-  bookmarkFormData,
-  bookmarkGlobalData,
-  popBookmark,
-  pushBookmark,
-  saveFormData,
-  tBookmark,
-  tBookmarkMetaData,
-} from '@rangeos-nx/ui/branded';
+
 
 import { createContext, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { tBookmark, tBookmarkMetaData, bookmarkCue, bookmarkFormData, bookmarkGlobalData, clearAllFormData, clearBookmarks, saveFormData, clearFormData, appendBookmarkMetaData, clearBookmarkMetaData, pushBookmark, popBookmark } from './bookmarksReducer';
 
 /**
  * @interface IBookmarksContext

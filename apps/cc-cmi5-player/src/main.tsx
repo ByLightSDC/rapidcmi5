@@ -19,15 +19,15 @@ declare global {
 
 // Expose methods globally to make them available in integration tests
 async function enableMocking() {
-  if (config.CYPRESS === true) {
-    window.store = store;
-  }
+  // if (config.CYPRESS === true) {
+  //   window.store = store;
+  // }
 
-  if (config.MSW_MOCK === true) {
-    debugLog('[main]  MOCK ', true);
-    window.msw = { worker, http };
-    return worker.start();
-  }
+  // if (config.MSW_MOCK === true) {
+  //   debugLog('[main]  MOCK ', true);
+  //   window.msw = { worker, http };
+  //   return worker.start();
+  // }
 
   return Promise.resolve();
 }

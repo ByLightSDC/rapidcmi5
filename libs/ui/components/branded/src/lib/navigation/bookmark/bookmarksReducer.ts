@@ -1,5 +1,5 @@
+import { resetPersistance } from '@rangeos-nx/ui/redux';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { resetPersistance } from '@rangeos-nx/ui/branded';
 
 interface State {
   bookmarks: tBookmarkState;

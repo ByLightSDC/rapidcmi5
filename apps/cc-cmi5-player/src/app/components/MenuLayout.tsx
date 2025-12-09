@@ -18,12 +18,6 @@ import { Tooltip, Typography } from '@mui/material';
 import { classIdSel, studentIdSel } from '../redux/auReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { cmi5Instance } from '../session/cmi5';
-
-import {
-  ButtonInfoField,
-  ButtonInfoFormHeaderLayout,
-  ButtonMainUi,
-} from '@rangeos-nx/ui/branded';
 import { classChangeModalId } from './CourseModals';
 import { dividerColor, setModal } from '@rangeos-nx/ui/redux';
 import RC5Player from './player/RC5Player';
@@ -31,10 +25,9 @@ import { AuManagerContext } from '../session/AuManager';
 import Slide from './Slide';
 import ScenarioWrapper from './scenario/ScenarioWrapper';
 import { config } from '@rangeos-nx/frontend/environment';
-import {
-  TeamScenarioContextProvider,
-} from './team-consoles/TeamScenarioContext';
+import { TeamScenarioContextProvider } from './team-consoles/TeamScenarioContext';
 import { useCMI5Session } from '../hooks/useCMI5Session';
+import { ButtonInfoField, ButtonMainUi, ButtonInfoFormHeaderLayout } from '@rangeos-nx/ui/api/hooks';
 
 /**
  * The main slide content.
@@ -320,39 +313,18 @@ export default function MenuLayout() {
               )}
             </Stack>
 
-            {config.CMI5_PLAYER_VERSION === '0' ? (
-              <Slide
-                auProps={{
-                  activeTab,
-                  progressPercent,
-                  viewedSlides,
-                  scenario,
-                  slides,
-                  setActiveTab,
-                  setProgress,
-                  slideData,
-                  submitScore,
-                  setActivityCache: null,
-                  getActivityCache: null,
-                  isAuthenticated,
-                  isTestMode,
-                }}
-                isSplitPanelShown={isSplitPanelShown}
-              />
-            ) : (
-              <>
-                {!config.CMI5_SSO_ENABLED && (
-                  <ScenarioWrapper>
-                    <RC5Player />
-                  </ScenarioWrapper>
-                )}
-                {config.CMI5_SSO_ENABLED && (
-                  <TeamScenarioContextProvider isEnabled={true}>
-                    <RC5Player />
-                  </TeamScenarioContextProvider>
-                )}
-              </>
-            )}
+            <>
+              {!config.CMI5_SSO_ENABLED && (
+                <ScenarioWrapper>
+                  <RC5Player />
+                </ScenarioWrapper>
+              )}
+              {config.CMI5_SSO_ENABLED && (
+                <TeamScenarioContextProvider isEnabled={true}>
+                  <RC5Player />
+                </TeamScenarioContextProvider>
+              )}
+            </>
           </div>
         </Panel>
         {isSplitPanelShown && (

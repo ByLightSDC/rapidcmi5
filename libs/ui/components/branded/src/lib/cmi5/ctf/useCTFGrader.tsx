@@ -1,12 +1,8 @@
 import { useDispatch } from 'react-redux';
-import {
-  AnswerType,
-  CTFContent,
-  CTFResponse,
-} from '../../../../../../../types/cmi5/src';
 import { debugLogError } from '../../utility/logger';
-import { setCurrentCTFGrade as setCurrentGrade } from '@rangeos-nx/ui/branded';
+import { setCurrentCTFGrade as setCurrentGrade } from './ctfReducer';
 import { useState } from 'react';
+import { AnswerType, CTFContent, CTFResponse } from '@rangeos-nx/types/cmi5';
 
 export default function useCTFGrader(ctfContent: CTFContent) {
   const [accuracy, setAccuracy] = useState(0);

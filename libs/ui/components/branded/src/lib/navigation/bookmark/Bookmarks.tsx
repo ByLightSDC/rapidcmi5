@@ -1,16 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
-/* BRANDED */
-import {
-  ButtonInfoField,
-  ButtonTooltip,
-  OverflowTypography,
-  shouldShowBookmarks,
-  bookmarkCue,
-  popToBookmark,
-  tBookmark,
-} from '@rangeos-nx/ui/branded';
 
 /* MUI */
 import Box from '@mui/material/Box';
@@ -18,6 +8,9 @@ import Typography from '@mui/material/Typography';
 
 /* Icons */
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import { ButtonInfoField, ButtonTooltip } from '@rangeos-nx/ui/api/hooks';
+import { OverflowTypography } from '../../data-display/OverflowTypography';
+import { bookmarkCue, tBookmark, popToBookmark } from './bookmarksReducer';
 
 /**
  * Renders a list of interactable bookmark labels

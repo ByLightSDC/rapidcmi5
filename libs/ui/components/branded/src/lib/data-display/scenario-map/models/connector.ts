@@ -1,6 +1,4 @@
-import { IconType, ModelType, NodeType, IModelBase } from './model-types';
-
-import { LooseObject } from 'libs/ui/api/hooks/src/lib/types';
+import { IconType, ModelType, NodeType, IModelBase, LooseObject } from './model-types';
 
 /* Connector Model 
 model for connecting devices and subnet boxes on the network map

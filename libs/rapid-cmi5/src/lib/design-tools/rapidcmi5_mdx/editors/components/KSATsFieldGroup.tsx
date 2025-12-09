@@ -1,13 +1,13 @@
 import { UseFormReturn } from 'react-hook-form';
-import { Topic } from '@rangeos-nx/ui/api/hooks';
+import { queryKeyKSATs, Topic } from '@rangeos-nx/ui/api/hooks';
 import {
   DynamicSelectorFieldGroup,
-  FormCrudType,
   FormFieldArray,
   tFormFieldRendererProps,
 } from '@rangeos-nx/ui/branded';
-import { queryKeyKSATs } from 'libs/ui/api/hooks/src/lib/lms/useKSATs';
+
 import KsatFieldDetail from './KsatFieldDetail';
+import { FormCrudType } from '@rangeos-nx/ui/redux';
 
 /**
  * @type tFieldGroupProps

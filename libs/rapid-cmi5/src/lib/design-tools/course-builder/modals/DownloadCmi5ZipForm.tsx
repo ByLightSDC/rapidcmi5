@@ -21,7 +21,7 @@ import { DownloadCmi5Type, PullType } from '../CourseBuilderApiTypes';
 import { useContext } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';
 import { downloadCmi5ZipModalId } from '../../rapidcmi5_mdx/modals/constants';
-import { getInfoText } from 'apps/rapid-cmi5-electron-frontend/src/app/utils/infoButtonText';
+import { getInfoText } from '../../../utils/infoButtonText';
 
 export function DownloadCmi5ZipForm({
   defaultData,

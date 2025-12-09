@@ -1,6 +1,5 @@
 /* Branded */
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { ButtonInfoField } from '@rangeos-nx/ui/branded';
 
 /* Icons*/
 import AutorenewIcon from '@mui/icons-material/Autorenew';
@@ -26,6 +25,7 @@ import {
   RangeVMStatusEnum,
   RangeVMKubevirtVmStatusEnum,
 } from '@rangeos-nx/frontend/clients/devops-api';
+import { ButtonInfoField } from './utils/buttons';
 
 /** @constant
  * Error Icon with Outline Style

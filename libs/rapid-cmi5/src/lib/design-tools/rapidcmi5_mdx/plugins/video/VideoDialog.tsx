@@ -17,7 +17,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 
 import {
-  ButtonIcon,
   ButtonModalMainUi,
   ComboBoxSelectorUi,
   ModalDialog,

@@ -954,6 +954,7 @@ export type {
 
 //Enums
 export {
+  ScenariosCreate1Request,
   AwsMachineConfigInstanceTypeEnum,
   AwsMachineConfigZoneEnum,
   BackgroundJobStateEnum,

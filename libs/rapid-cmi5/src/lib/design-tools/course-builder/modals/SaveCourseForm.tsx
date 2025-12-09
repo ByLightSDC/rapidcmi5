@@ -3,15 +3,13 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 
 import {
-  ButtonMinorUi,
   ModalDialog,
-  useToaster,
-  FormControlPassword,
   FormControlTextField,
   FormControlUIProvider,
   FormStateType,
   MiniForm,
   FormControlCheckboxField,
+  FormControlPassword,
 } from '@rangeos-nx/ui/branded';
 import { Alert, Box, Grid, Typography } from '@mui/material';
 import { getValue, Stack } from '@mui/system';
@@ -41,6 +39,7 @@ import {
   courseOperations,
   updateDirtyDisplay,
 } from '../../../redux/courseBuilderReducer';
+import { useToaster, ButtonMinorUi } from '@rangeos-nx/ui/api/hooks';
 
 export function SaveCourseForm({
   defaultData,

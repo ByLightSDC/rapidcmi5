@@ -15,7 +15,6 @@ import {
 
 import * as yup from 'yup';
 import {
-  ButtonTooltip,
   debugLog,
   editorInPlayback$,
   FormControlTextField,
@@ -33,13 +32,14 @@ import LinkOffIcon from '@mui/icons-material/LinkOff';
 
 import Popper from '@mui/material/Popper';
 import { useTheme } from '@mui/system';
-import { CustomTheme } from 'apps/rapid-cmi5-electron-frontend/src/app/styles/createPalette';
+import { CustomTheme } from '../../../../styles/createPalette';
 
 import LaunchIcon from '@mui/icons-material/Launch';
 import EditIcon from '@mui/icons-material/Edit';
 
 import { $setSelection } from 'lexical';
 import { useClickOutside } from './useClickOutside';
+import { ButtonTooltip } from '@rangeos-nx/ui/api/hooks';
 
 /**
  * Dialog for previewing and editing links in MdxEditor

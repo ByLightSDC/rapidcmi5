@@ -1,10 +1,10 @@
+import { setModal } from './commonAppReducer';
 import {
   useSetCacheSelection,
   useClearCacheSelection,
 } from './useCacheSelection';
 
 import { useDispatch } from 'react-redux';
-import { setModal } from '@rangeos-nx/ui/redux';
 
 export type tSelectionMeta = {
   filters?: any;

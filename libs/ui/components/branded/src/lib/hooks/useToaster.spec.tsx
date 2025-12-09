@@ -1,3 +1,4 @@
+import { useToaster } from '@rangeos-nx/ui/api/hooks';
 import '@testing-library/jest-dom';
 import {
   fireEvent,
@@ -5,8 +6,6 @@ import {
   waitForElementToBeRemoved,
 } from '@testing-library/react';
 import { NotificationsProvider } from '@toolpad/core';
-
-import { useToaster } from './useToaster';
 
 const UseToasterHookWrapper = ({
   message,

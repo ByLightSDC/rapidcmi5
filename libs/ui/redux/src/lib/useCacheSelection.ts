@@ -5,16 +5,9 @@ Methods included for setting and retrieving selection
 */
 
 import { useDispatch, useSelector } from 'react-redux';
+import { selection, CommonAppSelectionState, setSelection, multipleSelection, CommonAppMultipleSelectionState, setMultipleSelection } from './commonAppReducer';
 
-/* Redux */
-import {
-  CommonAppSelectionState,
-  CommonAppMultipleSelectionState,
-  selection,
-  setSelection,
-  multipleSelection,
-  setMultipleSelection,
-} from '@rangeos-nx/ui/redux';
+
 
 export const useClearCacheSelection = () => {
   const selectionArr = useSelector(selection);

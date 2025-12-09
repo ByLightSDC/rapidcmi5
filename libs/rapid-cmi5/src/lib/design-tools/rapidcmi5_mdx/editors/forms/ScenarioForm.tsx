@@ -1,13 +1,10 @@
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import { UseFormReturn } from 'react-hook-form';
 import {
-  ClearedUuidValue,
-  DynamicSelectorFieldGroup,
   FormControlCheckboxField,
   FormControlSelectField,
   FormControlTextField,
   FormControlUIProvider,
-  FormCrudType,
   FormStateType,
   MiniForm,
 } from '@rangeos-nx/ui/branded';
@@ -20,9 +17,10 @@ import {
 
 import { NAME_GROUP_OPT, UUID_GROUP } from '@rangeos-nx/ui/validation';
 
-import { getInfoText } from 'apps/rapid-cmi5-electron-frontend/src/app/utils/infoButtonText';
+import { getInfoText } from '../../../../utils/infoButtonText';
 import { RC5ActivityTypeEnum } from '@rangeos-nx/types/cmi5';
 import LrsHeaderWithDetails from './LrsStatementHelper';
+import { FormCrudType } from '@rangeos-nx/ui/redux';
 
 export const ScenarioForm = ({
   crudType,

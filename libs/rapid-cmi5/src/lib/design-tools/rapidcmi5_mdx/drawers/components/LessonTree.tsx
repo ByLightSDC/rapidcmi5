@@ -45,10 +45,10 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
-import { useToaster } from '@rangeos-nx/ui/branded';
 import { getRepoPath } from '../../../course-builder/GitViewer/utils/fileSystem';
 import { currentRepoAccessObjectSel } from '../../../../redux/repoManagerReducer';
 import { slugifyPath } from '../../../course-builder/GitViewer/utils/useCourseOperationsUtils';
+import { useToaster } from '@rangeos-nx/ui/api/hooks';
 
 const textColor = 'text.hint';
 

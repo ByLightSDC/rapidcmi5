@@ -15,6 +15,7 @@
         "entryFile": "libs/frontend/clients/devops-api/src/index.ts",
         "external": ["react/jsx-runtime"],
         "rollupConfig": "@nx/react/plugins/bundle-rollup",
+        "package.json" : "libs/frontend/clients/devops-api/package.json",
         "compiler": "babel",
         "assets": [
           {

@@ -3,7 +3,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 /* MUI */
 import MenuItem from '@mui/material/MenuItem';
 import TextField, { StandardTextFieldProps } from '@mui/material/TextField';
-import { ButtonInfoField } from '../buttons/buttons';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { TypographyProps } from '@mui/material/Typography';
@@ -12,6 +11,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 /* Icons */
 import Checkbox from '@mui/material/Checkbox';
 import { SelectProps, Stack } from '@mui/material';
+import { ButtonInfoField } from '@rangeos-nx/ui/api/hooks';
 
 export type SelectorMenuOption = {
   data?: any;
