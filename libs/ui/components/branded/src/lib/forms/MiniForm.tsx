@@ -1,17 +1,11 @@
+/*
+ *   Copyright (c) 2025 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 /* eslint-disable react/jsx-no-useless-fragment */
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Alert, Box, Grid, Stack } from '@mui/material';
-import {
-  ButtonLoadingUi,
-  ButtonModalCancelUi,
-  ButtonModalMainUi,
-  Form,
-  FormControlUIContext,
-  FormCrudType,
-  FormStateType,
-  LoadingUi,
-  useToaster,
-} from '@rangeos-nx/ui/branded';
+
 import {
   useCallback,
   useContext,
@@ -25,6 +19,13 @@ import { useForm, UseFormReturn, useWatch } from 'react-hook-form';
 /* Icons */
 import Check from '@mui/icons-material/Check';
 import { AxiosError } from 'axios';
+import { useToaster, ButtonLoadingUi } from '@rangeos-nx/ui/api/hooks';
+import { FormCrudType } from '@rangeos-nx/ui/redux';
+import { LoadingUi } from '../indicators/Loading';
+import { ButtonModalCancelUi, ButtonModalMainUi } from '../inputs/buttons/buttonsmodal';
+import { FormStateType } from '../types/form';
+import { FormControlUIContext } from './FormControlUIContext';
+import Form from './Form';
 
 /**
 * @typedef {Object} MiniFormProps
@@ -121,7 +122,7 @@ export function MiniForm({
     defaultValues: useMemo(() => {
       return initialData;
     }, [initialData]),
-    mode: 'onChange',
+    mode: 'all',
     resolver: yupResolver(validationSchema),
   });
 

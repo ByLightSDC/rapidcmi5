@@ -3,7 +3,6 @@ import { modal, setModal } from '@rangeos-nx/ui/redux';
 
 /* Branded */
 import {
-  ButtonCopyText,
   defaultCloneRepoData,
   defaultCommitData,
   defaultCreateCourseData,

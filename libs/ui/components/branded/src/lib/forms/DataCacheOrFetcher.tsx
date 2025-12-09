@@ -1,12 +1,16 @@
 /*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
+/*
 This script will attempt to retrieve data from React Query cache
 If it is not present in the cache, it will fetch and return it
 */
 
 import { useEffect, useState } from 'react';
 
-import { useCache } from '@rangeos-nx/ui/branded';
 import DataFetcher from './DataFetcher';
+import { useCache } from '@rangeos-nx/ui/api/hooks';
 
 export function DataCacheOrFetcher({
   apiHook,

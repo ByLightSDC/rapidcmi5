@@ -1,3 +1,7 @@
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -8,23 +12,24 @@ import {
   useClearCacheSelection,
   useGetCacheSelection,
   useCurrentSelection,
+  FormCrudType,
 } from '@rangeos-nx/ui/redux';
 
 /* Branded */
 import {
-  ButtonSelectUi,
-  FormCrudType,
+
   tFormFieldRendererProps,
-  tUUIDFieldInspectorProps,
+
   useDisplayFocus,
   useIsVisible,
 } from '@rangeos-nx/ui/branded';
 
-/* API */
-import UUIDFieldInspector from './UUIDFieldInspector';
+
 
 /* MUI */
 import { TextFieldProps } from '@mui/material/TextField';
+import { ButtonSelectUi } from '@rangeos-nx/ui/api/hooks';
+import UUIDFieldInspector, { tUUIDFieldInspectorProps } from './UUIDFieldInspector';
 
 export enum ClearedUuidValue {
   Empty,
@@ -403,7 +408,7 @@ export function DynamicSelectorFieldGroup(
         indexedArrayField: indexedArrayField,
         propertyKey,
         isKeyValue,
-        shouldSkipQuery: shouldRestrictToInDesignOnly,
+        shouldSkipQuery:shouldRestrictToInDesignOnly
       },
       selName: watchKey,
       topicId,

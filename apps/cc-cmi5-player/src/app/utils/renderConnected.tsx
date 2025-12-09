@@ -2,8 +2,8 @@ import { render } from '@testing-library/react';
 import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 
-import { commonAppReducer } from '@rangeos-nx/ui/redux';
-import { ctfReducer, FormCrudType } from '@rangeos-nx/ui/branded';
+import { commonAppReducer, FormCrudType } from '@rangeos-nx/ui/redux';
+import { ctfReducer } from '@rangeos-nx/ui/branded';
 
 import auReducer from '../redux/auReducer';
 

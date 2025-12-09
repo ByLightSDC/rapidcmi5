@@ -15,7 +15,6 @@ import useQuizGrader from './hooks/useQuizGrader';
 
 import AuQuizQuestion from './QuizQuestion';
 import QuizScore from './QuizScore';
-import { ButtonMainUi, ButtonMinorUi } from '../../inputs/buttons/buttons';
 
 /** Icons */
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
@@ -38,6 +37,7 @@ import QuizReview from './QuizReview';
 import QuestionNav from './QuestionNav';
 import { usePersistQuizProgress } from './hooks/usePersistQuiz';
 import { useHydrateQuiz } from './hooks/useHydrateQuiz';
+import { ButtonMinorUi, ButtonMainUi } from '@rangeos-nx/ui/api/hooks';
 
 export type PotentialAnswerType = AnswerType | null;
 

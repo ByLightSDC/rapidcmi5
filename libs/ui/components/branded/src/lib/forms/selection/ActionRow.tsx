@@ -1,3 +1,7 @@
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useMemo } from 'react';
 
@@ -5,7 +9,6 @@ import React, { useMemo } from 'react';
 import {
   OverflowTypography,
   useDisplayDateFormatter,
-  ButtonIcon,
   equalsNoCase,
   SortButton,
   defaultSortBy,
@@ -28,6 +31,7 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 
 import { RowAction, RowStatus } from '../../types/actionRowTypes';
 import Box from '@mui/material/Box';
+import { ButtonIcon } from '@rangeos-nx/ui/api/hooks';
 
 export const actionRowHeaderColor = 'text.hint';
 export const actionRowDateHeader = 'Created or Updated';

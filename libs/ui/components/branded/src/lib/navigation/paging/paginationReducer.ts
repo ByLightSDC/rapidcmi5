@@ -1,5 +1,5 @@
+import { resetPersistance } from '@rangeos-nx/ui/redux';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { resetPersistance } from '@rangeos-nx/ui/branded';
 
 /**
  * @interface SliceState
@@ -14,7 +14,7 @@ interface SliceState {
  * @interface Filters
  * @example  {"Certificates": {"tag": "Any", "sortBy": "dateEdited", "order": "desc"}, "DNS Servers": { "sortBy": "dateEdited", "order": "desc"}}
  */
-interface Filters {
+export interface Filters {
   [key: string]: { [key: string]: string };
 }
 
@@ -22,7 +22,7 @@ interface Filters {
  * @interface PageSettings
  * @example  {"Certificates": {"page": 1, "rowsPerPage": 10}}}
  */
-interface PageSettings {
+export interface PageSettings {
   [key: string]: { [key: string]: any };
 }
 

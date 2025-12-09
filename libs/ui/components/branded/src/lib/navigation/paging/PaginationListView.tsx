@@ -3,19 +3,8 @@
 import { useQueryClient } from 'react-query';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import DataFetcher from '../../forms/DataFetcher';
 import { PaginationFilters } from './PaginationFilters';
 import { PaginationFiltersContext } from './PaginationFiltersContext';
-
-import {
-  authoredByMeFilter,
-  ButtonIcon,
-  debugLogWarning,
-  ListView,
-  ListViewProps,
-  paginationFiltersConfig,
-  TablePaginationUi,
-} from '@rangeos-nx/ui/branded';
 
 /* MUI */
 import Alert from '@mui/material/Alert';
@@ -25,7 +14,12 @@ import { Typography } from '@mui/material';
 
 /*Icons */
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { queryHooksConfig } from '@rangeos-nx/ui/api/hooks';
+import { ButtonIcon, queryHooksConfig } from '@rangeos-nx/ui/api/hooks';
+import ListView, { ListViewProps } from '../../data-display/ListView';
+import { debugLogWarning } from '../../utility/logger';
+import { authoredByMeFilter, paginationFiltersConfig } from './paginationFiltersConstants';
+import TablePaginationUi from './TablePagination';
+import DataFetcher from '../../forms/DataFetcher';
 
 const defaultRowsPerPage = 100;
 

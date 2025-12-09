@@ -1,7 +1,17 @@
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 /* eslint-disable react/jsx-no-useless-fragment */
 import { useContext, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setLoader, modal, setModal, setMessage } from '@rangeos-nx/ui/redux';
+import {
+  setLoader,
+  modal,
+  setModal,
+  setMessage,
+  FormCrudType,
+} from '@rangeos-nx/ui/redux';
 import { useLocation, useNavigate } from 'react-router';
 
 /* Shared */
@@ -11,21 +21,6 @@ import {
   useGetCacheSelection,
   useSetCacheSelection,
 } from '@rangeos-nx/ui/redux';
-
-/* Branded */
-import {
-  ButtonMinorUi,
-  ModalDialog,
-  PaginationListView,
-  PaginationFiltersContextProvider,
-  BookmarksContext,
-  FormCrudType,
-  inputFilterType,
-  ButtonLoadingUi,
-  ButtonModalCancelUi,
-  sxSelectButtonprops,
-} from '@rangeos-nx/ui/branded';
-import { useCache, bookmarkCue, tBookmark } from '@rangeos-nx/ui/branded';
 
 /* Types */
 import { RowAction } from '../../types/actionRowTypes';
@@ -42,8 +37,25 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 
 /* Constants */
-import { addBookmarkButtonId, rowsPerPageDefault } from './constants';
-import { featureFlagRouteModals } from '../uuidInspectorFeatureFlags';
+import {
+  useCache,
+  ButtonMinorUi,
+  ButtonLoadingUi,
+} from '@rangeos-nx/ui/api/hooks';
+import { ButtonModalCancelUi } from '../../inputs/buttons/buttonsmodal';
+import ModalDialog from '../../modals/ModalDialog';
+import { BookmarksContext } from '../../navigation/bookmark/BookmarksContext';
+import {
+  tBookmark,
+  bookmarkCue,
+} from '../../navigation/bookmark/bookmarksReducer';
+import {
+  inputFilterType,
+  PaginationFiltersContextProvider,
+} from '../../navigation/paging/PaginationFiltersContext';
+import PaginationListView from '../../navigation/paging/PaginationListView';
+import { rowsPerPageDefault, addBookmarkButtonId } from './constants';
+import { sxSelectButtonprops } from './MultipleSelectWrapper';
 const dialogButtons = ['Cancel', 'Apply'];
 const selectButtonId = -1;
 
@@ -269,23 +281,8 @@ export function SelectWrapper(props: tSelectWrapperProps) {
         //Persist selection modal in bookmarks
         addModalToBookmark({ ...modalObj });
 
-        if (!featureFlagRouteModals) {
-          if (topicId) {
-            dispatch(
-              setModal({
-                id: data.uuid,
-                meta: data,
-                name: data.name,
-                crudType: FormCrudType.edit,
-                topic: topicId,
-                type: 'view',
-              }),
-            );
-          }
-        } else {
-          if (editRoute) {
-            navigate(editRoute + data.uuid);
-          }
+        if (editRoute) {
+          navigate(editRoute + data.uuid);
         }
 
         break;
@@ -547,25 +544,12 @@ export function SelectWrapper(props: tSelectWrapperProps) {
                     //Persist selection modal in bookmarks
                     addModalToBookmark({ ...modalObj });
 
-                    if (!featureFlagRouteModals) {
-                      if (topicId) {
-                        dispatch(
-                          setModal({
-                            id: null,
-                            meta: null,
-                            name: null,
-                            crudType: FormCrudType.create,
-                            topic: topicId,
-                            type: 'view',
-                          }),
-                        );
-                      }
-                    } else {
+                 
                       if (createRoute) {
                         navigate(createRoute);
                       }
                     }
-                  }}
+                  }
                   sxProps={{
                     ...sxSelectButtonprops,
                     marginLeft: '12px',

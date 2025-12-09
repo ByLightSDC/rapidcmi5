@@ -1,14 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-
-/* Store */
-import {
-  resetValidation,
-  fieldAttributes,
-  isYupValidationSetUp,
-  setAttribute,
-  setIsYupValidationSetUp,
-} from './dynamicSchemaReducer';
-
+import { fieldAttributes, isYupValidationSetUp, resetValidation, setAttribute, setIsYupValidationSetUp } from './dynamicSchemaReducer';
 // DO NOT CHANGE - this is the required delimiter for the react-hook-form nested fields
 export const keyDelim = '.';
 
@@ -28,6 +19,7 @@ export enum AttributeProperty {
  * AND form data can be sanitized before submitting to api
  * @returns The hook
  */
+
 export const useDynamicSchemaValidation = () => {
   const dispatch = useDispatch();
   const fieldAttributeSet = useSelector(fieldAttributes);
@@ -36,8 +28,8 @@ export const useDynamicSchemaValidation = () => {
   /**
    * Clears the schema data validation from redux store
    */
-  const clearValidation = () => {
-    dispatch(resetValidation());
+  const clearValidation = (v : any) => {
+    dispatch(resetValidation(v));
   };
 
   /**

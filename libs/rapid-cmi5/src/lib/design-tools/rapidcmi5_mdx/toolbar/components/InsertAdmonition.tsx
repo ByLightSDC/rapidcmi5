@@ -1,9 +1,8 @@
 import { useCellValue, usePublisher } from '@mdxeditor/gurx';
-import { capitalizeFirstLetter, SelectorMainUi } from '@rangeos-nx/ui/branded';
+import { capitalizeFirstLetter, getAdmonitionIcon, SelectorMainUi } from '@rangeos-nx/ui/branded';
 import { admonitionLabels, AdmonitionTypeEnum } from '@rangeos-nx/types/cmi5';
 import { directiveDescriptors$, insertDirective$ } from '@mdxeditor/editor';
 import { useEffect, useMemo } from 'react';
-import { getAdmonitionIcon } from 'libs/ui/components/branded/src/lib/cmi5/markdown/components/AdmonitionStyles';
 import { Typography } from '@mui/material';
 
 /**

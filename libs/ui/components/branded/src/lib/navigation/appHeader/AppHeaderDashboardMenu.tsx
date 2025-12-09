@@ -2,9 +2,6 @@ import React, { useContext } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
-/* Branded */
-import { BookmarksContext, SizingContext } from '@rangeos-nx/ui/branded';
-
 import { navBarIndex } from '@rangeos-nx/ui/redux';
 
 /* MUI */
@@ -14,6 +11,8 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 import { SvgIconTypeMap } from '@mui/material/SvgIcon';
+import { SizingContext } from '../../layout/SizingContext';
+import { BookmarksContext } from '../bookmark/BookmarksContext';
 
 /**
  * @typedef {Object} DashboardIcon

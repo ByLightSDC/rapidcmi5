@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import uniqid from 'uniqid';
 import { SlideTrigger } from '../constants/SlideTriggers';
-import { useItemVisibleInBounds } from '@rangeos-nx/ui/branded';
 import anime from 'animejs/lib/anime';
 import { SlideEvent } from '../constants/SlideEvents';
+import { useItemVisibleInBounds } from '../../../hooks/useItemVisibleInBounds';
 
 /**
  * A component that allows for an element in markdown to be animated.

@@ -1,15 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect } from 'react';
 
-/* Branded */
-import {
-  ButtonIcon,
-  ButtonTooltip,
-  SelectorMainUi,
-  TextFieldMainUi,
-  useDisplayFocus,
-} from '@rangeos-nx/ui/branded';
-
 import {
   PaginationFiltersContext,
   inputFilterType,
@@ -27,6 +18,10 @@ import Typography from '@mui/material/Typography';
 /* Icon */
 import FilterListIcon from '@mui/icons-material/FilterList';
 import Checkbox from '@mui/material/Checkbox';
+import { ButtonTooltip, ButtonIcon } from '@rangeos-nx/ui/api/hooks';
+import { useDisplayFocus } from '../../hooks/useDisplayFocus';
+import { SelectorMainUi } from '../../inputs/selectors/selectors';
+import { TextFieldMainUi } from '../../inputs/textfields/textfields';
 
 /**
  * @typedef {Object} PaginationFilterProps

@@ -34,8 +34,6 @@ import ImportExportIcon from '@mui/icons-material/ImportExport';
 
 //import SettingsIcon from '@mui/icons-material/Settings';
 import {
-  ButtonMinorUi,
-  ButtonOptions,
   debugLogError,
   RowAction,
 } from '@rangeos-nx/ui/branded';
@@ -46,6 +44,7 @@ import { RootState } from '../../../redux/store';
 import { RepoState } from '../../../redux/repoManagerReducer';
 import ChangeRepoExpander from './components/ChangeRepoExpander';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import { ButtonOptions, ButtonMinorUi } from '@rangeos-nx/ui/api/hooks';
 
 /** Order important actions */
 export enum CourseActionEnum {

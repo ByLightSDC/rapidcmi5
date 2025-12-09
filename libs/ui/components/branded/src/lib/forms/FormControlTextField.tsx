@@ -1,8 +1,9 @@
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 /* eslint-disable react/jsx-no-useless-fragment */
 import { Control, Controller } from 'react-hook-form';
-
-import ReadOnlyTextField from './ReadOnlyTextField';
-import { ButtonIcon, ButtonInfoField } from '../inputs/buttons/buttons';
 
 /* MUI */
 import FormControl from '@mui/material/FormControl';
@@ -10,6 +11,8 @@ import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
 import InputAdornment from '@mui/material/InputAdornment';
 import { fieldMarginTop } from '../styles/muiTheme';
+import { ButtonIcon, ButtonInfoField } from '@rangeos-nx/ui/api/hooks';
+import ReadOnlyTextField from './ReadOnlyTextField';
 
 export type tFormControlTextFieldProps = {
   control?: Control;

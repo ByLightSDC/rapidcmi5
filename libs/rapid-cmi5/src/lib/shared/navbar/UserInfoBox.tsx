@@ -1,17 +1,14 @@
 import { AppDispatch } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { modal, setModal, themeColor, setTheme } from '@rangeos-nx/ui/redux';
-import { config } from '@rangeos-nx/frontend/environment';
-
-import { useLogOut } from '../../hooks/useLogOut';
-
-/* Branded */
 import {
-  DataCacheOrFetcher,
-  ModalDialog,
+  modal,
+  setModal,
+  themeColor,
+  setTheme,
   resetPersistance,
-} from '@rangeos-nx/ui/branded';
+} from '@rangeos-nx/ui/redux';
+import { config } from '@rangeos-nx/frontend/environment';
 
 /*Material*/
 import Menu from '@mui/material/Menu';
@@ -30,11 +27,8 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 import { useState } from 'react';
 
-import {
-  queryKeyBuildVersion,
-  useGetBuildVersion,
-} from '@rangeos-nx/ui/api/hooks';
 import { BuildVersionInfo } from '@rangeos-nx/frontend/clients/devops-api';
+import { DataCacheOrFetcher, ModalDialog } from '@rangeos-nx/ui/branded';
 
 /**
  * @typedef propTypes - User Info Box props
@@ -49,7 +43,6 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
   const appThemeColor = useSelector(themeColor);
-  const logOut = useLogOut();
   const modalObj = useSelector(modal);
 
   //#region About
@@ -112,10 +105,6 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
     onClose();
   };
 
-  const handleLogout = async () => {
-    logOut();
-  };
-
   /**
    * Prompts user on whether they want to clear app data
    * Closes options menu
@@ -135,17 +124,7 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
   return (
     <section aria-label="user info">
       {/* dont fetch until the menu opens (anchor defined) to ensure that the authToken is set in queryHooksConfig */}
-      {anchorEl && (
-        <DataCacheOrFetcher
-          apiHook={useGetBuildVersion}
-          payload={{ id: 'buildVersion' }}
-          queryKey={queryKeyBuildVersion}
-          queryId={'buildVersion'}
-          shouldSuppressToaster={true}
-          onDataLoad={handleInitialDataLoad}
-          onError={handleInitialDataError}
-        />
-      )}
+
       <div data-testid="modals">
         <AboutBuildVersionDialog
           appThemeColor={appThemeColor}
@@ -210,7 +189,7 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
             }}
           />
         </MenuItem>
-        <MenuItem onClick={handleLogout}>
+        {/* <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <ExitToAppIcon />
           </ListItemIcon>
@@ -221,7 +200,7 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
               variant: 'body2',
             }}
           />
-        </MenuItem>
+        </MenuItem> */}
       </Menu>
     </section>
   );

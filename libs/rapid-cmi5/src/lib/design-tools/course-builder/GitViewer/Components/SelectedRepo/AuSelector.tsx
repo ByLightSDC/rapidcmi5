@@ -5,13 +5,11 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
-  Typography,
 } from '@mui/material';
-import DirectoryTreeView from './DirectoryTree';
-import { RepoState } from 'apps/rapid-cmi5-electron-frontend/src/app/redux/repoManagerReducer';
-import { RootState } from 'apps/rapid-cmi5-electron-frontend/src/app/redux/store';
+
 import { useSelector } from 'react-redux';
+import { RootState } from '../../../../../redux/store';
+import { RepoState } from '../../../../../redux/repoManagerReducer';
 
 interface AuSelectorProps {
   setSlideBlockName: (blockIndex: string | null) => void;

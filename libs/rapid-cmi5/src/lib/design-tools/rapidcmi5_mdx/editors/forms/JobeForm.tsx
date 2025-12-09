@@ -3,7 +3,6 @@ import {
   FormControlSelectField,
   FormControlTextField,
   FormControlUIProvider,
-  FormCrudType,
   FormStateType,
   MiniForm,
 } from '@rangeos-nx/ui/branded';
@@ -13,6 +12,7 @@ import { JobeContent, moveOnCriteriaOptions } from '@rangeos-nx/types/cmi5';
 
 import { RC5ActivityTypeEnum } from '@rangeos-nx/types/cmi5';
 import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
+import { FormCrudType } from '@rangeos-nx/ui/redux';
 
 export const JobeForm = ({
   crudType,

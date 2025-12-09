@@ -1,4 +1,3 @@
-import { AppLogo } from '@rangeos-nx/ui/branded';
 import { useNavigate } from 'react-router';
 
 /* MUI */
@@ -7,27 +6,8 @@ import { Typography } from '@mui/material';
 
 /* Icons */
 import { useSelector } from 'react-redux';
-import { plugins } from '@rangeos-nx/ui/redux';
-
-/**
- * @typedef {Object} AppMenuConfigItem
- * @property {string} id Application id
- * @property {boolean} isVisible Whether app should be visible in ap menus
- * @property {string} description App description
- * @property { JSX.Element} icon App icon
- * @property {string} title App title
- * @property {string} url App Url
- */
-export type AppMenuConfigItem = {
-  id: string;
-  isVisible: boolean;
-  description: string;
-  icon?: JSX.Element;
-  iconUrl?: string;
-  shouldIFrame?: boolean;
-  title: string;
-  url: string;
-};
+import { AppMenuConfigItem, plugins } from '@rangeos-nx/ui/redux';
+import AppLogo from './AppLogo';
 
 /**
  * Returns menu with links to launch apps from a welcome page

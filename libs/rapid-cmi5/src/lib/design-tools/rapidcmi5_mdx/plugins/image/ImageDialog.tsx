@@ -18,13 +18,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 
 import {
-  ButtonIcon,
   ButtonModalMainUi,
   ComboBoxSelectorUi,
   ModalDialog,
   TextFieldMainUi,
 } from '@rangeos-nx/ui/branded';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
+import { ButtonIcon } from '@rangeos-nx/ui/api/hooks';
 
 // used for uploading files
 const VisuallyHiddenInput = styled('input')({

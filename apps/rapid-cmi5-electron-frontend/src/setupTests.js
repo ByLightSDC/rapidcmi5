@@ -27,14 +27,6 @@ jest.mock('./app/utils/featureFlags', () => ({
   featureFlagBookmarks: false,
 }));
 
-jest.mock(
-  '../../../libs/ui/components/branded/src/lib/forms/uuidInspectorFeatureFlags',
-  () => ({
-    __esModule: false,
-    featureFlagInspectField: false,
-  }),
-);
-
 /** Local Date Display Snapshots Break  */
 const mockDateFormatter = () => {
   const formatDisplayDateTime = (databaseDate, dateFormat) => {

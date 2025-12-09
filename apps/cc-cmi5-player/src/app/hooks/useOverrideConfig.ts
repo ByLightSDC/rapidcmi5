@@ -155,7 +155,6 @@ export const useOverrideConfigs = () => {
           'Config after overrides',
           {
             DEVOPS_API_URL: config.DEVOPS_API_URL,
-            CMI5_PLAYER_VERSION: config.CMI5_PLAYER_VERSION,
             SLIDE_LOGO: config.THEME.SLIDE_LOGO,
           },
           'auManager',

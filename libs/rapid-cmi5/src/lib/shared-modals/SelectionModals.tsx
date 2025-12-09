@@ -3,14 +3,6 @@ import { useSelector } from 'react-redux';
 import { modal, useGetCacheSelection } from '@rangeos-nx/ui/redux';
 import { Topic, apiTopicsHookData } from '@rangeos-nx/ui/api/hooks';
 
-/* Branded */
-import {
-  ActionRow,
-  OverflowTypography,
-  SelectWrapper,
-  listStyles,
-  actionRowSortableColumns,
-} from '@rangeos-nx/ui/branded';
 
 /* Constants */
 import {
@@ -18,6 +10,7 @@ import {
   rowsPerPage_Certificate,
   rowsPerPage_DnsZone,
 } from '../constants';
+import { ActionRow, actionRowSortableColumns, SelectWrapper } from '@rangeos-nx/ui/branded';
 
 /**
  * Returns the form to be displayed based on modalObj.type

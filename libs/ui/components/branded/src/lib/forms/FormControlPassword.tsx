@@ -1,8 +1,10 @@
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 /* eslint-disable react/jsx-no-useless-fragment */
 import { useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
-
-import { ButtonIcon, ButtonInfoField } from '../inputs/buttons/buttons';
 
 /* MUI */
 import FormControl from '@mui/material/FormControl';
@@ -13,6 +15,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { fieldMarginTop } from '../styles/muiTheme';
+import { ButtonIcon, ButtonInfoField } from '@rangeos-nx/ui/api/hooks';
 
 type tFormControlPasswordProps = {
   control?: Control;

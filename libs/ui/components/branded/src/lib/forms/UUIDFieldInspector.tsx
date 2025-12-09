@@ -1,3 +1,7 @@
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /*
@@ -10,28 +14,18 @@ Because we use react hook form , clicking submit button in one form will trigger
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { commonIds, setModal } from '@rangeos-nx/ui/redux';
-
-import {
-  tFormControlTextFieldProps,
-  ButtonIcon,
-  DataCacheOrFetcher,
-  FormCrudType,
-  ReadOnlyTextField,
-  LoadingUi,
-} from '@rangeos-nx/ui/branded';
+import { FormCrudType, setModal } from '@rangeos-nx/ui/redux';
 
 import EditIcon from '@mui/icons-material/Edit';
 import PreviewIcon from '@mui/icons-material/Preview';
 
 import TextField from '@mui/material/TextField';
 
-import {
-  featureFlagInspectDisabledField,
-  featureFlagInspectField,
-  featureFlagInspectModalIsEditable,
-  featureFlagRouteModals,
-} from './uuidInspectorFeatureFlags';
+import { ButtonIcon } from '@rangeos-nx/ui/api/hooks';
+import { LoadingUi } from '../indicators/Loading';
+import DataCacheOrFetcher from './DataCacheOrFetcher';
+import { tFormControlTextFieldProps } from './FormControlTextField';
+import ReadOnlyTextField from './ReadOnlyTextField';
 
 /**
  * @interface iUUIDFieldInspectorProps
@@ -126,7 +120,6 @@ export function UUIDFieldInspector(props: tUUIDFieldInspectorProps) {
   } = props;
 
   const navigate = useNavigate();
-  const commonIdsSel = useSelector(commonIds);
   const [readyToLoad, setReadyToLoad] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalTriggered, setIsModalTriggered] = useState(false);
@@ -148,20 +141,13 @@ export function UUIDFieldInspector(props: tUUIDFieldInspectorProps) {
 
   //feature flags
   const isModalEditable =
-    featureFlagInspectModalIsEditable &&
-    (crudType === FormCrudType.create || crudType === FormCrudType.edit);
+    crudType === FormCrudType.create || crudType === FormCrudType.edit;
 
   //combine flags into single check
-  const shouldFetchFlag =
-    shouldFetch &&
-    (!disabled || featureFlagInspectDisabledField) &&
-    featureFlagInspectField &&
-    readyToLoad;
+  const shouldFetchFlag = shouldFetch && !disabled && readyToLoad;
 
   //cached data
-  const cacheData: any = uuid
-    ? commonIdsSel.find((element) => element.id === uuid)
-    : null;
+  const cacheData: any = null;
 
   if (crudType === FormCrudType.design && cacheData?.name) {
     shouldFetchFeature = false;
@@ -202,26 +188,9 @@ export function UUIDFieldInspector(props: tUUIDFieldInspectorProps) {
     event.stopPropagation();
     setIsModalTriggered(true);
     //Pull from Common or fallback on last load
-    const commonIdObj = commonIdsSel.find((element) => element.id === uuid);
 
-    if (!featureFlagRouteModals) {
-      dispatch(
-        setModal({
-          type: 'view',
-          id: commonIdObj?.meta?.uuid || uuid,
-          meta: commonIdObj?.meta || data,
-          name: alias,
-          crudType:
-            crudType === FormCrudType.view
-              ? FormCrudType.view
-              : FormCrudType.edit,
-          topic: topicId || null,
-        }),
-      );
-    } else {
-      if (editRoute) {
-        navigate(editRoute + '/' + uuid);
-      }
+    if (editRoute) {
+      navigate(editRoute + '/' + uuid);
     }
   };
 
@@ -289,7 +258,7 @@ export function UUIDFieldInspector(props: tUUIDFieldInspectorProps) {
     }
 
     //check for updated cached date
-    //TEMP REF this causes a bug
+    // REF this causes a bug
     // if (!defaultData.hasOwnProperty('isNotValid')) {
     //   debuggerLog('or cache changed', defaultData);
     //   //alias exists, use cached data

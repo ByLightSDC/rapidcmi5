@@ -421,31 +421,16 @@ function AuManager() {
       let makeProgress = true;
 
       if (auJson.slides[activeTab]) {
-        logger.debug(
-          'config.CMI5_PLAYER_VERSION',
-          { version: config.CMI5_PLAYER_VERSION },
-          'auManager',
-        );
-        if (config.CMI5_PLAYER_VERSION === '0') {
+        const content = auJson.slides[activeTab].content;
+        if (typeof content === 'string') {
           if (
-            auJson.slides[activeTab].type === SlideTypeEnum.Quiz ||
-            auJson.slides[activeTab].type === SlideTypeEnum.JobeInTheBox ||
-            auJson.slides[activeTab].type === SlideTypeEnum.CTF
+            content.indexOf(':::quiz') >= 0 ||
+            content.indexOf(':::ctf') >= 0 ||
+            content.indexOf(':::jobe') >= 0 ||
+            content.indexOf(':::consoles') >= 0 ||
+            content.indexOf(':::scenario') >= 0
           ) {
             makeProgress = false;
-          }
-        } else {
-          const content = auJson.slides[activeTab].content;
-          if (typeof content === 'string') {
-            if (
-              content.indexOf(':::quiz') >= 0 ||
-              content.indexOf(':::ctf') >= 0 ||
-              content.indexOf(':::jobe') >= 0 ||
-              content.indexOf(':::consoles') >= 0 ||
-              content.indexOf(':::scenario') >= 0
-            ) {
-              makeProgress = false;
-            }
           }
         }
       }

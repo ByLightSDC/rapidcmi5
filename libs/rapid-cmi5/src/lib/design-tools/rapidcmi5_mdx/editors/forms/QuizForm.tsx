@@ -6,7 +6,6 @@ import {
   FormControlSelectField,
   FormControlTextField,
   FormControlUIProvider,
-  FormCrudType,
   FormFieldArray,
   FormStateType,
   MiniForm,
@@ -35,6 +34,7 @@ import { RC5ActivityTypeEnum } from '@rangeos-nx/types/cmi5';
 import { QuizQuestionsFieldGroup } from '../../../course-builder/QuizQuestionsFieldGroup';
 import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
 import LrsHeaderWithDetails from './LrsStatementHelper';
+import { FormCrudType } from '@rangeos-nx/ui/redux';
 
 export const QuizForm = ({
   activityKind,

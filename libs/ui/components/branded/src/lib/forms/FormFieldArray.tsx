@@ -1,3 +1,7 @@
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -14,12 +18,6 @@ import { UseFormReturn, useFieldArray } from 'react-hook-form';
 
 /* Form */
 import FormControlTextField from './FormControlTextField';
-import {
-  ButtonInfoFormHeaderLayout,
-  ButtonIcon,
-  ButtonInfoField,
-} from '../inputs/buttons/buttons';
-
 import { ButtonModalMinorUi } from '../inputs/buttons/buttonsmodal';
 import { useDisplayFocus } from '../hooks/useDisplayFocus';
 
@@ -47,11 +45,12 @@ import PlusOneIcon from '@mui/icons-material/PlusOne';
 
 import { StepperContext } from '../navigation/stepper/StepperContext';
 import ModalDialog from '../modals/ModalDialog';
-import MultiSelectButton, { MultiSelectButtonProps } from './MultiSelectButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { expanded, message, setExpanded } from '@rangeos-nx/ui/redux';
-import { AddButton, SingleSelectButtonProps } from './AddButton';
-import { FormCrudType } from './constants';
+import { ButtonInfoField, ButtonInfoFormHeaderLayout, ButtonIcon } from '@rangeos-nx/ui/api/hooks';
+import MultiSelectButton, { MultiSelectButtonProps } from './MultiSelectButton';
+import { SingleSelectButtonProps, AddButton } from './AddButton';
+
 
 /* Style to deliminate between items */
 export enum DelimStyle {

@@ -64,12 +64,12 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   __rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
 
   /** @internal */
-  static getType(): string {
+  static override getType(): string {
     return 'image';
   }
 
   /** @internal */
-  static clone(node: ImageNode): ImageNode {
+  static override clone(node: ImageNode): ImageNode {
     return new ImageNode(
       node.__src,
       node.__altText,
@@ -83,7 +83,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  static importJSON(serializedNode: SerializedImageNode): ImageNode {
+  static override importJSON(serializedNode: SerializedImageNode): ImageNode {
     const { altText, title, src, width, rest, height, href } = serializedNode;
     const node = $createImageNode({
       altText,
@@ -98,7 +98,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  exportDOM(): DOMExportOutput {
+  override exportDOM(): DOMExportOutput {
     const element = document.createElement('img');
     element.setAttribute('src', this.__src);
     element.setAttribute('alt', this.__altText);
@@ -115,7 +115,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  static importDOM(): DOMConversionMap | null {
+  static override importDOM(): DOMConversionMap | null {
     return {
       img: () => ({
         conversion: convertImageElement,
@@ -149,7 +149,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  exportJSON(): SerializedImageNode {
+  override exportJSON(): SerializedImageNode {
     return {
       altText: this.getAltText(),
       title: this.getTitle(),
@@ -176,7 +176,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  createDOM(config: EditorConfig): HTMLElement {
+  override createDOM(config: EditorConfig): HTMLElement {
     const span = document.createElement('span');
     const theme = config.theme;
     const className = theme.image;
@@ -187,7 +187,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  updateDOM(): false {
+  override updateDOM(): false {
     return false;
   }
 
@@ -251,7 +251,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  decorate(_parentEditor: LexicalEditor): JSX.Element {
+  override decorate(_parentEditor: LexicalEditor): JSX.Element {
     return (
       <ImageEditor
         src={this.getSrc()}

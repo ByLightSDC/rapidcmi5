@@ -1,14 +1,18 @@
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 import { useEffect, useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
 
 import ReadOnlyTextField from './ReadOnlyTextField';
-import { ButtonInfoField } from '../inputs/buttons/buttons';
 
 /* MUI */
 import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import { fieldMarginTop } from '../styles/muiTheme';
+import { ButtonInfoField } from '@rangeos-nx/ui/api/hooks';
 /**
  * @typedef MenuOptionsProps - menu option props
  * @property { [key: string]: string } options enumerated list of options

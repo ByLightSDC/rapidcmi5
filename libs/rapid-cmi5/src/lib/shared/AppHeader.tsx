@@ -4,13 +4,7 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 // import { useAppBreadCrumbs } from '../hooks/useAppBreadCrumbs';
 
-import {
-  appHeaderVisible,
-  breadCrumbVisible,
-  isLoading,
-  themeColor,
-} from '@rangeos-nx/ui/redux';
-import { useLogOut } from '../hooks/useLogOut';
+import { appHeaderVisible, themeColor } from '@rangeos-nx/ui/redux';
 
 /* Branded */
 import { AppLogo, AppHeaderDashboardMenu } from '@rangeos-nx/ui/branded';
@@ -45,7 +39,6 @@ const settingsKey = 1;
 const logoutKey = 2;
 
 export default function AppHeader() {
-  const logOut = useLogOut();
   const showAppHeader = useSelector(appHeaderVisible);
   const appThemeColor = useSelector(themeColor);
   const [settingsMenuAnchor, setSettingsMenuAnchor] =
@@ -62,9 +55,6 @@ export default function AppHeader() {
           'settings-menu-anchor',
         );
         setSettingsMenuAnchor(menuButtonRef);
-        break;
-      case logoutKey:
-        logOut();
         break;
       default:
         break;

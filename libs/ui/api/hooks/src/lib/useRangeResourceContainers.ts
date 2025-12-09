@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { useCache } from '@rangeos-nx/ui/branded';
 import { DevopsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
 import {
   defaultQueryConfig,
@@ -11,6 +10,7 @@ import {
   queryHooksConfig,
 } from './config';
 import { getErrorMessage } from './errorMessages';
+import { useCache } from './utils/useQueryCache';
 
 export const queryKeyRangeResourceContainers = 'range-resource-containers';
 

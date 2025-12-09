@@ -1,3 +1,7 @@
+/*
+ *   Copyright (c) 2025 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 import { createContext, useState } from 'react';
 
 /*

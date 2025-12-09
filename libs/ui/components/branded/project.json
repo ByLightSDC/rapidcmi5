@@ -5,13 +5,30 @@
   "projectType": "library",
   "tags": [],
   "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "main": "libs/ui/components/branded/src/index.ts",
+        "outputPath": "dist/libs/ui/components/branded",
+        "tsConfig": "libs/ui/components/branded/tsconfig.lib.json",
+        "package.json": "libs/ui/components/branded/package.json"
+
+      }
+    },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
+      "outputs": [
+        "{options.outputFile}"
+      ]
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/ui/components/branded"],
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/ui/components/branded"
+      ],
       "options": {
         "jestConfig": "libs/ui/components/branded/jest.config.ts"
       }
@@ -37,7 +54,9 @@
     },
     "build-storybook": {
       "executor": "@nx/storybook:build",
-      "outputs": ["{options.outputDir}"],
+      "outputs": [
+        "{options.outputDir}"
+      ],
       "options": {
         "outputDir": "dist/storybook/ui-components-branded",
         "configDir": "libs/ui/components/branded/.storybook",
@@ -63,7 +82,9 @@
     },
     "static-storybook": {
       "executor": "@nx/web:file-server",
-      "dependsOn": ["build-storybook"],
+      "dependsOn": [
+        "build-storybook"
+      ],
       "options": {
         "buildTarget": "ui-components-branded:build-storybook",
         "staticFilePath": "dist/storybook/ui-components-branded",

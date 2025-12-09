@@ -1,3 +1,7 @@
+/*
+ *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
+ *   All rights reserved.
+ */
 import { Control, Controller } from 'react-hook-form';
 import { useDisplayDateFormatter } from '../hooks/useDisplayDateFormatter';
 

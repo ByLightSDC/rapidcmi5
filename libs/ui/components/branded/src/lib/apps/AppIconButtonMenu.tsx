@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { AppMenuConfigItem } from './AppDashboardMenu';
 import { brandedTheme } from '../styles/muiTheme';
 import { brandedThemeDark } from '../styles/muiThemeDark';
 
@@ -9,7 +8,7 @@ import Divider from '@mui/material/Divider';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { useSelector } from 'react-redux';
-import { plugins, themeColor } from '@rangeos-nx/ui/redux';
+import { AppMenuConfigItem, plugins, themeColor } from '@rangeos-nx/ui/redux';
 import { IconAsset } from './IconAsset';
 import { useNavigate } from 'react-router';
 import { config } from '@rangeos-nx/frontend/environment';

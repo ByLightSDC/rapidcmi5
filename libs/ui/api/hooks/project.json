@@ -5,13 +5,29 @@
   "projectType": "library",
   "tags": [],
   "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/libs/ui/api/hooks/branded",
+        "main": "libs/ui/api/hooks/src/index.ts",
+        "tsConfig": "libs/ui/api/hooks/tsconfig.lib.json",
+        "package.json": "libs/ui/api/hooks/package.json"
+      }
+    },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
+      "outputs": [
+        "{options.outputFile}"
+      ]
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/ui/api/hooks"],
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/ui/api/hooks"
+      ],
       "options": {
         "jestConfig": "libs/ui/api/hooks/jest.config.ts"
       }

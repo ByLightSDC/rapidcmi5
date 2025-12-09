@@ -17,8 +17,6 @@ import { RepoState } from '../../../redux/repoManagerReducer';
 import { RootState } from '../../../redux/store';
 
 import {
-  ButtonMinorUi,
-  ButtonOptions,
   RowAction,
   TabMainUi,
 } from '@rangeos-nx/ui/branded';
@@ -43,6 +41,7 @@ import React from 'react';
 import { listItemProps } from './components/LessonTreeNode';
 import { Renamer } from './components/Renamer';
 import FileSystemSelector from '../../course-builder/selectors/FileSystemSelector';
+import { ButtonOptions, ButtonMinorUi } from '@rangeos-nx/ui/api/hooks';
 
 enum RepoActionEnum {
   TriggerRename,

@@ -1,15 +1,13 @@
 import { AppDispatch } from '@rangeos-nx/rapid-cmi5';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { modal, setModal, themeColor, setTheme } from '@rangeos-nx/ui/redux';
+import { modal, setModal, themeColor, setTheme, resetPersistance } from '@rangeos-nx/ui/redux';
 
 import { useLogOut } from '../../hooks/useLogOut';
 
 /* Branded */
 import {
-  DataCacheOrFetcher,
   ModalDialog,
-  resetPersistance,
 } from '@rangeos-nx/ui/branded';
 
 /*Material*/

@@ -6,8 +6,7 @@ Navigates to path after storing information
  */
 import { useNavigate } from 'react-router';
 import { useDispatch } from 'react-redux';
-import { setCommonId, setCurrentFormCrudType } from '@rangeos-nx/ui/redux';
-import { FormCrudType } from '@rangeos-nx/ui/branded';
+import { FormCrudType, setCurrentFormCrudType } from '@rangeos-nx/ui/redux';
 
 export const useNavigateAlias = () => {
   const dispatch = useDispatch();
@@ -22,17 +21,17 @@ export const useNavigateAlias = () => {
     meta?: any,
     shouldOverride = true,
   ) => {
-    if (uuid && alias) {
-      dispatch(
-        setCommonId({
-          id: uuid,
-          name: alias,
-          crudType: crudType || FormCrudType.view,
-          meta: meta,
-          shouldOverride: shouldOverride,
-        }),
-      );
-    }
+    // if (uuid && alias) {
+    //   dispatch(
+    //     setCommonId({
+    //       id: uuid,
+    //       name: alias,
+    //       crudType: crudType || FormCrudType.view,
+    //       meta: meta,
+    //       shouldOverride: shouldOverride,
+    //     }),
+    //   );
+    // }
     if (crudType) {
       dispatch(setCurrentFormCrudType(crudType));
     }

@@ -11,13 +11,6 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
-  pageFilters,
-  pageSettings,
-  setPageFilters,
-  setPageSettings,
-} from '@rangeos-nx/ui/branded';
-
-import {
   authoredByMeFilter,
   defaultCpeFilters,
   defaultInputFilters,
@@ -26,6 +19,7 @@ import {
   defaultMetadataTags,
   uuidFilter,
 } from './paginationFiltersConstants';
+import { pageFilters, pageSettings, setPageFilters, setPageSettings } from './paginationReducer';
 
 export const pageProperty = 'page';
 export const rowsPerPageProperty = 'rowsPerPage';

@@ -1,12 +1,12 @@
 import { NodeProps } from 'reactflow';
 import { Handle, Position } from 'reactflow';
 import Typography from '@mui/material/Typography';
-import { NetmapNodeType } from '@rangeos-nx/ui/branded';
 import { brandedTheme } from '../../styles/muiTheme';
 import { brandedThemeDark } from '../../styles/muiThemeDark';
 
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import { NetmapNodeType } from './network-viz-data-types';
 
 type tData = {
   label: string;
@@ -40,7 +40,7 @@ export default function UUIDNode(props: NodeProps<tData>) {
             borderStyle: 'solid',
             borderRadius: '4px',
             borderWidth: brandedBorderWidth,
-            borderColor: brandedTheme.nav.icon,
+            borderColor: brandedTheme,
             backgroundColor: '#bcc2e6', //brandedTheme.nav.fillSelected, //#929BCC
           };
         default:
@@ -48,7 +48,7 @@ export default function UUIDNode(props: NodeProps<tData>) {
             borderStyle: 'solid',
             borderRadius: '0px',
             borderWidth: brandedBorderWidth,
-            borderColor: brandedTheme.nav.icon,
+            borderColor: brandedTheme,
             backgroundColor: '#e3e7fc', //,
           };
       }
@@ -59,7 +59,7 @@ export default function UUIDNode(props: NodeProps<tData>) {
             borderStyle: 'solid',
             borderRadius: ' px',
             borderWidth: '1px', //brandedBorderWidth,
-            borderColor: brandedThemeDark.header.title, //brandedTheme.nav.icon,
+            borderColor: brandedThemeDark, //brandedTheme.nav.icon,
             backgroundColor: brandedThemeDark.palette.grey[800], //,
           };
         case NetmapNodeType.L3:
@@ -67,7 +67,7 @@ export default function UUIDNode(props: NodeProps<tData>) {
             borderStyle: 'solid',
             borderRadius: '4px',
             borderWidth: brandedBorderWidth,
-            borderColor: brandedTheme.nav.icon,
+            borderColor: brandedTheme,
             backgroundColor: brandedThemeDark.palette.grey[700], //, //#929BCC
           };
         default:
@@ -75,7 +75,7 @@ export default function UUIDNode(props: NodeProps<tData>) {
             borderStyle: 'solid',
             borderRadius: '0px',
             borderWidth: brandedBorderWidth,
-            borderColor: brandedTheme.nav.icon,
+            borderColor: brandedTheme,
             backgroundColor: brandedThemeDark.palette.grey[500], //,
           };
       }

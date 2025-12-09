@@ -58,12 +58,12 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
   __rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
 
   /** @internal */
-  static getType(): string {
+  static override getType(): string {
     return 'video';
   }
 
   /** @internal */
-  static clone(node: VideoNode): VideoNode {
+  static override clone(node: VideoNode): VideoNode {
     return new VideoNode(
       node.__src,
       node.__title,
@@ -75,7 +75,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  static importJSON(serializedNode: SerializedVideoNode): VideoNode {
+  static override importJSON(serializedNode: SerializedVideoNode): VideoNode {
     const { title, src, width, rest, height } = serializedNode;
     const node = $createVideoNode({
       title,
@@ -88,7 +88,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  exportDOM(): DOMExportOutput {
+  override exportDOM(): DOMExportOutput {
     const element = document.createElement('video');
     element.setAttribute('src', this.__src);
     element.setAttribute('controls', 'true');
@@ -105,7 +105,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  static importDOM(): DOMConversionMap | null {
+  static override importDOM(): DOMConversionMap | null {
     return {
       video: () => ({
         conversion: convertVideoElement,
@@ -135,7 +135,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  exportJSON(): SerializedVideoNode {
+  override exportJSON(): SerializedVideoNode {
     return {
       title: this.getTitle(),
       height: this.__height === 'inherit' ? 0 : this.__height,
@@ -160,7 +160,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  createDOM(config: EditorConfig): HTMLElement {
+  override createDOM(config: EditorConfig): HTMLElement {
     const span = document.createElement('span');
     const theme = config.theme;
     const className = theme.video;
@@ -171,7 +171,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  updateDOM(): false {
+  override updateDOM(): false {
     return false;
   }
 
@@ -219,7 +219,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  decorate(_parentEditor: LexicalEditor): JSX.Element {
+  override decorate(_parentEditor: LexicalEditor): JSX.Element {
     return (
       <VideoEditor
         src={this.getSrc()}

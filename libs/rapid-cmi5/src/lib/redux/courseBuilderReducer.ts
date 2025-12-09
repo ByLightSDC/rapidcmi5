@@ -14,10 +14,10 @@ import { RootState } from './store';
 import {
   debugLog,
   defaultCourseData,
-  resetPersistance,
 } from '@rangeos-nx/ui/branded';
 import { Scenario } from '@rangeos-nx/frontend/clients/devops-api';
 import { ViewModeEnum } from '../design-tools/course-builder/CourseBuilderTypes';
+import { resetPersistance } from '@rangeos-nx/ui/redux';
 
 /**
  * Before user is connected to repo, they can play in slides sandbox

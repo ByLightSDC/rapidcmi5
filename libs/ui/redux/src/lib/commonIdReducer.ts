@@ -1,5 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { FormCrudType, resetPersistance } from '@rangeos-nx/ui/branded';
+import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
+import { resetPersistance } from './utils/store';
+import { FormCrudType } from './utils/types';
 
 /**
  * @typedef tCommonId The type of data for this slice
@@ -17,11 +18,11 @@ export type tCommonId = {
   shouldOverride?: boolean;
 };
 
-type tCommonIdState = {
+export type tCommonIdState = {
   commonIds: tCommonId[];
 };
 
-interface State {
+export interface State {
   commonId: tCommonIdState;
 }
 
@@ -42,7 +43,7 @@ const initialState: tCommonIdState = {
 /**
  * Slice to persist redux states as lookup table of any uuid/name information (example: used to resolve UUIDs in breadcrumbs)
  */
-export const commonIdSlice = createSlice({
+export const commonIdSlice : Slice = createSlice({
   name: 'commonId',
   initialState,
   extraReducers: (builder) =>
@@ -56,7 +57,7 @@ export const commonIdSlice = createSlice({
     setCommonId: (state, action: PayloadAction<tCommonId>) => {
       const { name, shouldOverride = true } = action.payload;
       const selIndex = state.commonIds.findIndex(
-        (item) => item.id === action.payload.id,
+        (item : any) => item.id === action.payload.id,
       );
       if (selIndex < 0) {
         state.commonIds.push(action.payload);
@@ -73,7 +74,7 @@ export const commonIdSlice = createSlice({
       for (let i = 0; i < arr.length; i++) {
         const commonItem: tCommonId = arr[i];
         const selIndex = state.commonIds.findIndex(
-          (item) => item.id === commonItem.id,
+          (item : any) => item.id === commonItem.id,
         );
         if (selIndex < 0) {
           state.commonIds.push(commonItem);

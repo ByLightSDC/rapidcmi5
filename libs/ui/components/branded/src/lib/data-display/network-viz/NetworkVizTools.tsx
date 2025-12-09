@@ -1,10 +1,7 @@
-import { ButtonMainUi, ButtonMinorUi, LoadingUi } from '@rangeos-nx/ui/branded';
-
-import { useContext } from 'react';
-import { NetworkVizContext } from './NetworkVizContext';
 
 /* MUI */
 import Box from '@mui/material/Box';
+import { ButtonMinorUi } from '@rangeos-nx/ui/api/hooks';
 
 export function NetworkVizTools() {
   //const { onMessage } = useContext(NetworkVizContext);

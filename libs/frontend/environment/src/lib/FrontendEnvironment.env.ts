@@ -14,6 +14,7 @@ declare global {
       NX_PUBLIC_KEYCLOAK_CLIENT_ID?: string;
       NX_PUBLIC_KEYCLOAK_SCOPE?: string;
       NX_PUBLIC_DEVOPS_GQL_SUBSCRIPTIONS_URL?: string;
+      NX_PUBLIC_CMI5_SSO_ENABLED?: boolean;
     };
   }
 }
@@ -38,6 +39,11 @@ function checkEnv(env: string | boolean | undefined, description: string) {
 let AUTH_URL =
   window._env_?.NX_PUBLIC_AUTH_URL || process.env['NX_PUBLIC_AUTH_URL'];
 AUTH_URL = checkEnv(AUTH_URL, 'NX_PUBLIC_AUTH_URL');
+
+let CMI5_SSO_ENABLED =
+  window._env_?.NX_PUBLIC_CMI5_SSO_ENABLED ||
+  yn(process.env['NX_PUBLIC_CMI5_SSO_ENABLED'], { default: false });
+CMI5_SSO_ENABLED = checkEnv(CMI5_SSO_ENABLED, 'NX_PUBLIC_CMI5_SSO_ENABLED');
 
 // db api settings
 let DEVOPS_API_URL =
@@ -104,6 +110,7 @@ export const config = {
   KEYCLOAK_SCOPE,
   DEVOPS_GQL_SUBSCRIPTIONS_URL,
   DEVOPS_GQL_URL,
+  CMI5_SSO_ENABLED,
   THEME: {
     SLIDE_BACKGROUND: '',
     SLIDE_LOGO: './assets/rapid-cmi5/RapidCMI5.png',

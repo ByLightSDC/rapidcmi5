@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { resetPersistance, FormCrudType } from '@rangeos-nx/ui/branded';
+import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
+import { resetPersistance } from './utils/store';
+import { FormCrudType } from './utils/types';
 
 /**
  * Expanded values
@@ -56,7 +57,7 @@ export type CommonAppMultipleSelectionState = {
 /**
  * Common App Store State
  */
-type tCommonAppState = {
+export type tCommonAppState = {
   expanded: { [key: string]: boolean };
   iconColor: string;
   dividerColor: string;
@@ -72,7 +73,7 @@ type tCommonAppState = {
   multipleSelection: CommonAppMultipleSelectionState[];
 };
 
-interface State {
+export interface State {
   commonApp: tCommonAppState;
 }
 
@@ -100,7 +101,7 @@ export const initialCommonAppState: tCommonAppState = {
   multipleSelection: [],
 };
 
-export const commonAppSlice = createSlice({
+export const commonAppSlice : Slice = createSlice({
   name: 'commonApp',
   initialState: initialCommonAppState,
   extraReducers: (builder) =>

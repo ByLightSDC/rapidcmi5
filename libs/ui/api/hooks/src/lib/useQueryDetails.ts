@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useToaster } from '@rangeos-nx/ui/branded';
+import { useToaster } from './utils/useToaster';
 
 export const formatQueryError = (queryError: any) => {
   //Post, Put, and Delete throw error objects

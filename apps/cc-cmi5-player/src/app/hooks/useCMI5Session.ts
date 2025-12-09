@@ -6,7 +6,7 @@ import { Statement } from '@xapi/xapi';
 import Cmi5 from '@xapi/cmi5';
 import { debugLog } from '../debug';
 import { setAuthToken } from '@rangeos-nx/ui/keycloak';
-import { queryHooksConfig } from '@rangeos-nx/ui/api/hooks';
+import { queryHooksConfig, useToaster } from '@rangeos-nx/ui/api/hooks';
 import {
   sendInitializedVerb,
   sendRangeosAuthVerb,
@@ -34,7 +34,6 @@ import {
 } from '../types/SlideState';
 import { config } from '@rangeos-nx/frontend/environment';
 import { cmi5Instance } from '../session/cmi5';
-import { useToaster } from '@rangeos-nx/ui/branded';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { setModal } from '@rangeos-nx/ui/redux';
 import { classPromptModalId } from '../components/CourseModals';

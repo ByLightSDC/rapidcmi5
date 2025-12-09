@@ -12,17 +12,6 @@ import {
   subnetColor,
 } from '../constants';
 
-//Icons
-import cloud from '../images/cloud.svg';
-import dumbswitch from '../images/dumbswitch.svg';
-import fileserver from '../images/fileserver.svg';
-import firewall from '../images/firewall.svg';
-import mailserver from '../images/mailserver.svg';
-import router from '../images/router.svg';
-import server from '../images/server.svg';
-import smartswitch from '../images/smartswitch.svg';
-import webservice from '../images/webservice.svg';
-import workstation from '../images/workstation.svg';
 
 export const useScenarioMapDraw = () => {
   const draw = useCanvasDraw();
@@ -113,8 +102,8 @@ export const useScenarioMapDraw = () => {
 
   const getIconSource = (iconType: IconType) => {
     switch (iconType) {
-      case IconType.CLOUD:
-        return cloud;
+      // case IconType.CLOUD:
+      //   return cloud;
       // case IconType.DUMB_SWITCH:
       //   return dumbswitch;
       // case IconType.FILE_SERVER:

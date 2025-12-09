@@ -22,7 +22,6 @@ import {
   AuQuiz,
   debugLogError,
   editorInPlayback$,
-  FormCrudType,
   jsonFormatSpaces,
   JobeInTheBox,
   debugLog,
@@ -39,7 +38,7 @@ import {
   updateScenario,
   updateTeamScenario,
 } from '../../../../redux/courseBuilderReducer';
-import { dividerColor } from '@rangeos-nx/ui/redux';
+import { dividerColor, FormCrudType } from '@rangeos-nx/ui/redux';
 import { TeamConsolesForm } from '../forms/TeamConsolesForm';
 import { DownloadFilesForm } from './DownloadFilesForm';
 

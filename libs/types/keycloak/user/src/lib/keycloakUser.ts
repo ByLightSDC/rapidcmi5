@@ -1,9 +1,6 @@
-import { Portal } from '@rangeos-nx/types/portal';
-
 export type AuthenticationData = {
   authenticated: boolean;
   authenticationType: 'cookie' | 'token' | 'websocket';
-  staticPermissions: Array<Portal.StaticPermission>;
   userTokenDecoded: UserTokenDecoded;
 };
 
@@ -11,7 +8,7 @@ export type UserTokenDecoded = {
   active: boolean;
   sub: string;
   email: string;
-  roles?: Array<Portal.RoleId | ContentManagementRoles | TomRoles>;
+  roles?: Array<ContentManagementRoles | TomRoles>;
 };
 
 export type Code = {

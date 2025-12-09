@@ -1,11 +1,11 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { flattenTree, INode } from 'react-accessible-treeview';
 import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
-import { resetPersistance } from '@rangeos-nx/ui/branded';
 import { RootState } from './store';
 import { getRepoPath } from '../design-tools/course-builder/GitViewer/utils/gitOperations';
 import { CourseData } from '@rangeos-nx/types/cmi5';
 import { getFsInstance } from '../design-tools/course-builder/GitViewer/utils/gitFsInstance';
+import { resetPersistance } from '@rangeos-nx/ui/redux';
 
 // this pair ensures we always know what file system type and what the repo name is
 // when acting upon the file system

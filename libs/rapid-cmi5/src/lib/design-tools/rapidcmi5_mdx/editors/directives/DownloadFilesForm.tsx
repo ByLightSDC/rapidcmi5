@@ -3,7 +3,6 @@ import {
   FileDownloadLink,
   FileFormFieldArray,
   FormControlUIProvider,
-  FormCrudType,
   FormStateType,
   MiniForm,
 } from '@rangeos-nx/ui/branded';
@@ -18,6 +17,7 @@ import { useImageFile } from '../../data-hooks/useImageFile';
 import { useSelector } from 'react-redux';
 import { currentAuPath } from '../../../../redux/courseBuilderReducer';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
+import { FormCrudType } from '@rangeos-nx/ui/redux';
 
 /**
  * Form course creators can use to attack files to a Lesson AU

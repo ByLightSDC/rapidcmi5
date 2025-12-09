@@ -14,7 +14,6 @@ import {
   useKeycloakRoleAuth,
 } from '@rangeos-nx/ui/keycloak';
 import Box from '@mui/material/Box';
-import { debugLog, ModalDialog } from '@rangeos-nx/ui/branded';
 
 /* Blocks UI when not authenticated */
 
@@ -34,7 +33,6 @@ export function Login(props: LoginProps) {
     if (initialized) {
       if (keycloak.authenticated) {
         // handy for inspecting all of the authenticated user's properties
-        debugLog('keycloak initialized', keycloak);
 
         let roles: string[] = [];
         if (
@@ -57,8 +55,7 @@ export function Login(props: LoginProps) {
             parsedUserToken: keycloak.tokenParsed,
           }),
         );
-        debugLog('setAuthToken from KK Login');
-        debugLog('keycloak.token', keycloak.token);
+
         dispatch(setAuthToken(keycloak.token));
         dispatch(setAuthIdToken(keycloak.idToken));
       } else {
@@ -91,13 +88,7 @@ export function Login(props: LoginProps) {
           }}
         />
       )}
-      {keyCloakErr?.error && (
-        <ModalDialog
-          dialogProps={{ open: true }}
-          message={keyCloakErr.error || ''}
-          title="Login Error"
-        />
-      )}
+
       {props.children}
     </>
   );

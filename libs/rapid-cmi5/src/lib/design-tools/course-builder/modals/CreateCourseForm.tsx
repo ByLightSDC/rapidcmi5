@@ -1,7 +1,6 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 import {
   FileUpload,
-  FormControlCheckboxField,
   FormControlTextField,
   FormControlUIProvider,
   FormStateType,
@@ -31,7 +30,6 @@ import { GitContext } from '../GitViewer/session/GitContext';
 export function CreateCourseForm({
   defaultData,
   modalObj,
-  shouldOpenRepoSelectAfterClone,
   handleCloseModal,
   handleModalAction,
 }: {

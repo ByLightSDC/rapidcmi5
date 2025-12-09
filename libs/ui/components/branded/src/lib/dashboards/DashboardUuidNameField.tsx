@@ -1,7 +1,6 @@
 import { useState } from 'react';
-
-/* Branded */
-import { DataCacheOrFetcher, OverflowTypography } from '@rangeos-nx/ui/branded';
+import { OverflowTypography } from '../data-display/OverflowTypography';
+import DataCacheOrFetcher from '../forms/DataCacheOrFetcher';
 
 /**
  * Props for DashboardUuidField

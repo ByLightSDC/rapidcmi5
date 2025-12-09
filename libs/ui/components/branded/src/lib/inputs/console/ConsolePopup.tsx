@@ -10,8 +10,6 @@ import { Resizable, ResizeCallbackData } from 'react-resizable';
 import Guacamole from 'guacamole-common-js';
 import 'react-resizable/css/styles.css';
 
-/** Branded */
-import { ConsoleContext, debugLog, useToaster } from '@rangeos-nx/ui/branded';
 
 /** MUI */
 import { Box } from '@mui/material';
@@ -33,7 +31,9 @@ import './virtual-keyboard/osk.css';
 import { ConsoleWindowManager } from './ConsoleWindowManager';
 import ConnectionAttemptDisplay from './ConnectionAttemptDisplay';
 import { getTunnelErrorMessage } from './constants';
-import { debugLogError, debugLogSuccess } from '../../utility/logger';
+import { debugLog, debugLogError, debugLogSuccess } from '../../utility/logger';
+import { ConsoleContext } from './ConsoleContext';
+import { useToaster } from '@rangeos-nx/ui/api/hooks';
 
 // guacamole connection settings
 const guacProtocol = 'wss';

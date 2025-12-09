@@ -7,7 +7,7 @@ import AuMarkDownSlide from './markdown/MarkDownSlide';
  * @returns
  */
 export default function AuSlide({ auProps }: { auProps: AuContextProps }) {
-  const { activeTab, resetSlide, slides } = auProps;
+  const { activeTab, slides } = auProps;
   const slideRef = useRef<HTMLDivElement | null>(null);
 
   const [isInitialized, setIsInitialized] = useState(false);
@@ -24,7 +24,7 @@ export default function AuSlide({ auProps }: { auProps: AuContextProps }) {
       return;
     }
     setIsInitialized(true);
-  }, [activeTab, resetSlide, slides, isInitialized]);
+  }, [activeTab, slides, isInitialized]);
 
   /** UE resets scrolltop */
   useEffect(() => {

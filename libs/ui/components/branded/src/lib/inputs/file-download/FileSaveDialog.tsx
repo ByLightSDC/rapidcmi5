@@ -3,9 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { modal, setModal } from '@rangeos-nx/ui/redux';
 
 /* Branded */
-import { ModalDialog } from '@rangeos-nx/ui/branded';
 import { AlertColor, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
+import ModalDialog from '../../modals/ModalDialog';
 
 export const saveFileModalId = 'saveFileModalId';
 

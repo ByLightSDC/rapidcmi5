@@ -24,12 +24,6 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import './styles.css';
 
-import {
-  ButtonMainUi,
-  FormControlTextField,
-  ModalDialog,
-} from '@rangeos-nx/ui/branded';
-
 import { brandedTheme } from '../../styles/muiTheme';
 import { brandedThemeDark } from '../../styles/muiThemeDark';
 

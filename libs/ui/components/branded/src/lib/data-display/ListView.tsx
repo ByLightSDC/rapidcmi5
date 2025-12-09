@@ -9,8 +9,6 @@ import ListItem from '@mui/material/ListItem';
 import Typography from '@mui/material/Typography';
 import ListItemPerformant from './ListItemPerformant';
 
-import { equalsNoCase } from '@rangeos-nx/ui/branded';
-
 /**
  * interface for list items
  *

@@ -1,11 +1,11 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { resetPersistance } from '@rangeos-nx/ui/branded';
+import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
+import { resetPersistance } from './utils/store';
 
 /**
  * @interface FieldAttributes List of properties passed to FormField Components. Ex. readOnly
  * @property Example:  {"field1": {"readOnly": true}, "field2": {"required": true, "readOnly": false}}
  */
-interface FieldAttributes {
+export interface FieldAttributes {
   [key: string]: { [key: string]: any };
 }
 
@@ -44,7 +44,7 @@ export const initialState: tDynamicSchemaState = {
  * Slice to manage dynamic schema data field attributes and validation
  * @see DynamicSchema component
  */
-export const dynamicSchemaSlice = createSlice({
+export const dynamicSchemaSlice : Slice = createSlice({
   name: 'schemaData',
   initialState,
   extraReducers: (builder) =>

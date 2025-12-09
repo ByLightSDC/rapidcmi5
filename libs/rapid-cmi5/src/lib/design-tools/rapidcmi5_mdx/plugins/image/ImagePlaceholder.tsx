@@ -1,6 +1,6 @@
 import React from 'react';
 import ImageIcon from '@mui/icons-material/Image';
-import styles from './styles/image-plugin.module.css';
+import styles from './styles/image-plugin.module.css'
 
 /**
  * A custom placeholder for images.

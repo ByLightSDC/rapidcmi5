@@ -1,10 +1,9 @@
-import { ButtonIcon, ButtonInfoField } from '../inputs/buttons/buttons';
-
 /* MUI */
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
 import InputAdornment from '@mui/material/InputAdornment';
 import { fieldMarginTop } from '../styles/muiTheme';
+import { ButtonIcon, ButtonInfoField } from '@rangeos-nx/ui/api/hooks';
 
 export function ReadOnlyTextField({
   children,

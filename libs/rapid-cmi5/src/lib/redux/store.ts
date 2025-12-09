@@ -6,7 +6,7 @@ import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import globalReducer from './globalReducer';
 
 //Internal
-import { commonIdReducer, dynamicSchemaReducer } from '@rangeos-nx/ui/redux';
+import { dynamicSchemaReducer } from '@rangeos-nx/ui/redux';
 import courseBuilderReducer from './courseBuilderReducer';
 import repoReducer from './repoManagerReducer';
 
@@ -57,7 +57,6 @@ const rootReducer = combineReducers({
   global: globalReducer,
   commonApp: commonAppReducer,
   commonAppTrans: commonAppTransReducer,
-  commonId: commonIdReducer,
   courseBuilder: courseBuilderReducer,
   keycloakUi: keycloakUiReducer,
   schemaData: dynamicSchemaReducer,

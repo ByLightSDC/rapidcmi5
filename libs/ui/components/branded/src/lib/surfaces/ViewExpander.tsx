@@ -1,10 +1,5 @@
 import { useEffect, useState } from 'react';
 
-import {
-  ButtonInfoFormHeaderLayout,
-  ButtonInfoField,
-} from '../inputs/buttons/buttons';
-
 /* MUI */
 import Divider, { DividerProps } from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
@@ -15,6 +10,7 @@ import { Variant } from '@mui/material/styles/createTypography';
 /* Icons */
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { SxProps } from '@mui/system';
+import { ButtonInfoField, ButtonInfoFormHeaderLayout } from '@rangeos-nx/ui/api/hooks';
 
 /**
  * @interface tViewExpanderProps
