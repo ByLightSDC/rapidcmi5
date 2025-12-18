@@ -1,4 +1,4 @@
-import { SlideType, SlideTypeEnum } from '@rangeos-nx/types/cmi5';
+import { SlideType, SlideTypeEnum } from '@rapid-cmi5/types/cmi5';
 
 /**
  * @typedef {Object} ScenarioContentType

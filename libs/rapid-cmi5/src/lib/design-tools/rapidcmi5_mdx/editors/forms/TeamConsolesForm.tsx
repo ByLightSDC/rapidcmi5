@@ -5,23 +5,23 @@ import {
   FormControlUIProvider,
   FormStateType,
   MiniForm,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import { Alert, Box, Grid, MenuItem, Typography } from '@mui/material';
 import * as yup from 'yup';
 import {
   moveOnCriteriaOptions,
   TeamConsolesContent,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 
 import {
   NAME_GROUP_OPT,
   REQUIRED_ENTRY,
   UUID_GROUP,
-} from '@rangeos-nx/ui/validation';
+} from '@rapid-cmi5/ui/validation';
 
-import { RC5ActivityTypeEnum } from '@rangeos-nx/types/cmi5';
+import { RC5ActivityTypeEnum } from '@rapid-cmi5/types/cmi5';
 import LrsHeaderWithDetails from './LrsStatementHelper';
-import { FormCrudType } from '@rangeos-nx/ui/redux';
+import { FormCrudType } from '@rapid-cmi5/ui/redux';
 
 export const TeamConsolesForm = ({
   crudType,

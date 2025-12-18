@@ -8,9 +8,9 @@ import {
   generateCourseDist,
   generateCmi5Xml,
   getFolderStructureBackend,
-} from '@rangeos-nx/cmi5-build/backend';
+} from '@rapid-cmi5/cmi5-build/backend';
 
-import { generateCourseJson } from '@rangeos-nx/cmi5-build/common';
+import { generateCourseJson } from '@rapid-cmi5/cmi5-build/common';
 
 function getAssetPath(...segments: string[]) {
   if (!app.isPackaged) {

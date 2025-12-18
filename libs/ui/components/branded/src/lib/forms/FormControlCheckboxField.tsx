@@ -11,7 +11,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Box from '@mui/material/Box';
 import Checkbox, { CheckboxProps } from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
-import { ButtonInfoField } from '@rangeos-nx/ui/api/hooks';
+import { ButtonInfoField } from '@rapid-cmi5/ui/api/hooks';
 
 /** @constant
  * Decorator appended to the checkbox label

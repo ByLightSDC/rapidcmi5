@@ -1,7 +1,7 @@
-import { FolderStruct } from '@rangeos-nx/cmi5-build/common';
+import { FolderStruct } from '@rapid-cmi5/cmi5-build/common';
 import { ModifiedFile } from './design-tools/course-builder/GitViewer/Components/GitActions/GitFileStatus';
 import { DirEntry } from './design-tools/course-builder/GitViewer/utils/ElectronFsApi';
-import * as git from 'isomorphic-git';
+import { ReadCommitResult, StatusRow } from 'isomorphic-git';
 
 export interface ipc {
   cmi5Build: (
@@ -52,10 +52,10 @@ export interface fsApi {
   rename: (oldpath: string, newpath: string) => Promise<void>;
   mkdir: (path: string, recursive?: boolean) => Promise<void>;
   readdir: (path: string) => Promise<DirEntry[]>;
-  getStatus: (path: string) => Promise<git.StatusRow[]>;
+  getStatus: (path: string) => Promise<StatusRow[]>;
   getStashStatus: (path: string) => Promise<ModifiedFile[]>;
   gitInitRepo: (dir: string, defaultBranch: string) => Promise<void>;
-  gitLog: (dir: string) => Promise<git.ReadCommitResult[]>;
+  gitLog: (dir: string) => Promise<ReadCommitResult[]>;
   getFolderStructure: (
     dir: string,
     repoPath: string,

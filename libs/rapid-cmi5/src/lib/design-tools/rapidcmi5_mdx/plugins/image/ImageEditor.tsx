@@ -38,7 +38,7 @@ import { $isImageNode } from './ImageNode';
 import ImageResizer from './ImageResizer';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 import { useSelector } from 'react-redux';
-import { debugLogError, editorInPlayback$ } from '@rangeos-nx/ui/branded';
+import { debugLogError, editorInPlayback$ } from '@rapid-cmi5/ui/branded';
 import { currentAuPath } from '../../../../redux/courseBuilderReducer';
 
 const BROKEN_IMG_URI =

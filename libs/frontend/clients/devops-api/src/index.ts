@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { config } from '@rangeos-nx/frontend/environment';
+import { config } from '@rapid-cmi5/frontend/environment';
 import {
   // APIs
   AssetsChartsApiFactory,

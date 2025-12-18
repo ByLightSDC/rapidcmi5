@@ -5,7 +5,7 @@ import {
   CourseAU,
   CourseData,
   SlideTypeEnum,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 import {
   fsType,
   RepoAccessObject,

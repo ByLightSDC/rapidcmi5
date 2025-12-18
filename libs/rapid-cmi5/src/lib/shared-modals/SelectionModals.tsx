@@ -1,7 +1,7 @@
 import { useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { modal, useGetCacheSelection } from '@rangeos-nx/ui/redux';
-import { Topic, apiTopicsHookData } from '@rangeos-nx/ui/api/hooks';
+import { modal, useGetCacheSelection } from '@rapid-cmi5/ui/redux';
+import { Topic, apiTopicsHookData } from '@rapid-cmi5/ui/api/hooks';
 
 
 /* Constants */
@@ -10,7 +10,7 @@ import {
   rowsPerPage_Certificate,
   rowsPerPage_DnsZone,
 } from '../constants';
-import { ActionRow, actionRowSortableColumns, SelectWrapper } from '@rangeos-nx/ui/branded';
+import { ActionRow, actionRowSortableColumns, SelectWrapper } from '@rapid-cmi5/ui/branded';
 
 /**
  * Returns the form to be displayed based on modalObj.type

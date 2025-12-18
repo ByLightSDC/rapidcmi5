@@ -8,10 +8,10 @@ import Divider from '@mui/material/Divider';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { useSelector } from 'react-redux';
-import { AppMenuConfigItem, plugins, themeColor } from '@rangeos-nx/ui/redux';
+import { AppMenuConfigItem, plugins, themeColor } from '@rapid-cmi5/ui/redux';
 import { IconAsset } from './IconAsset';
 import { useNavigate } from 'react-router';
-import { config } from '@rangeos-nx/frontend/environment';
+import { config } from '@rapid-cmi5/frontend/environment';
 
 /**
  * Returns drop down menu with links to launch apps

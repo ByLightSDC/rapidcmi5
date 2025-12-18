@@ -1,6 +1,6 @@
 /* Handlers for /vmImages endpoints */
 import { http, HttpResponse } from 'msw';
-import { config } from '@rangeos-nx/frontend/environment';
+import { config } from '@rapid-cmi5/frontend/environment';
 
 const list = [
   {

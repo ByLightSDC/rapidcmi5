@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useQueryDetails } from '@rangeos-nx/ui/api/hooks';
+import { useQueryDetails } from '@rapid-cmi5/ui/api/hooks';
 
 /**
  * Retrieves the list of data from given apiHook

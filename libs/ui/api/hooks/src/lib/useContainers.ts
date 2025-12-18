@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { DevopsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
+import { DevopsApiClient } from '@rapid-cmi5/frontend/clients/devops-api';
 import {
   defaultQueryConfig,
   defaultSortOrderBy,
@@ -9,7 +9,7 @@ import {
   queryHooksConfig,
 } from './config';
 import { getErrorMessage } from './errorMessages';
-import { tContainerCreate } from '@rangeos-nx/frontend/clients/devops-api';
+import { tContainerCreate } from '@rapid-cmi5/frontend/clients/devops-api';
 
 export const queryKeyContainers = 'containers';
 

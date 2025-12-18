@@ -7,7 +7,7 @@ import {
   graphqlScenarioFields,
   Topic,
   useSubscription,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rapid-cmi5/ui/api/hooks';
 import {
   DeployedScenarioData,
   ScenarioUpdatesContext,

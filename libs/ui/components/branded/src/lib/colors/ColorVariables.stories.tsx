@@ -2,7 +2,7 @@
 // import { ColorVariables } from './ColorVariables';
 // import { PaperWrapper } from '../storybook/PaperWrapper';
 // import { configureStore, createSlice } from '@reduxjs/toolkit';
-// import { commonAppReducer } from '@rangeos-nx/ui/redux';
+// import { commonAppReducer } from '@rapid-cmi5/ui/redux';
 // import { Provider } from 'react-redux';
 // import { BrowserRouter } from 'react-router';
 

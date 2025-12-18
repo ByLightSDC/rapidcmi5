@@ -22,7 +22,7 @@ import {
   FormStateType,
   MiniForm,
   ModalDialog,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { UseFormReturn } from 'react-hook-form';
@@ -39,7 +39,7 @@ import EditIcon from '@mui/icons-material/Edit';
 
 import { $setSelection } from 'lexical';
 import { useClickOutside } from './useClickOutside';
-import { ButtonTooltip } from '@rangeos-nx/ui/api/hooks';
+import { ButtonTooltip } from '@rapid-cmi5/ui/api/hooks';
 
 /**
  * Dialog for previewing and editing links in MdxEditor

@@ -1,5 +1,5 @@
 import { Box, CircularProgress, Stack, Typography } from '@mui/material';
-import { QuizCompletionEnum, QuizContent } from '@rangeos-nx/types/cmi5';
+import { QuizCompletionEnum, QuizContent } from '@rapid-cmi5/types/cmi5';
 import SportsScoreIcon from '@mui/icons-material/SportsScore';
 import CircleIcon from '@mui/icons-material/Circle';
 

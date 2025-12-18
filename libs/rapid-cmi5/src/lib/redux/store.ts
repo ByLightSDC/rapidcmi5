@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { combineReducers } from 'redux';
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 
@@ -6,19 +5,19 @@ import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import globalReducer from './globalReducer';
 
 //Internal
-import { dynamicSchemaReducer } from '@rangeos-nx/ui/redux';
+import { dynamicSchemaReducer } from '@rapid-cmi5/ui/redux';
 import courseBuilderReducer from './courseBuilderReducer';
 import repoReducer from './repoManagerReducer';
 
 //Branded, Shared Reducers
-import { keycloakUiReducer } from '@rangeos-nx/ui/keycloak';
+import { keycloakUiReducer } from '@rapid-cmi5/ui/keycloak';
 import {
   accordionReducer,
   bookmarksReducer,
   ctfReducer,
   paginationReducer,
-} from '@rangeos-nx/ui/branded';
-import { commonAppReducer, commonAppTransReducer } from '@rangeos-nx/ui/redux';
+} from '@rapid-cmi5/ui/branded';
+import { commonAppReducer, commonAppTransReducer } from '@rapid-cmi5/ui/redux';
 
 //Persist
 import storage from 'redux-persist/lib/storage';

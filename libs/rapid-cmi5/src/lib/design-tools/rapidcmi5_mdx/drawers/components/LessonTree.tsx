@@ -35,7 +35,7 @@ import {
   defaultSlideContent,
   MoveOnCriteriaEnum,
   SlideTypeEnum,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 
 import { RC5Context } from '../../contexts/RC5Context';
 import { useRC5Prompts } from '../../modals/useRC5Prompts';
@@ -48,7 +48,7 @@ import { GitContext } from '../../../course-builder/GitViewer/session/GitContext
 import { getRepoPath } from '../../../course-builder/GitViewer/utils/fileSystem';
 import { currentRepoAccessObjectSel } from '../../../../redux/repoManagerReducer';
 import { slugifyPath } from '../../../course-builder/GitViewer/utils/useCourseOperationsUtils';
-import { useToaster } from '@rangeos-nx/ui/api/hooks';
+import { useToaster } from '@rapid-cmi5/ui/api/hooks';
 
 const textColor = 'text.hint';
 

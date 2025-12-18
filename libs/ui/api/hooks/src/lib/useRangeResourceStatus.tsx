@@ -1,4 +1,4 @@
-import { RangeStatusEnum } from '@rangeos-nx/frontend/clients/devops-api';
+import { RangeStatusEnum } from '@rapid-cmi5/frontend/clients/devops-api';
 
 /* Branded */
 

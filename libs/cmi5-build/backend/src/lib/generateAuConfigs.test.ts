@@ -1,6 +1,6 @@
 import path from 'path';
 import { generateCourseDist } from './generateAuConfigs';
-import { generateCourseJson } from '@rangeos-nx/cmi5-build/common';
+import { generateCourseJson } from '@rapid-cmi5/cmi5-build/common';
 import { getFolderStructureBackend } from './fileSystem';
 import fs from 'fs';
 import os from 'os';

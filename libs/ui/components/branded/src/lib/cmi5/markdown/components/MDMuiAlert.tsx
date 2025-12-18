@@ -12,7 +12,7 @@ import {
   getAdmonitionHexColor,
   getAdmonitionIcon,
 } from './AdmonitionStyles';
-import { AdmonitionTypeEnum } from '@rangeos-nx/types/cmi5';
+import { AdmonitionTypeEnum } from '@rapid-cmi5/types/cmi5';
 
 export default function MDMuiAlert({
   admonitionType,

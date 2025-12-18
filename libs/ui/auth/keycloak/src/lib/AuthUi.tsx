@@ -1,5 +1,5 @@
-import { KeycloakUi } from '@rangeos-nx/ui/keycloak';
-import { config } from '@rangeos-nx/frontend/environment';
+import { KeycloakUi } from '@rapid-cmi5/ui/keycloak';
+import { config } from '@rapid-cmi5/frontend/environment';
 import React from 'react';
 
 /* eslint-disable-next-line */

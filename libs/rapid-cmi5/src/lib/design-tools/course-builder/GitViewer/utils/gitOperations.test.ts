@@ -16,7 +16,7 @@ import {
   TestContext,
   verifyCourseStructure,
 } from './courseOperations.test';
-import { Operation } from '@rangeos-nx/types/cmi5';
+import { Operation } from '@rapid-cmi5/types/cmi5';
 import { repoNameInUseMessage } from '../session/constants';
 
 // Add fetch polyfill for Node.js

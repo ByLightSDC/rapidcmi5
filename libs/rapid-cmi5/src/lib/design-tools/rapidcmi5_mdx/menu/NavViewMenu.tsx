@@ -10,7 +10,7 @@ import {
   currentViewMode,
 } from '../../../redux/courseBuilderReducer';
 import { ViewModeEnum } from '../../course-builder/CourseBuilderTypes';
-import { setBreadCrumbVisible, themeColor } from '@rangeos-nx/ui/redux';
+import { setBreadCrumbVisible, themeColor } from '@rapid-cmi5/ui/redux';
 import {
   getSvgStyleIcon,
   StyleIconTypeEnum,

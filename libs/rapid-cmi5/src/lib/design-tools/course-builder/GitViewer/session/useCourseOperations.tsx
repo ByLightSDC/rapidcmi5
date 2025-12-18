@@ -27,14 +27,14 @@ import YAML from 'yaml';
 
 import { AppDispatch, RootState } from '../../../../redux/store';
 import { ViewModeEnum } from '../../CourseBuilderTypes';
-import { CourseData, KSATElement, Operation } from '@rangeos-nx/types/cmi5';
+import { CourseData, KSATElement, Operation } from '@rapid-cmi5/types/cmi5';
 import { CreateCourseType } from '../../CourseBuilderApiTypes';
 import { courseNameInUseMessage, deleteCourseFailMessage } from './constants';
 import { GitFS } from '../utils/fileSystem';
 import { warningModalId } from '../../../rapidcmi5_mdx/modals/constants';
-import { setModal } from '@rangeos-nx/ui/redux';
-import { rc5MetaFilename } from '@rangeos-nx/cmi5-build/common';
-import { debugLog, debugLogError } from '@rangeos-nx/ui/branded';
+import { setModal } from '@rapid-cmi5/ui/redux';
+import { rc5MetaFilename } from '@rapid-cmi5/cmi5-build/common';
+import { debugLog, debugLogError } from '@rapid-cmi5/ui/branded';
 import { join } from 'path-browserify';
 import { getRepoPath } from '../utils/gitOperations';
 import { getRepoAccess } from './GitContext';

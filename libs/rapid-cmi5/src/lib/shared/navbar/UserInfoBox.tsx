@@ -7,8 +7,8 @@ import {
   themeColor,
   setTheme,
   resetPersistance,
-} from '@rangeos-nx/ui/redux';
-import { config } from '@rangeos-nx/frontend/environment';
+} from '@rapid-cmi5/ui/redux';
+import { config } from '@rapid-cmi5/frontend/environment';
 
 /*Material*/
 import Menu from '@mui/material/Menu';
@@ -27,8 +27,8 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 import { useState } from 'react';
 
-import { BuildVersionInfo } from '@rangeos-nx/frontend/clients/devops-api';
-import { DataCacheOrFetcher, ModalDialog } from '@rangeos-nx/ui/branded';
+import { BuildVersionInfo } from '@rapid-cmi5/frontend/clients/devops-api';
+import { DataCacheOrFetcher, ModalDialog } from '@rapid-cmi5/ui/branded';
 
 /**
  * @typedef propTypes - User Info Box props

@@ -11,7 +11,7 @@ import {
   CTFContent,
   JobeContent,
   TeamConsolesContent,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 import Ajv, { ErrorObject } from 'ajv';
 
 // To generate new schemas, ensure that whenever the types change ./utils/ajv-schema-generator.sh is ran

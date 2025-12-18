@@ -15,7 +15,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { fieldMarginTop } from '../styles/muiTheme';
-import { ButtonIcon, ButtonInfoField } from '@rangeos-nx/ui/api/hooks';
+import { ButtonIcon, ButtonInfoField } from '@rapid-cmi5/ui/api/hooks';
 
 type tFormControlPasswordProps = {
   control?: Control;

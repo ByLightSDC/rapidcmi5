@@ -7,7 +7,7 @@ import {
   queryHooksConfig,
 } from './config';
 import { request, gql } from 'graphql-request';
-import { RangeStatusEnum } from '@rangeos-nx/frontend/clients/devops-api';
+import { RangeStatusEnum } from '@rapid-cmi5/frontend/clients/devops-api';
 import { getErrorMessage } from './errorMessages';
 
 export type RangeResourceType = {

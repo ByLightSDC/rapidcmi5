@@ -23,7 +23,7 @@
 // } from './ctfSchema';
 // import Grid from '@mui/material/Grid';
 // import { useCallback, useEffect, useRef, useState } from 'react';
-// import { debugLog, useDisplayFocus } from '@rangeos-nx/ui/branded';
+// import { debugLog, useDisplayFocus } from '@rapid-cmi5/ui/branded';
 // import { TextField, Typography } from '@mui/material';
 // import { AnswerType, QuizCompletionEnum } from '../../types/QuizState';
 // import { debugLogError } from '../../debug';

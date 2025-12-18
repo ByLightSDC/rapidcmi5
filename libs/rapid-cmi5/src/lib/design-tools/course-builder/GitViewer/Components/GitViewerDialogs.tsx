@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { modal, setModal } from '@rangeos-nx/ui/redux';
+import { modal, setModal } from '@rapid-cmi5/ui/redux';
 
 /* Branded */
-import { ModalDialog } from '@rangeos-nx/ui/branded';
+import { ModalDialog } from '@rapid-cmi5/ui/branded';
 import { useContext, useEffect, useState } from 'react';
 import {
   DialogContent,

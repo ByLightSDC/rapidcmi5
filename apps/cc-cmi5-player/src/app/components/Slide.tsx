@@ -6,7 +6,7 @@ import {
   ScenarioContent,
   SlideTypeEnum,
   SourceDocContent,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 import ScenarioConsoles from './scenario/ScenarioConsoles';
 import ScenarioWrapper from './scenario/ScenarioWrapper';
 import {
@@ -15,9 +15,9 @@ import {
   AuQuiz,
   AuSourceDocSlide,
   JobeInTheBox,
-} from '@rangeos-nx/ui/branded';
-import { config } from '@rangeos-nx/frontend/environment';
-import { AuContextProps } from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/ui/branded';
+import { config } from '@rapid-cmi5/frontend/environment';
+import { AuContextProps } from '@rapid-cmi5/types/cmi5';
 
 function Slide({
   auProps,

@@ -7,7 +7,7 @@ import Tab from '@mui/material/Tab';
 //import RangeOS_Logo_White from '../../assets/cmi5/RangeOS_Logo_White.png';
 
 import AuProgressBar from './AuProgressBar';
-import { AuContextProps, SlideType } from '@rangeos-nx/types/cmi5';
+import { AuContextProps, SlideType } from '@rapid-cmi5/types/cmi5';
 
 /**
  *

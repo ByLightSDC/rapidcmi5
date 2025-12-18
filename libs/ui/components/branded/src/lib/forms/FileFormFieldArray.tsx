@@ -9,8 +9,8 @@ import { useFieldArray, UseFormReturn } from 'react-hook-form';
 import DownloadIcon from '@mui/icons-material/Download';
 
 import download from 'js-file-download';
-import { useToaster, ButtonIcon } from '@rangeos-nx/ui/api/hooks';
-import { FormCrudType } from '@rangeos-nx/ui/redux';
+import { useToaster, ButtonIcon } from '@rapid-cmi5/ui/api/hooks';
+import { FormCrudType } from '@rapid-cmi5/ui/redux';
 import { FormStateType } from '../types/form';
 import FormControlTextField from './FormControlTextField';
 import FormFieldArray, { tFormFieldRendererProps } from './FormFieldArray';

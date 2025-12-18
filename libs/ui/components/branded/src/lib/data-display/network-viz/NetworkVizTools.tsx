@@ -1,7 +1,7 @@
 
 /* MUI */
 import Box from '@mui/material/Box';
-import { ButtonMinorUi } from '@rangeos-nx/ui/api/hooks';
+import { ButtonMinorUi } from '@rapid-cmi5/ui/api/hooks';
 
 export function NetworkVizTools() {
   //const { onMessage } = useContext(NetworkVizContext);

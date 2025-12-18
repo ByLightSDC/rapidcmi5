@@ -6,17 +6,17 @@ import {
   MiniForm,
   ModalDialog,
   SelectorMainUi,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import { UseFormReturn } from 'react-hook-form';
 import { Grid, Typography } from '@mui/material';
 import * as yup from 'yup';
 import { useSelector } from 'react-redux';
-import { modal } from '@rangeos-nx/ui/redux';
+import { modal } from '@rapid-cmi5/ui/redux';
 import React from 'react';
 import {
   MoveOnCriteriaEnum,
   moveOnCriteriaOptions,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 
 const moveOnOptionDescriptions = new Map<string, string>([
   [

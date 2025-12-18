@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { QuizQuestion } from '@rangeos-nx/types/cmi5';
+import { QuizQuestion } from '@rapid-cmi5/types/cmi5';
 import { Grid, Typography } from '@mui/material';
 
 import CloseIcon from '@mui/icons-material/Close';

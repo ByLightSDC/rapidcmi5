@@ -11,11 +11,11 @@ import {
   setModal,
   useGetCacheMultipleSelection,
   useSetCacheMultipleSelection,
-} from '@rangeos-nx/ui/redux';
+} from '@rapid-cmi5/ui/redux';
 
 /* Icons */
 import TouchAppIcon from '@mui/icons-material/TouchApp';
-import { ButtonMinorUi } from '@rangeos-nx/ui/api/hooks';
+import { ButtonMinorUi } from '@rapid-cmi5/ui/api/hooks';
 import { ButtonModalMinorUi } from '../inputs/buttons/buttonsmodal';
 import { tMultiSelectionMeta } from './SharedFormWithProvider';
 

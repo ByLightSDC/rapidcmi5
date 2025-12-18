@@ -2,7 +2,7 @@ import {
   useQueryDetails,
   Topic,
   useGetRangeResourceAutoGraders,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rapid-cmi5/ui/api/hooks';
 import { useState } from 'react';
 import AutograderSubscription from '../subscriptions/AutograderSubscription';
 

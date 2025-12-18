@@ -5,7 +5,7 @@ import {
 } from '../../course-builder/GitViewer/session/GitContext';
 import { useSelector } from 'react-redux';
 
-import { debugLog, debugLogError } from '@rangeos-nx/ui/branded';
+import { debugLog, debugLogError } from '@rapid-cmi5/ui/branded';
 import { getRepoPath } from '../../course-builder/GitViewer/utils/fileSystem';
 
 import { join } from 'path-browserify';

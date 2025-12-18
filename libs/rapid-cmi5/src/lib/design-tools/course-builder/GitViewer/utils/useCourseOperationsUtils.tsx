@@ -12,7 +12,7 @@ import {
   SlideType,
   SlideTypeEnum,
   TeamConsolesContent,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 import { courseNameInUseMessage, RC5_VERSION } from '../session/constants';
 import { GitFS, MAX_FS_SLUG_LENGTH } from './fileSystem';
 import {
@@ -20,13 +20,13 @@ import {
   generateCourseJson,
   getScenarioDirectives,
   rc5MetaFilename,
-} from '@rangeos-nx/cmi5-build/common';
+} from '@rapid-cmi5/cmi5-build/common';
 import {
   debugLog,
   debugLogError,
   defaultCourseData,
   defaultEmptySlide,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import { basename, dirname, join, normalize } from 'path-browserify';
 import JSZip from 'jszip';
 import { getRepoPath } from './gitOperations';

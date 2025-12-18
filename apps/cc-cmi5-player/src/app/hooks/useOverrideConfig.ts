@@ -1,9 +1,9 @@
-import { config } from '@rangeos-nx/frontend/environment';
+import { config } from '@rapid-cmi5/frontend/environment';
 import { logger, debugLog } from '../debug';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setAuLogo } from '../redux/auReducer';
-import { overrideDevOpsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
+import { overrideDevOpsApiClient } from '@rapid-cmi5/frontend/clients/devops-api';
 
 /**
  * Processes a template.

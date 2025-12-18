@@ -22,7 +22,7 @@ import {
   WebServiceIconSvg,
 } from './svgIconConstants';
 
-import { MetaIconTypeEnum } from '@rangeos-nx/frontend/clients/devops-api';
+import { MetaIconTypeEnum } from '@rapid-cmi5/frontend/clients/devops-api';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const svgWrapper = (icon: JSX.Element, sxProps?: any) => {

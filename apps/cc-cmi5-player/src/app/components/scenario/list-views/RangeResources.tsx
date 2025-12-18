@@ -5,9 +5,9 @@
 import { useContext } from 'react';
 
 /* Branded */
-import { iListItemType, ListView } from '@rangeos-nx/ui/branded';
+import { iListItemType, ListView } from '@rapid-cmi5/ui/branded';
 
-import { queryKeyRangeResourceVMs, Topic } from '@rangeos-nx/ui/api/hooks';
+import { queryKeyRangeResourceVMs, Topic } from '@rapid-cmi5/ui/api/hooks';
 
 /* MUI */
 import Box from '@mui/material/Box';

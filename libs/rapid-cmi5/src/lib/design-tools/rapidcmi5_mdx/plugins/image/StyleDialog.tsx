@@ -23,7 +23,7 @@ import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
 import BlockIcon from '@mui/icons-material/Block';
 import ImageIcon from '@mui/icons-material/Image';
 
-import { ModalDialog, SelectorMainUi } from '@rangeos-nx/ui/branded';
+import { ModalDialog, SelectorMainUi } from '@rapid-cmi5/ui/branded';
 
 interface StyleProps {
   isOpen: boolean;

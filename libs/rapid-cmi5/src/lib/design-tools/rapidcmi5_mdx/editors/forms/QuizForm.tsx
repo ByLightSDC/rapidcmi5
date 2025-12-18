@@ -10,7 +10,7 @@ import {
   FormStateType,
   MiniForm,
   tFormFieldRendererProps,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import { Grid } from '@mui/material';
 import * as yup from 'yup';
 import {
@@ -21,20 +21,20 @@ import {
   QuizCompletionEnum,
   QuizContent,
   SlideTypeEnum,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 
 import {
   ENUM_GROUP,
   REQUIRED_ENTRY,
   REQUIRED_ERROR,
   SPECIFY_AT_LEAST_ONE_ERROR,
-} from '@rangeos-nx/ui/validation';
+} from '@rapid-cmi5/ui/validation';
 
-import { RC5ActivityTypeEnum } from '@rangeos-nx/types/cmi5';
+import { RC5ActivityTypeEnum } from '@rapid-cmi5/types/cmi5';
 import { QuizQuestionsFieldGroup } from '../../../course-builder/QuizQuestionsFieldGroup';
 import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
 import LrsHeaderWithDetails from './LrsStatementHelper';
-import { FormCrudType } from '@rangeos-nx/ui/redux';
+import { FormCrudType } from '@rapid-cmi5/ui/redux';
 
 export const QuizForm = ({
   activityKind,

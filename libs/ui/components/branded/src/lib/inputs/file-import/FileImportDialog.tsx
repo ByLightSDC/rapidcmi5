@@ -1,7 +1,7 @@
 import download from 'js-file-download';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { modal, setModal, themeColor, setTheme } from '@rangeos-nx/ui/redux';
+import { modal, setModal, themeColor, setTheme } from '@rapid-cmi5/ui/redux';
 
 
 import { TextField } from '@mui/material';

@@ -8,12 +8,12 @@ import {
   defaultSearch,
   defaultSortBy,
   inputFilterType,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 
 /* Topic */
 import {
   Topic,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rapid-cmi5/ui/api/hooks';
 import {
   ksatElementTypeFilter,
   ksatsSortBy

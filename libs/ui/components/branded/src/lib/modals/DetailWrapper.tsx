@@ -10,7 +10,7 @@
 // import { useContext, useEffect } from 'react';
 // import { useDispatch, useSelector } from 'react-redux';
 // import { useLocation, useNavigate, useParams } from 'react-router';
-// import { commonIds, FormCrudType, setCommonId } from '@rangeos-nx/ui/redux';
+// import { commonIds, FormCrudType, setCommonId } from '@rapid-cmi5/ui/redux';
 
 // /* Branded */
 
@@ -23,7 +23,7 @@
 // /*Icons */
 // import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 // import { debugLog } from '../utility/logger';
-// import { ButtonMinorUi } from '@rangeos-nx/ui/api/hooks';
+// import { ButtonMinorUi } from '@rapid-cmi5/ui/api/hooks';
 // import { BookmarksContext } from '../navigation/bookmark/BookmarksContext';
 
 // /* Constants */

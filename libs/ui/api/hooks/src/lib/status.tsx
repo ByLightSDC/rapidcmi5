@@ -24,7 +24,7 @@ import {
   RangeStatusEnum,
   RangeVMStatusEnum,
   RangeVMKubevirtVmStatusEnum,
-} from '@rangeos-nx/frontend/clients/devops-api';
+} from '@rapid-cmi5/frontend/clients/devops-api';
 import { ButtonInfoField } from './utils/buttons';
 
 /** @constant

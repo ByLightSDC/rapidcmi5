@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { QuizState } from '@rangeos-nx/types/cmi5';
+import { QuizState } from '@rapid-cmi5/types/cmi5';
 
 interface ActivitySessionState {
   quizCache: Record<string, QuizState>;

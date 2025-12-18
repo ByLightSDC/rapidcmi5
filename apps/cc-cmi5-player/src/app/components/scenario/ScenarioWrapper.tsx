@@ -2,7 +2,7 @@
 
 import { useContext, useMemo, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setModal } from '@rangeos-nx/ui/redux';
+import { setModal } from '@rapid-cmi5/ui/redux';
 import { activeTabSel } from '../../redux/navigationReducer';
 import { sendScenarioEventVerb } from '../../utils/LmsStatementManager';
 import {
@@ -26,17 +26,17 @@ import {
   ConsoleProvider,
   OverflowTypography,
   DataFetcher,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import {
   getScenarioStatusIcon,
   queryKeyRangeResourceContainers,
   Topic,
   useGetRangeResourceScenario,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rapid-cmi5/ui/api/hooks';
 import {
   DeployedScenario,
   DeployedScenarioDetailStatusEnum,
-} from '@rangeos-nx/frontend/clients/devops-api';
+} from '@rapid-cmi5/frontend/clients/devops-api';
 
 /* MUI */
 import { Box, IconButton, ListItemIcon, Stack, Tooltip } from '@mui/material';

@@ -15,10 +15,10 @@ import {
   defaultSortByOptions,
   defaultStatusSortBy,
   defaultStatusSortByOptions,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 
 /* Branded */
-import { listStyles } from '@rangeos-nx/ui/branded';
+import { listStyles } from '@rapid-cmi5/ui/branded';
 /* MUI */
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Tooltip from '@mui/material/Tooltip';
@@ -31,7 +31,7 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 
 import { RowAction, RowStatus } from '../../types/actionRowTypes';
 import Box from '@mui/material/Box';
-import { ButtonIcon } from '@rangeos-nx/ui/api/hooks';
+import { ButtonIcon } from '@rapid-cmi5/ui/api/hooks';
 
 export const actionRowHeaderColor = 'text.hint';
 export const actionRowDateHeader = 'Created or Updated';

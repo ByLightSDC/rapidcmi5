@@ -1,7 +1,7 @@
 import { MenuItem, SxProps } from '@mui/material';
 import AnySelector from '../AnySelector';
 import { useEffect } from 'react';
-import { CourseAU } from '@rangeos-nx/types/cmi5';
+import { CourseAU } from '@rapid-cmi5/types/cmi5';
 
 interface LessonSelectorProps {
   availableLessons: CourseAU[];

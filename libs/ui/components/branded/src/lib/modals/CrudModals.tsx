@@ -17,11 +17,11 @@ The most common use case for this class is a deletion prompt
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { ButtonCopyText, useQueryDetails, useToaster } from '@rangeos-nx/ui/api/hooks';
+import { ButtonCopyText, useQueryDetails, useToaster } from '@rapid-cmi5/ui/api/hooks';
 
-import { auth } from '@rangeos-nx/ui/keycloak';
-import { isLoading, setLoader, modal, setModal } from '@rangeos-nx/ui/redux';
-import { ErrorMessageDetail } from '@rangeos-nx/ui/validation';
+import { auth } from '@rapid-cmi5/ui/keycloak';
+import { isLoading, setLoader, modal, setModal } from '@rapid-cmi5/ui/redux';
+import { ErrorMessageDetail } from '@rapid-cmi5/ui/validation';
 
 /* MUI */
 import Alert from '@mui/material/Alert';

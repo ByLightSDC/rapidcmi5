@@ -1,5 +1,5 @@
 import { useKeycloak } from '@react-keycloak/web';
-import { config } from '@rangeos-nx/frontend/environment';
+import { config } from '@rapid-cmi5/frontend/environment';
 
 export const useKeycloakRoleAuth = (roles: Array<string>) => {
   const { keycloak } = useKeycloak();

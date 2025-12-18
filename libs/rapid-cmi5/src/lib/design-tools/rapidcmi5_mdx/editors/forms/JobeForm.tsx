@@ -5,14 +5,14 @@ import {
   FormControlUIProvider,
   FormStateType,
   MiniForm,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import { Grid, MenuItem } from '@mui/material';
 import * as yup from 'yup';
-import { JobeContent, moveOnCriteriaOptions } from '@rangeos-nx/types/cmi5';
+import { JobeContent, moveOnCriteriaOptions } from '@rapid-cmi5/types/cmi5';
 
-import { RC5ActivityTypeEnum } from '@rangeos-nx/types/cmi5';
+import { RC5ActivityTypeEnum } from '@rapid-cmi5/types/cmi5';
 import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
-import { FormCrudType } from '@rangeos-nx/ui/redux';
+import { FormCrudType } from '@rapid-cmi5/ui/redux';
 
 export const JobeForm = ({
   crudType,

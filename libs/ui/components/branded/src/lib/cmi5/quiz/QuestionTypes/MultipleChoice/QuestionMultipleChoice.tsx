@@ -1,4 +1,4 @@
-import { QuizOption, QuizQuestion } from '@rangeos-nx/types/cmi5';
+import { QuizOption, QuizQuestion } from '@rapid-cmi5/types/cmi5';
 
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';

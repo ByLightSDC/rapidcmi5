@@ -2,9 +2,9 @@
 import {
   ReadOnlyTextField,
   tFormFieldRendererProps,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 
-// import { Element } from '@rangeos-nx/frontend/clients/lms-api';
+// import { Element } from '@rapid-cmi5/frontend/clients/lms-api';
 
 /**
  * @typedef tFormProps

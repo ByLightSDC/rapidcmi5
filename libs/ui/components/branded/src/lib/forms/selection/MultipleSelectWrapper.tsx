@@ -14,9 +14,9 @@ import {
   useGetCacheMultipleSelection,
   useSetCacheMultipleSelection,
   FormCrudType,
-} from '@rangeos-nx/ui/redux';
+} from '@rapid-cmi5/ui/redux';
 
-import { ButtonMinorUi, Topic, useCache } from '@rangeos-nx/ui/api/hooks';
+import { ButtonMinorUi, Topic, useCache } from '@rapid-cmi5/ui/api/hooks';
 
 /* MUI */
 import Alert from '@mui/material/Alert';

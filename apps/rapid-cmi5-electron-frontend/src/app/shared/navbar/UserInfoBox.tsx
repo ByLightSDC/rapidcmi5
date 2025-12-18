@@ -1,14 +1,14 @@
-import { AppDispatch } from '@rangeos-nx/rapid-cmi5';
+import { AppDispatch } from '@rapid-cmi5/react-editor';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { modal, setModal, themeColor, setTheme, resetPersistance } from '@rangeos-nx/ui/redux';
+import { modal, setModal, themeColor, setTheme, resetPersistance } from '@rapid-cmi5/ui/redux';
 
 import { useLogOut } from '../../hooks/useLogOut';
 
 /* Branded */
 import {
   ModalDialog,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 
 /*Material*/
 import Menu from '@mui/material/Menu';
@@ -25,7 +25,7 @@ import Brightness6Icon from '@mui/icons-material/Brightness6';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useState } from 'react';
 
-import { BuildVersionInfo } from '@rangeos-nx/frontend/clients/devops-api';
+import { BuildVersionInfo } from '@rapid-cmi5/frontend/clients/devops-api';
 
 /**
  * @typedef propTypes - User Info Box props

@@ -6,12 +6,12 @@ import {
   Stack,
   Alert,
 } from '@mui/material';
-import { ButtonInfoField, ButtonInfoFormHeaderLayout, useToaster } from '@rangeos-nx/ui/api/hooks';
+import { ButtonInfoField, ButtonInfoFormHeaderLayout, useToaster } from '@rapid-cmi5/ui/api/hooks';
 import {
   ButtonModalCancelUi,
   ButtonModalMainUi,
   FileUpload,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import { dirname } from 'path-browserify';
 import { useEffect, useState } from 'react';
 

@@ -5,7 +5,7 @@ import {
   GetActivityCacheHandler,
   RC5ActivityTypeEnum,
   QuizState,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 import { useEffect } from 'react';
 import { debugLogError } from '../../../utility/logger';
 

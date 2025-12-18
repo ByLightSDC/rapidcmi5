@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { FolderStruct } from '@rangeos-nx/cmi5-build/common';
+import { FolderStruct } from '@rapid-cmi5/cmi5-build/common';
 
 export const getFolderStructureBackend = async (
   dir: string,

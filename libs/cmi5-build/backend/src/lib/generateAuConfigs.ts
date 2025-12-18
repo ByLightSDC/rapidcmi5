@@ -1,4 +1,4 @@
-import { CourseData } from '@rangeos-nx/types/cmi5';
+import { CourseData } from '@rapid-cmi5/types/cmi5';
 import fs from 'fs';
 import path from 'path';
 import { generateAuId, generateBlockId, sanitizeName } from './generateCmi5Xml';

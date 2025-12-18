@@ -22,9 +22,9 @@ import {
   ComboBoxSelectorUi,
   ModalDialog,
   TextFieldMainUi,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
-import { ButtonIcon } from '@rangeos-nx/ui/api/hooks';
+import { ButtonIcon } from '@rapid-cmi5/ui/api/hooks';
 
 // used for uploading files
 const VisuallyHiddenInput = styled('input')({

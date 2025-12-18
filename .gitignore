@@ -26,3 +26,6 @@ cmi5-test-lessons/**
 
 vite.config.*.timestamp*
 vitest.config.*.timestamp*
+temp.package
+temp.project
+allpackages.json

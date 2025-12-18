@@ -6,7 +6,7 @@ import {
   setDividerColor,
   setIconColor,
   themeColor,
-} from '@rangeos-nx/ui/redux';
+} from '@rapid-cmi5/ui/redux';
 
 /* Shared */
 import AppHeader from './shared/AppHeader';
@@ -15,7 +15,7 @@ import AppHeader from './shared/AppHeader';
 import {
   SizingContextProvider,
   TimePickerProvider,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 
 /* Material */
 import { NotificationsProvider } from '@toolpad/core';
@@ -25,19 +25,25 @@ import { ThemeProvider } from '@mui/material';
 import { lightTheme } from './styles/muiTheme';
 import { darkTheme } from './styles/muiThemeDark';
 
-// for using mui time picker library
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
-import { RapidCmi5Route } from '@rangeos-nx/rapid-cmi5';
+import {
+  buildCmi5ZipParams,
+  RapidCmi5,
+} from '@rapid-cmi5/react-editor';
+import { isAuthenticated, authToken } from '@rapid-cmi5/ui/keycloak';
+import { DevopsApiClient } from '@rapid-cmi5/frontend/clients/devops-api';
+import { MyScenariosForm } from './ScenarioSelection';
 
-/* Layout Notes
-App div has 2 columns: AppHeader and routed content below (Routes)
-*/
+
 
 export default function App() {
   const dispatch = useDispatch();
   const theme = useSelector(themeColor);
+
+  const isAuthenticatedSel = useSelector(isAuthenticated);
+  const token = useSelector(authToken);
 
   useEffect(() => {
     const iconColor =
@@ -50,7 +56,6 @@ export default function App() {
         : lightTheme.input.outlineColor;
     dispatch(setIconColor(iconColor));
     dispatch(setDividerColor(dividerColor || 'grey'));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme]);
 
   return (
@@ -79,17 +84,35 @@ export default function App() {
                   <TimePickerProvider>
                     <AppHeader />
 
-                    <main
-                      id="app-routes"
-                      style={{
-                        display: 'flex',
-                        width: '100%',
-                        height: '100%',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      <RapidCmi5Route isElectron={true} />
-                    </main>
+                    {isAuthenticatedSel && (
+                      <main
+                        id="app-routes"
+                        style={{
+                          display: 'flex',
+                          width: '100%',
+                          height: '100%',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <RapidCmi5
+                          authToken={token}
+                          buildCmi5Zip={async (params: buildCmi5ZipParams) => {
+                            return await DevopsApiClient.cmi5BuildBuild(
+                              params.zipBlob,
+                              params.zipName,
+                              params.createAuMappings,
+                              {
+                                headers: {
+                                  Authorization: `Bearer ${token}`,
+                                },
+                                responseType: 'blob',
+                              },
+                            );
+                          }}
+                          GetScenariosForm={MyScenariosForm}
+                        />
+                      </main>
+                    )}
                   </TimePickerProvider>
                 </SizingContextProvider>
               </Paper>

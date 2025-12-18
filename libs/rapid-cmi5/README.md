@@ -1,11 +1,6 @@
-# cmi5-build-common
+# Rapid CMI5 React Editor
 
-This library was generated with [Nx](https://nx.dev).
+This is the react component which can be placed into your own application.
+It is built to work out of the box in a web application, but requires more tooling to place into 
+your own electron environment.
 
-## Building
-
-Run `nx build cmi5-build-common` to build the library.
-
-## Running unit tests
-
-Run `nx test cmi5-build-common` to execute the unit tests via [Jest](https://jestjs.io).

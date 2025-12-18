@@ -15,18 +15,18 @@ import {
   infiniteRecordLimit,
   queryHooksConfig,
   Topic,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rapid-cmi5/ui/api/hooks';
 import {
   DeployedRangeConsole,
   DevopsApiClient,
-} from '@rangeos-nx/frontend/clients/devops-api';
+} from '@rapid-cmi5/frontend/clients/devops-api';
 
 import {
   ConsoleProvider,
   ConsolesDisplay,
   debugLog,
   submitScore$,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import { routeDelim } from '../scenario/ScenarioConsoleTab';
 import { sendScenarioEventVerb } from '../../utils/LmsStatementManager';
 import { debugLogError, logger } from '../../debug';
@@ -35,7 +35,7 @@ import {
   RC5ActivityTypeEnum,
   ScenarioSubmitResponse,
   TeamConsolesContent,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 import { useCellValue } from '@mdxeditor/editor';
 import { AuManagerContext } from '../../session/AuManager';
 

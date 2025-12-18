@@ -46,8 +46,8 @@ import PlusOneIcon from '@mui/icons-material/PlusOne';
 import { StepperContext } from '../navigation/stepper/StepperContext';
 import ModalDialog from '../modals/ModalDialog';
 import { useDispatch, useSelector } from 'react-redux';
-import { expanded, message, setExpanded } from '@rangeos-nx/ui/redux';
-import { ButtonInfoField, ButtonInfoFormHeaderLayout, ButtonIcon } from '@rangeos-nx/ui/api/hooks';
+import { expanded, message, setExpanded } from '@rapid-cmi5/ui/redux';
+import { ButtonInfoField, ButtonInfoFormHeaderLayout, ButtonIcon } from '@rapid-cmi5/ui/api/hooks';
 import MultiSelectButton, { MultiSelectButtonProps } from './MultiSelectButton';
 import { SingleSelectButtonProps, AddButton } from './AddButton';
 

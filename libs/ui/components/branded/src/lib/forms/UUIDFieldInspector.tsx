@@ -14,14 +14,14 @@ Because we use react hook form , clicking submit button in one form will trigger
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { FormCrudType, setModal } from '@rangeos-nx/ui/redux';
+import { FormCrudType, setModal } from '@rapid-cmi5/ui/redux';
 
 import EditIcon from '@mui/icons-material/Edit';
 import PreviewIcon from '@mui/icons-material/Preview';
 
 import TextField from '@mui/material/TextField';
 
-import { ButtonIcon } from '@rangeos-nx/ui/api/hooks';
+import { ButtonIcon } from '@rapid-cmi5/ui/api/hooks';
 import { LoadingUi } from '../indicators/Loading';
 import DataCacheOrFetcher from './DataCacheOrFetcher';
 import { tFormControlTextFieldProps } from './FormControlTextField';

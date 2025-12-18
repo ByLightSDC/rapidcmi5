@@ -1,11 +1,7 @@
-/*
- *   Copyright (c) 2025 By Light Professional IT Services LLC
- *   All rights reserved.
- */
 /* eslint-disable react/jsx-no-useless-fragment */
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Alert, Box, Grid, Stack } from '@mui/material';
-
+import Grid from '@mui/material/Grid2';
+import { Alert, Box, Stack } from '@mui/material';
 import {
   useCallback,
   useContext,
@@ -19,8 +15,8 @@ import { useForm, UseFormReturn, useWatch } from 'react-hook-form';
 /* Icons */
 import Check from '@mui/icons-material/Check';
 import { AxiosError } from 'axios';
-import { useToaster, ButtonLoadingUi } from '@rangeos-nx/ui/api/hooks';
-import { FormCrudType } from '@rangeos-nx/ui/redux';
+import { useToaster, ButtonLoadingUi } from '@rapid-cmi5/ui/api/hooks';
+import { FormCrudType } from '@rapid-cmi5/ui/redux';
 import { LoadingUi } from '../indicators/Loading';
 import { ButtonModalCancelUi, ButtonModalMainUi } from '../inputs/buttons/buttonsmodal';
 import { FormStateType } from '../types/form';
@@ -378,7 +374,11 @@ export function MiniForm({
             showPaper={showPaper}
             // 8px below fixes top row getting clipped in Blueprint and VM Image forms
             formFields={
-              <Grid container spacing={2} sx={{ paddingTop: '8px' }}>
+              <Grid
+                container
+                spacing={2}
+                sx={{ paddingTop: '8px', width: '100%' }}
+              >
                 {children}
                 {showInternalError && submitError && (
                   <Alert

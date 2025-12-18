@@ -37,8 +37,6 @@ export const darkTheme = createTheme({
       primary: '#fff',
       secondary: 'rgba(255, 255, 255, 0.85)',
       disabled: 'rgba(255, 255, 255, 0.6)',
-      hint: 'rgba(255, 255, 255, 0.6)',
-      interactable: '#ffffffe8', // white @ 90% opacity
     },
     background: {
       paper: '#212125',
@@ -53,15 +51,11 @@ export const darkTheme = createTheme({
   },
   breadcrumbs: {
     default: '#C8C8C8', //disabled breadcrumb text
-    underline: mainColor,
-    hoverColor: '#a8a7a7',
-    hoverBackground: '#FFC84020',
   },
   button: {
     disabledBackgroundColor: '#293658', //'#07128580',
     disabledColor: '#C1C9DB99',
     minorBackgroundColor: '#213157', //'#333333',
-    indicatorColor: 'pink', //'#FFC840', //
   },
   card: {
     default: 'linear-gradient(180deg, #3E5BA5BF 0%, #2E4C94BF 100%)',
@@ -75,19 +69,16 @@ export const darkTheme = createTheme({
   header: {
     border: '#ffffffb0',
     buttonColor: '#C5C5C5',
-    selColor: '#A5BEFF', //'#a4c9eb', //selColor: '#A5BEFF',
     default: '#282b30',
     hoverColor: '#FFFFFF',
     light: '#9AA8CD', //loading bar color
     dark: '#333',
     title: '#ffffffc0', // white @ 80% opacity
-    underline: '#666666', //'DarkGray', //divider OR parting line
   },
   input: {
     outlineColor: '#464646', //see overrides below MuiFilledInput, MuiFilledInput+MuiOutlinedInput
     fill: '#26272C',
     disabledFill: '#26272C',
-    disabledOutline: '#26272C',
     disabledOutlineColor: '#26272C', //before making outline color match fill  '#36393E',
   },
   nav: {

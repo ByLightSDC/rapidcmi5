@@ -9,14 +9,14 @@ import {
   SetActivityCacheHandler,
   SetCmi5ProgressHandler,
   SubmitCmiScoreHandler,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 import {
   DevopsApiClient,
   AutoGrader,
-} from '@rangeos-nx/frontend/clients/devops-api';
+} from '@rapid-cmi5/frontend/clients/devops-api';
 import { cmi5Instance } from '../../../session/cmi5';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
-import { debugLogError } from '@rangeos-nx/ui/branded';
+import { debugLogError } from '@rapid-cmi5/ui/branded';
 import { logger } from '../../../debug';
 
 type UseAutoGraderProgressArgs = {

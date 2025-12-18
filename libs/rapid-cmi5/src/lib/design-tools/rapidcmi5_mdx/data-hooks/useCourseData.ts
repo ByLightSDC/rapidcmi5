@@ -1,10 +1,10 @@
-import { Scenario } from '@rangeos-nx/frontend/clients/devops-api';
+import { Scenario } from '@rapid-cmi5/frontend/clients/devops-api';
 import {
   debugLog,
   debugLogError,
   defaultCourseData,
   defaultEmptySlide,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import {
   addCourseOperation,
   courseDataCache,
@@ -28,7 +28,7 @@ import { useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { RC5Context } from '../contexts/RC5Context';
-import { Operation } from '@rangeos-nx/types/cmi5';
+import { Operation } from '@rapid-cmi5/types/cmi5';
 import { CreateLessonType } from '../../course-builder/CourseBuilderApiTypes';
 
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';

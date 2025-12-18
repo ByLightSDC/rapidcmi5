@@ -16,7 +16,7 @@ import {
   CTFContent,
   JobeContent,
   RC5ActivityTypeEnum,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 import {
   AuCTF,
   AuQuiz,
@@ -26,10 +26,10 @@ import {
   JobeInTheBox,
   debugLog,
   useTimeStampUUID,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 
 import { QuizForm } from '../forms/QuizForm';
-import { QuizContent } from '@rangeos-nx/types/cmi5';
+import { QuizContent } from '@rapid-cmi5/types/cmi5';
 import { useAuContext } from '../../data-hooks/useAuContext';
 import DeleteIconButton from '../components/DeleteIconButton';
 import RightMenuContainer from '../components/RightMenuContainer';
@@ -38,7 +38,7 @@ import {
   updateScenario,
   updateTeamScenario,
 } from '../../../../redux/courseBuilderReducer';
-import { dividerColor, FormCrudType } from '@rangeos-nx/ui/redux';
+import { dividerColor, FormCrudType } from '@rapid-cmi5/ui/redux';
 import { TeamConsolesForm } from '../forms/TeamConsolesForm';
 import { DownloadFilesForm } from './DownloadFilesForm';
 

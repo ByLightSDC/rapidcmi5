@@ -7,12 +7,12 @@ import {
   debugLogError,
   getDefaultData,
   SelectorMainUi,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import {
   activityLabels,
   RC5ActivityTypeEnum,
   getActivityTypeFromDisplayName,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 import {
   scenario,
   teamScenario,

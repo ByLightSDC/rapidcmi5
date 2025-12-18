@@ -6,10 +6,10 @@
 
 */
 import { useState } from 'react';
-import { LoadingUi } from '@rangeos-nx/ui/branded';
+import { LoadingUi } from '@rapid-cmi5/ui/branded';
 
 /* API Hooks & Types*/
-import { useQueryDetails, useToaster } from '@rangeos-nx/ui/api/hooks';
+import { useQueryDetails, useToaster } from '@rapid-cmi5/ui/api/hooks';
 import { SxProps } from '@mui/system';
 import { Box } from '@mui/material';
 

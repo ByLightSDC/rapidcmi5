@@ -10,7 +10,7 @@ import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import { useEffect } from 'react';
 import { fieldMarginTop } from '../styles/muiTheme';
-import { ButtonInfoField } from '@rangeos-nx/ui/api/hooks';
+import { ButtonInfoField } from '@rapid-cmi5/ui/api/hooks';
 
 const leadingZeroRegex = /^([0][0-9]+)$|^([-][0][0-9]+)$/; // don't allow -0n or 0n at beginning
 

@@ -21,7 +21,7 @@ import {
   setFileContent,
   setSelectedFile,
 } from '../../../../redux/repoManagerReducer';
-import { debugLog, debugLogError } from '@rangeos-nx/ui/branded';
+import { debugLog, debugLogError } from '@rapid-cmi5/ui/branded';
 import { AppDispatch, RootState } from '../../../../redux/store';
 import {
   cloneFailMessage,

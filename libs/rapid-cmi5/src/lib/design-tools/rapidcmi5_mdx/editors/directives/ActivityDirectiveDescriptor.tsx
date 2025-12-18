@@ -1,7 +1,7 @@
 import { DirectiveDescriptor } from '@mdxeditor/editor';
 
 import { ActivityEditor } from './ActivityEditor';
-import { ActivityType } from '@rangeos-nx/types/cmi5';
+import { ActivityType } from '@rapid-cmi5/types/cmi5';
 
 /**
  * MDX Activity Config

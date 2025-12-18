@@ -1,16 +1,16 @@
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { modal } from '@rangeos-nx/ui/redux';
+import { modal } from '@rapid-cmi5/ui/redux';
 
 /* Branded */
 import {
   ActionRow,
   MultipleSelectWrapper,
   actionRowSortableColumns,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 
 /* Constants */
-import { Topic, apiTopicsHookData } from '@rangeos-nx/ui/api/hooks';
+import { Topic, apiTopicsHookData } from '@rapid-cmi5/ui/api/hooks';
 import {
   rowsPerPageDefault,
   rowsPerPage_Certificate,

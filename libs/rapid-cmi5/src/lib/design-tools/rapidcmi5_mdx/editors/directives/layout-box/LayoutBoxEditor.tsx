@@ -20,7 +20,7 @@ import {
 
 import { ContainerDirective } from 'mdast-util-directive';
 import { LayoutBoxToolbar } from './LayoutBoxToolbar';
-import { ModalDialog } from '@rangeos-nx/ui/branded';
+import { ModalDialog } from '@rapid-cmi5/ui/branded';
 import {
   Box,
   Paper,

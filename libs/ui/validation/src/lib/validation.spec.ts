@@ -13,7 +13,7 @@ import {
   getIntegerWithUnitsValidation,
   getOptIntegerWithUnitsValidation,
   RESOURCE_QUANTITY_WITH_MINIMUM_GROUP,
-} from '@rangeos-nx/ui/validation';
+} from '@rapid-cmi5/ui/validation';
 
 describe('CERTIFICATE_SUBJECT_GROUP validates', () => {
   const schema = yup.object().shape({

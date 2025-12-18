@@ -7,7 +7,7 @@ import {
   DeployedScenarioPermission,
   DevopsApiClient,
   ScenariosUpdateByRangeIdUuidRequest,
-} from '@rangeos-nx/frontend/clients/devops-api';
+} from '@rapid-cmi5/frontend/clients/devops-api';
 import {
   defaultQueryConfig,
   defaultSortOrder,
@@ -19,7 +19,7 @@ import { getErrorMessage, getErrorMessageDetail } from './errorMessages';
 import {
   ScenariosCreateByRangeIdRequest,
   ScenariosValidateRequest,
-} from '@rangeos-nx/frontend/clients/devops-api';
+} from '@rapid-cmi5/frontend/clients/devops-api';
 
 export const queryKeyRangeResourceScenarios = 'range-resource-scenarios';
 export const queryKeyRangeResourceScenarioPermissions =

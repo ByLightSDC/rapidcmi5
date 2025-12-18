@@ -5,8 +5,8 @@ import {
   QuizCompletionEnum,
   AuContextProps,
   MoveOnCriteriaEnum,
-} from '@rangeos-nx/types/cmi5';
-import { parseQuizdownFile } from '@rangeos-nx/cmi5-build/common';
+} from '@rapid-cmi5/types/cmi5';
+import { parseQuizdownFile } from '@rapid-cmi5/cmi5-build/common';
 import { AuQuiz } from '../quiz/Quiz';
 
 export default function EmbeddedQuiz({

@@ -1,4 +1,4 @@
-import { CourseAU, CourseData } from '@rangeos-nx/types/cmi5';
+import { CourseAU, CourseData } from '@rapid-cmi5/types/cmi5';
 import { INode } from 'react-accessible-treeview';
 import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 

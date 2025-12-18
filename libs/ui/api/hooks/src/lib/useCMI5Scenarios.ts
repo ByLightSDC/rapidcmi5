@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 import {
   DevopsApiClient,
   ScenariosDeployRequest,
-} from '@rangeos-nx/frontend/clients/devops-api';
+} from '@rapid-cmi5/frontend/clients/devops-api';
 import {
   defaultQueryConfig,
   defaultSortOrder,
@@ -12,7 +12,7 @@ import {
 } from './config';
 import { getErrorMessage } from './errorMessages';
 
-import { ScenariosCreate1Request } from '@rangeos-nx/frontend/clients/devops-api';
+import { ScenariosCreate1Request } from '@rapid-cmi5/frontend/clients/devops-api';
 
 export const queryKeyCMI5Scenarios = 'cmi5-scenarios';
 

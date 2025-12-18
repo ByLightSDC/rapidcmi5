@@ -6,7 +6,7 @@ Navigates to path after storing information
  */
 import { useNavigate } from 'react-router';
 import { useDispatch } from 'react-redux';
-import { FormCrudType, setCurrentFormCrudType } from '@rangeos-nx/ui/redux';
+import { FormCrudType, setCurrentFormCrudType } from '@rapid-cmi5/ui/redux';
 
 export const useNavigateAlias = () => {
   const dispatch = useDispatch();

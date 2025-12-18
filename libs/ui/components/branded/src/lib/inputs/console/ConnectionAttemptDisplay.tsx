@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ConnectionState, AlertSeverity } from './constants';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import { ButtonMinorUi } from '@rangeos-nx/ui/api/hooks';
+import { ButtonMinorUi } from '@rapid-cmi5/ui/api/hooks';
 
 const MAX_SECONDS_COUNTDOWN = 10;
 const MAX_CONNECTION_RETRYS = 3;

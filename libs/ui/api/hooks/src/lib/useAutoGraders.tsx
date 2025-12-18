@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 
-import { DevopsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
+import { DevopsApiClient } from '@rapid-cmi5/frontend/clients/devops-api';
 import {
   defaultQueryConfig,
   defaultSortOrderBy,
@@ -17,7 +17,7 @@ import { getErrorMessage } from './errorMessages';
 import {
   AutoGraderCreate,
   AutoGraderUpdate,
-} from '@rangeos-nx/frontend/clients/devops-api';
+} from '@rapid-cmi5/frontend/clients/devops-api';
 
 export const queryKeyAutoGraders = 'auto-graders';
 

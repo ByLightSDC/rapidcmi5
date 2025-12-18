@@ -9,7 +9,7 @@ import {
   RepoAccessObject,
   RepoState,
 } from '../../../../redux/repoManagerReducer';
-import { debugLog, debugLogError } from '@rangeos-nx/ui/branded';
+import { debugLog, debugLogError } from '@rapid-cmi5/ui/branded';
 import { GitFS } from '../utils/fileSystem';
 import { getRepoAccess } from './GitContext';
 import { failedMergePath, GitOperations } from '../utils/gitOperations';

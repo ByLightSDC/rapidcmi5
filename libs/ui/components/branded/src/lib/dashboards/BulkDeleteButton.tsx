@@ -7,7 +7,7 @@ import {
   setModal,
   useGetCacheMultipleSelection,
   useSetCacheMultipleSelection,
-} from '@rangeos-nx/ui/redux';
+} from '@rapid-cmi5/ui/redux';
 import { useDispatch, useSelector } from 'react-redux';
 
 /* MUI */
@@ -27,8 +27,8 @@ import {
   ButtonCopyText,
   ButtonIcon,
   Topic,
-} from '@rangeos-nx/ui/api/hooks';
-import { auth } from '@rangeos-nx/ui/keycloak';
+} from '@rapid-cmi5/ui/api/hooks';
+import { auth } from '@rapid-cmi5/ui/keycloak';
 import ModalDialog from '../modals/ModalDialog';
 
 const confirmationDialogButtons = ['Cancel', 'Continue'];

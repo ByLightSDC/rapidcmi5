@@ -21,7 +21,7 @@ import {
   ComboBoxSelectorUi,
   ModalDialog,
   TextFieldMainUi,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 
 // used for uploading files

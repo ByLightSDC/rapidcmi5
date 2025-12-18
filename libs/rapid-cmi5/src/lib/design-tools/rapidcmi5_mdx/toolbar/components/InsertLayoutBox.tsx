@@ -22,7 +22,7 @@ import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 
 import ViewComfyIcon from '@mui/icons-material/ViewComfy';
 
-import { exportMarkdownFromLexical } from '@rangeos-nx/ui/branded';
+import { exportMarkdownFromLexical } from '@rapid-cmi5/ui/branded';
 
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';

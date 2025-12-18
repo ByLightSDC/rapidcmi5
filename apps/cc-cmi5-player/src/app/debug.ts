@@ -1,4 +1,4 @@
-import { config } from '@rangeos-nx/frontend/environment';
+import { config } from '@rapid-cmi5/frontend/environment';
 const currentMinLogLevel = config.CLIENT_LOG ? 0 : -1;
 export const debugColorSuccess = 'background:lightgreen';
 export const debugColor2 = 'background:lightblue';

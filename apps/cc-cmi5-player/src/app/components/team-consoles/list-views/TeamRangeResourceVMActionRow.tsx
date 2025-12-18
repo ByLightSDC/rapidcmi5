@@ -11,7 +11,7 @@ import {
   OverflowTypography,
   actionRowHeaderColor,
   ConsoleList,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 
 /* MUI */
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -21,8 +21,8 @@ import {
   DeployedRangeConsole,
   RangeVMStatusEnum,
   RangeVMKubevirtVmStatusEnum,
-} from '@rangeos-nx/frontend/clients/devops-api';
-import { getVmStatusIcon } from '@rangeos-nx/ui/api/hooks';
+} from '@rapid-cmi5/frontend/clients/devops-api';
+import { getVmStatusIcon } from '@rapid-cmi5/ui/api/hooks';
 
 // widths so name doesn't run into consoles if they exist
 const nameFieldDefaultWidth = '90%';

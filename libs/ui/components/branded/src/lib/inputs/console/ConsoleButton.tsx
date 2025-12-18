@@ -9,9 +9,9 @@ import { useEffect } from 'react';
 import {
   DeployedRangeConsole,
   DeployedRangeConsoleStatusEnum,
-} from '@rangeos-nx/frontend/clients/devops-api';
+} from '@rapid-cmi5/frontend/clients/devops-api';
 import { SxProps } from '@mui/system';
-import { ButtonMinorUi } from '@rangeos-nx/ui/api/hooks';
+import { ButtonMinorUi } from '@rapid-cmi5/ui/api/hooks';
 
 /**
  * @typedef {Object} tProps

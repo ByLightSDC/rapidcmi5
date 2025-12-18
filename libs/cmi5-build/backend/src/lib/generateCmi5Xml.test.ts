@@ -1,7 +1,7 @@
 import path from 'path';
 import { generateCmi5Xml } from './generateCmi5Xml';
 import { getFolderStructureBackend } from './fileSystem';
-import { generateCourseJson } from '@rangeos-nx/cmi5-build/common';
+import { generateCourseJson } from '@rapid-cmi5/cmi5-build/common';
 import { coursePaths } from './constants'
 import { XMLParser } from 'fast-xml-parser';
 

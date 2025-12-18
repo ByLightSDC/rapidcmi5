@@ -12,7 +12,7 @@ import {
 import { Buffer } from 'buffer';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { CourseData } from '@rangeos-nx/types/cmi5';
+import { CourseData } from '@rapid-cmi5/types/cmi5';
 import {
   CreateCloneType,
   CreateCommitType,
@@ -24,23 +24,21 @@ import {
   PullType,
   PushType,
 } from '../../CourseBuilderApiTypes';
-import { auth } from '@rangeos-nx/ui/keycloak';
+import { auth } from '@rapid-cmi5/ui/keycloak';
 
 import { ViewModeEnum } from '../../CourseBuilderTypes';
 import {
   debugLog,
   debugLogError,
   defaultCourseData,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import { ReadCommitResult } from 'isomorphic-git';
 import { sandboxIntro } from '../../../rapidcmi5_mdx/constants/sandboxIntro';
 import { useGitRepoStatus } from './useGitRepoStatus';
 import { useGitOperations } from './useGitOperations';
 import { sandBoxName } from './constants';
-import {
-  useCourseOperations,
-} from './useCourseOperations';
+import { useCourseOperations } from './useCourseOperations';
 import { usePublishActions } from './usePublishActions';
 import { useImageCache } from './useImageCache';
 import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
@@ -48,7 +46,7 @@ import { INode } from 'react-accessible-treeview';
 import { FileContent, getRepoPath, GitFS } from '../utils/fileSystem';
 import { GitOperations } from '../utils/gitOperations';
 import JSZip from 'jszip';
-import { FolderStruct } from '@rangeos-nx/cmi5-build/common';
+import { FolderStruct } from '@rapid-cmi5/cmi5-build/common';
 import {
   currentSlideNum,
   updateCourseData,
@@ -75,7 +73,12 @@ import {
 } from '../../../../redux/repoManagerReducer';
 import { AppDispatch, RootState } from '../../../../redux/store';
 import { getFsInstance } from '../utils/gitFsInstance';
-import { createNewCourseInFs, createUniquePath, slugifyPath } from '../utils/useCourseOperationsUtils';
+import {
+  createNewCourseInFs,
+  createUniquePath,
+  slugifyPath,
+} from '../utils/useCourseOperationsUtils';
+import { RapidCmi5Opts, ScenarioFormProps } from '../../../rapidcmi5_mdx/main';
 
 interface IGitContext {
   currentCourse?: Course | null;
@@ -94,6 +97,7 @@ interface IGitContext {
   isRepoConnectedToRemote: boolean;
   currentGitConfig: GitConfigType;
   isElectron: boolean;
+  GetScenariosForm?: React.ComponentType<ScenarioFormProps>;
   handleChangeRepo: (name: string) => void;
   handleChangeFileSystem: (fsType: fsType) => void;
   handleChangeRepoName: (name: string) => void;
@@ -188,7 +192,7 @@ interface IGitContext {
 interface tProviderProps {
   isEnabled?: boolean;
   children?: JSX.Element;
-  isElectron?: boolean;
+  rapidCmi5Opts: RapidCmi5Opts;
 }
 
 /**
@@ -212,6 +216,7 @@ const defaultGitContext: IGitContext = {
   isRepoConnectedToRemote: false,
   currentGitConfig: {} as GitConfigType,
   gitRepoCommits: [],
+  GetScenariosForm: undefined,
   handlePathExists: async () => false,
   handleBlobImageFile: async (r, filePath, fileType) => null,
   handleGetFolderStructure: async () => [],
@@ -312,9 +317,10 @@ export const getRepoAccess = (repoAccessObject: RepoAccessObject | null) => {
 // Project Context Provider
 // Simple functions should stay in their own hooks, functions which need data from other hooks should be created
 // in this context
-export const GitContextProvider: any = (props: tProviderProps) => {
-  const { children, isElectron = false } = props;
+export const GitContextProvider = (props: tProviderProps) => {
+  const { children, rapidCmi5Opts } = props;
   const gitFs = getFsInstance();
+  const isElectron = gitFs.isElectron;
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -329,6 +335,7 @@ export const GitContextProvider: any = (props: tProviderProps) => {
     fileSystemType,
   }: RepoState = useSelector((state: RootState) => state.repoManager);
 
+  const GetScenariosForm = rapidCmi5Opts.GetScenariosForm;
   const currentAuth = useSelector(auth);
   const availableCourses = fileState?.availableCourses ?? [];
   const currentCourse = fileState.selectedCourse;
@@ -349,7 +356,12 @@ export const GitContextProvider: any = (props: tProviderProps) => {
   }, [fileSystemType, browserFileSystemLoaded, localFileSystemLoaded]);
 
   const { resolvePCTEProjects, publishToPCTE, handleDownloadCmi5Zip } =
-    usePublishActions(gitFs, repoAccessObject);
+    usePublishActions(
+      gitFs,
+      repoAccessObject,
+      rapidCmi5Opts.authToken,
+      rapidCmi5Opts.buildCmi5Zip,
+    );
 
   const { getLocalFileBlob, getLocalFileBlobUrl } = useImageCache(
     repoAccessObject,
@@ -1082,6 +1094,7 @@ export const GitContextProvider: any = (props: tProviderProps) => {
   return (
     <GitContext.Provider
       value={{
+        GetScenariosForm,
         isElectron,
         isFsLoaded,
         isGitLoaded,

@@ -11,7 +11,7 @@ import {
   setModal,
   setMessage,
   FormCrudType,
-} from '@rangeos-nx/ui/redux';
+} from '@rapid-cmi5/ui/redux';
 import { useLocation, useNavigate } from 'react-router';
 
 /* Shared */
@@ -20,7 +20,7 @@ import {
   useClearCacheSelection,
   useGetCacheSelection,
   useSetCacheSelection,
-} from '@rangeos-nx/ui/redux';
+} from '@rapid-cmi5/ui/redux';
 
 /* Types */
 import { RowAction } from '../../types/actionRowTypes';
@@ -41,7 +41,7 @@ import {
   useCache,
   ButtonMinorUi,
   ButtonLoadingUi,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rapid-cmi5/ui/api/hooks';
 import { ButtonModalCancelUi } from '../../inputs/buttons/buttonsmodal';
 import ModalDialog from '../../modals/ModalDialog';
 import { BookmarksContext } from '../../navigation/bookmark/BookmarksContext';

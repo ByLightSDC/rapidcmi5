@@ -1,4 +1,4 @@
-import { useToaster } from '@rangeos-nx/ui/api/hooks';
+import { useToaster } from '@rapid-cmi5/ui/api/hooks';
 import '@testing-library/jest-dom';
 import {
   fireEvent,

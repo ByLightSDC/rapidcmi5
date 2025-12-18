@@ -25,7 +25,7 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 import React, { Fragment } from 'react';
-import { ButtonLoadingUi } from '@rangeos-nx/ui/api/hooks';
+import { ButtonLoadingUi } from '@rapid-cmi5/ui/api/hooks';
 import { ButtonModalCancelUi } from '../inputs/buttons/buttonsmodal';
 
 /**

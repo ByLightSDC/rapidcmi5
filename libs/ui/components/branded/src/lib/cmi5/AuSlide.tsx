@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AuContextProps, SlideTypeEnum } from '@rangeos-nx/types/cmi5';
+import { AuContextProps, SlideTypeEnum } from '@rapid-cmi5/types/cmi5';
 import AuMarkDownSlide from './markdown/MarkDownSlide';
 
 /**

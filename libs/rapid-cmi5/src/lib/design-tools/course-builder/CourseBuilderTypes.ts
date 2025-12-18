@@ -1,4 +1,4 @@
-import { Topic } from '@rangeos-nx/ui/api/hooks';
+import { Topic } from '@rapid-cmi5/ui/api/hooks';
 
 export enum ViewModeEnum {
   Designer = 'Designer',

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /* BRANDED */
-import { OverflowTypography } from '@rangeos-nx/ui/branded';
+import { OverflowTypography } from '@rapid-cmi5/ui/branded';
 
 /* Branded */
-import { listStyles } from '@rangeos-nx/ui/branded';
+import { listStyles } from '@rapid-cmi5/ui/branded';
 /* MUI */
 import ListItemIcon from '@mui/material/ListItemIcon';
 

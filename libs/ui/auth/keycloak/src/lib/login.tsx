@@ -1,7 +1,7 @@
 import React from 'react';
 import { useKeycloak } from '@react-keycloak/web';
 import { useDispatch, useSelector } from 'react-redux';
-import { config } from '@rangeos-nx/frontend/environment';
+import { config } from '@rapid-cmi5/frontend/environment';
 
 import {
   authRefreshError,
@@ -12,7 +12,7 @@ import {
   setIsAuthenticated,
   authError,
   useKeycloakRoleAuth,
-} from '@rangeos-nx/ui/keycloak';
+} from '@rapid-cmi5/ui/keycloak';
 import Box from '@mui/material/Box';
 
 /* Blocks UI when not authenticated */

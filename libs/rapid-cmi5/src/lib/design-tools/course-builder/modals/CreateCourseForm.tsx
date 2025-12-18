@@ -6,13 +6,13 @@ import {
   FormStateType,
   MiniForm,
   ModalDialog,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import * as yup from 'yup';
 
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 import { createCourseModalId } from '../../rapidcmi5_mdx/modals/constants';
-import { CommonAppModalState } from '@rangeos-nx/ui/redux';
+import { CommonAppModalState } from '@rapid-cmi5/ui/redux';
 
 import { Alert, Grid, IconButton, Tooltip } from '@mui/material';
 
@@ -22,7 +22,7 @@ import {
   DESCRIPTION_GROUP_OPT,
   NAME_GROUP,
   STARTS_WITH_HTTPS_GROUP,
-} from '@rangeos-nx/ui/validation';
+} from '@rapid-cmi5/ui/validation';
 import { CreateCourseType } from '../CourseBuilderApiTypes';
 import { useContext, useMemo } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';

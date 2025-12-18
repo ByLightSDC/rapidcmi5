@@ -1,4 +1,4 @@
-import { setModal } from '@rangeos-nx/ui/redux';
+import { setModal } from '@rapid-cmi5/ui/redux';
 import {
   attachRemoteRepoModalId,
   cloneRepoModalId,

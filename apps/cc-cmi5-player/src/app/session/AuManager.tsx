@@ -35,21 +35,21 @@ import {
   QuizState,
   RC5ActivityTypeEnum,
   SlideTypeEnum,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 import MenuLayout from '../components/MenuLayout';
 import { getAutoGradersProgress } from '../utils/Cmi5Helpers';
 
-import { modal, setModal } from '@rangeos-nx/ui/redux';
+import { modal, setModal } from '@rapid-cmi5/ui/redux';
 import {
   classChangeModalId,
   classPromptModalId,
 } from '../components/CourseModals';
 import { debugLogError } from '../debug';
-import { config } from '@rangeos-nx/frontend/environment';
+import { config } from '@rapid-cmi5/frontend/environment';
 import { useActivitySession } from '../hooks/useActivitySession';
 import Auth from '../Auth';
 import { handleActivityScoring } from '../utils/LmsStatementManager';
-import { debugLog } from '@rangeos-nx/ui/branded';
+import { debugLog } from '@rapid-cmi5/ui/branded';
 
 /**
  * Context for Building CMI5 Course

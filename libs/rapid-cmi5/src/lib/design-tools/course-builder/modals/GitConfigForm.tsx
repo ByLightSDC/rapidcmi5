@@ -5,17 +5,17 @@ import {
   FormStateType,
   MiniForm,
   ModalDialog,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import * as yup from 'yup';
 
 import { setGitConfigModalId } from '../../rapidcmi5_mdx/modals/constants';
-import { CommonAppModalState } from '@rangeos-nx/ui/redux';
+import { CommonAppModalState } from '@rapid-cmi5/ui/redux';
 
 import { Grid } from '@mui/material';
 
 import { UseFormReturn } from 'react-hook-form';
 
-import { NAME_GROUP_OPT } from '@rangeos-nx/ui/validation';
+import { NAME_GROUP_OPT } from '@rapid-cmi5/ui/validation';
 import { GitConfigType } from '../CourseBuilderApiTypes';
 import { useContext } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';

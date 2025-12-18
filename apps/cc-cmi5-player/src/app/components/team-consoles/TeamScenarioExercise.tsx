@@ -7,17 +7,17 @@ import {
   useRef,
 } from 'react';
 
-import { OverflowTypography, TabMainUi } from '@rangeos-nx/ui/branded';
+import { OverflowTypography, TabMainUi } from '@rapid-cmi5/ui/branded';
 import {
   getScenarioStatusIcon,
   queryKeyRangeResourceAutoGraders,
   queryKeyRangeResourceContainers,
   Topic,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rapid-cmi5/ui/api/hooks';
 import {
   DeployedScenario,
   DeployedScenarioDetailStatusEnum,
-} from '@rangeos-nx/frontend/clients/devops-api';
+} from '@rapid-cmi5/frontend/clients/devops-api';
 
 /* MUI */
 import {
@@ -36,7 +36,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AutoModeIcon from '@mui/icons-material/AutoMode';
 import TerminalIcon from '@mui/icons-material/Terminal';
 
-import { AuContextProps, TeamConsolesContent } from '@rangeos-nx/types/cmi5';
+import { AuContextProps, TeamConsolesContent } from '@rapid-cmi5/types/cmi5';
 
 import TimeClock from '../scenario/TimeClock';
 import RangeResources from './list-views/RangeResources';

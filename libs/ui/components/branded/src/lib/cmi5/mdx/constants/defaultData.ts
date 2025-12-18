@@ -13,8 +13,8 @@ import {
   ScenarioContent,
   SlideTypeEnum,
   TeamConsolesContent,
-} from '@rangeos-nx/types/cmi5';
-import { RC5ActivityTypeEnum } from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
+import { RC5ActivityTypeEnum } from '@rapid-cmi5/types/cmi5';
 
 export const jsonFormatSpaces = 1;
 

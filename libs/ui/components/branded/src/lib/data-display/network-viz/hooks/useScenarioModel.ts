@@ -1,7 +1,7 @@
-import { useGetScenarioGraph, useQueryDetails } from '@rangeos-nx/ui/api/hooks';
+import { useGetScenarioGraph, useQueryDetails } from '@rapid-cmi5/ui/api/hooks';
 import { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setLoader, setNavbarToggleState } from '@rangeos-nx/ui/redux';
+import { setLoader, setNavbarToggleState } from '@rapid-cmi5/ui/redux';
 
 export const useScenarioModel = (
   defaultMapData: any,

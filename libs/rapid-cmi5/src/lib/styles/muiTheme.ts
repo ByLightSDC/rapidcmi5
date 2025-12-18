@@ -32,8 +32,6 @@ export const lightTheme = createTheme({
       primary: 'rgba(0, 0, 0, 0.9)', //unusable
       secondary: '#323232D9',
       disabled: 'rgba(0, 0, 0, .6)',
-      hint: '#656565',
-      interactable: '#212121',
     },
     background: {
       paper: '#F8F8F8',
@@ -53,27 +51,16 @@ export const lightTheme = createTheme({
   },
   breadcrumbs: {
     default: '#202020',
-    underline: mainColor, //interactive
-    hoverColor: '#133c67', //TODO
-    hoverBackground: 'A6A6A6',
   },
-  card: {
-    default: 'linear-gradient(180deg, #3E5BA5 0%, #2E4C94 100%)',
-    defaultHover: 'linear-gradient(180deg, #8AA6D0 0%, #8AA6D0 100%)',
-    borderColor: '#8AA6D0',
-    titleColor: '#FFFFFF',
-    formInstructionsColor: '#E5F6FDBF',
-  },
+
   header: {
     border: '#ffffffc3', //active se
     buttonColor: '#C5C5C5',
-    selColor: '#a4c9eb', //'#a4b8eb',
     default: '#282b30',
     light: '#071285B2', // loading bar color
     dark: '#f1f3f9',
     hoverColor: '#ffffff',
-    title: '#3C59A2',
-    underline: 'LightGrey', //divider OR parting line
+    title: '#3C59A2'
   },
   input: {
     outlineColor: '#CBCBCB',
@@ -137,12 +124,11 @@ export const lightTheme = createTheme({
             border: '2px solid #dd6fff00', //inset thumb on track background color
             minHeight: '48px',
           },
-          '*::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover':
-            {
-              backgroundColor: '#5871AF',
-              borderLeft: '4px solid #f8f8f8',
-              cursor: 'pointer',
-            },
+          '*::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: '#5871AF',
+            borderLeft: '4px solid #f8f8f8',
+            cursor: 'pointer',
+          },
           '*::-webkit-scrollbar, & *::-webkit-scrollbar': {
             width: '16px',
           },
@@ -331,4 +317,12 @@ export const lightTheme = createTheme({
       },
     },
   },
+  card: {
+    default: undefined,
+    defaultHover: undefined,
+    borderColor: undefined,
+    formInstructionsColor: undefined,
+    instructionsColor: undefined,
+    titleColor: undefined
+  }
 });

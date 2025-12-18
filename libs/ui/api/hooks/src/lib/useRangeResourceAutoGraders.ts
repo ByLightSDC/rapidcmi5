@@ -4,7 +4,7 @@ import { useQuery } from 'react-query';
 import {
   AutoGrader,
   DevopsApiClient,
-} from '@rangeos-nx/frontend/clients/devops-api';
+} from '@rapid-cmi5/frontend/clients/devops-api';
 import {
   defaultQueryConfig,
   defaultSortOrderBy,

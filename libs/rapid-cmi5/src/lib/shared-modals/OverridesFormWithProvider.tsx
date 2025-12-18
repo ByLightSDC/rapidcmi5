@@ -11,7 +11,7 @@
 // } from 'react-hook-form';
 // import { yupResolver } from '@hookform/resolvers/yup';
 // import { AppDispatch } from '../../../redux/store';
-// import { setLoader } from '@rangeos-nx/ui/redux';
+// import { setLoader } from '@rapid-cmi5/ui/redux';
 
 // /* Shared */
 // import MultiSelectionModals from './MultiSelectionModals';
@@ -20,7 +20,7 @@
 //   ErrorMessageDetail,
 //   diffPayload,
 //   sanitizePayload,
-// } from '@rangeos-nx/ui/validation';
+// } from '@rapid-cmi5/ui/validation';
 
 // /* Branded */
 // import {
@@ -39,7 +39,7 @@
 //   iListItemType,
 //   tAuthoringInfoFieldProps,
 //   useNavigateAlias,
-// } from '@rangeos-nx/ui/branded';
+// } from '@rapid-cmi5/ui/branded';
 
 // /* MUI */
 // import Box from '@mui/material/Box';
@@ -53,8 +53,8 @@
 //   useGetRangeResourceScenarioOverrides,
 //   usePutRangeResourceScenario,
 //   useQueryDetails,
-// } from '@rangeos-nx/ui/api/hooks';
-// import { ScenarioOverridesOverride } from '@rangeos-nx/frontend/clients/devops-api';
+// } from '@rapid-cmi5/ui/api/hooks';
+// import { ScenarioOverridesOverride } from '@rapid-cmi5/frontend/clients/devops-api';
 // const defaultFormWidth = 880;
 
 // /**

@@ -4,9 +4,9 @@ import {
   useGetRangeResourceContainersGraph,
   useQueryDetails,
   Topic,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rapid-cmi5/ui/api/hooks';
 
-import { debugLogError } from '@rangeos-nx/ui/branded';
+import { debugLogError } from '@rapid-cmi5/ui/branded';
 import { useState } from 'react';
 import ContainerSubscription from '../subscriptions/ContainerSubscription';
 

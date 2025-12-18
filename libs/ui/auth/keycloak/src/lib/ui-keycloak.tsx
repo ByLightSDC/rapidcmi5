@@ -1,4 +1,4 @@
-import { config } from '@rangeos-nx/frontend/environment';
+import { config } from '@rapid-cmi5/frontend/environment';
 import Keycloak, { KeycloakConfig } from 'keycloak-js';
 import { AuthClientError } from '@react-keycloak/core';
 import { ReactKeycloakProvider } from '@react-keycloak/web';

@@ -1,6 +1,6 @@
 import download from 'js-file-download';
 import { useDispatch, useSelector } from 'react-redux';
-import { modal, setModal } from '@rangeos-nx/ui/redux';
+import { modal, setModal } from '@rapid-cmi5/ui/redux';
 
 /* Branded */
 import { AlertColor, TextField } from '@mui/material';

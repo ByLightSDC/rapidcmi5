@@ -10,7 +10,7 @@ import { Variant } from '@mui/material/styles/createTypography';
 /* Icons */
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { SxProps } from '@mui/system';
-import { ButtonInfoField, ButtonInfoFormHeaderLayout } from '@rangeos-nx/ui/api/hooks';
+import { ButtonInfoField, ButtonInfoFormHeaderLayout } from '@rapid-cmi5/ui/api/hooks';
 
 /**
  * @interface tViewExpanderProps

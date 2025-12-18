@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import SchoolIcon from '@mui/icons-material/School';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { RC5ActivityTypeEnum } from '@rangeos-nx/types/cmi5';
+import { RC5ActivityTypeEnum } from '@rapid-cmi5/types/cmi5';
 
 export default function LrsHeaderWithDetails({
   activityType,

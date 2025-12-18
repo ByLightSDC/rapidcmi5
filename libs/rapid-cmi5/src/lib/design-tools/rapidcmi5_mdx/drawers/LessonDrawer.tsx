@@ -36,7 +36,7 @@ import ImportExportIcon from '@mui/icons-material/ImportExport';
 import {
   debugLogError,
   RowAction,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import { listItemProps } from './components/LessonTreeNode';
 import { useSelector } from 'react-redux';
 import { Renamer } from './components/Renamer';
@@ -44,7 +44,7 @@ import { RootState } from '../../../redux/store';
 import { RepoState } from '../../../redux/repoManagerReducer';
 import ChangeRepoExpander from './components/ChangeRepoExpander';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import { ButtonOptions, ButtonMinorUi } from '@rangeos-nx/ui/api/hooks';
+import { ButtonOptions, ButtonMinorUi } from '@rapid-cmi5/ui/api/hooks';
 
 /** Order important actions */
 export enum CourseActionEnum {

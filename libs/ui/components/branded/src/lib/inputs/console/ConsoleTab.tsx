@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react';
 import {
   useGetRangeResourceConsolesGraph,
   useQueryDetails,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rapid-cmi5/ui/api/hooks';
 import { Alert } from '@mui/material';
 import { LoadingUi } from '../../indicators/Loading';
 import ConsolePopup from './ConsolePopup';

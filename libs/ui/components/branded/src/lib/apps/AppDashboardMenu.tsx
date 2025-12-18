@@ -6,7 +6,7 @@ import { Typography } from '@mui/material';
 
 /* Icons */
 import { useSelector } from 'react-redux';
-import { AppMenuConfigItem, plugins } from '@rangeos-nx/ui/redux';
+import { AppMenuConfigItem, plugins } from '@rapid-cmi5/ui/redux';
 import AppLogo from './AppLogo';
 
 /**

@@ -19,7 +19,7 @@ import { RootState } from '../../../redux/store';
 import {
   RowAction,
   TabMainUi,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 
 import { useMDStyleIcons } from '../styles/useMDStyleIcons';
 import RepositorySelector from '../../course-builder/selectors/RepositorySelector';
@@ -41,7 +41,7 @@ import React from 'react';
 import { listItemProps } from './components/LessonTreeNode';
 import { Renamer } from './components/Renamer';
 import FileSystemSelector from '../../course-builder/selectors/FileSystemSelector';
-import { ButtonOptions, ButtonMinorUi } from '@rangeos-nx/ui/api/hooks';
+import { ButtonOptions, ButtonMinorUi } from '@rapid-cmi5/ui/api/hooks';
 
 enum RepoActionEnum {
   TriggerRename,

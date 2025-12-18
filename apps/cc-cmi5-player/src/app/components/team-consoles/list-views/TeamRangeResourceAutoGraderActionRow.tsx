@@ -1,7 +1,7 @@
 import {
   AutoGraderMetadata,
   DeployedAutoGrader,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rapid-cmi5/ui/api/hooks';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 
@@ -20,7 +20,7 @@ import {
   actionRowHeaderColor,
   listStyles,
   OverflowTypography,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 
 type Props = {
   counter: number;

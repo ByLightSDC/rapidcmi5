@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { AuMappingService } from '../auMappingService';
-import { CourseData } from '@rangeos-nx/types/cmi5';
+import { CourseData } from '@rapid-cmi5/types/cmi5';
 import { AllowedNamespaces, UploadService } from './multiPartUploadService';
 import FormData from 'form-data';
 import fs from 'fs';

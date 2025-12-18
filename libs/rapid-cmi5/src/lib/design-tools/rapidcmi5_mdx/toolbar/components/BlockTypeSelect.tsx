@@ -21,7 +21,7 @@ import {
   $createFootnoteReferenceNode,
   $createTocHeadingNode,
   githubSlugger$,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getSelection, $isRangeSelection } from 'lexical';
 

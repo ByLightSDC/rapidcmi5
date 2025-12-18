@@ -7,7 +7,7 @@ import {
   QuestionResponse,
   responseOptions,
   SlideTypeEnum,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 import {
   FormControlCheckboxField,
   FormControlSelectField,
@@ -15,8 +15,8 @@ import {
   FormFieldArray,
   tFormFieldRendererProps,
   useDisplayFocus,
-} from '@rangeos-nx/ui/branded';
-import { FormCrudType } from '@rangeos-nx/ui/redux';
+} from '@rapid-cmi5/ui/branded';
+import { FormCrudType } from '@rapid-cmi5/ui/redux';
 
 /**
  * @interface fieldGroupProps

@@ -2,7 +2,7 @@ import { IconButton, Tooltip } from '@mui/material';
 
 /* Icons */
 import AppsIcon from '@mui/icons-material/Apps';
-import { ButtonOptions } from '@rangeos-nx/ui/api/hooks';
+import { ButtonOptions } from '@rapid-cmi5/ui/api/hooks';
 import AppIconButtonMenu from './AppIconButtonMenu';
 
 const defaultAppIconStyle = {

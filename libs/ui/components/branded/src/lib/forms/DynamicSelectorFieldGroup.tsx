@@ -1,9 +1,4 @@
-/*
- *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
- *   All rights reserved.
- */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   message,
@@ -13,23 +8,21 @@ import {
   useGetCacheSelection,
   useCurrentSelection,
   FormCrudType,
-} from '@rangeos-nx/ui/redux';
+} from '@rapid-cmi5/ui/redux';
 
 /* Branded */
 import {
-
   tFormFieldRendererProps,
-
   useDisplayFocus,
   useIsVisible,
-} from '@rangeos-nx/ui/branded';
-
-
+} from '@rapid-cmi5/ui/branded';
 
 /* MUI */
 import { TextFieldProps } from '@mui/material/TextField';
-import { ButtonSelectUi } from '@rangeos-nx/ui/api/hooks';
-import UUIDFieldInspector, { tUUIDFieldInspectorProps } from './UUIDFieldInspector';
+import { ButtonSelectUi } from '@rapid-cmi5/ui/api/hooks';
+import UUIDFieldInspector, {
+  tUUIDFieldInspectorProps,
+} from './UUIDFieldInspector';
 
 export enum ClearedUuidValue {
   Empty,
@@ -396,6 +389,7 @@ export function DynamicSelectorFieldGroup(
   }, [selectionArr, messageObj.message, messageObj.meta?.indexedArrayField]);
 
   const handleOpenSelection = (event: any) => {
+    console.log('clickerd opn');
     const selectionData = {
       dataIdField,
       modalId: selectionModalId,
@@ -408,11 +402,13 @@ export function DynamicSelectorFieldGroup(
         indexedArrayField: indexedArrayField,
         propertyKey,
         isKeyValue,
-        shouldSkipQuery:shouldRestrictToInDesignOnly
+        shouldSkipQuery: shouldRestrictToInDesignOnly,
       },
       selName: watchKey,
       topicId,
     };
+
+    console.log("se3lection data", selectionData);
     selectionHelper.openSelection(selectionData);
   };
 
@@ -422,29 +418,27 @@ export function DynamicSelectorFieldGroup(
       ref={divRef}
       style={{ marginTop: marginTop, gap: '4px' }} //negative margin to undo extra div vertical
     >
-      {isVisible && (
-        <>
-          {!readOnly && (
-            <ButtonSelectUi
-              aria-label={`select-${itemName}`}
-              id={selectButtonFocusId}
-              onClick={handleOpenSelection}
-              sxProps={
-                shouldShowButtonText
-                  ? {
-                      width: 'auto',
-                      minWidth: '90px', //hack for node 1, node 2 in BGP Link Form
-                      marginBottom: '8px',
-                    }
-                  : { width: '40px', minWidth: '0px', marginBottom: '8px' }
-              }
-            >
-              {shouldShowButtonText ? itemName : ''}
-            </ButtonSelectUi>
-          )}
-          {uuidMemo}
-        </>
-      )}
+      <>
+        {!readOnly && (
+          <ButtonSelectUi
+            aria-label={`select-${itemName}`}
+            id={selectButtonFocusId}
+            onClick={handleOpenSelection}
+            sxProps={
+              shouldShowButtonText
+                ? {
+                    width: 'auto',
+                    minWidth: '90px', //hack for node 1, node 2 in BGP Link Form
+                    marginBottom: '8px',
+                  }
+                : { width: '40px', minWidth: '0px', marginBottom: '8px' }
+            }
+          >
+            {shouldShowButtonText ? itemName : ''}
+          </ButtonSelectUi>
+        )}
+        {uuidMemo}
+      </>
     </div>
   );
 }

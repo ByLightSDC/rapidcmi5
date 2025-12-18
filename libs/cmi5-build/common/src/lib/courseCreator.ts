@@ -5,7 +5,7 @@ import {
   RC5ScenarioContent,
   SlideTypeEnum,
   TeamConsolesContent,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 import { getScenarioDirectives } from './codeValidators/markdownValidator';
 
 export interface FolderStruct {

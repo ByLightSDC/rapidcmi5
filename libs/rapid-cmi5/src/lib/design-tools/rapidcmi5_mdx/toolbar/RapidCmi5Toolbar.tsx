@@ -39,7 +39,7 @@ import {
   AdmonitionTypeEnum,
   AdmonitionTypes,
   RC5ActivityTypeEnum,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 import { InsertAdmonition } from './components/InsertAdmonition';
 import {
   iconButtonSize,
@@ -49,9 +49,9 @@ import {
 import {
   CONTENT_UPDATED_COMMAND,
   editorInPlayback$,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import { useSelector } from 'react-redux';
-import { dividerColor } from '@rangeos-nx/ui/redux';
+import { dividerColor } from '@rapid-cmi5/ui/redux';
 import { BlockTypeSelect } from './components/BlockTypeSelect';
 import { displayData } from '../../../redux/courseBuilderReducer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';

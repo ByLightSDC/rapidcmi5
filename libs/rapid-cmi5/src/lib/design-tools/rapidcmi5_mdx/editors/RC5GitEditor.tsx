@@ -34,7 +34,7 @@ import { gitViewCurrentTab } from '../../../redux/courseBuilderReducer';
 import GitFileStatus from '../../course-builder/GitViewer/Components/GitActions/GitFileStatus';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
 import FileSystemLoader from './components/FileSystemLoader';
-import { useToaster, ButtonMinorUi } from '@rangeos-nx/ui/api/hooks';
+import { useToaster, ButtonMinorUi } from '@rapid-cmi5/ui/api/hooks';
 
 /**
  * Rapid CMI5 Git Editor

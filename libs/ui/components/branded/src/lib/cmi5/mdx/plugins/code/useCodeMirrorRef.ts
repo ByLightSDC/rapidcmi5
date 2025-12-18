@@ -1,6 +1,5 @@
 
 // use public api instead if it becomes available
-//REF import { CodeMirrorRef } from '@codesandbox/sandpack-react/dist/components/CodeEditor/CodeMirror'
 import { $createParagraphNode, $getNodeByKey } from 'lexical'
 import React from 'react'
 import { useCellValue, usePublisher } from '@mdxeditor/gurx'

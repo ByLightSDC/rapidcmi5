@@ -8,16 +8,16 @@ import {
   JobeContent,
   Operation,
   CourseAU,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './store';
 import {
   debugLog,
   defaultCourseData,
-} from '@rangeos-nx/ui/branded';
-import { Scenario } from '@rangeos-nx/frontend/clients/devops-api';
+} from '@rapid-cmi5/ui/branded';
+import { Scenario } from '@rapid-cmi5/frontend/clients/devops-api';
 import { ViewModeEnum } from '../design-tools/course-builder/CourseBuilderTypes';
-import { resetPersistance } from '@rangeos-nx/ui/redux';
+import { resetPersistance } from '@rapid-cmi5/ui/redux';
 
 /**
  * Before user is connected to repo, they can play in slides sandbox

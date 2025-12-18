@@ -7,7 +7,7 @@ import {
   AutoGraderEvent,
   graphqlAutoGraderResultsFields,
   useSubscription,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rapid-cmi5/ui/api/hooks';
 
 /**
  * Queries graph for AutoGrader updates

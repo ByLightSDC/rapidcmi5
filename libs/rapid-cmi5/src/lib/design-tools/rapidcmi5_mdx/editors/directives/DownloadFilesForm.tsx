@@ -5,19 +5,19 @@ import {
   FormControlUIProvider,
   FormStateType,
   MiniForm,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import { Box, Typography } from '@mui/material';
 import * as yup from 'yup';
-import { DownloadFileData, DownloadFilesContent } from '@rangeos-nx/types/cmi5';
+import { DownloadFileData, DownloadFilesContent } from '@rapid-cmi5/types/cmi5';
 
-import { RC5ActivityTypeEnum } from '@rangeos-nx/types/cmi5';
+import { RC5ActivityTypeEnum } from '@rapid-cmi5/types/cmi5';
 import { useContext, useState } from 'react';
 
 import { useImageFile } from '../../data-hooks/useImageFile';
 import { useSelector } from 'react-redux';
 import { currentAuPath } from '../../../../redux/courseBuilderReducer';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
-import { FormCrudType } from '@rangeos-nx/ui/redux';
+import { FormCrudType } from '@rapid-cmi5/ui/redux';
 
 /**
  * Form course creators can use to attack files to a Lesson AU

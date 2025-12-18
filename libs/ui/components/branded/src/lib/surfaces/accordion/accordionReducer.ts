@@ -1,4 +1,4 @@
-import { resetPersistance } from '@rangeos-nx/ui/redux';
+import { resetPersistance } from '@rapid-cmi5/ui/redux';
 import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 
 type tAccordionState = {

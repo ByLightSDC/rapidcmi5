@@ -80,7 +80,7 @@ export const { resetValidation, setAttribute, setIsYupValidationSetUp } =
 /**
  * Selector to return the current set of fieldAttributes defined
  * To use
- *   import fieldAttributes from '@rangeos-nx/ui/redux'
+ *   import fieldAttributes from '@rapid-cmi5/ui/redux'
  *   const fieldAttributeSet = useSelector(fieldAttributes);
  * @param {RootState} state the redux state (useSelector handles this)
  * @returns {FieldAttributes}
@@ -91,7 +91,7 @@ export const fieldAttributes = (state: State) =>
 /**
  * Selector to return the current validation status of schema data fields
  * To use
- *   import isYupValidationSetUp from '@rangeos-nx/ui/redux'
+ *   import isYupValidationSetUp from '@rapid-cmi5/ui/redux'
  *   const isValidationSetUp = useSelector(isYupValidationSetUp);
  * @param {RootState} state the redux state (useSelector handles this)
  * @returns {boolean}

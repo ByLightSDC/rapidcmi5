@@ -32,7 +32,7 @@ import React, {
   useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { appHeaderVisible, themeColor } from '@rangeos-nx/ui/redux';
+import { appHeaderVisible, themeColor } from '@rapid-cmi5/ui/redux';
 import SharedFormModals from '../../../shared-modals/SharedFormModals';
 import { Box, useTheme } from '@mui/material';
 import { RC5Context } from '../contexts/RC5Context';
@@ -53,7 +53,7 @@ import {
   htmlPlugin,
   diffSourcePlugin,
   debugLog,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import { imagePlugin } from '../plugins/image';
 import { videoPlugin } from '../plugins/video';
 import { audioPlugin } from '../plugins/audio';

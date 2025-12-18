@@ -1,6 +1,6 @@
 
 /* Branded */
-import { DashboardIcon } from '@rangeos-nx/ui/branded';
+import { DashboardIcon } from '@rapid-cmi5/ui/branded';
 
 export const rangesNavIndex = 0;
 export const classNavIndex = 1;

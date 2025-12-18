@@ -56,6 +56,8 @@ export const useCurrentSelection = () => {
       [dataIdField]: selId, //order important
     });
 
+    console.log('setting modal');
+
     dispatch(
       setModal({
         id: topicId || selId,

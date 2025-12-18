@@ -14,7 +14,7 @@ import {
   getAdmonitionHexColor,
   getAdmonitionIcon,
 } from './components/AdmonitionStyles';
-import { AdmonitionTypeEnum } from '@rangeos-nx/types/cmi5';
+import { AdmonitionTypeEnum } from '@rapid-cmi5/types/cmi5';
 
 /**
  * Admonition

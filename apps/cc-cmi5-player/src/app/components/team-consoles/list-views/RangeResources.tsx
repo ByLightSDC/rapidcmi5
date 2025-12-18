@@ -5,13 +5,13 @@
 import { useEffect, useMemo } from 'react';
 
 /* Branded */
-import { iListItemType, ListView, LoadingUi } from '@rangeos-nx/ui/branded';
+import { iListItemType, ListView, LoadingUi } from '@rapid-cmi5/ui/branded';
 
 import {
   DeployedAutoGrader,
   queryKeyRangeResourceVMs,
   Topic,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rapid-cmi5/ui/api/hooks';
 
 /* MUI */
 import { Alert } from '@mui/material';
@@ -19,7 +19,7 @@ import Box from '@mui/material/Box';
 
 import TeamRangeResourceVMActionRow from './TeamRangeResourceVMActionRow';
 import TeamRangeResourceContainerActionRow from './TeamRangeResourceContainerActionRow';
-import { DeployedRangeConsole } from '@rangeos-nx/frontend/clients/devops-api';
+import { DeployedRangeConsole } from '@rapid-cmi5/frontend/clients/devops-api';
 import TeamRangeResourceAutoGraderActionActionRow from './TeamRangeResourceAutoGraderActionRow';
 import AutoGraderProgressDisplay from './AutoGraderProgressDisplay';
 

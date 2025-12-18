@@ -1,6 +1,6 @@
 import { Text } from '@codemirror/state';
 import { Diagnostic, linter } from '@codemirror/lint';
-import { validateMarkdownDirectives } from '@rangeos-nx/cmi5-build/common';
+import { validateMarkdownDirectives } from '@rapid-cmi5/cmi5-build/common';
 
 
 function getOffset(doc: Text, line: number, column: number) {

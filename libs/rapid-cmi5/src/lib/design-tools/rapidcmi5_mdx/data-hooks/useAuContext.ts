@@ -10,7 +10,7 @@ import {
 import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
-import { AuContextProps } from '@rangeos-nx/types/cmi5';
+import { AuContextProps } from '@rapid-cmi5/types/cmi5';
 
 /**
  * AU State & Methods

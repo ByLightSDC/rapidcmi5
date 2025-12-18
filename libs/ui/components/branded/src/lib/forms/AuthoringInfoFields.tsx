@@ -6,7 +6,7 @@ import { Control } from 'react-hook-form';
 
 /* MUI */
 import Grid from '@mui/material/Grid';
-import { FormCrudType } from '@rangeos-nx/ui/redux';
+import { FormCrudType } from '@rapid-cmi5/ui/redux';
 import FormControlTextField from './FormControlTextField';
 import FormControlDateDisplay from './FormControlDateDisplay';
 

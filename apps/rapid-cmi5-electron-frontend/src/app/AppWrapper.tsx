@@ -2,12 +2,12 @@
 import { QueryClient, QueryClientProvider } from 'react-query';
 import App from './app';
 import { Provider } from 'react-redux';
-import { store } from '@rangeos-nx/rapid-cmi5';
-import { persistor } from '@rangeos-nx/rapid-cmi5';
+import { store, persistor} from '@rapid-cmi5/react-editor';
 import { StrictMode } from 'react';
 import { PersistGate } from 'redux-persist/integration/react';
 
 import AppUrlParams from './AppUrlParams';
+import Auth from './Auth';
 
 export default function AppWrapper() {
   const queryClient = new QueryClient();
@@ -15,13 +15,15 @@ export default function AppWrapper() {
   return (
     <Provider store={store}>
       <AppUrlParams />
-      <StrictMode>
-        <PersistGate loading={null} persistor={persistor}>
-          <QueryClientProvider client={queryClient}>
-            <App />
-          </QueryClientProvider>
-        </PersistGate>
-      </StrictMode>
+      <Auth>
+        <StrictMode>
+          <PersistGate loading={null} persistor={persistor}>
+            <QueryClientProvider client={queryClient}>
+              <App />
+            </QueryClientProvider>
+          </PersistGate>
+        </StrictMode>
+      </Auth>
     </Provider>
   );
 }

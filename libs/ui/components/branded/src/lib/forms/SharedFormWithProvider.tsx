@@ -24,11 +24,11 @@ import {
   useGetCacheSelection,
   useGetCacheMultipleSelection,
   FormCrudType,
-} from '@rangeos-nx/ui/redux';
+} from '@rapid-cmi5/ui/redux';
 
-import { ButtonLoadingUi, useQueryDetails } from '@rangeos-nx/ui/api/hooks';
-import { setLoader } from '@rangeos-nx/ui/redux';
-import { ErrorMessageDetail, sanitizePayload } from '@rangeos-nx/ui/validation';
+import { ButtonLoadingUi, useQueryDetails } from '@rapid-cmi5/ui/api/hooks';
+import { setLoader } from '@rapid-cmi5/ui/redux';
+import { ErrorMessageDetail, sanitizePayload } from '@rapid-cmi5/ui/validation';
 
 /* MUI */
 import Box from '@mui/material/Box';

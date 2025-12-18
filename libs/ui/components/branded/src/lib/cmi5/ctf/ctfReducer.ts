@@ -4,7 +4,7 @@ import {
   AnswerType,
   CTFContent,
   QuizCompletionEnum,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 
 type tCTFState = {
   currentQuestion: number;

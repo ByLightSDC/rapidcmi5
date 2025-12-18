@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
-import { navBarIndex } from '@rangeos-nx/ui/redux';
+import { navBarIndex } from '@rapid-cmi5/ui/redux';
 
 /* MUI */
 import IconButton from '@mui/material/IconButton';

@@ -5,7 +5,7 @@ import {
   SetActivityCacheHandler,
   SetCmi5ProgressHandler,
   SubmitCmiScoreHandler,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 
 /**
  * Whether editor will display what CMI5 participants see

@@ -5,7 +5,7 @@ import React, { createContext, useRef, useState } from 'react';
 import { ReactFlowInstance } from 'reactflow';
 import { ConsoleWindowManager } from './ConsoleWindowManager';
 import ConsolePopup from './ConsolePopup';
-import { DeployedRangeConsoleStatusEnum } from '@rangeos-nx/frontend/clients/devops-api';
+import { DeployedRangeConsoleStatusEnum } from '@rapid-cmi5/frontend/clients/devops-api';
 
 interface iConsoleContext {
   addConsoleWindow: (

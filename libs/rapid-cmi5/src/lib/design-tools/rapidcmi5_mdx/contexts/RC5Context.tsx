@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { MDXEditorMethods } from '@mdxeditor/editor';
-import { debugLog, debugLogError } from '@rangeos-nx/ui/branded';
+import { debugLog, debugLogError } from '@rapid-cmi5/ui/branded';
 import React, {
   createContext,
   RefObject,
@@ -33,13 +33,13 @@ import {
   updateDisplayText,
 } from '../../../redux/courseBuilderReducer';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
-import { setModal } from '@rangeos-nx/ui/redux';
+import { setModal } from '@rapid-cmi5/ui/redux';
 import {
   CourseAU,
   MoveOnCriteriaEnum,
   Operation,
   SlideType,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 
 import {
   createCourseModalId,

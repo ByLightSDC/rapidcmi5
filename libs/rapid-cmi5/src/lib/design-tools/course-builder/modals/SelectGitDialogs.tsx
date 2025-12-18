@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { modal, setModal } from '@rangeos-nx/ui/redux';
+import { modal, setModal } from '@rapid-cmi5/ui/redux';
 
 /* Branded */
 import {
@@ -11,7 +11,7 @@ import {
   defaultImportRepoZipData,
   ModalDialog,
   ViewExpander,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 import { useContext, useEffect, useState } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';
 import DirectoryTreeView from '../GitViewer/Components/SelectedRepo/DirectoryTree';
@@ -40,7 +40,7 @@ import { CreateCourseForm } from './CreateCourseForm';
 import { CreateLessonForm } from './CreateLessonForm';
 import { RepoState } from '../../../redux/repoManagerReducer';
 import CommitForm from './CommitForm';
-import { auth } from '@rangeos-nx/ui/keycloak';
+import { auth } from '@rapid-cmi5/ui/keycloak';
 import { RootState } from '../../../redux/store';
 import PullForm from './PullForm';
 import PushForm from './PushForm';

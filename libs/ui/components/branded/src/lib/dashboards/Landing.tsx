@@ -5,9 +5,9 @@
 import { useContext, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { FormCrudType, setLoader, setModal, themeColor } from '@rangeos-nx/ui/redux';
+import { FormCrudType, setLoader, setModal, themeColor } from '@rapid-cmi5/ui/redux';
 
-import { ButtonMainUi, Topic } from '@rangeos-nx/ui/api/hooks';
+import { ButtonMainUi, Topic } from '@rapid-cmi5/ui/api/hooks';
 
 import { brandedTheme } from '../styles/muiTheme';
 import { brandedThemeDark } from '../styles/muiThemeDark';

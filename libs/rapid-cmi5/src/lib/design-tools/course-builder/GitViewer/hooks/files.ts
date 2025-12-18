@@ -1,4 +1,4 @@
-// import { debugLog } from '@rangeos-nx/ui/branded';
+// import { debugLog } from '@rapid-cmi5/ui/branded';
 // import { RepoAccessObject } from '../../../../redux/repoManagerReducer';
 // import { getFsInstance } from '../utils/gitFsInstance';
 

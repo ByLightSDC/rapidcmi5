@@ -3,7 +3,7 @@
 import { AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { DevopsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
+import { DevopsApiClient } from '@rapid-cmi5/frontend/clients/devops-api';
 import {
   defaultQueryConfig,
   defaultSortOrderBy,
@@ -15,7 +15,7 @@ import { getErrorMessage } from './errorMessages';
 import {
   ContainerSpecificationCreate,
   ContainerSpecificationUpdate,
-} from '@rangeos-nx/frontend/clients/devops-api';
+} from '@rapid-cmi5/frontend/clients/devops-api';
 
 export const queryKeyContainerSpecs = 'container-specs';
 

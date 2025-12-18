@@ -1,19 +1,17 @@
 // import { useEffect, useMemo } from 'react';
 // import { useSelector, useDispatch } from 'react-redux';
-// import { AppDispatch } from '../../../redux/store';
-// import { modal, setModal } from '@rangeos-nx/ui/redux';
+// import { modal, setModal } from '@rapid-cmi5/ui/redux';
 // /* eslint-disable react-hooks/exhaustive-deps */
 // import {
 //   DetailWrapper,
 //   DynamicPropertyProvider,
 //   StepperContextProvider,
 //   hasModal,
-// } from '@rangeos-nx/ui/branded';
+// } from '@rapid-cmi5/ui/branded';
 
-// import { featureFlagCleanUpModals } from '../../../utils/featureFlags';
 
 // /* Topics */
-// import { Topic } from '@rangeos-nx/ui/api/hooks';
+// import { Topic } from '@rapid-cmi5/ui/api/hooks';
 // /**
 //  * View Modals component
 //  * Component renders forms in a modal dialog

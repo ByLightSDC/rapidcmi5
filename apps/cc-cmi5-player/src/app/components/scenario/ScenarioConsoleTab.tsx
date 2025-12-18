@@ -1,11 +1,11 @@
 /* CMI5 Flavor */
 
-import { ConsolePopup, LoadingUi } from '@rangeos-nx/ui/branded';
+import { ConsolePopup, LoadingUi } from '@rapid-cmi5/ui/branded';
 import { useEffect, useRef, useState } from 'react';
 import {
   useGetRangeResourceConsolesGraph,
   useQueryDetails,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rapid-cmi5/ui/api/hooks';
 import { Alert } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { rangeConsoleDataSel, rangeDataSel } from '../../redux/auReducer';

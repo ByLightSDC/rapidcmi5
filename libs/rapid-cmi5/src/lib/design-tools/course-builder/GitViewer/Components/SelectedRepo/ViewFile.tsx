@@ -9,14 +9,14 @@ import {
   setSelectedFile,
 } from '../../../../../redux/repoManagerReducer';
 import { RootState, AppDispatch } from '../../../../../redux/store';
-import { ButtonModalCancelUi } from '@rangeos-nx/ui/branded';
+import { ButtonModalCancelUi } from '@rapid-cmi5/ui/branded';
 
 /* Icons */
 import { Stack } from '@mui/system';
 import path from 'path-browserify';
-import { themeColor } from '@rangeos-nx/ui/redux';
+import { themeColor } from '@rapid-cmi5/ui/redux';
 import { getMonacoTheme } from '../../utils/monacoEditor';
-import { validateMarkdownDirectives } from '@rangeos-nx/cmi5-build/common';
+import { validateMarkdownDirectives } from '@rapid-cmi5/cmi5-build/common';
 import {
   ConflictBlock,
   parseConflictBlocksFromModel,

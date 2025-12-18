@@ -1,5 +1,5 @@
 import { DirectiveDescriptor } from '@mdxeditor/editor';
-import { ActivityType } from '@rangeos-nx/types/cmi5';
+import { ActivityType } from '@rapid-cmi5/types/cmi5';
 import { ActivityPlayback } from './ActivityPlayback';
 
 /**

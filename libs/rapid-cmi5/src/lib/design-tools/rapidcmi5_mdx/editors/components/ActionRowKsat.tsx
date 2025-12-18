@@ -5,7 +5,7 @@ import {
   iListItemType,
   listStyles,
   OverflowTypography,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 
 export default function ActionRowKsat(props: ActionRowProps) {
   const { data } = props;

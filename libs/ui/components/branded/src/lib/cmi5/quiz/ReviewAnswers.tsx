@@ -2,7 +2,7 @@ import {
   AnswerType,
   QuestionResponse,
   QuizContent,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 
 import ReviewMultipleChoice from './QuestionTypes/MultipleChoice/ReviewMultipleChoice';
 import ReviewSelectAll from './QuestionTypes/SelectAll/ReviewSelectAll';

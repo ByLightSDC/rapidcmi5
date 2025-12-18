@@ -1,6 +1,6 @@
 /* defaults to be used by hooks */
 
-import { config } from '@rangeos-nx/frontend/environment';
+import { config } from '@rapid-cmi5/frontend/environment';
 
 export const defaultSortOrderBy = 'dateEdited';
 export const defaultSortOrder = 'desc'; // this will put the last edited at the top

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 // import 'katex/dist/katex.min.css';
 
-import { AuContextProps } from '@rangeos-nx/types/cmi5';
+import { AuContextProps } from '@rapid-cmi5/types/cmi5';
 
 import { Typography } from '@mui/material';
 import { MarkdownConvertorSlide } from './MarkdownConvertor';

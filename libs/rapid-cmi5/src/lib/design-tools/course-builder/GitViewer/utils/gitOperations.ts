@@ -4,7 +4,7 @@ import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import * as git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
 import { GitConfigType } from '../../CourseBuilderApiTypes';
-import { debugLog, debugLogError } from '@rangeos-nx/ui/branded';
+import { debugLog, debugLogError } from '@rapid-cmi5/ui/branded';
 import path, { join } from 'path-browserify';
 import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { slugifyPath } from './useCourseOperationsUtils';

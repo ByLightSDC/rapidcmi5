@@ -12,10 +12,10 @@ import {
   selection,
   setMessage,
   useGetCacheSelection,
-} from '@rangeos-nx/ui/redux';
+} from '@rapid-cmi5/ui/redux';
 import { useEffect } from 'react';
 import { debugLog, debugLogError } from '../utility/logger';
-import { Topic } from '@rangeos-nx/ui/api/hooks';
+import { Topic } from '@rapid-cmi5/ui/api/hooks';
 
 /**
  * @typedef {Object} AddButtonProps

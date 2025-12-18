@@ -8,7 +8,7 @@ import {
   QuizContent,
   QuizOption,
   QuizQuestion,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 import { mdxJsxFromMarkdown, mdxJsxToMarkdown } from 'mdast-util-mdx-jsx';
 
 import {

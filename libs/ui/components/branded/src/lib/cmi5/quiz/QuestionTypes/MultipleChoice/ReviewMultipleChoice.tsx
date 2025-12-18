@@ -1,4 +1,4 @@
-import { ReviewProps } from '@rangeos-nx/types/cmi5';
+import { ReviewProps } from '@rapid-cmi5/types/cmi5';
 import useQuizGrader from '../../hooks/useQuizGrader';
 import { MarkdownConvertorQuiz } from '../../../markdown/MarkdownConvertor';
 

@@ -10,7 +10,7 @@ If it is not present in the cache, it will fetch and return it
 import { useEffect, useState } from 'react';
 
 import DataFetcher from './DataFetcher';
-import { useCache } from '@rangeos-nx/ui/api/hooks';
+import { useCache } from '@rapid-cmi5/ui/api/hooks';
 
 export function DataCacheOrFetcher({
   apiHook,

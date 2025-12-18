@@ -13,7 +13,7 @@ import BoltIcon from '@mui/icons-material/Bolt';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import NotesIcon from '@mui/icons-material/Notes';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
-import { AdmonitionTypeEnum } from '@rangeos-nx/types/cmi5';
+import { AdmonitionTypeEnum } from '@rapid-cmi5/types/cmi5';
 
 /**
  * Admonition Color

@@ -14,7 +14,7 @@ import {
   RC5ActivityTypeEnum,
   ActivityCacheGetState,
   ActivityCacheSetState,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/types/cmi5';
 import { SlideActivityType } from '../../../../types/SlideActivityStatusState';
 import {
   AuCTF,
@@ -27,9 +27,9 @@ import {
   debugLog,
   getActivityCache$,
   setActivityCache$,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui/branded';
 
-import { QuizContent } from '@rangeos-nx/types/cmi5';
+import { QuizContent } from '@rapid-cmi5/types/cmi5';
 import ScenarioConsoles from '../../../scenario/ScenarioConsoles';
 import TeamScenarioExercise from '../../../team-consoles/TeamScenarioExercise';
 import { useSelector } from 'react-redux';

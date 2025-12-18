@@ -5,7 +5,7 @@ import {
   useGetRangeResourceConsolesGraph,
   useQueryDetails,
   Topic,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rapid-cmi5/ui/api/hooks';
 import { useState } from 'react';
 import ConsoleSubscription from '../subscriptions/ConsoleSubscription';
 

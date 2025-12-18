@@ -4,7 +4,7 @@
 
 import { useState, useRef, useContext, useEffect, SyntheticEvent } from 'react';
 import { useSelector } from 'react-redux';
-import { authIdToken, isSSOEnabled } from '@rangeos-nx/ui/keycloak';
+import { authIdToken, isSSOEnabled } from '@rapid-cmi5/ui/keycloak';
 import Draggable from 'react-draggable';
 import { Resizable, ResizeCallbackData } from 'react-resizable';
 import Guacamole from 'guacamole-common-js';
@@ -33,7 +33,7 @@ import ConnectionAttemptDisplay from './ConnectionAttemptDisplay';
 import { getTunnelErrorMessage } from './constants';
 import { debugLog, debugLogError, debugLogSuccess } from '../../utility/logger';
 import { ConsoleContext } from './ConsoleContext';
-import { useToaster } from '@rangeos-nx/ui/api/hooks';
+import { useToaster } from '@rapid-cmi5/ui/api/hooks';
 
 // guacamole connection settings
 const guacProtocol = 'wss';
