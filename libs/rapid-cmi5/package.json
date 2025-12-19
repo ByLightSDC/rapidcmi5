@@ -1,6 +1,6 @@
 {
   "name": "@rapid-cmi5/react-editor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A markdown cmi5 editor with built in git version control and made for react.",
   "publishConfig": {
     "access": "public"
@@ -22,7 +22,7 @@
     "react-dom": "^18"
   },
   "dependencies": {
-    "@rapid-cmi5/cmi5-build/common": "0.1.0",
-    "@rapid-cmi5/ui/branded": "0.1.0"
+    "@rapid-cmi5/cmi5-build-common": "0.1.1",
+    "@rapid-cmi5/ui": "0.1.1"
   }
 }
