@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { modal, setModal } from '@rapid-cmi5/ui/redux';
+import { modal, setModal } from '@rapid-cmi5/ui/branded';
 
 /* Branded */
 import { ModalDialog } from '@rapid-cmi5/ui/branded';

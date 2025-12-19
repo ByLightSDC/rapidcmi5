@@ -4,7 +4,7 @@ import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import activitySessionReducer from './activitySessionReducer';
 
 //Branded, Shared Reducers
-import { commonAppReducer } from '@rapid-cmi5/ui/redux';
+import { commonAppReducer } from '@rapid-cmi5/ui/branded';
 import { keycloakUiReducer } from '@rapid-cmi5/ui/keycloak';
 
 //Persist

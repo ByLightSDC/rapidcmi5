@@ -13,7 +13,7 @@ import * as yup from 'yup';
 import {
   commitChangesModalId,
 } from '../../rapidcmi5_mdx/modals/constants';
-import { CommonAppModalState } from '@rapid-cmi5/ui/redux';
+import { CommonAppModalState } from '@rapid-cmi5/ui/branded';
 
 import { Box, Grid } from '@mui/material';
 
@@ -25,7 +25,7 @@ import {
   EMAIL_GROUP,
   NAME_GROUP,
   NAME_GROUP_OPT,
-} from '@rapid-cmi5/ui/validation';
+} from '@rapid-cmi5/ui/branded';
 import { CreateCommitType } from '../CourseBuilderApiTypes';
 import { useContext } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';

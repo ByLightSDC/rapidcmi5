@@ -2,13 +2,18 @@ import { MenuItem } from '@mui/material';
 import { UseFormReturn } from 'react-hook-form';
 import {
   defaultQuestion,
+  ENUM_GROUP,
   FormControlIntegerField,
   FormControlSelectField,
   FormControlTextField,
   FormControlUIProvider,
+  FormCrudType,
   FormFieldArray,
   FormStateType,
   MiniForm,
+  REQUIRED_ENTRY,
+  REQUIRED_ERROR,
+  SPECIFY_AT_LEAST_ONE_ERROR,
   tFormFieldRendererProps,
 } from '@rapid-cmi5/ui/branded';
 import { Grid } from '@mui/material';
@@ -21,20 +26,13 @@ import {
   QuizCompletionEnum,
   QuizContent,
   SlideTypeEnum,
-} from '@rapid-cmi5/types/cmi5';
+} from '@rapid-cmi5/cmi5-build/common';
 
-import {
-  ENUM_GROUP,
-  REQUIRED_ENTRY,
-  REQUIRED_ERROR,
-  SPECIFY_AT_LEAST_ONE_ERROR,
-} from '@rapid-cmi5/ui/validation';
 
-import { RC5ActivityTypeEnum } from '@rapid-cmi5/types/cmi5';
+import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build/common';
 import { QuizQuestionsFieldGroup } from '../../../course-builder/QuizQuestionsFieldGroup';
 import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
 import LrsHeaderWithDetails from './LrsStatementHelper';
-import { FormCrudType } from '@rapid-cmi5/ui/redux';
 
 export const QuizForm = ({
   activityKind,

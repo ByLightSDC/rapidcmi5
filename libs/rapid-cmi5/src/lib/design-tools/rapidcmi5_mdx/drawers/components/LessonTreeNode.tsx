@@ -32,10 +32,9 @@ import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
 import React, { useRef } from 'react';
-import { RowAction } from '@rapid-cmi5/ui/branded';
+import { ButtonOptions, RowAction } from '@rapid-cmi5/ui/branded';
 import { ITreeViewOnNodeSelectProps } from 'react-accessible-treeview';
 import { LessonTreeNodeType } from './LessonTree';
-import { ButtonOptions } from '@rapid-cmi5/ui/api/hooks';
 
 interface NodeProps {
   isOpen: boolean;

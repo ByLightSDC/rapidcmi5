@@ -21,7 +21,7 @@ import {
   QuizScore,
   QuizState,
   RC5ActivityTypeEnum,
-} from '@rapid-cmi5/types/cmi5';
+} from '@rapid-cmi5/cmi5-build/common';
 
 import { sendActivityCompletedVerb } from './LmsStatementManager';
 import { gradeActivity, createSlideActivityScore } from './gradeActivity';

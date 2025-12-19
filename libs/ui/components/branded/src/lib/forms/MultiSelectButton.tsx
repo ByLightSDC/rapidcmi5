@@ -5,19 +5,14 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { UseFormReturn } from 'react-hook-form';
-import {
-  message,
-  setMessage,
-  setModal,
-  useGetCacheMultipleSelection,
-  useSetCacheMultipleSelection,
-} from '@rapid-cmi5/ui/redux';
 
 /* Icons */
 import TouchAppIcon from '@mui/icons-material/TouchApp';
-import { ButtonMinorUi } from '@rapid-cmi5/ui/api/hooks';
 import { ButtonModalMinorUi } from '../inputs/buttons/buttonsmodal';
 import { tMultiSelectionMeta } from './SharedFormWithProvider';
+import { message, setMessage, setModal } from '../redux/commonAppReducer';
+import { useSetCacheMultipleSelection, useGetCacheMultipleSelection } from '../redux/useCacheSelection';
+import { ButtonMinorUi } from '../utility/buttons';
 
 export type MultiSelectButtonProps = {
   buttonText?: string;

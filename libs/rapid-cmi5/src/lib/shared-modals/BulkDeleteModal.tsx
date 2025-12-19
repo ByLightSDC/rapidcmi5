@@ -1,6 +1,6 @@
 // import { useMemo } from 'react';
 // import { useSelector } from 'react-redux';
-// import { modal } from '@rapid-cmi5/ui/redux';
+// import { modal } from '@rapid-cmi5/ui/branded';
 // /* Branded */
 // import {
 //   ActionRow,
@@ -8,7 +8,7 @@
 //   defaultInputFilters,
 // } from '@rapid-cmi5/ui/branded';
 // /* Constants */
-// import { Topic, apiTopicsHookData } from '@rapid-cmi5/ui/api/hooks';
+// import { Topic, apiTopicsHookData } from '@rapid-cmi5/ui/branded';
 // import {
 //   rowsPerPageDefault,
 //   rowsPerPage_Certificate,

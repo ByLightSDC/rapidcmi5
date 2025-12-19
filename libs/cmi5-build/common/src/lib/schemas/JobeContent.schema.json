@@ -1,0 +1,88 @@
+{
+  "$ref": "#/definitions/JobeContent",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "JobeContent": {
+      "additionalProperties": false,
+      "properties": {
+        "cmi5QuizId": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "evaluator": {
+          "type": "string"
+        },
+        "ksats": {
+          "items": {
+            "$ref": "#/definitions/KSATElement"
+          },
+          "type": "array"
+        },
+        "moveOnCriteria": {
+          "$ref": "#/definitions/MoveOnCriteriaEnum"
+        },
+        "rc5id": {
+          "type": "string"
+        },
+        "student": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cmi5QuizId",
+        "description",
+        "evaluator",
+        "student",
+        "title"
+      ],
+      "type": "object"
+    },
+    "KSATElement": {
+      "additionalProperties": false,
+      "properties": {
+        "doc_identifier": {
+          "type": "string"
+        },
+        "element_identifier": {
+          "type": "string"
+        },
+        "element_type": {
+          "enum": [
+            "task",
+            "knowledge",
+            "skill"
+          ],
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "element_identifier",
+        "element_type",
+        "title",
+        "text",
+        "doc_identifier"
+      ],
+      "type": "object"
+    },
+    "MoveOnCriteriaEnum": {
+      "enum": [
+        "completed",
+        "passed",
+        "completed-and-passed",
+        "not-applicable"
+      ],
+      "type": "string"
+    }
+  }
+}

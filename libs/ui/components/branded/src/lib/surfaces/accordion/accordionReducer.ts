@@ -1,5 +1,5 @@
-import { resetPersistance } from '@rapid-cmi5/ui/redux';
 import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
+import { resetPersistance } from '../../redux/utils/store';
 
 type tAccordionState = {
   touched: Record<string, boolean>;

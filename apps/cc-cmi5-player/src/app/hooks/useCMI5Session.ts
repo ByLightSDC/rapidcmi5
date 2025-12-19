@@ -6,7 +6,7 @@ import { Statement } from '@xapi/xapi';
 import Cmi5 from '@xapi/cmi5';
 import { debugLog } from '../debug';
 import { setAuthToken } from '@rapid-cmi5/ui/keycloak';
-import { queryHooksConfig, useToaster } from '@rapid-cmi5/ui/api/hooks';
+import { queryHooksConfig, useToaster } from '@rapid-cmi5/ui/branded';
 import {
   sendInitializedVerb,
   sendRangeosAuthVerb,
@@ -32,10 +32,10 @@ import {
   InitScenarioResponse,
   ScenarioConsolesResponse,
 } from '../types/SlideState';
-import { config } from '@rapid-cmi5/frontend/environment';
+import { config } from '@rapid-cmi5/ui/branded';
 import { cmi5Instance } from '../session/cmi5';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { setModal } from '@rapid-cmi5/ui/redux';
+import { setModal } from '@rapid-cmi5/ui/branded';
 import { classPromptModalId } from '../components/CourseModals';
 import { checkForDevMode } from '../utils/DevMode';
 

@@ -7,13 +7,9 @@ import {
   ascSortOrder,
   defaultSearch,
   defaultSortBy,
-  inputFilterType,
+  inputFilterType
 } from '@rapid-cmi5/ui/branded';
 
-/* Topic */
-import {
-  Topic,
-} from '@rapid-cmi5/ui/api/hooks';
 import {
   ksatElementTypeFilter,
   ksatsSortBy
@@ -79,7 +75,7 @@ export const ltiCourseSortBy = {
  */
 export const menuOptionData: MenuOptions = {
   //#endregion
-  [Topic.KSAT]: {
+  ['ksats']: {
     arrayFieldName: '',
     dataIdField: 'element_identifier',
     renderItem: ActionRowKsat,

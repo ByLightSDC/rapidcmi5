@@ -2,7 +2,7 @@ import { Gauge } from '@mui/x-charts/Gauge';
 import { useContext, useMemo } from 'react';
 import { TeamConsolesContext } from '../TeamScenarioContext';
 import { Alert } from '@mui/material';
-import { Topic } from '@rapid-cmi5/ui/api/hooks';
+import { Topic } from '@rapid-cmi5/ui/branded';
 import { LoadingUi } from '@rapid-cmi5/ui/branded';
 
 /**

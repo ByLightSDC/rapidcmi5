@@ -13,7 +13,7 @@ import { set, get } from 'idb-keyval';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui/branded';
 import { electronFs } from './ElectronFsApi';
-import { CourseData } from '@rapid-cmi5/types/cmi5';
+import { CourseData } from '@rapid-cmi5/cmi5-build/common';
 import { IFs } from 'memfs';
 import { getFsInstance } from './gitFsInstance';
 

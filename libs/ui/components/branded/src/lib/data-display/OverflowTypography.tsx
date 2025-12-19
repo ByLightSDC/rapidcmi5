@@ -4,8 +4,7 @@ import { useRef, useEffect, useState } from 'react';
 /* MUI */
 import Tooltip from '@mui/material/Tooltip';
 import Typography, { TypographyProps } from '@mui/material/Typography';
-import { ButtonCopyText } from '@rapid-cmi5/ui/api/hooks';
-
+import { ButtonCopyText } from '../utility/buttons';
 
 /**
  * @interface OverflowTypographyProps  Extended TypographyProps

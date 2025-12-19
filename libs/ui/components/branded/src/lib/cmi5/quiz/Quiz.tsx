@@ -10,7 +10,7 @@ import {
   ActivityScore,
   RC5ActivityTypeEnum,
   QuizState,
-} from '@rapid-cmi5/types/cmi5';
+} from '@rapid-cmi5/cmi5-build/common';
 import useQuizGrader from './hooks/useQuizGrader';
 
 import AuQuizQuestion from './QuizQuestion';
@@ -37,7 +37,7 @@ import QuizReview from './QuizReview';
 import QuestionNav from './QuestionNav';
 import { usePersistQuizProgress } from './hooks/usePersistQuiz';
 import { useHydrateQuiz } from './hooks/useHydrateQuiz';
-import { ButtonMinorUi, ButtonMainUi } from '@rapid-cmi5/ui/api/hooks';
+import { ButtonMinorUi, ButtonMainUi } from '../../utility/buttons';
 
 export type PotentialAnswerType = AnswerType | null;
 

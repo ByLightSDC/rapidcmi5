@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { modal, setModal } from '@rapid-cmi5/ui/redux';
+import { auth, modal, setModal } from '@rapid-cmi5/ui/branded';
 
 /* Branded */
 import {
@@ -40,7 +40,6 @@ import { CreateCourseForm } from './CreateCourseForm';
 import { CreateLessonForm } from './CreateLessonForm';
 import { RepoState } from '../../../redux/repoManagerReducer';
 import CommitForm from './CommitForm';
-import { auth } from '@rapid-cmi5/ui/keycloak';
 import { RootState } from '../../../redux/store';
 import PullForm from './PullForm';
 import PushForm from './PushForm';

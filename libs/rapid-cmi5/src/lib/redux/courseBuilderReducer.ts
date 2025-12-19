@@ -8,17 +8,60 @@ import {
   JobeContent,
   Operation,
   CourseAU,
-} from '@rapid-cmi5/types/cmi5';
+} from '@rapid-cmi5/cmi5-build/common';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './store';
 import {
   debugLog,
   defaultCourseData,
+  resetPersistance,
 } from '@rapid-cmi5/ui/branded';
-import { Scenario } from '@rapid-cmi5/frontend/clients/devops-api';
 import { ViewModeEnum } from '../design-tools/course-builder/CourseBuilderTypes';
-import { resetPersistance } from '@rapid-cmi5/ui/redux';
 
+export interface Scenario {
+    /**
+     * 
+     * @type {string}
+     * @memberof Scenario
+     */
+    'uuid'?: string;
+    /**
+     * Date when the object was created.
+     * @type {string}
+     * @memberof Scenario
+     */
+    'dateCreated'?: string;
+    /**
+     * Date when the object was last edited.
+     * @type {string}
+     * @memberof Scenario
+     */
+    'dateEdited'?: string;
+    /**
+     * A user provided human readable description.
+     * @type {string}
+     * @memberof Scenario
+     */
+    'description'?: string;
+    /**
+     * A user provided human readable name.
+     * @type {string}
+     * @memberof Scenario
+     */
+    'name'?: string;
+    /**
+     * The author of the package.
+     * @type {string}
+     * @memberof Scenario
+     */
+    'author'?: string;
+    /**
+     * User provided metadata
+     * @type {object}
+     * @memberof Scenario
+     */
+    'metadata'?: object;
+}
 /**
  * Before user is connected to repo, they can play in slides sandbox
  * FUTURE we will allow them to apply stash to a new lesson

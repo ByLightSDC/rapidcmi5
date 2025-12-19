@@ -31,7 +31,7 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 
 import { RowAction, RowStatus } from '../../types/actionRowTypes';
 import Box from '@mui/material/Box';
-import { ButtonIcon } from '@rapid-cmi5/ui/api/hooks';
+import { ButtonIcon } from '../../utility/buttons';
 
 export const actionRowHeaderColor = 'text.hint';
 export const actionRowDateHeader = 'Created or Updated';

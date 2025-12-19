@@ -7,8 +7,8 @@ import {
   graphqlConsoleFields,
   useSubscription,
   Topic,
-} from '@rapid-cmi5/ui/api/hooks';
-import { DeployedRangeConsole } from '@rapid-cmi5/frontend/clients/devops-api';
+} from '@rapid-cmi5/ui/branded';
+import { DeployedRangeConsole } from '@rapid-cmi5/ui/branded';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
 
 /**

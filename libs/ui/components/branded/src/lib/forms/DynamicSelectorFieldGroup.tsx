@@ -1,14 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  message,
-  selection,
-  setMessage,
-  useClearCacheSelection,
-  useGetCacheSelection,
-  useCurrentSelection,
-  FormCrudType,
-} from '@rapid-cmi5/ui/redux';
 
 /* Branded */
 import {
@@ -19,10 +10,14 @@ import {
 
 /* MUI */
 import { TextFieldProps } from '@mui/material/TextField';
-import { ButtonSelectUi } from '@rapid-cmi5/ui/api/hooks';
 import UUIDFieldInspector, {
   tUUIDFieldInspectorProps,
 } from './UUIDFieldInspector';
+import { message, selection, setMessage } from '../redux/commonAppReducer';
+import { useClearCacheSelection, useGetCacheSelection } from '../redux/useCacheSelection';
+import { useCurrentSelection } from '../redux/useCurrentSelection';
+import { FormCrudType } from '../redux/utils/types';
+import { ButtonSelectUi } from '../utility/buttons';
 
 export enum ClearedUuidValue {
   Empty,

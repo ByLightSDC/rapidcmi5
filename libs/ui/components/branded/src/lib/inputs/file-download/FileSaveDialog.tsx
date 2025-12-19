@@ -1,11 +1,10 @@
 import download from 'js-file-download';
 import { useDispatch, useSelector } from 'react-redux';
-import { modal, setModal } from '@rapid-cmi5/ui/redux';
-
 /* Branded */
 import { AlertColor, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import ModalDialog from '../../modals/ModalDialog';
+import { modal, setModal } from '../../redux/commonAppReducer';
 
 export const saveFileModalId = 'saveFileModalId';
 

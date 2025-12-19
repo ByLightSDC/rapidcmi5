@@ -1,13 +1,8 @@
-import download from 'js-file-download';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
-import { modal, setModal, themeColor, setTheme } from '@rapid-cmi5/ui/redux';
-
-
-import { TextField } from '@mui/material';
 import { useState } from 'react';
 import ModalDialog from '../../modals/ModalDialog';
 import { FileUpload } from '../file-upload/FileUpload';
+import { modal, setModal } from '../../redux/commonAppReducer';
 
 export const importFileModalId = 'importFileModalId';
 

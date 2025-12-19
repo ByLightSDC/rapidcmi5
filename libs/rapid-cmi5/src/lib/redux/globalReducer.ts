@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './store';
 import storage from 'redux-persist/lib/storage';
-import { resetPersistance } from '@rapid-cmi5/ui/redux';
+import { resetPersistance } from '@rapid-cmi5/ui/branded';
 
 type tGlobalState = {
   lastAuthenticationSeconds: number;

@@ -13,11 +13,11 @@ import {
   queryKeyRangeResourceAutoGraders,
   queryKeyRangeResourceContainers,
   Topic,
-} from '@rapid-cmi5/ui/api/hooks';
+} from '@rapid-cmi5/ui/branded';
 import {
   DeployedScenario,
   DeployedScenarioDetailStatusEnum,
-} from '@rapid-cmi5/frontend/clients/devops-api';
+} from '@rapid-cmi5/ui/branded';
 
 /* MUI */
 import {
@@ -36,7 +36,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AutoModeIcon from '@mui/icons-material/AutoMode';
 import TerminalIcon from '@mui/icons-material/Terminal';
 
-import { AuContextProps, TeamConsolesContent } from '@rapid-cmi5/types/cmi5';
+import { AuContextProps, TeamConsolesContent } from '@rapid-cmi5/cmi5-build/common';
 
 import TimeClock from '../scenario/TimeClock';
 import RangeResources from './list-views/RangeResources';

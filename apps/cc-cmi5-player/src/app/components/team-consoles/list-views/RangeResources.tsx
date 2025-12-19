@@ -11,7 +11,7 @@ import {
   DeployedAutoGrader,
   queryKeyRangeResourceVMs,
   Topic,
-} from '@rapid-cmi5/ui/api/hooks';
+} from '@rapid-cmi5/ui/branded';
 
 /* MUI */
 import { Alert } from '@mui/material';
@@ -19,7 +19,7 @@ import Box from '@mui/material/Box';
 
 import TeamRangeResourceVMActionRow from './TeamRangeResourceVMActionRow';
 import TeamRangeResourceContainerActionRow from './TeamRangeResourceContainerActionRow';
-import { DeployedRangeConsole } from '@rapid-cmi5/frontend/clients/devops-api';
+import { DeployedRangeConsole } from '@rapid-cmi5/ui/branded';
 import TeamRangeResourceAutoGraderActionActionRow from './TeamRangeResourceAutoGraderActionRow';
 import AutoGraderProgressDisplay from './AutoGraderProgressDisplay';
 

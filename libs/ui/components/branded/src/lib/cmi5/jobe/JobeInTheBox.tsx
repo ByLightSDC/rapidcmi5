@@ -3,7 +3,7 @@ import {
   JobeContent,
   RC5ActivityTypeEnum,
   ActivityScore,
-} from '@rapid-cmi5/types/cmi5';
+} from '@rapid-cmi5/cmi5-build/common';
 import Editor from 'react-simple-code-editor';
 // @ts-expect-error - prismjs types are not fully compatible
 import { highlight, languages } from 'prismjs/components/prism-core';
@@ -18,9 +18,8 @@ import useJobeGrader from './useJobeGrader';
 import { useEffect, useState } from 'react';
 
 import { useSelector } from 'react-redux';
-import { dividerColor } from '@rapid-cmi5/ui/redux';
-import { ButtonMainUi } from '@rapid-cmi5/ui/api/hooks';
-
+import { dividerColor } from '../../redux/commonAppReducer';
+import { ButtonMainUi } from '../../utility/buttons';
 export function JobeInTheBox({
   auProps,
   content,

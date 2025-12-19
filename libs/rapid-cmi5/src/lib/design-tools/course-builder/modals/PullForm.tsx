@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 import {
+  CommonAppModalState,
   FormControlCheckboxField,
   FormControlPassword,
   FormControlTextField,
@@ -7,17 +8,16 @@ import {
   FormStateType,
   MiniForm,
   ModalDialog,
+  NAME_GROUP_OPT,
 } from '@rapid-cmi5/ui/branded';
 import * as yup from 'yup';
 
 import { gitPullModalId } from '../../rapidcmi5_mdx/modals/constants';
-import { CommonAppModalState } from '@rapid-cmi5/ui/redux';
 
 import { Grid, Typography } from '@mui/material';
 
 import { UseFormReturn } from 'react-hook-form';
 
-import { NAME_GROUP_OPT } from '@rapid-cmi5/ui/validation';
 import { PullType } from '../CourseBuilderApiTypes';
 import { useContext } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';

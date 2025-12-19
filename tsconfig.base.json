@@ -20,25 +20,15 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@rangeos-nx/frontend/clients/devops-api": [
+        "libs/frontend/clients/devops-api/src/index.ts"
+      ],
       "@rapid-cmi5/cmi5-build/backend": [
         "libs/cmi5-build/backend/src/index.ts"
       ],
       "@rapid-cmi5/cmi5-build/common": ["libs/cmi5-build/common/src/index.ts"],
-      "@rapid-cmi5/ui/keycloak": [
-        "libs/ui/auth/keycloak/src/index.ts"
-      ],
-      "@rapid-cmi5/frontend/clients/devops-api": [
-        "libs/frontend/clients/devops-api/src/index.ts"
-      ],
-      "@rapid-cmi5/frontend/environment": [
-        "libs/frontend/environment/src/index.ts"
-      ],
       "@rapid-cmi5/react-editor": ["libs/rapid-cmi5/src/index.ts"],
-      "@rapid-cmi5/types/cmi5": ["libs/types/cmi5/src/index.ts"],
-      "@rapid-cmi5/ui/api/hooks": ["libs/ui/api/hooks/src/index.ts"],
-      "@rapid-cmi5/ui/branded": ["libs/ui/components/branded/src/index.ts"],
-      "@rapid-cmi5/ui/redux": ["libs/ui/redux/src/index.ts"],
-      "@rapid-cmi5/ui/validation": ["libs/ui/validation/src/index.ts"]
+      "@rapid-cmi5/ui/branded": ["libs/ui/components/branded/src/index.ts"]
     }
   },
   "exclude": ["**/node_modules", "**/.*/", "tmp"]

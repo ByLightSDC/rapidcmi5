@@ -17,7 +17,7 @@ import RC5VisualEditor from './editors/RC5VisualEditor';
 import RC5GitEditor from './editors/RC5GitEditor';
 import { GitDrawer } from './drawers/GitDrawer';
 import { SlideMenu } from './menu/SlideMenu';
-import { dividerColor } from '@rapid-cmi5/ui/redux';
+import { dividerColor } from '@rapid-cmi5/ui/branded';
 
 /**
  * RapidCMI5 Course Editor Landing

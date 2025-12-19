@@ -5,7 +5,7 @@ import {
   QuizState,
   RC5ActivityTypeEnum,
   SetActivityCacheHandler,
-} from '@rapid-cmi5/types/cmi5';
+} from '@rapid-cmi5/cmi5-build/common';
 
 /* 
   This component chooses when to write to the cache.

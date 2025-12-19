@@ -44,7 +44,7 @@ import { RootState } from '../../../redux/store';
 import { RepoState } from '../../../redux/repoManagerReducer';
 import ChangeRepoExpander from './components/ChangeRepoExpander';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import { ButtonOptions, ButtonMinorUi } from '@rapid-cmi5/ui/api/hooks';
+import { ButtonOptions, ButtonMinorUi } from '@rapid-cmi5/ui/branded';
 
 /** Order important actions */
 export enum CourseActionEnum {

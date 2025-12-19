@@ -11,7 +11,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 /* Icons */
 import Checkbox from '@mui/material/Checkbox';
 import { SelectProps, Stack } from '@mui/material';
-import { ButtonInfoField } from '@rapid-cmi5/ui/api/hooks';
+import { ButtonInfoField } from '../../utility/buttons';
 
 export type SelectorMenuOption = {
   data?: any;

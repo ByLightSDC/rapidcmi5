@@ -1,6 +1,6 @@
 // import { useEffect, useMemo } from 'react';
 // import { useSelector, useDispatch } from 'react-redux';
-// import { modal, setModal } from '@rapid-cmi5/ui/redux';
+// import { modal, setModal } from '@rapid-cmi5/ui/branded';
 // /* eslint-disable react-hooks/exhaustive-deps */
 // import {
 //   DetailWrapper,
@@ -11,7 +11,7 @@
 
 
 // /* Topics */
-// import { Topic } from '@rapid-cmi5/ui/api/hooks';
+// import { Topic } from '@rapid-cmi5/ui/branded';
 // /**
 //  * View Modals component
 //  * Component renders forms in a modal dialog

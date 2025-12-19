@@ -6,7 +6,7 @@ import {
   ScenarioContent,
   SlideTypeEnum,
   SourceDocContent,
-} from '@rapid-cmi5/types/cmi5';
+} from '@rapid-cmi5/cmi5-build/common';
 import ScenarioConsoles from './scenario/ScenarioConsoles';
 import ScenarioWrapper from './scenario/ScenarioWrapper';
 import {
@@ -16,8 +16,8 @@ import {
   AuSourceDocSlide,
   JobeInTheBox,
 } from '@rapid-cmi5/ui/branded';
-import { config } from '@rapid-cmi5/frontend/environment';
-import { AuContextProps } from '@rapid-cmi5/types/cmi5';
+import { config } from '@rapid-cmi5/ui/branded';
+import { AuContextProps } from '@rapid-cmi5/cmi5-build/common';
 
 function Slide({
   auProps,

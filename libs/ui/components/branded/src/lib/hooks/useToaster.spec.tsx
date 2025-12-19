@@ -1,4 +1,3 @@
-import { useToaster } from '@rapid-cmi5/ui/api/hooks';
 import '@testing-library/jest-dom';
 import {
   fireEvent,
@@ -6,6 +5,7 @@ import {
   waitForElementToBeRemoved,
 } from '@testing-library/react';
 import { NotificationsProvider } from '@toolpad/core';
+import { useToaster } from '../utility/useToaster';
 
 const UseToasterHookWrapper = ({
   message,

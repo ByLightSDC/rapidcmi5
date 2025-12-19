@@ -6,7 +6,7 @@ import {
   Stack,
   Alert,
 } from '@mui/material';
-import { ButtonInfoField, ButtonInfoFormHeaderLayout, useToaster } from '@rapid-cmi5/ui/api/hooks';
+import { ButtonInfoField, ButtonInfoFormHeaderLayout, useToaster } from '@rapid-cmi5/ui/branded';
 import {
   ButtonModalCancelUi,
   ButtonModalMainUi,

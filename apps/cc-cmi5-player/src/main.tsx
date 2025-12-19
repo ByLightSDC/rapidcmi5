@@ -1,6 +1,5 @@
 import * as ReactDOM from 'react-dom/client';
 import AppWrapper from './app/AppWrapper';
-import { config } from '@rapid-cmi5/frontend/environment';
 import { worker } from './mocks/browser';
 import { http } from 'msw';
 import { store } from './app/redux/store';

@@ -8,7 +8,7 @@ import {
   useSubscription,
   Topic,
   AutoGraderEvent,
-} from '@rapid-cmi5/ui/api/hooks';
+} from '@rapid-cmi5/ui/branded';
 
 /**
  * Queries graph for vm updates

@@ -3,7 +3,7 @@ import {
   QuestionGrading,
   QuestionResponse,
   QuizQuestion,
-} from '@rapid-cmi5/types/cmi5';
+} from '@rapid-cmi5/cmi5-build/common';
 import { useState } from 'react';
 
 export default function useQuizGrader() {

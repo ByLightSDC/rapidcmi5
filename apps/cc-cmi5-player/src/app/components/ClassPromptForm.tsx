@@ -3,7 +3,7 @@
 import { UseFormReturn } from 'react-hook-form';
 
 import * as yup from 'yup';
-import { NAME_GROUP } from '@rapid-cmi5/ui/validation';
+import { NAME_GROUP } from '@rapid-cmi5/ui/branded';
 
 /* Branded */
 import {
@@ -22,11 +22,11 @@ import Grid from '@mui/material/Grid';
 import {
   Topic,
   usePostInitializeCMI5Scenarios,
-} from '@rapid-cmi5/ui/api/hooks';
+} from '@rapid-cmi5/ui/branded';
 
 import { ClassEntry, defaultClassEntryData } from '../session/constants';
 import { useEffect } from 'react';
-import { FormCrudType } from '@rapid-cmi5/ui/redux';
+import { FormCrudType } from '@rapid-cmi5/ui/branded';
 
 /**
  * @typedef {Object} tFormProps

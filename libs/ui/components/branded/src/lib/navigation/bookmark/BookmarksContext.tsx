@@ -1,10 +1,10 @@
-import { setModal } from '@rapid-cmi5/ui/redux';
 
 
 
 import { createContext, useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { tBookmark, tBookmarkMetaData, bookmarkCue, bookmarkFormData, bookmarkGlobalData, clearAllFormData, clearBookmarks, saveFormData, clearFormData, appendBookmarkMetaData, clearBookmarkMetaData, pushBookmark, popBookmark } from './bookmarksReducer';
+import { setModal } from '../../redux/commonAppReducer';
+import { useSelector, useDispatch } from 'react-redux';
 
 /**
  * @interface IBookmarksContext

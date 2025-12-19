@@ -1,4 +1,4 @@
-import { SlideType, SlideTypeEnum } from '@rapid-cmi5/types/cmi5';
+import { SlideType, SlideTypeEnum } from '@rapid-cmi5/cmi5-build/common';
 
 /**
  * @typedef {Object} ScenarioContentType

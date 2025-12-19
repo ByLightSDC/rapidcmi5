@@ -1,9 +1,9 @@
-import { config } from '@rapid-cmi5/frontend/environment';
+import { config } from '@rapid-cmi5/ui/branded';
 import { logger, debugLog } from '../debug';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setAuLogo } from '../redux/auReducer';
-import { overrideDevOpsApiClient } from '@rapid-cmi5/frontend/clients/devops-api';
+import { overrideDevOpsApiClient } from '@rapid-cmi5/ui/branded';
 
 /**
  * Processes a template.

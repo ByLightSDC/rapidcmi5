@@ -26,7 +26,7 @@ import {
   isDisplayDirty,
   navigateSlide,
 } from '../../../redux/courseBuilderReducer';
-import { defaultSlideContent, SlideTypeEnum } from '@rapid-cmi5/types/cmi5';
+import { defaultSlideContent, SlideTypeEnum } from '@rapid-cmi5/cmi5-build/common';
 import { MessageType } from '../../course-builder/CourseBuilderTypes';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
 import { RC5Context } from '../contexts/RC5Context';
@@ -37,7 +37,7 @@ import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
  * Icons
  */
 
-import { appHeaderVisible } from '@rapid-cmi5/ui/redux';
+import { appHeaderVisible } from '@rapid-cmi5/ui/branded';
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
 
 /**

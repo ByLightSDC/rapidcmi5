@@ -1,5 +1,5 @@
 import { IconButton, Stack, Typography } from '@mui/material';
-import { DownloadFileData } from '@rapid-cmi5/types/cmi5';
+import { DownloadFileData } from '@rapid-cmi5/cmi5-build/common';
 import { useEffect, useState } from 'react';
 
 import FilePresentIcon from '@mui/icons-material/FilePresent';

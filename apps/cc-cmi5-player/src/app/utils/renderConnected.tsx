@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 
-import { commonAppReducer, FormCrudType } from '@rapid-cmi5/ui/redux';
+import { commonAppReducer, FormCrudType } from '@rapid-cmi5/ui/branded';
 import { ctfReducer } from '@rapid-cmi5/ui/branded';
 
 import auReducer from '../redux/auReducer';

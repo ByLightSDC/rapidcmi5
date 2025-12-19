@@ -12,7 +12,7 @@ import {
 import { Buffer } from 'buffer';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { CourseData } from '@rapid-cmi5/types/cmi5';
+import { CourseData } from '@rapid-cmi5/cmi5-build/common';
 import {
   CreateCloneType,
   CreateCommitType,
@@ -24,10 +24,10 @@ import {
   PullType,
   PushType,
 } from '../../CourseBuilderApiTypes';
-import { auth } from '@rapid-cmi5/ui/keycloak';
 
 import { ViewModeEnum } from '../../CourseBuilderTypes';
 import {
+  auth,
   debugLog,
   debugLogError,
   defaultCourseData,

@@ -7,8 +7,8 @@ import {
   graphqlContainerFields,
   useSubscription,
   Topic,
-} from '@rapid-cmi5/ui/api/hooks';
-import { RangeContainer } from '@rapid-cmi5/frontend/clients/devops-api';
+} from '@rapid-cmi5/ui/branded';
+import { RangeContainer } from '@rapid-cmi5/ui/branded';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
 
 /**

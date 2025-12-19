@@ -5,22 +5,12 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 import { useContext, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  setLoader,
-  modal,
-  setModal,
-  setMessage,
-  FormCrudType,
-} from '@rapid-cmi5/ui/redux';
+
 import { useLocation, useNavigate } from 'react-router';
 
 /* Shared */
 import { ActionRow } from './ActionRow';
-import {
-  useClearCacheSelection,
-  useGetCacheSelection,
-  useSetCacheSelection,
-} from '@rapid-cmi5/ui/redux';
+
 
 /* Types */
 import { RowAction } from '../../types/actionRowTypes';
@@ -37,11 +27,7 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 
 /* Constants */
-import {
-  useCache,
-  ButtonMinorUi,
-  ButtonLoadingUi,
-} from '@rapid-cmi5/ui/api/hooks';
+
 import { ButtonModalCancelUi } from '../../inputs/buttons/buttonsmodal';
 import ModalDialog from '../../modals/ModalDialog';
 import { BookmarksContext } from '../../navigation/bookmark/BookmarksContext';
@@ -56,6 +42,10 @@ import {
 import PaginationListView from '../../navigation/paging/PaginationListView';
 import { rowsPerPageDefault, addBookmarkButtonId } from './constants';
 import { sxSelectButtonprops } from './MultipleSelectWrapper';
+import { modal, setMessage, setModal, setLoader } from '../../redux/commonAppReducer';
+import { useSetCacheSelection, useGetCacheSelection, useClearCacheSelection } from '../../redux/useCacheSelection';
+import { ButtonMinorUi, ButtonLoadingUi } from '../../utility/buttons';
+import { useCache } from '../../utility/useQueryCache';
 const dialogButtons = ['Cancel', 'Apply'];
 const selectButtonId = -1;
 

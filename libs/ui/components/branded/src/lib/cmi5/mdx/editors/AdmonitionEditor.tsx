@@ -42,7 +42,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { fromMarkdown, type Options } from 'mdast-util-from-markdown';
 import { toMarkdown } from 'mdast-util-to-markdown';
 
-import { AdmonitionTypeEnum } from '@rapid-cmi5/types/cmi5';
+import { AdmonitionTypeEnum } from '@rapid-cmi5/cmi5-build/common';
 import { AdmonitionDirectiveNode } from './AdmonitionDirectiveDescriptor';
 import DeleteIconButton from '../components/DeleteIconButton';
 import SettingsIconButton from '../components/SettingsIconButton';

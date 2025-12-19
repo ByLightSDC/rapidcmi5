@@ -9,9 +9,10 @@ import { useState } from 'react';
 import { LoadingUi } from '@rapid-cmi5/ui/branded';
 
 /* API Hooks & Types*/
-import { useQueryDetails, useToaster } from '@rapid-cmi5/ui/api/hooks';
 import { SxProps } from '@mui/system';
 import { Box } from '@mui/material';
+import { useToaster } from '../utility/useToaster';
+import { useQueryDetails } from '../utility/useQueryDetails';
 
 export function DataFetcher({
   apiHook,

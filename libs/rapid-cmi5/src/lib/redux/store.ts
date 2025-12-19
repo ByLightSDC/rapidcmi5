@@ -5,19 +5,20 @@ import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import globalReducer from './globalReducer';
 
 //Internal
-import { dynamicSchemaReducer } from '@rapid-cmi5/ui/redux';
 import courseBuilderReducer from './courseBuilderReducer';
 import repoReducer from './repoManagerReducer';
 
 //Branded, Shared Reducers
-import { keycloakUiReducer } from '@rapid-cmi5/ui/keycloak';
 import {
   accordionReducer,
   bookmarksReducer,
+  commonAppReducer,
+  commonAppTransReducer,
   ctfReducer,
+  dynamicSchemaReducer,
+  keycloakUiReducer,
   paginationReducer,
 } from '@rapid-cmi5/ui/branded';
-import { commonAppReducer, commonAppTransReducer } from '@rapid-cmi5/ui/redux';
 
 //Persist
 import storage from 'redux-persist/lib/storage';

@@ -8,7 +8,7 @@ import {
 import { useContext } from 'react';
 import { GitContext } from '../../session/GitContext';
 import { useRC5Prompts } from '../../../../rapidcmi5_mdx/modals/useRC5Prompts';
-import { ButtonMinorUi } from '@rapid-cmi5/ui/api/hooks';
+import { ButtonMinorUi } from '@rapid-cmi5/ui/branded';
 
 export default function DeleteRepoButton({
   isButtonStyleMinimized,

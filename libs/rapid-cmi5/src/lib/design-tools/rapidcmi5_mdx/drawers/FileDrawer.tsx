@@ -22,7 +22,7 @@ import { RepoState } from '../../../redux/repoManagerReducer';
 import { RootState } from '../../../redux/store';
 import { useSelector } from 'react-redux';
 import SectionLabel from '../../../shared/SectionLabel';
-import { ButtonTooltip } from '@rapid-cmi5/ui/api/hooks';
+import { ButtonTooltip } from '@rapid-cmi5/ui/branded';
 
 export const FileDrawer = () => {
   const {

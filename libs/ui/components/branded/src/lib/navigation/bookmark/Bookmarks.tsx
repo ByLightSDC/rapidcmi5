@@ -8,9 +8,9 @@ import Typography from '@mui/material/Typography';
 
 /* Icons */
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import { ButtonInfoField, ButtonTooltip } from '@rapid-cmi5/ui/api/hooks';
 import { OverflowTypography } from '../../data-display/OverflowTypography';
 import { bookmarkCue, tBookmark, popToBookmark } from './bookmarksReducer';
+import { ButtonInfoField, ButtonTooltip } from '../../utility/buttons';
 
 /**
  * Renders a list of interactable bookmark labels

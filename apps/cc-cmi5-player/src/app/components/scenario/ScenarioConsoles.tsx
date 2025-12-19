@@ -1,6 +1,6 @@
 import { useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setModal } from '@rapid-cmi5/ui/redux';
+import { setModal } from '@rapid-cmi5/ui/branded';
 import {
   rangeConsoleDataAttemptsSel,
   rangeConsoleDataErrorSel,
@@ -24,11 +24,11 @@ import {
   getScenarioStatusIcon,
   queryKeyRangeResourceContainers,
   Topic,
-} from '@rapid-cmi5/ui/api/hooks';
+} from '@rapid-cmi5/ui/branded';
 import {
   DeployedScenario,
   DeployedScenarioDetailStatusEnum,
-} from '@rapid-cmi5/frontend/clients/devops-api';
+} from '@rapid-cmi5/ui/branded';
 
 /* MUI */
 import {
@@ -61,7 +61,7 @@ import ScenarioModals from './ScenarioModals';
 import TimeClock from './TimeClock';
 import { numRetries } from '../../hooks/useCMI5Session';
 import { classChangeModalId } from '../CourseModals';
-import { AuContextProps, ScenarioContent } from '@rapid-cmi5/types/cmi5';
+import { AuContextProps, ScenarioContent } from '@rapid-cmi5/cmi5-build/common';
 import ScenarioProgress from './ScenarioProgress';
 import { useAutoGraderProgress } from './hooks/useAutoGraderProgress';
 import AutoGraderSubscription from './graph/AutoGraderSubscription';

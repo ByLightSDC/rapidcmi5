@@ -1,4 +1,3 @@
-import { Topic } from '@rapid-cmi5/ui/api/hooks';
 
 export enum ViewModeEnum {
   Designer = 'Designer',
@@ -33,7 +32,7 @@ export type Message = {
   type: string;
   meta?: any;
   event?: any;
-  topicId?: Topic;
+  topicId?: string;
 };
 
 /**

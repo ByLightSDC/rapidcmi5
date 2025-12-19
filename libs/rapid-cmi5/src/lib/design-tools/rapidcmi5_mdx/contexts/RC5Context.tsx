@@ -33,13 +33,13 @@ import {
   updateDisplayText,
 } from '../../../redux/courseBuilderReducer';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
-import { setModal } from '@rapid-cmi5/ui/redux';
+import { setModal } from '@rapid-cmi5/ui/branded';
 import {
   CourseAU,
   MoveOnCriteriaEnum,
   Operation,
   SlideType,
-} from '@rapid-cmi5/types/cmi5';
+} from '@rapid-cmi5/cmi5-build/common';
 
 import {
   createCourseModalId,

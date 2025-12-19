@@ -7,8 +7,8 @@ import {
   graphqlVmFields,
   useSubscription,
   Topic,
-} from '@rapid-cmi5/ui/api/hooks';
-import { RangeVM } from '@rapid-cmi5/frontend/clients/devops-api';
+} from '@rapid-cmi5/ui/branded';
+import { RangeVM } from '@rapid-cmi5/ui/branded';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
 
 /**

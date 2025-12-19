@@ -15,13 +15,14 @@ import { useForm, UseFormReturn, useWatch } from 'react-hook-form';
 /* Icons */
 import Check from '@mui/icons-material/Check';
 import { AxiosError } from 'axios';
-import { useToaster, ButtonLoadingUi } from '@rapid-cmi5/ui/api/hooks';
-import { FormCrudType } from '@rapid-cmi5/ui/redux';
 import { LoadingUi } from '../indicators/Loading';
 import { ButtonModalCancelUi, ButtonModalMainUi } from '../inputs/buttons/buttonsmodal';
 import { FormStateType } from '../types/form';
 import { FormControlUIContext } from './FormControlUIContext';
 import Form from './Form';
+import { FormCrudType } from '../redux/utils/types';
+import { useToaster } from '../utility/useToaster';
+import { ButtonLoadingUi } from '../utility/buttons';
 
 /**
 * @typedef {Object} MiniFormProps

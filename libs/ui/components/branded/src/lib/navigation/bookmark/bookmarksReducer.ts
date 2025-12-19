@@ -1,5 +1,5 @@
-import { resetPersistance } from '@rapid-cmi5/ui/redux';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { resetPersistance } from '../../redux/utils/store';
 
 interface State {
   bookmarks: tBookmarkState;

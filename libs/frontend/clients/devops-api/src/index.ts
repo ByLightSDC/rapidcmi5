@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { config } from '@rapid-cmi5/frontend/environment';
 import {
   // APIs
   AssetsChartsApiFactory,
@@ -106,7 +105,8 @@ import type { ScenarioGroup } from './lib';
 
 //#endregion
 
-export let DEVOPS_API_URL = config.DEVOPS_API_URL || 'http://localhost:8080';
+export let DEVOPS_API_URL =
+  process.env['NX_PUBLIC_DEVOPS_API_URL'] || 'http://localhost:8080';
 
 export const initializeDevOpsApiClient = (apiUrl?: string) => {
   if (apiUrl) {

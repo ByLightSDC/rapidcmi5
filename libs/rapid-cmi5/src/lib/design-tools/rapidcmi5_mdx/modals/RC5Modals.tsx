@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 
-import { modal, setModal } from '@rapid-cmi5/ui/redux';
+import { ButtonCopyText, modal, setModal } from '@rapid-cmi5/ui/branded';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   deleteCourseModalId,
@@ -24,7 +24,6 @@ import { RootState } from '../../../redux/store';
 import { RepoState } from '../../../redux/repoManagerReducer';
 import SaveCourseForm from '../../course-builder/modals/SaveCourseForm';
 import { SuperSaveFormType } from '../../course-builder/CourseBuilderApiTypes';
-import { ButtonCopyText } from '@rapid-cmi5/ui/api/hooks';
 
 export default function RC5Modals() {
   const modalObj = useSelector(modal);

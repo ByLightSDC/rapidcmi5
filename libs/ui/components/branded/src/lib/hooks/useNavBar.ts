@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffectOnce } from './useEffectOnce';
-import { navBarIndex, setNavbarIndex } from '@rapid-cmi5/ui/redux';
+import { navBarIndex, setNavbarIndex } from '../redux/commonAppReducer';
 
 // React18 StrictMode introduced useEffect running twice in development mode
 // Use this hook as a work around

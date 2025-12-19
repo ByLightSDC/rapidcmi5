@@ -10,13 +10,13 @@ import {
 import * as yup from 'yup';
 
 import { importRepoZipModalId } from '../../rapidcmi5_mdx/modals/constants';
-import { CommonAppModalState } from '@rapid-cmi5/ui/redux';
+import { CommonAppModalState } from '@rapid-cmi5/ui/branded';
 
 import { Alert, Grid, Typography } from '@mui/material';
 
 import { UseFormReturn } from 'react-hook-form';
 
-import { NAME_GROUP } from '@rapid-cmi5/ui/validation';
+import { NAME_GROUP } from '@rapid-cmi5/ui/branded';
 import { ImportRepoZipType } from '../CourseBuilderApiTypes';
 import { useContext, useState } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';

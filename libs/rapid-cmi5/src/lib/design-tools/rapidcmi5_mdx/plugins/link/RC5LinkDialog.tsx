@@ -15,6 +15,7 @@ import {
 
 import * as yup from 'yup';
 import {
+  ButtonTooltip,
   debugLog,
   editorInPlayback$,
   FormControlTextField,
@@ -39,7 +40,6 @@ import EditIcon from '@mui/icons-material/Edit';
 
 import { $setSelection } from 'lexical';
 import { useClickOutside } from './useClickOutside';
-import { ButtonTooltip } from '@rapid-cmi5/ui/api/hooks';
 
 /**
  * Dialog for previewing and editing links in MdxEditor

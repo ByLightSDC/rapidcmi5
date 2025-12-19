@@ -3,8 +3,7 @@ import { useCallback } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import { saveAs } from 'file-saver';
 import { useSelector } from 'react-redux';
-import { authToken } from '@rapid-cmi5/ui/keycloak';
-import { config } from '@rapid-cmi5/frontend/environment';
+import { config } from '@rapid-cmi5/ui/branded';
 import { debugLog } from '@rapid-cmi5/ui/branded';
 import { DownloadCmi5Type } from '../../CourseBuilderApiTypes';
 import {

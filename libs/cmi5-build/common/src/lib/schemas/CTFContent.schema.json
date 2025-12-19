@@ -1,0 +1,190 @@
+{
+  "$ref": "#/definitions/CTFContent",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "BasicCFTResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "correctAnswer": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "grading": {
+          "$ref": "#/definitions/QuestionGrading"
+        },
+        "options": {
+          "items": {
+            "$ref": "#/definitions/CTFQuizOption"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "correctAnswer",
+        "grading"
+      ],
+      "type": "object"
+    },
+    "CTFContent": {
+      "additionalProperties": false,
+      "properties": {
+        "cmi5QuizId": {
+          "type": "string"
+        },
+        "completionRequired": {
+          "$ref": "#/definitions/QuizCompletionEnum"
+        },
+        "display": {
+          "$ref": "#/definitions/CTFDisplay"
+        },
+        "ksats": {
+          "items": {
+            "$ref": "#/definitions/KSATElement"
+          },
+          "type": "array"
+        },
+        "moveOnCriteria": {
+          "$ref": "#/definitions/MoveOnCriteriaEnum"
+        },
+        "passingScore": {
+          "type": "number"
+        },
+        "questions": {
+          "items": {
+            "$ref": "#/definitions/CTFQuestion"
+          },
+          "type": "array"
+        },
+        "rc5id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cmi5QuizId",
+        "passingScore",
+        "questions"
+      ],
+      "type": "object"
+    },
+    "CTFDisplay": {
+      "additionalProperties": false,
+      "properties": {
+        "shouldNumberQuestions": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "CTFQuestion": {
+      "additionalProperties": false,
+      "properties": {
+        "cmi5QuestionId": {
+          "type": "string"
+        },
+        "question": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/CTFResponse"
+        },
+        "typeAttributes": {
+          "$ref": "#/definitions/BasicCFTResponse"
+        }
+      },
+      "required": [
+        "question",
+        "type",
+        "typeAttributes",
+        "cmi5QuestionId"
+      ],
+      "type": "object"
+    },
+    "CTFQuizOption": {
+      "additionalProperties": false,
+      "properties": {
+        "correct": {
+          "type": "boolean"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "correct"
+      ],
+      "type": "object"
+    },
+    "CTFResponse": {
+      "const": "freeResponse",
+      "type": "string"
+    },
+    "KSATElement": {
+      "additionalProperties": false,
+      "properties": {
+        "doc_identifier": {
+          "type": "string"
+        },
+        "element_identifier": {
+          "type": "string"
+        },
+        "element_type": {
+          "enum": [
+            "task",
+            "knowledge",
+            "skill"
+          ],
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "element_identifier",
+        "element_type",
+        "title",
+        "text",
+        "doc_identifier"
+      ],
+      "type": "object"
+    },
+    "MoveOnCriteriaEnum": {
+      "enum": [
+        "completed",
+        "passed",
+        "completed-and-passed",
+        "not-applicable"
+      ],
+      "type": "string"
+    },
+    "QuestionGrading": {
+      "enum": [
+        "none",
+        "exact"
+      ],
+      "type": "string"
+    },
+    "QuizCompletionEnum": {
+      "enum": [
+        "attempted",
+        "passed",
+        "completed",
+        "completed-and-passed",
+        "not-applicable"
+      ],
+      "type": "string"
+    }
+  }
+}

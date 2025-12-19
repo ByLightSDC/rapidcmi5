@@ -1,4 +1,4 @@
-import { setModal } from '@rapid-cmi5/ui/redux';
+import { setModal } from '@rapid-cmi5/ui/branded';
 import {
   attachRemoteRepoModalId,
   cloneRepoModalId,

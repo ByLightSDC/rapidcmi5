@@ -1,6 +1,6 @@
 import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 import { capitalizeFirstLetter, getAdmonitionIcon, SelectorMainUi } from '@rapid-cmi5/ui/branded';
-import { admonitionLabels, AdmonitionTypeEnum } from '@rapid-cmi5/types/cmi5';
+import { admonitionLabels, AdmonitionTypeEnum } from '@rapid-cmi5/cmi5-build/common';
 import { directiveDescriptors$, insertDirective$ } from '@mdxeditor/editor';
 import { useEffect, useMemo } from 'react';
 import { Typography } from '@mui/material';

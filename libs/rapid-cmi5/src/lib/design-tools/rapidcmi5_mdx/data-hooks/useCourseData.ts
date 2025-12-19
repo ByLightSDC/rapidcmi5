@@ -1,4 +1,3 @@
-import { Scenario } from '@rapid-cmi5/frontend/clients/devops-api';
 import {
   debugLog,
   debugLogError,
@@ -15,6 +14,7 @@ import {
   isLessonMounted,
   reorderLesson,
   reorderSlide,
+  Scenario,
   setIsLessonMounted,
   updateAuAndSlideIndex,
   updateAuIndex,
@@ -28,7 +28,7 @@ import { useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { RC5Context } from '../contexts/RC5Context';
-import { Operation } from '@rapid-cmi5/types/cmi5';
+import { Operation } from '@rapid-cmi5/cmi5-build/common';
 import { CreateLessonType } from '../../course-builder/CourseBuilderApiTypes';
 
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';

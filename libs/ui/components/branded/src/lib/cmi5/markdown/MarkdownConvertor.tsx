@@ -11,7 +11,7 @@ import { imagePlugin } from './ImagePlugin';
 import { linkPlugin } from './LinkPlugin';
 import { customMarkdownParser } from './MarkDownParser';
 import { remarkQuizDown } from './QuizDownPlugIn';
-import { AuContextProps } from '@rapid-cmi5/types/cmi5';
+import { AuContextProps } from '@rapid-cmi5/cmi5-build/common';
 import { remarkKeyboardPlugin } from './KeyboardPlugin';
 import { markDownSlideStyle } from './styles';
 

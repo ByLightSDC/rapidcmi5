@@ -18,7 +18,7 @@ import {
 import {
   RC5ScenarioContent,
   TeamConsolesContent,
-} from '@rapid-cmi5/types/cmi5';
+} from '@rapid-cmi5/cmi5-build/common';
 
 // We create our own version from monaco editor, no reason to be tied up with theres
 export enum MarkerSeverity {

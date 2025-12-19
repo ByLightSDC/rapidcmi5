@@ -7,15 +7,11 @@ import { UseFormReturn } from 'react-hook-form';
 
 import PlusOneIcon from '@mui/icons-material/PlusOne';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  message,
-  selection,
-  setMessage,
-  useGetCacheSelection,
-} from '@rapid-cmi5/ui/redux';
+
 import { useEffect } from 'react';
 import { debugLog, debugLogError } from '../utility/logger';
-import { Topic } from '@rapid-cmi5/ui/api/hooks';
+import { message, selection, setMessage } from '../redux/commonAppReducer';
+import { useGetCacheSelection } from '../redux/useCacheSelection';
 
 /**
  * @typedef {Object} AddButtonProps
@@ -64,7 +60,7 @@ export function AddButton({
   fieldName,
   formMethods,
   arrayMethods,
-  topicId = Topic.Unknown,
+  topicId = 'unkown',
   isDisabled = false,
   shouldApplySelections = true,
   onApplySelection,

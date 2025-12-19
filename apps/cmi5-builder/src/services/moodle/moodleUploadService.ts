@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { AuMappingService } from '../auMappingService';
-import { CourseData } from '@rapid-cmi5/types/cmi5';
+import { CourseData } from '@rapid-cmi5/cmi5-build/common';
 
 import FormData from 'form-data';
 import fs from 'fs';

@@ -1,14 +1,8 @@
 import { AppDispatch } from '../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import {
-  modal,
-  setModal,
-  themeColor,
-  setTheme,
-  resetPersistance,
-} from '@rapid-cmi5/ui/redux';
-import { config } from '@rapid-cmi5/frontend/environment';
+
+import { config, modal, resetPersistance, setModal, setTheme, themeColor } from '@rapid-cmi5/ui/branded';
 
 /*Material*/
 import Menu from '@mui/material/Menu';
@@ -22,12 +16,9 @@ import Typography from '@mui/material/Typography';
 /* Icons */
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import Brightness6Icon from '@mui/icons-material/Brightness6';
-import ContactSupportIcon from '@mui/icons-material/ContactSupport';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
+
 import { useState } from 'react';
 
-import { BuildVersionInfo } from '@rapid-cmi5/frontend/clients/devops-api';
 import { DataCacheOrFetcher, ModalDialog } from '@rapid-cmi5/ui/branded';
 
 /**
@@ -48,12 +39,7 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
   //#region About
   const [isAboutDisabled, setAboutDisabled] = useState(false);
   const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
-  const [aboutBuildVersionData, setAboutBuildVersionData] =
-    useState<BuildVersionInfo>({
-      buildId: 0,
-      gitBranch: '',
-      gitCommit: '',
-    });
+ 
   const handleAboutClick = () => {
     onClose();
     setAboutDialogOpen(true);
@@ -62,12 +48,6 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
     setAboutDialogOpen(false);
   };
 
-  /**
-   * Build Version Data is loaded via fetcher component
-   */
-  const handleInitialDataLoad = (data: BuildVersionInfo) => {
-    setAboutBuildVersionData(data);
-  };
   /**
    * Handles error returned from API call
    * @param {any} error error returned from api call
@@ -126,12 +106,6 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
       {/* dont fetch until the menu opens (anchor defined) to ensure that the authToken is set in queryHooksConfig */}
 
       <div data-testid="modals">
-        <AboutBuildVersionDialog
-          appThemeColor={appThemeColor}
-          versionData={aboutBuildVersionData}
-          isOpen={aboutDialogOpen}
-          onClose={handleAboutDialogClose}
-        />
         {modalObj.type !== '' && (
           <ModalDialog
             testId={clearStoragePromptModalId}
@@ -208,12 +182,11 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
 
 type tAboutProps = {
   appThemeColor: string;
-  versionData: BuildVersionInfo;
   isOpen: boolean;
   onClose: () => void;
 };
 function AboutBuildVersionDialog(props: tAboutProps) {
-  const { appThemeColor, versionData, isOpen, onClose } = props;
+  const { appThemeColor, isOpen, onClose } = props;
   return (
     <div data-testid="about-build-version-modal">
       <ModalDialog
@@ -250,20 +223,7 @@ function AboutBuildVersionDialog(props: tAboutProps) {
             paddingLeft: '24px',
           }}
         >
-          <Stack direction="column" style={{}}>
-            <Typography variant="body2">
-              <strong>Build ID: </strong>
-              {`${versionData?.buildId}`}
-            </Typography>
-            <Typography variant="body2">
-              <strong>Git Branch: </strong>
-              {`${versionData?.gitBranch}`}
-            </Typography>
-            <Typography variant="body2">
-              <strong>Git Commit: </strong>
-              {`${versionData?.gitCommit}`}
-            </Typography>
-          </Stack>
+        
         </Box>
       </ModalDialog>
     </div>

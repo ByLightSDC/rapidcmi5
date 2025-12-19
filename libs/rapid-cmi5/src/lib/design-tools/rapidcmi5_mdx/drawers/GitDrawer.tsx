@@ -41,7 +41,7 @@ import React from 'react';
 import { listItemProps } from './components/LessonTreeNode';
 import { Renamer } from './components/Renamer';
 import FileSystemSelector from '../../course-builder/selectors/FileSystemSelector';
-import { ButtonOptions, ButtonMinorUi } from '@rapid-cmi5/ui/api/hooks';
+import { ButtonOptions, ButtonMinorUi } from '@rapid-cmi5/ui/branded';
 
 enum RepoActionEnum {
   TriggerRename,

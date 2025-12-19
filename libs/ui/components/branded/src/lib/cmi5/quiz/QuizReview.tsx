@@ -2,7 +2,7 @@ import React from 'react';
 import { Paper, Typography, IconButton, Tooltip, Divider } from '@mui/material';
 import { Stack } from '@mui/system';
 import { OverflowTypography } from '../../data-display/OverflowTypography';
-import { QuizContent } from '@rapid-cmi5/types/cmi5';
+import { QuizContent } from '@rapid-cmi5/cmi5-build/common';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';

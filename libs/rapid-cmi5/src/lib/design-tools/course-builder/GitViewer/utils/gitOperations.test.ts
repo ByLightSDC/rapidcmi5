@@ -16,11 +16,11 @@ import {
   TestContext,
   verifyCourseStructure,
 } from './courseOperations.test';
-import { Operation } from '@rapid-cmi5/types/cmi5';
+import { Operation } from '@rapid-cmi5/cmi5-build/common';
 import { repoNameInUseMessage } from '../session/constants';
 
 // Add fetch polyfill for Node.js
-global.fetch = require('node-fetch');
+// global.fetch = require('node-fetch');
 
 // ============================================================================
 // Test Fixtures and Setup
@@ -38,7 +38,7 @@ const DEFAULT_GIT_CONFIG = {
   authorEmail: 'test@example.com',
   remoteRepoUrl: '',
 };
-export const PUBLIC_TEST_REPO =
+const PUBLIC_TEST_REPO =
   'https://github.com/aaiirr123/rapid-cmi5-test-course.git';
 const MOCK_CREDENTIALS = {
   username: 'testuser',

@@ -1,6 +1,6 @@
 import { Paper, Typography, IconButton, Tooltip } from '@mui/material';
 import { Stack } from '@mui/system';
-import { AnswerType, QuizContent } from '@rapid-cmi5/types/cmi5';
+import { AnswerType, QuizContent } from '@rapid-cmi5/cmi5-build/common';
 import { OverflowTypography } from '../../data-display/OverflowTypography';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';

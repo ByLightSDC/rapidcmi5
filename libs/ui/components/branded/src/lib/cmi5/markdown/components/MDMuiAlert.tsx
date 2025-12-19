@@ -12,7 +12,7 @@ import {
   getAdmonitionHexColor,
   getAdmonitionIcon,
 } from './AdmonitionStyles';
-import { AdmonitionTypeEnum } from '@rapid-cmi5/types/cmi5';
+import { AdmonitionTypeEnum } from '@rapid-cmi5/cmi5-build/common';
 
 export default function MDMuiAlert({
   admonitionType,

@@ -21,10 +21,10 @@
 //   Package,
 //   PackageCreate,
 //   PackageUpdate,
-// } from '@rapid-cmi5/frontend/clients/devops-api';
+// } from '@rapid-cmi5/ui/branded';
 
 // /* Constants */
-// import { Category, Topic } from '@rapid-cmi5/ui/api/hooks';
+// import { Category, Topic } from '@rapid-cmi5/ui/branded';
 
 // /**
 //  * Hook that determines whether field arrays have changed in the Package Form

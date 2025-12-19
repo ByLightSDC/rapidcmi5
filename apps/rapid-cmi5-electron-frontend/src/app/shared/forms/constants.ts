@@ -1,5 +1,5 @@
 import { tFormFieldRendererProps } from '@rapid-cmi5/ui/branded';
-import { FormCrudType } from '@rapid-cmi5/ui/redux';
+import { FormCrudType } from '@rapid-cmi5/ui/branded';
 
 // Shared Field constants
 export const minCpuCores = 1;

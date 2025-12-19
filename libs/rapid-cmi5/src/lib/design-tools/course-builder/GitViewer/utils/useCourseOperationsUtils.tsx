@@ -12,7 +12,7 @@ import {
   SlideType,
   SlideTypeEnum,
   TeamConsolesContent,
-} from '@rapid-cmi5/types/cmi5';
+} from '@rapid-cmi5/cmi5-build/common';
 import { courseNameInUseMessage, RC5_VERSION } from '../session/constants';
 import { GitFS, MAX_FS_SLUG_LENGTH } from './fileSystem';
 import {

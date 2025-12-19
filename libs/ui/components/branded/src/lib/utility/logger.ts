@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { config } from '@rapid-cmi5/frontend/environment';
+import { config } from '@rapid-cmi5/ui/branded';
 export const debugColorSuccess = 'background:lightgreen';
 export const debugColor2 = 'background:lightblue';
 export const debugColor3 = 'background:lightgrey';

@@ -26,7 +26,7 @@ import {
 import { CONTENT_UPDATED_COMMAND, fnRefOrder$, fnRefs$ } from './vars';
 import { debugLog } from '../../../../utility/logger';
 import { useSelector } from 'react-redux';
-import { modal } from '@rapid-cmi5/ui/redux';
+import { modal } from '../../../../redux/commonAppReducer';
 
 /**
  * Maintains a registry of reference and definition nodes and their relationship

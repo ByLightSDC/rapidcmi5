@@ -7,7 +7,7 @@ import {
   AutoGraderEvent,
   graphqlAutoGraderResultsFields,
   useSubscription,
-} from '@rapid-cmi5/ui/api/hooks';
+} from '@rapid-cmi5/ui/branded';
 
 /**
  * Queries graph for AutoGrader updates

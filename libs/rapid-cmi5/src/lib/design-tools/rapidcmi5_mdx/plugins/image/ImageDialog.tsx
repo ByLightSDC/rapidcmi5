@@ -18,13 +18,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 
 import {
+  ButtonIcon,
   ButtonModalMainUi,
   ComboBoxSelectorUi,
   ModalDialog,
   TextFieldMainUi,
 } from '@rapid-cmi5/ui/branded';
+
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
-import { ButtonIcon } from '@rapid-cmi5/ui/api/hooks';
 
 // used for uploading files
 const VisuallyHiddenInput = styled('input')({

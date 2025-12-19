@@ -14,13 +14,12 @@ import { Typography } from '@mui/material';
 
 /*Icons */
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { ButtonIcon, queryHooksConfig } from '@rapid-cmi5/ui/api/hooks';
 import ListView, { ListViewProps } from '../../data-display/ListView';
 import { debugLogWarning } from '../../utility/logger';
 import { authoredByMeFilter, paginationFiltersConfig } from './paginationFiltersConstants';
 import TablePaginationUi from './TablePagination';
 import DataFetcher from '../../forms/DataFetcher';
-
+import { ButtonIcon } from '../../utility/buttons';
 const defaultRowsPerPage = 100;
 
 /**
@@ -333,7 +332,7 @@ export function PaginationListView({
 
     //some of endpoints require an auth token
     if (sendTokenHeader) {
-      reqOptions['authToken'] = queryHooksConfig.headers.Authorization;
+      // reqOptions['authToken'] = queryHooksConfig.headers.Authorization;
     }
 
     reqOptions['queryConfig'] = queryConfig;

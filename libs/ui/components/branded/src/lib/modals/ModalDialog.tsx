@@ -24,9 +24,9 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
-import React, { Fragment } from 'react';
-import { ButtonLoadingUi } from '@rapid-cmi5/ui/api/hooks';
+import { Fragment } from 'react';
 import { ButtonModalCancelUi } from '../inputs/buttons/buttonsmodal';
+import { ButtonLoadingUi } from '../utility/buttons';
 
 /**
  * @interface ModalDialogProps

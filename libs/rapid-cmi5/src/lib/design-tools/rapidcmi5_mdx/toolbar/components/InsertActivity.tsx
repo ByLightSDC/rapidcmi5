@@ -12,7 +12,7 @@ import {
   activityLabels,
   RC5ActivityTypeEnum,
   getActivityTypeFromDisplayName,
-} from '@rapid-cmi5/types/cmi5';
+} from '@rapid-cmi5/cmi5-build/common';
 import {
   scenario,
   teamScenario,

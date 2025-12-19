@@ -11,13 +11,13 @@ import {
 import * as yup from 'yup';
 
 import { cloneRepoModalId } from '../../rapidcmi5_mdx/modals/constants';
-import { CommonAppModalState } from '@rapid-cmi5/ui/redux';
+import { CommonAppModalState } from '@rapid-cmi5/ui/branded';
 
 import { Grid, Typography } from '@mui/material';
 
 import { UseFormReturn } from 'react-hook-form';
 
-import { GIT_URL_GROUP, NAME_GROUP } from '@rapid-cmi5/ui/validation';
+import { GIT_URL_GROUP, NAME_GROUP } from '@rapid-cmi5/ui/branded';
 import { CreateCloneType } from '../CourseBuilderApiTypes';
 import { useCallback, useContext, useEffect } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';

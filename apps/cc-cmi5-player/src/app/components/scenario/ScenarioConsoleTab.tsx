@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   useGetRangeResourceConsolesGraph,
   useQueryDetails,
-} from '@rapid-cmi5/ui/api/hooks';
+} from '@rapid-cmi5/ui/branded';
 import { Alert } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { rangeConsoleDataSel, rangeDataSel } from '../../redux/auReducer';

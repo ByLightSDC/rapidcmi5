@@ -2,8 +2,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
-import { config } from '@rapid-cmi5/frontend/environment';
-import { authToken } from '@rapid-cmi5/ui/keycloak';
+import { config, authToken} from '@rapid-cmi5/ui/branded';
 import type { ScenarioFormProps } from '@rapid-cmi5/react-editor';
 
 export interface Scenario {

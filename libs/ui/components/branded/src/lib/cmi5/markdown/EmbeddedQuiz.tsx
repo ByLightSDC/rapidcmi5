@@ -5,7 +5,7 @@ import {
   QuizCompletionEnum,
   AuContextProps,
   MoveOnCriteriaEnum,
-} from '@rapid-cmi5/types/cmi5';
+} from '@rapid-cmi5/cmi5-build/common';
 import { parseQuizdownFile } from '@rapid-cmi5/cmi5-build/common';
 import { AuQuiz } from '../quiz/Quiz';
 

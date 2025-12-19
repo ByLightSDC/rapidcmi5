@@ -17,12 +17,6 @@ The most common use case for this class is a deletion prompt
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { ButtonCopyText, useQueryDetails, useToaster } from '@rapid-cmi5/ui/api/hooks';
-
-import { auth } from '@rapid-cmi5/ui/keycloak';
-import { isLoading, setLoader, modal, setModal } from '@rapid-cmi5/ui/redux';
-import { ErrorMessageDetail } from '@rapid-cmi5/ui/validation';
-
 /* MUI */
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
@@ -31,6 +25,12 @@ import TextField from '@mui/material/TextField';
 
 import ModalDialog from './ModalDialog';
 import { Typography } from '@mui/material';
+import { auth } from '../keycloak/reducer';
+import { isLoading, modal, setLoader, setModal } from '../redux/commonAppReducer';
+import ErrorMessageDetail from '../validation/ErrorMessageDetail';
+import { ButtonCopyText } from '../utility/buttons';
+import { useToaster } from '../utility/useToaster';
+import { useQueryDetails } from '../utility/useQueryDetails';
 
 /* Constants */
 const deleteDialogButtons = ['Cancel', 'Delete'];

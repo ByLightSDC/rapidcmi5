@@ -6,7 +6,7 @@ import {
   setDividerColor,
   setIconColor,
   themeColor,
-} from '@rapid-cmi5/ui/redux';
+} from '@rapid-cmi5/ui/branded';
 
 /* Shared */
 import AppHeader from './shared/AppHeader';
@@ -15,7 +15,11 @@ import AppHeader from './shared/AppHeader';
 import {
   SizingContextProvider,
   TimePickerProvider,
+  isAuthenticated,
+  authToken,
 } from '@rapid-cmi5/ui/branded';
+
+import {DevopsApiClient} from '@rangeos-nx/frontend/clients/devops-api'
 
 /* Material */
 import { NotificationsProvider } from '@toolpad/core';
@@ -28,15 +32,8 @@ import { darkTheme } from './styles/muiThemeDark';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
-import {
-  buildCmi5ZipParams,
-  RapidCmi5,
-} from '@rapid-cmi5/react-editor';
-import { isAuthenticated, authToken } from '@rapid-cmi5/ui/keycloak';
-import { DevopsApiClient } from '@rapid-cmi5/frontend/clients/devops-api';
+import { buildCmi5ZipParams, RapidCmi5 } from '@rapid-cmi5/react-editor';
 import { MyScenariosForm } from './ScenarioSelection';
-
-
 
 export default function App() {
   const dispatch = useDispatch();

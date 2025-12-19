@@ -1,4 +1,4 @@
-import { JobeContent, JobeSubmitResponse } from '@rapid-cmi5/types/cmi5';
+import { JobeContent, JobeSubmitResponse } from '@rapid-cmi5/cmi5-build/common';
 import axios from 'axios';
 import { debugLog } from '../../utility/logger';
 

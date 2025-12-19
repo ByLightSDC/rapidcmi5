@@ -3,16 +3,15 @@ import {
   FormControlSelectField,
   FormControlTextField,
   FormControlUIProvider,
+  FormCrudType,
   FormStateType,
   MiniForm,
 } from '@rapid-cmi5/ui/branded';
 import { Grid, MenuItem } from '@mui/material';
 import * as yup from 'yup';
-import { JobeContent, moveOnCriteriaOptions } from '@rapid-cmi5/types/cmi5';
+import { JobeContent, moveOnCriteriaOptions } from '@rapid-cmi5/cmi5-build/common';
 
-import { RC5ActivityTypeEnum } from '@rapid-cmi5/types/cmi5';
-import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
-import { FormCrudType } from '@rapid-cmi5/ui/redux';
+import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build/common';
 
 export const JobeForm = ({
   crudType,

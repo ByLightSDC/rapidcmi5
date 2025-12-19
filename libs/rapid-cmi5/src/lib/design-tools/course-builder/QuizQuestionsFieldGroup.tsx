@@ -7,16 +7,16 @@ import {
   QuestionResponse,
   responseOptions,
   SlideTypeEnum,
-} from '@rapid-cmi5/types/cmi5';
+} from '@rapid-cmi5/cmi5-build/common';
 import {
   FormControlCheckboxField,
   FormControlSelectField,
   FormControlTextField,
+  FormCrudType,
   FormFieldArray,
   tFormFieldRendererProps,
   useDisplayFocus,
 } from '@rapid-cmi5/ui/branded';
-import { FormCrudType } from '@rapid-cmi5/ui/redux';
 
 /**
  * @interface fieldGroupProps

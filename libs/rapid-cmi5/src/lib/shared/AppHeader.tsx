@@ -1,13 +1,11 @@
-/* eslint-disable react/jsx-no-useless-fragment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 // import { useAppBreadCrumbs } from '../hooks/useAppBreadCrumbs';
 
-import { appHeaderVisible, themeColor } from '@rapid-cmi5/ui/redux';
 
 /* Branded */
-import { AppLogo, AppHeaderDashboardMenu } from '@rapid-cmi5/ui/branded';
+import { AppLogo, AppHeaderDashboardMenu, appHeaderVisible, themeColor } from '@rapid-cmi5/ui/branded';
 
 /* MUI */
 import Box from '@mui/material/Box';
@@ -22,7 +20,6 @@ import SettingsIcon from '@mui/icons-material/Settings';
 
 import UserInfoBox from './navbar/UserInfoBox';
 
-import { BuildVersionInfo } from '@rapid-cmi5/frontend/clients/devops-api';
 
 /* Layout Notes
 height is determined by the toggle icon size in the Navbar , currently medium

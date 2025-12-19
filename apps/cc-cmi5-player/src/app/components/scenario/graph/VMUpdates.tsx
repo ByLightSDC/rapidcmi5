@@ -6,7 +6,7 @@ import {
   useGetRangeResourceVmsGraph,
   useQueryDetails,
   Topic,
-} from '@rapid-cmi5/ui/api/hooks';
+} from '@rapid-cmi5/ui/branded';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
 import VMSubscription from './VMSubscription';
 

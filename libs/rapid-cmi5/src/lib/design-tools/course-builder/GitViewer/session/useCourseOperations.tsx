@@ -27,12 +27,12 @@ import YAML from 'yaml';
 
 import { AppDispatch, RootState } from '../../../../redux/store';
 import { ViewModeEnum } from '../../CourseBuilderTypes';
-import { CourseData, KSATElement, Operation } from '@rapid-cmi5/types/cmi5';
+import { CourseData, KSATElement, Operation } from '@rapid-cmi5/cmi5-build/common';
 import { CreateCourseType } from '../../CourseBuilderApiTypes';
 import { courseNameInUseMessage, deleteCourseFailMessage } from './constants';
 import { GitFS } from '../utils/fileSystem';
 import { warningModalId } from '../../../rapidcmi5_mdx/modals/constants';
-import { setModal } from '@rapid-cmi5/ui/redux';
+import { setModal } from '@rapid-cmi5/ui/branded';
 import { rc5MetaFilename } from '@rapid-cmi5/cmi5-build/common';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui/branded';
 import { join } from 'path-browserify';

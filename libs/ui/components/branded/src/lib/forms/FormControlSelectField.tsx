@@ -12,7 +12,7 @@ import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import { fieldMarginTop } from '../styles/muiTheme';
-import { ButtonInfoField } from '@rapid-cmi5/ui/api/hooks';
+import { ButtonInfoField } from '../utility/buttons';
 /**
  * @typedef MenuOptionsProps - menu option props
  * @property { [key: string]: string } options enumerated list of options

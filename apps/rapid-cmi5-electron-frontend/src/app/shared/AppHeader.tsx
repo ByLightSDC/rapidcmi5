@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import {
   appHeaderVisible,
   themeColor,
-} from '@rapid-cmi5/ui/redux';
+} from '@rapid-cmi5/ui/branded';
 import { useLogOut } from '../hooks/useLogOut';
 
 /* Branded */

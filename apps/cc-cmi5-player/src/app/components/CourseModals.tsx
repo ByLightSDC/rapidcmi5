@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { FormCrudType, modal, setModal } from '@rapid-cmi5/ui/redux';
+import { FormCrudType, modal, setModal } from '@rapid-cmi5/ui/branded';
 
 /* Branded */
 import {

@@ -1,14 +1,13 @@
 import { KeycloakUi } from '@rapid-cmi5/ui/keycloak';
-import { config } from '@rapid-cmi5/frontend/environment';
 import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { authToken } from '@rapid-cmi5/ui/keycloak';
-import { queryHooksConfig } from '@rapid-cmi5/ui/api/hooks';
+import { queryHooksConfig } from '@rapid-cmi5/ui/branded';
 import {
   auConfigInitializedSel,
   setIsDisplayInitialized,
 } from './redux/auReducer';
-import { debugLog } from '@rapid-cmi5/ui/branded';
+import { config, debugLog } from '@rapid-cmi5/ui/branded';
 
 /* eslint-disable-next-line */
 export interface AuthProps {

@@ -7,9 +7,9 @@ import {
   CTFQuestion,
   QuizCompletionEnum,
   RC5ActivityTypeEnum,
-} from '@rapid-cmi5/types/cmi5';
+} from '@rapid-cmi5/cmi5-build/common';
+
 import {
-  MouseEventHandler,
   useCallback,
   useEffect,
   useRef,
@@ -48,7 +48,7 @@ import {
 
 } from './ctfReducer';
 import { Box, Stack } from '@mui/system';
-import { ButtonInfoField, ButtonMainUi, ButtonMinorUi } from '@rapid-cmi5/ui/api/hooks';
+import { ButtonInfoField, ButtonMainUi, ButtonMinorUi } from '../../utility/buttons';
 
 const answerBoxGridSize = 3.8;
 const attemptedLabel = '#Attempted';

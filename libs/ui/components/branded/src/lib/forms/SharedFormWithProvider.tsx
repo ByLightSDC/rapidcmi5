@@ -4,7 +4,6 @@
  */
 
 import {
-  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -12,23 +11,9 @@ import {
   useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation } from 'react-router';
 import { UseFormReturn, useForm, useWatch } from 'react-hook-form';
-import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import {
-  message,
-  modal,
-  setMessage,
-  tSelectionMeta,
-  useGetCacheSelection,
-  useGetCacheMultipleSelection,
-  FormCrudType,
-} from '@rapid-cmi5/ui/redux';
-
-import { ButtonLoadingUi, useQueryDetails } from '@rapid-cmi5/ui/api/hooks';
-import { setLoader } from '@rapid-cmi5/ui/redux';
-import { ErrorMessageDetail, sanitizePayload } from '@rapid-cmi5/ui/validation';
 
 /* MUI */
 import Box from '@mui/material/Box';
@@ -46,7 +31,6 @@ import { BookmarksContext } from '../navigation/bookmark/BookmarksContext';
 import {
   ButtonModalCancelUi,
   ButtonModalMainUi,
-  ButtonModalMinorUi,
 } from '../inputs/buttons/buttonsmodal';
 import DataFetcher from './DataFetcher';
 import FileUpload from '../inputs/file-upload/FileUpload';
@@ -58,10 +42,15 @@ import { useNavigateAlias } from '../hooks/useNavigateAlias';
 
 import { FormStateType } from '../types/form';
 import { iListItemType } from '../dashboards/constants';
-import axios, { CancelTokenSource } from 'axios';
 import { debugLog } from '../utility/logger';
 import AuthoringInfoFields, { tAuthoringInfoFieldProps } from './AuthoringInfoFields';
 import Form from './Form';
+import { modal, setLoader } from '../redux/commonAppReducer';
+import { FormCrudType } from '../redux/utils/types';
+import ErrorMessageDetail from '../validation/ErrorMessageDetail';
+import { sanitizePayload } from '../validation/utility';
+import { ButtonLoadingUi } from '../utility/buttons';
+import { useQueryDetails } from '../utility/useQueryDetails';
 
 const defaultFormWidth = 800;
 

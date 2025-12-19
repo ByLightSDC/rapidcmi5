@@ -20,8 +20,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import {
   DeployedRangeConsole,
   RangeContainerStatusEnum,
-} from '@rapid-cmi5/frontend/clients/devops-api';
-import { getContainerStatusIcon } from '@rapid-cmi5/ui/api/hooks';
+} from '@rapid-cmi5/ui/branded';
+import { getContainerStatusIcon } from '@rapid-cmi5/ui/branded';
 
 // widths so name doesn't run into consoles if they exist
 const nameFieldDefaultWidth = '90%';

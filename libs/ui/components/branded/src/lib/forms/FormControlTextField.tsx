@@ -11,8 +11,8 @@ import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
 import InputAdornment from '@mui/material/InputAdornment';
 import { fieldMarginTop } from '../styles/muiTheme';
-import { ButtonIcon, ButtonInfoField } from '@rapid-cmi5/ui/api/hooks';
 import ReadOnlyTextField from './ReadOnlyTextField';
+import { ButtonIcon, ButtonInfoField } from '../utility/buttons';
 
 export type tFormControlTextFieldProps = {
   control?: Control;

@@ -1,7 +1,7 @@
 import { AppDispatch } from '@rapid-cmi5/react-editor';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { modal, setModal, themeColor, setTheme, resetPersistance } from '@rapid-cmi5/ui/redux';
+import { modal, setModal, themeColor, setTheme, resetPersistance } from '@rapid-cmi5/ui/branded';
 
 import { useLogOut } from '../../hooks/useLogOut';
 
@@ -25,8 +25,6 @@ import Brightness6Icon from '@mui/icons-material/Brightness6';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useState } from 'react';
 
-import { BuildVersionInfo } from '@rapid-cmi5/frontend/clients/devops-api';
-
 /**
  * @typedef propTypes - User Info Box props
  * @property {HTMLElement | null} anchorEl Display Element to anchor the User Info to (hidden when null)
@@ -46,26 +44,11 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
   //#region About
   const [isAboutDisabled, setAboutDisabled] = useState(false);
   const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
-  const [aboutBuildVersionData, setAboutBuildVersionData] =
-    useState<BuildVersionInfo>({
-      buildId: 0,
-      gitBranch: '',
-      gitCommit: '',
-    });
-  const handleAboutClick = () => {
-    onClose();
-    setAboutDialogOpen(true);
-  };
+ 
   const handleAboutDialogClose = () => {
     setAboutDialogOpen(false);
   };
 
-  /**
-   * Build Version Data is loaded via fetcher component
-   */
-  const handleInitialDataLoad = (data: BuildVersionInfo) => {
-    setAboutBuildVersionData(data);
-  };
   /**
    * Handles error returned from API call
    * @param {any} error error returned from api call
@@ -130,7 +113,6 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
       <div data-testid="modals">
         <AboutBuildVersionDialog
           appThemeColor={appThemeColor}
-          versionData={aboutBuildVersionData}
           isOpen={aboutDialogOpen}
           onClose={handleAboutDialogClose}
         />
@@ -210,12 +192,11 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
 
 type tAboutProps = {
   appThemeColor: string;
-  versionData: BuildVersionInfo;
   isOpen: boolean;
   onClose: () => void;
 };
 function AboutBuildVersionDialog(props: tAboutProps) {
-  const { appThemeColor, versionData, isOpen, onClose } = props;
+  const { appThemeColor, isOpen, onClose } = props;
   return (
     <div data-testid="about-build-version-modal">
       <ModalDialog
@@ -252,7 +233,7 @@ function AboutBuildVersionDialog(props: tAboutProps) {
             paddingLeft: '24px',
           }}
         >
-          <Stack direction="column" style={{}}>
+          {/* <Stack direction="column" style={{}}>
             <Typography variant="body2">
               <strong>Build ID: </strong>
               {`${versionData?.buildId}`}
@@ -265,7 +246,7 @@ function AboutBuildVersionDialog(props: tAboutProps) {
               <strong>Git Commit: </strong>
               {`${versionData?.gitCommit}`}
             </Typography>
-          </Stack>
+          </Stack> */}
         </Box>
       </ModalDialog>
     </div>

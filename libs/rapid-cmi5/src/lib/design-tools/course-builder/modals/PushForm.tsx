@@ -9,7 +9,7 @@ import {
 } from '@rapid-cmi5/ui/branded';
 import * as yup from 'yup';
 
-import { CommonAppModalState } from '@rapid-cmi5/ui/redux';
+import { CommonAppModalState } from '@rapid-cmi5/ui/branded';
 
 import { Grid } from '@mui/material';
 
@@ -17,7 +17,7 @@ import { UseFormReturn } from 'react-hook-form';
 
 import {
   NAME_GROUP_OPT,
-} from '@rapid-cmi5/ui/validation';
+} from '@rapid-cmi5/ui/branded';
 import { PushType } from '../CourseBuilderApiTypes';
 import { useContext } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';

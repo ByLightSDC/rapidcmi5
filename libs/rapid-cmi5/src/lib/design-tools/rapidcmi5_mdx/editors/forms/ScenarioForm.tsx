@@ -5,8 +5,11 @@ import {
   FormControlSelectField,
   FormControlTextField,
   FormControlUIProvider,
+  FormCrudType,
   FormStateType,
   MiniForm,
+  NAME_GROUP_OPT,
+  UUID_GROUP,
 } from '@rapid-cmi5/ui/branded';
 import { Alert, MenuItem, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
@@ -15,14 +18,11 @@ import * as yup from 'yup';
 import {
   moveOnCriteriaOptions,
   RC5ScenarioContent,
-} from '@rapid-cmi5/types/cmi5';
-
-import { NAME_GROUP_OPT, UUID_GROUP } from '@rapid-cmi5/ui/validation';
+} from '@rapid-cmi5/cmi5-build/common';
 
 import { getInfoText } from '../../../../utils/infoButtonText';
-import { RC5ActivityTypeEnum } from '@rapid-cmi5/types/cmi5';
+import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build/common';
 import LrsHeaderWithDetails from './LrsStatementHelper';
-import { FormCrudType } from '@rapid-cmi5/ui/redux';
 import { useContext } from 'react';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 

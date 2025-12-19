@@ -10,19 +10,19 @@ import {
   MiniForm,
   FormControlCheckboxField,
   FormControlPassword,
+  CommonAppModalState,
+  NAME_GROUP_OPT,
+  ButtonMinorUi,
+  useToaster,
 } from '@rapid-cmi5/ui/branded';
-import { Alert, Box, Grid, Typography } from '@mui/material';
-import { getValue, Stack } from '@mui/system';
+import { Alert, Grid, Typography } from '@mui/material';
+import { Stack } from '@mui/system';
 
 import AddIcon from '@mui/icons-material/Add';
 
 import * as yup from 'yup';
 
-import { CommonAppModalState } from '@rapid-cmi5/ui/redux';
-
 import { UseFormReturn } from 'react-hook-form';
-
-import { NAME_GROUP_OPT } from '@rapid-cmi5/ui/validation';
 import { SuperSaveFormType } from '../CourseBuilderApiTypes';
 
 import {
@@ -39,7 +39,6 @@ import {
   courseOperations,
   updateDirtyDisplay,
 } from '../../../redux/courseBuilderReducer';
-import { useToaster, ButtonMinorUi } from '@rapid-cmi5/ui/api/hooks';
 
 export function SaveCourseForm({
   defaultData,

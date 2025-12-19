@@ -1,4 +1,4 @@
-import { AuContextProps } from '@rapid-cmi5/types/cmi5';
+import { AuContextProps } from '@rapid-cmi5/cmi5-build/common';
 import { useEffect, useState } from 'react';
 import { parseAttributeList } from './ImagePlugin';
 

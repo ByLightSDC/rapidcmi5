@@ -5,18 +5,6 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  CommonAppSelectionState,
-  setLoader,
-  modal,
-  setModal,
-  setMessage,
-  useGetCacheMultipleSelection,
-  useSetCacheMultipleSelection,
-  FormCrudType,
-} from '@rapid-cmi5/ui/redux';
-
-import { ButtonMinorUi, Topic, useCache } from '@rapid-cmi5/ui/api/hooks';
 
 /* MUI */
 import Alert from '@mui/material/Alert';
@@ -42,6 +30,20 @@ import {
 import PaginationListView from '../../navigation/paging/PaginationListView';
 import { RowAction } from '../../types/actionRowTypes';
 import ActionRow from './ActionRow';
+import {
+  modal,
+  setMessage,
+  setModal,
+  CommonAppSelectionState,
+  setLoader,
+} from '../../redux/commonAppReducer';
+import {
+  useSetCacheMultipleSelection,
+  useGetCacheMultipleSelection,
+} from '../../redux/useCacheSelection';
+import { FormCrudType } from '../../redux/utils/types';
+import { ButtonMinorUi } from '../../utility/buttons';
+import { useCache } from '../../utility/useQueryCache';
 
 const featureFlagMultipleSelectShift = true;
 
@@ -726,13 +728,7 @@ export function MultipleSelectWrapper(props: tMultipleSelectWrapperProps) {
             onPageData={onPageData}
             renderItem={(data: any, index?: number) => {
               // currently only for ansible playbooks selecting parent
-              if (
-                topicId === Topic.AnsiblePlaybook &&
-                excludeId &&
-                excludeId === data.uuid
-              ) {
-                return <div style={{ height: '.1px' }} />; // skip parent -- height non-zero so perfornamt list doesn't reset it
-              }
+
               const selIndex = selection.current.findIndex(
                 (obj: CommonAppSelectionState) => obj.id === data[dataIdField],
               );

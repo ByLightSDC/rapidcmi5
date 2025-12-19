@@ -11,7 +11,7 @@
 // } from 'react-hook-form';
 // import { yupResolver } from '@hookform/resolvers/yup';
 // import { AppDispatch } from '../../../redux/store';
-// import { setLoader } from '@rapid-cmi5/ui/redux';
+// import { setLoader } from '@rapid-cmi5/ui/branded';
 
 // /* Shared */
 // import MultiSelectionModals from './MultiSelectionModals';
@@ -20,7 +20,7 @@
 //   ErrorMessageDetail,
 //   diffPayload,
 //   sanitizePayload,
-// } from '@rapid-cmi5/ui/validation';
+// } from '@rapid-cmi5/ui/branded';
 
 // /* Branded */
 // import {
@@ -53,8 +53,8 @@
 //   useGetRangeResourceScenarioOverrides,
 //   usePutRangeResourceScenario,
 //   useQueryDetails,
-// } from '@rapid-cmi5/ui/api/hooks';
-// import { ScenarioOverridesOverride } from '@rapid-cmi5/frontend/clients/devops-api';
+// } from '@rapid-cmi5/ui/branded';
+// import { ScenarioOverridesOverride } from '@rapid-cmi5/ui/branded';
 // const defaultFormWidth = 880;
 
 // /**

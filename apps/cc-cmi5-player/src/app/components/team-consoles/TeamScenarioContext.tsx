@@ -15,11 +15,11 @@ import {
   infiniteRecordLimit,
   queryHooksConfig,
   Topic,
-} from '@rapid-cmi5/ui/api/hooks';
+} from '@rapid-cmi5/ui/branded';
 import {
   DeployedRangeConsole,
   DevopsApiClient,
-} from '@rapid-cmi5/frontend/clients/devops-api';
+} from '@rapid-cmi5/ui/branded';
 
 import {
   ConsoleProvider,
@@ -35,7 +35,7 @@ import {
   RC5ActivityTypeEnum,
   ScenarioSubmitResponse,
   TeamConsolesContent,
-} from '@rapid-cmi5/types/cmi5';
+} from '@rapid-cmi5/cmi5-build/common';
 import { useCellValue } from '@mdxeditor/editor';
 import { AuManagerContext } from '../../session/AuManager';
 

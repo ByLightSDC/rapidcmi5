@@ -18,10 +18,10 @@ import Typography from '@mui/material/Typography';
 /* Icon */
 import FilterListIcon from '@mui/icons-material/FilterList';
 import Checkbox from '@mui/material/Checkbox';
-import { ButtonTooltip, ButtonIcon } from '@rapid-cmi5/ui/api/hooks';
 import { useDisplayFocus } from '../../hooks/useDisplayFocus';
 import { SelectorMainUi } from '../../inputs/selectors/selectors';
 import { TextFieldMainUi } from '../../inputs/textfields/textfields';
+import { ButtonTooltip, ButtonIcon } from '../../utility/buttons';
 
 /**
  * @typedef {Object} PaginationFilterProps

@@ -15,7 +15,7 @@ import CollapsibleThing from './CollapsibleThing';
 import CollapsibleTOC, { TOC_LINK_CLICK } from './CollapsibleTOC';
 import MDMuiAlert from './components/MDMuiAlert';
 
-import { AuContextProps } from '@rapid-cmi5/types/cmi5';
+import { AuContextProps } from '@rapid-cmi5/cmi5-build/common';
 
 import EmbeddedQuiz from './EmbeddedQuiz';
 import MarkdownImage from './MarkdownImage';

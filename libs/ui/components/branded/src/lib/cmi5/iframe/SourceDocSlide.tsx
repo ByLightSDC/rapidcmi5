@@ -15,7 +15,7 @@ import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 // import 'katex/dist/katex.min.css';
 
-import { AuContextProps } from '@rapid-cmi5/types/cmi5';
+import { AuContextProps } from '@rapid-cmi5/cmi5-build/common';
 
 import { customMarkdownParser } from '../markdown/MarkDownParser';
 import { imagePlugin } from '../markdown/ImagePlugin';

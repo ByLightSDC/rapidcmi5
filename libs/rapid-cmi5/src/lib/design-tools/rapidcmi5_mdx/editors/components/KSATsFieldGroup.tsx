@@ -1,13 +1,12 @@
 import { UseFormReturn } from 'react-hook-form';
-import { queryKeyKSATs, Topic } from '@rapid-cmi5/ui/api/hooks';
 import {
   DynamicSelectorFieldGroup,
+  FormCrudType,
   FormFieldArray,
   tFormFieldRendererProps,
 } from '@rapid-cmi5/ui/branded';
 
 import KsatFieldDetail from './KsatFieldDetail';
-import { FormCrudType } from '@rapid-cmi5/ui/redux';
 
 /**
  * @type tFieldGroupProps
@@ -108,7 +107,7 @@ export function KSATsFieldGroup(props: tFieldGroupProps) {
         const ksatFieldName = props.indexedArrayField + '.element_identifier';
         return (
           <DynamicSelectorFieldGroup
-            topicId={Topic.KSAT}
+            topicId={'ksat'}
             crudType={crudType}
             dataIdField="element_identifier"
             formProps={{
@@ -122,7 +121,7 @@ export function KSATsFieldGroup(props: tFieldGroupProps) {
               //determines selectable, viewable
               readOnly: crudType === FormCrudType.view,
             }}
-            queryKey={queryKeyKSATs}
+            queryKey={'ksats'}
             getRenderItems={(data: any, index: number) => {
               if (index === 1) {
                 return (
@@ -161,7 +160,7 @@ export function KSATsFieldGroup(props: tFieldGroupProps) {
       formMethods={formMethods}
       multiSelectButtonProps={{
         formMethods: formMethods,
-        topicId: Topic.KSAT,
+        topicId: 'ksats',
         onApply: handleSelectMultipleKsats,
       }}
       //#REF  onDeleteEntry={handleDeleteKsat}
