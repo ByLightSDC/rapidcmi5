@@ -10,7 +10,7 @@ import { ElectronFsHandler } from './app/api/fileSystem/fileSystem';
 import { app } from 'electron';
 import { cmi5Builder } from './app/api/cmi5Builder/build';
 import JSZip from 'jszip';
-import { FolderStruct } from '@rapid-cmi5/cmi5-build/common';
+import { FolderStruct } from '@rapid-cmi5/cmi5-build-common';
 
 const builder = new cmi5Builder();
 const isTestMode = App.isTestMode();

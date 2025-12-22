@@ -3,7 +3,7 @@ import {
   DeployedScenario,
   RangeContainer,
   RangeVM,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 
 export type ScenarioResources = {
   deployedScenarioId?: string;

@@ -9,14 +9,14 @@ import {
   SetActivityCacheHandler,
   SetCmi5ProgressHandler,
   SubmitCmiScoreHandler,
-} from '@rapid-cmi5/cmi5-build/common';
+} from '@rapid-cmi5/cmi5-build-common';
 import {
   DevopsApiClient,
   AutoGrader,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 import { cmi5Instance } from '../../../session/cmi5';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
-import { debugLogError } from '@rapid-cmi5/ui/branded';
+import { debugLogError } from '@rapid-cmi5/ui';
 import { logger } from '../../../debug';
 
 type UseAutoGraderProgressArgs = {

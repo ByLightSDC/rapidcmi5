@@ -1,6 +1,6 @@
 /* defaults to be used by hooks */
 
-import { config } from '@rapid-cmi5/ui/branded';
+import { config } from '@rapid-cmi5/ui';
 
 export const defaultSortOrderBy = 'dateEdited';
 export const defaultSortOrder = 'desc'; // this will put the last edited at the top

@@ -31,7 +31,7 @@ import {
   languageList,
   htmlPlugin,
   CodeMirrorEditor,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 
 import { RC5PlayerToolbar } from './RC5PlayerToolbar';
 import { ActivityDirectiveDescriptor } from './editors/directives/ActivityDirectiveDescriptor';

@@ -123,3 +123,11 @@ This will run all unit tests in rapid cmi5
 
 For interactive tests run
 `nx run rapid-cmi5-electron:e2e --ui`
+
+
+### Publishing to npm
+to test a npm package you have built locally, first build with the nx.
+then go to the output at ./dist/your-lib
+run npm pack
+then copy to the place you would wish to test the install with npm i <lib.version>.tgz
+`

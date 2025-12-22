@@ -7,17 +7,17 @@ import {
   useRef,
 } from 'react';
 
-import { OverflowTypography, TabMainUi } from '@rapid-cmi5/ui/branded';
+import { OverflowTypography, TabMainUi } from '@rapid-cmi5/ui';
 import {
   getScenarioStatusIcon,
   queryKeyRangeResourceAutoGraders,
   queryKeyRangeResourceContainers,
   Topic,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 import {
   DeployedScenario,
   DeployedScenarioDetailStatusEnum,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 
 /* MUI */
 import {
@@ -36,7 +36,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AutoModeIcon from '@mui/icons-material/AutoMode';
 import TerminalIcon from '@mui/icons-material/Terminal';
 
-import { AuContextProps, TeamConsolesContent } from '@rapid-cmi5/cmi5-build/common';
+import { AuContextProps, TeamConsolesContent } from '@rapid-cmi5/cmi5-build-common';
 
 import TimeClock from '../scenario/TimeClock';
 import RangeResources from './list-views/RangeResources';

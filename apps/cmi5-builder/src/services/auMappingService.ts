@@ -1,4 +1,4 @@
-import { CourseAU, CourseData } from '@rapid-cmi5/cmi5-build/common';
+import { CourseAU, CourseData } from '@rapid-cmi5/cmi5-build-common';
 import { AxiosRequestConfig, isAxiosError } from 'axios';
 
 import { createAuMappingName } from '../commands/generateAuMappings';

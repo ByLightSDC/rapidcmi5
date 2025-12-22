@@ -11,7 +11,7 @@ import {
   OverflowTypography,
   actionRowHeaderColor,
   ConsoleList,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 
 /* MUI */
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -21,8 +21,8 @@ import {
   DeployedRangeConsole,
   RangeVMStatusEnum,
   RangeVMKubevirtVmStatusEnum,
-} from '@rapid-cmi5/ui/branded';
-import { getVmStatusIcon } from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
+import { getVmStatusIcon } from '@rapid-cmi5/ui';
 
 // widths so name doesn't run into consoles if they exist
 const nameFieldDefaultWidth = '90%';

@@ -2,24 +2,15 @@ import { useEffect } from 'react';
 import { BrowserRouter as RouterWrapper } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 
-import {
-  setDividerColor,
-  setIconColor,
-  themeColor,
-} from '@rapid-cmi5/ui/branded';
+import { setDividerColor, setIconColor, themeColor } from '@rapid-cmi5/ui';
 
 /* Shared */
 import AppHeader from './shared/AppHeader';
 
 /* Branded */
-import {
-  SizingContextProvider,
-  TimePickerProvider,
-  isAuthenticated,
-  authToken,
-} from '@rapid-cmi5/ui/branded';
+import { SizingContextProvider, TimePickerProvider } from '@rapid-cmi5/ui';
 
-import {DevopsApiClient} from '@rangeos-nx/frontend/clients/devops-api'
+import { DevopsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
 
 /* Material */
 import { NotificationsProvider } from '@toolpad/core';
@@ -34,7 +25,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 import { buildCmi5ZipParams, RapidCmi5 } from '@rapid-cmi5/react-editor';
 import { MyScenariosForm } from './ScenarioSelection';
-
+import { authToken, isAuthenticated } from '@rapid-cmi5/keycloak';
 export default function App() {
   const dispatch = useDispatch();
   const theme = useSelector(themeColor);

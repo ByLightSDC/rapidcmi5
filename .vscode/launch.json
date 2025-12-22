@@ -2,6 +2,22 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch rapid-cmi5-frontend",
+      "request": "launch",
+      "type": "chrome",
+      "url": "http://localhost:4200",
+      "userDataDir": true,
+      "webRoot": "${workspaceFolder}/apps/rapid-cmi5-electron-frontend",
+      "sourceMapPathOverrides": {
+        "webpack:///./*": "${webRoot}/*",
+        "webpack://apps/*": "${webRoot}/apps/*",
+        "webpack:///src/*": "${workspaceFolder}/apps/rapid-cmi5-electron-frontend/src/*",
+        "webpack:///libs/*": "${workspaceFolder}/libs/*",
+        "webpack://*/src/*": "${workspaceFolder}/apps/rapid-cmi5-electron-frontend/src/*",
+        "webpack://*/libs/*": "${workspaceFolder}/libs/*"
+      }
+    },
+    {
       "name": "Launch cc-cmi5-player debugger",
       "request": "launch",
       "type": "chrome",

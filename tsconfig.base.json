@@ -26,9 +26,10 @@
       "@rapid-cmi5/cmi5-build/backend": [
         "libs/cmi5-build/backend/src/index.ts"
       ],
-      "@rapid-cmi5/cmi5-build/common": ["libs/cmi5-build/common/src/index.ts"],
-      "@rapid-cmi5/react-editor": ["libs/rapid-cmi5/src/index.ts"],
-      "@rapid-cmi5/ui/branded": ["libs/ui/components/branded/src/index.ts"]
+      "@rapid-cmi5/keycloak": ["libs/keycloak/src/index.ts"],
+      "@rapid-cmi5/cmi5-build-common": ["packages/common/src/index.ts"],
+      "@rapid-cmi5/react-editor": ["packages/rapid-cmi5/src/index.ts"],
+      "@rapid-cmi5/ui": ["packages/ui/src/index.ts"]
     }
   },
   "exclude": ["**/node_modules", "**/.*/", "tmp"]

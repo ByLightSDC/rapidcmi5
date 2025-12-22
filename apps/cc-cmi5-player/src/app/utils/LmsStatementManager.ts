@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { cmi5Instance } from '../session/cmi5';
 import { debugLog, logger } from '../debug';
 import { checkForDevMode } from './DevMode';
-import { config } from '@rapid-cmi5/ui/branded';
+import { config } from '@rapid-cmi5/ui';
 import sha256 from 'crypto-js/sha256';
 
 // Imports for progress management functions
@@ -23,7 +23,7 @@ import {
 import {
   ActivityScore,
   getActivityTypeFromDisplayName,
-} from '@rapid-cmi5/cmi5-build/common';
+} from '@rapid-cmi5/cmi5-build-common';
 import {
   calculateQuizScore,
   sendDetailedInteractionStatements,

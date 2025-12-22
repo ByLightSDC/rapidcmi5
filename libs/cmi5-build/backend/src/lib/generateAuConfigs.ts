@@ -1,4 +1,4 @@
-import { CourseData } from '@rapid-cmi5/cmi5-build/common';
+import { CourseData } from '@rapid-cmi5/cmi5-build-common';
 import fs from 'fs';
 import path from 'path';
 import { generateAuId, generateBlockId, sanitizeName } from './generateCmi5Xml';

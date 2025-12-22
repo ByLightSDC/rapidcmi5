@@ -1,4 +1,4 @@
-import { debugLog } from '@rapid-cmi5/ui/branded';
+import { debugLog } from '@rapid-cmi5/ui';
 import Cmi5 from '@xapi/cmi5';
 
 let cmi5Instance: Cmi5;

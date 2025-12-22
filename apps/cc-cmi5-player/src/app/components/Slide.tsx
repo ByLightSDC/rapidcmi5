@@ -6,7 +6,7 @@ import {
   ScenarioContent,
   SlideTypeEnum,
   SourceDocContent,
-} from '@rapid-cmi5/cmi5-build/common';
+} from '@rapid-cmi5/cmi5-build-common';
 import ScenarioConsoles from './scenario/ScenarioConsoles';
 import ScenarioWrapper from './scenario/ScenarioWrapper';
 import {
@@ -15,9 +15,9 @@ import {
   AuQuiz,
   AuSourceDocSlide,
   JobeInTheBox,
-} from '@rapid-cmi5/ui/branded';
-import { config } from '@rapid-cmi5/ui/branded';
-import { AuContextProps } from '@rapid-cmi5/cmi5-build/common';
+} from '@rapid-cmi5/ui';
+import { config } from '@rapid-cmi5/ui';
+import { AuContextProps } from '@rapid-cmi5/cmi5-build-common';
 
 function Slide({
   auProps,
@@ -64,24 +64,6 @@ function Slide({
             <AuMarkDownSlide
               auProps={auProps}
               content={slides[activeTab].content as string}
-              slideTop={0}
-              slideHeight={slideRef.current?.clientHeight || 0}
-              slideWidth={slideRef.current?.clientWidth || 0}
-            />
-          )}
-          {slides[activeTab].type === SlideTypeEnum.SourceDoc && (
-            <AuSourceDocSlide
-              introContent={
-                (slides[activeTab].content as SourceDocContent).introContent
-              }
-              sourceDoc={
-                slides[activeTab].content
-                  ? (slides[activeTab].content as SourceDocContent).sourceDoc
-                  : ''
-              }
-              styleProps={
-                (slides[activeTab].content as SourceDocContent).styleProps
-              }
               slideTop={0}
               slideHeight={slideRef.current?.clientHeight || 0}
               slideWidth={slideRef.current?.clientWidth || 0}

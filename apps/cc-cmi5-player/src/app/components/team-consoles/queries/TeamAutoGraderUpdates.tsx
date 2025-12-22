@@ -2,7 +2,7 @@ import {
   useQueryDetails,
   Topic,
   useGetRangeResourceAutoGraders,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 import { useState } from 'react';
 import AutograderSubscription from '../subscriptions/AutograderSubscription';
 

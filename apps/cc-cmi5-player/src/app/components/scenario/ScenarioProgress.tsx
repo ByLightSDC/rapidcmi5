@@ -2,7 +2,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import { Gauge } from '@mui/x-charts/Gauge';
 
-import { AuAutoGrader } from '@rapid-cmi5/cmi5-build/common';
+import { AuAutoGrader } from '@rapid-cmi5/cmi5-build-common';
 import {
   Paper,
   Typography,

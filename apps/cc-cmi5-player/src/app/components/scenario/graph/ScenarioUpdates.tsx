@@ -7,7 +7,7 @@ import {
   useGetRangeResourceScenarioGraph,
   useQueryDetails,
   Topic,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
 import ScenarioSubscription from './ScenarioSubscription';
 

@@ -1,11 +1,11 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { FormCrudType, modal, setModal } from '@rapid-cmi5/ui/branded';
+import { FormCrudType, modal, setModal } from '@rapid-cmi5/ui';
 
 /* Branded */
 import {
   FormControlUIProvider,
   ModalDialog,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 
 /* Constants */
 import { useEffect, useState } from 'react';

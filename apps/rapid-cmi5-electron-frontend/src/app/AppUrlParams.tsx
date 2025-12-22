@@ -2,7 +2,7 @@ import {
   setAppHeaderVisible,
   setBreadCrumbVisible,
   setTheme,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 

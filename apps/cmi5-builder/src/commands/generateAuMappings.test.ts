@@ -1,6 +1,6 @@
 import path from 'path';
 import { generateAllAuMappings } from './generateAuMappings';
-import { generateCourseJson } from '@rapid-cmi5/cmi5-build/common';
+import { generateCourseJson } from '@rapid-cmi5/cmi5-build-common';
 import { getFolderStructureBackend } from '@rapid-cmi5/cmi5-build/backend';
 
 import { coursePaths } from '@rapid-cmi5/cmi5-build/backend';

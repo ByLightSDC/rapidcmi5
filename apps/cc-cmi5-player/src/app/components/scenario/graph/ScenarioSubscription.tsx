@@ -7,7 +7,7 @@ import {
   graphqlScenarioFields,
   Topic,
   useSubscription,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 import {
   DeployedScenarioData,
   ScenarioUpdatesContext,

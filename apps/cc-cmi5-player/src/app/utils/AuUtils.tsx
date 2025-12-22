@@ -5,7 +5,7 @@ import { setActiveTab } from '../redux/navigationReducer';
 import { State } from '../types/SlideState';
 import { getSlideState } from './Cmi5Helpers';
 import { Dispatch } from '@reduxjs/toolkit';
-import { CourseAU } from '@rapid-cmi5/cmi5-build/common';
+import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
 import { checkForDevMode } from './DevMode';
 import { logger } from '../debug';
 import { handleSlideViewed } from './LmsStatementManager';

@@ -4,7 +4,7 @@ import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import activitySessionReducer from './activitySessionReducer';
 
 //Branded, Shared Reducers
-import { commonAppReducer } from '@rapid-cmi5/ui/branded';
+import { commonAppReducer } from '@rapid-cmi5/ui';
 import { keycloakUiReducer } from '@rapid-cmi5/ui/keycloak';
 
 //Persist
@@ -21,7 +21,7 @@ import {
 } from 'redux-persist';
 import auReducer from './auReducer';
 import navigationReducer from './navigationReducer';
-import { ctfReducer } from '@rapid-cmi5/ui/branded';
+import { ctfReducer } from '@rapid-cmi5/ui';
 
 //Config for persisting redux
 //Referenced guide here

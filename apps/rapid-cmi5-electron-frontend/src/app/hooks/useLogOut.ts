@@ -1,7 +1,8 @@
 import { AppDispatch } from '@rapid-cmi5/react-editor';
 import { useNavigate } from 'react-router';
 import { useDispatch } from 'react-redux';
-import { resetPersistance, setIsLoggingOut } from '@rapid-cmi5/ui/branded';
+import { resetPersistance } from '@rapid-cmi5/ui';
+import { setIsLoggingOut } from '@rapid-cmi5/keycloak';
 /**
  * Hook resets persisted data and logs user out of keycloak
  */

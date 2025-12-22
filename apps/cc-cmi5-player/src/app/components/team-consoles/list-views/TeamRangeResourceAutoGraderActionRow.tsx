@@ -1,7 +1,7 @@
 import {
   AutoGraderMetadata,
   DeployedAutoGrader,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 
@@ -20,7 +20,7 @@ import {
   actionRowHeaderColor,
   listStyles,
   OverflowTypography,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 
 type Props = {
   counter: number;

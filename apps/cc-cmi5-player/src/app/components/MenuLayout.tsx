@@ -19,15 +19,15 @@ import { classIdSel, studentIdSel } from '../redux/auReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { cmi5Instance } from '../session/cmi5';
 import { classChangeModalId } from './CourseModals';
-import { dividerColor, setModal } from '@rapid-cmi5/ui/branded';
+import { dividerColor, setModal } from '@rapid-cmi5/ui';
 import RC5Player from './player/RC5Player';
 import { AuManagerContext } from '../session/AuManager';
 import Slide from './Slide';
 import ScenarioWrapper from './scenario/ScenarioWrapper';
-import { config } from '@rapid-cmi5/ui/branded';
+import { config } from '@rapid-cmi5/ui';
 import { TeamScenarioContextProvider } from './team-consoles/TeamScenarioContext';
 import { useCMI5Session } from '../hooks/useCMI5Session';
-import { ButtonInfoField, ButtonMainUi, ButtonInfoFormHeaderLayout } from '@rapid-cmi5/ui/branded';
+import { ButtonInfoField, ButtonMainUi, ButtonInfoFormHeaderLayout } from '@rapid-cmi5/ui';
 
 /**
  * The main slide content.

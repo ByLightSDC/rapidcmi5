@@ -8,8 +8,8 @@ import {
   DeployedPackageDetail,
   DeployedRangeConsole,
   DeployedScenario,
-} from '@rapid-cmi5/ui/branded';
-import { Topic } from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
+import { Topic } from '@rapid-cmi5/ui';
 import ContainerUpdates from './graph/ContainerUpdates';
 import ConsoleUpdates from './graph/ConsoleUpdates';
 import ScenarioUpdates from './graph/ScenarioUpdates';

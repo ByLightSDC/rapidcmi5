@@ -1,4 +1,5 @@
-import { config, KeycloakUi } from '@rapid-cmi5/ui/branded';
+import { KeycloakUi } from '@rapid-cmi5/keycloak';
+import { config } from '@rapid-cmi5/ui';
 
 export interface AuthProps {
   children?: JSX.Element;

@@ -7,8 +7,8 @@ import {
   graphqlConsoleFields,
   useSubscription,
   Topic,
-} from '@rapid-cmi5/ui/branded';
-import { DeployedRangeConsole } from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
+import { DeployedRangeConsole } from '@rapid-cmi5/ui';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
 
 /**

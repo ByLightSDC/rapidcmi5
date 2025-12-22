@@ -14,7 +14,7 @@ import {
   RC5ActivityTypeEnum,
   ActivityCacheGetState,
   ActivityCacheSetState,
-} from '@rapid-cmi5/cmi5-build/common';
+} from '@rapid-cmi5/cmi5-build-common';
 import { SlideActivityType } from '../../../../types/SlideActivityStatusState';
 import {
   AuCTF,
@@ -27,9 +27,9 @@ import {
   debugLog,
   getActivityCache$,
   setActivityCache$,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 
-import { QuizContent } from '@rapid-cmi5/cmi5-build/common';
+import { QuizContent } from '@rapid-cmi5/cmi5-build-common';
 import ScenarioConsoles from '../../../scenario/ScenarioConsoles';
 import TeamScenarioExercise from '../../../team-consoles/TeamScenarioExercise';
 import { useSelector } from 'react-redux';

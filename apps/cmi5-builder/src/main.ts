@@ -19,7 +19,7 @@ import {
   QuizContent,
   SlideType,
   SlideTypeEnum,
-} from '@rapid-cmi5/cmi5-build/common';
+} from '@rapid-cmi5/cmi5-build-common';
 
 import YAML from 'yaml';
 import 'dotenv/config';
@@ -31,7 +31,7 @@ import {
   FolderStruct,
   generateCourseJson,
   RC5_VERSION,
-} from '@rapid-cmi5/cmi5-build/common';
+} from '@rapid-cmi5/cmi5-build-common';
 import {
   generateCourseDist,
   generateCmi5Xml,

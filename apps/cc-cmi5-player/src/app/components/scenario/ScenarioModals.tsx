@@ -1,13 +1,13 @@
 import { useSelector } from 'react-redux';
-import { modal } from '@rapid-cmi5/ui/branded';
+import { modal } from '@rapid-cmi5/ui';
 
 /* API */
 import {
   useDeleteRangeResourceScenario,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 
 /* Branded */
-import { CrudModals } from '@rapid-cmi5/ui/branded';
+import { CrudModals } from '@rapid-cmi5/ui';
 
 /* Constants */
 import { deleteModalId } from './constants';

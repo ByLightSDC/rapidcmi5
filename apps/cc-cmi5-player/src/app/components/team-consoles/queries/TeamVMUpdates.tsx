@@ -4,7 +4,7 @@ import {
   useGetRangeResourceVmsGraph,
   useQueryDetails,
   Topic,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 import { useState } from 'react';
 import VMSubscription from '../subscriptions/VMSubscription';
 

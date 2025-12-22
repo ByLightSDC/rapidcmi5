@@ -7,11 +7,11 @@ import { useSelector } from 'react-redux';
 import {
   appHeaderVisible,
   themeColor,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 import { useLogOut } from '../hooks/useLogOut';
 
 /* Branded */
-import { AppLogo, AppHeaderDashboardMenu } from '@rapid-cmi5/ui/branded';
+import { AppLogo, AppHeaderDashboardMenu } from '@rapid-cmi5/ui';
 
 /* MUI */
 import Box from '@mui/material/Box';

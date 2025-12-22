@@ -7,8 +7,8 @@ import {
   graphqlVmFields,
   useSubscription,
   Topic,
-} from '@rapid-cmi5/ui/branded';
-import { RangeVM } from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
+import { RangeVM } from '@rapid-cmi5/ui';
 
 /**
  * Queries graph for vm updates

@@ -15,18 +15,18 @@ import {
   infiniteRecordLimit,
   queryHooksConfig,
   Topic,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 import {
   DeployedRangeConsole,
   DevopsApiClient,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 
 import {
   ConsoleProvider,
   ConsolesDisplay,
   debugLog,
   submitScore$,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 import { routeDelim } from '../scenario/ScenarioConsoleTab';
 import { sendScenarioEventVerb } from '../../utils/LmsStatementManager';
 import { debugLogError, logger } from '../../debug';
@@ -35,7 +35,7 @@ import {
   RC5ActivityTypeEnum,
   ScenarioSubmitResponse,
   TeamConsolesContent,
-} from '@rapid-cmi5/cmi5-build/common';
+} from '@rapid-cmi5/cmi5-build-common';
 import { useCellValue } from '@mdxeditor/editor';
 import { AuManagerContext } from '../../session/AuManager';
 

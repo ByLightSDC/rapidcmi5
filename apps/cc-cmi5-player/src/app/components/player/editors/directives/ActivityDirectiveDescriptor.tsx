@@ -1,5 +1,5 @@
 import { DirectiveDescriptor } from '@mdxeditor/editor';
-import { ActivityType } from '@rapid-cmi5/cmi5-build/common';
+import { ActivityType } from '@rapid-cmi5/cmi5-build-common';
 import { ActivityPlayback } from './ActivityPlayback';
 
 /**

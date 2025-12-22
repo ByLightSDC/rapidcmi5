@@ -1,6 +1,6 @@
 /* Handlers for /vmImages endpoints */
 import { http, HttpResponse } from 'msw';
-import { config } from '@rapid-cmi5/ui/branded';
+import { config } from '@rapid-cmi5/ui';
 
 const list = [
   {

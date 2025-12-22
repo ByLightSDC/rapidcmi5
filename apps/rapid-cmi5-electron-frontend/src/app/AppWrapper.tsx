@@ -2,12 +2,12 @@
 import { QueryClient, QueryClientProvider } from 'react-query';
 import App from './app';
 import { Provider } from 'react-redux';
-import { store, persistor} from '@rapid-cmi5/react-editor';
 import { StrictMode } from 'react';
 import { PersistGate } from 'redux-persist/integration/react';
 
 import AppUrlParams from './AppUrlParams';
 import Auth from './Auth';
+import { persistor, store } from './redux/store';
 
 export default function AppWrapper() {
   const queryClient = new QueryClient();

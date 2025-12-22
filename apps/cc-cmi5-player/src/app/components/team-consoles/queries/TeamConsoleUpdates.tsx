@@ -5,7 +5,7 @@ import {
   useGetRangeResourceConsolesGraph,
   useQueryDetails,
   Topic,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 import { useState } from 'react';
 import ConsoleSubscription from '../subscriptions/ConsoleSubscription';
 

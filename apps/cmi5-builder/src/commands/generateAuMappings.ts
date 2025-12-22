@@ -1,4 +1,4 @@
-import { CourseData } from '@rapid-cmi5/cmi5-build/common';
+import { CourseData } from '@rapid-cmi5/cmi5-build-common';
 import { generateAuId, generateBlockId } from '@rapid-cmi5/cmi5-build/backend';
 
 type TfDict = {

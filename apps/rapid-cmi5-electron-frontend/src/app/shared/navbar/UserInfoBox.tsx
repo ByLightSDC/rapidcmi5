@@ -1,14 +1,14 @@
 import { AppDispatch } from '@rapid-cmi5/react-editor';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { modal, setModal, themeColor, setTheme, resetPersistance } from '@rapid-cmi5/ui/branded';
+import { modal, setModal, themeColor, setTheme, resetPersistance } from '@rapid-cmi5/ui';
 
 import { useLogOut } from '../../hooks/useLogOut';
 
 /* Branded */
 import {
   ModalDialog,
-} from '@rapid-cmi5/ui/branded';
+} from '@rapid-cmi5/ui';
 
 /*Material*/
 import Menu from '@mui/material/Menu';
