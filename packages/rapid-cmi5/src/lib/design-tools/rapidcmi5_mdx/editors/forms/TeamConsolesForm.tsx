@@ -9,7 +9,9 @@ import {
   REQUIRED_ENTRY,
   UUID_GROUP,
 } from '@rapid-cmi5/ui';
-import { Alert, Grid, MenuItem, Typography } from '@mui/material';
+import { Alert, MenuItem, Typography } from '@mui/material';
+import Grid from '@mui/material/Grid2';
+
 import * as yup from 'yup';
 import {
   moveOnCriteriaOptions,
@@ -19,6 +21,8 @@ import { FormCrudType } from '@rapid-cmi5/ui';
 
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import LrsHeaderWithDetails from './LrsStatementHelper';
+import { useContext } from 'react';
+import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 
 export const TeamConsolesForm = ({
   crudType,
@@ -32,6 +36,8 @@ export const TeamConsolesForm = ({
   handleCloseModal?: () => void;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
+  const { GetScenariosForm } = useContext(GitContext);
+
   const validationSchema = yup.object().shape({
     uuid: UUID_GROUP,
     name: NAME_GROUP_OPT,
@@ -66,70 +72,78 @@ export const TeamConsolesForm = ({
      * @param {string} topicId
      * @param {any} item New value of field
      */
-    const onApplyScenario = (topicId: string, item: any) => {
-      setValue('uuid', item.meta.uuid, { shouldDirty: true });
-      setValue('name', item.meta.name, { shouldDirty: true });
+    const onApplyScenario = (item: any) => {
+      setValue('uuid', item.uuid, { shouldDirty: true });
+      setValue('name', item.name, { shouldDirty: true });
       trigger('uuid');
     };
 
     return (
       <>
-        <Grid item xs={11}>
+        <Grid size={11}>
           <Typography variant="body2">
             This activity will present participants with console access to a
             deployed scenario. Instructor MUST deploy the scenario manually.
           </Typography>
         </Grid>
-        <Grid item xs={11}>
+        <Grid size={11}>
           <Alert severity="warning">
             This activity requires SSO authentication and cannot be used in
             conjunction with an Individual Training Scenario which is
             authenticated via Basic Auth.
           </Alert>
         </Grid>
-        <Grid item xs={7.5}>
-          <FormControlTextField
-            control={control}
-            name={'name'}
-            required
-            label="Scenario Name"
-            error={Boolean(errors?.name)}
-            helperText={errors?.name?.message}
-            readOnly={crudType === FormCrudType.view}
-          />
-        </Grid>
-        <Grid item xs={7.5}>
-          <FormControlTextField
-            control={control}
-            name={'uuid'}
-            required
-            label="Scenario UUID"
-            error={Boolean(errors?.uuid)}
-            helperText={errors?.uuid?.message}
-            readOnly={crudType === FormCrudType.view}
-          />
-        </Grid>
-        <Grid item xs={4.5}>
-          <FormControlSelectField
-            control={control}
-            name={'moveOnCriteria'}
-            required
-            label="Move On Criteria"
-            error={Boolean(errors?.moveOnCriteria)}
-            helperText={errors?.moveOnCriteria?.message}
-            readOnly={crudType === FormCrudType.view}
-          >
-            {moveOnCriteriaOptions.map((item) => (
-              <MenuItem key={item} value={item}>
-                {item}
-              </MenuItem>
-            ))}
-          </FormControlSelectField>
-        </Grid>
-        {/* <Grid item xs={11.5}>
+        {GetScenariosForm ? (
+          <Grid size={7.5}>
+            <GetScenariosForm submitForm={onApplyScenario} />
+          </Grid>
+        ) : (
+          <>
+            <Grid size={7.5}>
+              <FormControlTextField
+                control={control}
+                name={'name'}
+                required
+                label="Scenario Name"
+                error={Boolean(errors?.name)}
+                helperText={errors?.name?.message}
+                readOnly={crudType === FormCrudType.view}
+              />
+            </Grid>
+            <Grid size={7.5}>
+              <FormControlTextField
+                control={control}
+                name={'uuid'}
+                required
+                label="Scenario UUID"
+                error={Boolean(errors?.uuid)}
+                helperText={errors?.uuid?.message}
+                readOnly={crudType === FormCrudType.view}
+              />
+            </Grid>
+            <Grid size={4.5}>
+              <FormControlSelectField
+                control={control}
+                name={'moveOnCriteria'}
+                required
+                label="Move On Criteria"
+                error={Boolean(errors?.moveOnCriteria)}
+                helperText={errors?.moveOnCriteria?.message}
+                readOnly={crudType === FormCrudType.view}
+              >
+                {moveOnCriteriaOptions.map((item) => (
+                  <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </FormControlSelectField>
+            </Grid>
+          </>
+        )}
+        {/* <Grid size={11.5}>
           <KSATsFieldGroup formMethods={formMethods} crudType={crudType} />
         </Grid> */}
-        <Grid item xs={11}>
+        <Grid size={11}>
           <LrsHeaderWithDetails activityType={RC5ActivityTypeEnum.consoles} />
         </Grid>
       </>

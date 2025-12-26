@@ -209,7 +209,7 @@ jest.mock('@mdxeditor/gurx', () => ({
 }));
 
 jest.mock(
-  '../../../../../libs/ui/components/branded/src/lib/cmi5/mdx/state/vars',
+  '../../../../../packages/ui/src/lib/cmi5/mdx/state/vars',
   () => ({
     editorInPlayback$: false,
     setProgress$: () => jest.fn(),

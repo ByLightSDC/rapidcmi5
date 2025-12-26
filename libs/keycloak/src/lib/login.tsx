@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
 import { useDispatch, useSelector } from 'react-redux';
 import { config, ModalDialog } from '@rapid-cmi5/ui';
@@ -17,7 +17,7 @@ import {
 
 export interface LoginProps {
   scope: string;
-  children: JSX.Element;
+  children: ReactNode;
 }
 
 export function Login(props: LoginProps) {

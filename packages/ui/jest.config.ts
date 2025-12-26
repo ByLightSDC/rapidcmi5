@@ -12,6 +12,6 @@ export default {
     'node_modules/(?!@mdxeditor)*',
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/ui/components/branded',
+  coverageDirectory: '../../../coverage/packages/ui/',
   setupFiles: ['./src/setupTests.js'],
 };

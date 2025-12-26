@@ -2,7 +2,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
-import { config} from '@rapid-cmi5/ui';
+import { config } from '@rapid-cmi5/ui';
 import type { ScenarioFormProps } from '@rapid-cmi5/react-editor';
 
 export interface Scenario {
@@ -37,7 +37,6 @@ import {
   Box,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { authToken } from '@rapid-cmi5/keycloak';
 
 interface ApiResponse {
   offset: number;
@@ -51,12 +50,10 @@ interface ScenarioFormData {
   selectedScenarioId: string;
 }
 
-export function MyScenariosForm({ submitForm }: ScenarioFormProps) {
+export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
   const [open, setOpen] = useState(false);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  const token = useSelector(authToken);
 
   const {
     control,

@@ -23,10 +23,47 @@ import { darkTheme } from './styles/muiThemeDark';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
-import { buildCmi5ZipParams, RapidCmi5 } from '@rapid-cmi5/react-editor';
+import {
+  buildCmi5ZipParams,
+  GetScenarioFormProps,
+  RapidCmi5,
+} from '@rapid-cmi5/react-editor';
 import { MyScenariosForm } from './ScenarioSelection';
 import { authToken, isAuthenticated } from '@rapid-cmi5/keycloak';
-export default function App() {
+
+function RapidCmi5WithAuth({
+  isAuthenticated,
+  token,
+}: {
+  isAuthenticated: boolean;
+  token: string | undefined;
+}) {
+  console.log(isAuthenticated, token);
+  if (!token) return null;
+  return (
+    <RapidCmi5
+      authToken={token}
+      buildCmi5Zip={async (params: buildCmi5ZipParams) => {
+        return await DevopsApiClient.cmi5BuildBuild(
+          params.zipBlob,
+          params.zipName,
+          params.createAuMappings,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            responseType: 'blob',
+          },
+        );
+      }}
+      GetScenariosForm={(props: GetScenarioFormProps) => (
+        <MyScenariosForm token={token} submitForm={props.submitForm} />
+      )}
+    />
+  );
+}
+
+export default function App({ authEnabled }: { authEnabled: boolean }) {
   const dispatch = useDispatch();
   const theme = useSelector(themeColor);
 
@@ -72,35 +109,24 @@ export default function App() {
                   <TimePickerProvider>
                     <AppHeader />
 
-                    {isAuthenticatedSel && (
-                      <main
-                        id="app-routes"
-                        style={{
-                          display: 'flex',
-                          width: '100%',
-                          height: '100%',
-                          overflow: 'hidden',
-                        }}
-                      >
-                        <RapidCmi5
-                          authToken={token}
-                          buildCmi5Zip={async (params: buildCmi5ZipParams) => {
-                            return await DevopsApiClient.cmi5BuildBuild(
-                              params.zipBlob,
-                              params.zipName,
-                              params.createAuMappings,
-                              {
-                                headers: {
-                                  Authorization: `Bearer ${token}`,
-                                },
-                                responseType: 'blob',
-                              },
-                            );
-                          }}
-                          GetScenariosForm={MyScenariosForm}
+                    <main
+                      id="app-routes"
+                      style={{
+                        display: 'flex',
+                        width: '100%',
+                        height: '100%',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      {authEnabled ? (
+                        <RapidCmi5WithAuth
+                          isAuthenticated={isAuthenticatedSel}
+                          token={token}
                         />
-                      </main>
-                    )}
+                      ) : (
+                        <RapidCmi5 />
+                      )}
+                    </main>
                   </TimePickerProvider>
                 </SizingContextProvider>
               </Paper>

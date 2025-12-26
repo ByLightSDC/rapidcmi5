@@ -11,6 +11,7 @@ import {
 } from './reducer';
 
 import { Login } from './login';
+import { ReactNode } from 'react';
 
 /* eslint-disable-next-line */
 export interface KeycloakUiProps {
@@ -18,7 +19,7 @@ export interface KeycloakUiProps {
   realm: string;
   clientId: string;
   scope: string;
-  children?: JSX.Element;
+  children?: ReactNode;
 }
 
 export function KeycloakUi(props: KeycloakUiProps) {
@@ -68,6 +69,7 @@ export function KeycloakUi(props: KeycloakUiProps) {
   // this handles both the initial token and the automatic refreshes
   const onKeycloakTokensUpdate = (tokens: any) => {
   
+    console.log("got tokens", tokens)
     if (typeof tokens?.idToken === 'undefined') {
       dispatch(
         setAuthRefreshError({

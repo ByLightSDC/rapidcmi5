@@ -1,4 +1,3 @@
-import React from 'react';
 import KeycloakUi from './ui-keycloak';
 import { config } from '@rapid-cmi5/ui';
 

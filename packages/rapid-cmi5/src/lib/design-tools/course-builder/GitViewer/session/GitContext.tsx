@@ -73,7 +73,7 @@ import {
   createUniquePath,
   slugifyPath,
 } from '../utils/useCourseOperationsUtils';
-import { RapidCmi5Opts, ScenarioFormProps } from '../../../rapidcmi5_mdx/main';
+import { GetScenarioFormProps, RapidCmi5Opts, ScenarioFormProps } from '../../../rapidcmi5_mdx/main';
 
 interface IGitContext {
   currentCourse?: Course | null;
@@ -92,7 +92,7 @@ interface IGitContext {
   isRepoConnectedToRemote: boolean;
   currentGitConfig: GitConfigType;
   isElectron: boolean;
-  GetScenariosForm?: React.ComponentType<ScenarioFormProps>;
+  GetScenariosForm?: React.ComponentType<GetScenarioFormProps>;
   handleChangeRepo: (name: string) => void;
   handleChangeFileSystem: (fsType: fsType) => void;
   handleChangeRepoName: (name: string) => void;
