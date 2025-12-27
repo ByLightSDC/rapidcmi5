@@ -31,7 +31,7 @@ import React, {
   useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { appHeaderVisible, themeColor } from '@rapid-cmi5/ui';
+import { AnimationConfig, animationDirectivePlugin, appHeaderVisible, themeColor } from '@rapid-cmi5/ui';
 // import SharedFormModals from '../../../shared-modals/SharedFormModals';
 import { Box, useTheme } from '@mui/material';
 import { RC5Context } from '../contexts/RC5Context';
@@ -73,6 +73,7 @@ import { RC5LinkDialog } from '../plugins/link/RC5LinkDialog';
 import { directiveLinter } from './code/codeMirrorUtils';
 import { LayoutBoxDirectiveDescriptor } from './directives/layout-box/LayoutBoxDirectiveDescriptor';
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
+import { animationPlugin, areAnimationsEqual, injectAnimationsIntoFrontmatter } from '../plugins/animation';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -100,6 +101,82 @@ function RC5VisualEditor() {
   //WARNING NOT SURE WHY THIS WORKS-------------------------------------------------------
 
   const debouncer = useRef<NodeJS.Timeout>();
+
+  
+  // Store animations per slide (keyed by slide index)
+  const slideAnimationsRef = useRef<Map<number, AnimationConfig[]>>(new Map());
+  const [animationsVersion, setAnimationsVersion] = useState(0);
+  const initialAnimationsForSlide = useMemo(
+    () => slideAnimationsRef.current.get(currentSlideIndex) || [],
+    [currentSlideIndex, animationsVersion],
+  );
+
+  const getMarkdownCb = useCallback(() => ref.current?.getMarkdown() || '', []);
+
+  const setMarkdownCb = useCallback((markdown: string) => {
+    ref.current?.setMarkdown(markdown);
+  }, []);
+
+  const onAnimationsChangeCb = useCallback(
+    (animations: AnimationConfig[]) => {
+      debugLog('🔔 onAnimationsChange triggered');
+      const currentAnims =
+        slideAnimationsRef.current.get(currentSlideIndex) || [];
+      debugLog(`  Current animations: ${currentAnims.length} items`);
+      debugLog(`  New animations: ${animations.length} items`);
+
+      // ALWAYS update the ref (needed for save to work correctly)
+      const oldAnimations =
+        slideAnimationsRef.current.get(currentSlideIndex) || [];
+      slideAnimationsRef.current.set(currentSlideIndex, animations);
+      setAnimationsVersion((v) => v + 1);
+
+      // Check if animations actually changed (deep comparison of relevant fields)
+      const hasActuallyChanged = !areAnimationsEqual(oldAnimations, animations);
+
+      if (!hasActuallyChanged) {
+        debugLog(
+          '⏭️  Animations unchanged (same content), skipping dirty flag',
+        );
+        // Note: AnimationResolver will update indicators after key resolution
+        return; // Don't mark as dirty if nothing changed
+      }
+
+      debugLog('✅ Animations have changed, marking as dirty');
+
+      // Update editor frontmatter in real-time to reflect animation changes
+      if (ref.current) {
+        try {
+          const currentMarkdown = ref.current.getMarkdown();
+          const updatedMarkdown = injectAnimationsIntoFrontmatter(
+            currentMarkdown,
+            animations,
+          );
+
+          // Only update if the markdown actually changed (to avoid unnecessary re-renders)
+          if (currentMarkdown !== updatedMarkdown) {
+            debugLog('📝 Updating editor frontmatter with new animations');
+            ref.current.setMarkdown(updatedMarkdown);
+          }
+        } catch (error) {
+          console.error('❌ Error updating editor frontmatter:', error);
+        }
+      }
+
+      // Mark slide as dirty (enables save button)
+      debugLog('💾 Setting dirty flag: animation changed');
+      dispatch(updateDirtyDisplay({ reason: 'animation changed' }));
+
+      // Note: AnimationResolver will update indicators after key resolution
+
+      debugLog(
+        `Animations changed for slide ${currentSlideIndex}:`,
+        animations,
+      );
+    },
+    [currentSlideIndex, dispatch],
+  );
+  
   const {
     imageFilePath,
     imageUploadHandler,
@@ -209,6 +286,13 @@ function RC5VisualEditor() {
         footnoteReferenceEditorDescriptors: [FootnoteReferenceDescriptor],
       }),
       frontmatterPlugin(),
+      animationDirectivePlugin(),
+      animationPlugin({
+        initialAnimations: initialAnimationsForSlide,
+        getMarkdown: getMarkdownCb,
+        setMarkdown: setMarkdownCb,
+        onAnimationsChange: onAnimationsChangeCb,
+      }),
       imagePlugin({
         imageUploadHandler: imageUploadHandler,
         imageFilePath: imageFilePath,

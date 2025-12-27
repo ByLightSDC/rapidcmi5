@@ -1,0 +1,98 @@
+.tableEditor {
+  table-layout: fixed;
+  width: 100%;
+  height: 100%;
+  border-spacing: 0;
+  border-collapse: collapse;
+
+  & thead > tr > th {
+    text-align: right;
+  }
+
+  & > tbody > tr > td:not(.toolCell),
+  & > tbody > tr > th:not(.toolCell):not([data-tool-cell='true']) {
+    border: 1px solid var(--baseBgActive);
+    padding: var(--spacing-1) var(--spacing-2);
+    white-space: normal;
+
+    & > div {
+      outline: none;
+
+      & > p {
+        margin: 0;
+      }
+    }
+
+    &[data-active='true'] {
+      outline: solid 1px var(--baseSolid);
+    }
+  }
+
+  .tableColumnEditorTrigger,
+  .tableRowEditorTrigger,
+  .addRowButton,
+  .addColumnButton,
+  .iconButton {
+    opacity: 0.15;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      .tableColumnEditorTrigger,
+      .tableRowEditorTrigger,
+      .addRowButton,
+      .addColumnButton,
+      .iconButton {
+        opacity: 0.3;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+  }
+}
+
+
+.tableColumnEditorTrigger {
+  @mixin icon-button;
+  padding: var(--spacing-1);
+  border-radius: var(--radius-full);
+  opacity: 0.2;
+  &[data-active='true'] {
+    opacity: 1 !important;
+  }
+}
+
+.tableColumnEditorToolbar {
+  display: flex;
+  & > button {
+    @mixin icon-button;
+  }
+
+  & [role='separator'] {
+    margin-left: var(--spacing-1);
+    margin-right: var(--spacing-1);
+  }
+}
+
+.tableToolsColumn {
+  width: 2rem;
+
+  & button {
+    margin: auto;
+    display: block;
+  }
+}
+
+.leftAlignedCell {
+  text-align: left;
+}
+
+.rightAlignedCell {
+  text-align: right;
+}
+
+.centeredCell {
+  text-align: center;
+}

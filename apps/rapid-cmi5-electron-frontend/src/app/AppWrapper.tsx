@@ -1,4 +1,3 @@
-//REF import { ReactQueryDevtools } from 'react-query/devtools';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import App from './app';
 import { Provider } from 'react-redux';

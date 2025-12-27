@@ -46,10 +46,7 @@ import {
   iconButtonStyle,
   tooltipStyle,
 } from '../styles/styles';
-import {
-  CONTENT_UPDATED_COMMAND,
-  editorInPlayback$,
-} from '@rapid-cmi5/ui';
+import { CONTENT_UPDATED_COMMAND, editorInPlayback$ } from '@rapid-cmi5/ui';
 import { useSelector } from 'react-redux';
 import { dividerColor } from '@rapid-cmi5/ui';
 import { BlockTypeSelect } from './components/BlockTypeSelect';
@@ -60,6 +57,8 @@ import { ColorTextSplitButton } from './components/ColorTextSplitButton';
 import { HighlightSplitButton } from './components/HighlightSplitButton';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { InsertAudio } from './components/InsertAudio';
+import { InsertAnimation } from './components/InsertAnimation';
+import { TextFxButton } from './components/TextFxButton';
 
 //Admonition
 export type RapidAdmonitionKind =
@@ -162,6 +161,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                   <StrikeThroughSupSubToggles />
                   <ColorTextSplitButton />
                   <HighlightSplitButton />
+                  <TextFxButton />
                   <Separator />
                   <CodeToggle />
                   <ListsToggle />
@@ -207,6 +207,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                   <Separator />
                   <InsertCodeBlock />
                   <InsertLayoutBox />
+                  <InsertAnimation />
                   {/*REF <InsertSandpack />
                   <InsertFrontmatter /> */}
                   <Separator />

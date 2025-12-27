@@ -1,4 +1,6 @@
 export * from './constants/defaultData';
+export * from './constants/colors';
+
 export * from './components/DeleteIconButton';
 export * from './components/RightMenuContainer';
 export * from './components/SettingsIconButton';
@@ -28,8 +30,20 @@ export * from './plugins/footnote/methods';
 export * from './plugins/footnote/types';
 export * from './plugins/footnote/vars';
 export * from './plugins/link/util';
+export * from './plugins/animation-directive';
+export * from './editors/FxDirectiveDescriptor';
+export * from './plugins/fx/vars';
+export * from './plugins/fx/types';
 export * from './icons/Icons';
 export * from './state/vars';
 export * from './util/exportMarkdownFromLexical';
 export * from './util/importMarkdownToLexical';
+export * from './util/caret';
+export * from './plugins/table';
+export * from './plugins/table/methods';
 export * from './util/mergeStyleAttributes';
+export * from './util/mergeStyleAttributes';
+export * from './animation/engine/AnimationEngine';
+export * from './animation/types/Animation.types';
+export * from './util/mergeStyleAttributes';
+

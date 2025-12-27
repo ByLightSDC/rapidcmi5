@@ -1,7 +1,3 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable no-prototype-builtins */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { Query, useQueryClient } from 'react-query';
 
 interface LooseObject {
