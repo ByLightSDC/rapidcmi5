@@ -1,5 +1,4 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import React from 'react';
 import { ExtraProps } from 'react-markdown';
 import ReactPlayer from 'react-player';
