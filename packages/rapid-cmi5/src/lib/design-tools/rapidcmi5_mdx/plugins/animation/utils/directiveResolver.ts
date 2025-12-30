@@ -6,8 +6,7 @@
 import { $getRoot, LexicalEditor } from 'lexical';
 import { $isDirectiveNode } from '@mdxeditor/editor';
 import { debugWrap } from '../utils/debug';
-import { debugLog } from '@rapid-cmi5/ui';
-import { AnimationConfig } from '../types/Animation.types';
+import { AnimationConfig, debugLog } from '@rapid-cmi5/ui';
 
 /**
  * Find a directive node by its id attribute

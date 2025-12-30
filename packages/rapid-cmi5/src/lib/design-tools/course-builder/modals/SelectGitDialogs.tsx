@@ -459,6 +459,7 @@ export function SelectGitDialogs() {
             repoUsername: '',
             repoPassword: '',
             branch: currentBranch || '',
+            force: false,
           }}
           modalObj={modalObj}
           handleCloseModal={handleCloseModal}

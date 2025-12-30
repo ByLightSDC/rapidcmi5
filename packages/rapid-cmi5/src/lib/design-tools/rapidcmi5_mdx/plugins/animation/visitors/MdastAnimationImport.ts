@@ -1,6 +1,5 @@
 import { parse as parseYaml } from 'yaml';
-import { AnimationConfig } from '../types/Animation.types';
-import { debugLog } from '@rapid-cmi5/ui';
+import { AnimationConfig, debugLog } from '@rapid-cmi5/ui';
 
 
 /**

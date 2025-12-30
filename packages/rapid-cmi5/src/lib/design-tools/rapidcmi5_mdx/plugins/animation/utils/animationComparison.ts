@@ -1,4 +1,4 @@
-import { AnimationConfig } from "../types/Animation.types";
+import { AnimationConfig } from "@rapid-cmi5/ui";
 
 /**
  * Compare two animation arrays to see if they have meaningful changes

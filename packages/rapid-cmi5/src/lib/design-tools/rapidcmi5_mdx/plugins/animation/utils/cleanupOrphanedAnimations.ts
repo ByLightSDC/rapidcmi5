@@ -1,6 +1,5 @@
-import { debugLog } from '@rapid-cmi5/ui';
+import { AnimationConfig, debugLog } from '@rapid-cmi5/ui';
 import { LexicalEditor } from 'lexical';
-import { AnimationConfig } from '../types/Animation.types';
 
 
 /**

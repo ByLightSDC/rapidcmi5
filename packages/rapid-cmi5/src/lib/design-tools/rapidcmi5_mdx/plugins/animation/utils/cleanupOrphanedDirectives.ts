@@ -5,8 +5,7 @@
 
 import { LexicalEditor } from 'lexical';
 import { getAllDirectiveIds } from './directiveResolver';
-import { debugLog } from '@rapid-cmi5/ui';
-import { AnimationConfig } from '../types/Animation.types';
+import { AnimationConfig, debugLog } from '@rapid-cmi5/ui';
 
 
 /**

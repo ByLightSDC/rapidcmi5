@@ -28,8 +28,7 @@ import { DirectiveWrapper } from '../wrapping';
 import { addAnimationIdsToElements } from '../utils/lexicalDomBridge';
 import { debugWrap } from '../utils/debug';
 import { useLexicalSelection } from '../hooks/useLexicalSelection';
-import { debugLog } from '@rapid-cmi5/ui';
-import { AnimationTrigger, EntranceEffect } from '../types/Animation.types';
+import { AnimationTrigger, debugLog, EntranceEffect } from '@rapid-cmi5/ui';
 
 /**
  * Component to wrap selected content with an animation directive

@@ -15,8 +15,7 @@ import {
   clearAnimationIndicators,
   updateAnimationIndicators,
 } from '../utils/updateAnimationIndicators';
-import { AnimationEngine, debugLog } from '@rapid-cmi5/ui';
-import { PlaybackState } from '../types/Animation.types';
+import { AnimationEngine, debugLog, PlaybackState } from '@rapid-cmi5/ui';
 
 /**
  * Animation Preview Controls

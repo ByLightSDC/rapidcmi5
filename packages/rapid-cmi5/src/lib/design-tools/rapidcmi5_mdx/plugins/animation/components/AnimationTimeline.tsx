@@ -1,7 +1,7 @@
 import React from 'react';
 import { Stack, Typography, Box } from '@mui/material';
 import { AnimationItem } from './AnimationItem';
-import { AnimationConfig } from '../types/Animation.types';
+import { AnimationConfig } from '@rapid-cmi5/ui';
 
 interface Props {
   animations: AnimationConfig[];

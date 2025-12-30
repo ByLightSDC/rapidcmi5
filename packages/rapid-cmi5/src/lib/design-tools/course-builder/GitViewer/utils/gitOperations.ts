@@ -683,6 +683,7 @@ export class GitOperations {
     r: RepoAccessObject,
     username: string,
     password: string,
+    force: boolean,
   ): Promise<void> => {
     const dir = getRepoPath(r);
     try {
@@ -693,6 +694,7 @@ export class GitOperations {
           fs: this.gitFs.fs,
           http,
           dir,
+          force,
           onAuth: () => ({ username, password }),
         });
       }

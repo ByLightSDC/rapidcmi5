@@ -221,7 +221,7 @@ export const useGitOperations = (
   const pushRepo = useCallback(
     async (req: PushType) => {
       const r: RepoAccessObject = getRepoAccess(repoAccessObject);
-      await gitOperator.gitPush(r, req.repoUsername, req.repoPassword);
+      await gitOperator.gitPush(r, req.repoUsername, req.repoPassword, req.force);
     },
     [repoAccessObject],
   );
@@ -273,7 +273,7 @@ export const useGitOperations = (
         req.repoPassword,
         req.allowConflicts,
       );
-      // Need to show the new files created or deleted fron the pull
+      // Need to show the new files created or deleted from the pull
     } catch (error: any) {
       debugLog('Failed to pull repo', r.repoName);
       let errorMessage = pullFailMessage;

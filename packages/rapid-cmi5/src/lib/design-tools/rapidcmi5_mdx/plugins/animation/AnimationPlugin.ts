@@ -1,7 +1,6 @@
 import { realmPlugin, addComposerChild$ } from '@mdxeditor/editor';
 import { AnimationDrawer } from './components/AnimationDrawer';
 import { AnimationResolver } from './components/AnimationResolver';
-import { AnimationConfig } from './types/Animation.types';
 import {
   slideAnimations$,
   selectedAnimation$,
@@ -11,7 +10,7 @@ import {
 
 import { getMarkdownFn$, setMarkdownFn$ } from './state/animationCells';
 import { areAnimationsEqual } from './utils/animationComparison';
-import { debugLog, onAnimDirectiveClick$ } from '@rapid-cmi5/ui';
+import { AnimationConfig, debugLog, onAnimDirectiveClick$ } from '@rapid-cmi5/ui';
 export interface AnimationPluginParams {
   initialAnimations?: AnimationConfig[];
   onAnimationsChange?: (animations: AnimationConfig[]) => void;

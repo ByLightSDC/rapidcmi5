@@ -2,8 +2,6 @@
 export { animationPlugin } from './AnimationPlugin';
 export type { AnimationPluginParams } from './AnimationPlugin';
 
-// Types
-export * from './types/Animation.types';
 
 // State (for external access)
 export {
@@ -36,10 +34,6 @@ export { WrapWithAnimDirective } from './components/WrapWithAnimDirective';
 // Utilities for frontmatter handling
 export { parseAnimationsFromFrontmatter } from './visitors/MdastAnimationImport';
 export { injectAnimationsIntoFrontmatter } from './visitors/LexicalAnimationExport';
-
-// Animation engine
-export { AnimationEngine } from './engine/AnimationEngine';
-
 // Utilities
 export * from './utils/lexicalSelection';
 export {

@@ -1,5 +1,5 @@
-/* eslint-disable react/jsx-no-useless-fragment */
 import {
+  FormControlCheckboxField,
   FormControlPassword,
   FormControlTextField,
   FormControlUIProvider,
@@ -11,18 +11,16 @@ import * as yup from 'yup';
 
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
-import { Grid } from '@mui/material';
+import { Typography } from '@mui/material';
 
 import { UseFormReturn } from 'react-hook-form';
 
-import {
-  NAME_GROUP_OPT,
-} from '@rapid-cmi5/ui';
+import { NAME_GROUP_OPT } from '@rapid-cmi5/ui';
 import { PushType } from '../CourseBuilderApiTypes';
 import { useContext } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';
 import { gitPushModalId } from '../../rapidcmi5_mdx/modals/constants';
-
+import Grid from '@mui/material/Grid2';
 
 export function PushForm({
   defaultData,
@@ -65,15 +63,17 @@ export function PushForm({
    * @param {FormStateType} formState React hook form state fields (ex. errors, isValid)
    * @return {JSX.Element} Render elements
    */
-  const pullFormFields = (
+  const pushFormFields = (
     formMethods: UseFormReturn,
     formState: FormStateType,
   ): JSX.Element => {
-    const { control, getValues, setValue, trigger } = formMethods;
-    const { errors, isValid } = formState;
+    const { control, watch } = formMethods;
+    const { errors } = formState;
+    const isForceChecked = watch('force');
+
     return (
       <>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.repoUsername)}
@@ -84,7 +84,7 @@ export function PushForm({
             readOnly={false}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlPassword
             control={control}
             error={Boolean(errors?.repoPassword)}
@@ -96,7 +96,7 @@ export function PushForm({
           />
         </Grid>
 
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.branch)}
@@ -105,6 +105,25 @@ export function PushForm({
             label="Branch"
             readOnly={true}
           />
+        </Grid>
+
+        <Grid size={12}>
+          <FormControlCheckboxField
+            control={control}
+            name="force"
+            error={errors?.force}
+            label="Force push"
+          />
+          {isForceChecked && (
+            <Typography
+              variant="body2"
+              color="warning.main"
+              sx={{ mt: 1, ml: 4 }}
+            >
+              ⚠️ Warning: Force push will overwrite remote history. This cannot
+              be undone and may affect other collaborators.
+            </Typography>
+          )}
         </Grid>
       </>
     );
@@ -124,7 +143,7 @@ export function PushForm({
           dataCache={defaultData}
           doAction={handlePushRepo}
           formTitle="Push Git Repo"
-          getFormFields={pullFormFields}
+          getFormFields={pushFormFields}
           instructions=""
           submitButtonText="Push"
           successToasterMessage="Pushed Successfully"

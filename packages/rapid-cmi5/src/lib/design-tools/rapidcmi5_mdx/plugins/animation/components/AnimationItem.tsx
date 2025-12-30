@@ -23,8 +23,7 @@ import {
 import { activeEditor$ } from '@mdxeditor/editor';
 import { debugWrap } from '../utils/debug';
 import { DirectiveWrapper } from '../wrapping';
-import { AnimationConfig, AnimationTrigger, EntranceEffect, ExitEffect } from '../types/Animation.types';
-import { SelectorMainUi } from '@rapid-cmi5/ui';
+import { AnimationConfig, AnimationTrigger, EntranceEffect, ExitEffect, SelectorMainUi } from '@rapid-cmi5/ui';
 
 interface Props {
   animation: AnimationConfig;

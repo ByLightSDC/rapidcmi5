@@ -71,6 +71,7 @@ export type PushType = {
   branch?: string;
   repoUsername: string;
   repoPassword: string;
+  force: boolean;
 };
 
 export type CreateCourseType = {

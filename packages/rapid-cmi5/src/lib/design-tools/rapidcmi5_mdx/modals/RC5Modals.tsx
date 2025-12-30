@@ -10,10 +10,7 @@ import {
   saveCourseFileModalId,
   warningModalId,
 } from './constants';
-import {
-  defaultCommitData,
-  ModalDialog,
-} from '@rapid-cmi5/ui';
+import { defaultCommitData, ModalDialog } from '@rapid-cmi5/ui';
 import { RC5Context } from '../contexts/RC5Context';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { Alert, Box, TextField, Typography } from '@mui/material';
@@ -198,6 +195,7 @@ export default function RC5Modals() {
         repoUsername: superSaveDataCache?.push.repoUsername || '',
         repoPassword: superSaveDataCache?.push.repoPassword || '',
         branch: currentBranch || 'main',
+        force: false,
       },
       shouldAutoCommit: superSaveDataCache
         ? superSaveDataCache.shouldAutoCommit

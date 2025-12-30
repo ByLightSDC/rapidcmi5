@@ -1,6 +1,5 @@
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
-import { AnimationConfig } from '../types/Animation.types';
-import { debugLog } from '@rapid-cmi5/ui';
+import { AnimationConfig, debugLog } from '@rapid-cmi5/ui';
 
 /**
  * Inject animations into markdown frontmatter
