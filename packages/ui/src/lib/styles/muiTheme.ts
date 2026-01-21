@@ -1,4 +1,5 @@
-import { createTheme } from "@mui/system";
+//@ts-nocheck
+import { createTheme } from '@mui/material/styles';
 
 export const primaryDateStyle = 'MM/dd/yyyy';
 export const primaryTimeStyle = 'H:mm';
@@ -13,7 +14,7 @@ const tooltipPadding = '4px 16px';
 const mainColor = '#3C59A2'; //icons, button fills
 const hoverMainColor = '#8AA6D0'; //button hover
 
-export const brandedTheme = createTheme({
+export const lightTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
@@ -32,11 +33,62 @@ export const brandedTheme = createTheme({
       primary: 'rgba(0, 0, 0, 0.9)', //unusable
       secondary: '#323232D9',
       disabled: 'rgba(0, 0, 0, .6)',
+      hint: '#656565',
+      interactable: '#212121',
     },
     background: {
       paper: '#F8F8F8',
       default: '#EEEEEE',
     },
+  },
+  accordion: {
+    borderBottom: `1px solid #D4D5DB`,
+    backgroundColor: '#EEEEEE',
+    borderColor: '#D4D5DB',
+    titleBackgroundColor: '#EEEEEE',
+  },
+  button: {
+    disabledBackgroundColor: '#7f8cb9',
+    disabledColor: '#C1C9DB',
+    minorBackgroundColor: '#3C59A2',
+  },
+  breadcrumbs: {
+    default: '#202020',
+    underline: mainColor, //interactive
+    hoverColor: '#133c67', //TODO
+    hoverBackground: 'A6A6A6',
+  },
+  card: {
+    default: 'linear-gradient(180deg, #3E5BA5 0%, #2E4C94 100%)',
+    defaultHover: 'linear-gradient(180deg, #8AA6D0 0%, #8AA6D0 100%)',
+    borderColor: '#8AA6D0',
+    titleColor: '#FFFFFF',
+    formInstructionsColor: '#E5F6FDBF',
+  },
+  header: {
+    border: '#ffffffc3', //active se
+    buttonColor: '#C5C5C5',
+    selColor: '#a4c9eb', //'#a4b8eb',
+    default: '#282b30',
+    light: '#071285B2', // loading bar color
+    dark: '#f1f3f9',
+    hoverColor: '#ffffff',
+    title: '#3C59A2',
+    underline: 'LightGrey', //divider OR parting line
+  },
+  input: {
+    outlineColor: '#CBCBCB',
+    fill: '#F5F6F9',
+    disabledFill: '#CBCBCB00',
+    disabledOutlineColor: '#CBCBCB4D', //before making outline color match fill '#88888860',
+  },
+  nav: {
+    fill: '',
+    fillSelected: 'red',
+    icon: '#071285d0', // overriden
+    iconSelected: '#071285',
+    border: '#071285',
+    borderSelected: '#071285',
   },
   typography: {
     fontFamily: [

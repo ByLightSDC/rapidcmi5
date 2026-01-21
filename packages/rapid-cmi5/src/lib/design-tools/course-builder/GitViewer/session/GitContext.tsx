@@ -26,7 +26,12 @@ import {
 } from '../../CourseBuilderApiTypes';
 
 import { ViewModeEnum } from '../../CourseBuilderTypes';
-import { debugLog, debugLogError, defaultCourseData } from '@rapid-cmi5/ui';
+import {
+  debugLog,
+  debugLogError,
+  defaultCourseData,
+  hasModal,
+} from '@rapid-cmi5/ui';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import { ReadCommitResult } from 'isomorphic-git';
 import { sandboxIntro } from '../../../rapidcmi5_mdx/constants/sandboxIntro';
@@ -38,7 +43,7 @@ import { usePublishActions } from './usePublishActions';
 import { useImageCache } from './useImageCache';
 import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 import { INode } from 'react-accessible-treeview';
-import { FileContent, getRepoPath, GitFS } from '../utils/fileSystem';
+import { DirMeta, FileContent, getRepoPath, GitFS } from '../utils/fileSystem';
 import { GitOperations } from '../utils/gitOperations';
 import JSZip from 'jszip';
 import { FolderStruct } from '@rapid-cmi5/cmi5-build-common';
@@ -63,8 +68,9 @@ import {
   addRepo,
   setCurrentBranch,
   setAllBranches,
-  setAvailableRepos,
   Course,
+  setLoadingState,
+  LoadingState,
 } from '../../../../redux/repoManagerReducer';
 import { AppDispatch, RootState } from '../../../../redux/store';
 import { getFsInstance } from '../utils/gitFsInstance';
@@ -73,7 +79,10 @@ import {
   createUniquePath,
   slugifyPath,
 } from '../utils/useCourseOperationsUtils';
-import { GetScenarioFormProps, RapidCmi5Opts, ScenarioFormProps } from '../../../rapidcmi5_mdx/main';
+import {
+  GetScenarioFormProps,
+  RapidCmi5Opts,
+} from '../../../rapidcmi5_mdx/main';
 
 interface IGitContext {
   currentCourse?: Course | null;
@@ -122,15 +131,14 @@ interface IGitContext {
   handlePull: (req: PullType) => Promise<void>;
   handleDownloadCmi5Zip: (req: DownloadCmi5Type) => void;
   syncCurrentCourseWithGit: (courseData: CourseData) => Promise<string[]>;
-  handleAutoSelectCourse: () => void;
-  handleCloneRepo: (req: CreateCloneType) => void;
+  handleCloneRepo: (req: CreateCloneType) => Promise<void>;
   handleDeleteCurrentRepo: () => Promise<void>;
   handleDeleteCourse: (courseName: string) => void;
   handleCommit: (req: CreateCommitType) => Promise<void>;
   handleCheckoutBranch: (branch: string) => Promise<void>;
   handleResolveMerge: () => Promise<void>;
   handleGitSetConfig: (req: GitConfigType) => void;
-  handleCreateCourse: (req: CreateCourseType) => void;
+  handleCreateCourse: (req: CreateCourseType) => Promise<void>;
   handleStageFile: (filepath: string) => Promise<void>;
   handleUnStageFile: (filepath: string) => void;
   handleGetUniqueFilePath: (
@@ -181,7 +189,15 @@ interface IGitContext {
   directoryTree: INode<IFlatMetadata>[];
   handleRenameCourse: (newCourseName: string) => void;
   handleImportRepoZip: (req: ImportRepoZipType) => void;
-  handleCreateLocalCourse: (req: CreateLocalRepoType) => void;
+  handleCreateLocalCourse: (req: CreateLocalRepoType) => Promise<void>;
+  openLocalFolder: (cloneForm: () => Promise<CreateCloneType>) => Promise<void>;
+  createNewRepo: (
+    cloneForm: () => Promise<CreateLocalRepoType>,
+  ) => Promise<void>;
+  openSandbox: () => Promise<void>;
+  getLocalFolders: () => Promise<DirMeta[]>;
+  openLocalRepo: (id?: string) => Promise<void>;
+  getDirHandle: () => Promise<FileSystemDirectoryHandle | null>;
 }
 
 interface tProviderProps {
@@ -224,7 +240,7 @@ const defaultGitContext: IGitContext = {
   handleChangeFileSystem: () => {},
   handleChangeRepoName: () => {},
   handleGitSetConfig: () => {},
-  handleCloneRepo: () => {},
+  handleCloneRepo: async (): Promise<void> => {},
   handleCommit: async () => {},
   handleResolveMerge: async () => {},
   handleLoadCourse: () => {},
@@ -281,8 +297,7 @@ const defaultGitContext: IGitContext = {
   handleRevertFile: () => {},
   handleRemoveFile: () => {},
   syncCurrentCourseWithGit: async () => [],
-  handleAutoSelectCourse: () => {},
-  handleCreateCourse: () => {},
+  handleCreateCourse: async () => {},
   getLocalFileBlob: async () => null,
   getLocalFileBlobUrl: async () => null,
   handlePushRepo: async () => {},
@@ -293,8 +308,18 @@ const defaultGitContext: IGitContext = {
   directoryTree: [],
   handleRenameCourse: () => {},
   handleImportRepoZip: () => {},
-  handleCreateLocalCourse: () => {},
+  handleCreateLocalCourse: async () => {},
   numStaged: 0,
+  openLocalFolder: async (
+    cloneForm: () => Promise<CreateCloneType>,
+  ): Promise<void> => {},
+  createNewRepo: async (
+    cloneForm: () => Promise<CreateLocalRepoType>,
+  ): Promise<void> => {},
+  getLocalFolders: async (): Promise<DirMeta[]> => [],
+  openSandbox: async (): Promise<void> => {},
+  openLocalRepo: async (): Promise<void> => {},
+  getDirHandle: async (): Promise<FileSystemDirectoryHandle | null> => null,
 };
 
 export const GitContext = createContext<IGitContext>(defaultGitContext);
@@ -395,7 +420,7 @@ export const GitContextProvider = (props: tProviderProps) => {
   const courseOperationsSet = useSelector(courseOperations);
 
   const {
-    handleLoadCourse,
+    loadCourse,
     handleAutoSelectCourse,
     getCourseData,
     createCourse,
@@ -434,32 +459,34 @@ export const GitContextProvider = (props: tProviderProps) => {
   } = useGitOperations(gitFs, repoAccessObject);
 
   const handleNavToDesigner = async () => {
+    const r = getRepoAccess(repoAccessObject);
+    await navToDesigner(r);
+  };
+
+  const navToDesigner = async (r: RepoAccessObject) => {
     let courseDataToUse = defaultCourseData;
 
-    const r = getRepoAccess(repoAccessObject);
-
-    if (fileState.selectedCourse) {
-      const courseData = await getCourseData(
-        r,
-        fileState.selectedCourse.basePath,
-      );
-
+    if (currentCourse) {
+      await loadCourse(currentCourse.basePath, r);
+      const courseData = await getCourseData(r, currentCourse.basePath);
       if (courseData) {
         courseDataToUse = courseData;
       }
     } else {
       const firstCourse = await getFirstCoursePath(r);
       if (firstCourse) {
-        await handleLoadCourse(firstCourse.basePath);
+        await loadCourse(firstCourse.basePath, r);
         const courseData = await getCourseData(r, firstCourse.basePath);
         if (courseData) {
           courseDataToUse = courseData;
         }
       }
     }
+
     dispatch(recalculateFileTree(r));
     dispatch(updateCourseData(courseDataToUse));
     dispatch(setIsLessonMounted(false));
+    dispatch(changeViewMode(ViewModeEnum.Designer));
   };
 
   const handleDeleteCurrentRepo = async () => {
@@ -468,10 +495,12 @@ export const GitContextProvider = (props: tProviderProps) => {
     setIsGitLoaded(false);
     await deleteRepo(r);
     await resetRepoStatus();
+    dispatch(changeViewMode(ViewModeEnum.RepoSelector));
   };
 
   const handleNavToGitView = async () => {
-    await resolvePushStatus();
+    const r = getRepoAccess(repoAccessObject);
+    await resolvePushStatus(r);
   };
 
   const handleStageAll = useCallback(
@@ -486,15 +515,17 @@ export const GitContextProvider = (props: tProviderProps) => {
         : await gitOperator.gitRepoStatus(r, changedFiles);
 
       const afterStage = await stageFiles(filesForStaging);
-      await resolveGitRepoStatus(afterStage);
+      await resolveGitRepoStatus(r, afterStage);
       setCanCommit(true);
     },
     [modifiedFiles, resolveGitRepoStatus, stageFiles],
   );
 
   const handleUnstageAll = async () => {
+    const r = getRepoAccess(repoAccessObject);
+
     const chagnedFiles = await unstageFiles(modifiedFiles);
-    await resolveGitRepoStatus(chagnedFiles);
+    await resolveGitRepoStatus(r, chagnedFiles);
     setCanCommit(false);
   };
 
@@ -519,22 +550,71 @@ export const GitContextProvider = (props: tProviderProps) => {
     }
   };
 
+  const handleLoadCourse = async (coursePath: string) => {
+    const r = getRepoAccess(repoAccessObject);
+    await loadCourse(coursePath, r);
+  };
+
   const handleCloneRepo = async (req: CreateCloneType) => {
     const cleanedName = slugifyPath(req.repoDirName);
+    dispatch(setLoadingState(LoadingState.cloningRepo));
 
-    const r: RepoAccessObject = { fileSystemType, repoName: cleanedName };
-    await cloneRemoteRepo(req);
+    try {
+      const r: RepoAccessObject = {
+        fileSystemType: fsType.localFileSystem,
+        repoName: cleanedName,
+      };
 
-    await setConfig(r, {
-      authorEmail:
-        currentGitConfig.authorEmail ||
-        currentAuth?.parsedUserToken?.email?.toLowerCase(),
-      authorName:
-        currentGitConfig.authorName || currentAuth?.parsedUserToken?.name,
-      remoteRepoUrl: '',
-    });
-    await resetRepoStatus();
-    await handleChangeRepo(cleanedName);
+      // @ts-ignore
+      let dirHandle = (await window.showDirectoryPicker({
+        mode: 'readwrite',
+        startIn: 'documents',
+      })) as FileSystemDirectoryHandle;
+      if (!dirHandle) throw Error('No directory selected for clone');
+      await gitFs.openLocalDirectory(dirHandle, true);
+
+      await cloneRemoteRepo(req);
+
+      // await setConfig(r, {
+      //   authorEmail:
+      //     currentGitConfig.authorEmail ||
+      //     currentAuth?.parsedUserToken?.email?.toLowerCase(),
+      //   authorName:
+      //     currentGitConfig.authorName || currentAuth?.parsedUserToken?.name,
+      //   remoteRepoUrl: '',
+      // });
+
+      await resetRepoStatus();
+      await handleChangeRepo(cleanedName);
+
+      // verify repo dir actually exits
+      try {
+        const repoDir = await dirHandle.getDirectoryHandle(req.repoDirName);
+
+        await gitFs.setDirHandle(repoDir);
+
+        await gitFs.openLocalDirectory(repoDir);
+      } catch {
+        throw Error(
+          'The clone operation failed to save files to your local computer.',
+        );
+      }
+
+      dispatch(setCurrentFileSystemType(fsType.localFileSystem));
+
+      await resetRepoStatus();
+      dispatch(setCurrentRepo(req.repoDirName));
+      setIsGitLoaded(false);
+
+      setLocalFileSystemLoaded(true);
+      setBrowserFileSystemLoaded(true);
+      await resolveCurrentRepo({
+        fileSystemType: fsType.localFileSystem,
+        repoName: req.repoDirName,
+      });
+    } finally {
+      dispatch(setLoadingState(LoadingState.loaded));
+    }
   };
 
   const handleCreateCourse = async (req: CreateCourseType) => {
@@ -575,6 +655,158 @@ export const GitContextProvider = (props: tProviderProps) => {
     await changeRepo(name);
     await resetRepoStatus();
     setIsGitLoaded(false);
+  };
+
+  const getLocalFolders = async () => {
+    return await gitFs.getLocalDirs();
+  };
+
+  const populateSandBox = async () => {
+    if (!(await gitOperator.checkSandBox())) {
+      await handleCreateSandBox();
+      await resolveCurrentRepo({
+        fileSystemType: fsType.inBrowser,
+        repoName: sandBoxName,
+      });
+    }
+  };
+  const openSandbox = async () => {
+    await handleBrowserFileSystemAccess();
+    await handleChangeFileSystem(fsType.inBrowser);
+    await resetRepoStatus();
+    dispatch(setCurrentRepo(sandBoxName));
+    setIsGitLoaded(false);
+    await populateSandBox();
+    setLocalFileSystemLoaded(true);
+
+    await resolveCurrentRepo({
+      fileSystemType: fsType.inBrowser,
+      repoName: sandBoxName,
+    });
+  };
+
+  const openLocalRepo = async (id?: string) => {
+    let dirHandle: FileSystemDirectoryHandle | undefined;
+    dispatch(setLoadingState(LoadingState.loadingRepo));
+
+    try {
+      if (id) {
+        dirHandle = await gitFs.getDirHandle(id);
+      }
+      if (!dirHandle) {
+        // @ts-ignore
+        dirHandle = await window.showDirectoryPicker({
+          mode: 'readwrite',
+          startIn: 'documents',
+        });
+        if (!dirHandle) return;
+
+        await gitFs.setDirHandle(dirHandle);
+      }
+
+      // ensure the file has a .git folder
+      const gitFolder = await dirHandle.getDirectoryHandle('.git');
+      if (!gitFolder) throw Error('No git folder');
+
+      await gitFs.openLocalDirectory(dirHandle);
+
+      dispatch(setCurrentFileSystemType(fsType.localFileSystem));
+
+      await resetRepoStatus();
+      dispatch(setCurrentRepo(dirHandle.name));
+      setIsGitLoaded(false);
+
+      setLocalFileSystemLoaded(true);
+      setBrowserFileSystemLoaded(true);
+      await resolveCurrentRepo({
+        fileSystemType: fsType.localFileSystem,
+        repoName: dirHandle.name,
+      });
+    } finally {
+      dispatch(setLoadingState(LoadingState.loaded));
+    }
+  };
+
+  const getDirHandle = async () => {
+    // @ts-ignore
+    let dirHandle = (await window.showDirectoryPicker({
+      // id: id,
+      mode: 'readwrite',
+      startIn: 'documents',
+    })) as FileSystemDirectoryHandle;
+    if (!dirHandle) return null;
+    return dirHandle;
+  };
+
+  const openLocalFolder = async (cloneForm: () => Promise<CreateCloneType>) => {
+    // @ts-ignore
+    let dirHandle = (await window.showDirectoryPicker({
+      // id: id,
+      mode: 'readwrite',
+      startIn: 'documents',
+    })) as FileSystemDirectoryHandle;
+    if (!dirHandle) return; // user canceled
+    await gitFs.openLocalDirectory(dirHandle, true);
+
+    const req = await cloneForm();
+
+    await handleCloneRepo(req);
+
+    // verify repo dir actually exits
+    const repoDir = await dirHandle.getDirectoryHandle(req.repoDirName);
+
+    await gitFs.setDirHandle(repoDir);
+
+    await gitFs.openLocalDirectory(repoDir);
+
+    dispatch(setCurrentFileSystemType(fsType.localFileSystem));
+
+    await resetRepoStatus();
+    dispatch(setCurrentRepo(req.repoDirName));
+    setIsGitLoaded(false);
+
+    setLocalFileSystemLoaded(true);
+    setBrowserFileSystemLoaded(true);
+    await resolveCurrentRepo({
+      fileSystemType: fsType.localFileSystem,
+      repoName: req.repoDirName,
+    });
+  };
+
+  const createNewRepo = async (
+    createRepoForm: () => Promise<CreateLocalRepoType>,
+  ) => {
+    // @ts-ignore
+    let dirHandle = (await window.showDirectoryPicker({
+      mode: 'readwrite',
+      startIn: 'documents',
+    })) as FileSystemDirectoryHandle;
+    if (!dirHandle) return; // user canceled
+    await gitFs.openLocalDirectory(dirHandle, true);
+
+    const req = await createRepoForm();
+
+    await handleCreateLocalCourse(req);
+
+    // verify repo dir actually exits
+    const repoDir = await dirHandle.getDirectoryHandle(req.repoDirName);
+
+    await gitFs.setDirHandle(repoDir);
+
+    await gitFs.openLocalDirectory(repoDir);
+
+    dispatch(setCurrentFileSystemType(fsType.localFileSystem));
+
+    await resetRepoStatus();
+    dispatch(setCurrentRepo(req.repoDirName));
+    setIsGitLoaded(false);
+
+    setLocalFileSystemLoaded(true);
+    setBrowserFileSystemLoaded(true);
+    await resolveCurrentRepo({
+      fileSystemType: fsType.localFileSystem,
+      repoName: req.repoDirName,
+    });
   };
 
   /*
@@ -661,9 +893,11 @@ export const GitContextProvider = (props: tProviderProps) => {
     const r: RepoAccessObject = { fileSystemType, repoName: cleanedName };
     await handleRenameCurrentRepo(r);
 
-    resolveGitRepos(r);
+    // resolveGitRepos(r);
   };
   const handlePull = async (req: PullType) => {
+    const r = getRepoAccess(repoAccessObject);
+
     try {
       if (canCommit) {
         await handleCommit({
@@ -676,15 +910,17 @@ export const GitContextProvider = (props: tProviderProps) => {
     } catch (error: any) {
       throw error;
     } finally {
-      await resolveGitRepoStatus(undefined, true);
-      await resolvePushStatus();
+      await resolveGitRepoStatus(r, undefined, true);
+      await resolvePushStatus(r);
     }
   };
 
   const handlePushRepo = async (req: PushType) => {
+    const r = getRepoAccess(repoAccessObject);
+
     await pushRepo(req);
-    await resolveGitRepoStatus();
-    await resolvePushStatus();
+    await resolveGitRepoStatus(r);
+    await resolvePushStatus(r);
   };
 
   const handleNavToFile = async (filePath: string) => {
@@ -808,8 +1044,8 @@ export const GitContextProvider = (props: tProviderProps) => {
       currentGitConfig.authorEmail,
       currentBranch,
     );
-    await resolveGitRepoStatus();
-    await resolvePushStatus();
+    await resolveGitRepoStatus(r);
+    await resolvePushStatus(r);
   };
 
   const handleStageFile = async (filepath: string) => {
@@ -827,22 +1063,26 @@ export const GitContextProvider = (props: tProviderProps) => {
   };
 
   const handleGitCommitReset = async (filepath: string) => {
+    const r = getRepoAccess(repoAccessObject);
+
     await gitCommitReset(filepath);
-    await resolveGitRepoStatus();
-    await resolvePushStatus();
+    await resolveGitRepoStatus(r);
+    await resolvePushStatus(r);
   };
 
   const handleCommit = async (req: CreateCommitType) => {
+    const r = getRepoAccess(repoAccessObject);
+
     await commit(req);
-    await resolveGitRepoStatus();
-    await resolvePushStatus();
+    await resolveGitRepoStatus(r);
+    await resolvePushStatus(r);
   };
 
   const handleGitStashChanges = async () => {
     const r = getRepoAccess(repoAccessObject);
 
     await stashChanges();
-    await resolveGitRepoStatus();
+    await resolveGitRepoStatus(r);
     dispatch(recalculateFileTree(r));
   };
 
@@ -850,7 +1090,7 @@ export const GitContextProvider = (props: tProviderProps) => {
     const r = getRepoAccess(repoAccessObject);
 
     const changedFiles = await stashPopChanges();
-    await resolveGitRepoStatus(changedFiles);
+    await resolveGitRepoStatus(r, changedFiles);
     dispatch(recalculateFileTree(r));
   };
 
@@ -859,7 +1099,7 @@ export const GitContextProvider = (props: tProviderProps) => {
 
     await setConfig(r, req);
     if (req.remoteRepoUrl) setIsRepoConnectedToRemote(true);
-    await resolvePushStatus();
+    await resolvePushStatus(r);
   };
 
   const handlePathExists = async (path: string) => {
@@ -944,17 +1184,54 @@ export const GitContextProvider = (props: tProviderProps) => {
   // instead this function expliciltly calls filesystem functions itself to get around having to wait for redux state
   const handleCreateLocalCourse = async (req: CreateLocalRepoType) => {
     const cleanedName = slugifyPath(req.repoDirName);
+    dispatch(setLoadingState(LoadingState.loadingRepo));
 
-    const r: RepoAccessObject = { repoName: cleanedName, fileSystemType };
     try {
-      await gitOperator.initGitRepo(r, req.repoBranch);
+      const r: RepoAccessObject = {
+        repoName: cleanedName,
+        fileSystemType: fsType.localFileSystem,
+      };
 
-      await configureNewCourse(r);
+      // @ts-ignore
+      let dirHandle = (await window.showDirectoryPicker({
+        mode: 'readwrite',
+        startIn: 'documents',
+      })) as FileSystemDirectoryHandle;
+      if (!dirHandle) throw Error('No directory selected for clone');
+      await gitFs.openLocalDirectory(dirHandle, true);
 
-      if (req.repoRemoteUrl) setIsRepoConnectedToRemote(true);
-    } catch (error: any) {
-      debugLogError('Error creating the local file system');
-      throw error;
+      try {
+        await gitOperator.initGitRepo(r, req.repoBranch);
+
+        await configureNewCourse(r);
+
+        if (req.repoRemoteUrl) setIsRepoConnectedToRemote(true);
+      } catch (error: any) {
+        debugLogError('Error creating the local file system');
+        throw error;
+      }
+
+      // verify repo dir actually exits
+      const repoDir = await dirHandle.getDirectoryHandle(req.repoDirName);
+
+      await gitFs.setDirHandle(repoDir);
+
+      await gitFs.openLocalDirectory(repoDir);
+
+      dispatch(setCurrentFileSystemType(fsType.localFileSystem));
+
+      await resetRepoStatus();
+      dispatch(setCurrentRepo(req.repoDirName));
+      setIsGitLoaded(false);
+
+      setLocalFileSystemLoaded(true);
+      setBrowserFileSystemLoaded(true);
+      await resolveCurrentRepo({
+        fileSystemType: fsType.localFileSystem,
+        repoName: req.repoDirName,
+      });
+    } finally {
+      dispatch(setLoadingState(LoadingState.loaded));
     }
   };
 
@@ -973,10 +1250,9 @@ export const GitContextProvider = (props: tProviderProps) => {
     }
   };
 
-  const resolveCurrentRepo = async () => {
-    await resolveGitConfig();
+  const resolveCurrentRepo = async (r: RepoAccessObject) => {
+    await resolveGitConfig(r);
 
-    const r = getRepoAccess(repoAccessObject);
     dispatch(recalculateFileTree(r));
 
     // prevent a double copy at the same time due to use effect
@@ -991,6 +1267,8 @@ export const GitContextProvider = (props: tProviderProps) => {
       return;
     }
 
+    await handleAutoSelectCourse(r);
+
     const branch = await gitOperator.getCurrentGitBranch(r);
     if (branch) {
       dispatch(setCurrentBranch(branch));
@@ -1001,94 +1279,15 @@ export const GitContextProvider = (props: tProviderProps) => {
     if (allBranches) {
       dispatch(setAllBranches(allBranches));
     }
-
-    await resolveGitRepoStatus();
+    await resolveGitRepoStatus(r);
 
     setIsGitLoaded(true);
 
-    await resolveRemoteRepoStatus();
+    await resolveRemoteRepoStatus(r);
 
-    await resolvePushStatus();
-    await handleNavToDesigner();
+    await resolvePushStatus(r);
+    await navToDesigner(r);
   };
-
-  const resolveGitRepos = async (r: RepoAccessObject | null) => {
-    // The user will always have at least one file system to work in
-
-    const currentRepos = await gitOperator.listRepos(fileSystemType);
-
-    dispatch(setAvailableRepos(currentRepos));
-
-    // if repo access object is null create the sandbox, otherwise we want to resolve the repo access object
-    if (currentRepos.length < 1) {
-      await handleCreateSandBox();
-      return;
-    }
-
-    if (r) {
-      await resolveCurrentRepo();
-    } else {
-      dispatch(setCurrentRepo(currentRepos[0]));
-    }
-  };
-
-  // use effect to take care of auto selecting a course
-  useEffect(() => {
-    if (repoAccessObject && !currentCourse) {
-      const hasLocalFsAccess =
-        repoAccessObject.fileSystemType === fsType.localFileSystem &&
-        localFileSystemLoaded;
-
-      const hasBrowserAccess =
-        repoAccessObject.fileSystemType === fsType.inBrowser &&
-        browserFileSystemLoaded;
-
-      if (hasBrowserAccess || hasLocalFsAccess) {
-        try {
-          handleAutoSelectCourse();
-        } catch (error: any) {
-          debugLogError(`Could not auto select course: ${error}`);
-        }
-      }
-    }
-  }, [
-    repoAccessObject,
-    currentCourse,
-    localFileSystemLoaded,
-    browserFileSystemLoaded,
-    fileSystemType,
-  ]);
-
-  // this allows us to use an existing file system api handle without prompting the user again
-  useEffect(() => {
-    if (fileSystemType === fsType.localFileSystem) {
-      handleLocalFileSystemAccess();
-    }
-
-    if (fileSystemType === fsType.inBrowser) {
-      handleBrowserFileSystemAccess();
-    }
-  }, []);
-
-  // Populate branches when current repo changes
-  useEffect(() => {
-    debugLog('resolveGitRepos for', repoAccessObject?.repoName);
-    // We will need to wait until this is loaded
-    if (fileSystemType === fsType.localFileSystem) {
-      if (localFileSystemLoaded) {
-        resolveGitRepos(repoAccessObject);
-      }
-    } else if (fileSystemType === fsType.inBrowser) {
-      if (browserFileSystemLoaded) {
-        resolveGitRepos(repoAccessObject);
-      }
-    }
-  }, [
-    repoAccessObject,
-    localFileSystemLoaded,
-    browserFileSystemLoaded,
-    fileSystemType,
-  ]);
 
   return (
     <GitContext.Provider
@@ -1143,7 +1342,6 @@ export const GitContextProvider = (props: tProviderProps) => {
         handleDownloadCmi5Zip,
         handleCommit,
         handleResolveMerge,
-        handleAutoSelectCourse,
         handleStageAll,
         handleUnstageAll,
         availableCourses,
@@ -1164,6 +1362,12 @@ export const GitContextProvider = (props: tProviderProps) => {
         handleGetDiff,
         numStaged,
         handleNavToFile,
+        openLocalFolder,
+        getLocalFolders,
+        openSandbox,
+        openLocalRepo,
+        createNewRepo,
+        getDirHandle,
       }}
     >
       {children}

@@ -40,6 +40,20 @@ export class GitOperations {
     }
   };
 
+  checkSandBox = async (): Promise<boolean> => {
+    try {
+      const raw = await this.gitFs.fs.promises.readdir(
+        '/' + fsType.inBrowser.toString(),
+      );
+
+      const folders = raw.map((folder) => folder.toString());
+      return folders.some((folder) => folder === '.git');
+    } catch (error: any) {
+      debugLogError(`Could not list repos ${error}`);
+      return false;
+    }
+  };
+
   cloneRepo = async (
     repoDirName: string,
     fileSystemType: fsType,

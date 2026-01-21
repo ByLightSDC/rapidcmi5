@@ -2,7 +2,11 @@ import { useEffect } from 'react';
 import { BrowserRouter as RouterWrapper } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { setDividerColor, setIconColor, themeColor } from '@rapid-cmi5/ui';
+import {
+  setDividerColor,
+  setIconColor,
+  themeColor,
+} from '@rapid-cmi5/ui';
 
 /* Shared */
 import AppHeader from './shared/AppHeader';
@@ -17,8 +21,6 @@ import { NotificationsProvider } from '@toolpad/core';
 import CssBaseline from '@mui/material/CssBaseline';
 import Paper from '@mui/material/Paper';
 import { ThemeProvider } from '@mui/material';
-import { lightTheme } from './styles/muiTheme';
-import { darkTheme } from './styles/muiThemeDark';
 
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -30,6 +32,8 @@ import {
 } from '@rapid-cmi5/react-editor';
 import { MyScenariosForm } from './ScenarioSelection';
 import { authToken, isAuthenticated } from '@rapid-cmi5/keycloak';
+import { darkTheme } from './styles/muiThemeDark';
+import { lightTheme } from './styles/muiTheme';
 
 function RapidCmi5WithAuth({
   isAuthenticated,
@@ -77,10 +81,14 @@ export default function App({ authEnabled }: { authEnabled: boolean }) {
         : lightTheme.palette.primary.main;
     const dividerColor =
       theme === 'dark'
-        ? darkTheme.input.outlineColor
-        : lightTheme.input.outlineColor;
+        ? darkTheme.palette.primary.main
+        : lightTheme.palette.primary.main;
+    // theme === 'dark'
+    //   ? darkTheme.typography.outlineColor
+    //   : lightTheme.typography.outlineColor;
     dispatch(setIconColor(iconColor));
     dispatch(setDividerColor(dividerColor || 'grey'));
+    console.log('Theme chanbge', theme);
   }, [theme]);
 
   return (

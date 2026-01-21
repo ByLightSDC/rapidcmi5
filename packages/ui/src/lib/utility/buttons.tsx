@@ -15,7 +15,6 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TouchAppIcon from '@mui/icons-material/TouchApp';
 
-
 /*Constants */
 const minLoadingButtonWidth = '94px'; // so button wont change size when "Loading"
 const minButtonHeight = '32px';
@@ -303,12 +302,14 @@ export function ButtonMinorUi(props: BrandedButtonProps) {
                 //Recent fix to make button fit child text
                 minWidth: 'auto',
                 whiteSpace: 'nowrap',
-                paddingLeft: props?.startIcon ? '4px' : '6px',
-                paddingRight: props?.children
+                px: props?.children
                   ? props?.startIcon
-                    ? '8px'
-                    : '8px'
-                  : '4px',
+                    ? '8px 12px'
+                    : '12px'
+                  : '8px',
+                py: '6px',
+                height: 'auto',
+                minHeight: '32px',
                 //margin: '8px',
                 backgroundColor: (theme: any) => `${theme.nav.fill}`,
                 '&:hover': {
@@ -316,6 +317,10 @@ export function ButtonMinorUi(props: BrandedButtonProps) {
                   color: 'primary.light',
                   borderColor: 'primary.light',
                   backgroundColor: (theme: any) => `${theme.nav.fill}`,
+                },
+                '& .MuiButton-startIcon': {
+                  marginRight: props?.children ? '6px' : '0px',
+                  marginLeft: '-2px',
                 },
                 ...props?.sxProps,
               }}

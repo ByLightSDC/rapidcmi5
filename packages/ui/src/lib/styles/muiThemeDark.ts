@@ -1,10 +1,10 @@
 import { createTheme } from "@mui/system";
 
-export const primaryDateStyle = 'MM/dd/yyyy';
-export const primaryTimeStyle = 'H:mm';
-export const timeStyleWithSeconds = 'H:mm:ss';
+export const primaryDateStyleDark = 'MM/dd/yyyy';
+export const primaryTimeStyleDark = 'H:mm';
+export const timeStyleWithSecondsDark = 'H:mm:ss';
 
-export const dividerColor = '#2E2E2E';
+export const dividerColorDark = '#2E2E2E';
 
 const tabHeight = '38px';
 const tooltipColor = '#6F96FF'; //'#303030';
@@ -15,7 +15,7 @@ const colorPop = true;
 const mainColor = '#6F96FF'; //icons, button fills
 const hoverMainColor = '#8cadfa'; //button hover
 
-export const brandedThemeDark = createTheme({
+export const darkTheme = createTheme({
   palette: {
     error: {
       main: '#fc5451', // textfield error and helper text

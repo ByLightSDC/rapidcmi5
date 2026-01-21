@@ -12,7 +12,7 @@ import { RootState, AppDispatch } from '../../../../../redux/store';
 import { ButtonModalCancelUi } from '@rapid-cmi5/ui';
 
 /* Icons */
-import { Stack } from '@mui/system';
+import { Stack, useTheme } from '@mui/system';
 import path from 'path-browserify';
 import { themeColor } from '@rapid-cmi5/ui';
 import { getMonacoTheme } from '../../utils/monacoEditor';
@@ -33,9 +33,10 @@ export default function ViewFile() {
   const { handleUpdateFile } = useContext(GitContext);
 
   const dispatch = useDispatch<AppDispatch>();
-  const themeSel = useSelector(themeColor);
+  const theme = useTheme();
+// const isDark = theme.palette.mode === 'dark';
   const [monacoEditorTheme, setMonacoEditorTheme] = useState(
-    getMonacoTheme(themeSel),
+    getMonacoTheme(theme.palette.mode),
   );
 
   const [editorContent, setEditorContent] = useState<string>('');
@@ -59,8 +60,8 @@ export default function ViewFile() {
    * UE sets mdx theme when MUI theme changes
    */
   useEffect(() => {
-    setMonacoEditorTheme(getMonacoTheme(themeSel));
-  }, [themeSel]);
+    setMonacoEditorTheme(getMonacoTheme(theme.palette.mode));
+  }, [theme]);
 
   useEffect(() => {
     setIsSaveable(false);

@@ -5,7 +5,6 @@ import {
   setCourseList,
   selectCourse,
   Course,
-  RepoState,
   pushCourseList,
   recalculateFileTree,
   renameCurrentCourse,
@@ -17,35 +16,24 @@ import {
   setIsLessonMounted,
   updateDirtyDisplay,
   currentViewMode,
-  courseOperations,
   resetCourseOperations,
 } from '../../../../redux/courseBuilderReducer';
 
-import slug from 'slug';
-
-import YAML from 'yaml';
-
-import { AppDispatch, RootState } from '../../../../redux/store';
+import { AppDispatch } from '../../../../redux/store';
 import { ViewModeEnum } from '../../CourseBuilderTypes';
-import { CourseData, KSATElement, Operation } from '@rapid-cmi5/cmi5-build-common';
+import { CourseData, Operation } from '@rapid-cmi5/cmi5-build-common';
 import { CreateCourseType } from '../../CourseBuilderApiTypes';
 import { courseNameInUseMessage, deleteCourseFailMessage } from './constants';
 import { GitFS } from '../utils/fileSystem';
 import { warningModalId } from '../../../rapidcmi5_mdx/modals/constants';
 import { setModal } from '@rapid-cmi5/ui';
-import { rc5MetaFilename } from '@rapid-cmi5/cmi5-build-common';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
-import { join } from 'path-browserify';
-import { getRepoPath } from '../utils/gitOperations';
 import { getRepoAccess } from './GitContext';
 import {
   computeCourseFromJsonFs,
   createCourseInFs,
   findAllCourses,
-  flattenSlides,
   getCourseDataInFs,
-  readRC5Meta,
-  updatePaths,
 } from '../utils/useCourseOperationsUtils';
 
 export const useCourseOperations = (
@@ -89,10 +77,8 @@ export const useCourseOperations = (
     [dispatch],
   );
 
-  const handleLoadCourse = useCallback(
-    async (coursePath: string) => {
-      const r = getRepoAccess(repoAccessObject);
-
+  const loadCourse = useCallback(
+    async (coursePath: string, r: RepoAccessObject) => {
       try {
         const result = await findCourse(r, coursePath);
 
@@ -130,17 +116,18 @@ export const useCourseOperations = (
     dispatch(renameCurrentCourse(newCourseName));
   };
 
-  const handleAutoSelectCourse = useCallback(async () => {
-    const r = getRepoAccess(repoAccessObject);
+  const handleAutoSelectCourse = useCallback(
+    async (r: RepoAccessObject) => {
+      const firstCourse = await getFirstCoursePath(r);
+      if (!firstCourse) {
+        return;
+      }
 
-    const firstCourse = await getFirstCoursePath(r);
-    if (!firstCourse) {
-      return;
-    }
-
-    await handleLoadCourse(firstCourse.basePath);
-    dispatch(recalculateFileTree(r));
-  }, [repoAccessObject, getFirstCoursePath, handleLoadCourse]);
+      await loadCourse(firstCourse.basePath, r);
+      // dispatch(recalculateFileTree(r));
+    },
+    [getFirstCoursePath, loadCourse],
+  );
 
   /**
    * Saves course
@@ -231,7 +218,7 @@ export const useCourseOperations = (
       await fsInstance.deleteDir(r, courseName);
 
       if (currentCourse?.basePath === r.repoName) {
-        await handleAutoSelectCourse();
+        await handleAutoSelectCourse(r);
       }
       dispatch(updateDirtyDisplay({ reason: 'delete course' }));
     } catch (error: any) {
@@ -301,7 +288,7 @@ export const useCourseOperations = (
   };
 
   return {
-    handleLoadCourse,
+    loadCourse,
     syncCurrentCourseWithGit,
     createCourse,
     deleteCourse,

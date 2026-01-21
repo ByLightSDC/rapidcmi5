@@ -13,7 +13,8 @@ import * as yup from 'yup';
 import { cloneRepoModalId } from '../../rapidcmi5_mdx/modals/constants';
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
-import { Grid, Typography } from '@mui/material';
+import { Typography, Box } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 
 import { UseFormReturn } from 'react-hook-form';
 
@@ -21,6 +22,7 @@ import { GIT_URL_GROUP, NAME_GROUP } from '@rapid-cmi5/ui';
 import { CreateCloneType } from '../CourseBuilderApiTypes';
 import { useCallback, useContext, useEffect } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';
+
 const validationSchema = yup.object().shape({
   repoDirName: NAME_GROUP,
   repoRemoteUrl: GIT_URL_GROUP(),
@@ -47,7 +49,6 @@ export function CloneRepoForm({
   ) => void;
 }) {
   const { handleCloneRepo } = useContext(GitContext);
-
   const onCancel = () => {
     handleCloseModal();
   };
@@ -99,7 +100,7 @@ export function CloneRepoForm({
 
       return (
         <>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <FormControlTextField
               control={control}
               error={Boolean(errors?.repoRemoteUrl)}
@@ -111,7 +112,8 @@ export function CloneRepoForm({
               readOnly={false}
             />
           </Grid>
-          <Grid item xs={6}>
+
+          <Grid size={{ xs: 12, sm: 6 }}>
             <FormControlTextField
               control={control}
               error={Boolean(errors?.repoDirName)}
@@ -122,7 +124,8 @@ export function CloneRepoForm({
               readOnly={false}
             />
           </Grid>
-          <Grid item xs={6}>
+
+          <Grid size={{ xs: 12, sm: 6 }}>
             <FormControlTextField
               control={control}
               error={Boolean(errors?.repoBranch)}
@@ -133,7 +136,8 @@ export function CloneRepoForm({
               readOnly={false}
             />
           </Grid>
-          <Grid item xs={6}>
+
+          <Grid size={{ xs: 12, sm: 6 }}>
             <FormControlTextField
               control={control}
               error={Boolean(errors?.repoUsername)}
@@ -144,7 +148,8 @@ export function CloneRepoForm({
               readOnly={false}
             />
           </Grid>
-          <Grid item xs={6}>
+
+          <Grid size={{ xs: 12, sm: 6 }}>
             <FormControlPassword
               control={control}
               error={Boolean(errors?.repoPassword)}
@@ -155,7 +160,8 @@ export function CloneRepoForm({
               readOnly={false}
             />
           </Grid>
-          <Grid item xs={6}>
+
+          <Grid size={{ xs: 12, sm: 6 }}>
             <FormControlTextField
               control={control}
               error={Boolean(errors?.authorName)}
@@ -166,7 +172,8 @@ export function CloneRepoForm({
               readOnly={false}
             />
           </Grid>
-          <Grid item xs={6}>
+
+          <Grid size={{ xs: 12, sm: 6 }}>
             <FormControlTextField
               control={control}
               error={Boolean(errors?.authorEmail)}
@@ -177,15 +184,22 @@ export function CloneRepoForm({
               readOnly={false}
             />
           </Grid>
-          <Grid item xs={6}>
-            <FormControlCheckboxField
-              control={control}
-              name="shallowClone"
-              label="Shallow Clone"
-            />
-            <Typography>
-              This improves performance for very large repos
-            </Typography>
+
+          <Grid size={12}>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <FormControlCheckboxField
+                control={control}
+                name="shallowClone"
+                label="Shallow Clone"
+              />
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ ml: 2 }}
+              >
+                This improves performance for very large repos
+              </Typography>
+            </Box>
           </Grid>
         </>
       );

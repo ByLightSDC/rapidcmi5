@@ -4,7 +4,6 @@ import { useContext, useEffect, useState } from 'react';
 import {
   Box,
   Checkbox,
-  FormControlLabel,
   IconButton,
   Stack,
   Tooltip,
@@ -17,26 +16,11 @@ import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { filterTreePath } from '../../course-builder/GitViewer/Components/SelectedRepo/treeHelpers';
 import { useCourseData } from '../data-hooks/useCourseData';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import ChangeRepoExpander from './components/ChangeRepoExpander';
-import { RepoState } from '../../../redux/repoManagerReducer';
-import { RootState } from '../../../redux/store';
-import { useSelector } from 'react-redux';
 import SectionLabel from '../../../shared/SectionLabel';
 import { ButtonTooltip } from '@rapid-cmi5/ui';
 
 export const FileDrawer = () => {
-  const {
-    currentCourse,
-    currentRepo,
-    directoryTree,
-    handleChangeRepo,
-    handleChangeFileSystem,
-    isElectron,
-  } = useContext(GitContext);
-
-  const { fileSystemType, availableRepos }: RepoState = useSelector(
-    (state: RootState) => state.repoManager,
-  );
+  const { currentCourse, currentRepo, directoryTree } = useContext(GitContext);
 
   const { currentAuIndex, currentBlockIndex } = useCourseData();
 
@@ -58,12 +42,6 @@ export const FileDrawer = () => {
     };
     getCmi5();
   }, [selectedCourseFilter, selectedLessonFilter, currentRepo, directoryTree]);
-
-  // useEffect(() => {
-  //   if (!currentCourse) {
-  //     handleAutoSelectCourse();
-  //   }
-  // }, []);
 
   const filterCount =
     (selectedLessonFilter ? 1 : 0) + (selectedCourseFilter ? 1 : 0);
@@ -125,15 +103,6 @@ export const FileDrawer = () => {
             </Tooltip>
           </Stack>
         </Stack>
-        <ChangeRepoExpander
-          isExpanded={true}
-          isElectron={isElectron}
-          availableRepos={availableRepos}
-          currentRepo={currentRepo}
-          fileSystemType={fileSystemType}
-          handleChangeFileSystem={handleChangeFileSystem}
-          handleChangeRepo={handleChangeRepo}
-        />
         {showFilters && (
           <Stack direction="column" spacing={1}>
             <Stack direction="row" spacing={0} alignItems="center">

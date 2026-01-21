@@ -16,13 +16,9 @@ import {
 import { RepoState } from '../../../redux/repoManagerReducer';
 import { RootState } from '../../../redux/store';
 
-import {
-  RowAction,
-  TabMainUi,
-} from '@rapid-cmi5/ui';
+import { RowAction, TabMainUi } from '@rapid-cmi5/ui';
 
 import { useMDStyleIcons } from '../styles/useMDStyleIcons';
-import RepositorySelector from '../../course-builder/selectors/RepositorySelector';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
 import {
@@ -35,18 +31,19 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 import { useRC5Prompts } from '../modals/useRC5Prompts';
 import React from 'react';
 import { listItemProps } from './components/LessonTreeNode';
 import { Renamer } from './components/Renamer';
-import FileSystemSelector from '../../course-builder/selectors/FileSystemSelector';
 import { ButtonOptions, ButtonMinorUi } from '@rapid-cmi5/ui';
 
 enum RepoActionEnum {
   TriggerRename,
   Rename,
   Delete,
+  Config,
 }
 
 /**
@@ -66,6 +63,10 @@ const repoActions = [
     tooltip: 'Delete Local Repository',
     icon: <DeleteForeverIcon color="inherit" />,
   },
+  {
+    tooltip: 'Config Settings',
+    icon: <SettingsIcon color="inherit" />,
+  },
 ];
 
 /**
@@ -75,28 +76,21 @@ const repoActions = [
  */
 export const GitDrawer = () => {
   const dispatch = useDispatch();
-  const { availableRepos, currentBranch, fileSystemType }: RepoState =
-    useSelector((state: RootState) => state.repoManager);
+  const { currentBranch }: RepoState = useSelector(
+    (state: RootState) => state.repoManager,
+  );
   const { promptDeleteRepo } = useRC5Prompts();
   const {
-    handleChangeRepo,
     isRepoConnectedToRemote,
     handleNavToGitView,
     handleChangeRepoName,
-    handleChangeFileSystem,
     currentRepo,
-    isElectron,
   } = useContext(GitContext);
   const { gitIcon } = useMDStyleIcons();
 
   const currentTab = useSelector(gitViewCurrentTab);
 
-  const {
-    promptAttachRemoteRepo,
-    promptCloneRepo,
-    promptImportRepoZip,
-    promptCreateLocalRepo,
-  } = useRC5Prompts();
+  const { promptAttachRemoteRepo, promptGitConfig } = useRC5Prompts();
 
   const [menuAnchor, setMenuAnchor] = useState<any>(null);
   const [menuAnchorPos, setMenuAnchorPos] = useState<number[]>([0, 0]);
@@ -130,6 +124,9 @@ export const GitDrawer = () => {
       case RepoActionEnum.TriggerRename:
         setMenuAnchorPos([event.clientX - 60, event.clientY + 20]);
         break;
+      case RepoActionEnum.Config:
+        promptGitConfig();
+        break;
     }
   };
 
@@ -158,16 +155,8 @@ export const GitDrawer = () => {
           alignContent: 'center',
           marginBottom: '12px',
           width: '100%',
-          //backgroundColor: 'pink',
         }}
       >
-        <RepositorySelector
-          currentRepo={currentRepo || undefined}
-          availableRepos={availableRepos}
-          disabled={!availableRepos || availableRepos?.length === 0}
-          //RED onAction={promptCloneRepo}
-          onSelect={handleChangeRepo}
-        />
         {/* <BranchSelector
           currentBranch={currentBranch || undefined}
           availableBranches={allBranches}
@@ -175,6 +164,7 @@ export const GitDrawer = () => {
           //RED onAction={promptCloneRepo}
           onSelect={handleCheckoutBranch}
         /> */}
+        <Typography>{currentRepo}</Typography>
         <div style={{ flexGrow: 1 }} />
         <Stack direction="row">
           <ButtonOptions
@@ -210,7 +200,7 @@ export const GitDrawer = () => {
               }}
               component="nav"
             >
-              <Typography sx={{ marginLeft: '12px' }} variant="caption">
+              <Typography sx={{ ml: 3, pl: 3 }} variant="caption">
                 {currentRepo}...
               </Typography>
               {repoActions.map((option: RowAction, index: number) => (
@@ -271,41 +261,6 @@ export const GitDrawer = () => {
         </Alert>
       )}
 
-      <Stack
-        direction="row"
-        gap={0}
-        flexWrap="wrap"
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <ButtonMinorUi
-          tooltip="Create a new local repository (start from scratch)"
-          startIcon={<AddIcon />}
-          onClick={promptCreateLocalRepo}
-        >
-          New
-        </ButtonMinorUi>
-        <ButtonMinorUi
-          tooltip="Clone a remote repository containing RapidCMI5 content"
-          startIcon={<AddIcon />}
-          onClick={promptCloneRepo}
-          data-testid="clone-repo-button"
-        >
-          Clone
-        </ButtonMinorUi>
-        <ButtonMinorUi
-          tooltip="Import a RapidCMI5 repository from a zip file"
-          startIcon={<AddIcon />}
-          onClick={promptImportRepoZip}
-        >
-          Import
-        </ButtonMinorUi>
-      </Stack>
-
       {isRepoConnectedToRemote && (
         <Stack direction="column">
           <Stack
@@ -331,12 +286,6 @@ export const GitDrawer = () => {
         <TabMainUi label="Commit History" style={{ marginBottom: '8px' }} />
         <TabMainUi label="Stashes" style={{ marginBottom: '8px' }} />
       </Tabs>
-      {!isElectron && (
-        <FileSystemSelector
-          currentFs={fileSystemType}
-          onSelect={handleChangeFileSystem}
-        />
-      )}
 
       {menuAnchor && (
         <Renamer

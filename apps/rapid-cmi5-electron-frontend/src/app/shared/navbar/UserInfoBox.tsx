@@ -1,23 +1,25 @@
 import { AppDispatch } from '@rapid-cmi5/react-editor';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { modal, setModal, themeColor, setTheme, resetPersistance } from '@rapid-cmi5/ui';
+import {
+  modal,
+  setModal,
+  themeColor,
+  setTheme,
+  resetPersistance,
+} from '@rapid-cmi5/ui';
 
 import { useLogOut } from '../../hooks/useLogOut';
 
 /* Branded */
-import {
-  ModalDialog,
-} from '@rapid-cmi5/ui';
+import { ModalDialog } from '@rapid-cmi5/ui';
 
 /*Material*/
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { Stack } from '@mui/system';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 
 /* Icons */
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -44,19 +46,11 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
   //#region About
   const [isAboutDisabled, setAboutDisabled] = useState(false);
   const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
- 
+
   const handleAboutDialogClose = () => {
     setAboutDialogOpen(false);
   };
 
-  /**
-   * Handles error returned from API call
-   * @param {any} error error returned from api call
-   */
-  const handleInitialDataError = (error: string) => {
-    // wont be able to view About Build Version Information
-    setAboutDisabled(true);
-  };
   //#endregion
 
   /**
@@ -79,6 +73,7 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
 
   const handleThemeToggle = () => {
     const newTheme = appThemeColor === 'dark' ? 'light' : 'dark';
+    console.log('setting theme', newTheme);
 
     localStorage.setItem('themeColor', newTheme);
 

@@ -12,6 +12,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import {
   addRepo,
+  fsType,
   recalculateFileTree,
   removeRepo,
   RepoAccessObject,
@@ -46,8 +47,9 @@ export const useGitOperations = (
   const dispatch = useDispatch<AppDispatch>();
   const gitOperator = new GitOperations(fsInstance);
 
-  const { availableRepos, currentBranch, fileSystemType }: RepoState =
-    useSelector((state: RootState) => state.repoManager);
+  const { currentBranch, fileSystemType }: RepoState = useSelector(
+    (state: RootState) => state.repoManager,
+  );
 
   const removeRepoFileSelection = () => {
     dispatch(setFileContent({ content: null, type: null }));
@@ -56,21 +58,23 @@ export const useGitOperations = (
 
   const cloneRemoteRepo = async (req: CreateCloneType) => {
     debugLog('clone repo', req);
-    if (availableRepos.includes(req.repoDirName)) {
+    const currentRepos = await gitOperator.listRepos(fileSystemType);
+
+    if (currentRepos.includes(req.repoDirName)) {
       throw Error(repoNameInUseMessage);
     }
 
     try {
       const r = await gitOperator.cloneRepo(
         req.repoDirName,
-        fileSystemType,
+        fsType.localFileSystem,
         req.repoRemoteUrl,
         req.repoBranch,
         req.repoUsername,
         req.repoPassword,
         req.shallowClone,
       );
-      
+
       await fsInstance.writeModifiedFiles(r, []);
       debugLog('adding repo', r.repoName);
       dispatch(setRepoViewScrollTop(0));
@@ -221,7 +225,12 @@ export const useGitOperations = (
   const pushRepo = useCallback(
     async (req: PushType) => {
       const r: RepoAccessObject = getRepoAccess(repoAccessObject);
-      await gitOperator.gitPush(r, req.repoUsername, req.repoPassword, req.force);
+      await gitOperator.gitPush(
+        r,
+        req.repoUsername,
+        req.repoPassword,
+        req.force,
+      );
     },
     [repoAccessObject],
   );
@@ -240,9 +249,8 @@ export const useGitOperations = (
     dispatch(setCurrentWorkingDir('/'));
   };
 
-  const getCurrentGitConfig = async () => {
+  const getCurrentGitConfig = async (r: RepoAccessObject) => {
     try {
-      const r: RepoAccessObject = getRepoAccess(repoAccessObject);
       const gitConfig = await gitOperator.getGitConfig(r);
       return gitConfig;
     } catch (error) {
@@ -319,8 +327,8 @@ export const useGitOperations = (
     }
   };
 
-  const resolveGitConfig = async () => {
-    const gitConfig = await getCurrentGitConfig();
+  const resolveGitConfig = async (r: RepoAccessObject) => {
+    const gitConfig = await getCurrentGitConfig(r);
     setCurrentGitConfig(gitConfig);
   };
 

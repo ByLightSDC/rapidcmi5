@@ -33,7 +33,6 @@ import LinkOffIcon from '@mui/icons-material/LinkOff';
 
 import Popper from '@mui/material/Popper';
 import { useTheme } from '@mui/system';
-import { CustomTheme } from '../../../../styles/createPalette';
 
 import LaunchIcon from '@mui/icons-material/Launch';
 import EditIcon from '@mui/icons-material/Edit';
@@ -263,7 +262,7 @@ export const RC5LinkDialog: React.FC = () => {
           style={{
             backgroundColor: theme.palette['background']['paper'],
             borderStyle: 'solid',
-            borderColor: (theme as CustomTheme).input.outlineColor,
+            // borderColor: (theme as CustomTheme).input.outlineColor,
             borderWidth: '1px',
             padding: '8px',
             display: 'flex',

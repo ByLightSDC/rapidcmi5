@@ -31,7 +31,12 @@ import React, {
   useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AnimationConfig, animationDirectivePlugin, appHeaderVisible, themeColor } from '@rapid-cmi5/ui';
+import {
+  AnimationConfig,
+  animationDirectivePlugin,
+  appHeaderVisible,
+  themeColor,
+} from '@rapid-cmi5/ui';
 // import SharedFormModals from '../../../shared-modals/SharedFormModals';
 import { Box, useTheme } from '@mui/material';
 import { RC5Context } from '../contexts/RC5Context';
@@ -73,7 +78,11 @@ import { RC5LinkDialog } from '../plugins/link/RC5LinkDialog';
 import { directiveLinter } from './code/codeMirrorUtils';
 import { LayoutBoxDirectiveDescriptor } from './directives/layout-box/LayoutBoxDirectiveDescriptor';
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
-import { animationPlugin, areAnimationsEqual, injectAnimationsIntoFrontmatter } from '../plugins/animation';
+import {
+  animationPlugin,
+  areAnimationsEqual,
+  injectAnimationsIntoFrontmatter,
+} from '../plugins/animation';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -84,9 +93,12 @@ function RC5VisualEditor() {
   const dispatch = useDispatch();
   const { addEditor, removeEditor } = useContext(RC5Context);
   const currentSlideIndex = useSelector(currentSlideNum);
-  const themeSel = useSelector(themeColor);
+
+  const theme = useTheme();
+  const themeMode = theme.palette.mode;
+
   const [mdxTheme, setMdxTheme] = useState(
-    `${themeSel}-theme ${themeSel}-editor nested-editable-${themeSel}`,
+    `${themeMode}-theme ${themeMode}-editor nested-editable-${themeMode}`,
   );
   const isAppHeaderShowing = useSelector(appHeaderVisible);
   const content = useSelector(displayData); //CAREFUL here, retrieving from context causes inf rendering loop
@@ -102,7 +114,6 @@ function RC5VisualEditor() {
 
   const debouncer = useRef<NodeJS.Timeout>();
 
-  
   // Store animations per slide (keyed by slide index)
   const slideAnimationsRef = useRef<Map<number, AnimationConfig[]>>(new Map());
   const [animationsVersion, setAnimationsVersion] = useState(0);
@@ -176,7 +187,7 @@ function RC5VisualEditor() {
     },
     [currentSlideIndex, dispatch],
   );
-  
+
   const {
     imageFilePath,
     imageUploadHandler,
@@ -393,9 +404,9 @@ function RC5VisualEditor() {
    */
   useEffect(() => {
     setMdxTheme(
-      `${themeSel}-theme ${themeSel}-editor nested-editable-${themeSel}`,
+      `${themeMode}-theme ${themeMode}-editor nested-editable-${themeMode}`,
     );
-  }, [themeSel]);
+  }, [themeMode]);
 
   /**
    * UE injects markdown from lesson into editor and resets focus

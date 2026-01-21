@@ -25,25 +25,29 @@ import {
   PURGE,
   REGISTER,
 } from 'redux-persist';
-import { CURRENT_STORE_VERSION, storeMigrations } from './storeMigrations';
+import { CURRENT_STORE_VERSION } from './storeMigrations';
 
 const persistConfig = {
   key: 'rapidCmi5Redux',
   version: CURRENT_STORE_VERSION,
   storage,
-  whitelist: [
-    'commonApp',
-    'courseBuilder',
-    'pagination',
-    'repoManager',
-  ],
-  // migrate: createMigrate(storeMigrations, { debug: false }),
+  blacklist: [],
+  whitelist: ['commonApp', 'courseBuilder', 'pagination'],
+};
+
+const courseBuilderPersistConfig = {
+  key: 'courseBuilder',
+  storage,
+  blacklist: ['showSelectCourses'], 
 };
 
 const rootReducer = combineReducers({
   commonApp: commonAppReducer,
   commonAppTrans: commonAppTransReducer,
-  courseBuilder: courseBuilderReducer,
+  courseBuilder: persistReducer(
+    courseBuilderPersistConfig,
+    courseBuilderReducer,
+  ),
   pagination: paginationReducer,
   repoManager: repoReducer,
 });

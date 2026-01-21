@@ -1,6 +1,5 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 import {
-  FormControlPassword,
   FormControlTextField,
   FormControlUIProvider,
   FormStateType,
@@ -12,7 +11,7 @@ import * as yup from 'yup';
 import { createLocalRepoModalId } from '../../rapidcmi5_mdx/modals/constants';
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
-import { Grid } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 
 import { UseFormReturn } from 'react-hook-form';
 
@@ -101,7 +100,7 @@ export function CreateLocalRepoForm({
 
     return (
       <>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.repoRemoteUrl)}
@@ -112,7 +111,7 @@ export function CreateLocalRepoForm({
             readOnly={false}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.repoDirName)}
@@ -123,7 +122,7 @@ export function CreateLocalRepoForm({
             readOnly={false}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.repoBranch)}
@@ -134,7 +133,7 @@ export function CreateLocalRepoForm({
             readOnly={false}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.authorName)}
@@ -145,7 +144,7 @@ export function CreateLocalRepoForm({
             readOnly={false}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.authorEmail)}

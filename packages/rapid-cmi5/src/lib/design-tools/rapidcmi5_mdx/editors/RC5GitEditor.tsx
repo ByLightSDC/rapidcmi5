@@ -11,8 +11,6 @@ import {
   Badge,
   Box,
   Divider,
-  IconButton,
-  Tooltip,
   Typography,
 } from '@mui/material';
 import { Stack } from '@mui/system';
@@ -21,11 +19,9 @@ import { Stack } from '@mui/system';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import SettingsIcon from '@mui/icons-material/Settings';
 import SpokeIcon from '@mui/icons-material/Spoke';
 
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
-import DeleteRepoButton from '../../course-builder/GitViewer/Components/GitActions/DeleteRepoButton';
 
 import { iconButtonStyle, tooltipStyle } from '../styles/styles';
 
@@ -78,7 +74,6 @@ export default function RC5GitEditor({ top = '0px' }: { top?: string }) {
     promptCommit,
     promptPull,
     promptPush,
-    promptGitConfig,
     promptRevertToCommit,
   } = useRC5Prompts();
 
@@ -168,7 +163,7 @@ export default function RC5GitEditor({ top = '0px' }: { top?: string }) {
 
       {currentRepo && (
         <Box
-          data-testid='git-editor'
+          data-testid="git-editor"
           sx={{
             marginTop: '12px',
             height: 'auto',
@@ -267,32 +262,6 @@ export default function RC5GitEditor({ top = '0px' }: { top?: string }) {
             >
               Stash Changes
             </ButtonMinorUi>
-
-            <Stack
-              direction="row"
-              sx={{
-                flexGrow: 1,
-                display: 'flex',
-                justifyContent: 'flex-end',
-              }}
-            >
-              {/* <ButtonMinorUi onClick={promptPublishPcteModal}>
-                Publish
-              </ButtonMinorUi>
-              <PublishPcteDialogs /> */}
-              <IconButton
-                aria-label="design-view"
-                color="primary"
-                style={iconButtonStyle}
-                onClick={() => promptGitConfig()}
-                disabled={!isFsLoaded}
-              >
-                <Tooltip arrow title={`Settings`} {...tooltipStyle}>
-                  <SettingsIcon color="inherit" />
-                </Tooltip>
-              </IconButton>
-              <DeleteRepoButton isButtonStyleMinimized={true} />
-            </Stack>
           </Stack>
 
           {currentTab === 0 && (

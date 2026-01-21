@@ -15,8 +15,8 @@ import {
   currentAuPath,
   deleteSlide,
   navigateSlide,
-  updateCourseAuData,
 } from '../../../../redux/courseBuilderReducer';
+import AddIcon from '@mui/icons-material/Add';
 
 import { AppDispatch } from '../../../../redux/store';
 
@@ -48,7 +48,9 @@ import { GitContext } from '../../../course-builder/GitViewer/session/GitContext
 import { getRepoPath } from '../../../course-builder/GitViewer/utils/fileSystem';
 import { currentRepoAccessObjectSel } from '../../../../redux/repoManagerReducer';
 import { slugifyPath } from '../../../course-builder/GitViewer/utils/useCourseOperationsUtils';
-import { useToaster } from '@rapid-cmi5/ui';
+import { ButtonMinorUi, useToaster } from '@rapid-cmi5/ui';
+import { Divider, Typography } from '@mui/material';
+import { Box, maxWidth, Stack } from '@mui/system';
 
 const textColor = 'text.hint';
 
@@ -57,6 +59,7 @@ interface LessonTreeViewProps {
   courses?: CourseData[];
   isReadOnly?: boolean;
   paddingBase?: number;
+  onCreateLesson?: () => void;
 }
 
 export enum LessonTreeNodeType {
@@ -71,6 +74,7 @@ function LessonTree({
   courseData,
   isReadOnly = false,
   paddingBase = 12,
+  onCreateLesson,
 }: LessonTreeViewProps) {
   const {
     changeLesson,
@@ -87,7 +91,7 @@ function LessonTree({
   const displayToaster = useToaster();
   const [treeData, setTreeData] = useState<INode<IFlatMetadata>[]>([]);
   const currentExpandedNodes = useRef<NodeId[]>([]);
-  const { promptDeleteLesson } = useRC5Prompts();
+  const { promptDeleteLesson, promptCreateLesson } = useRC5Prompts();
   const currentAuDir = useSelector(currentAuPath);
   const { handleGetUniqueFilePath } = useContext(GitContext);
 
@@ -413,89 +417,133 @@ function LessonTree({
     }
   }, []);
   return (
-    <DndProvider backend={HTML5Backend}>
-      {/* only show the tree when there is data to show to prevent errors while in process of switching repos - tree not yet filled in */}
-      {treeData.length > 1 && (
-        <div
-          className="directory"
-          style={{
-            color: textColor,
+    <>
+      <DndProvider backend={HTML5Backend}>
+        <Box
+          sx={{
+            height: '100%', // IMPORTANT: parent must have a height
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0, // IMPORTANT for overflow in flex children
           }}
         >
-          <TreeView
-            data={treeData}
-            aria-label="directory tree"
-            data-testid="course-tree"
-            onNodeSelect={handleNodeSelect}
-            onExpand={handleNodeExpand}
-            defaultExpandedIds={currentExpandedNodes.current}
-            //expandedIds={currentExpandedNodes.current}
-            selectedIds={[]}
-            nodeRenderer={({
-              element,
-              isBranch,
-              isExpanded,
-              getNodeProps,
-              level,
-            }) => (
+          <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+            {/* only show the tree when there is data to show to prevent errors while in process of switching repos - tree not yet filled in */}
+            {treeData.length > 1 && (
               <div
-                {...getNodeProps()}
+                className="directory"
                 style={{
-                  marginTop: '2px',
-                  paddingLeft: paddingBase * (level - 1),
+                  color: textColor,
                 }}
               >
-                <LessonTreeNode
-                  key={
-                    element.id.toString() +
-                    '/' +
-                    (element.parent || 0).toString()
-                  }
-                  data-testid={
-                    'slide-node-' +
-                    element.id.toString() +
-                    '/' +
-                    (element.parent || 0).toString()
-                  }
-                  isOpen={isExpanded}
-                  element={element}
-                  isReadOnly={isReadOnly}
-                  currentLesson={currentAuIndex}
-                  currentSlide={currentSlideIndex}
-                  onAction={handleNodeAction}
-                  moveNode={moveNode}
+                <TreeView
+                  data={treeData}
+                  aria-label="directory tree"
+                  data-testid="course-tree"
+                  onNodeSelect={handleNodeSelect}
+                  onExpand={handleNodeExpand}
+                  defaultExpandedIds={currentExpandedNodes.current}
+                  //expandedIds={currentExpandedNodes.current}
+                  selectedIds={[]}
+                  nodeRenderer={({
+                    element,
+                    isBranch,
+                    isExpanded,
+                    getNodeProps,
+                    level,
+                  }) => (
+                    <div
+                      {...getNodeProps()}
+                      style={{
+                        marginTop: '2px',
+                        paddingLeft: paddingBase * (level - 1),
+                      }}
+                    >
+                      <LessonTreeNode
+                        key={
+                          element.id.toString() +
+                          '/' +
+                          (element.parent || 0).toString()
+                        }
+                        data-testid={
+                          'slide-node-' +
+                          element.id.toString() +
+                          '/' +
+                          (element.parent || 0).toString()
+                        }
+                        isOpen={isExpanded}
+                        element={element}
+                        isReadOnly={isReadOnly}
+                        currentLesson={currentAuIndex}
+                        currentSlide={currentSlideIndex}
+                        onAction={handleNodeAction}
+                        moveNode={moveNode}
+                      />
+                    </div>
+                  )}
                 />
+                {menuAnchor && (
+                  <Renamer
+                    anchor={menuAnchor}
+                    anchorPos={menuAnchorPos}
+                    element={menuNode}
+                    onClose={handleCancel}
+                    onSave={handleRename}
+                  />
+                )}
+                {moveOnCriteriaForm && (
+                  <MoveOnCriteriaForm
+                    handleCloseModal={() => {
+                      setMoveOnCriteriaForm(null);
+                    }}
+                    handleModalAction={handleMoveOn}
+                    currentMoveOn={
+                      moveOnCriteriaForm.id !== undefined &&
+                      moveOnCriteriaForm.block !== undefined
+                        ? courseData?.blocks?.[moveOnCriteriaForm.block]?.aus?.[
+                            moveOnCriteriaForm.id as number
+                          ]?.moveOnCriteria
+                        : undefined
+                    }
+                  />
+                )}
               </div>
             )}
-          />
-          {menuAnchor && (
-            <Renamer
-              anchor={menuAnchor}
-              anchorPos={menuAnchorPos}
-              element={menuNode}
-              onClose={handleCancel}
-              onSave={handleRename}
-            />
+          </Box>
+          {onCreateLesson && (
+            <>
+              <Divider sx={{ mt: 'auto' }} />
+              <Box
+                sx={{
+                  mt: 'auto',
+                  borderTop: 1,
+                  borderColor: 'divider',
+                  p: 1.5,
+                }}
+              >
+                <ButtonMinorUi
+                  startIcon={<AddIcon />}
+                  sxProps={{
+                    width: '100%',
+                    height: 36,
+                    minHeight: 36,
+                    justifyContent: 'flex-start',
+                    px: 1.5,
+                    borderRadius: 1,
+                    fontWeight: 500,
+                    fontSize: '0.875rem',
+                  }}
+                  onClick={onCreateLesson}
+                  data-testid="create-lesson-button"
+                >
+                  Create Lesson
+                </ButtonMinorUi>
+              </Box>
+            </>
           )}
-          {moveOnCriteriaForm && (
-            <MoveOnCriteriaForm
-              handleCloseModal={() => {
-                setMoveOnCriteriaForm(null);
-              }}
-              handleModalAction={handleMoveOn}
-              currentMoveOn={
-                moveOnCriteriaForm.id !== undefined &&
-                moveOnCriteriaForm.block !== undefined
-                  ? courseData?.blocks?.[moveOnCriteriaForm.block]?.aus?.[
-                      moveOnCriteriaForm.id as number
-                    ]?.moveOnCriteria
-                  : undefined
-              }
-            />
-          )}
-        </div>
-      )}
-    </DndProvider>
+        </Box>
+      </DndProvider>
+    </>
   );
 }
 

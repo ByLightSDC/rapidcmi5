@@ -9,7 +9,7 @@ import YAML from 'yaml';
 import { configure, fs as zenFs } from '@zenfs/core';
 import { IndexedDB, WebAccess } from '@zenfs/dom';
 import { RepoAccessObject } from '../../../../redux/repoManagerReducer';
-import { set, get } from 'idb-keyval';
+import { set, get, keys, getMany } from 'idb-keyval';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import { electronFs } from './ElectronFsApi';
@@ -24,6 +24,16 @@ export type FileSystemObject = typeof zenFs | typeof electronFs | IFs;
 
 export const gitCache = `/gitfs/gittemp`;
 export const modifiedFileCache = 'rc5ModifiedFiles.json';
+export type DirMeta = {
+  dirHandle: FileSystemDirectoryHandle;
+  id: string;
+  createdAt: string;
+  name: string;
+  isValid: boolean;
+  lastAccessed: string;
+  remoteUrl?: string;
+};
+
 export class GitFS {
   public fs: FileSystemObject;
 
@@ -123,32 +133,111 @@ export class GitFS {
   };
 
   // this is browser specific
-  openLocalDirectory = async (dirHandle: FileSystemDirectoryHandle) => {
+  openLocalDirectory = async (
+    dirHandle: FileSystemDirectoryHandle,
+    forClone: boolean = false,
+  ) => {
     const webacess = await WebAccess.create({ handle: dirHandle });
 
     try {
       zenFs.umount('/localFileSystem');
-      zenFs.mount('/localFileSystem', webacess);
+      if (forClone) {
+        zenFs.mount('/localFileSystem', webacess);
+      } else {
+        zenFs.mount('/localFileSystem/' + dirHandle.name, webacess);
+      }
 
       this.isBrowserFsLoaded = true;
     } catch (error: any) {
       throw error;
     }
   };
+  async getGitRemoteUrl(
+    dirHandle: FileSystemDirectoryHandle,
+  ): Promise<string | undefined> {
+    try {
+      const gitDir = await dirHandle.getDirectoryHandle('.git', {
+        create: false,
+      });
 
+      const configFile = await gitDir.getFileHandle('config', {
+        create: false,
+      });
+
+      const file = await configFile.getFile();
+      const text = await file.text();
+
+      // Match: [remote "origin"] ... url = xxx
+      const match = text.match(/\[remote\s+"origin"\][\s\S]*?url\s*=\s*(.+)/);
+
+      return match?.[1]?.trim();
+    } catch (err) {
+      // Not a git repo or no access
+      return undefined;
+    }
+  }
   // save the local file access directory handle so we dont have to ask for it each time
   setDirHandle = async (dirHandle: FileSystemDirectoryHandle) => {
-    await set('rootDir', dirHandle);
+    const id = crypto.randomUUID();
+
+    const dirMeta: DirMeta = {
+      createdAt: new Date().toISOString(),
+      lastAccessed: new Date().toISOString(),
+      dirHandle,
+      id,
+      name: dirHandle.name,
+      isValid: true,
+      remoteUrl: await this.getGitRemoteUrl(dirHandle),
+    };
+
+    console.log('Set dir ', dirMeta);
+    await set('courses/' + id || 'rootdir', dirMeta);
   };
 
-  getDirHandle = async () => {
-    const saved = await get<FileSystemDirectoryHandle>('rootDir');
+  getLocalDirs = async () => {
+    const allKeys = await keys();
+
+    const matchingKeys = allKeys.filter(
+      (key): key is string =>
+        typeof key === 'string' && key.startsWith('courses/'),
+    );
+
+    const dirMetas = await getMany<DirMeta>(matchingKeys);
+    const newMetas: DirMeta[] = [];
+
+    for (const meta of dirMetas) {
+      const status = await verifyHandlePermission(meta.dirHandle);
+      const newMeta: DirMeta = { ...meta, isValid: status };
+      console.log('new MEta', newMeta);
+      newMetas.push(newMeta);
+      await set('courses/' + meta.id, meta);
+    }
+
+    console.log('Let see whats here return all dirs', dirMetas);
+
+    return newMetas.sort((a, b) => {
+      const aTime = new Date(a.lastAccessed ?? a.createdAt).getTime();
+      const bTime = new Date(b.lastAccessed ?? b.createdAt).getTime();
+      return bTime - aTime;
+    });
+  };
+
+  getDirHandle = async (id?: string) => {
+    console.log('Let see whats here', id);
+    const saved = await get<DirMeta>('courses/' + id || 'rootdir');
+    console.log('Let see whats here saved', saved);
 
     if (saved) {
-      const valid = await verifyHandlePermission(saved);
-      if (!valid) return;
+      const valid = await verifyHandlePermission(saved.dirHandle);
+      if (!valid) {
+        //@ts-ignore
+        const permission = await saved.dirHandle.requestPermission({
+          mode: 'readwrite',
+        });
+        if (!permission) return;
+      }
     }
-    return saved;
+    return saved?.dirHandle;
   };
   /**
    * Deletes a local repository directory by name.

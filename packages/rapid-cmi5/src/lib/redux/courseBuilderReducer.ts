@@ -151,7 +151,7 @@ export const initialState: CourseBuilderState = {
   slides: [
     { slideTitle: '', content: '', type: SlideTypeEnum.Markdown, filepath: '' },
   ],
-  viewMode: ViewModeEnum.Designer,
+  viewMode: ViewModeEnum.RepoSelector,
   currentAuIndex: 0,
   currentBlockIndex: 0,
   currentAuPath: '',

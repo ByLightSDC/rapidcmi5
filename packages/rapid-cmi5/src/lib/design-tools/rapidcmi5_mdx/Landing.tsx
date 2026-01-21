@@ -7,8 +7,11 @@ import { Divider, Stack } from '@mui/material';
 import { LessonDrawer } from './drawers/LessonDrawer';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { NavViewMenu } from './menu/NavViewMenu';
-import { useSelector } from 'react-redux';
-import { currentViewMode } from '../../redux/courseBuilderReducer';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  changeViewMode,
+  currentViewMode,
+} from '../../redux/courseBuilderReducer';
 import { ViewModeEnum } from '../course-builder/CourseBuilderTypes';
 
 import { FileDrawer } from './drawers/FileDrawer';
@@ -18,6 +21,8 @@ import RC5GitEditor from './editors/RC5GitEditor';
 import { GitDrawer } from './drawers/GitDrawer';
 import { SlideMenu } from './menu/SlideMenu';
 import { dividerColor } from '@rapid-cmi5/ui';
+import WelcomePage from './ProjectSelection/SelectProject';
+import { useEffect } from 'react';
 
 /**
  * RapidCMI5 Course Editor Landing
@@ -28,42 +33,57 @@ import { dividerColor } from '@rapid-cmi5/ui';
 export function Landing() {
   const viewMode = useSelector(currentViewMode);
   const themedDividerColor = useSelector(dividerColor);
+  console.log(viewMode);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(changeViewMode(ViewModeEnum.RepoSelector));
+  }, []);
 
   return (
-    <Stack
-      direction="row"
-      sx={{
-        width: '100%',
-        height: '100%',
-      }}
-    >
-      <NavViewMenu />
-      <Divider orientation="vertical" />
-      <PanelGroup direction="horizontal">
-        <Panel defaultSize={20} minSize={5}>
-          {viewMode === ViewModeEnum.Designer && <LessonDrawer />}
-          {viewMode === ViewModeEnum.CodeEditor && <FileDrawer />}
-          {viewMode === ViewModeEnum.GitEditor && <GitDrawer />}
-        </Panel>
-
-        <PanelResizeHandle
-          style={{
-            backgroundColor: themedDividerColor,
-            width: 4,
+    <>
+      {viewMode === ViewModeEnum.RepoSelector ? (
+        <WelcomePage
+          setRepoSelected={() => {
+            dispatch(changeViewMode(ViewModeEnum.Designer));
           }}
         />
-        <Panel>
-          {viewMode === ViewModeEnum.Designer && (
-            <>
-              <SlideMenu />
-              <RC5VisualEditor />
-            </>
-          )}
-          {viewMode === ViewModeEnum.CodeEditor && <RC5FileEditor />}
-          {viewMode === ViewModeEnum.GitEditor && <RC5GitEditor />}
-        </Panel>
-      </PanelGroup>
-    </Stack>
+      ) : (
+        <Stack
+          direction="row"
+          sx={{
+            width: '100%',
+            height: '100%',
+          }}
+        >
+          <NavViewMenu />
+          <Divider orientation="vertical" />
+          <PanelGroup direction="horizontal">
+            <Panel defaultSize={20} minSize={5}>
+              {viewMode === ViewModeEnum.Designer && <LessonDrawer />}
+              {viewMode === ViewModeEnum.CodeEditor && <FileDrawer />}
+              {viewMode === ViewModeEnum.GitEditor && <GitDrawer />}
+            </Panel>
+
+            <PanelResizeHandle
+              style={{
+                backgroundColor: themedDividerColor,
+                width: 4,
+              }}
+            />
+            <Panel>
+              {viewMode === ViewModeEnum.Designer && (
+                <>
+                  <SlideMenu />
+                  <RC5VisualEditor />
+                </>
+              )}
+              {viewMode === ViewModeEnum.CodeEditor && <RC5FileEditor />}
+              {viewMode === ViewModeEnum.GitEditor && <RC5GitEditor />}
+            </Panel>
+          </PanelGroup>
+        </Stack>
+      )}
+    </>
   );
 }
 

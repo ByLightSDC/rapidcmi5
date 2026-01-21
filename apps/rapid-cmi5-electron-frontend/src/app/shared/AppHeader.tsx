@@ -4,10 +4,7 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 // import { useAppBreadCrumbs } from '../hooks/useAppBreadCrumbs';
 
-import {
-  appHeaderVisible,
-  themeColor,
-} from '@rapid-cmi5/ui';
+import { appHeaderVisible, themeColor } from '@rapid-cmi5/ui';
 import { useLogOut } from '../hooks/useLogOut';
 
 /* Branded */
@@ -23,6 +20,7 @@ import Tooltip from '@mui/material/Tooltip';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 import UserInfoBox from './navbar/UserInfoBox';
+import { Typography } from '@mui/material';
 
 /* Layout Notes
 height is determined by the toggle icon size in the Navbar , currently medium
@@ -78,58 +76,74 @@ export default function AppHeader() {
   return (
     <>
       {showAppHeader && (
-        <Box sx={{ height: 'auto', backgroundColor: 'background.paper' }}>
-          <Grid
-            container
-            sx={{
-              //we need this to avoid layout issue (see Scenario Designer drawers top alignment)
-              backgroundColor: (theme: any) => `${theme.header.default}`,
-              alignItems: 'center',
-              alignContent: 'center',
-              paddingTop: '0px',
-            }}
-          >
+        <Box
+          sx={{
+            height: '35px',
+            backgroundColor: (theme: any) => `${theme.header.default}`,
+            borderBottom: '1px solid',
+            borderBottomColor: 'divider',
+            display: 'flex',
+            alignItems: 'center',
+            px: 1,
+          }}
+        >
+          {/* Left section - Logo and Dashboard Menu */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <AppLogo
-
               assetId="rapid-cmi5"
               isNavOpen={false}
               appThemeColor={appThemeColor}
             />
-
-            <AppHeaderDashboardMenu
-              dashboardIcons={[]}
-              appThemeColor={appThemeColor}
-            />
-            <Box
+            <Typography
+              variant="body2"
               sx={{
-                display: 'flex',
-                position: 'absolute',
-                right: '8px',
-                width: 'auto',
+                fontWeight: 500,
+                fontSize: '15px',
+                letterSpacing: '0.02em',
+                color: (theme: any) => `${theme.header.buttonColor}`,
+                userSelect: 'none',
+                opacity: 0.9,
               }}
             >
-              <IconButton
-                aria-label="user-settings"
-                id="settings-menu-anchor"
-                onClick={() => onAppIconClick(settingsKey)}
-                sx={appIconStyle}
+              Rapid CMI5
+            </Typography>
+          </Box>
+
+          {/* Center section - could add breadcrumbs or title here */}
+          <Box sx={{ flex: 1 }} />
+
+          {/* Right section - Settings and User */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <IconButton
+              aria-label="user-settings"
+              id="settings-menu-anchor"
+              onClick={() => onAppIconClick(settingsKey)}
+              size="small"
+              sx={{
+                color: (theme: any) => `${theme.header.buttonColor}`,
+                borderRadius: '4px',
+                '&:hover': {
+                  backgroundColor: 'action.hover',
+                  color: (theme: any) => `${theme.header.hoverColor}`,
+                },
+              }}
+            >
+              <Tooltip
+                arrow
+                enterDelay={500}
+                enterNextDelay={500}
+                title="User Settings"
+                placement="bottom"
               >
-                <Tooltip
-                  arrow
-                  enterDelay={500}
-                  enterNextDelay={500}
-                  title="User Settings"
-                  placement="bottom"
-                >
-                  <SettingsIcon />
-                </Tooltip>
-              </IconButton>
-              <UserInfoBox
-                anchorEl={settingsMenuAnchor}
-                onClose={() => setSettingsMenuAnchor(null)}
-              />
-            </Box>
-          </Grid>
+                <SettingsIcon fontSize="small" />
+              </Tooltip>
+            </IconButton>
+
+            <UserInfoBox
+              anchorEl={settingsMenuAnchor}
+              onClose={() => setSettingsMenuAnchor(null)}
+            />
+          </Box>
         </Box>
       )}
       {/* <Box sx={{ height: 'auto', backgroundColor: 'background.paper' }}>

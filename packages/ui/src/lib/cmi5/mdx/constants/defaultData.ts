@@ -59,7 +59,7 @@ export const defaultCloneRepoData = {
   repoUsername: '',
   repoPassword: '',
   authorName: '',
-  authorEmail: '',
+  authorEmail: ''
 };
 
 export const defaultImportRepoZipData = {

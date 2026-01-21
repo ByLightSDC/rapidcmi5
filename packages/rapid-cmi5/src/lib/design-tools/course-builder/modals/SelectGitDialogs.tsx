@@ -15,7 +15,6 @@ import {
 import { useContext, useEffect, useState } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';
 import DirectoryTreeView from '../GitViewer/Components/SelectedRepo/DirectoryTree';
-import RepositorySelector from '../selectors/RepositorySelector';
 import CourseSelector from '../selectors/CourseSelector';
 import { Box, Stack } from '@mui/system';
 
@@ -73,11 +72,11 @@ export function SelectGitDialogs() {
     handleLoadCourse,
     currentRepo,
     availableRepos,
-    handleChangeRepo,
     currentGitConfig,
     directoryTree,
     handleGitCommitReset,
     isElectron,
+    getDirHandle,
   } = useContext(GitContext);
   const { sendMessage } = useContext(RC5Context);
 
@@ -164,8 +163,8 @@ export function SelectGitDialogs() {
     switch (modalId) {
       case cloneRepoModalId:
         //after clone we end up here
-        promptSelectRepo();
-        return;
+        // promptSelectRepo();
+        break;
       case createCourseModalId:
         break;
       case createNewLessonModalId:
@@ -221,13 +220,6 @@ export function SelectGitDialogs() {
               height: '100%',
             }}
           >
-            <RepositorySelector
-              currentRepo={currentRepo || undefined}
-              availableRepos={availableRepos}
-              disabled={!availableRepos || availableRepos?.length === 0}
-              onAction={promptCloneRepo}
-              onSelect={handleChangeRepo}
-            />
             {/* <Divider /> */}
             <CourseSelector
               currentCoursePath={currentCourse?.basePath || undefined}
@@ -289,8 +281,10 @@ export function SelectGitDialogs() {
           defaultData={{
             ...defaultCloneRepoData,
             repoRemoteUrl: '',
-            authorEmail: currentAuth?.parsedUserToken?.email?.toLowerCase(),
-            authorName: currentAuth?.parsedUserToken?.name,
+            authorEmail: '',
+            authorName: '',
+            // authorEmail: currentAuth?.parsedUserToken?.email?.toLowerCase(),
+            // authorName: currentAuth?.parsedUserToken?.name,
             shallowClone: false,
           }}
           modalObj={modalObj}

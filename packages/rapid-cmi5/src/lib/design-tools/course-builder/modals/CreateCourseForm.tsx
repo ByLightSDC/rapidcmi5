@@ -14,7 +14,8 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { createCourseModalId } from '../../rapidcmi5_mdx/modals/constants';
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
-import { Alert, Grid, IconButton, Tooltip } from '@mui/material';
+import { Alert, IconButton, Tooltip } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 
 import { useForm, UseFormReturn } from 'react-hook-form';
 
@@ -50,8 +51,6 @@ export function CreateCourseForm({
     mode: 'onChange',
   });
 
-  const { watch } = formMethods;
-
   const validationSchema = useMemo(() => {
     return yup.object().shape({
       courseName: NAME_GROUP,
@@ -72,6 +71,7 @@ export function CreateCourseForm({
         ),
     });
   }, []);
+  
   const onCancel = () => {
     handleCloseModal();
   };
@@ -101,7 +101,7 @@ export function CreateCourseForm({
     const isUploading = watch('zipFile');
 
     const defaultLessonField = !isUploading && (
-      <Grid item xs={12}>
+      <Grid size={12}>
         <FormControlTextField
           control={control}
           error={Boolean(errors?.firstAuName)}
@@ -114,8 +114,8 @@ export function CreateCourseForm({
     );
 
     const zipUploadField = (
-      <Grid item xs={12}>
-        <Tooltip title="Uupload an existing CMI5 course zip file into the repo. Must have a valid RC5 version.">
+      <Grid size={12}>
+        <Tooltip title="Upload an existing CMI5 course zip file into the repo. Must have a valid RC5 version.">
           <IconButton size="small">
             <InfoOutlinedIcon fontSize="small" />
           </IconButton>
@@ -145,7 +145,7 @@ export function CreateCourseForm({
     return (
       <>
         {/* Required Metadata */}
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.courseName)}
@@ -155,7 +155,7 @@ export function CreateCourseForm({
             label="Course Name"
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.courseId)}
@@ -165,8 +165,8 @@ export function CreateCourseForm({
             label="Course Id"
           />
         </Grid>
-        <Grid item xs={6} /> {/* spacer for layout */}
-        <Grid item xs={12}>
+        <Grid size={6} /> {/* spacer for layout */}
+        <Grid size={12}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.courseDescription)}
@@ -203,6 +203,7 @@ export function CreateCourseForm({
           onCancel={onCancel}
           onResponse={onResponse}
           validationSchema={validationSchema}
+          shouldAutoSave={false}
         />
       </FormControlUIProvider>
     </ModalDialog>

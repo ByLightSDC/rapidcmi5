@@ -11,7 +11,6 @@ import {
 } from '../../../../redux/repoManagerReducer';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import { GitFS } from '../utils/fileSystem';
-import { getRepoAccess } from './GitContext';
 import { failedMergePath, GitOperations } from '../utils/gitOperations';
 
 export function useGitRepoStatus(
@@ -41,10 +40,9 @@ export function useGitRepoStatus(
   const [numStaged, setNumStaged] = useState(0);
   const [isRepoConnectedToRemote, setIsRepoConnectedToRemote] = useState(true);
 
-  const resolvePushStatus = async () => {
+  const resolvePushStatus = async (r: RepoAccessObject) => {
     if (!fsInstance.isBrowserFsLoaded) return;
     try {
-      const r = getRepoAccess(repoAccessObject);
       if (!currentBranch) return;
 
       const numberCommits = await gitOperator.getCommitsToPushCount(
@@ -111,6 +109,7 @@ export function useGitRepoStatus(
 
   const resolveGitRepoStatus = useCallback(
     async (
+      r: RepoAccessObject,
       changedFiles?: ModifiedFile[] | undefined,
       fullResolve?: boolean,
     ) => {
@@ -118,8 +117,6 @@ export function useGitRepoStatus(
         gettingRepoStatus.current = true;
 
         try {
-          const r = getRepoAccess(repoAccessObject);
-
           let status: ModifiedFile[];
 
           if (fullResolve) {
@@ -205,12 +202,9 @@ export function useGitRepoStatus(
     setCanPop(hasStashes);
   };
 
-  const resolveRemoteRepoStatus = async () => {
+  const resolveRemoteRepoStatus = async (r: RepoAccessObject) => {
     try {
-      const r = getRepoAccess(repoAccessObject);
-
       const checkRemoteRepo = async () => {
-
         try {
           const remoteRepos = await gitOperator.listRepoRemotes(r);
           const hasRemotes = remoteRepos.length > 0;
@@ -228,7 +222,9 @@ export function useGitRepoStatus(
   };
 
   useEffect(() => {
-
+    if (!repoAccessObject) {
+      return;
+    }
     let hasStaged = false;
     let hasUnstaged = false;
     let numOfStaged = 0;

@@ -6,6 +6,7 @@ import { getRepoPath } from '../design-tools/course-builder/GitViewer/utils/gitO
 import { CourseData } from '@rapid-cmi5/cmi5-build-common';
 import { getFsInstance } from '../design-tools/course-builder/GitViewer/utils/gitFsInstance';
 import { resetPersistance } from '@rapid-cmi5/ui';
+import { Payload } from 'react-rough-notation/dist/RoughNotationGroup/types';
 
 // this pair ensures we always know what file system type and what the repo name is
 // when acting upon the file system
@@ -30,6 +31,12 @@ export interface FileState {
   lastSelectedPath: string;
 }
 
+export enum LoadingState {
+  loaded = 'Loaded',
+  loadingRepo = 'Loading Repo',
+  cloningRepo = 'Cloning Repo',
+}
+
 // the file system path for the particular mount type
 export enum fsType {
   inBrowser = 'inBrowser',
@@ -49,6 +56,8 @@ export interface RepoState {
   allBranches: string[];
   availableRepos: string[];
   fileState: FileState;
+  showSelectProjects: boolean;
+  loadingState: LoadingState;
 }
 
 export const initFileState: FileState = {
@@ -69,6 +78,8 @@ export const initialState: RepoState = {
   availableRepos: [],
   fileState: initFileState,
   fileSystemType: fsType.inBrowser,
+  showSelectProjects: true,
+  loadingState: LoadingState.loaded,
 };
 
 export const repoManagerSlice = createSlice({
@@ -85,6 +96,9 @@ export const repoManagerSlice = createSlice({
       state.availableRepos = state.availableRepos.filter(
         (repo) => repo !== action.payload,
       );
+    },
+    setLoadingState: (state, action: PayloadAction<LoadingState>) => {
+      state.loadingState = action.payload;
     },
     setCurrentRepo: (state, action: PayloadAction<string | null>) => {
       const repoName = action.payload;
@@ -128,7 +142,9 @@ export const repoManagerSlice = createSlice({
         state.fileState.availableCourses[courseIndex] = { ...selected };
       }
     },
-
+    toggleShowProject: (state, action: PayloadAction<boolean>) => {
+      state.showSelectProjects = action.payload;
+    },
     pushCourseList: (state, action: PayloadAction<Course>) => {
       state.fileState.availableCourses.push(action.payload);
     },
@@ -256,11 +272,15 @@ export const {
   unselectCourse,
   renameCurrentCourse,
   setCurrentFileSystemType,
+  toggleShowProject,
+  setLoadingState,
 } = repoManagerSlice.actions;
 
 export default repoManagerSlice.reducer;
 export const currentFsTypeSel = (state: RootState) =>
   state.repoManager.fileSystemType;
+export const showSelectProjects = (state: RootState) =>
+  state.repoManager.showSelectProjects;
 
 export const currentRepoAccessObjectSel = (state: RootState) =>
   state.repoManager.repoAccessObject;

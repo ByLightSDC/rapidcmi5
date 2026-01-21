@@ -6,6 +6,8 @@ import { AxiosResponse } from 'axios';
 import { Provider } from 'react-redux';
 import { persistor, store } from '../../redux/store';
 import { PersistGate } from 'redux-persist/integration/react';
+import WelcomePage from './ProjectSelection/SelectProject';
+import { useState } from 'react';
 
 export interface buildCmi5ZipParams {
   zipBlob: File;
@@ -39,8 +41,8 @@ export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {
       <PersistGate loading={null} persistor={persistor}>
         <GitContextProvider rapidCmi5Opts={rapidCmi5Opts}>
           <RC5ContextProvider>
-            <Landing />
             <RC5Modals />
+            <Landing />
           </RC5ContextProvider>
         </GitContextProvider>
       </PersistGate>

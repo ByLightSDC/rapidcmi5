@@ -1,9 +1,9 @@
-
 export enum ViewModeEnum {
   Designer = 'Designer',
   CodeEditor = 'Code Editor',
   FormEditor = 'Form Editor',
   GitEditor = 'Git Editor',
+  RepoSelector = 'Repo Selector',
 }
 
 /**

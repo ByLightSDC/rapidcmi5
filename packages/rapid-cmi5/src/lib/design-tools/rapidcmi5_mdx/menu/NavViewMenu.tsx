@@ -10,13 +10,17 @@ import {
   currentViewMode,
 } from '../../../redux/courseBuilderReducer';
 import { ViewModeEnum } from '../../course-builder/CourseBuilderTypes';
-import { setBreadCrumbVisible, themeColor } from '@rapid-cmi5/ui';
+import {
+  darkTheme,
+  lightTheme,
+  setBreadCrumbVisible,
+  themeColor,
+} from '@rapid-cmi5/ui';
 import {
   getSvgStyleIcon,
   StyleIconTypeEnum,
 } from '../styles/styleSvgConstants';
-import { lightTheme } from '../../../styles/muiTheme';
-import { darkTheme } from '../../../styles/muiThemeDark';
+
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
 import { RC5Context } from '../contexts/RC5Context';
@@ -46,6 +50,7 @@ export const NavViewMenu = () => {
   const { saveSlide } = useContext(RC5Context);
   const { promptNavAway } = useRC5Prompts();
 
+  // @ts-ignore
   const disabledIconColor = lightTheme.header.buttonColor;
 
   const menuIconStyle = {
@@ -222,7 +227,6 @@ export const NavViewMenu = () => {
         }
         onClick={() => {
           handleNavToDesigner();
-          dispatch(changeViewMode(ViewModeEnum.Designer));
         }}
       >
         <Tooltip arrow placement="right" title="Visual Designer">

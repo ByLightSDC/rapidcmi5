@@ -57,7 +57,7 @@ export default function CourseSelector({
   return (
     <AnySelector
       id="courses"
-      data-testid='course-selector'
+      data-testid="course-selector"
       theValue={currentCoursePath || ''}
       onChange={handleSelect}
       topicLabel="Course"
@@ -68,11 +68,15 @@ export default function CourseSelector({
       iconButtonTooltip="Create Course"
       iconButtonDisabled={false}
       styleProps={styleProps}
-      selectorStyleProps={{ width: '180px' }}
+      selectorStyleProps={{ width: '180px', height: 32, minHeight: 32 }}
     >
       {availableCourses &&
         availableCourses.map((course) => (
-          <MenuItem key={course.basePath} value={course.basePath} onClick={() => handleSelect(course.basePath)}>
+          <MenuItem
+            key={course.basePath}
+            value={course.basePath}
+            onClick={() => handleSelect(course.basePath)}
+          >
             {course.basePath}
           </MenuItem>
         ))}

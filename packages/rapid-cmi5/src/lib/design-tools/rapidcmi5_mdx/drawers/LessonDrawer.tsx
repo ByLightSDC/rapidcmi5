@@ -1,4 +1,5 @@
 import {
+  Box,
   Divider,
   IconButton,
   List,
@@ -33,17 +34,12 @@ import FolderZipIcon from '@mui/icons-material/FolderZip';
 import ImportExportIcon from '@mui/icons-material/ImportExport';
 
 //import SettingsIcon from '@mui/icons-material/Settings';
-import {
-  debugLogError,
-  RowAction,
-} from '@rapid-cmi5/ui';
+import { debugLogError, RowAction } from '@rapid-cmi5/ui';
 import { listItemProps } from './components/LessonTreeNode';
 import { useSelector } from 'react-redux';
 import { Renamer } from './components/Renamer';
 import { RootState } from '../../../redux/store';
 import { RepoState } from '../../../redux/repoManagerReducer';
-import ChangeRepoExpander from './components/ChangeRepoExpander';
-import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { ButtonOptions, ButtonMinorUi } from '@rapid-cmi5/ui';
 
 /** Order important actions */
@@ -97,14 +93,8 @@ const courseActions = [
  * @returns
  */
 export const LessonDrawer = () => {
-  const {
-    availableCourses,
-    currentCourse,
-    currentRepo,
-    handleChangeRepo,
-    handleChangeFileSystem,
-    isElectron,
-  } = useContext(GitContext);
+  const { availableCourses, currentCourse, currentRepo } =
+    useContext(GitContext);
 
   const courseData = useSelector(courseDataCache);
   const currentBlockIndex = useSelector(currentBlock);
@@ -119,11 +109,6 @@ export const LessonDrawer = () => {
 
   const [menuAnchor, setMenuAnchor] = useState<any>(null);
   const [menuAnchorPos, setMenuAnchorPos] = useState<number[]>([0, 0]);
-  const { fileSystemType, availableRepos }: RepoState = useSelector(
-    (state: RootState) => state.repoManager,
-  );
-
-  const [isRepoSelecterExpanded, setIsRepoSelecterExpanded] = useState(false);
 
   const onCreateLesson = useCallback(() => {
     saveSlide();
@@ -193,45 +178,56 @@ export const LessonDrawer = () => {
       </Typography>
       <Stack
         direction="row"
+        spacing={1}
         sx={{
-          display: 'flex',
-          alignContent: 'center',
-          marginBottom: '12px',
+          mb: 2,
+          p: 1,
+          borderRadius: 1,
+          alignItems: 'center',
         }}
       >
-        <CourseSelector
-          currentCoursePath={currentCourse?.basePath || undefined}
-          currentRepo={currentRepo || undefined}
-          availableCourses={availableCourses}
-          disabled={!availableCourses || availableCourses?.length === 0}
-          styleProps={{
-            marginTop: '12px',
-          }}
-          //REF onAction={promptCreateCourse}
-          onSelect={(coursePath: string) => {
-            saveSlide();
-            promptChangeCourse(coursePath);
-          }}
-        />
+        <Box sx={{ flex: 1 }}>
+          <CourseSelector
+            currentCoursePath={currentCourse?.basePath || undefined}
+            currentRepo={currentRepo || undefined}
+            availableCourses={availableCourses}
+            disabled={!availableCourses || availableCourses?.length === 0}
+            onSelect={(coursePath: string) => {
+              saveSlide();
+              promptChangeCourse(coursePath);
+            }}
+          />
+        </Box>
+
+        <Tooltip title="Create Course">
+          <span>
+            <IconButton
+              disabled={!currentRepo}
+              size="small"
+              onClick={promptCreateCourse}
+              data-testid="create-course-button"
+            >
+              <AddIcon fontSize="small" />
+            </IconButton>
+          </span>
+        </Tooltip>
 
         <ButtonOptions
-          optionButton={(handleClick: any, tooltip: string) => {
-            return (
-              <IconButton
-                aria-label="apps"
-                className="nodrag"
-                disabled={!currentRepo}
-                sx={{
-                  color: 'primary',
-                  maxHeight: '30px',
-                  marginTop: '12px',
-                }}
-                onClick={handleClick}
-              >
-                <MoreVertIcon fontSize="inherit" color="inherit" />
-              </IconButton>
-            );
-          }}
+          optionButton={(handleClick: any) => (
+            <Tooltip title="More Options">
+              <span>
+                <IconButton
+                  aria-label="course options"
+                  className="nodrag"
+                  disabled={!currentRepo}
+                  size="small"
+                  onClick={handleClick}
+                >
+                  <MoreVertIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+          )}
           closeOnClick={true}
           onTrigger={(event?: any) => {
             onCourseContextAction(event, CourseActionEnum.TriggerRename);
@@ -301,66 +297,6 @@ export const LessonDrawer = () => {
           onSave={updateCourseName}
         />
       )}
-
-      <Stack
-        direction="row"
-        sx={{
-          display: 'flex',
-          alignContent: 'center',
-        }}
-      >
-        <ButtonMinorUi
-          startIcon=<AddIcon />
-          disabled={!currentRepo}
-          sxProps={{}}
-          onClick={onCreateLesson}
-          data-testid="create-lesson-button"
-        >
-          Lesson
-        </ButtonMinorUi>
-        <ButtonMinorUi
-          startIcon=<AddIcon />
-          disabled={!currentRepo}
-          sxProps={{ height: '30px' }}
-          onClick={promptCreateCourse}
-          data-testid="create-course-button"
-        >
-          Course
-        </ButtonMinorUi>
-        <Tooltip
-          title={
-            isRepoSelecterExpanded
-              ? 'Hide repository and file system options'
-              : 'Show repository and file system options'
-          }
-          placement="top"
-          arrow
-        >
-          <IconButton
-            onClick={() => setIsRepoSelecterExpanded(!isRepoSelecterExpanded)}
-            size="small"
-            sx={{
-              backgroundColor: 'action.hover',
-              '&:hover': {
-                backgroundColor: 'action.selected',
-              },
-            }}
-          >
-            {isRepoSelecterExpanded ? <ExpandLess /> : <ExpandMore />}
-          </IconButton>
-        </Tooltip>
-      </Stack>
-
-      <ChangeRepoExpander
-        isExpanded={isRepoSelecterExpanded}
-        isElectron={isElectron}
-        availableRepos={availableRepos}
-        currentRepo={currentRepo}
-        fileSystemType={fileSystemType}
-        handleChangeFileSystem={handleChangeFileSystem}
-        handleChangeRepo={handleChangeRepo}
-      />
-
       {courseData?.courseTitle ? (
         <>
           <Typography
@@ -369,7 +305,7 @@ export const LessonDrawer = () => {
           >
             Lessons
           </Typography>
-          <LessonTree courseData={courseData} />
+          <LessonTree courseData={courseData} onCreateLesson={onCreateLesson} />
         </>
       ) : (
         <Typography

@@ -16,7 +16,10 @@ import { useForm, UseFormReturn, useWatch } from 'react-hook-form';
 import Check from '@mui/icons-material/Check';
 import { AxiosError } from 'axios';
 import { LoadingUi } from '../indicators/Loading';
-import { ButtonModalCancelUi, ButtonModalMainUi } from '../inputs/buttons/buttonsmodal';
+import {
+  ButtonModalCancelUi,
+  ButtonModalMainUi,
+} from '../inputs/buttons/buttonsmodal';
 import { FormStateType } from '../types/form';
 import { FormControlUIContext } from './FormControlUIContext';
 import Form from './Form';
@@ -51,7 +54,7 @@ export type MiniFormProps = {
   autoSaveDebounceTime?: number;
   crudType?: FormCrudType;
   dataCache?: any;
-  doAction?: (data: any) => void;
+  doAction?: (data: any) => Promise<void> | void;
   formWidth?: number | string;
   instructions?: string;
   getFormFields: (
@@ -132,8 +135,7 @@ export function MiniForm({
     trigger,
     formState,
   } = methods;
-  const { errors, isValid, isDirty, isSubmitSuccessful, dirtyFields } =
-    formState;
+  const { isValid, isDirty, isSubmitSuccessful } = formState;
 
   /**
    * Debug UE
@@ -330,23 +332,19 @@ export function MiniForm({
     if (shouldAutoSave) {
       if (isDirty) {
         if (autoSaveDebounceTime > 0) {
-          setIsSubmitting(true);
           if (debouncer.current !== undefined) {
             clearTimeout(debouncer.current);
           }
           debouncer.current = setTimeout(() => {
+            setIsSubmitting(true);
             autoSave();
           }, autoSaveDebounceTime);
         } else {
+          setIsSubmitting(true);
           autoSave();
-        }
-      } else {
-        if (debouncer.current !== undefined) {
-          clearTimeout(debouncer.current);
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDirty, allFormValues]);
 
   return (
