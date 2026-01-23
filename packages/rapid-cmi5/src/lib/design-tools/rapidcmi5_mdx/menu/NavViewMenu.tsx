@@ -20,7 +20,7 @@ import {
   getSvgStyleIcon,
   StyleIconTypeEnum,
 } from '../styles/styleSvgConstants';
-
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
 import { RC5Context } from '../contexts/RC5Context';
@@ -29,6 +29,7 @@ import { RC5Context } from '../contexts/RC5Context';
  * Icons
  */
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { Home } from '@mui/icons-material';
 
 const navIconStyle = { marginTop: '4px', position: 'relative' };
 
@@ -36,7 +37,11 @@ const navIconStyle = { marginTop: '4px', position: 'relative' };
  * Vertical nav menu for changing between MdxEditor, File Editor, and Git GUI
  * @returns
  */
-export const NavViewMenu = () => {
+export const NavViewMenu = ({
+  showHomeButton,
+}: {
+  showHomeButton?: boolean;
+}) => {
   const dispatch = useDispatch();
   const themeSel = useSelector(themeColor);
   const viewMode = useSelector(currentViewMode);
@@ -213,6 +218,7 @@ export const NavViewMenu = () => {
       sx={{
         width: '48px',
         height: '100%',
+        minHeight: 0,
       }}
       spacing={0}
     >
@@ -334,6 +340,35 @@ export const NavViewMenu = () => {
           </Stack>
         </Tooltip>
       </IconButton>
+      {showHomeButton && (
+        <Box sx={{ mt: 'auto', mb: 2}}>
+          <IconButton
+            aria-label="repo-selection-button"
+            data-testid="repo-selection-button"
+            color="inherit"
+            size={iconButtonSize}
+            style={menuIconStyle}
+            onClick={() => {
+              dispatch(changeViewMode(ViewModeEnum.RepoSelector));
+            }}
+            sx={{backgroundColor: 'inherit'}}
+          >
+            <Tooltip arrow placement="right" title="Repo Selection">
+              {viewMode === ViewModeEnum.RepoSelector ? (
+                <div
+                  style={{
+                    color: disabledIconColor,
+                  }}
+                >
+                  <ArrowBackIcon color="inherit" sx={navIconStyle} />
+                </div>
+              ) : (
+                <ArrowBackIcon color="primary" sx={navIconStyle} />
+              )}
+            </Tooltip>
+          </IconButton>
+        </Box>
+      )}
     </Stack>
   );
 };

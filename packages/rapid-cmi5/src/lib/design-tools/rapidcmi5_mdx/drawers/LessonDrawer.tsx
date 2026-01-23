@@ -131,6 +131,10 @@ export const LessonDrawer = () => {
     );
   }, [courseData, currentBlockIndex, promptCreateLesson, saveSlide]);
 
+  const publishCourse = () => {
+    saveSlide();
+    promptDownloadCourseCMI5Zip();
+  };
   const onCourseContextAction = (event: any, whichAction: number) => {
     switch (whichAction) {
       // case CourseActionEnum.Configure:
@@ -150,8 +154,7 @@ export const LessonDrawer = () => {
         }
         break;
       case CourseActionEnum.Publish:
-        saveSlide();
-        promptDownloadCourseCMI5Zip();
+        publishCourse();
         break;
     }
   };
@@ -199,89 +202,123 @@ export const LessonDrawer = () => {
           />
         </Box>
 
-        <Tooltip title="Create Course">
-          <span>
-            <IconButton
-              disabled={!currentRepo}
-              size="small"
-              onClick={promptCreateCourse}
-              data-testid="create-course-button"
-            >
-              <AddIcon fontSize="small" />
-            </IconButton>
-          </span>
-        </Tooltip>
+        <Stack direction="row" spacing={0.5}>
+          <Tooltip title="Create Course">
+            <span>
+              <IconButton
+                disabled={!currentRepo}
+                size="small"
+                onClick={promptCreateCourse}
+                data-testid="create-course-button"
+                sx={{
+                  borderRadius: 1,
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  },
+                }}
+              >
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
 
-        <ButtonOptions
-          optionButton={(handleClick: any) => (
-            <Tooltip title="More Options">
-              <span>
-                <IconButton
-                  aria-label="course options"
-                  className="nodrag"
-                  disabled={!currentRepo}
-                  size="small"
-                  onClick={handleClick}
-                >
-                  <MoreVertIcon fontSize="small" />
-                </IconButton>
-              </span>
-            </Tooltip>
-          )}
-          closeOnClick={true}
-          onTrigger={(event?: any) => {
-            onCourseContextAction(event, CourseActionEnum.TriggerRename);
-          }}
-        >
-          <List
-            sx={{
-              backgroundColor: (theme: any) => `${theme.nav.fill}`,
-              color: (theme: any) => `${theme.nav.icon}`,
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-              height: 'auto',
+          <Tooltip title="Publish Course">
+            <span>
+              <IconButton
+                disabled={!currentRepo}
+                size="small"
+                onClick={publishCourse}
+                data-testid="publish-course-button"
+                sx={{
+                  borderRadius: 1,
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  },
+                }}
+              >
+                <PublishIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+
+          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
+          <ButtonOptions
+            optionButton={(handleClick: any) => (
+              <Tooltip title="More Options">
+                <span>
+                  <IconButton
+                    aria-label="course options"
+                    className="nodrag"
+                    disabled={!currentRepo}
+                    size="small"
+                    onClick={handleClick}
+                    sx={{
+                      borderRadius: 1,
+                      '&:hover': {
+                        bgcolor: 'action.hover',
+                      },
+                    }}
+                  >
+                    <MoreVertIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
+            closeOnClick={true}
+            onTrigger={(event?: any) => {
+              onCourseContextAction(event, CourseActionEnum.TriggerRename);
             }}
-            component="nav"
           >
-            <Typography sx={{ marginLeft: '12px' }} variant="caption">
-              {courseData?.courseTitle || 'No Course Selected'}
-            </Typography>
-            {courseActions.map((option: RowAction, index: number) => (
-              // eslint-disable-next-line react/jsx-no-useless-fragment
-              <React.Fragment key={option.tooltip}>
-                {!option.hidden && (
-                  <>
-                    {index > 0 && <Divider />}
-                    <ListItemButton
-                      sx={{
-                        height: 30,
-                      }}
-                      onClick={(event) => {
-                        onCourseContextAction(event, index);
-                      }}
-                    >
-                      <ListItemIcon
+            <List
+              sx={{
+                backgroundColor: (theme: any) => `${theme.nav.fill}`,
+                color: (theme: any) => `${theme.nav.icon}`,
+                display: 'flex',
+                flexDirection: 'column',
+                width: '100%',
+                height: 'auto',
+              }}
+              component="nav"
+            >
+              <Typography sx={{ marginLeft: '12px' }} variant="caption">
+                {courseData?.courseTitle || 'No Course Selected'}
+              </Typography>
+              {courseActions.map((option: RowAction, index: number) => (
+                <React.Fragment key={option.tooltip}>
+                  {!option.hidden && (
+                    <>
+                      {index > 0 && <Divider />}
+                      <ListItemButton
                         sx={{
-                          padding: '0px',
-                          margin: '0px',
-                          marginRight: '2px',
-                          minWidth: '0px',
+                          height: 30,
+                        }}
+                        onClick={(event) => {
+                          onCourseContextAction(event, index);
                         }}
                       >
-                        {option.icon}
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={option.tooltip}
-                        slotProps={{ primary: listItemProps }}
-                      />
-                    </ListItemButton>
-                  </>
-                )}
-              </React.Fragment>
-            ))}
-          </List>
-        </ButtonOptions>
+                        <ListItemIcon
+                          sx={{
+                            padding: '0px',
+                            margin: '0px',
+                            marginRight: '2px',
+                            minWidth: '0px',
+                          }}
+                        >
+                          {option.icon}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={option.tooltip}
+                          slotProps={{ primary: listItemProps }}
+                        />
+                      </ListItemButton>
+                    </>
+                  )}
+                </React.Fragment>
+              ))}
+            </List>
+          </ButtonOptions>
+        </Stack>
       </Stack>
       {menuAnchor && (
         <Renamer

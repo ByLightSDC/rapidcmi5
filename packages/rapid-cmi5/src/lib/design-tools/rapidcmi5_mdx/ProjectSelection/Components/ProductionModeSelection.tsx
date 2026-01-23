@@ -70,11 +70,13 @@ export default function ProductionModeSelection({
   cloneRepo,
   onShowDocumentation,
   createRepo,
+  isElectron = false,
 }: {
   openLocalFolder: () => void;
   cloneRepo: () => void;
   onShowDocumentation?: (doc: OptionDocumentation) => void;
   createRepo: () => void;
+  isElectron?: boolean;
 }) {
   const handleShowDocs = (key: string) => {
     if (onShowDocumentation) {
@@ -83,7 +85,7 @@ export default function ProductionModeSelection({
   };
   const theme = useTheme();
   const { palette } = theme;
-  
+
   return (
     <GlassCard
       title="Production Mode"
@@ -108,17 +110,20 @@ export default function ProductionModeSelection({
           }
         />
         {/* Open Existing Repository */}
-        <OptionCard
-          title={'Open Existing Repository'}
-          handleSelect={() => openLocalFolder()}
-          handleShowDocs={() => handleShowDocs('open')}
-          icon={<FolderOpen />}
-          subText={
-            <>Select an existing Git repository from your local computer.</>
-          }
-        />
+        {!isElectron && (
+          <OptionCard
+            title={'Open Existing Repository'}
+            handleSelect={() => openLocalFolder()}
+            handleShowDocs={() => handleShowDocs('open')}
+            icon={<FolderOpen />}
+            subText={
+              <>Select an existing Git repository from your local computer.</>
+            }
+          />
+        )}
         {/* Create New Repository */}
         <OptionCard
+          data-testid='create-repo-button'
           title={'Create New Repository'}
           handleSelect={() => createRepo()}
           handleShowDocs={() => handleShowDocs('create')}

@@ -1,7 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
 
-import { Box, Grid, MenuItem } from '@mui/material';
+import { Box, MenuItem } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import {
   gradingOptions,
   QuestionResponse,
@@ -73,7 +74,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
       sx={{ marginLeft: '12px' }}
       id={indexedArrayField} // this is used for scrolling when new array entry added
     >
-      <Grid item xs={4}>
+      <Grid size={4}>
         <FormControlSelectField
           control={control}
           name={`${indexedArrayField}.type`}
@@ -92,7 +93,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           ))}
         </FormControlSelectField>
       </Grid>
-      <Grid item xs={4}>
+      <Grid size={4}>
         <FormControlSelectField
           control={control}
           name={`${indexedArrayField}.typeAttributes.grading`}
@@ -113,7 +114,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           ))}
         </FormControlSelectField>
       </Grid>
-      <Grid item xs={4}>
+      <Grid size={4}>
         <FormControlTextField
           control={control}
           placeholder="Question Id"
@@ -122,7 +123,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           readOnly={true}
         />
       </Grid>
-      <Grid item xs={11}>
+      <Grid size={11}>
         <FormControlTextField
           control={control}
           placeholder="Question"
@@ -137,7 +138,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
       </Grid>
       {(watchQuestionType === QuestionResponse.MultipleChoice ||
         watchQuestionType === QuestionResponse.SelectAll) && (
-        <Grid item xs={11}>
+        <Grid size={11}>
           <FormFieldArray
             errors={indexedErrors?.typeAttributes}
             arrayFieldName={`${indexedArrayField}.typeAttributes.options`}
@@ -165,7 +166,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
         </Grid>
       )}
       {watchQuestionType === QuestionResponse.TrueFalse && (
-        <Grid item xs={4}>
+        <Grid size={4}>
           <FormControlSelectField
             control={control}
             name={`${indexedArrayField}.typeAttributes.correctAnswer`}
@@ -188,7 +189,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
         watchQuestionType !== QuestionResponse.Matching &&
         watchQuestionType !== QuestionResponse.SelectAll &&
         watchQuestionType !== QuestionResponse.TrueFalse && (
-          <Grid item xs={11}>
+          <Grid size={11}>
             <FormControlTextField
               control={control}
               placeholder="Answer"
@@ -276,7 +277,7 @@ function QuestionOptionsFieldGroup(props: optionFieldGroupProps) {
       sx={{ marginLeft: '12px' }}
       id={indexedArrayField} // this is used for scrolling when new array entry added
     >
-      <Grid item xs={9}>
+      <Grid size={9}>
         <FormControlTextField
           control={control}
           placeholder="Enter Option"
@@ -288,7 +289,7 @@ function QuestionOptionsFieldGroup(props: optionFieldGroupProps) {
           required
         />
       </Grid>
-      <Grid item xs={3}>
+      <Grid size={3}>
         <FormControlCheckboxField
           control={control}
           name={`${indexedArrayField}.correct`}
@@ -318,7 +319,7 @@ function QuestionMatchingFieldGroup(props: fieldGroupProps) {
       sx={{ marginLeft: '12px' }}
       id={indexedArrayField}
     >
-      <Grid item xs={6}>
+      <Grid size={6}>
         <FormControlTextField
           control={control}
           placeholder="Enter Option"
@@ -331,7 +332,7 @@ function QuestionMatchingFieldGroup(props: fieldGroupProps) {
           required
         />
       </Grid>
-      <Grid item xs={6}>
+      <Grid size={6}>
         <FormControlTextField
           control={control}
           placeholder="Enter Correct Match"

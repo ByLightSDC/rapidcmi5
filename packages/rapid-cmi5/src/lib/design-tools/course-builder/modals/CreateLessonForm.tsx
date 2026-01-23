@@ -11,8 +11,7 @@ import {
 import * as yup from 'yup';
 
 import { CommonAppModalState } from '@rapid-cmi5/ui';
-import { Grid } from '@mui/material';
-
+import Grid from '@mui/material/Grid2';
 import { UseFormReturn } from 'react-hook-form';
 
 import { CreateLessonType } from '../CourseBuilderApiTypes';
@@ -74,7 +73,7 @@ export function CreateLessonForm({
 
     return (
       <>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.auName)}
@@ -85,7 +84,7 @@ export function CreateLessonForm({
             readOnly={false}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             name="courseName"

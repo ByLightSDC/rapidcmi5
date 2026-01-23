@@ -8,10 +8,18 @@ import {
   ListItemText,
   Tooltip,
   ListItemButton,
+  TextField,
+  InputAdornment,
 } from '@mui/material';
 import { alpha, Box, palette, Stack, useTheme } from '@mui/system';
-import { History, ChevronLeft, ChevronRight } from '@mui/icons-material';
-import { useState } from 'react';
+import {
+  History,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  Clear,
+} from '@mui/icons-material';
+import { useState, useMemo } from 'react';
 import { DirMeta } from '../../../course-builder/GitViewer/utils/fileSystem';
 import { GlassCard } from './GlassCard';
 import ThemedOptionCard from './ThemedOption';
@@ -35,8 +43,6 @@ const formatRelativeTime = (isoDate: string): string => {
   return `${diffDays} days ago`;
 };
 
-const PROJECTS_PER_PAGE = 4;
-
 export default function RecentProjectSelection({
   recentProjects,
   openRecentProject,
@@ -44,20 +50,28 @@ export default function RecentProjectSelection({
   recentProjects: DirMeta[];
   openRecentProject: (path: string) => void;
 }) {
-  const [currentPage, setCurrentPage] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
   const theme = useTheme();
   const { palette } = theme;
-  const totalPages = Math.ceil(recentProjects.length / PROJECTS_PER_PAGE);
-  const startIndex = currentPage * PROJECTS_PER_PAGE;
-  const endIndex = startIndex + PROJECTS_PER_PAGE;
-  const currentProjects = recentProjects.slice(startIndex, endIndex);
 
-  const handlePrevPage = () => {
-    setCurrentPage((prev) => Math.max(0, prev - 1));
+  // Filter projects based on search query
+  const filteredProjects = useMemo(() => {
+    if (!searchQuery.trim()) return recentProjects;
+
+    const query = searchQuery.toLowerCase();
+    return recentProjects.filter(
+      (project) =>
+        project.name.toLowerCase().includes(query) ||
+        project.remoteUrl?.toLowerCase().includes(query),
+    );
+  }, [recentProjects, searchQuery]);
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
   };
 
-  const handleNextPage = () => {
-    setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1));
+  const handleClearSearch = () => {
+    setSearchQuery('');
   };
 
   return (
@@ -67,107 +81,202 @@ export default function RecentProjectSelection({
     >
       <Box
         sx={{
-          height: '100%', // IMPORTANT: parent must have a height
+          height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          minHeight: 0, // IMPORTANT for overflow in flex children
+          minHeight: 0,
         }}
       >
+        {/* Search Bar */}
+        {recentProjects.length > 0 && (
+          <TextField
+            size="small"
+            placeholder="Search projects..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            sx={{
+              mb: 2,
+              flexShrink: 0,
+              '& .MuiOutlinedInput-root': {
+                fontFamily: '"IBM Plex Sans", sans-serif',
+                fontSize: '0.875rem',
+                backgroundColor: alpha(palette.background.paper, 0.5),
+                backdropFilter: 'blur(10px)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  backgroundColor: alpha(palette.background.paper, 0.7),
+                },
+                '&.Mui-focused': {
+                  backgroundColor: alpha(palette.background.paper, 0.8),
+                  boxShadow: `0 0 0 2px ${alpha(palette.primary.main, 0.2)}`,
+                },
+              },
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search sx={{ fontSize: 18, color: 'text.secondary' }} />
+                </InputAdornment>
+              ),
+              endAdornment: searchQuery && (
+                <InputAdornment position="end">
+                  <IconButton
+                    size="small"
+                    onClick={handleClearSearch}
+                    edge="end"
+                    sx={{
+                      width: 24,
+                      height: 24,
+                      '&:hover': {
+                        color: 'primary.main',
+                      },
+                    }}
+                  >
+                    <Clear sx={{ fontSize: 16 }} />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        )}
+
+        {/* Scrollable Projects List */}
         <Box
           sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: 'repeat(1fr)' },
-            gap: 2,
-            mb: 1,
+            flex: 1,
+            overflowY: 'auto',
+            minHeight: 0,
+            pr: 1,
+            mr: -1,
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: alpha(palette.background.paper, 0.3),
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: alpha(palette.primary.main, 0.3),
+              borderRadius: '4px',
+              '&:hover': {
+                background: alpha(palette.primary.main, 0.5),
+              },
+            },
           }}
         >
-          {currentProjects.map((project, index) => (
-            <ThemedOptionCard>
-              <ListItemButton
-                onClick={() => openRecentProject(project.id)}
-                sx={{
-                  borderRadius: 2,
-                  p: 1.2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  gap: 0.5,
-                  transition: 'none',
-                  '&:hover': {
-                    background: 'transparent',
-                  },
-                }}
-              >
-                <Box sx={{ mb: 1 }}>
-                  <ListItemText
-                    primary={project.name}
-                    sx={{
-                      margin: 0,
-                      flex: 1,
-                      fontFamily: '"IBM Plex Sans", sans-serif',
-                      fontWeight: 500,
-                      fontSize: '14px',
-                      letterSpacing: '0.01em',
-                    }}
-                  />
-
-                  {!project.isValid && (
-                    <Box
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: '1fr',
+              gap: 2,
+            }}
+          >
+            {filteredProjects.map((project) => (
+              <ThemedOptionCard key={project.id}>
+                <ListItemButton
+                  onClick={() => openRecentProject(project.id)}
+                  sx={{
+                    borderRadius: 2,
+                    p: 1.2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    gap: 0.5,
+                    transition: 'none',
+                    '&:hover': {
+                      background: 'transparent',
+                    },
+                  }}
+                >
+                  <Box sx={{ mb: 1 }}>
+                    <ListItemText
+                      primary={project.name}
                       sx={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                        px: 1,
-                        py: 0.25,
-                        borderRadius: 1,
-                        background: alpha(palette.warning.main, 0.1),
-                        border: `1px solid ${alpha(palette.warning.main, 0.3)}`,
+                        margin: 0,
+                        flex: 1,
+                        fontFamily: '"IBM Plex Sans", sans-serif',
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        letterSpacing: '0.01em',
+                      }}
+                    />
+
+                    {!project.isValid && (
+                      <Box
+                        sx={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                          px: 1,
+                          py: 0.25,
+                          borderRadius: 1,
+                          background: alpha(palette.warning.main, 0.1),
+                          border: `1px solid ${alpha(palette.warning.main, 0.3)}`,
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontFamily: '"Space Mono", monospace',
+                            fontSize: '0.7rem',
+                            color: palette.warning.light,
+                          }}
+                        >
+                          ⚠ Needs permission
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+                  <Stack spacing={0.5}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontFamily: '"IBM Plex Sans", sans-serif',
+                        fontSize: '0.75rem',
+                        color: alpha(palette.text.primary, 0.7),
                       }}
                     >
+                      {formatRelativeTime(project.lastAccessed)}
+                    </Typography>
+
+                    {project.remoteUrl && (
                       <Typography
                         variant="caption"
                         sx={{
                           fontFamily: '"Space Mono", monospace',
                           fontSize: '0.7rem',
-                          color: palette.warning.light,
+                          color: alpha(palette.text.primary, 0.5),
                         }}
                       >
-                        ⚠ Needs permission
+                        {project.remoteUrl}
                       </Typography>
-                    </Box>
-                  )}
-                </Box>
-                <Stack spacing={0.5}>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontFamily: '"IBM Plex Sans", sans-serif',
-                      fontSize: '0.75rem',
-                      color: alpha(palette.text.primary, 0.7),
-                    }}
-                  >
-                    {formatRelativeTime(project.lastAccessed)}
-                  </Typography>
-
-                  {project.remoteUrl && (
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        fontFamily: '"Space Mono", monospace',
-                        fontSize: '0.7rem',
-                        color: alpha(palette.text.primary, 0.5),
-                      }}
-                    >
-                      {project.remoteUrl}
-                    </Typography>
-                  )}
-                </Stack>
-              </ListItemButton>
-            </ThemedOptionCard>
-            //   </CardContent>
-            // </Card>
-          ))}
+                    )}
+                  </Stack>
+                </ListItemButton>
+              </ThemedOptionCard>
+            ))}
+          </Box>
         </Box>
+
+        {filteredProjects.length === 0 && recentProjects.length > 0 && (
+          <Box
+            sx={{
+              py: 6,
+              textAlign: 'center',
+            }}
+          >
+            <Typography
+              variant="body1"
+              sx={{
+                fontFamily: '"IBM Plex Sans", sans-serif',
+                color: 'text.secondary',
+              }}
+            >
+              No projects match "{searchQuery}"
+            </Typography>
+          </Box>
+        )}
+
         {recentProjects.length === 0 && (
           <Box
             sx={{
@@ -183,86 +292,6 @@ export default function RecentProjectSelection({
             >
               No recent projects yet
             </Typography>
-          </Box>
-        )}
-
-        {totalPages > 1 && (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              pt: 1,
-              borderTop: 1,
-              borderColor: 'divider',
-              mt: 'auto',
-            }}
-          >
-            <Stack direction="row" spacing={1} alignItems="center">
-              <IconButton
-                onClick={handlePrevPage}
-                disabled={currentPage === 0}
-                size="small"
-                sx={{
-                  width: 32,
-                  height: 32,
-                  border: 1,
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
-                    borderColor: 'primary.main',
-                    color: 'primary.main',
-                  },
-                  '&.Mui-disabled': {
-                    borderColor: (theme) => alpha(theme.palette.divider, 0.3),
-                    color: 'text.disabled',
-                  },
-                }}
-              >
-                <ChevronLeft fontSize="small" />
-              </IconButton>
-
-              <Typography
-                variant="body2"
-                sx={{
-                  fontFamily: 'monospace',
-                  fontSize: '0.8125rem',
-                  minWidth: '60px',
-                  textAlign: 'center',
-                  color: 'text.secondary',
-                  fontWeight: 500,
-                }}
-              >
-                {currentPage + 1} / {totalPages}
-              </Typography>
-
-              <IconButton
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages - 1}
-                size="small"
-                sx={{
-                  width: 32,
-                  height: 32,
-                  border: 1,
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1),
-                    borderColor: 'primary.main',
-                    color: 'primary.main',
-                  },
-                  '&.Mui-disabled': {
-                    borderColor: (theme) => alpha(theme.palette.divider, 0.3),
-                    color: 'text.disabled',
-                  },
-                }}
-              >
-                <ChevronRight fontSize="small" />
-              </IconButton>
-            </Stack>
           </Box>
         )}
       </Box>

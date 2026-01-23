@@ -107,15 +107,13 @@ export default function DocumentationDialog({
               alignItems: 'center',
               justifyContent: 'center',
               mr: 2,
-              boxShadow: (theme) =>
-                `0 4px 12px ${alpha(theme.palette.primary.main, 0.4)}`,
             }}
           >
             <Typography
               sx={{
-                color: 'primary.contrastText',
                 fontSize: '1.2rem',
                 fontWeight: 700,
+                color: 'white',
               }}
             >
               ?

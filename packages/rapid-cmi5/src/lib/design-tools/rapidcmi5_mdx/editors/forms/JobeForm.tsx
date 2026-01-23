@@ -7,9 +7,14 @@ import {
   FormStateType,
   MiniForm,
 } from '@rapid-cmi5/ui';
-import { Grid, MenuItem } from '@mui/material';
+import Grid from '@mui/material/Grid2';
+
+import { MenuItem } from '@mui/material';
 import * as yup from 'yup';
-import { JobeContent, moveOnCriteriaOptions } from '@rapid-cmi5/cmi5-build-common';
+import {
+  JobeContent,
+  moveOnCriteriaOptions,
+} from '@rapid-cmi5/cmi5-build-common';
 
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 
@@ -56,7 +61,7 @@ export const JobeForm = ({
 
     return (
       <>
-        <Grid item xs={7.5}>
+        <Grid size={7.5}>
           <FormControlTextField
             control={control}
             name={'title'}
@@ -65,7 +70,7 @@ export const JobeForm = ({
             sxProps={{ height: '30%' }}
           />
         </Grid>
-        <Grid item xs={4.5}>
+        <Grid size={4.5}>
           <FormControlSelectField
             control={control}
             name={'moveOnCriteria'}
@@ -82,7 +87,7 @@ export const JobeForm = ({
             ))}
           </FormControlSelectField>
         </Grid>
-        <Grid item xs={11.5}>
+        <Grid size={11.5}>
           <FormControlTextField
             control={control}
             name={`student`}
@@ -95,7 +100,7 @@ export const JobeForm = ({
             sxProps={{ height: '30%' }}
           />
         </Grid>
-        <Grid item xs={11.5}>
+        <Grid size={11.5}>
           <FormControlTextField
             control={control}
             name={`evaluator`}
@@ -108,7 +113,7 @@ export const JobeForm = ({
             sxProps={{ height: '30%' }}
           />
         </Grid>
-        {/* <Grid item xs={11.5}>
+        {/* <Grid size={11.5}>
           <KSATsFieldGroup formMethods={formMethods} crudType={crudType} />
         </Grid> */}
       </>

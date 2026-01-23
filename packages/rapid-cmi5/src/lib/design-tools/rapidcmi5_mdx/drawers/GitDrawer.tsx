@@ -82,7 +82,6 @@ export const GitDrawer = () => {
   const { promptDeleteRepo } = useRC5Prompts();
   const {
     isRepoConnectedToRemote,
-    handleNavToGitView,
     handleChangeRepoName,
     currentRepo,
   } = useContext(GitContext);
@@ -115,7 +114,6 @@ export const GitDrawer = () => {
     switch (whichAction) {
       case RepoActionEnum.Delete:
         promptDeleteRepo(currentRepo);
-
         break;
       case RepoActionEnum.Rename:
         setMenuAnchor(event.target);
@@ -129,10 +127,6 @@ export const GitDrawer = () => {
         break;
     }
   };
-
-  useEffect(() => {
-    handleNavToGitView();
-  }, []);
 
   return (
     <Stack

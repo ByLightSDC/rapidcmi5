@@ -5,7 +5,7 @@
 import { Control } from 'react-hook-form';
 
 /* MUI */
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import FormControlTextField from './FormControlTextField';
 import FormControlDateDisplay from './FormControlDateDisplay';
 import { FormCrudType } from '../redux/utils/types';
@@ -29,7 +29,7 @@ export function AuthoringInfoFields({
       {includeVersioning && (
         <>
           {includeProperties.hasOwnProperty('branch') && (
-            <Grid item xs={5}>
+            <Grid size={5}>
               <FormControlTextField
                 control={control}
                 error={Boolean(errors?.branch)}
@@ -41,7 +41,7 @@ export function AuthoringInfoFields({
             </Grid>
           )}
           {includeProperties.hasOwnProperty('tag') && (
-            <Grid item xs={5}>
+            <Grid size={5}>
               <FormControlTextField
                 control={control}
                 error={Boolean(errors?.tag)}
@@ -56,7 +56,7 @@ export function AuthoringInfoFields({
       )}
       {crudType !== FormCrudType.create && crudType !== FormCrudType.design ? (
         <>
-          <Grid item xs={6}>
+          <Grid size={6}>
             <FormControlTextField
               control={control}
               name="author"
@@ -65,7 +65,7 @@ export function AuthoringInfoFields({
               disabled={true}
             />
           </Grid>
-          <Grid item xs={4}>
+          <Grid size={4}>
             <FormControlDateDisplay
               control={control}
               name="dateEdited"
@@ -76,7 +76,7 @@ export function AuthoringInfoFields({
       ) : null}
       {crudType === FormCrudType.design ? (
         <>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <FormControlTextField
               control={control}
               name="uuid"

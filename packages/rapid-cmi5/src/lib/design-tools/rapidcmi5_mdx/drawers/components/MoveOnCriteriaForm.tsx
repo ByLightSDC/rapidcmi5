@@ -8,8 +8,10 @@ import {
   ModalDialog,
   SelectorMainUi,
 } from '@rapid-cmi5/ui';
+import Grid from '@mui/material/Grid2';
+
 import { UseFormReturn } from 'react-hook-form';
-import { Grid, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import * as yup from 'yup';
 import { useSelector } from 'react-redux';
 import React from 'react';
@@ -75,7 +77,7 @@ export function MoveOnCriteriaForm({
     const { errors, isValid } = formState;
     return (
       <>
-        <Grid item xs={11.5}>
+        <Grid size={11.5}>
           <SelectorMainUi
             value={moveOnCriteria}
             options={moveOnCriteriaOptions}

@@ -1,8 +1,6 @@
-/*
- *   Copyright (c) 2025 By Light Professional IT Services LLC
- *   All rights reserved.
- */
-import { Grid, Stack } from '@mui/material';
+import Grid from '@mui/material/Grid2';
+
+import { Stack } from '@mui/material';
 
 import { useEffect, useState } from 'react';
 import { useFieldArray, UseFormReturn } from 'react-hook-form';
@@ -87,7 +85,7 @@ export function FileFormFieldArray({
   return (
     <>
       {crudType !== FormCrudType.preview && (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <FileUpload
             fileTypes={'*'}
             onFileSelected={(file, selected) => {
@@ -104,7 +102,7 @@ export function FileFormFieldArray({
           />
         </Grid>
       )}
-      <Grid item xs={12}>
+      <Grid size={12}>
         <FormFieldArray
           allowAdd={false}
           arrayFieldName={'files'}

@@ -2,11 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter as RouterWrapper } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 
-import {
-  setDividerColor,
-  setIconColor,
-  themeColor,
-} from '@rapid-cmi5/ui';
+import { setDividerColor, setIconColor, themeColor } from '@rapid-cmi5/ui';
 
 /* Shared */
 import AppHeader from './shared/AppHeader';
@@ -132,7 +128,7 @@ export default function App({ authEnabled }: { authEnabled: boolean }) {
                           token={token}
                         />
                       ) : (
-                        <RapidCmi5 />
+                        <RapidCmi5 showHomeButton={true} />
                       )}
                     </main>
                   </TimePickerProvider>

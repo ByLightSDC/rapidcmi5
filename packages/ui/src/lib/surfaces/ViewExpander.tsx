@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 /* MUI */
 import Divider, { DividerProps } from '@mui/material/Divider';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Typography from '@mui/material/Typography';
 import { Variant } from '@mui/material/styles/createTypography';
@@ -84,11 +84,11 @@ export function ViewExpander({
   return (
     <>
       {shouldStartWithDivider && (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Divider sx={dividerSxProps} />
         </Grid>
       )}
-      <Grid item xs={12}>
+      <Grid size={12}>
         <div
           className="content-row-icons"
           style={headerSxProps}
@@ -123,7 +123,7 @@ export function ViewExpander({
 
       {isExpanded && children}
       {shouldEndWithDivider && (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Divider />
         </Grid>
       )}

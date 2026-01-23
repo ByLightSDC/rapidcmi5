@@ -12,8 +12,7 @@ import { useCellValues, usePublisher } from '@mdxeditor/gurx';
 // MUI
 import { Box, Paper, Stack, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import Grid from '@mui/material/Grid';
-import EditIcon from '@mui/icons-material/Edit';
+import Grid from '@mui/material/Grid2';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 
 import {
@@ -283,7 +282,7 @@ export const VideoDialog: React.FC = () => {
 
             {/* Width/Height section */}
             <Grid container alignItems="center">
-              <Grid item xs={6}>
+              <Grid size={6}>
                 <TextFieldMainUi
                   margin="dense"
                   label="Width (px)"
@@ -295,7 +294,7 @@ export const VideoDialog: React.FC = () => {
                   infoText={'Optional video width in pixels'}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid size={6}>
                 <TextFieldMainUi
                   margin="dense"
                   label="Height (px)"
@@ -311,7 +310,7 @@ export const VideoDialog: React.FC = () => {
 
             {/* Style section */}
             <Grid container alignItems="center">
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <TextFieldMainUi
                   margin="dense"
                   label="Styles"

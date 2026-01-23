@@ -30,7 +30,7 @@ import { useEffect } from 'react';
  *
  * @returns
  */
-export function Landing() {
+export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
   const viewMode = useSelector(currentViewMode);
   const themedDividerColor = useSelector(dividerColor);
   console.log(viewMode);
@@ -53,9 +53,10 @@ export function Landing() {
           sx={{
             width: '100%',
             height: '100%',
+            minHeight: 0,
           }}
         >
-          <NavViewMenu />
+          <NavViewMenu showHomeButton={showHomeButton} />
           <Divider orientation="vertical" />
           <PanelGroup direction="horizontal">
             <Panel defaultSize={20} minSize={5}>

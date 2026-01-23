@@ -7,7 +7,6 @@ import {
   MiniForm,
   ModalDialog,
 } from '@rapid-cmi5/ui';
-import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
 import {
@@ -15,8 +14,8 @@ import {
 } from '../../rapidcmi5_mdx/modals/constants';
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
-import { Box, Grid } from '@mui/material';
-
+import { Box } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import { UseFormReturn } from 'react-hook-form';
 
 import {
@@ -81,7 +80,7 @@ export function CommitForm({
     const { errors, isValid } = formState;
     return (
       <>
-        <Grid item xs={11.5}>
+        <Grid size={11.5}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.commitMessage)}
@@ -93,7 +92,7 @@ export function CommitForm({
           />
         </Grid>
 
-        <Grid item xs={9}>
+        <Grid size={9}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.authorEmail)}
@@ -103,7 +102,7 @@ export function CommitForm({
             readOnly={false}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.authorName)}
@@ -113,7 +112,7 @@ export function CommitForm({
             readOnly={false}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.branch)}

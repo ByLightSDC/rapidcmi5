@@ -8,7 +8,7 @@ import path, { basename, dirname, join } from 'path-browserify';
 import YAML from 'yaml';
 import { configure, fs as zenFs } from '@zenfs/core';
 import { IndexedDB, WebAccess } from '@zenfs/dom';
-import { RepoAccessObject } from '../../../../redux/repoManagerReducer';
+import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { set, get, keys, getMany } from 'idb-keyval';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
@@ -25,7 +25,8 @@ export type FileSystemObject = typeof zenFs | typeof electronFs | IFs;
 export const gitCache = `/gitfs/gittemp`;
 export const modifiedFileCache = 'rc5ModifiedFiles.json';
 export type DirMeta = {
-  dirHandle: FileSystemDirectoryHandle;
+  // not needed for electron
+  dirHandle?: FileSystemDirectoryHandle;
   id: string;
   createdAt: string;
   name: string;
@@ -140,10 +141,13 @@ export class GitFS {
     const webacess = await WebAccess.create({ handle: dirHandle });
 
     try {
-      zenFs.umount('/localFileSystem');
       if (forClone) {
+        zenFs.umount('/localFileSystem');
+
         zenFs.mount('/localFileSystem', webacess);
       } else {
+        zenFs.umount('/localFileSystem/' + dirHandle.name);
+
         zenFs.mount('/localFileSystem/' + dirHandle.name, webacess);
       }
 
@@ -152,6 +156,73 @@ export class GitFS {
       throw error;
     }
   };
+
+  async openLocalRepo(id?: string) {
+    if (this.isElectron) {
+      if (!id) throw Error('No directory ID given');
+      if (!(await this.dirExists('/' + fsType.localFileSystem + '/' + id)))
+        throw Error('Could not find dir');
+      const dirName = basename(id);
+      return dirName;
+    } else {
+      let dirHandle: FileSystemDirectoryHandle | undefined;
+
+      if (id) {
+        dirHandle = await this.getDirHandle(id);
+      }
+      if (!dirHandle) {
+        // @ts-ignore
+        dirHandle = await window.showDirectoryPicker({
+          mode: 'readwrite',
+          startIn: 'documents',
+        });
+        if (!dirHandle) throw Error('Could not get the dir handle');
+
+        await this.setDirHandle(dirHandle);
+      }
+
+      // ensure the file has a .git folder
+      const gitFolder = await dirHandle.getDirectoryHandle('.git');
+      if (!gitFolder) throw Error('No git folder');
+
+      await this.openLocalDirectory(dirHandle);
+      return dirHandle.name;
+    }
+  }
+
+  async createRepoInDir(
+    parentDir: string,
+    createFunction: () => Promise<void>,
+  ) {
+    if (this.isElectron) {
+      await createFunction();
+    } else {
+      // @ts-ignore
+      let dirHandle = (await window.showDirectoryPicker({
+        mode: 'readwrite',
+        startIn: 'documents',
+      })) as FileSystemDirectoryHandle;
+
+      if (!dirHandle) throw Error('No directory selected for clone');
+
+      await this.openLocalDirectory(dirHandle, true);
+      await createFunction();
+
+      // verify repo dir actually exits
+      try {
+        const repoDir = await dirHandle.getDirectoryHandle(parentDir);
+
+        await this.setDirHandle(repoDir);
+
+        await this.openLocalDirectory(repoDir);
+      } catch {
+        throw Error(
+          'The clone operation failed to save files to your local computer.',
+        );
+      }
+    }
+  }
+
   async getGitRemoteUrl(
     dirHandle: FileSystemDirectoryHandle,
   ): Promise<string | undefined> {
@@ -176,6 +247,29 @@ export class GitFS {
       return undefined;
     }
   }
+
+  async getGitRemoteUrlElectron(path: string): Promise<string | undefined> {
+    try {
+      const r: RepoAccessObject = {
+        fileSystemType: fsType.localFileSystem,
+        repoName: path,
+      };
+
+      const file = await this.getFileContent(r, '.git/config');
+
+      if (!file) return undefined;
+
+      const text = file.content.toString();
+      // Match: [remote "origin"] ... url = xxx
+      const match = text.match(/\[remote\s+"origin"\][\s\S]*?url\s*=\s*(.+)/);
+
+      return match?.[1]?.trim();
+    } catch (err) {
+      // Not a git repo or no access
+      return undefined;
+    }
+  }
+
   // save the local file access directory handle so we dont have to ask for it each time
   setDirHandle = async (dirHandle: FileSystemDirectoryHandle) => {
     const id = crypto.randomUUID();
@@ -195,26 +289,45 @@ export class GitFS {
   };
 
   getLocalDirs = async () => {
-    const allKeys = await keys();
-
-    const matchingKeys = allKeys.filter(
-      (key): key is string =>
-        typeof key === 'string' && key.startsWith('courses/'),
-    );
-
-    const dirMetas = await getMany<DirMeta>(matchingKeys);
     const newMetas: DirMeta[] = [];
 
-    for (const meta of dirMetas) {
-      const status = await verifyHandlePermission(meta.dirHandle);
-      const newMeta: DirMeta = { ...meta, isValid: status };
-      console.log('new MEta', newMeta);
-      newMetas.push(newMeta);
-      await set('courses/' + meta.id, meta);
+    if (this.isElectron) {
+      const dirs = await this.fs.promises.readdir(fsType.localFileSystem);
+      console.log(dirs);
+
+      for (const dir of dirs) {
+        const stats = await this.fs.promises.stat(
+          fsType.localFileSystem + '/' + dir.toString(),
+        );
+        console.log(stats);
+        newMetas.push({
+          createdAt: new Date(stats.ctimeMs as number).toISOString(),
+          lastAccessed: new Date(stats.mtimeMs as number).toISOString(),
+          id: dir.toString(),
+          isValid: true,
+          name: dir.toString(),
+          remoteUrl: await this.getGitRemoteUrlElectron(dir.toString()),
+        });
+      }
+    } else {
+      const allKeys = await keys();
+
+      const matchingKeys = allKeys.filter(
+        (key): key is string =>
+          typeof key === 'string' && key.startsWith('courses/'),
+      );
+
+      const dirMetas = await getMany<DirMeta>(matchingKeys);
+
+      for (const meta of dirMetas) {
+        if (!meta.dirHandle) continue;
+        const status = await verifyHandlePermission(meta.dirHandle);
+        const newMeta: DirMeta = { ...meta, isValid: status };
+
+        newMetas.push(newMeta);
+        await set('courses/' + meta.id, meta);
+      }
     }
-
-    console.log('Let see whats here return all dirs', dirMetas);
-
     return newMetas.sort((a, b) => {
       const aTime = new Date(a.lastAccessed ?? a.createdAt).getTime();
       const bTime = new Date(b.lastAccessed ?? b.createdAt).getTime();
@@ -227,7 +340,7 @@ export class GitFS {
     const saved = await get<DirMeta>('courses/' + id || 'rootdir');
     console.log('Let see whats here saved', saved);
 
-    if (saved) {
+    if (saved?.dirHandle) {
       const valid = await verifyHandlePermission(saved.dirHandle);
       if (!valid) {
         //@ts-ignore

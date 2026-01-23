@@ -13,7 +13,7 @@ import {
 } from '@rapid-cmi5/ui';
 
 /* MUI */
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 
 /* Constants */
 //import { defaultPostPutData, navId } from './constants';
@@ -78,7 +78,7 @@ export default function ClassPromptForm(props: tFormProps) {
     return (
       // eslint-disable-next-line react/jsx-no-useless-fragment
       <>
-        <Grid item xs={5}>
+        <Grid size={5}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.name)}

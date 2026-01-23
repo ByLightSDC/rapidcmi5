@@ -14,7 +14,9 @@ import * as yup from 'yup';
 
 import { gitPullModalId } from '../../rapidcmi5_mdx/modals/constants';
 
-import { Grid, Typography } from '@mui/material';
+import Grid from '@mui/material/Grid2';
+
+import { Typography } from '@mui/material';
 
 import { UseFormReturn } from 'react-hook-form';
 
@@ -71,12 +73,12 @@ export function PullForm({
     const { errors } = formState;
     return (
       <>
-        <Grid item xs={11}>
+        <Grid size={11}>
           <Typography>
             Staged changes will be commited before the repo is pulled.
           </Typography>
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.repoUsername)}
@@ -87,7 +89,7 @@ export function PullForm({
             readOnly={false}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlPassword
             control={control}
             error={Boolean(errors?.repoPassword)}
@@ -99,7 +101,7 @@ export function PullForm({
           />
         </Grid>
 
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlCheckboxField
             control={control}
             error={errors?.allowConflicts}
@@ -107,7 +109,7 @@ export function PullForm({
             name="allowConflicts"
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.branch)}

@@ -16,7 +16,7 @@ import {
   SPECIFY_AT_LEAST_ONE_ERROR,
   tFormFieldRendererProps,
 } from '@rapid-cmi5/ui';
-import { Grid } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import * as yup from 'yup';
 import {
   MoveOnCriteriaEnum,
@@ -143,7 +143,7 @@ export const QuizForm = ({
 
     return (
       <>
-        <Grid item xs={3}>
+        <Grid size={3}>
           <FormControlTextField
             control={control}
             placeholder="Activity Id"
@@ -156,7 +156,7 @@ export const QuizForm = ({
           />
         </Grid>
 
-        {/*<Grid item xs={2.5}>*/}
+        {/*<Grid size={2.5}>*/}
         {/*  <FormControlSelectField*/}
         {/*    control={control}*/}
         {/*    name={'completionRequired'}*/}
@@ -174,7 +174,7 @@ export const QuizForm = ({
         {/*  </FormControlSelectField>*/}
         {/*</Grid>*/}
 
-        <Grid item xs={4}>
+        <Grid size={4}>
           <FormControlIntegerField
             {...formMethods}
             control={control}
@@ -187,7 +187,7 @@ export const QuizForm = ({
             required
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid size={4}>
           <FormControlSelectField
             control={control}
             name={'moveOnCriteria'}
@@ -204,7 +204,7 @@ export const QuizForm = ({
             ))}
           </FormControlSelectField>
         </Grid>
-        <Grid item xs={11}>
+        <Grid size={11}>
           <FormControlTextField
             control={control}
             placeholder="Title"
@@ -215,7 +215,7 @@ export const QuizForm = ({
             readOnly={crudType === FormCrudType.view}
           />
         </Grid>
-        <Grid item xs={11}>
+        <Grid size={11}>
           <FormFieldArray
             errors={errors?.questions}
             allowReOrder={true}
@@ -244,7 +244,7 @@ export const QuizForm = ({
             onReorderEntry={handleReorderQuestions}
           />
         </Grid>
-        {/* <Grid item xs={11.5}>
+        {/* <Grid size={11.5}>
           <KSATsFieldGroup
             formMethods={formMethods}
             crudType={crudType}
@@ -252,7 +252,7 @@ export const QuizForm = ({
           />
         </Grid> */}
 
-        <Grid item xs={11}>
+        <Grid size={11}>
           <LrsHeaderWithDetails activityType={RC5ActivityTypeEnum.quiz} />
         </Grid>
       </>

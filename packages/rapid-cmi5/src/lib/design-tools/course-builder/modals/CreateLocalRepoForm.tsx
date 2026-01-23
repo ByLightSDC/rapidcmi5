@@ -109,6 +109,7 @@ export function CreateLocalRepoForm({
             label="Remote Repository URL"
             multiline={true}
             readOnly={false}
+            data-testid=''
           />
         </Grid>
         <Grid size={6}>

@@ -25,9 +25,10 @@ import {
   ModalDialog,
 } from '@rapid-cmi5/ui';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import Grid from '@mui/material/Grid2';
 
 import { UseFormReturn } from 'react-hook-form';
-import { Grid, IconButton, Stack } from '@mui/material';
+import { IconButton, Stack } from '@mui/material';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 
@@ -195,7 +196,7 @@ export const RC5LinkDialog: React.FC = () => {
     const { errors } = formState;
     return (
       <>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.url)}
@@ -206,7 +207,7 @@ export const RC5LinkDialog: React.FC = () => {
             readOnly={false}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.title)}

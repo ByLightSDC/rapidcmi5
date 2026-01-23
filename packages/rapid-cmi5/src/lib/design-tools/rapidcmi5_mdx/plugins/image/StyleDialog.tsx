@@ -13,7 +13,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import { MuiColorInput } from 'mui-color-input';
 
 // icons
@@ -311,10 +311,10 @@ export const StyleDialog: React.FC<StyleProps> = ({
                 }}
               >
                 <Grid container alignItems="center" spacing={3}>
-                  <Grid item xs={2}>
+                  <Grid size={2}>
                     <Typography gutterBottom>Alignment</Typography>
                   </Grid>
-                  <Grid item xs={10}>
+                  <Grid size={10}>
                     <ToggleButtonGroup
                       value={alignment}
                       exclusive
@@ -338,10 +338,10 @@ export const StyleDialog: React.FC<StyleProps> = ({
                 </Grid>
 
                 <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={2}>
+                  <Grid size={2}>
                     <Typography gutterBottom>Opacity</Typography>
                   </Grid>
-                  <Grid item xs={7}>
+                  <Grid size={7}>
                     <Slider
                       size={'small'}
                       value={opacity}
@@ -352,7 +352,7 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       step={0.1}
                     />
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid size={3}>
                     <TextField
                       autoFocus
                       margin="dense"
@@ -387,10 +387,10 @@ export const StyleDialog: React.FC<StyleProps> = ({
                 </Grid>
 
                 <Grid container alignItems="center" spacing={3}>
-                  <Grid item xs={2}>
+                  <Grid size={2}>
                     <Typography>Flip</Typography>
                   </Grid>
-                  <Grid item xs={5}>
+                  <Grid size={5}>
                     <Typography variant="caption">Horizontal</Typography>
                     <Checkbox
                       name="flip-horizontal"
@@ -398,7 +398,7 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       onChange={handleFlipHorizontalCheckboxChange}
                     />
                   </Grid>
-                  <Grid item xs={5}>
+                  <Grid size={5}>
                     <Typography variant="caption">Vertical</Typography>
                     <Checkbox
                       name="flip-vertical"
@@ -464,10 +464,10 @@ export const StyleDialog: React.FC<StyleProps> = ({
               >
                 <Typography variant="body1">Border</Typography>
                 <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={2}>
+                  <Grid size={2}>
                     <Typography variant="caption">Width</Typography>
                   </Grid>
-                  <Grid item xs={7}>
+                  <Grid size={7}>
                     <Slider
                       size={'small'}
                       value={borderWidth}
@@ -478,7 +478,7 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       step={1}
                     />
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid size={3}>
                     <TextField
                       autoFocus
                       margin="dense"
@@ -514,10 +514,10 @@ export const StyleDialog: React.FC<StyleProps> = ({
                 </Grid>
 
                 <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={2}>
+                  <Grid size={2}>
                     <Typography variant="caption">Color</Typography>
                   </Grid>
-                  <Grid item xs={10}>
+                  <Grid size={10}>
                     <MuiColorInput
                       format="hex"
                       value={borderColor}
@@ -528,10 +528,10 @@ export const StyleDialog: React.FC<StyleProps> = ({
                 </Grid>
 
                 <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={2}>
+                  <Grid size={2}>
                     <Typography variant="caption">Style</Typography>
                   </Grid>
-                  <Grid item xs={10}>
+                  <Grid size={10}>
                     <SelectorMainUi
                       value={borderStyle}
                       options={BorderStyles}
@@ -541,10 +541,10 @@ export const StyleDialog: React.FC<StyleProps> = ({
                 </Grid>
 
                 <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={2}>
+                  <Grid size={2}>
                     <Typography variant="caption">Radius</Typography>
                   </Grid>
-                  <Grid item xs={7}>
+                  <Grid size={7}>
                     <Slider
                       size={'small'}
                       value={borderRadius}
@@ -555,7 +555,7 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       step={1}
                     />
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid size={3}>
                     <TextField
                       autoFocus
                       margin="dense"
@@ -600,10 +600,10 @@ export const StyleDialog: React.FC<StyleProps> = ({
               >
                 <Typography variant="body1">Drop Shadow</Typography>
                 <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={2}>
+                  <Grid size={2}>
                     <Typography variant="caption">Offset X</Typography>
                   </Grid>
-                  <Grid item xs={7}>
+                  <Grid size={7}>
                     <Slider
                       size={'small'}
                       value={dropShadowOffsetX}
@@ -614,7 +614,7 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       step={1}
                     />
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid size={3}>
                     <TextField
                       autoFocus
                       margin="dense"
@@ -649,10 +649,10 @@ export const StyleDialog: React.FC<StyleProps> = ({
                   </Grid>
                 </Grid>
                 <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={2}>
+                  <Grid size={2}>
                     <Typography variant="caption">Offset Y</Typography>
                   </Grid>
-                  <Grid item xs={7}>
+                  <Grid size={7}>
                     <Slider
                       size={'small'}
                       value={dropShadowOffsetY}
@@ -663,7 +663,7 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       step={1}
                     />
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid size={3}>
                     <TextField
                       autoFocus
                       margin="dense"
@@ -698,10 +698,10 @@ export const StyleDialog: React.FC<StyleProps> = ({
                   </Grid>
                 </Grid>
                 <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={2}>
+                  <Grid size={2}>
                     <Typography variant="caption">Blur Radius</Typography>
                   </Grid>
-                  <Grid item xs={7}>
+                  <Grid size={7}>
                     <Slider
                       size={'small'}
                       value={dropShadowBlurRadius}
@@ -712,7 +712,7 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       step={1}
                     />
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid size={3}>
                     <TextField
                       autoFocus
                       margin="dense"
@@ -746,10 +746,10 @@ export const StyleDialog: React.FC<StyleProps> = ({
                   </Grid>
                 </Grid>
                 <Grid container alignItems="center" spacing={2}>
-                  <Grid item xs={2}>
+                  <Grid size={2}>
                     <Typography variant="caption">Color</Typography>
                   </Grid>
-                  <Grid item xs={10}>
+                  <Grid size={10}>
                     <MuiColorInput
                       format="hex"
                       value={dropShadowColor}

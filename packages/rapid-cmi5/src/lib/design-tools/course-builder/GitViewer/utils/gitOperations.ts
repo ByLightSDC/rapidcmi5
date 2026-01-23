@@ -8,7 +8,7 @@ import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import path, { join } from 'path-browserify';
 import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { slugifyPath } from './useCourseOperationsUtils';
-import { repoNameInUseMessage } from '../session/constants';
+import { repoNameInUseMessage, sandBoxName } from '../session/constants';
 
 const AuthenticationErrorMessage =
   'The credentials provided are invalid; authentication has failed.';
@@ -47,7 +47,7 @@ export class GitOperations {
       );
 
       const folders = raw.map((folder) => folder.toString());
-      return folders.some((folder) => folder === '.git');
+      return folders.some((folder) => folder === sandBoxName);
     } catch (error: any) {
       debugLogError(`Could not list repos ${error}`);
       return false;

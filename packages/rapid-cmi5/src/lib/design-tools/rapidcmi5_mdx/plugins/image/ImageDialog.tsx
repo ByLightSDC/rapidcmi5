@@ -13,7 +13,7 @@ import { StyleDialog } from './StyleDialog';
 // MUI
 import { Box, Paper, Stack, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import EditIcon from '@mui/icons-material/Edit';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 
@@ -334,7 +334,7 @@ export const ImageDialog: React.FC = () => {
 
             {/* Width/Height section */}
             <Grid container alignItems="center">
-              <Grid item xs={6}>
+              <Grid size={6}>
                 <TextFieldMainUi
                   margin="dense"
                   label="Width (px)"
@@ -346,7 +346,7 @@ export const ImageDialog: React.FC = () => {
                   infoText={'Optional image width in pixels'}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid size={6}>
                 <TextFieldMainUi
                   margin="dense"
                   label="Height (px)"
@@ -362,7 +362,7 @@ export const ImageDialog: React.FC = () => {
 
             {/* Style section */}
             <Grid container alignItems="center">
-              <Grid item xs={0.8}>
+              <Grid size={0.8}>
                 <ButtonIcon
                   name="edit-style"
                   props={{
@@ -381,7 +381,7 @@ export const ImageDialog: React.FC = () => {
                   </Tooltip>
                 </ButtonIcon>
               </Grid>
-              <Grid item xs={11.2}>
+              <Grid size={11.2}>
                 <TextFieldMainUi
                   autoFocus
                   margin="dense"

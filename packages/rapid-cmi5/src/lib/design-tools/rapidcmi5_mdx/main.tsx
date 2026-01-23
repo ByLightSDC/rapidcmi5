@@ -33,6 +33,9 @@ export interface RapidCmi5Opts {
   authToken?: string;
   buildCmi5Zip?: (params: buildCmi5ZipParams) => Promise<AxiosResponse<object>>;
   GetScenariosForm?: React.ComponentType<GetScenarioFormProps>;
+  clearData?: () => void;
+  showHomeButton?: boolean;
+  clearCache?: () => void;
 }
 
 export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {
@@ -42,7 +45,7 @@ export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {
         <GitContextProvider rapidCmi5Opts={rapidCmi5Opts}>
           <RC5ContextProvider>
             <RC5Modals />
-            <Landing />
+            <Landing showHomeButton={rapidCmi5Opts.showHomeButton} />
           </RC5ContextProvider>
         </GitContextProvider>
       </PersistGate>

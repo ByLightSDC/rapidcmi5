@@ -1,4 +1,3 @@
-
 import {
   ModalDialog,
   FormControlTextField,
@@ -12,7 +11,9 @@ import {
   ButtonMinorUi,
   useToaster,
 } from '@rapid-cmi5/ui';
-import { Alert, Grid, Typography } from '@mui/material';
+import Grid from '@mui/material/Grid2';
+
+import { Alert, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 
 import AddIcon from '@mui/icons-material/Add';
@@ -57,7 +58,6 @@ export function SaveCourseForm({
   const {
     currentGitConfig,
     handleCommit,
-    handleNavToGitView,
     handlePushRepo,
     handleStageAll,
     currentCourse,
@@ -140,7 +140,6 @@ export function SaveCourseForm({
 
           setSaveProgressMessage('Updating Modified Files...');
           // @Aaron My Attempt to fix a bug where all files do not get staged
-          // await handleNavToGitView();
 
           // Stage
           setSaveProgressMessage('Staging Files...');
@@ -193,7 +192,6 @@ export function SaveCourseForm({
       handleCloseModal,
       handleCommit,
       handleModalAction,
-      handleNavToGitView,
       handlePushRepo,
       handleStageAll,
       modalId,
@@ -230,12 +228,12 @@ export function SaveCourseForm({
       <>
         {!isRepoConnectedToRemote && (
           <>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <Typography sx={{ whiteSpace: 'preWrap', paddingBottom: '8px' }}>
                 {cacheWarning}
               </Typography>
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <Alert severity="warning">
                 <Stack direction="column">
                   It is highly recommended that you use Version Control to back
@@ -255,12 +253,12 @@ export function SaveCourseForm({
         )}
 
         <>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Typography sx={{ whiteSpace: 'preWrap' }}>
               {cacheWarning}
             </Typography>
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Typography
               variant="subtitle2"
               sx={{ fontWeight: 'bold', marginTop: 2 }}
@@ -269,8 +267,7 @@ export function SaveCourseForm({
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={12}
+            size={12}
             sx={{
               display: 'flex',
               flexDirection: 'row',
@@ -298,7 +295,7 @@ export function SaveCourseForm({
             )}
           </Grid>
           {shouldCommit && (
-            <Grid item xs={11.5}>
+            <Grid size={11.5}>
               <FormControlTextField
                 control={control}
                 error={Boolean(errors?.commit?.commitMessage)}
@@ -314,7 +311,7 @@ export function SaveCourseForm({
           )}
           {shouldPush && isRepoConnectedToRemote && (
             <>
-              <Grid item xs={6}>
+              <Grid size={6}>
                 <FormControlTextField
                   control={control}
                   error={Boolean(errors?.push?.repoUsername)}
@@ -325,7 +322,7 @@ export function SaveCourseForm({
                   readOnly={false}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid size={6}>
                 <FormControlPassword
                   control={control}
                   error={Boolean(errors?.push?.repoPassword)}
@@ -336,7 +333,7 @@ export function SaveCourseForm({
                   readOnly={false}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid size={6}>
                 <FormControlTextField
                   control={control}
                   error={Boolean(errors?.push?.branch)}
@@ -350,14 +347,14 @@ export function SaveCourseForm({
           )}
 
           {saveProgressMessage && (
-            <Grid item xs={12}>
+            <Grid size={12}>
               <Typography variant="body1">{saveProgressMessage}</Typography>
             </Grid>
           )}
         </>
 
         {saveError && (
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Alert
               onClose={() => {
                 setSaveErrorMessage(null);

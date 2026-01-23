@@ -1,16 +1,15 @@
 import { useContext, useEffect, useState } from 'react';
 import { alpha, Box, Container, useTheme } from '@mui/material';
 import { useSelector } from 'react-redux';
-import SandBoxSelection from './Components/SandBoxSelection';
-import RecentProjectSelection from './Components/RecentProjectSelection';
-import ProductionModeSelection from './Components/ProductionModeSelection';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { DirMeta } from '../../course-builder/GitViewer/utils/fileSystem';
 import DocumentationDialog from './Dialogs/DocumentationDialog';
-import CloneLoadingOverlay from './Components/LoadingOverlay';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
 import { RepoState } from '../../../redux/repoManagerReducer';
 import { RootState } from '../../../redux/store';
+import WebAppSelection from './Components/WebAppSelection';
+import ElectronAppSelection from './Components/ElectronSelection';
+import CloneLoadingOverlay from './Components/LoadingOverlay';
 
 interface OptionDocumentation {
   title: string;
@@ -25,11 +24,10 @@ export default function WelcomePage({
   const theme = useTheme();
   const { palette } = theme;
 
-  const { getLocalFolders, openSandbox, createNewRepo, openLocalRepo } =
+  const { getLocalFolders, openSandbox, openLocalRepo, isElectron } =
     useContext(GitContext);
   const { promptCloneRepo, promptCreateLocalRepo } = useRC5Prompts();
   const [recentProjects, setRecentProjects] = useState<DirMeta[]>([]);
-  console.log('recentProjects', recentProjects);
 
   const { loadingState }: RepoState = useSelector(
     (state: RootState) => state.repoManager,
@@ -78,27 +76,17 @@ export default function WelcomePage({
 
   const openLocalFolderAndSet = async () => {
     await openLocalRepo();
-
     setRepoSelected();
   };
 
   const openLocalRecentProject = async (id: string) => {
-    console.log('opening with ', id);
     await openLocalRepo(id);
     setRepoSelected();
   };
 
-  const createRepo = async () => {
-    promptCreateLocalRepo();
-  };
-
-  const openSandboxt = async () => {
+  const handleOpenSandbox = async () => {
     await openSandbox();
     setRepoSelected();
-  };
-
-  const cloneRepo = async () => {
-    promptCloneRepo();
   };
 
   return (
@@ -120,46 +108,44 @@ export default function WelcomePage({
           overflow: 'auto',
         }}
       >
-        <Container sx={{ py: 3, position: 'relative', zIndex: 1 }}>
-          {/* Main Grid Layout */}
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
-              gap: 2,
-            }}
-          >
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateRows: { xs: 'auto', md: '1fr auto' },
-                alignContent: 'start',
-                gap: 2,
-              }}
-            >
-              <ProductionModeSelection
-                openLocalFolder={openLocalFolderAndSet}
-                cloneRepo={cloneRepo}
-                createRepo={createRepo}
-                onShowDocumentation={handleShowDocumentation}
-              />
-              <SandBoxSelection openSandbox={openSandboxt} />
-            </Box>
-
-            <RecentProjectSelection
+        <Container
+          sx={{
+            py: 3,
+            position: 'relative',
+            zIndex: 1,
+            display: 'flex',
+            height: 'clamp(700px, 80vh, 750px)',
+          }}
+        >
+          {isElectron ? (
+            <ElectronAppSelection
               recentProjects={recentProjects}
-              openRecentProject={openLocalRecentProject}
+              handleShowDocumentation={handleShowDocumentation}
+              handleCloneRepo={promptCloneRepo}
+              handleCreateRepo={promptCreateLocalRepo}
+              openLocalFolderAndSet={openLocalFolderAndSet}
+              openLocalRecentProject={openLocalRecentProject}
             />
-          </Box>
-          <CloneLoadingOverlay loadingVariant={loadingState} />
-
-          <DocumentationDialog
-            open={docDialogOpen}
-            onClose={handleCloseDocumentation}
-            title={currentDoc?.title || ''}
-            content={currentDoc?.content || ''}
-          />
+          ) : (
+            <WebAppSelection
+              handleOpenSandbox={handleOpenSandbox}
+              recentProjects={recentProjects}
+              handleShowDocumentation={handleShowDocumentation}
+              handleCloneRepo={promptCloneRepo}
+              handleCreateRepo={promptCreateLocalRepo}
+              openLocalFolderAndSet={openLocalFolderAndSet}
+              openLocalRecentProject={openLocalRecentProject}
+            />
+          )}
         </Container>
+        <CloneLoadingOverlay loadingVariant={loadingState} />
+
+        <DocumentationDialog
+          open={docDialogOpen}
+          onClose={handleCloseDocumentation}
+          title={currentDoc?.title || ''}
+          content={currentDoc?.content || ''}
+        />
 
         {/* Global Styles for Animations */}
         <style>

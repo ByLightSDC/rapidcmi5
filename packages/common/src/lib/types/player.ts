@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { RC5ActivityTypeEnum } from './activity';
 import { Cmi5Scenario, CourseAU, CourseData } from './course';
 import { QuizState } from './quiz';
@@ -29,7 +30,7 @@ export interface AuContextProps {
   activeTab: number;
   course?: CourseData;
   au?: CourseAU;
-  getSlide?: (props: AuContextProps) => JSX.Element | null;
+  getSlide?: (props: AuContextProps) => ReactNode | null;
   progressPercent: number;
   scenario?: Cmi5Scenario | undefined;
   slides: SlideType[];

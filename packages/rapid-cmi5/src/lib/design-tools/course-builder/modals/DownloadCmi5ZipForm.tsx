@@ -12,7 +12,7 @@ import * as yup from 'yup';
 
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
-import { Box, Grid } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 
 import { UseFormReturn } from 'react-hook-form';
 
@@ -74,7 +74,7 @@ export function DownloadCmi5ZipForm({
     const { errors } = formState;
     return (
       <>
-        <Grid item xs={6} sx={{ marginTop: '8px' }}>
+        <Grid size={6} sx={{ marginTop: '8px' }}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.zipName)}
@@ -86,7 +86,7 @@ export function DownloadCmi5ZipForm({
           />
         </Grid>
         {!isElectron && (
-          <Grid item xs={6} sx={{ marginTop: '12px' }}>
+          <Grid size={6} sx={{ marginTop: '12px' }}>
             <FormControlCheckboxField
               infoText={getInfoText('cmiAUMapping', 'auId')}
               control={control}

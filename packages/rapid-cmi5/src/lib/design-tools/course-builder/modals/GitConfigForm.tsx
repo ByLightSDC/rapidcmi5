@@ -11,7 +11,7 @@ import * as yup from 'yup';
 import { setGitConfigModalId } from '../../rapidcmi5_mdx/modals/constants';
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
-import { Grid } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 
 import { UseFormReturn } from 'react-hook-form';
 
@@ -69,7 +69,7 @@ export function GitConfigForm({
     const { errors, isValid } = formState;
     return (
       <>
-        <Grid item xs={9}>
+        <Grid size={9}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.authorEmail)}
@@ -79,7 +79,7 @@ export function GitConfigForm({
             readOnly={false}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.authorName)}
@@ -89,7 +89,7 @@ export function GitConfigForm({
             readOnly={false}
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.remoteRepoUrl)}

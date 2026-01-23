@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
-import { Grid, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
@@ -66,7 +67,7 @@ function Matching({
       <Grid container spacing={2}>
         {pairs.map((p, index) => (
           <React.Fragment key={index}>
-            <Grid item xs={6} key={p.option}>
+            <Grid size={6} key={p.option}>
               <>
                 {isGraded && (
                   <div
@@ -91,7 +92,7 @@ function Matching({
                 </Typography>
               </>
             </Grid>
-            <Grid item xs={6}>
+            <Grid size={6}>
               <SelectorMainUi
                 allowItemWrapping={true}
                 disabled={isGraded}

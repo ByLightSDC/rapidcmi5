@@ -11,8 +11,8 @@ import * as yup from 'yup';
 import { attachRemoteRepoModalId } from '../../rapidcmi5_mdx/modals/constants';
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
-import { Grid, Typography } from '@mui/material';
-
+import { Typography } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import { UseFormReturn } from 'react-hook-form';
 
 import { GIT_URL_GROUP, NAME_GROUP } from '@rapid-cmi5/ui';
@@ -71,13 +71,13 @@ export function AttachRemoteRepoForm({
     const { errors } = formState;
     return (
       <>
-        <Grid item xs={12} sx={{ marginBottom: '12px' }}>
+        <Grid size={12} sx={{ marginBottom: '12px' }}>
           <Typography>The remote repository...</Typography>
           <Typography>• MUST be empty (NO branches, NO README)</Typography>
           <Typography>• MUST be able to PUSH and PULL over https</Typography>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={12}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.remoteRepoUrl)}
@@ -89,7 +89,7 @@ export function AttachRemoteRepoForm({
             readOnly={false}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.authorName)}
@@ -100,7 +100,7 @@ export function AttachRemoteRepoForm({
             readOnly={false}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.authorEmail)}

@@ -190,10 +190,6 @@ interface IGitContext {
   handleRenameCourse: (newCourseName: string) => void;
   handleImportRepoZip: (req: ImportRepoZipType) => void;
   handleCreateLocalCourse: (req: CreateLocalRepoType) => Promise<void>;
-  openLocalFolder: (cloneForm: () => Promise<CreateCloneType>) => Promise<void>;
-  createNewRepo: (
-    cloneForm: () => Promise<CreateLocalRepoType>,
-  ) => Promise<void>;
   openSandbox: () => Promise<void>;
   getLocalFolders: () => Promise<DirMeta[]>;
   openLocalRepo: (id?: string) => Promise<void>;
@@ -310,12 +306,6 @@ const defaultGitContext: IGitContext = {
   handleImportRepoZip: () => {},
   handleCreateLocalCourse: async () => {},
   numStaged: 0,
-  openLocalFolder: async (
-    cloneForm: () => Promise<CreateCloneType>,
-  ): Promise<void> => {},
-  createNewRepo: async (
-    cloneForm: () => Promise<CreateLocalRepoType>,
-  ): Promise<void> => {},
   getLocalFolders: async (): Promise<DirMeta[]> => [],
   openSandbox: async (): Promise<void> => {},
   openLocalRepo: async (): Promise<void> => {},
@@ -560,46 +550,37 @@ export const GitContextProvider = (props: tProviderProps) => {
     dispatch(setLoadingState(LoadingState.cloningRepo));
 
     try {
-      const r: RepoAccessObject = {
-        fileSystemType: fsType.localFileSystem,
-        repoName: cleanedName,
-      };
+      // // @ts-ignore
+      // let dirHandle = (await window.showDirectoryPicker({
+      //   mode: 'readwrite',
+      //   startIn: 'documents',
+      // })) as FileSystemDirectoryHandle;
 
-      // @ts-ignore
-      let dirHandle = (await window.showDirectoryPicker({
-        mode: 'readwrite',
-        startIn: 'documents',
-      })) as FileSystemDirectoryHandle;
-      if (!dirHandle) throw Error('No directory selected for clone');
-      await gitFs.openLocalDirectory(dirHandle, true);
+      // if (!dirHandle) throw Error('No directory selected for clone');
 
-      await cloneRemoteRepo(req);
+      // await gitFs.openLocalDirectory(dirHandle, true);
 
-      // await setConfig(r, {
-      //   authorEmail:
-      //     currentGitConfig.authorEmail ||
-      //     currentAuth?.parsedUserToken?.email?.toLowerCase(),
-      //   authorName:
-      //     currentGitConfig.authorName || currentAuth?.parsedUserToken?.name,
-      //   remoteRepoUrl: '',
-      // });
+      // // verify repo dir actually exits
+      // try {
+      //   const repoDir = await dirHandle.getDirectoryHandle(req.repoDirName);
+
+      //   await gitFs.setDirHandle(repoDir);
+
+      //   await gitFs.openLocalDirectory(repoDir);
+      // } catch {
+      //   throw Error(
+      //     'The clone operation failed to save files to your local computer.',
+      //   );
+      // }
+
+      await gitFs.createRepoInDir(
+        req.repoDirName,
+        async () => await cloneRemoteRepo(req),
+      );
 
       await resetRepoStatus();
+
       await handleChangeRepo(cleanedName);
-
-      // verify repo dir actually exits
-      try {
-        const repoDir = await dirHandle.getDirectoryHandle(req.repoDirName);
-
-        await gitFs.setDirHandle(repoDir);
-
-        await gitFs.openLocalDirectory(repoDir);
-      } catch {
-        throw Error(
-          'The clone operation failed to save files to your local computer.',
-        );
-      }
-
       dispatch(setCurrentFileSystemType(fsType.localFileSystem));
 
       await resetRepoStatus();
@@ -670,6 +651,7 @@ export const GitContextProvider = (props: tProviderProps) => {
       });
     }
   };
+  
   const openSandbox = async () => {
     await handleBrowserFileSystemAccess();
     await handleChangeFileSystem(fsType.inBrowser);
@@ -686,41 +668,21 @@ export const GitContextProvider = (props: tProviderProps) => {
   };
 
   const openLocalRepo = async (id?: string) => {
-    let dirHandle: FileSystemDirectoryHandle | undefined;
     dispatch(setLoadingState(LoadingState.loadingRepo));
-
     try {
-      if (id) {
-        dirHandle = await gitFs.getDirHandle(id);
-      }
-      if (!dirHandle) {
-        // @ts-ignore
-        dirHandle = await window.showDirectoryPicker({
-          mode: 'readwrite',
-          startIn: 'documents',
-        });
-        if (!dirHandle) return;
-
-        await gitFs.setDirHandle(dirHandle);
-      }
-
-      // ensure the file has a .git folder
-      const gitFolder = await dirHandle.getDirectoryHandle('.git');
-      if (!gitFolder) throw Error('No git folder');
-
-      await gitFs.openLocalDirectory(dirHandle);
+      const dirName = await gitFs.openLocalRepo(id);
 
       dispatch(setCurrentFileSystemType(fsType.localFileSystem));
 
       await resetRepoStatus();
-      dispatch(setCurrentRepo(dirHandle.name));
+      dispatch(setCurrentRepo(dirName));
       setIsGitLoaded(false);
 
       setLocalFileSystemLoaded(true);
       setBrowserFileSystemLoaded(true);
       await resolveCurrentRepo({
         fileSystemType: fsType.localFileSystem,
-        repoName: dirHandle.name,
+        repoName: dirName,
       });
     } finally {
       dispatch(setLoadingState(LoadingState.loaded));
@@ -736,77 +698,6 @@ export const GitContextProvider = (props: tProviderProps) => {
     })) as FileSystemDirectoryHandle;
     if (!dirHandle) return null;
     return dirHandle;
-  };
-
-  const openLocalFolder = async (cloneForm: () => Promise<CreateCloneType>) => {
-    // @ts-ignore
-    let dirHandle = (await window.showDirectoryPicker({
-      // id: id,
-      mode: 'readwrite',
-      startIn: 'documents',
-    })) as FileSystemDirectoryHandle;
-    if (!dirHandle) return; // user canceled
-    await gitFs.openLocalDirectory(dirHandle, true);
-
-    const req = await cloneForm();
-
-    await handleCloneRepo(req);
-
-    // verify repo dir actually exits
-    const repoDir = await dirHandle.getDirectoryHandle(req.repoDirName);
-
-    await gitFs.setDirHandle(repoDir);
-
-    await gitFs.openLocalDirectory(repoDir);
-
-    dispatch(setCurrentFileSystemType(fsType.localFileSystem));
-
-    await resetRepoStatus();
-    dispatch(setCurrentRepo(req.repoDirName));
-    setIsGitLoaded(false);
-
-    setLocalFileSystemLoaded(true);
-    setBrowserFileSystemLoaded(true);
-    await resolveCurrentRepo({
-      fileSystemType: fsType.localFileSystem,
-      repoName: req.repoDirName,
-    });
-  };
-
-  const createNewRepo = async (
-    createRepoForm: () => Promise<CreateLocalRepoType>,
-  ) => {
-    // @ts-ignore
-    let dirHandle = (await window.showDirectoryPicker({
-      mode: 'readwrite',
-      startIn: 'documents',
-    })) as FileSystemDirectoryHandle;
-    if (!dirHandle) return; // user canceled
-    await gitFs.openLocalDirectory(dirHandle, true);
-
-    const req = await createRepoForm();
-
-    await handleCreateLocalCourse(req);
-
-    // verify repo dir actually exits
-    const repoDir = await dirHandle.getDirectoryHandle(req.repoDirName);
-
-    await gitFs.setDirHandle(repoDir);
-
-    await gitFs.openLocalDirectory(repoDir);
-
-    dispatch(setCurrentFileSystemType(fsType.localFileSystem));
-
-    await resetRepoStatus();
-    dispatch(setCurrentRepo(req.repoDirName));
-    setIsGitLoaded(false);
-
-    setLocalFileSystemLoaded(true);
-    setBrowserFileSystemLoaded(true);
-    await resolveCurrentRepo({
-      fileSystemType: fsType.localFileSystem,
-      repoName: req.repoDirName,
-    });
   };
 
   /*
@@ -1192,16 +1083,19 @@ export const GitContextProvider = (props: tProviderProps) => {
         fileSystemType: fsType.localFileSystem,
       };
 
-      // @ts-ignore
-      let dirHandle = (await window.showDirectoryPicker({
-        mode: 'readwrite',
-        startIn: 'documents',
-      })) as FileSystemDirectoryHandle;
-      if (!dirHandle) throw Error('No directory selected for clone');
-      await gitFs.openLocalDirectory(dirHandle, true);
+      // // @ts-ignore
+      // let dirHandle = (await window.showDirectoryPicker({
+      //   mode: 'readwrite',
+      //   startIn: 'documents',
+      // })) as FileSystemDirectoryHandle;
+      // if (!dirHandle) throw Error('No directory selected for clone');
+      // await gitFs.openLocalDirectory(dirHandle, true);
 
       try {
-        await gitOperator.initGitRepo(r, req.repoBranch);
+        await gitFs.createRepoInDir(
+          req.repoDirName,
+          async () => await gitOperator.initGitRepo(r, req.repoBranch),
+        );
 
         await configureNewCourse(r);
 
@@ -1211,12 +1105,12 @@ export const GitContextProvider = (props: tProviderProps) => {
         throw error;
       }
 
-      // verify repo dir actually exits
-      const repoDir = await dirHandle.getDirectoryHandle(req.repoDirName);
+      // // verify repo dir actually exits
+      // const repoDir = await dirHandle.getDirectoryHandle(req.repoDirName);
 
-      await gitFs.setDirHandle(repoDir);
+      // await gitFs.setDirHandle(repoDir);
 
-      await gitFs.openLocalDirectory(repoDir);
+      // await gitFs.openLocalDirectory(repoDir);
 
       dispatch(setCurrentFileSystemType(fsType.localFileSystem));
 
@@ -1362,11 +1256,9 @@ export const GitContextProvider = (props: tProviderProps) => {
         handleGetDiff,
         numStaged,
         handleNavToFile,
-        openLocalFolder,
         getLocalFolders,
         openSandbox,
         openLocalRepo,
-        createNewRepo,
         getDirHandle,
       }}
     >

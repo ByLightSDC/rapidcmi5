@@ -6,7 +6,7 @@
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { SxProps } from '@mui/system';
@@ -63,10 +63,10 @@ export function Form({
     >
       <form className="form" data-testid={testId} onSubmit={onSubmit}>
         <Grid container columns={1} direction="column" wrap="nowrap">
-          <Grid item xs={12}>
+          <Grid size={12}>
             {subTitle && (
               <Grid container sx={{ marginBottom: '12px' }}>
-                <Grid item xs={4.8}>
+                <Grid size={4.8}>
                   <div className="content-row-icons">
                     {titleStartIcon}
                     {title && (
@@ -81,7 +81,7 @@ export function Form({
                     {titleEndChildren}
                   </div>
                 </Grid>
-                <Grid item xs={2.4}>
+                <Grid size={2.4}>
                   <Typography
                     className="clipped-text"
                     variant="h5"
@@ -92,11 +92,11 @@ export function Form({
                     {subTitle}
                   </Typography>
                 </Grid>
-                <Grid item xs={4.8}></Grid>
+                <Grid size={4.8}></Grid>
               </Grid>
             )}
             {!subTitle && (
-              <Grid item xs={11} sx={{ marginBottom: '12px' }}>
+              <Grid size={11} sx={{ marginBottom: '12px' }}>
                 <div className="content-row-icons">
                   {titleStartIcon}
                   {title && (
@@ -113,7 +113,7 @@ export function Form({
               </Grid>
             )}
           </Grid>
-          <Grid item>
+          <Grid>
             {instructions && (
               <Typography
                 id="instructions"
@@ -151,8 +151,8 @@ export function Form({
               {submitError}
             </Alert>
           )}
-          <Grid item padding={1} xs={12} />
-          <Grid item xs={12} sx={{ padding: '0px', margin: '0px' }}>
+          <Grid size={12} padding={1} />
+          <Grid size={12} sx={{ padding: '0px', margin: '0px' }}>
             <Box id="button-container-right">
               {formButtons ? <>{formButtons}</> : null}
             </Box>

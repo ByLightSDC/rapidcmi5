@@ -30,7 +30,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 
 import VerticalAlignCenterIcon from '@mui/icons-material/VerticalAlignCenter';
 import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
@@ -291,10 +291,10 @@ export const LayoutBoxEditor: React.FC<
                 <Stack spacing={0.1}>
                   {/* Justification */}
                   <Grid container alignItems="center" spacing={2}>
-                    <Grid item xs={3}>
+                    <Grid size={3}>
                       <Typography gutterBottom>Horizontal Alignment</Typography>
                     </Grid>
-                    <Grid item xs={9}>
+                    <Grid size={9}>
                       <ToggleButtonGroup
                         value={form.justifyContent}
                         exclusive
@@ -327,10 +327,10 @@ export const LayoutBoxEditor: React.FC<
 
                   {/* Vertical Alignment */}
                   <Grid container alignItems="center" spacing={2}>
-                    <Grid item xs={3}>
+                    <Grid size={3}>
                       <Typography gutterBottom>Vertical Alignment</Typography>
                     </Grid>
-                    <Grid item xs={9}>
+                    <Grid size={9}>
                       <ToggleButtonGroup
                         value={form.alignItems}
                         exclusive
@@ -357,10 +357,10 @@ export const LayoutBoxEditor: React.FC<
 
                   {/* Width */}
                   <Grid container alignItems="center" spacing={2}>
-                    <Grid item xs={3}>
+                    <Grid size={3}>
                       <Typography gutterBottom>Width</Typography>
                     </Grid>
-                    <Grid item xs={9}>
+                    <Grid size={9}>
                       <TextField
                         autoFocus
                         margin="dense"
@@ -380,10 +380,10 @@ export const LayoutBoxEditor: React.FC<
 
                   {/* Height */}
                   <Grid container alignItems="center" spacing={2}>
-                    <Grid item xs={3}>
+                    <Grid size={3}>
                       <Typography gutterBottom>Height</Typography>
                     </Grid>
-                    <Grid item xs={9}>
+                    <Grid size={9}>
                       <TextField
                         autoFocus
                         margin="dense"
