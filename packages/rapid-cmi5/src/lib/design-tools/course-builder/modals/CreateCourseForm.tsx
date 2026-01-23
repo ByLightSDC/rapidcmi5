@@ -14,7 +14,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { createCourseModalId } from '../../rapidcmi5_mdx/modals/constants';
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
-import { Alert, IconButton, Tooltip } from '@mui/material';
+import { Alert, Button, IconButton, Tooltip } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import { useForm, UseFormReturn } from 'react-hook-form';
@@ -71,7 +71,7 @@ export function CreateCourseForm({
         ),
     });
   }, []);
-  
+
   const onCancel = () => {
     handleCloseModal();
   };
@@ -144,7 +144,6 @@ export function CreateCourseForm({
 
     return (
       <>
-        {/* Required Metadata */}
         <Grid size={6}>
           <FormControlTextField
             control={control}
@@ -165,7 +164,7 @@ export function CreateCourseForm({
             label="Course Id"
           />
         </Grid>
-        <Grid size={6} /> {/* spacer for layout */}
+        <Grid size={6} />
         <Grid size={12}>
           <FormControlTextField
             control={control}
@@ -203,7 +202,6 @@ export function CreateCourseForm({
           onCancel={onCancel}
           onResponse={onResponse}
           validationSchema={validationSchema}
-          shouldAutoSave={false}
         />
       </FormControlUIProvider>
     </ModalDialog>

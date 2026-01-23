@@ -65,7 +65,7 @@ const courseActions = [
     hidden: true, // hidden for showing the edit field to rename course
   },
   {
-    tooltip: 'Create Course',
+    tooltip: 'Course',
     icon: <AddIcon color="inherit" />,
   },
   {
@@ -183,7 +183,7 @@ export const LessonDrawer = () => {
         direction="row"
         spacing={1}
         sx={{
-          mb: 2,
+          mb: 1,
           p: 1,
           borderRadius: 1,
           alignItems: 'center',
@@ -202,124 +202,105 @@ export const LessonDrawer = () => {
           />
         </Box>
 
-        <Stack direction="row" spacing={0.5}>
-          <Tooltip title="Create Course">
-            <span>
-              <IconButton
-                disabled={!currentRepo}
-                size="small"
-                onClick={promptCreateCourse}
-                data-testid="create-course-button"
-                sx={{
-                  borderRadius: 1,
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                  },
-                }}
-              >
-                <AddIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
-
-          <Tooltip title="Publish Course">
-            <span>
-              <IconButton
-                disabled={!currentRepo}
-                size="small"
-                onClick={publishCourse}
-                data-testid="publish-course-button"
-                sx={{
-                  borderRadius: 1,
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                  },
-                }}
-              >
-                <PublishIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
-
-          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-
-          <ButtonOptions
-            optionButton={(handleClick: any) => (
-              <Tooltip title="More Options">
-                <span>
-                  <IconButton
-                    aria-label="course options"
-                    className="nodrag"
-                    disabled={!currentRepo}
-                    size="small"
-                    onClick={handleClick}
-                    sx={{
-                      borderRadius: 1,
-                      '&:hover': {
-                        bgcolor: 'action.hover',
-                      },
-                    }}
-                  >
-                    <MoreVertIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            )}
-            closeOnClick={true}
-            onTrigger={(event?: any) => {
-              onCourseContextAction(event, CourseActionEnum.TriggerRename);
+        <ButtonOptions
+          optionButton={(handleClick: any) => (
+            <Tooltip title="More Options">
+              <span>
+                <IconButton
+                  aria-label="course options"
+                  className="nodrag"
+                  disabled={!currentRepo}
+                  size="small"
+                  onClick={handleClick}
+                  sx={{
+                    borderRadius: 1,
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                    },
+                  }}
+                >
+                  <MoreVertIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+          )}
+          closeOnClick={true}
+          onTrigger={(event?: any) => {
+            onCourseContextAction(event, CourseActionEnum.TriggerRename);
+          }}
+        >
+          <List
+            sx={{
+              backgroundColor: (theme: any) => `${theme.nav.fill}`,
+              color: (theme: any) => `${theme.nav.icon}`,
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+              height: 'auto',
             }}
+            component="nav"
           >
-            <List
-              sx={{
-                backgroundColor: (theme: any) => `${theme.nav.fill}`,
-                color: (theme: any) => `${theme.nav.icon}`,
-                display: 'flex',
-                flexDirection: 'column',
-                width: '100%',
-                height: 'auto',
-              }}
-              component="nav"
-            >
-              <Typography sx={{ marginLeft: '12px' }} variant="caption">
-                {courseData?.courseTitle || 'No Course Selected'}
-              </Typography>
-              {courseActions.map((option: RowAction, index: number) => (
-                <React.Fragment key={option.tooltip}>
-                  {!option.hidden && (
-                    <>
-                      {index > 0 && <Divider />}
-                      <ListItemButton
+            <Typography sx={{ marginLeft: '12px' }} variant="caption">
+              {courseData?.courseTitle || 'No Course Selected'}
+            </Typography>
+            {courseActions.map((option: RowAction, index: number) => (
+              <React.Fragment key={option.tooltip}>
+                {!option.hidden && (
+                  <>
+                    {index > 0 && <Divider />}
+                    <ListItemButton
+                      sx={{
+                        height: 30,
+                      }}
+                      onClick={(event) => {
+                        onCourseContextAction(event, index);
+                      }}
+                    >
+                      <ListItemIcon
                         sx={{
-                          height: 30,
-                        }}
-                        onClick={(event) => {
-                          onCourseContextAction(event, index);
+                          padding: '0px',
+                          margin: '0px',
+                          marginRight: '2px',
+                          minWidth: '0px',
                         }}
                       >
-                        <ListItemIcon
-                          sx={{
-                            padding: '0px',
-                            margin: '0px',
-                            marginRight: '2px',
-                            minWidth: '0px',
-                          }}
-                        >
-                          {option.icon}
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={option.tooltip}
-                          slotProps={{ primary: listItemProps }}
-                        />
-                      </ListItemButton>
-                    </>
-                  )}
-                </React.Fragment>
-              ))}
-            </List>
-          </ButtonOptions>
-        </Stack>
+                        {option.icon}
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={option.tooltip}
+                        slotProps={{ primary: listItemProps }}
+                      />
+                    </ListItemButton>
+                  </>
+                )}
+              </React.Fragment>
+            ))}
+          </List>
+        </ButtonOptions>
       </Stack>
+
+      {/* Action buttons below selector */}
+      <Stack direction="row" spacing={1} sx={{ mb: 2, px: 1 }}>
+        <ButtonMinorUi
+          id="create-course-button"
+          startIcon={<AddIcon />}
+          disabled={!currentRepo}
+          onClick={promptCreateCourse}
+          sx={{ flex: 1 }}
+        >
+          Course
+        </ButtonMinorUi>
+        <ButtonMinorUi
+          id="publish-course-button"
+          startIcon={<PublishIcon />}
+          disabled={!currentRepo}
+          onClick={publishCourse}
+          sx={{ flex: 1 }}
+        >
+          Publish
+        </ButtonMinorUi>
+      </Stack>
+
       {menuAnchor && (
         <Renamer
           anchor={menuAnchor}

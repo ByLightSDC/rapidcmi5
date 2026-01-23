@@ -114,7 +114,7 @@ export default function WelcomePage({
             position: 'relative',
             zIndex: 1,
             display: 'flex',
-            height: 'clamp(700px, 80vh, 750px)',
+            mb: 3,
           }}
         >
           {isElectron ? (

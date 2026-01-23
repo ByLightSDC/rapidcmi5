@@ -15,7 +15,6 @@ import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import { electronFs } from './ElectronFsApi';
 import { CourseData } from '@rapid-cmi5/cmi5-build-common';
 import { IFs } from 'memfs';
-import { getFsInstance } from './gitFsInstance';
 
 export const getRepoPath = (r: RepoAccessObject) =>
   `/${r.fileSystemType}/${r.repoName}`;
@@ -292,22 +291,25 @@ export class GitFS {
     const newMetas: DirMeta[] = [];
 
     if (this.isElectron) {
-      const dirs = await this.fs.promises.readdir(fsType.localFileSystem);
-      console.log(dirs);
+      try {
+        const dirs = await this.fs.promises.readdir(fsType.localFileSystem);
 
-      for (const dir of dirs) {
-        const stats = await this.fs.promises.stat(
-          fsType.localFileSystem + '/' + dir.toString(),
-        );
-        console.log(stats);
-        newMetas.push({
-          createdAt: new Date(stats.ctimeMs as number).toISOString(),
-          lastAccessed: new Date(stats.mtimeMs as number).toISOString(),
-          id: dir.toString(),
-          isValid: true,
-          name: dir.toString(),
-          remoteUrl: await this.getGitRemoteUrlElectron(dir.toString()),
-        });
+        for (const dir of dirs) {
+          const stats = await this.fs.promises.stat(
+            fsType.localFileSystem + '/' + dir.toString(),
+          );
+          console.log(stats);
+          newMetas.push({
+            createdAt: new Date(stats.ctimeMs as number).toISOString(),
+            lastAccessed: new Date(stats.mtimeMs as number).toISOString(),
+            id: dir.toString(),
+            isValid: true,
+            name: dir.toString(),
+            remoteUrl: await this.getGitRemoteUrlElectron(dir.toString()),
+          });
+        }
+      } catch {
+        return [];
       }
     } else {
       const allKeys = await keys();

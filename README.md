@@ -119,10 +119,10 @@ This will run all unit tests in rapid cmi5
 
 ### E2E testing
 `npx nx serve rapid-cmi5-electron-frontend`
-`nx run rapid-cmi5-electron:e2e`
+`npx nx run rapid-cmi5-electron:e2e`
 
 For interactive tests run
-`nx run rapid-cmi5-electron:e2e --ui`
+`npx nx run rapid-cmi5-electron:e2e --ui`
 
 
 ### Publishing to npm

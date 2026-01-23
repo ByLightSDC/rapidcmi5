@@ -34,17 +34,17 @@ export function Form({
   titleStartIcon?: JSX.Element;
   subTitle?: string;
   formWidth?: number | string;
-  formHeight?: number | string; // limit the height of the form - defaults to "auto"
-  formButtons?: any; // any buttons to display
-  formFields: any; // grid container / items for any fields to display
+  formHeight?: number | string;
+  formButtons?: any;
+  formFields: any;
   instructions?: string;
   showBorder?: boolean;
   showPaper?: boolean;
   sxProps?: any;
   submitError?: string | JSX.Element;
   testId?: string;
-  onSubmit?: (event?: any) => void; // callback for when button of "type=submit" is called - should be one of the buttons above
-  onCloseAlert?: () => void; // callback for when a submit error alert is "acknowledged"
+  onSubmit?: (event?: any) => void;
+  onCloseAlert?: () => void;
 }) {
   const sxDisplayProps = {
     color: 'text.secondary',
@@ -62,11 +62,11 @@ export function Form({
       sxDisplayProps={sxDisplayProps}
     >
       <form className="form" data-testid={testId} onSubmit={onSubmit}>
-        <Grid container columns={1} direction="column" wrap="nowrap">
+        <Grid container direction="column">
           <Grid size={12}>
             {subTitle && (
               <Grid container sx={{ marginBottom: '12px' }}>
-                <Grid size={4.8}>
+                <Grid size={4}>
                   <div className="content-row-icons">
                     {titleStartIcon}
                     {title && (
@@ -81,7 +81,7 @@ export function Form({
                     {titleEndChildren}
                   </div>
                 </Grid>
-                <Grid size={2.4}>
+                <Grid size={2}>
                   <Typography
                     className="clipped-text"
                     variant="h5"
@@ -92,11 +92,11 @@ export function Form({
                     {subTitle}
                   </Typography>
                 </Grid>
-                <Grid size={4.8}></Grid>
+                <Grid size={4}></Grid>
               </Grid>
             )}
             {!subTitle && (
-              <Grid size={11} sx={{ marginBottom: '12px' }}>
+              <Grid size={12} sx={{ marginBottom: '12px' }}>
                 <div className="content-row-icons">
                   {titleStartIcon}
                   {title && (
@@ -113,7 +113,7 @@ export function Form({
               </Grid>
             )}
           </Grid>
-          <Grid>
+          <Grid size={12}>
             {instructions && (
               <Typography
                 id="instructions"
@@ -130,28 +130,29 @@ export function Form({
           className="form-fields-container"
           style={{
             height: sxDisplayProps.height,
-            /* this is the height that allows top and bottom of form to remain visible at smallest screen res*/
             minHeight: sxDisplayProps.minHeight ?? '0',
           }}
         >
           {formFields}
         </div>
-        <Grid container columns={1} direction="column" wrap="nowrap">
+        <Grid container direction="column">
           {submitError && (
-            <Alert
-              sx={{ width: 'auto' }}
-              onClose={() => {
-                if (onCloseAlert) {
-                  onCloseAlert();
-                }
-              }}
-              severity="error"
-            >
-              <AlertTitle>Submit Error</AlertTitle>
-              {submitError}
-            </Alert>
+            <Grid size={12}>
+              <Alert
+                sx={{ width: 'auto' }}
+                onClose={() => {
+                  if (onCloseAlert) {
+                    onCloseAlert();
+                  }
+                }}
+                severity="error"
+              >
+                <AlertTitle>Submit Error</AlertTitle>
+                {submitError}
+              </Alert>
+            </Grid>
           )}
-          <Grid size={12} padding={1} />
+          <Grid size={12} sx={{ padding: '8px' }} />
           <Grid size={12} sx={{ padding: '0px', margin: '0px' }}>
             <Box id="button-container-right">
               {formButtons ? <>{formButtons}</> : null}
@@ -195,7 +196,7 @@ function FormPaperOrBox({
   }
 
   const variant = showBorder ? 'outlined' : 'elevation';
-  let elevation; // we want it undefined when variant is "outlined" to prevent a console warning
+  let elevation;
   if (!showBorder) {
     elevation = 0;
   }

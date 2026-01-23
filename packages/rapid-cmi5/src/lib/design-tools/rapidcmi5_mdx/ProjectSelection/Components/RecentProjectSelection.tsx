@@ -76,6 +76,7 @@ export default function RecentProjectSelection({
 
   return (
     <GlassCard
+      sx={{ height: 'clamp(650px, 80vh, 700px)' }}
       title="Recent Projects"
       icon={<History sx={{ color: 'white' }} />}
     >
