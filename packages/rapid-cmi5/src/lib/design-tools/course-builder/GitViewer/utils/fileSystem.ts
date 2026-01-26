@@ -90,12 +90,17 @@ export class GitFS {
 
       try {
         await this.fs.promises.mkdir(gitCache, { recursive: true });
-      } catch {}
+      } catch (error: any) {
+        debugLogError(error);
+      }
       try {
         await this.fs.promises.mkdir('/inBrowser', { recursive: true });
-      } catch {}
+      } catch (error: any) {
+        debugLogError(error);
+      }
 
       this.isBrowserFsLoaded = true;
+      this.isMountStarted = false;
     } catch (error: any) {
       throw error;
     }
@@ -148,8 +153,11 @@ export class GitFS {
         zenFs.umount('/localFileSystem/' + dirHandle.name);
 
         zenFs.mount('/localFileSystem/' + dirHandle.name, webacess);
-      }
+        // zenFs.umount('/localFileSystem');
 
+        // zenFs.mount('/localFileSystem', webacess);
+
+      }
       this.isBrowserFsLoaded = true;
     } catch (error: any) {
       throw error;

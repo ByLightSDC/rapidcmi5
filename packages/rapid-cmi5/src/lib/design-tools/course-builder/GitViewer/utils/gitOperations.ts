@@ -308,18 +308,24 @@ export class GitOperations {
     changedFiles?: string[],
   ): Promise<ModifiedFile[]> => {
     const dir = getRepoPath(r);
-
     try {
       let status;
 
       if (this.gitFs.isElectron) {
         status = await window.fsApi.getStatus(dir);
       } else {
+        // const files = await this.gitFs.fs.promises.readdir(dir);
+        // console.log(files)
         status = await git.statusMatrix({
           fs: this.gitFs.fs,
           dir,
-          gitdir: this.gitFs.isElectron ? undefined : gitCache,
           filepaths: changedFiles,
+          gitdir: gitCache,
+
+          // This is super needed, please do not remove
+          // The file system access api does not allow the . operator
+          // when it is the base mounted directory
+          filter: (filepath) => filepath.endsWith('.md'),
         });
       }
 
@@ -403,7 +409,7 @@ export class GitOperations {
           fs: this.gitFs.fs,
           dir,
           filepath,
-          gitdir: this.gitFs.isElectron ? undefined : gitCache,
+          gitdir: gitCache,
         });
       }
 

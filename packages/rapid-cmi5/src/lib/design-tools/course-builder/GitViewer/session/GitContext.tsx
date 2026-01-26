@@ -550,29 +550,6 @@ export const GitContextProvider = (props: tProviderProps) => {
     dispatch(setLoadingState(LoadingState.cloningRepo));
 
     try {
-      // // @ts-ignore
-      // let dirHandle = (await window.showDirectoryPicker({
-      //   mode: 'readwrite',
-      //   startIn: 'documents',
-      // })) as FileSystemDirectoryHandle;
-
-      // if (!dirHandle) throw Error('No directory selected for clone');
-
-      // await gitFs.openLocalDirectory(dirHandle, true);
-
-      // // verify repo dir actually exits
-      // try {
-      //   const repoDir = await dirHandle.getDirectoryHandle(req.repoDirName);
-
-      //   await gitFs.setDirHandle(repoDir);
-
-      //   await gitFs.openLocalDirectory(repoDir);
-      // } catch {
-      //   throw Error(
-      //     'The clone operation failed to save files to your local computer.',
-      //   );
-      // }
-
       await gitFs.createRepoInDir(
         req.repoDirName,
         async () => await cloneRemoteRepo(req),
@@ -651,7 +628,7 @@ export const GitContextProvider = (props: tProviderProps) => {
       });
     }
   };
-  
+
   const openSandbox = async () => {
     await handleBrowserFileSystemAccess();
     await handleChangeFileSystem(fsType.inBrowser);
@@ -740,29 +717,12 @@ export const GitContextProvider = (props: tProviderProps) => {
     }
   };
 
-  const handleLocalFileSystemAccess = async () => {
-    try {
-      await handleBrowserFileSystemAccess();
-      let dirHandle = await gitFs.getDirHandle();
-
-      if (dirHandle === undefined) {
-        // for now we will just switch back to in browser if the handle is invalid
-        dispatch(setCurrentFileSystemType(fsType.inBrowser));
-      }
-      if (dirHandle) {
-        await gitFs.openLocalDirectory(dirHandle);
-
-        setLocalFileSystemLoaded(true);
-      }
-    } catch (error: any) {
-      debugLog(error);
-    }
-  };
-
   const handleBrowserFileSystemAccess = async () => {
     try {
       if (!gitFs.isMountStarted) {
-        await gitFs.init();
+        if (!gitFs.isBrowserFsLoaded) {
+          await gitFs.init();
+        }
 
         setBrowserFileSystemLoaded(true);
       }

@@ -170,12 +170,11 @@ export function useGitRepoStatus(
           }
         } catch (error: any) {
           throw error;
-          debugLogError(error);
         }
         gettingRepoStatus.current = false;
       }
     },
-    [repoAccessObject, modifiedFiles],
+    [modifiedFiles],
   );
 
   const resolveStashStatus = async (

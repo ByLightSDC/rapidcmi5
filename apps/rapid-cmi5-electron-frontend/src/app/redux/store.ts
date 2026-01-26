@@ -4,7 +4,6 @@ import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 //Persist
 import storage from 'redux-persist/lib/storage';
 import {
-  createMigrate,
   persistReducer,
   persistStore,
   FLUSH,
