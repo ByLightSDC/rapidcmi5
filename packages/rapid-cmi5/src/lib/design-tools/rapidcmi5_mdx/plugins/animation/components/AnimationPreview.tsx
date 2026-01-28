@@ -15,7 +15,7 @@ import {
   clearAnimationIndicators,
   updateAnimationIndicators,
 } from '../utils/updateAnimationIndicators';
-import { AnimationEngine, debugLog, PlaybackState } from '@rapid-cmi5/ui';
+import { AnimationEngine, PlaybackState, debugLog } from '@rapid-cmi5/ui';
 
 /**
  * Animation Preview Controls
@@ -91,50 +91,46 @@ export function AnimationPreview() {
       'drawer',
     );
 
-    // Log each animation's details for debugging
-    animations.forEach((anim, index) => {
-      debugLog(`🔍 [AnimationPreview] Animation ${index + 1}:`, {
-        id: anim.id,
-        directiveId: anim.directiveId,
-        targetNodeKey: anim.targetNodeKey,
-        targetLabel: anim.targetLabel,
-        order: anim.order,
-      });
-    });
+    // Log each animation's details for debugging (with current order from slideAnimations$)
+    debugLog('🔍 [AnimationPreview] Current animations from slideAnimations$ cell:', animations.map((anim, index) => ({
+      position: index + 1,
+      order: anim.order,
+      label: anim.targetLabel,
+      id: anim.id,
+    })), undefined, 'preview');
 
-    // Create new engine instance
+    // CRITICAL: Always cleanup old engine before creating new one
+    // This ensures we don't have stale animation data from before deletion/reordering
+    if (engineRef.current) {
+      debugLog('🧹 [AnimationPreview] Cleaning up old engine instance before creating new one', undefined, undefined, 'preview');
+      engineRef.current.cleanup();
+      engineRef.current = null;
+    }
+
+    // Create new engine instance with CURRENT animations (fresh snapshot)
+    debugLog('🏗️ [AnimationPreview] Creating NEW AnimationEngine with current animations', undefined, undefined, 'preview');
     const prefersReducedMotion = AnimationEngine.prefersReducedMotion();
     engineRef.current = new AnimationEngine(animations, {
       prefersReducedMotion,
-      // B2: Resolve elements by directiveId (stable) when Lexical keys churn.
-      // We keep key-based lookup as the fast-path for V1 and current-session matches.
+      // V2: Resolve elements by directiveId (required)
       findElement: (targetNodeKey: string) => {
-        // Fast-path: existing key-based selectors
-        let el = document.querySelector<HTMLElement>(
-          `[data-animation-id="${targetNodeKey}"]`,
-        );
-        if (el) return el;
-
-        el = document.querySelector<HTMLElement>(
-          `[data-animation-target="${targetNodeKey}"]`,
-        );
-        if (el) return el;
-
-        el = document.querySelector<HTMLElement>(
-          `[data-lexical-key="${targetNodeKey}"]`,
-        );
-        if (el) return el;
-
-        // Fallback: if this animation is directive-based, resolve via stable directive id
+        // Find the animation config to get directiveId
         const anim = animations.find((a) => a.targetNodeKey === targetNodeKey);
-        if (anim?.directiveId) {
-          el = document.querySelector<HTMLElement>(
-            `[data-anim-directive-id="${anim.directiveId}"]`,
-          );
-          if (el) return el;
+        if (!anim?.directiveId) {
+          console.warn('Animation missing directiveId for preview:', targetNodeKey);
+          return null;
         }
 
-        return null;
+        // Look up by directive ID
+        const el = document.querySelector<HTMLElement>(
+          `[data-anim-directive-id="${anim.directiveId}"]`,
+        );
+
+        if (!el) {
+          console.warn('Element not found for directiveId:', anim.directiveId);
+        }
+
+        return el;
       },
       onAnimationStart: (id) => {
         const anim = animations.find((a) => a.id === id);

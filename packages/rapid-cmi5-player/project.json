@@ -1,0 +1,41 @@
+{
+  "name": "rapid-cmi5-player",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/rapid-cmi5-player/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/packages/rapid-cmi5-player",
+        "main": "packages/rapid-cmi5-player/src/index.ts",
+        "tsConfig": "packages/rapid-cmi5-player/tsconfig.lib.json",
+        "package.json": "packages/rapid-cmi5-player/package.json",
+        "updateBuildableProjectDepsInPackageJson": true,
+        "assets": [
+          {
+            "input": "packages/rapid-cmi5-player/src/lib",
+            "glob": "**/*.{css,png,svg,jpg,jpeg,gif}",
+            "output": "src/lib"
+          }
+        ]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
+      "options": {
+        "jestConfig": "packages/rapid-cmi5-player/jest.config.ts"
+      }
+    }
+  }
+}

@@ -3,7 +3,7 @@
   width: 100%;
   height: 100%;
   border-spacing: 0;
-  border-collapse: collapse;
+  border-collapse: separate;
 
   & thead > tr > th {
     text-align: right;

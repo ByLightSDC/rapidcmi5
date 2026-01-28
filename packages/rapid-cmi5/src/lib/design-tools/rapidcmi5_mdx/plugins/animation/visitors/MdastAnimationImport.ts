@@ -1,6 +1,5 @@
-import { parse as parseYaml } from 'yaml';
 import { AnimationConfig, debugLog } from '@rapid-cmi5/ui';
-
+import { parse as parseYaml } from 'yaml';
 
 /**
  * Parse animations from markdown frontmatter
@@ -30,12 +29,18 @@ export function parseAnimationsFromFrontmatter(
         const validAnimations: AnimationConfig[] = animations
           .filter((anim: any) => {
             // Basic validation - must have required fields
+            // Note: targetNodeKey is optional for directive-based animations (V2)
+            // which use directiveId instead
+            const hasValidTargeting =
+              typeof anim.targetNodeKey === 'string' ||
+              typeof anim.directiveId === 'string';
+
             return (
               anim &&
               typeof anim === 'object' &&
               typeof anim.id === 'string' &&
               typeof anim.order === 'number' &&
-              typeof anim.targetNodeKey === 'string' &&
+              hasValidTargeting &&
               typeof anim.trigger === 'string' &&
               typeof anim.duration === 'number' &&
               typeof anim.delay === 'number' &&
@@ -45,7 +50,9 @@ export function parseAnimationsFromFrontmatter(
           .map((anim: any) => ({
             id: anim.id,
             order: anim.order,
-            targetNodeKey: anim.targetNodeKey,
+            // V1: targetNodeKey (required for legacy animations)
+            // V2: may be undefined for directive-based animations
+            targetNodeKey: anim.targetNodeKey || '',
             stableId: anim.stableId,  // CRITICAL: Load stable ID for resolution!
             directiveId: anim.directiveId, // CRITICAL: Load directive ID for V2 animations!
             targetLabel: anim.targetLabel,

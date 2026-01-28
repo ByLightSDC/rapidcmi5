@@ -9,25 +9,17 @@ import {
   RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import Grid from '@mui/material/Grid2';
+
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { debugLog } from '../../utility/logger';
 import { useDisplayFocus } from '../../hooks/useDisplayFocus';
 import useCTFGrader from './useCTFGrader';
 
-import {
-  Alert,
-  Grid,
-  Paper,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Alert, Paper, TextField, Typography } from '@mui/material';
+
 
 /* Icons */
 import InfoIcon from '@mui/icons-material/Info';
@@ -47,10 +39,13 @@ import {
   setCTFScore as setScore,
   setCurrentCTFAnswer as setCurrentAnswer,
   getAllCTFAnswers as getAllAnswers,
-
 } from './ctfReducer';
 import { Box, Stack } from '@mui/system';
-import { ButtonInfoField, ButtonMainUi, ButtonMinorUi } from '../../utility/buttons';
+import {
+  ButtonInfoField,
+  ButtonMainUi,
+  ButtonMinorUi,
+} from '../../utility/buttons';
 
 const answerBoxGridSize = 3.8;
 const attemptedLabel = '#Attempted';
@@ -446,7 +441,7 @@ export function AuCTF({
               container
               rowSpacing={0}
               columnSpacing={0} //this warps buttons
-              sx={{ padding: '8px' }}
+              sx={{ padding: '8px', width: '100%' }}
             >
               {ctfContent.questions.map(
                 (option: CTFQuestion, index: number) => {
@@ -468,7 +463,7 @@ export function AuCTF({
                           : 'bg-zinc'
                       }
                       key={`q${index}`}
-                      xs={answerBoxGridSize}
+                      size={answerBoxGridSize}
                       sx={{
                         borderColor:
                           currentQuestionIndex === index && isFocused
@@ -625,7 +620,6 @@ function QuestionInput({
       <TextField
         inputRef={inputRef}
         sx={{ position: 'relative', maxWidth: '480px', marginRight: '8px' }}
-        InputLabelProps={{ shrink: true }} // always put label above box even if empty
         fullWidth={true}
         id="me"
         name=""
@@ -642,9 +636,12 @@ function QuestionInput({
         value={theAnswer}
         size="small"
         disabled={!isEnabled}
-        InputProps={{
-          readOnly: false, //TODO !isEnabled,
-          inputProps: { tabIndex: 1 },
+        slotProps={{
+          inputLabel: { shrink: true }, // always put label above box even if empty
+          input: {
+            readOnly: false, //TODO !isEnabled,
+            inputProps: { tabIndex: 1 },
+          },
         }}
         onChange={(event) => {
           setTheAnswer(event.target.value);

@@ -1,11 +1,5 @@
-import {
-  ActionRow,
-  actionRowHeaderColor,
-  ActionRowProps,
-  iListItemType,
-  listStyles,
-  OverflowTypography,
-} from '@rapid-cmi5/ui';
+import { ActionRowProps, listStyles, OverflowTypography, iListItemType, actionRowHeaderColor, ActionRow } from "@rapid-cmi5/ui";
+import { Element } from '@rangeos-nx/frontend/clients/lms-api';
 
 export default function ActionRowKsat(props: ActionRowProps) {
   const { data } = props;
@@ -21,7 +15,6 @@ export default function ActionRowKsat(props: ActionRowProps) {
       <>
         <div style={{ ...listStyles.xxs }}>
           <OverflowTypography
-            //@ts-ignore
             title={rowData.element_identifier || ''}
             sxProps={{
               marginLeft: '8px',

@@ -7,8 +7,8 @@ import {
   graphqlVmFields,
   useSubscription,
   Topic,
-} from '@rapid-cmi5/ui';
-import { RangeVM } from '@rapid-cmi5/ui';
+} from '@rangeos-nx/frontend/clients/hooks';
+import { RangeVM } from '@rangeos-nx/frontend/clients/devops-api';
 
 /**
  * Queries graph for vm updates

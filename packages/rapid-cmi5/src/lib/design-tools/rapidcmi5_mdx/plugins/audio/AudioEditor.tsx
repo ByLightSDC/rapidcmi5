@@ -17,6 +17,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 import { mergeRegister } from '@lexical/utils';
 import {
+  audioFilePath$,
   audioPlaceholder$,
   audioPreviewHandler$,
   editAudioToolbarComponent$,
@@ -31,12 +32,14 @@ interface AudioComponentProps {
   src: string;
   title?: string;
   nodeKey: NodeKey;
+  id: string;
 }
 
 function AudioComponent({
   src,
   title,
   nodeKey,
+  id,
 }: AudioComponentProps): JSX.Element {
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const [isSelected, setSelected, clearSelection] =
@@ -118,7 +121,6 @@ function AudioComponent({
   );
 
   React.useEffect(() => {
-    let isMounted = true;
     const unregister = mergeRegister(
       editor.registerCommand<MouseEvent>(
         CLICK_COMMAND,
@@ -162,7 +164,6 @@ function AudioComponent({
     );
 
     return () => {
-      isMounted = false;
       unregister();
     };
   }, [editor, isSelected, nodeKey, onDelete, onEnter, onEscape, onClick]);
@@ -208,6 +209,7 @@ function AudioComponent({
           ref={audioRef}
           controls
           muted={false}
+          data-audio-id={id}
           style={{
             display: 'block',
             maxWidth: '100%',
@@ -226,6 +228,7 @@ export interface AudioEditorProps {
   title?: string;
   nodeKey: NodeKey;
   rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
+  id: string;
 }
 
 export function AudioEditor({
@@ -233,7 +236,9 @@ export function AudioEditor({
   title,
   nodeKey,
   rest,
+  id,
 }: AudioEditorProps): JSX.Element {
+  const [audioFilePath] = useCellValues(audioFilePath$);
   const [Placeholder] = useCellValues(audioPlaceholder$);
   const [EditAudioToolbar] = useCellValues(editAudioToolbarComponent$);
   const [disableSettingsButton] = useCellValues(disableAudioSettingsButton$);
@@ -254,23 +259,29 @@ export function AudioEditor({
     } else {
       setPreviewSrc(src);
     }
-  }, [src, audioPreviewHandler]);
+  }, [src, audioPreviewHandler, audioFilePath]);
 
   const isLocal = src.startsWith('./');
   const initialAudioPath = isLocal ? src : null;
+  // Extract just the filename from the relative path
+  const fileName = src.split('/').pop() || src;
+  const audioSource = isLocal ? `${audioFilePath}/${fileName}` : src;
   const shouldShowToolbar =
     isSelected && !disableSettingsButton && EditAudioToolbar;
 
   return (
     <React.Suspense fallback={Placeholder ? <Placeholder /> : null}>
-      <div
-        style={{ position: 'relative', display: 'inline-block', width: '100%' }}
-      >
-        <AudioComponent src={previewSrc} title={title} nodeKey={nodeKey} />
+      <div style={{ position: 'relative', display: 'block', width: '100%' }}>
+        <AudioComponent
+          src={previewSrc || audioSource}
+          title={title}
+          nodeKey={nodeKey}
+          id={id}
+        />
         {shouldShowToolbar && (
           <EditAudioToolbar
             nodeKey={nodeKey}
-            audioSource={src}
+            audioSource={audioSource}
             initialAudioPath={initialAudioPath}
             title={title || ''}
             rest={rest}

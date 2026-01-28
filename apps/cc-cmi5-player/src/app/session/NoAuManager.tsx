@@ -6,10 +6,10 @@ import { debugLog } from '@rapid-cmi5/ui';
 
 import { Alert, AlertTitle, CircularProgress, Typography } from '@mui/material';
 
-import { authToken } from '@rapid-cmi5/ui/keycloak';
 import ScenarioConsoleTab from '../components/scenario/ScenarioConsoleTab';
 import { useCMI5Session } from '../hooks/useCMI5Session';
 import { checkForDevMode } from '../utils/DevMode';
+import { authToken } from '@rapid-cmi5/keycloak';
 
 enum NoAuManagerState {
   waiting = 'Loading...',

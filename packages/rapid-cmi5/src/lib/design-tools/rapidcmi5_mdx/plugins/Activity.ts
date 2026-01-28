@@ -9,6 +9,7 @@ import { Directives } from 'mdast-util-directive';
 
 /**
  * Inserts Activity Directive with children
+ * children are mdast nodes
  */
 export const insertActivityDirective$ = Signal<{
   type: Directives['type'];

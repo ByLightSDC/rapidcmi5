@@ -23,7 +23,7 @@ export const darkTheme = createTheme({
       main: mainColor,
       dark: '#3C59A2',
       light: hoverMainColor,
-      contrastText: '#212121',
+      contrastText: '#fff',
     },
     secondary: {
       main: '#a8a7a7',
@@ -67,8 +67,13 @@ export const darkTheme = createTheme({
   button: {
     disabledBackgroundColor: '#293658', //'#07128580',
     disabledColor: '#C1C9DB99',
+    gradient: 'linear-gradient(180deg, #405CA7 0%, #2C4B93 100%)',
     minorBackgroundColor: '#213157', //'#333333',
-    indicatorColor: 'pink', //'#FFC840', //
+    indicatorColor: mainColor,
+    iconColor: mainColor,
+  },
+  form: {
+    backgroundColor: '#282b30',
   },
   header: {
     // border: '#ffffffb0',
@@ -90,7 +95,7 @@ export const darkTheme = createTheme({
   },
   nav: {
     fill: '',
-    fillSelected: '#FFC84018',
+    fillSelected: '#3D4047',
     icon: '#ffffffc0',
     iconSelected: '#FFC840',
     border: '#FFC840d0',

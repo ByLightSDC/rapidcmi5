@@ -12,6 +12,14 @@ import {
 } from '@mdxeditor/editor';
 
 import AnimationDirectiveRegistry from '../../editors/AnimationDirectiveRegistry';
+import { AnimationConfig } from '../../animation/types/Animation.types';
+
+
+/**
+ * Cell for storing current slide's animations (published from app layer)
+ * Directives subscribe to this to get their order numbers
+ */
+export const slideAnimationsForDirectives$ = Cell<AnimationConfig[]>([]);
 
 /**
  * Cell for storing click handler (passed from app layer)
@@ -25,6 +33,24 @@ export const animDirectiveClickHandler$ = Cell<
  * App layer should subscribe to this to open drawer and select animation
  */
 export const onAnimDirectiveClick$ = Signal<string>();
+
+/**
+ * Signal triggered when animation directive unwrap is requested
+ * App layer should subscribe to this to delete the animation config
+ */
+export const onAnimDirectiveDelete$ = Signal<string>();
+
+/**
+ * Cell that holds the animation ID to unwrap
+ * Descriptors watch this cell and trigger unwrap when it matches their animation
+ */
+export const animationToUnwrap$ = Cell<string | null>(null);
+
+/**
+ * Signal published by descriptors after successfully unwrapping
+ * App layer should subscribe to this to delete the animation config
+ */
+export const onAnimationUnwrapped$ = Signal<string>();
 
 /**
  * Animation Directive Plugin

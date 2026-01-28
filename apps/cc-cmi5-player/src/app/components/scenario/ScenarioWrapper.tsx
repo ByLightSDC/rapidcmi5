@@ -1,9 +1,6 @@
 /* eslint-disable react/jsx-no-useless-fragment */
-
 import { useContext, useMemo, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setModal } from '@rapid-cmi5/ui';
-import { activeTabSel } from '../../redux/navigationReducer';
 import { sendScenarioEventVerb } from '../../utils/LmsStatementManager';
 import {
   auJsonSel,
@@ -21,22 +18,12 @@ import {
   ScenarioUpdatesContext,
   ScenarioUpdatesContextProvider,
 } from './ScenarioUpdatesContext';
-import {
-  ConsolesDisplay,
-  ConsoleProvider,
-  OverflowTypography,
-  DataFetcher,
-} from '@rapid-cmi5/ui';
-import {
-  getScenarioStatusIcon,
-  queryKeyRangeResourceContainers,
-  Topic,
-  useGetRangeResourceScenario,
-} from '@rapid-cmi5/ui';
+
+
 import {
   DeployedScenario,
   DeployedScenarioDetailStatusEnum,
-} from '@rapid-cmi5/ui';
+} from '@rangeos-nx/frontend/clients/devops-api';
 
 /* MUI */
 import { Box, IconButton, ListItemIcon, Stack, Tooltip } from '@mui/material';
@@ -57,6 +44,10 @@ import { routeDelim } from './ScenarioConsoleTab';
 import { debugLog, logger } from '../../debug';
 import TimeClock from './TimeClock';
 import { ScenarioContentType } from './scenarioSchema';
+import { useGetRangeResourceScenario } from '@rangeos-nx/frontend/clients/hooks';
+import { DataFetcher } from '@rapid-cmi5/ui';
+import { ConsoleProvider } from './console/ConsoleContext';
+import ConsolesDisplay from './console/ConsolesDisplay';
 
 /**
  * Wraps course to persist Scenario Console State across slides
@@ -93,9 +84,13 @@ function ScenarioWrapper({ children }: { children: any }) {
         (creds) => creds.scenarioUUID === rangeData?.deployedScenarios[0],
       );
 
+      // Work around for older versions of api in pcte
       if (found) {
         setUsername(found.username);
         setPassword(found.password);
+      } else {
+        setUsername(rangeConsoleData.credentials[0].username);
+        setPassword(rangeConsoleData.credentials[0].password);
       }
 
       setScenarioId(rangeData?.deployedScenarios[0]);

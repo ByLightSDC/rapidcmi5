@@ -55,7 +55,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent1.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent1.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -66,7 +66,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent2.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent2.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -77,7 +77,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent3.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent3.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -88,7 +88,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent4.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent4.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -99,7 +99,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent5.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent5.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -110,7 +110,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent6.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent6.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -121,7 +121,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent7.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent7.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -132,7 +132,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent8.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent8.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -143,7 +143,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent9.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent9.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -154,7 +154,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent10.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent10.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -165,7 +165,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent11.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent11.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -176,7 +176,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent12.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent12.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -187,7 +187,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent13.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent13.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -198,7 +198,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent14.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent14.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -209,7 +209,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent15.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent15.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -220,7 +220,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent16.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent16.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -231,7 +231,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent17.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent17.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -242,7 +242,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent18.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent18.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -253,7 +253,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent19.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent19.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {
@@ -264,7 +264,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.ent20.pcte.mil",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss://rangeos-graphql.ent20.pcte.mil",
         "SLIDE_BACKGROUND": "",
-        "SLIDE_LOGO": "../../../assets/pcte/pcte.png"
+        "SLIDE_LOGO": "./assets/pcte/pcte.png"
       }
     },
     {

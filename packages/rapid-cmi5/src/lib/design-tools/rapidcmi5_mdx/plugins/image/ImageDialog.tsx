@@ -333,7 +333,7 @@ export const ImageDialog: React.FC = () => {
             />
 
             {/* Width/Height section */}
-            <Grid container alignItems="center">
+            <Grid container alignItems="center" sx={{ width: '100%' }}>
               <Grid size={6}>
                 <TextFieldMainUi
                   margin="dense"
@@ -361,7 +361,7 @@ export const ImageDialog: React.FC = () => {
             </Grid>
 
             {/* Style section */}
-            <Grid container alignItems="center">
+            <Grid container alignItems="center" sx={{ width: '100%' }}>
               <Grid size={0.8}>
                 <ButtonIcon
                   name="edit-style"
@@ -395,8 +395,10 @@ export const ImageDialog: React.FC = () => {
                     setIsStyleDialogOpen(true);
                   }}
                   infoText="Inline styles Ex. opacity:0.5;"
-                  InputProps={{
-                    readOnly: true,
+                  slotProps={{
+                    input: {
+                      readOnly: true,
+                    },
                   }}
                 />
               </Grid>

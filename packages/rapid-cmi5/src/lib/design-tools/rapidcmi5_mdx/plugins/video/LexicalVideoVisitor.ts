@@ -11,19 +11,27 @@ export const LexicalVideoVisitor: LexicalExportVisitor<VideoNode, Mdast.Html> =
     visitLexicalNode({ mdastParent, lexicalNode, actions }) {
       const video = document.createElement('video');
 
-      // Set src first - this is the most important attribute
-      video.src = lexicalNode.getSrc();
+      // ❌ DO NOT set video.src directly - it resolves blob URLs!
+      // video.src = lexicalNode.getSrc();
+
+      // Use setAttribute to preserve the original path
+      const src = lexicalNode.getSrc();
+      video.setAttribute('src', src);
       video.setAttribute('controls', 'true');
 
+      // ✅ Add videoId for persistence (BEFORE other attributes)
+      const videoId = lexicalNode.getVideoId();
+      video.setAttribute('data-video-id', videoId);
+
       if (lexicalNode.getHeight() !== 'inherit') {
-        video.height = lexicalNode.getHeight() as number;
+        video.setAttribute('height', String(lexicalNode.getHeight()));
       }
       if (lexicalNode.getWidth() !== 'inherit') {
-        video.width = lexicalNode.getWidth() as number;
+        video.setAttribute('width', String(lexicalNode.getWidth()));
       }
 
       if (lexicalNode.getTitle()) {
-        video.title = lexicalNode.getTitle()!;
+        video.setAttribute('title', lexicalNode.getTitle()!);
       }
 
       for (const attr of lexicalNode.getRest()) {
@@ -34,7 +42,7 @@ export const LexicalVideoVisitor: LexicalExportVisitor<VideoNode, Mdast.Html> =
         }
       }
 
-      // Now outerHTML will include all attributes properly
+      // Now outerHTML will include all attributes properly (including data-video-id and original src)
       actions.appendToParent(mdastParent, {
         type: 'html',
         value: video.outerHTML,

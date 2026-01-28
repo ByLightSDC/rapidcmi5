@@ -3,13 +3,9 @@
 import { useContext, useEffect } from 'react';
 import { gql } from 'graphql-request';
 
-import {
-  graphqlConsoleFields,
-  useSubscription,
-  Topic,
-} from '@rapid-cmi5/ui';
-import { DeployedRangeConsole } from '@rapid-cmi5/ui';
+import { DeployedRangeConsole } from '@rangeos-nx/frontend/clients/devops-api';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
+import { graphqlConsoleFields, Topic, useSubscription } from '@rangeos-nx/frontend/clients/hooks';
 
 /**
  * Queries graph for vm updates

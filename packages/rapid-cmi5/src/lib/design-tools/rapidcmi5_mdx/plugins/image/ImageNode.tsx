@@ -16,8 +16,8 @@ import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
 function convertImageElement(domNode: Node): null | DOMConversionOutput {
   if (domNode instanceof HTMLImageElement) {
-    const { alt: altText, src, title, width, height } = domNode;
-    const node = $createImageNode({ altText, src, title, width, height });
+    const { alt: altText, id, src, title, width, height } = domNode;
+    const node = $createImageNode({ altText, id, src, title, width, height });
     return { node };
   }
   return null;
@@ -36,6 +36,7 @@ export type SerializedImageNode = Spread<
     src: string;
     rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
     href?: string;
+    id?: string; // Unique persistent ID for animation targeting
     type: 'image';
     version: 1;
   },
@@ -59,6 +60,8 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   __height: 'inherit' | number;
   /** @internal */
   __href: string | undefined;
+  /** @internal */
+  __id: string | undefined; // Unique persistent ID for animation targeting
 
   /** @internal */
   __rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
@@ -70,7 +73,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
 
   /** @internal */
   static override clone(node: ImageNode): ImageNode {
-    return new ImageNode(
+    const cloned = new ImageNode(
       node.__src,
       node.__altText,
       node.__title,
@@ -79,12 +82,15 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       node.__rest,
       node.__href,
       node.__key,
+      node.__id,
     );
+    return cloned;
   }
 
   /** @internal */
   static override importJSON(serializedNode: SerializedImageNode): ImageNode {
-    const { altText, title, src, width, rest, height, href } = serializedNode;
+    const { altText, title, src, width, rest, height, href, id } =
+      serializedNode;
     const node = $createImageNode({
       altText,
       title,
@@ -93,6 +99,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       width,
       rest,
       href,
+      id, 
     });
     return node;
   }
@@ -110,6 +117,9 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     }
     if (this.__height) {
       element.setAttribute('height', this.__height.toString());
+    }
+    if (this.__id) {
+      element.setAttribute('id', this.__id.toString());
     }
     return { element };
   }
@@ -137,6 +147,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[],
     href?: string,
     key?: NodeKey,
+    id?: string,
   ) {
     super(key);
     this.__src = src;
@@ -146,6 +157,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     this.__height = height ? height : 'inherit';
     this.__rest = rest ?? [];
     this.__href = href;
+    this.__id = id;
   }
 
   /** @internal */
@@ -158,6 +170,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       src: this.getSrc(),
       rest: this.__rest,
       href: this.__href,
+      id: this.__id, 
       type: 'image',
       version: 1,
     };
@@ -183,6 +196,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     if (className !== undefined) {
       span.className = className;
     }
+
     return span;
   }
 
@@ -219,6 +233,10 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     return this.__href;
   }
 
+  getId(): string | undefined {
+    return this.__id;
+  }
+
   setTitle(title: string | undefined): void {
     this.getWritable().__title = title;
   }
@@ -229,6 +247,10 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
 
   setAltText(altText: string | undefined): void {
     this.getWritable().__altText = altText ?? '';
+  }
+
+  setId(id: string): void {
+    this.getWritable().__id = id;
   }
 
   setRest(
@@ -243,11 +265,10 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
 
   /** @internal */
   shouldBeSerializedAsElement(): boolean {
-    return (
-      this.__width !== 'inherit' ||
-      this.__height !== 'inherit' ||
-      this.__rest.length > 0
-    );
+    // ALWAYS serialize as HTML element to preserve id for animations!
+    // Previously only returned true for images with custom dimensions or attributes,
+    // but we need the data-image-id attribute on ALL images for animation persistence.
+    return true;
   }
 
   /** @internal */
@@ -262,6 +283,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
         alt={this.__altText}
         rest={this.__rest}
         href={this.__href}
+        id={this.__id}
       />
     );
   }
@@ -280,6 +302,7 @@ export interface CreateImageNodeParameters {
   rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   src: string;
   href?: string;
+  id?: string; // Optional: restore from saved state, otherwise generates new
 }
 
 /**
@@ -288,8 +311,8 @@ export interface CreateImageNodeParameters {
  * @group Image
  */
 export function $createImageNode(params: CreateImageNodeParameters): ImageNode {
-  const { altText, title, src, key, width, height, rest, href } = params;
-  return new ImageNode(src, altText, title, width, height, rest, href, key);
+  const { altText, title, src, key, width, height, rest, href, id } = params;
+  return new ImageNode(src, altText, title, width, height, rest, href, key, id);
 }
 
 /**

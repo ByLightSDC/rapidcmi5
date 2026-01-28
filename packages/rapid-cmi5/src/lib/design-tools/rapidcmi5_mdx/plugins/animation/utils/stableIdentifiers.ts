@@ -1,6 +1,7 @@
-import { $getNodeByKey, $getRoot, LexicalEditor } from 'lexical';
+import { $getNodeByKey, $getRoot, LexicalEditor, LexicalNode } from 'lexical';
+
 import { findDirectiveNodeKeyById } from './directiveResolver';
-import { AnimationConfig, debugLog } from '@rapid-cmi5/ui';
+import { debugLog, AnimationConfig } from '@rapid-cmi5/ui';
 
 /**
  * Simple string hash function for generating content-based IDs
@@ -387,7 +388,9 @@ export function resolveAnimations(
     if (anim.directiveId) {
       const currentKey = findDirectiveNodeKeyById(editor, anim.directiveId);
       if (currentKey) {
-        debugLog(`✅ Resolved directive ID ${anim.directiveId} → node key ${currentKey}`);
+        debugLog(
+          `✅ Resolved directive ID ${anim.directiveId} → node key ${currentKey}`,
+        );
         return {
           ...anim,
           targetNodeKey: currentKey, // Update to current key
@@ -399,25 +402,9 @@ export function resolveAnimations(
       }
     }
 
-    // PRIORITY 2: Try stable ID (for V1 animations)
-    if (anim.stableId) {
-      const currentKey = findNodeKeyByStableId(editor, anim.stableId);
-      if (currentKey) {
-        debugLog(`✅ Resolved stable ID ${anim.stableId} → node key ${currentKey}`);
-        return {
-          ...anim,
-          targetNodeKey: currentKey, // Update to current key
-        };
-      } else {
-        console.warn(
-          `Could not resolve stable ID ${anim.stableId} for animation ${anim.id}`,
-        );
-      }
-    }
-
     // No resolution possible, keep original key
     console.warn(
-      `Animation ${anim.id} has no directiveId or stableId, keeping old key ${anim.targetNodeKey}`,
+      `Animation ${anim.id} has no directiveId, keeping old key ${anim.targetNodeKey}`,
     );
     return anim;
   });

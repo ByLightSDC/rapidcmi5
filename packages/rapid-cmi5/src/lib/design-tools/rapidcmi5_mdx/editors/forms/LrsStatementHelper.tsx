@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  Grid,
   Box,
   Typography,
   Tooltip,
@@ -23,7 +22,7 @@ export default function LrsHeaderWithDetails({
   const toggle = () => setOpen((v) => !v);
 
   return (
-    <>
+    <Box sx={{ overflowAnchor: 'none' }}>
       <Box
         sx={{
           display: 'flex',
@@ -48,7 +47,7 @@ export default function LrsHeaderWithDetails({
             size="small"
             sx={{ color: 'inherit', p: 0.5, mr: 0.5 }}
             onClick={(e) => {
-              e.stopPropagation(); 
+              e.stopPropagation();
               toggle();
             }}
             aria-label="Toggle LRS details"
@@ -70,7 +69,13 @@ export default function LrsHeaderWithDetails({
         />
       </Box>
 
-      <Collapse in={open} timeout="auto" unmountOnExit>
+      <Collapse
+        in={open}
+        timeout="auto"
+        unmountOnExit
+        collapsedSize={0} 
+        sx={{ overflowAnchor: 'none' }} 
+      >
         <Paper
           id="lrs-details"
           elevation={0}
@@ -80,6 +85,8 @@ export default function LrsHeaderWithDetails({
             borderRadius: '6px',
             border: (t) => `1px solid ${t.palette.divider}`,
             bgcolor: 'background.paper',
+            maxHeight: 360, 
+            overflow: 'auto', 
           }}
         >
           <Typography variant="subtitle2" gutterBottom>
@@ -252,6 +259,6 @@ export default function LrsHeaderWithDetails({
           )}
         </Paper>
       </Collapse>
-    </>
+    </Box>
   );
 }

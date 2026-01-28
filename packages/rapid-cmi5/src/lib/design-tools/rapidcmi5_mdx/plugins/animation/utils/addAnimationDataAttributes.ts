@@ -1,4 +1,4 @@
-import { debugLog } from "@rapid-cmi5/ui";
+import { debugLog } from '@rangeos-nx/ui/branded';
 
 /**
  * Add data attributes to elements for animation targeting

@@ -182,6 +182,29 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     console.log('the table', table);
   }
 
+  /**
+   * Sets the full style string for the table.
+   * Used by the TableStyleDialog to apply complex border styles.
+   */
+  setTableStyle(styleString: string): void {
+    const self = this.getWritable();
+    const table = self.__mdastNode;
+
+    const data = table.data || {};
+    const hProperties = data.hProperties || {};
+
+    self.__mdastNode = {
+      ...table,
+      data: {
+        ...data,
+        hProperties: {
+          ...hProperties,
+          style: styleString
+        }
+      }
+    };
+  }
+
   /** @internal */
   updateCellContents(
     colIndex: number,

@@ -4,6 +4,7 @@ import { BaseActivity, KSATElement } from './activity';
 import { CTFContent } from './ctf';
 import { JobeContent } from './jobe';
 import { QuizContent } from './quiz';
+import { SxProps } from '@mui/material';
 
 export const defaultSlideContent = '# Slide'; //TODO focus issues if you try to paste blank
 
@@ -55,7 +56,9 @@ export type RC5ScenarioContent = BaseActivity & {
   uuid: string;
   name?: string;
   promptClass?: boolean;
+  defaultClassId?: string;
   cmi5QuizId?: string; // Activity ID for LRS tracking (consistent with other activities)
+  ksats?: KSATElement[]; // Array of KSAT elements
 };
 
 // AutoGrader event structure from GraphQL subscription
@@ -113,6 +116,7 @@ export type AuAutoGrader = {
 export type SourceDocContent = {
   introContent?: string;
   sourceDoc: string;
+  styleProps?: SxProps;
 };
 
 /**
@@ -124,28 +128,11 @@ export type SourceDocContent = {
 export type SlideType = {
   type: SlideTypeEnum;
   slideTitle: string;
-  content?:
-    | string
-    | ScenarioContent
-    | QuizContent
-    | CTFContent
-    | JobeContent
-    | SourceDocContent;
-  display?: string;
+  display?:string;
+  content:string
   filepath: string;
 };
 
-/**
- * @interface ScenarioSlide
- * @property {SlideTypeEnum} type Slide Type
- * @property {string} slideTitle  Slide Title
- * @property {ScenarioContent} Slide Content
- */
-export interface ScenarioSlide extends SlideType {
-  type: SlideTypeEnum;
-  slideTitle: string;
-  content: ScenarioContent;
-}
 
 /**
 

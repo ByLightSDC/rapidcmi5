@@ -1,23 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
 
-import { Box, MenuItem } from '@mui/material';
+/* MUI */
 import Grid from '@mui/material/Grid2';
-import {
-  gradingOptions,
-  QuestionResponse,
-  responseOptions,
-  SlideTypeEnum,
-} from '@rapid-cmi5/cmi5-build-common';
-import {
-  FormControlCheckboxField,
-  FormControlSelectField,
-  FormControlTextField,
-  FormCrudType,
-  FormFieldArray,
-  tFormFieldRendererProps,
-  useDisplayFocus,
-} from '@rapid-cmi5/ui';
+import { Box, MenuItem } from '@mui/material';
+import { SlideTypeEnum, QuestionResponse, responseOptions, gradingOptions } from '@rapid-cmi5/cmi5-build-common';
+import { FormCrudType, tFormFieldRendererProps, useDisplayFocus, FormControlSelectField, FormControlTextField, FormControlCheckboxField, FormFieldArray } from '@rapid-cmi5/ui';
+
+
 
 /**
  * @interface fieldGroupProps
@@ -71,7 +61,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
     <Grid
       container
       spacing={0.5}
-      sx={{ marginLeft: '12px' }}
+      sx={{ marginLeft: '12px', width: '100%' }}
       id={indexedArrayField} // this is used for scrolling when new array entry added
     >
       <Grid size={4}>
@@ -138,32 +128,43 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
       </Grid>
       {(watchQuestionType === QuestionResponse.MultipleChoice ||
         watchQuestionType === QuestionResponse.SelectAll) && (
-        <Grid size={11}>
-          <FormFieldArray
-            errors={indexedErrors?.typeAttributes}
-            arrayFieldName={`${indexedArrayField}.typeAttributes.options`}
-            arrayRenderItem={(props: tFormFieldRendererProps) => {
-              return (
-                <QuestionOptionsFieldGroup
-                  crudType={crudType}
-                  formProps={props}
-                  questionField={indexedArrayField}
-                  questionType={watchQuestionType}
-                  slideType={slideType}
-                />
-              );
-            }}
-            defaultIsExpanded={true}
-            defaultValues={{
-              text: '',
-              correct:
-                watchQuestionType === QuestionResponse.SelectAll ? true : false,
-            }}
-            isExpandable={true}
-            title="Options *"
-            {...formProps}
-          />
-        </Grid>
+        <>
+          <Grid size={6}>
+            <FormControlCheckboxField
+              control={control}
+              name={`${indexedArrayField}.typeAttributes.shuffleAnswers`}
+              label="Shuffle Answer Order"
+            />
+          </Grid>
+          <Grid size={11}>
+            <FormFieldArray
+              errors={indexedErrors?.typeAttributes}
+              arrayFieldName={`${indexedArrayField}.typeAttributes.options`}
+              arrayRenderItem={(props: tFormFieldRendererProps) => {
+                return (
+                  <QuestionOptionsFieldGroup
+                    crudType={crudType}
+                    formProps={props}
+                    questionField={indexedArrayField}
+                    questionType={watchQuestionType}
+                    slideType={slideType}
+                  />
+                );
+              }}
+              defaultIsExpanded={true}
+              defaultValues={{
+                text: '',
+                correct:
+                  watchQuestionType === QuestionResponse.SelectAll
+                    ? true
+                    : false,
+              }}
+              isExpandable={true}
+              title="Options *"
+              {...formProps}
+            />
+          </Grid>
+        </>
       )}
       {watchQuestionType === QuestionResponse.TrueFalse && (
         <Grid size={4}>
@@ -274,7 +275,7 @@ function QuestionOptionsFieldGroup(props: optionFieldGroupProps) {
     <Grid
       container
       spacing={0.5}
-      sx={{ marginLeft: '12px' }}
+      sx={{ marginLeft: '12px', width: '100%' }}
       id={indexedArrayField} // this is used for scrolling when new array entry added
     >
       <Grid size={9}>
@@ -316,7 +317,7 @@ function QuestionMatchingFieldGroup(props: fieldGroupProps) {
     <Grid
       container
       spacing={0.5}
-      sx={{ marginLeft: '12px' }}
+      sx={{ marginLeft: '12px', width: '100%' }}
       id={indexedArrayField}
     >
       <Grid size={6}>

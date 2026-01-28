@@ -23,6 +23,12 @@
       "@rangeos-nx/frontend/clients/devops-api": [
         "libs/frontend/clients/devops-api/src/index.ts"
       ],
+      "@rangeos-nx/frontend/clients/lms-api": [
+        "libs/frontend/clients/lms-api/src/index.ts"
+      ],
+      "@rangeos-nx/frontend/clients/hooks": [
+        "libs/frontend/clients/hooks/src/index.ts"
+      ],
       "@rapid-cmi5/cmi5-build/backend": [
         "libs/cmi5-build/backend/src/index.ts"
       ],

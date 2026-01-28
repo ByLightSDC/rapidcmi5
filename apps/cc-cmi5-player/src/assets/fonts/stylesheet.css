@@ -3,7 +3,7 @@
   font-family: 'Roboto';
   src:
     local('Roboto-Bold'),
-    url('/assets/fonts/Roboto/Roboto-Bold.ttf') format('truetype');
+    url('./Roboto/Roboto-Bold.ttf') format('truetype');
   font-weight: normal;
 }
 
@@ -11,7 +11,7 @@
   font-family: 'Roboto';
   src:
     local('Roboto-Italic'),
-    url('/assets/fonts/Roboto/Roboto-Italic.ttf') format('truetype');
+    url('./Roboto/Roboto-Italic.ttf') format('truetype');
   font-weight: normal;
 }
 
@@ -19,7 +19,7 @@
   font-family: 'Roboto';
   src:
     local('Roboto-Medium'),
-    url('/assets/fonts/Roboto/Roboto-Medium.ttf') format('truetype');
+    url('./Roboto/Roboto-Medium.ttf') format('truetype');
   font-weight: normal;
 }
 
@@ -27,7 +27,7 @@
   font-family: 'Roboto';
   src:
     local('Roboto-MediumItalic'),
-    url('/assets/fonts/Roboto/Roboto-MediumItalic.ttf') format('truetype');
+    url('./Roboto/Roboto-MediumItalic.ttf') format('truetype');
   font-weight: normal;
 }
 
@@ -35,7 +35,7 @@
   font-family: 'Roboto';
   src:
     local('Roboto-Regular'),
-    url('/assets/fonts/Roboto/Roboto-Regular.ttf') format('truetype');
+    url('./Roboto/Roboto-Regular.ttf') format('truetype');
   font-weight: normal;
 }
 
@@ -44,8 +44,7 @@
   font-family: 'BarlowCondensed';
   src:
     local('BarlowCondensed-Bold'),
-    url('/assets/fonts/BarlowCondensed/BarlowCondensed-Bold.ttf')
-      format('truetype');
+    url('./BarlowCondensed/BarlowCondensed-Bold.ttf') format('truetype');
   font-weight: normal;
 }
 
@@ -53,8 +52,7 @@
   font-family: 'BarlowCondensed';
   src:
     local('BarlowCondensed-Italic'),
-    url('/assets/fonts/BarlowCondensed/BarlowCondensed-Italic.ttf')
-      format('truetype');
+    url('./BarlowCondensed/BarlowCondensed-Italic.ttf') format('truetype');
   font-weight: normal;
 }
 
@@ -62,8 +60,7 @@
   font-family: 'BarlowCondensed';
   src:
     local('BarlowCondensed-Medium'),
-    url('/assets/fonts/BarlowCondensed/BarlowCondensed-Medium.ttf')
-      format('truetype');
+    url('./BarlowCondensed/BarlowCondensed-Medium.ttf') format('truetype');
   font-weight: normal;
 }
 
@@ -71,8 +68,7 @@
   font-family: 'BarlowCondensed';
   src:
     local('BarlowCondensed-MediumItalic'),
-    url('/assets/fonts/BarlowCondensed/BarlowCondensed-MediumItalic.ttf')
-      format('truetype');
+    url('./BarlowCondensed/BarlowCondensed-MediumItalic.ttf') format('truetype');
   font-weight: normal;
 }
 
@@ -80,7 +76,6 @@
   font-family: 'BarlowCondensed';
   src:
     local('BarlowCondensed-Regular'),
-    url('/assets/fonts/BarlowCondensed/BarlowCondensed-Regular.ttf')
-      format('truetype');
+    url('./BarlowCondensed/BarlowCondensed-Regular.ttf') format('truetype');
   font-weight: normal;
 }

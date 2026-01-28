@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useCellValues } from '@mdxeditor/gurx';
 import classNames from 'classnames';
 import {
@@ -6,11 +6,14 @@ import {
   MdxJsxExpressionAttribute,
   MdxJsxAttributeValueExpression,
 } from 'mdast-util-mdx-jsx';
+
 import {
   imagePlaceholder$ as imagePlaceholderComponent$,
   imagePreviewHandler$,
 } from './index';
 import styles from './styles/image-plugin.module.css';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 
 const BROKEN_IMG_URI =
   'data:image/svg+xml;charset=utf-8,' +
@@ -22,12 +25,15 @@ const BROKEN_IMG_URI =
 `);
 
 export interface ImageViewerProps {
+  nodeKey: string;
   src: string;
   alt?: string;
   title?: string;
   width: number | 'inherit';
   height: number | 'inherit';
   rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
+  href?: string;
+  id?: string; // Unique persistent ID for animation targeting
 }
 
 // https://css-tricks.com/pre-caching-image-with-react-suspense/
@@ -101,6 +107,7 @@ function LazyImage({
   height,
   rest,
   style,
+  id,
 }: {
   title: string;
   alt: string;
@@ -110,11 +117,13 @@ function LazyImage({
   height: number | 'inherit';
   rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   style?: React.CSSProperties;
+  id?: string;
 }) {
   const [url] = useState<string>(src);
 
   return (
     <img
+      id={id}
       className={className ?? undefined}
       alt={alt}
       src={imgCache.read(url)}
@@ -131,24 +140,29 @@ export function ImageViewer({
   src,
   title,
   alt,
+  nodeKey,
   width,
   height,
   rest,
+  href,
+  id,
 }: ImageViewerProps): JSX.Element | null {
+  const [editor] = useLexicalComposerContext();
   const [ImagePlaceholderComponent, imagePreviewHandler] = useCellValues(
     imagePlaceholderComponent$,
     imagePreviewHandler$,
   );
-
+  const labelsRef = React.useRef<null | HTMLImageElement>(null);
   const [imageSource, setImageSource] = React.useState<string | null>(null);
-
+  const [isSelected, setSelected, clearSelection] =
+    useLexicalNodeSelection(nodeKey);
   // determine styles
   let styleAttribute: MdxJsxAttribute | undefined;
   let style: React.CSSProperties = {};
   const wrapperStyle: React.CSSProperties = {};
   if (rest) {
     styleAttribute = rest.find(
-      (item): item is MdxJsxAttribute =>
+      (item: any): item is MdxJsxAttribute =>
         item.type === 'mdxJsxAttribute' && item.name === 'style',
     );
 
@@ -163,7 +177,7 @@ export function ImageViewer({
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (imagePreviewHandler) {
       const callPreviewHandler = async () => {
         const updatedSrc = await imagePreviewHandler(src);
@@ -182,7 +196,7 @@ export function ImageViewer({
       return null;
     }
     const className = rest.find(
-      (attr) =>
+      (attr: any) =>
         attr.type === 'mdxJsxAttribute' &&
         (attr.name === 'class' || attr.name === 'className'),
     );
@@ -198,9 +212,24 @@ export function ImageViewer({
         ImagePlaceholderComponent ? <ImagePlaceholderComponent /> : null
       }
     >
-      <div style={wrapperStyle}>
-        <div className={styles['imageWrapper']} data-editor-block-type="image">
+      <div id="image-styles" style={wrapperStyle}>
+        <div
+          id="image-wrapper"
+          className={styles['imageWrapper']}
+          data-editor-block-type="image"
+        >
+          <div
+            id={`image-labels-${id}`}
+            ref={labelsRef}
+            style={{
+              position: 'absolute',
+              left: 0,
+              width: '100%',
+              height: '100%',
+            }}
+          />
           <LazyImage
+            id={id}
             width={width}
             height={height}
             className={classNames(passedClassName)}

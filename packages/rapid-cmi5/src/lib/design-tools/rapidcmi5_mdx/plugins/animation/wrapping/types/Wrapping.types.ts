@@ -1,5 +1,5 @@
 /**
- * Phase 5.1: Wrapping Types
+ * Wrapping Types
  */
 
 import type * as Mdast from 'mdast';
@@ -42,7 +42,7 @@ export type SupportedMdastContent =
   | Mdast.Paragraph
   | Mdast.Heading
   | Mdast.Image
-  | Mdast.HTML  // For video/audio
+  | Mdast.HTML // For video/audio
   | Mdast.Text
   | Mdast.Strong
   | Mdast.Emphasis

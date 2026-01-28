@@ -1,7 +1,9 @@
 import React, { ChangeEvent, CSSProperties, useEffect, useState } from 'react';
+// @ts-ignore - inline-style-parser has type declaration issues
 import parse from 'inline-style-parser';
 import ImagePreviewPNG from './icons/image-preview.png';
 
+/* MUI */
 import {
   Box,
   Checkbox,
@@ -22,8 +24,8 @@ import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
 import BlockIcon from '@mui/icons-material/Block';
 import ImageIcon from '@mui/icons-material/Image';
-
 import { ModalDialog, SelectorMainUi } from '@rapid-cmi5/ui';
+
 
 interface StyleProps {
   isOpen: boolean;
@@ -96,7 +98,7 @@ export const StyleDialog: React.FC<StyleProps> = ({
   useEffect(() => {
     const styles = parse(style);
 
-    styles.forEach((style) => {
+    styles.forEach((style: any) => {
       if (style.type === 'declaration') {
         if (style.property === 'opacity') {
           const numberValue = parseFloat(style.value);
@@ -310,7 +312,12 @@ export const StyleDialog: React.FC<StyleProps> = ({
                   width: '50%',
                 }}
               >
-                <Grid container alignItems="center" spacing={3}>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={3}
+                  sx={{ width: '100%' }}
+                >
                   <Grid size={2}>
                     <Typography gutterBottom>Alignment</Typography>
                   </Grid>
@@ -337,7 +344,12 @@ export const StyleDialog: React.FC<StyleProps> = ({
                   </Grid>
                 </Grid>
 
-                <Grid container alignItems="center" spacing={2}>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
                   <Grid size={2}>
                     <Typography gutterBottom>Opacity</Typography>
                   </Grid>
@@ -359,10 +371,14 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       type="number"
                       value={opacity}
                       fullWidth={false}
-                      inputProps={{
-                        step: 0.1,
-                        min: 0,
-                        max: 1,
+                      slotProps={{
+                        input: {
+                          inputProps: {
+                            step: 0.1,
+                            min: 0,
+                            max: 1,
+                          },
+                        },
                       }}
                       onChange={(
                         event: ChangeEvent<
@@ -386,7 +402,12 @@ export const StyleDialog: React.FC<StyleProps> = ({
                   </Grid>
                 </Grid>
 
-                <Grid container alignItems="center" spacing={3}>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={3}
+                  sx={{ width: '100%' }}
+                >
                   <Grid size={2}>
                     <Typography>Flip</Typography>
                   </Grid>
@@ -463,7 +484,12 @@ export const StyleDialog: React.FC<StyleProps> = ({
                 }}
               >
                 <Typography variant="body1">Border</Typography>
-                <Grid container alignItems="center" spacing={2}>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
                   <Grid size={2}>
                     <Typography variant="caption">Width</Typography>
                   </Grid>
@@ -486,10 +512,14 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       type="number"
                       value={borderWidth}
                       fullWidth={false}
-                      inputProps={{
-                        step: 1,
-                        min: 0,
-                        max: 20,
+                      slotProps={{
+                        input: {
+                          inputProps: {
+                            step: 1,
+                            min: 0,
+                            max: 20,
+                          },
+                        },
                       }}
                       onChange={(
                         event: ChangeEvent<
@@ -513,7 +543,12 @@ export const StyleDialog: React.FC<StyleProps> = ({
                   </Grid>
                 </Grid>
 
-                <Grid container alignItems="center" spacing={2}>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
                   <Grid size={2}>
                     <Typography variant="caption">Color</Typography>
                   </Grid>
@@ -527,20 +562,30 @@ export const StyleDialog: React.FC<StyleProps> = ({
                   </Grid>
                 </Grid>
 
-                <Grid container alignItems="center" spacing={2}>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
                   <Grid size={2}>
                     <Typography variant="caption">Style</Typography>
                   </Grid>
                   <Grid size={10}>
                     <SelectorMainUi
-                      value={borderStyle}
+                      defaultValue={borderStyle}
                       options={BorderStyles}
                       onSelect={handleBorderStyleSelect}
                     />
                   </Grid>
                 </Grid>
 
-                <Grid container alignItems="center" spacing={2}>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
                   <Grid size={2}>
                     <Typography variant="caption">Radius</Typography>
                   </Grid>
@@ -563,10 +608,14 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       type="number"
                       value={borderRadius}
                       fullWidth={false}
-                      inputProps={{
-                        step: 1,
-                        min: 0,
-                        max: 50,
+                      slotProps={{
+                        input: {
+                          inputProps: {
+                            step: 1,
+                            min: 0,
+                            max: 50,
+                          },
+                        },
                       }}
                       onChange={(
                         event: ChangeEvent<
@@ -599,7 +648,12 @@ export const StyleDialog: React.FC<StyleProps> = ({
                 }}
               >
                 <Typography variant="body1">Drop Shadow</Typography>
-                <Grid container alignItems="center" spacing={2}>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
                   <Grid size={2}>
                     <Typography variant="caption">Offset X</Typography>
                   </Grid>
@@ -622,10 +676,14 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       type="number"
                       value={dropShadowOffsetX}
                       fullWidth={false}
-                      inputProps={{
-                        step: 1,
-                        min: -20,
-                        max: 20,
+                      slotProps={{
+                        input: {
+                          inputProps: {
+                            step: 1,
+                            min: -20,
+                            max: 20,
+                          },
+                        },
                       }}
                       onChange={(
                         event: ChangeEvent<
@@ -648,7 +706,12 @@ export const StyleDialog: React.FC<StyleProps> = ({
                     />
                   </Grid>
                 </Grid>
-                <Grid container alignItems="center" spacing={2}>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
                   <Grid size={2}>
                     <Typography variant="caption">Offset Y</Typography>
                   </Grid>
@@ -671,10 +734,14 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       type="number"
                       value={dropShadowOffsetY}
                       fullWidth={false}
-                      inputProps={{
-                        step: 1,
-                        min: -20,
-                        max: 20,
+                      slotProps={{
+                        input: {
+                          inputProps: {
+                            step: 1,
+                            min: -20,
+                            max: 20,
+                          },
+                        },
                       }}
                       onChange={(
                         event: ChangeEvent<
@@ -697,7 +764,12 @@ export const StyleDialog: React.FC<StyleProps> = ({
                     />
                   </Grid>
                 </Grid>
-                <Grid container alignItems="center" spacing={2}>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
                   <Grid size={2}>
                     <Typography variant="caption">Blur Radius</Typography>
                   </Grid>
@@ -719,10 +791,14 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       type="number"
                       value={dropShadowBlurRadius}
                       fullWidth={false}
-                      inputProps={{
-                        step: 1,
-                        min: 0,
-                        max: 20,
+                      slotProps={{
+                        input: {
+                          inputProps: {
+                            step: 1,
+                            min: 0,
+                            max: 20,
+                          },
+                        },
                       }}
                       onChange={(
                         event: ChangeEvent<
@@ -745,7 +821,12 @@ export const StyleDialog: React.FC<StyleProps> = ({
                     />
                   </Grid>
                 </Grid>
-                <Grid container alignItems="center" spacing={2}>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
                   <Grid size={2}>
                     <Typography variant="caption">Color</Typography>
                   </Grid>

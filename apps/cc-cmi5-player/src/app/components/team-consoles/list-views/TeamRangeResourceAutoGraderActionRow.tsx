@@ -1,7 +1,4 @@
-import {
-  AutoGraderMetadata,
-  DeployedAutoGrader,
-} from '@rapid-cmi5/ui';
+
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 
@@ -15,12 +12,10 @@ import {
   Stack,
 } from '@mui/material';
 import { Box } from '@mui/system';
+import { DeployedAutoGrader, AutoGraderMetadata } from '@rangeos-nx/frontend/clients/hooks';
+import { listStyles, OverflowTypography, actionRowHeaderColor } from '@rapid-cmi5/ui';
 import { useEffect, useMemo, useState } from 'react';
-import {
-  actionRowHeaderColor,
-  listStyles,
-  OverflowTypography,
-} from '@rapid-cmi5/ui';
+
 
 type Props = {
   counter: number;

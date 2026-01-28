@@ -1,5 +1,5 @@
 /**
- * Phase 5.1: Selection Analysis Types
+ * Selection Analysis Types
  */
 
 import type { LexicalNode } from 'lexical';
@@ -48,4 +48,7 @@ export interface ValidationResult {
 
   /** Helpful suggestion for the user */
   suggestion?: string;
+
+  /** Selection type: 'block' for full elements, 'inline' for partial text */
+  selectionType?: 'block' | 'inline';
 }

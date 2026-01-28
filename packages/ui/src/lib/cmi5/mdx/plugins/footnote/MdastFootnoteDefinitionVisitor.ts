@@ -22,8 +22,6 @@ export const MdastFootnoteDefinitionVisitor: MdastImportVisitor<Mdast.FootnoteDe
       });
 
       if (lexicalParent.getType() === 'root') {
-        //console.log('visit mdast def');
-
         const paragraph = $createParagraphNode();
         paragraph.append(theNode);
         (lexicalParent as RootNode).append(paragraph);

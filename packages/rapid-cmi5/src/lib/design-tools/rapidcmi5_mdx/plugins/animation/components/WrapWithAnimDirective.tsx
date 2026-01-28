@@ -3,317 +3,228 @@
  *   All rights reserved.
  */
 
-import React, { useCallback, useRef, useState } from 'react';
-import {
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-} from '@mui/material';
+import React, { useCallback, useRef } from 'react';
+import { Button } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { usePublisher, useCellValue } from '@mdxeditor/gurx';
-import { activeEditor$, insertMarkdown$ } from '@mdxeditor/editor';
+import { usePublisher, useCellValue, useCellValues } from '@mdxeditor/gurx';
 import {
-  $createRangeSelection,
-  $getSelection,
-  $isNodeSelection,
-  $isRangeSelection,
-  $setSelection,
-  type LexicalEditor,
-} from 'lexical';
-import { addAnimation$ } from '../state/animationCells';
+  activeEditor$,
+  exportVisitors$,
+  jsxComponentDescriptors$,
+  jsxIsAvailable$,
+  syntaxExtensions$,
+} from '@mdxeditor/editor';
+import { type LexicalEditor } from 'lexical';
+import { addAnimation$, slideAnimations$ } from '../state/animationCells';
 import { DirectiveWrapper } from '../wrapping';
-import { addAnimationIdsToElements } from '../utils/lexicalDomBridge';
-import { debugWrap } from '../utils/debug';
+
 import { useLexicalSelection } from '../hooks/useLexicalSelection';
-import { AnimationTrigger, debugLog, EntranceEffect } from '@rapid-cmi5/ui';
+import { debugLog, EntranceEffect, AnimationTrigger } from '@rapid-cmi5/ui';
 
 /**
  * Component to wrap selected content with an animation directive
  *
- * Phase 5: Dialog-based naming for directive creation
+ * REFACTORED: Uses wrapSelectionOrBlock pattern
  * 1. Select content in the editor
  * 2. Click "Add Animation"
- * 3. Dialog opens to name the animation directive
- * 4. Directive is created with the user-provided ID
+ * 3. Directive is created with auto-generated ID
+ * 4. Animation config is added immediately (no markdown round-trip!)
+ *
+ * NEW: Direct Lexical node insertion using $createDirectiveNode
+ * - No more insertMarkdown$ delays
+ * - No more key resolution retries
+ * - Immediate directive key available
+ * - Much more reliable!
  */
 export function WrapWithAnimDirective() {
-  const insertionAnchorRef = useRef<{
-    parentKey: string;
-    index: number;
-  } | null>(null);
-
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [directiveId, setDirectiveId] = useState('');
-
   const addAnimation = usePublisher(addAnimation$);
+  const animations = useCellValue(slideAnimations$);
   const activeEditor = useCellValue(activeEditor$);
+
+  // Get MDXEditor configuration cells needed for exportMarkdownFromLexical
+  const [
+    exportVisitors,
+    jsxComponentDescriptors,
+    jsxIsAvailable,
+    syntaxExtensions,
+  ] = useCellValues(
+    exportVisitors$,
+    jsxComponentDescriptors$,
+    jsxIsAvailable$,
+    syntaxExtensions$,
+  );
+
   // When the dialog opens, the editor can lose focus and `activeEditor$` may go null.
   // Cache the last known editor so "Create" still works while the dialog is focused.
   const lastActiveEditorRef = useRef<LexicalEditor | null>(null);
   if (activeEditor) {
     lastActiveEditorRef.current = activeEditor as LexicalEditor;
   }
-  const insertMarkdown = usePublisher(insertMarkdown$);
-  const { isAnimatable } = useLexicalSelection();
 
-  const handleOpenDialog = useCallback(() => {
-    setDialogOpen(true);
-    setDirectiveId(''); // Reset ID field
-  }, []);
-
-  const handleCloseDialog = useCallback(() => {
-    debugWrap.log('🧼 Closing dialog (handleCloseDialog)');
-    setDialogOpen(false);
-    setDirectiveId('');
-  }, []);
+  const { isAnimatable, selectedInfo } = useLexicalSelection();
 
   const handleWrap = useCallback(() => {
-    const animId = directiveId.trim();
-
-    debugWrap.log('🟦 handleWrap invoked', {
-      dialogOpen,
-      directiveId,
-      animId,
-      hasActiveEditor: Boolean(activeEditor),
-      hasLastEditor: Boolean(lastActiveEditorRef.current),
-    });
-
-    // Always close dialog, even on validation failures
-    try {
-      if (!animId) {
-        debugWrap.warn('⛔ Animation ID is required (early return)');
-        return;
-      }
-
-      // Validate ID format (alphanumeric, underscores, hyphens)
-      if (!/^[a-zA-Z0-9_-]+$/.test(animId)) {
-        debugWrap.warn('⛔ Invalid ID format (early return)', animId);
-        return;
-      }
-
-      const editor =
-        (activeEditor as LexicalEditor | null) ?? lastActiveEditorRef.current;
-      if (!editor) {
-        debugWrap.error('⛔ Editor not available (early return)');
-        return;
-      }
+    // Early checks
+    const editor =
+      (activeEditor as LexicalEditor | null) ?? lastActiveEditorRef.current;
+    if (!editor) {
       debugLog(
-        '🚀 Phase 5: Wrapping with user-provided ID',
-        animId,
+        '⛔ Editor not available (early return)',
+        undefined,
         undefined,
         'wrap',
       );
-      debugWrap.log('🎬 handleWrap start with animId', animId);
+      return;
+    }
+    if (!selectedInfo) {
+      debugLog(
+        '⛔ No selection info (early return)',
+        undefined,
+        undefined,
+        'wrap',
+      );
+      return;
+    }
 
-      const result = DirectiveWrapper.wrapSelectionToMarkdown(
+    // Reuse existing directiveId for the selected node if present
+    const existingForNode = animations.find(
+      (a) => a.targetNodeKey === selectedInfo.nodeKey && a.directiveId,
+    );
+
+    const existingIds = new Set(
+      animations.map((a) => a.directiveId).filter(Boolean) as string[],
+    );
+    const genId = () =>
+      `anim_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+    let animId = existingForNode?.directiveId ?? genId();
+    while (existingIds.has(animId)) {
+      animId = genId();
+    }
+
+    debugLog(
+      '🟦 handleWrap invoked (auto ID)',
+      {
+        animId,
+        hasActiveEditor: Boolean(activeEditor),
+        hasLastEditor: Boolean(lastActiveEditorRef.current),
+        hasExportVisitors: Boolean(exportVisitors),
+        hasJsxComponentDescriptors: Boolean(jsxComponentDescriptors),
+        hasJsxIsAvailable: jsxIsAvailable,
+        hasSyntaxExtensions: Boolean(syntaxExtensions),
+      },
+      undefined,
+      'wrap',
+    );
+
+    // Defensive check for required MDXEditor cells
+    if (!exportVisitors || !jsxComponentDescriptors || !syntaxExtensions) {
+      const missing = [];
+      if (!exportVisitors) missing.push('exportVisitors');
+      if (!jsxComponentDescriptors) missing.push('jsxComponentDescriptors');
+      if (!syntaxExtensions) missing.push('syntaxExtensions');
+
+      debugLog(
+        '❌ Missing required MDXEditor cells:',
+        missing,
+        undefined,
+        'wrap',
+      );
+      console.error('Missing required MDXEditor cells:', missing);
+      return;
+    }
+
+    try {
+      // Direct insertion using wrapSelection (not wrapSelectionToMarkdown!)
+      const result = DirectiveWrapper.wrapSelection(
         editor,
         {
           directiveId: animId,
           validateNesting: true,
         },
         true, // drawer is open (we're in the component)
+        exportVisitors,
+        jsxComponentDescriptors,
+        jsxIsAvailable ?? false,
+        syntaxExtensions,
       );
 
       if (!result.success) {
-        debugWrap.warn('❌ wrapSelectionToMarkdown failed', result.error);
+        debugLog('❌ wrapSelection failed', result.error, undefined, 'wrap');
         console.error('Failed to wrap selection:', result.error);
         return;
       }
 
-      debugWrap.log('✅ Generated wrapped markdown:', result.markdown);
+      debugLog(
+        '✅ Directive inserted with key:',
+        result.targetNodeKey,
+        undefined,
+        'wrap',
+      );
 
-      // Delete selection (range or decorator) and position caret where we will insert
-      editor.update(() => {
-        const selection = $getSelection();
+      // NEW: targetNodeKey is available immediately!
+      const targetNodeKey = result.targetNodeKey!;
 
-        if ($isRangeSelection(selection) && !selection.isCollapsed()) {
-          selection.removeText();
-          const anchor = selection.anchor.getNode();
-          const parent = anchor.getParent();
-          if (parent) {
-            insertionAnchorRef.current = {
-              parentKey: parent.getKey(),
-              index: anchor.getIndexWithinParent(),
-            };
-            debugWrap.log(
-              '🧭 Range selection anchor',
-              insertionAnchorRef.current,
-            );
-          }
-          return;
-        }
-
-        if ($isNodeSelection(selection)) {
-          const nodes = selection.getNodes();
-          if (nodes.length > 0) {
-            const node = nodes[0];
-            const parent = node.getParent();
-            const index = node.getIndexWithinParent();
-
-            node.remove();
-
-            if (parent) {
-              insertionAnchorRef.current = {
-                parentKey: parent.getKey(),
-                index,
-              };
-              debugWrap.log(
-                '🧭 Node selection anchor',
-                insertionAnchorRef.current,
-              );
-              const range = $createRangeSelection();
-              range.anchor.set(parent.getKey(), index, 'element');
-              range.focus.set(parent.getKey(), index, 'element');
-              $setSelection(range);
-            }
-          }
-        }
-      });
-
-      // Ensure a valid selection exists at the intended insertion point
-      editor.update(() => {
-        const anchor = insertionAnchorRef.current;
-        if (anchor) {
-          const range = $createRangeSelection();
-          range.anchor.set(anchor.parentKey, anchor.index, 'element');
-          range.focus.set(anchor.parentKey, anchor.index, 'element');
-          $setSelection(range);
-          debugWrap.log('📌 Restored selection at anchor', anchor);
-        }
-      });
-
-      // Insert the wrapped content (must be after delete completes)
-      insertMarkdown(result.markdown);
-
-      debugLog('📝 Inserted wrapped content', undefined, undefined, 'wrap');
-      debugWrap.log('📝 Inserted wrapped content');
-
-      // Wait a tick for the directive to be inserted, then find its key
-      setTimeout(() => {
-        // Tag all elements (including the newly inserted directive) so we can find its key
-        addAnimationIdsToElements(editor);
-        debugWrap.log('🔖 Retagged elements after insert');
-
-        const resolveTargetKey = () =>
-          DirectiveWrapper.findInsertedDirectiveKey(editor, animId) || 'temp';
-
-        const finalizeAnimation = (targetNodeKey: string) => {
-          debugWrap.log('🔑 Found directive node key:', targetNodeKey);
-
-          const newAnimation = {
-            id: `anim_config_${Date.now()}`,
-            order: 1, // Will be auto-adjusted by registry
-            targetNodeKey, // Link to the directive node
-            directiveId: animId, // Link to the directive
-            targetLabel: `Animation: ${animId}`,
-            entranceEffect: EntranceEffect.FADE_IN,
-            trigger: AnimationTrigger.ON_SLIDE_OPEN,
-            duration: 0.5,
-            delay: 0,
-            enabled: true,
-          };
-
-          debugLog(
-            '🎬 Creating animation config:',
-            newAnimation,
-            undefined,
-            'wrap',
-          );
-          addAnimation(newAnimation);
+      // RACE CONDITION FIX: Defer frontmatter update to next frame
+      // This allows the Lexical transaction to complete and the directive to be
+      // fully persisted before the frontmatter update triggers a re-render.
+      // Without this, the frontmatter update causes React to re-render, which
+      // causes MDXEditor to re-parse markdown, losing the just-inserted directive.
+      requestAnimationFrame(() => {
+        // Create animation config
+        const newAnimation = {
+          id: `anim_config_${Date.now()}`,
+          order: 1, // Will be auto-adjusted by registry
+          targetNodeKey, // Link to the directive node
+          directiveId: animId, // Link to the directive
+          targetLabel: selectedInfo?.label || 'Animation',
+          entranceEffect: EntranceEffect.FADE_IN,
+          trigger: AnimationTrigger.ON_SLIDE_OPEN,
+          duration: 0.5,
+          delay: 0,
+          enabled: true,
         };
 
-        let targetNodeKey = resolveTargetKey();
+        debugLog(
+          '🎬 Creating animation config (deferred):',
+          newAnimation,
+          undefined,
+          'wrap',
+        );
+        addAnimation(newAnimation);
 
-        if (targetNodeKey === 'temp') {
-          setTimeout(() => {
-            addAnimationIdsToElements(editor);
-            debugWrap.warn('⏳ Retrying directive key resolution');
-            targetNodeKey = resolveTargetKey();
-            if (targetNodeKey === 'temp') {
-              debugWrap.error(
-                '❌ Could not resolve directive node key after retry. Aborting animation creation.',
-              );
-              console.error(
-                'Could not resolve inserted directive. Please try again.',
-              );
-              return;
-            }
-            finalizeAnimation(targetNodeKey);
-          }, 150);
-        } else {
-          finalizeAnimation(targetNodeKey);
-        }
-      }, 100);
+        debugLog(
+          '✅ Animation created successfully',
+          undefined,
+          undefined,
+          'wrap',
+        );
+      });
     } catch (err) {
       console.error('❌ Error wrapping with animation directive:', err);
-      debugWrap.error('❌ handleWrap caught error', err);
-    } finally {
-      debugWrap.log('🟩 handleWrap finally: closing dialog');
-      handleCloseDialog();
     }
   }, [
-    addAnimation,
     activeEditor,
-    insertMarkdown,
-    directiveId,
-    handleCloseDialog,
-    dialogOpen,
+    addAnimation,
+    animations,
+    selectedInfo,
+    exportVisitors,
+    jsxComponentDescriptors,
+    jsxIsAvailable,
+    syntaxExtensions,
   ]);
 
   return (
-    <>
-      <Button
-        variant="outlined"
-        startIcon={<AddCircleOutlineIcon />}
-        onClick={handleOpenDialog}
-        fullWidth
-        // Spacing is controlled by the parent drawer layout for consistent vertical rhythm
-        sx={{ mb: 0 }}
-        disabled={!isAnimatable}
-      >
-        Add Animation
-      </Button>
-
-      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (directiveId.trim()) {
-              handleWrap();
-            }
-          }}
-        >
-          <DialogTitle>Name Animation Directive</DialogTitle>
-          <DialogContent>
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Animation ID"
-              type="text"
-              fullWidth
-              value={directiveId}
-              onChange={(e) => setDirectiveId(e.target.value)}
-              helperText="Use letters, numbers, underscores, and hyphens only"
-              placeholder="e.g., fadeIn_hero, slideIn_1"
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog} type="button">
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={!directiveId.trim()}
-            >
-              Create
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-    </>
+    <Button
+      variant="outlined"
+      startIcon={<AddCircleOutlineIcon />}
+      onClick={handleWrap}
+      fullWidth
+      // Spacing is controlled by the parent drawer layout for consistent vertical rhythm
+      sx={{ mb: 0 }}
+      disabled={!isAnimatable}
+    >
+      Add Animation
+    </Button>
   );
 }

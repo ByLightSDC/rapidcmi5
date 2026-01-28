@@ -1,20 +1,14 @@
 /* Branded */
-import {
-  ReadOnlyTextField,
-  tFormFieldRendererProps,
-} from '@rapid-cmi5/ui';
 
-// import { Element } from '@rapid-cmi5/frontend/clients/lms-api';
+
+import { Element } from '@rangeos-nx/frontend/clients/lms-api';
+import { tFormFieldRendererProps, ReadOnlyTextField } from '@rapid-cmi5/ui';
 
 /**
  * @typedef tFormProps
  * @property {FormCrudType} topic Mode for displaying data*/
 type tProps = {
-  data: {
-    title: string;
-    text: string;
-    element_identifier: string;
-  };
+  data: Partial<Element>;
   formProps: Partial<tFormFieldRendererProps>;
 };
 
@@ -26,6 +20,11 @@ type tProps = {
  */
 export default function KsatFieldDetail(props: tProps) {
   const { data, formProps } = props;
+
+  // Safety check for undefined data
+  if (!data) {
+    return null;
+  }
 
   const titleText = data.title || data.text || '';
   return (

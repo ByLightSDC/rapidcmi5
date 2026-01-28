@@ -14,6 +14,10 @@ import { ImportStatement } from './importMarkdownToLexical';
 import { isMdastHTMLNode, JsxComponentDescriptor } from '@mdxeditor/editor';
 import { mergeStyleAttributes } from './mergeStyleAttributes';
 
+/** Utility to exportMarkdownFromLexical
+ * see exportMarkdownFromLexical fxn below
+ */
+
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown';
 
 /**
@@ -318,7 +322,7 @@ export function exportLexicalTreeToMdast({
   );
 
   const typedRoot = unistRoot; // as Mdast.RootContent;
-  console.log('typedRoot', typedRoot);
+  //console.log('typedRoot', typedRoot);
 
   //REF we dont implement frontmatter yet
   // const frontmatter = typedRoot.children.find((child) => child.type === 'yaml');
@@ -382,7 +386,7 @@ function collapseNestedHtmlTags(node: Mdast.Nodes) {
 }
 
 function convertUnderlineJsxToHtml(node: Mdast.Parent | Mdast.RootContent) {
-  console.log('[convertUnderlineJsxToHtml] node', typeof node);
+  //console.log('[convertUnderlineJsxToHtml] node', typeof node);
   if (Object.prototype.hasOwnProperty.call(node, 'children')) {
     const nodeAsParent = node as Mdast.Parent;
     const newChildren = [] as Mdast.RootContent[];
@@ -498,7 +502,8 @@ export function exportMarkdownFromLexical({
   jsxComponentDescriptors,
   jsxIsAvailable,
 }: ExportMarkdownFromLexicalOptions): string {
-  //you may wish to add  + '\n'
+  //REF we had this note in here ....you may wish to add  + '\n'
+  //But this method adds line returns when it should not!!!!
   return toMarkdown(
     exportLexicalTreeToMdast({
       root,
@@ -509,6 +514,7 @@ export function exportMarkdownFromLexical({
     {
       extensions: toMarkdownExtensions,
       ...toMarkdownOptions,
+      
     },
   );
 }

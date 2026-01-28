@@ -3,7 +3,7 @@ import { logger, debugLog } from '../debug';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setAuLogo } from '../redux/auReducer';
-import { overrideDevOpsApiClient } from '@rapid-cmi5/ui';
+import { overrideDevOpsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
 
 /**
  * Processes a template.

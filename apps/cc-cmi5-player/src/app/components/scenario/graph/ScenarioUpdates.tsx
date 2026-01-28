@@ -2,14 +2,10 @@
 
 import { useContext } from 'react';
 
-import {
-  formatQueryError,
-  useGetRangeResourceScenarioGraph,
-  useQueryDetails,
-  Topic,
-} from '@rapid-cmi5/ui';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
 import ScenarioSubscription from './ScenarioSubscription';
+import { Topic, useGetRangeResourceScenarioGraph } from '@rangeos-nx/frontend/clients/hooks';
+import { useQueryDetails, formatQueryError } from '@rapid-cmi5/ui';
 
 /**
  * Queries graph for sceanrio updates

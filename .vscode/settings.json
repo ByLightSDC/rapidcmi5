@@ -75,5 +75,6 @@
   "colorize.languages": [
     "javascript"
     // ...
-  ]
+  ],
+  "snyk.advanced.autoSelectOrganization": true
 }

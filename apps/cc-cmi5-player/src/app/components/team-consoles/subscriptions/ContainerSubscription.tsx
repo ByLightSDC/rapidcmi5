@@ -7,8 +7,8 @@ import {
   graphqlContainerFields,
   useSubscription,
   Topic,
-} from '@rapid-cmi5/ui';
-import { RangeContainer } from '@rapid-cmi5/ui';
+} from '@rangeos-nx/frontend/clients/hooks';
+import { RangeContainer } from '@rangeos-nx/frontend/clients/devops-api';
 
 /**
  * Queries graph for vm updates

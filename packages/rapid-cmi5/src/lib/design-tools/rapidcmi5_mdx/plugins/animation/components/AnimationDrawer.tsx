@@ -105,7 +105,7 @@ export function AnimationDrawer() {
         sx: {
           width: 360,
           maxWidth: '90vw',
-          //TODO top: 42,
+
           zIndex: 1400, // Ensure paper also has high z-index
         },
       }}
@@ -137,7 +137,9 @@ export function AnimationDrawer() {
                 Selected: {selectedInfo.label}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {selectedInfo.nodeType}
+                {selectedInfo.selectionType === 'inline'
+                  ? 'inline'
+                  : selectedInfo.nodeType}
               </Typography>
             </Alert>
           ) : selectedInfo && !isAnimatable ? (
@@ -154,7 +156,7 @@ export function AnimationDrawer() {
           ) : (
             <Alert severity="info" sx={{ mb: 1 }}>
               <Typography variant="body2">
-                Click on an element in the editor
+                Select element(s) to animate
               </Typography>
               <Typography variant="caption">
                 Paragraphs, headings, images, videos, etc.
@@ -165,37 +167,9 @@ export function AnimationDrawer() {
 
         {/* Add / Wrap section */}
         <Box sx={{ px: 2, py: 2 }}>
-          {/* COMMENTED OUT: V1 Add Animation - Using V2 directive-based approach only
-          <ButtonMinorUi
-            startIcon={<AddIcon />}
-            onClick={handleAddAnimation}
-            fullWidth
-            disabled={!isAnimatable || !selectedElementKey}
-          >
-            Add Animation (V1)
-          </ButtonMinorUi>
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ display: 'block', marginTop: 1 }}
-          >
-            {!selectedElementKey
-              ? 'Select an element in the editor first'
-              : 'Add animation to selected element'}
-          </Typography>
-
-          <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: 'divider' }}>
-          */}
-
-          {/* Phase 2: Wrap with Animation Directive (V2) */}
           <WrapWithAnimDirective />
-
-          {/* COMMENTED OUT: Closing tag for V1 section
-          </Box>
-          */}
         </Box>
 
-        {/* Divider between add/wrap and move controls */}
         <Divider />
 
         {/* Move Up/Down Buttons */}

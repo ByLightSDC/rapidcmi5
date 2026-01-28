@@ -2,8 +2,8 @@ import { DirectiveDescriptor } from '@mdxeditor/editor';
 
 import { ContainerDirective } from 'mdast-util-directive';
 
-import { AdmonitionTypes } from '@rapid-cmi5/cmi5-build-common';
 import { AdmonitionEditor } from './AdmonitionEditor';
+import { AdmonitionTypes } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * 

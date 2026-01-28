@@ -54,11 +54,10 @@ audio {
 
 audio::-webkit-media-controls-panel {
   background-color: #2d3748;
-  filter: brightness(1.5);
 }
 
 audio::-webkit-media-controls-enclosure {
-  filter: brightness(1.5);
+  background-color: #2d3748;
 }
 
 /* Make all control buttons white */
@@ -153,6 +152,26 @@ audio::-moz-media-controls {
 .slide-rangeos {
   @apply prose prose-invert prose-xl w-full mx-auto px-4;
 }
+
+.rc5-table {
+  table-layout: fixed !important; /* Force columns to share width */
+  width: 100% !important;        /* Force table to fill the slide */
+  border-collapse: separate;
+  margin: 1rem 0;
+}
+
+.rc5-table th,
+.rc5-table td {
+  padding: 8px 12px;
+  word-wrap: break-word;        /* Prevents text from pushing columns wide */
+  overflow-wrap: break-word;
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Fallback border */
+}
+
+/* Ensure alignment classes from your TableEditor.tsx also work here */
+.rc5-table .leftAlignedCell { text-align: left; }
+.rc5-table .rightAlignedCell { text-align: right; }
+.rc5-table .centeredCell { text-align: center; }
 
 @layer base {
   html,

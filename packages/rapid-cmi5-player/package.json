@@ -1,0 +1,28 @@
+{
+  "name": "@rapid-cmi5/cmi5-player",
+  "version": "0.1.1",
+  "description": "A markdown cmi5 editor with built in git version control and made for react.",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ByLightSDC/rapidcmi5"
+  },
+  "keywords": [
+    "React",
+    "cmi5",
+    "xapi"
+  ],
+  "author": {
+    "name": "Aaron Crawford"
+  },
+  "peerDependencies": {
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "dependencies": {
+    "@rapid-cmi5/cmi5-build-common": "0.1.1",
+    "@rapid-cmi5/ui": "0.1.1"
+  }
+}

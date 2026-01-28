@@ -18,16 +18,19 @@ import { Tooltip, Typography } from '@mui/material';
 import { classIdSel, studentIdSel } from '../redux/auReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { cmi5Instance } from '../session/cmi5';
+
+
 import { classChangeModalId } from './CourseModals';
-import { dividerColor, setModal } from '@rapid-cmi5/ui';
 import RC5Player from './player/RC5Player';
 import { AuManagerContext } from '../session/AuManager';
-import Slide from './Slide';
+
 import ScenarioWrapper from './scenario/ScenarioWrapper';
-import { config } from '@rapid-cmi5/ui';
-import { TeamScenarioContextProvider } from './team-consoles/TeamScenarioContext';
+import {
+  TeamConsolesContext,
+  TeamScenarioContextProvider,
+} from './team-consoles/TeamScenarioContext';
 import { useCMI5Session } from '../hooks/useCMI5Session';
-import { ButtonInfoField, ButtonMainUi, ButtonInfoFormHeaderLayout } from '@rapid-cmi5/ui';
+import { ButtonInfoField, ButtonInfoFormHeaderLayout, ButtonMainUi, config, dividerColor, setModal } from '@rapid-cmi5/ui';
 
 /**
  * The main slide content.
@@ -37,17 +40,6 @@ import { ButtonInfoField, ButtonMainUi, ButtonInfoFormHeaderLayout } from '@rapi
 export default function MenuLayout() {
   const [isMenuDrawerOpen, setIsMenuDrawerOpen] = useState(true);
   const [isSplitPanelShown, setIsSplitPanelShown] = useState(false);
-  const {
-    activeTab,
-    progressPercent,
-    viewedSlides,
-    scenario,
-    slides,
-    setActiveTab,
-    setProgress,
-    slideData,
-    submitScore,
-  } = useContext(AuManagerContext);
 
   const dispatch = useDispatch();
   const classId = useSelector(classIdSel);
@@ -137,7 +129,11 @@ export default function MenuLayout() {
             style={{
               height: '100%',
               width: '100%',
-              overflow: 'auto',
+              overflowX: 'visible',
+              overflowY: 'auto',
+              paddingTop: '32px',
+              paddingBottom: '24px',
+              boxSizing: 'border-box',
             }}
           >
             <Stack

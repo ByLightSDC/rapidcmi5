@@ -9,8 +9,8 @@ import {
 
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { ColorSelectionPopover } from './ColorSelectionPopover';
-import { HIGHLIGHT_PRESET_COLORS } from '../constants';
+import { HIGHLIGHT_PRESET_COLORS } from '@rapid-cmi5/ui';
+import { ColorSelectionPopover } from 'packages/ui/src/lib/colors/ColorSelectionPopover';
 
 const DEFAULT_HIGHLIGHT = '#FFFF00';
 export const highlightColorLast$ = Cell<string>(DEFAULT_HIGHLIGHT);
@@ -81,12 +81,9 @@ export function HighlightSplitButton() {
   return (
     <>
       <ButtonWithTooltip
-        title={
-          showDefaultIcon ? 'Apply highlight' : `Apply highlight (${lastColor})`
-        }
+        title="Change text background color"
         onClick={handleMainClick}
         disabled={disabled}
-        aria-label="Apply highlight"
       >
         <BorderColorIcon
           fontSize="small"
@@ -95,10 +92,9 @@ export function HighlightSplitButton() {
       </ButtonWithTooltip>
 
       <ButtonWithTooltip
-        title="Choose highlight color"
+        title="Select text background color"
         onClick={openPicker}
         disabled={disabled}
-        aria-label="Open highlight color menu"
         style={{
           width: '10px',
           minWidth: 0,

@@ -27,7 +27,7 @@ export class TOCHeadingNode extends HeadingNode {
   override insertNewAfter(
     selection?: RangeSelection,
     restoreSelection?: boolean,
-  ): ParagraphNode | TOCHeadingNode {
+  ): ParagraphNode | HeadingNode {
     const anchorOffet = selection ? selection.anchor.offset : 0;
     const lastDesc = this.getLastDescendant();
     const isAtEnd =
@@ -48,6 +48,34 @@ export class TOCHeadingNode extends HeadingNode {
       this.replace(paragraph, true);
     }
     return newElement;
+  }
+
+  // bug/CCUI-2621-HeaderTOC
+  // when pressing backspace at the start of a heading (or at "R"), Lexical calls collapseAtStart() on TOCHeadingNode.
+  // Since TOCHeadingNode extends HeadingNode, it inherits the parent's collapseAtStart(), which tries to create a HeadingNode using $createHeadingNode.
+  // However, only TOCHeadingNode is registered in the editor, not the base HeadingNode, causing the error.
+  // This override ensures that the correct node type is used when collapsing at the start of a heading.
+  override collapseAtStart(): true {
+    const previousSibling = this.getPreviousSibling();
+    if ($isTOCHeadingNode(previousSibling)) {
+      // Merge with previous heading - append children to previous sibling
+      previousSibling.append(...this.getChildren());
+      this.remove();
+      return true;
+    }
+    // If empty, convert to paragraph
+    if (this.isEmpty()) {
+      const paragraph = $createParagraphNode();
+      this.replace(paragraph);
+      return true;
+    }
+    // For non-empty headings at start with no previous heading sibling,
+    // convert to paragraph to prevent parent from trying to create unregistered HeadingNode
+    // This handles the case where backspace at start would trigger parent collapse logic
+    const paragraph = $createParagraphNode();
+    paragraph.append(...this.getChildren());
+    this.replace(paragraph);
+    return true;
   }
 
   override exportJSON() {

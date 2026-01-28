@@ -2,9 +2,8 @@ import { Gauge } from '@mui/x-charts/Gauge';
 import { useContext, useMemo } from 'react';
 import { TeamConsolesContext } from '../TeamScenarioContext';
 import { Alert } from '@mui/material';
-import { Topic } from '@rapid-cmi5/ui';
+import { Topic } from '@rangeos-nx/frontend/clients/hooks';
 import { LoadingUi } from '@rapid-cmi5/ui';
-
 /**
  * Display gauge progress meter for Autograder Progress
  * @param param0

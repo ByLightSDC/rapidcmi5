@@ -13,7 +13,7 @@
 
 import type * as Mdast from 'mdast';
 import type { LexicalNode } from 'lexical';
-import { debugMdast } from '../utils/debug';
+import { debugLog } from '@rangeos-nx/ui/branded';
 import { $isDirectiveNode } from '@mdxeditor/editor';
 import {
   $isParagraphNode,
@@ -39,9 +39,11 @@ export class MdastExtractor {
   static extractMdast(nodes: LexicalNode[]): Mdast.Content[] {
     const mdastNodes: Mdast.Content[] = [];
 
-    debugMdast.log(
+    debugLog(
       '➡️ extractMdast input nodes:',
       nodes.map((n) => ({ key: n.getKey(), type: n.getType() })),
+      undefined,
+      'mdast',
     );
 
     for (const node of nodes) {
@@ -49,11 +51,11 @@ export class MdastExtractor {
         const mdast = this.convertNode(node);
         if (mdast) {
           mdastNodes.push(mdast);
-          debugMdast.log(
-            '✅ Converted node',
-            node.getKey(),
-            node.getType(),
+          debugLog(
+            `✅ Converted node ${node.getKey()} (${node.getType()})`,
             mdast,
+            undefined,
+            'mdast',
           );
         }
       } catch (error) {
@@ -264,7 +266,7 @@ export class MdastExtractor {
     if (title) attrs.push(`title="${title}"`);
     if (typeof width === 'number') attrs.push(`width="${width}"`);
     if (typeof height === 'number') attrs.push(`height="${height}"`);
-    if (id) attrs.push(`data-image-id="${id}"`);
+    if (id) attrs.push(`id="${id}"`);
 
     const imgHtml = `<img ${attrs.join(' ')} />`;
     const finalHtml = href

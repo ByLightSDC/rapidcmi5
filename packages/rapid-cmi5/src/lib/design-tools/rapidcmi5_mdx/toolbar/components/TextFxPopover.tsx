@@ -39,7 +39,7 @@ import {
   useCellValue,
   usePublisher,
 } from '@mdxeditor/editor';
-import { FxDirectiveAttributes, refreshTextFx$, selFxNode$, applyFx$, defaultFxColor, debugLog, CHANGE_TEXT_FX, ButtonMinorUi, ButtonModalCancelUi, ButtonLoadingUi, SHAPE_PRESET_COLORS } from '@rapid-cmi5/ui';
+import { FxDirectiveAttributes, SHAPE_PRESET_COLORS, refreshTextFx$, selFxNode$, applyFx$, defaultFxColor, debugLog, CHANGE_TEXT_FX, ButtonMinorUi, ButtonModalCancelUi, ButtonLoadingUi } from '@rapid-cmi5/ui';
 
 /**
  * A color square on which to click

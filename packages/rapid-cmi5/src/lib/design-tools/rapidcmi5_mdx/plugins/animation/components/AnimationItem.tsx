@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   Stack,
   Typography,
@@ -8,113 +14,75 @@ import {
   Collapse,
   Box,
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { usePublisher, useCellValue } from '@mdxeditor/gurx';
-import {
-  deleteAnimation$,
-  selectedAnimation$,
-  updateAnimation$,
-  slideAnimations$,
-  getMarkdownFn$,
-  setMarkdownFn$,
-} from '../state/animationCells';
+import { selectedAnimation$, updateAnimation$ } from '../state/animationCells';
+import { AnimationConfig, EntranceEffect, ExitEffect, AnimationTrigger, SelectorMainUi } from '@rapid-cmi5/ui';
 
-import { activeEditor$ } from '@mdxeditor/editor';
-import { debugWrap } from '../utils/debug';
-import { DirectiveWrapper } from '../wrapping';
-import { AnimationConfig, AnimationTrigger, EntranceEffect, ExitEffect, SelectorMainUi } from '@rapid-cmi5/ui';
 
 interface Props {
   animation: AnimationConfig;
 }
 
 export function AnimationItem({ animation }: Props) {
-  const deleteAnim = usePublisher(deleteAnimation$);
   const updateAnim = usePublisher(updateAnimation$);
   const selectedId = useCellValue(selectedAnimation$);
   const selectAnimation = usePublisher(selectedAnimation$);
-  const editor = useCellValue(activeEditor$);
-  const animations = useCellValue(slideAnimations$);
-  const getMarkdown = useCellValue(getMarkdownFn$);
-  const setMarkdown = useCellValue(setMarkdownFn$);
   const isSelected = selectedId === animation.id;
+
+  // Ref for scrolling into view when selected
+  const itemRef = useRef<HTMLDivElement>(null);
 
   // Auto-expand when selected, but allow manual control
   const [isExpanded, setIsExpanded] = useState(isSelected);
 
-  // COMMENTED OUT: Local state for editing the directive ID
-  // Renaming at runtime causes race conditions - ID should only be set at creation
-  // const [editingDirectiveId, setEditingDirectiveId] = useState(animation.directiveId || '');
+  // Auto-expand when selection changes from not selected -> selected
+  // Auto-collapse when selection changes from selected -> not selected (with debounce)
+  const wasSelectedRef = useRef(isSelected);
+  const collapseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Auto-expand when selected, but don't auto-collapse (user may be editing)
   useEffect(() => {
-    if (isSelected && !isExpanded) {
-      // Only auto-expand when becoming selected
-      setIsExpanded(true);
-    }
-    // Don't auto-collapse when deselected - let user manually collapse
-  }, [isSelected, isExpanded]);
+    const wasSelected = wasSelectedRef.current;
 
-  // COMMENTED OUT: Sync local editing state when animation.directiveId changes
-  // useEffect(() => {
-  //   setEditingDirectiveId(animation.directiveId || '');
-  // }, [animation.directiveId]);
-
-  const handleDelete = useCallback(() => {
-    // If this is the last animation tied to a directive, unwrap the directive block
-    if (editor && animation.directiveId && getMarkdown && setMarkdown) {
-      const remainingForDirective = animations.filter(
-        (a) => a.directiveId === animation.directiveId,
-      );
-      if (remainingForDirective.length <= 1) {
-        debugWrap.log(
-          '🗑️ Delete requested for last anim on directive',
-          animation.directiveId,
-        );
-        const unwrapped = DirectiveWrapper.unwrapDirectiveById(
-          editor,
-          animation.directiveId,
-          getMarkdown,
-          setMarkdown,
-        );
-        if (unwrapped) {
-          debugWrap.log(
-            '🧹 Unwrapped anim directive after delete',
-            animation.directiveId,
-          );
-
-          // Defer animation deletion to allow unwrap's setMarkdown to complete
-          // This prevents a race condition where onAnimationsChange reads stale markdown
-          setTimeout(() => {
-            deleteAnim(animation.id);
-          }, 50);
-          return;
-        } else {
-          debugWrap.warn(
-            '⚠️ Could not find anim directive to unwrap after delete',
-            animation.directiveId,
-          );
-        }
-      } else {
-        debugWrap.log(
-          'ℹ️ Directive has other animations, not unwrapping',
-          animation.directiveId,
-        );
+    if (isSelected && !wasSelected) {
+      // Cancel any pending collapse - selection was restored
+      if (collapseTimeoutRef.current) {
+        clearTimeout(collapseTimeoutRef.current);
+        collapseTimeoutRef.current = null;
       }
-    }
 
-    // Delete animation immediately if no unwrap was needed
-    deleteAnim(animation.id);
-  }, [
-    deleteAnim,
-    animation.id,
-    animation.directiveId,
-    editor,
-    animations,
-    getMarkdown,
-    setMarkdown,
-  ]);
+      // Expand the item when it becomes selected
+      if (!isExpanded) {
+        setIsExpanded(true);
+      }
+
+      // Scroll into view with smooth animation
+      if (itemRef.current) {
+        setTimeout(() => {
+          itemRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'nearest',
+          });
+        }, 100); // Small delay to allow expansion animation to start
+      }
+    } else if (!isSelected && wasSelected) {
+      // Debounce collapse to allow for selection restoration during markdown re-parse
+      collapseTimeoutRef.current = setTimeout(() => {
+        setIsExpanded(false);
+        collapseTimeoutRef.current = null;
+      }, 50); // Short debounce to allow selection restore to cancel
+    }
+    wasSelectedRef.current = isSelected;
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (collapseTimeoutRef.current) {
+        clearTimeout(collapseTimeoutRef.current);
+      }
+    };
+  }, [isSelected, isExpanded, selectedId, animation.id]);
 
   const handleEntranceChange = useCallback(
     (value: string) => {
@@ -175,84 +143,6 @@ export function AnimationItem({ animation }: Props) {
     [updateAnim, animation.id],
   );
 
-  // COMMENTED OUT: handleDirectiveIdChange - causes race conditions with markdown re-parsing
-  // Users should set the ID at creation time via the dialog, or edit in markdown directly
-  /*
-  const handleDirectiveIdChange = useCallback(
-    (newId: string) => {
-      const trimmedId = newId.trim();
-
-      debugLog('🔄 [AnimationItem] handleDirectiveIdChange called', {
-        oldId: animation.directiveId,
-        newId: trimmedId,
-        animationConfigId: animation.id,
-      }, undefined, 'drawer');
-
-      // Validate ID format (alphanumeric, underscores, hyphens)
-      if (trimmedId && !/^[a-zA-Z0-9_-]+$/.test(trimmedId)) {
-        console.warn('Invalid ID format. Use only letters, numbers, underscores, and hyphens');
-        return;
-      }
-
-      if (!trimmedId || !animation.directiveId || trimmedId === animation.directiveId) {
-        debugLog('🔄 [AnimationItem] Skipping update (empty or same ID)', undefined, undefined, 'drawer');
-        return;
-      }
-
-      // Update the directive ID in the markdown
-      if (editor && getMarkdown && setMarkdown) {
-        debugLog('🔄 [AnimationItem] Step 1: Updating directive ID in markdown', undefined, undefined, 'drawer');
-        const success = DirectiveWrapper.updateDirectiveId(
-          animation.directiveId,
-          trimmedId,
-          getMarkdown,
-          setMarkdown,
-        );
-
-        if (success) {
-          console.log('✅ [AnimationItem] Step 1 complete: Directive ID updated in markdown');
-
-          // Small delay to let markdown re-parse before updating animation config
-          setTimeout(() => {
-            debugLog('🔄 [AnimationItem] Step 2: Finding new node key for renamed directive', undefined, undefined, 'drawer');
-
-            // Find the new node key for the renamed directive
-            const newNodeKey = DirectiveWrapper.findInsertedDirectiveKey(editor, trimmedId);
-
-            if (newNodeKey) {
-              console.log('✅ [AnimationItem] Found new node key:', newNodeKey);
-
-              // Update the animation config with both the new directive ID and new node key
-              updateAnim({
-                id: animation.id,
-                updates: {
-                  directiveId: trimmedId,
-                  targetNodeKey: newNodeKey,
-                  targetLabel: `Animation: ${trimmedId}`,
-                },
-              });
-              debugLog('✅ [AnimationItem] Step 2 complete: Animation config updated with new node key', undefined, undefined, 'drawer');
-            } else {
-              console.error('❌ [AnimationItem] Could not find new node key for directive:', trimmedId);
-              // Still update the directiveId even if we can't find the key
-              updateAnim({
-                id: animation.id,
-                updates: {
-                  directiveId: trimmedId,
-                  targetLabel: `Animation: ${trimmedId}`,
-                },
-              });
-            }
-          }, 150); // Increased delay to ensure re-parse completes
-        } else {
-          console.error('❌ [AnimationItem] Failed to update directive ID in markdown');
-        }
-      }
-    },
-    [animation.id, animation.directiveId, editor, getMarkdown, setMarkdown, updateAnim],
-  );
-  */
-
   const handleToggleExpand = useCallback(() => {
     setIsExpanded((prev) => !prev);
     // Select this animation when expanding
@@ -296,8 +186,13 @@ export function AnimationItem({ animation }: Props) {
         ? animation.exitEffect
         : 'None';
 
+  // UX: always show a simple label; targetLabel still kept in data/markdown.
+  const displayLabel = 'Animation';
+
   return (
     <Paper
+      ref={itemRef}
+      data-animation-id={animation.id}
       elevation={isSelected ? 3 : 1}
       sx={{
         marginBottom: 1,
@@ -338,23 +233,12 @@ export function AnimationItem({ animation }: Props) {
 
           <Box sx={{ flex: 1 }}>
             <Typography variant="body2" fontWeight="bold">
-              {animation.order}. {animation.targetLabel || 'Element'}
+              {animation.order}. {displayLabel}
             </Typography>
             <Typography variant="caption" color="text.secondary">
               {primaryEffect} • {animation.trigger}
             </Typography>
           </Box>
-
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDelete();
-            }}
-            aria-label="Delete animation"
-          >
-            <DeleteIcon fontSize="small" />
-          </IconButton>
         </Box>
 
         {/* Expandable Controls */}
@@ -364,53 +248,10 @@ export function AnimationItem({ animation }: Props) {
             onKeyDown={handleControlsKeyDown}
           >
             <Stack direction="column" spacing={1}>
-              {/* COMMENTED OUT: Animation ID Field - Editable
-                  Renaming at runtime causes race conditions - ID should only be set at creation
-              {animation.directiveId && (
-                <>
-                  <Typography variant="caption" sx={{ marginTop: 1 }}>
-                    Animation ID
-                  </Typography>
-                  <TextField
-                    size="small"
-                    value={editingDirectiveId}
-                    onChange={(e) => setEditingDirectiveId(e.target.value)}
-                    onBlur={(e) => handleDirectiveIdChange(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        const target = e.target as HTMLInputElement;
-                        handleDirectiveIdChange(target.value);
-                      }
-                    }}
-                    helperText="Press Enter or blur to save"
-                    sx={{ flex: 1 }}
-                  />
-                </>
-              )}
-              */}
-
-              {/* COMMENTED OUT: Animation ID Field - Read-only display
-              {animation.directiveId && (
-                <>
-                  <Typography variant="caption" sx={{ marginTop: 1 }}>
-                    Animation ID (set at creation)
-                  </Typography>
-                  <Typography variant="body2" sx={{
-                    padding: 1,
-                    backgroundColor: 'action.hover',
-                    borderRadius: 1,
-                    fontFamily: 'monospace',
-                  }}>
-                    {animation.directiveId}
-                  </Typography>
-                </>
-              )}
-              */}
-
               {/* Entrance Effect Selector */}
               <Typography variant="caption">Entrance</Typography>
               <SelectorMainUi
-                defaultValue={animation.entranceEffect || EntranceEffect.NONE}
+                value={animation.entranceEffect || EntranceEffect.NONE}
                 options={Object.values(EntranceEffect)}
                 onSelect={handleEntranceChange}
                 onKeyDown={handleFieldKeyDown}
@@ -425,7 +266,7 @@ export function AnimationItem({ animation }: Props) {
               {/* Exit Effect Selector */}
               <Typography variant="caption">Exit</Typography>
               <SelectorMainUi
-                defaultValue={animation.exitEffect || ExitEffect.NONE}
+                value={animation.exitEffect || ExitEffect.NONE}
                 options={Object.values(ExitEffect)}
                 onSelect={handleExitChange}
                 onKeyDown={handleFieldKeyDown}
@@ -440,7 +281,7 @@ export function AnimationItem({ animation }: Props) {
               {/* Trigger Selector */}
               <Typography variant="caption">Trigger</Typography>
               <SelectorMainUi
-                defaultValue={animation.trigger}
+                value={animation.trigger}
                 options={Object.values(AnimationTrigger)}
                 onSelect={handleTriggerChange}
                 onKeyDown={handleFieldKeyDown}
@@ -460,7 +301,7 @@ export function AnimationItem({ animation }: Props) {
                   size="small"
                   value={animation.duration}
                   onChange={handleDurationChange}
-                onKeyDown={handleFieldKeyDown}
+                  onKeyDown={handleFieldKeyDown}
                   inputProps={{ min: 0.1, max: 10, step: 0.1 }}
                   sx={{ flex: 1 }}
                 />
@@ -470,7 +311,7 @@ export function AnimationItem({ animation }: Props) {
                   size="small"
                   value={animation.delay}
                   onChange={handleDelayChange}
-                onKeyDown={handleFieldKeyDown}
+                  onKeyDown={handleFieldKeyDown}
                   inputProps={{ min: 0, max: 10, step: 0.1 }}
                   sx={{ flex: 1 }}
                 />

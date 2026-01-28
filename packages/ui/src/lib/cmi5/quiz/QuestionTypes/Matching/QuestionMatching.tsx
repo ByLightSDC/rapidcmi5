@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
-import { Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
+import Typography from '@mui/material/Typography';
 
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
-import { SelectorMainUi } from '../../../../inputs/selectors/selectors';
+import { QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
+import { SelectorMainUi } from 'packages/ui/src/lib/inputs/selectors/selectors';
+
 
 function Matching({
   question,
@@ -64,7 +65,7 @@ function Matching({
 
   return (
     <>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} sx={{ width: '100%' }}>
         {pairs.map((p, index) => (
           <React.Fragment key={index}>
             <Grid size={6} key={p.option}>
@@ -97,7 +98,7 @@ function Matching({
                 allowItemWrapping={true}
                 disabled={isGraded}
                 label="Select Correct Match"
-                value={selectedAnswers[index] || ''}
+                defaultValue={selectedAnswers[index] || ''}
                 options={answers}
                 onSelect={(newValue: string) => {
                   handleSelectChange(index, newValue);

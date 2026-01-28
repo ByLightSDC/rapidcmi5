@@ -11,7 +11,7 @@ import {
   DeployedRangeConsoleStatusEnum,
 } from '@rangeos-nx/frontend/clients/devops-api';
 import { SxProps } from '@mui/system';
-import { ButtonMinorUi } from '../../api/utils/buttons';
+import { ButtonMinorUi } from '@rapid-cmi5/ui';
 
 /**
  * @typedef {Object} tProps
@@ -56,7 +56,6 @@ export function ConsoleButton(props: tProps) {
     overrideRangeId,
     sxProps = {
       //make button more compact
-      color: 'primary',
       margin: '4px',
       padding: '4px',
       height: '26px',

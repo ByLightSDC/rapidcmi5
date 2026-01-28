@@ -1,4 +1,4 @@
-import { debugLog } from '@rapid-cmi5/ui';
+import { debugLog } from 'packages/ui/src/lib/utility/logger';
 import {
   AnimationConfig,
   AnimationTrigger,
@@ -15,6 +15,14 @@ export interface AnimationEngineOptions {
   onAnimationComplete?: (animationId: string) => void;
   onAllComplete?: () => void;
   prefersReducedMotion?: boolean;
+  /**
+   * Optional hook used by editor to mark playing state; player can omit.
+   */
+  onMarkPlaying?: (targetNodeKey: string, playing: boolean) => void;
+  /**
+   * Enable verbose diagnostics (debugLog). Default: false/undefined.
+   */
+  enableDiagnostics?: boolean;
   /**
    * Custom element finder function
    * Allows player/editor to provide their own element lookup strategy
@@ -284,25 +292,32 @@ export class AnimationEngine {
         return;
       }
 
-      debugLog(
-        '✅ Found element for animation',
-        { id: animation.id, element },
-        undefined,
-        'engine',
-      );
+      if (this.options.enableDiagnostics) {
+        debugLog(
+          '✅ Found element for animation',
+          { id: animation.id, element },
+          undefined,
+          'engine',
+        );
+      }
       this.animationElements.set(animation.id, element);
+
+      // Mark as playing (editor-only hook; player can leave undefined)
+      this.options.onMarkPlaying?.(animation.targetNodeKey, true);
 
       // Apply entrance effect
       if (
         animation.entranceEffect &&
         animation.entranceEffect !== EntranceEffect.NONE
       ) {
-        debugLog(
-          '🎨 Applying entrance effect',
-          { effect: animation.entranceEffect, element },
-          undefined,
-          'engine',
-        );
+        if (this.options.enableDiagnostics) {
+          debugLog(
+            '🎨 Applying entrance effect',
+            { effect: animation.entranceEffect, element },
+            undefined,
+            'engine',
+          );
+        }
         this.applyEntranceEffect(element, animation);
       }
 
@@ -313,14 +328,19 @@ export class AnimationEngine {
       const timeoutId = window.setTimeout(() => {
         // Apply exit effect if specified
         if (animation.exitEffect && animation.exitEffect !== ExitEffect.NONE) {
-          debugLog(
-            '🎨 Applying exit effect',
-            { effect: animation.exitEffect },
-            undefined,
-            'engine',
-          );
+          if (this.options.enableDiagnostics) {
+            debugLog(
+              '🎨 Applying exit effect',
+              { effect: animation.exitEffect },
+              undefined,
+              'engine',
+            );
+          }
           this.applyExitEffect(element, animation);
         }
+
+        // Mark as stopped
+        this.options.onMarkPlaying?.(animation.targetNodeKey, false);
 
         this.options.onAnimationComplete?.(animation.id);
         this.animationTimeouts.delete(animation.id);
@@ -417,51 +437,34 @@ export class AnimationEngine {
 
   /**
    * Default element finding strategy
-   * Looks for elements by animation-id or animation-target attributes
+   * V2: Looks for elements by data-anim-directive-id attribute
+   * This requires animations to use the :anim directive wrapper pattern
    */
   private defaultFindElement(nodeKey: string): HTMLElement | null {
-    const editorRoot = document.querySelector(
-      '.mdxeditor-root-contenteditable',
-    );
+    // Find the animation config to get the directiveId
+    const animation = this.animations.find((a) => a.targetNodeKey === nodeKey);
 
-    // Strategy 1: Find by animation-id attribute
-    let element = document.querySelector<HTMLElement>(
-      `[data-animation-id="${nodeKey}"]`,
-    );
-    if (element) {
-      return element;
-    }
-
-    // Strategy 2: Fallback to animation-target
-    element = document.querySelector<HTMLElement>(
-      `[data-animation-target="${nodeKey}"]`,
-    );
-    if (element) {
-      return element;
-    }
-
-    // Strategy 3: Fallback to lexical-key (for backward compatibility)
-    element = document.querySelector<HTMLElement>(
-      `[data-lexical-key="${nodeKey}"]`,
-    );
-    if (element) {
-      return element;
-    }
-
-    // Strategy 4: Fallback for single element cases
-    if (editorRoot) {
-      const allElements = Array.from(
-        editorRoot.querySelectorAll(
-          'p, h1, h2, h3, h4, h5, h6, li, blockquote',
-        ),
+    if (!animation?.directiveId) {
+      console.warn(
+        `❌ Animation missing directiveId - cannot find element. Animation ID: ${animation?.id || 'unknown'}`,
+        'All animations must use the :anim{id="..."} directive wrapper pattern.',
       );
-
-      if (allElements.length === 1) {
-        return allElements[0] as HTMLElement;
-      }
+      return null;
     }
 
-    return null;
+    // Find element by directive ID attribute (set by AnimDirectiveDescriptor)
+    const directiveElement = document.querySelector<HTMLElement>(
+      `[data-anim-directive-id="${animation.directiveId}"]`,
+    );
+
+    if (!directiveElement) {
+      console.warn(
+        `❌ Could not find element with data-anim-directive-id="${animation.directiveId}"`,
+        'Ensure the :anim{id="' + animation.directiveId + '"} directive exists in the markdown.',
+      );
+    }
+
+    return directiveElement;
   }
 
   /**

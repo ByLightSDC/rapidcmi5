@@ -2,8 +2,6 @@ import { visit } from 'unist-util-visit';
 import { debugLog } from '../../utility/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const h = require('hastscript');
-
 const attributeListRegEx = /(?:{):(.+)}/g;
 const debugMe = true;
 

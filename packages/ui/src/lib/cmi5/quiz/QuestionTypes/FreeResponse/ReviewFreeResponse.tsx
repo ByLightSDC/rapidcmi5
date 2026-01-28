@@ -1,5 +1,5 @@
-import useQuizGrader from '../../hooks/useQuizGrader';
 import { ReviewProps } from '@rapid-cmi5/cmi5-build-common';
+import useQuizGrader from '../../hooks/useQuizGrader';
 
 export default function ReviewFreeResponse(props: ReviewProps) {
   const { question, answer } = props;

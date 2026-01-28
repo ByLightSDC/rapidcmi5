@@ -32,6 +32,7 @@ export type SerializedAudioNode = Spread<
     title?: string;
     src: string;
     rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
+    id?: string; // Unique persistent ID for animation targeting
     type: 'audio';
     version: 1;
   },
@@ -47,6 +48,8 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
   __src: string;
   /** @internal */
   __title: string | undefined;
+  /** @internal */
+  __id: string; // Unique persistent ID for animation targeting
 
   /** @internal */
   __rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
@@ -58,16 +61,24 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
 
   /** @internal */
   static override clone(node: AudioNode): AudioNode {
-    return new AudioNode(node.__src, node.__title, node.__rest, node.__key);
+    const cloned = new AudioNode(
+      node.__src,
+      node.__title,
+      node.__rest,
+      node.__key,
+    );
+    cloned.__id = node.__id; // Preserve id on clone
+    return cloned;
   }
 
   /** @internal */
   static override importJSON(serializedNode: SerializedAudioNode): AudioNode {
-    const { title, src, rest } = serializedNode;
+    const { title, src, rest, id } = serializedNode;
     const node = $createAudioNode({
       title,
       src,
       rest,
+      id, // Restore id from saved state
     });
     return node;
   }
@@ -102,11 +113,24 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
     title: string | undefined,
     rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[],
     key?: NodeKey,
+    id?: string,
   ) {
     super(key);
     this.__src = src;
     this.__title = title;
     this.__rest = rest ?? [];
+    // Generate or restore unique id for animation targeting
+    this.__id = id || this.generateId();
+  }
+
+  /** @internal */
+  private generateId(): string {
+    // Use crypto.randomUUID() if available, otherwise fallback to timestamp + random
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    // Fallback for older browsers
+    return `aud-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 
   /** @internal */
@@ -115,6 +139,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
       title: this.getTitle(),
       src: this.getSrc(),
       rest: this.__rest,
+      id: this.__id, // Save id for persistence
       type: 'audio',
       version: 1,
     };
@@ -144,6 +169,10 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
     return this.__title;
   }
 
+  getId(): string {
+    return this.__id;
+  }
+
   getRest(): (MdxJsxAttribute | MdxJsxExpressionAttribute)[] {
     return this.__rest;
   }
@@ -164,7 +193,8 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
 
   /** @internal */
   shouldBeSerializedAsElement(): boolean {
-    return this.__rest.length > 0;
+    // ALWAYS serialize as HTML element to preserve id for animations!
+    return true;
   }
 
   /** @internal */
@@ -175,6 +205,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
         title={this.getTitle()}
         nodeKey={this.getKey()}
         rest={this.__rest}
+        id={this.__id}
       />
     );
   }
@@ -189,6 +220,7 @@ export interface CreateAudioNodeParameters {
   key?: NodeKey;
   rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   src: string;
+  id?: string;
 }
 
 /**
@@ -197,8 +229,8 @@ export interface CreateAudioNodeParameters {
  * @group Audio
  */
 export function $createAudioNode(params: CreateAudioNodeParameters): AudioNode {
-  const { title, src, key, rest } = params;
-  return new AudioNode(src, title, rest, key);
+  const { title, src, key, rest, id } = params;
+  return new AudioNode(src, title, rest, key, id);
 }
 
 /**

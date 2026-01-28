@@ -1,12 +1,8 @@
 import { UseFormReturn } from 'react-hook-form';
-import {
-  DynamicSelectorFieldGroup,
-  FormCrudType,
-  FormFieldArray,
-  tFormFieldRendererProps,
-} from '@rapid-cmi5/ui';
-
+import { useEffect } from 'react';
+import {queryKeyKSATs, Topic} from '@rangeos-nx/frontend/clients/hooks'
 import KsatFieldDetail from './KsatFieldDetail';
+import { FormCrudType, FormFieldArray, tFormFieldRendererProps, DynamicSelectorFieldGroup } from '@rapid-cmi5/ui';
 
 /**
  * @type tFieldGroupProps
@@ -17,7 +13,7 @@ import KsatFieldDetail from './KsatFieldDetail';
 type tFieldGroupProps = {
   crudType: FormCrudType;
   formMethods: UseFormReturn;
-  //#REF   scopedKsatsFieldName: string;
+  scopedKsatsFieldName?: string;
 };
 
 /**
@@ -30,32 +26,65 @@ export function KSATsFieldGroup(props: tFieldGroupProps) {
   const { formState, getValues, setValue, trigger } = formMethods;
   const { errors } = formState;
 
+  const scopedKsatsFieldName = 'ksats';
+
+  // Initialize scoped field from global ksats field if scoped field is empty
+  useEffect(() => {
+    const globalKsats = getValues('ksats') || [];
+    const scopedKsats = getValues(scopedKsatsFieldName) || [];
+
+    // REF
+    // console.log('🔍 KSATsFieldGroup initialization:', {
+    //   scopedKsatsFieldName,
+    //   globalKsats: globalKsats.length,
+    //   scopedKsats: scopedKsats.length,
+    //   globalKsatsData: globalKsats,
+    //   scopedKsatsData: scopedKsats,
+    // });
+
+    // If scoped field is empty but global field has data, copy it over
+    if (scopedKsats.length === 0 && globalKsats.length > 0) {
+      // console.log('🔄 Copying global KSATs to scoped field');
+      setValue(scopedKsatsFieldName, globalKsats, {
+        shouldDirty: false, // Don't mark as dirty on initialization
+        shouldTouch: false,
+        shouldValidate: false,
+      });
+    }
+  }, [scopedKsatsFieldName, getValues, setValue]);
+
   /**
    * Applies multi selected KSAT elements
    */
   const handleSelectMultipleKsats = (selectedItems: any[]) => {
     const newList: Element[] = [];
-    selectedItems.map((item) => {
+    selectedItems.forEach((item) => {
       newList.push(item.meta);
     });
 
+    // console.log('🔄 handleSelectMultipleKsats:', {
+    //   scopedKsatsFieldName,
+    //   selectedItems: selectedItems.length,
+    //   newList: newList.length,
+    //   newListData: newList,
+    // });
+
+    // Store in scoped field (primary field for this activity)
+    setValue(scopedKsatsFieldName, newList, {
+      shouldDirty: true, // Explicitly mark as dirty
+      shouldTouch: true, // Mark as touched
+      shouldValidate: true, // Trigger validation
+    });
+
+    // Also update the global ksats field for backward compatibility
     setValue('ksats', newList, {
       shouldDirty: true, // Explicitly mark as dirty
       shouldTouch: true, // Mark as touched
       shouldValidate: true, // Trigger validation
     });
 
-    // Store in scoped field for React Hook Form state management (not persisted)
-    //#REF
-    // setValue(scopedKsatsFieldName, newList, {
-    //   shouldDirty: true, // Explicitly mark as dirty
-    //   shouldTouch: true, // Mark as touched
-    //   shouldValidate: true, // Trigger validation
-    // });
-
     // Trigger both fields to ensure form state is updated
-    //#REF trigger(['ksats', scopedKsatsFieldName]);
-    trigger('ksats');
+    trigger(['ksats', scopedKsatsFieldName]);
   };
 
   /**
@@ -65,23 +94,48 @@ export function KSATsFieldGroup(props: tFieldGroupProps) {
     indexedFieldArray: string,
     selection: any,
   ) => {
+    // console.log('🔄 handleApplyKsatSelection:', {
+    //   indexedFieldArray,
+    //   scopedKsatsFieldName,
+    //   selection: selection?.meta,
+    //   currentScopedKsats: getValues(scopedKsatsFieldName)?.length || 0,
+    // });
+
+    // Set the individual field value
     setValue(indexedFieldArray, selection.meta, {
       shouldDirty: true, // Explicitly mark as dirty
       shouldTouch: true, // Mark as touched
       shouldValidate: true, // Trigger validation
     });
 
-    // Store this updated list in scoped field for React Hook Form state management (not persisted)
-    // #REF
-    // formMethods.setValue(scopedKsatsFieldName, getValues('ksats'), {
-    //   shouldDirty: true, // Explicitly mark as dirty
-    //   shouldTouch: true, // Mark as touched
-    //   shouldValidate: true, // Trigger validation
+    // Get current scoped field values and replace the item at the specific index
+    const currentScopedKsats = getValues(scopedKsatsFieldName) || [];
+    const fieldIndex = parseInt(indexedFieldArray.split('[')[1].split(']')[0]);
+    const updatedScopedKsats = [...currentScopedKsats];
+    updatedScopedKsats[fieldIndex] = selection.meta;
+
+    // console.log('🔄 Updated scoped KSATs:', {
+    //   fieldIndex,
+    //   updatedScopedKsats: updatedScopedKsats.length,
+    //   updatedScopedKsatsData: updatedScopedKsats,
     // });
 
+    // Store this updated list in scoped field for React Hook Form state management (not persisted)
+    formMethods.setValue(scopedKsatsFieldName, updatedScopedKsats, {
+      shouldDirty: true, // Explicitly mark as dirty
+      shouldTouch: true, // Mark as touched
+      shouldValidate: true, // Trigger validation
+    });
+
+    // Also update the global ksats field for backward compatibility
+    formMethods.setValue('ksats', updatedScopedKsats, {
+      shouldDirty: true, // Explicitly mark as dirty
+      shouldTouch: true, // Mark as touched
+      shouldValidate: true, // Trigger validation
+    });
+
     // Trigger both fields to ensure form state is updated
-    //#REF trigger(['ksats', scopedKsatsFieldName]);
-    trigger('ksats');
+    trigger(['ksats', scopedKsatsFieldName]);
   };
 
   /**
@@ -101,13 +155,13 @@ export function KSATsFieldGroup(props: tFieldGroupProps) {
 
   return (
     <FormFieldArray
-      errors={errors?.ksats}
-      arrayFieldName={`ksats`}
+      errors={errors?.[scopedKsatsFieldName]}
+      arrayFieldName={scopedKsatsFieldName}
       arrayRenderItem={(props: tFormFieldRendererProps) => {
         const ksatFieldName = props.indexedArrayField + '.element_identifier';
         return (
           <DynamicSelectorFieldGroup
-            topicId={'ksat'}
+            topicId={Topic.KSAT}
             crudType={crudType}
             dataIdField="element_identifier"
             formProps={{
@@ -121,12 +175,13 @@ export function KSATsFieldGroup(props: tFieldGroupProps) {
               //determines selectable, viewable
               readOnly: crudType === FormCrudType.view,
             }}
-            queryKey={'ksats'}
+            queryKey={queryKeyKSATs}
             getRenderItems={(data: any, index: number) => {
               if (index === 1) {
+                const fieldData = getValues(props.indexedArrayField);
                 return (
                   <KsatFieldDetail
-                    data={getValues(props.indexedArrayField)}
+                    data={fieldData || {}}
                     formProps={{
                       indexedArrayField: props.indexedArrayField,
                     }}
@@ -150,7 +205,13 @@ export function KSATsFieldGroup(props: tFieldGroupProps) {
           />
         );
       }}
-      defaultValues={{}}
+      defaultValues={{
+        element_identifier: '',
+        element_type: 'knowledge',
+        title: '',
+        text: '',
+        doc_identifier: '',
+      }}
       defaultIsExpanded={false}
       defaultSingleItemView={true}
       expandId={`ksats`}
@@ -160,7 +221,7 @@ export function KSATsFieldGroup(props: tFieldGroupProps) {
       formMethods={formMethods}
       multiSelectButtonProps={{
         formMethods: formMethods,
-        topicId: 'ksats',
+        topicId: Topic.KSAT,
         onApply: handleSelectMultipleKsats,
       }}
       //#REF  onDeleteEntry={handleDeleteKsat}

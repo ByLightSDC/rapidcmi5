@@ -30,10 +30,9 @@ import './virtual-keyboard/osk.css';
 import { ConsoleWindowManager } from './ConsoleWindowManager';
 import ConnectionAttemptDisplay from './ConnectionAttemptDisplay';
 import { getTunnelErrorMessage } from './constants';
-import { debugLog, debugLogError, debugLogSuccess } from '../../utility/logger';
 import { ConsoleContext } from './ConsoleContext';
-import { useToaster } from '../../api/utils/useToaster';
-import { authIdToken, isSSOEnabled } from '../../keycloak/reducer';
+import { authIdToken, isSSOEnabled } from '@rapid-cmi5/keycloak';
+import { useToaster, debugLogSuccess, debugLogError, debugLog } from '@rapid-cmi5/ui';
 
 // guacamole connection settings
 const guacProtocol = 'wss';
@@ -63,6 +62,8 @@ const INIT_BASE_ZOOM = -999;
 
 // ctrl-alt-delete keycode (just a made up number that won't clash with real keycodes)
 const KEYCODE_CTRL_ALT_DEL = 99999;
+
+const ICON_FONTSIZE = '22px';
 
 type tProps = {
   connectionId: string;
@@ -1392,8 +1393,10 @@ export function ConsolePopup(props: tProps) {
                       enterDelay={500}
                       enterNextDelay={500}
                       title="Close"
-                      PopperProps={{
-                        style: { zIndex: zIndex },
+                      slotProps={{
+                        popper: {
+                          style: { zIndex },
+                        },
                       }}
                     >
                       <IconButton
@@ -1401,10 +1404,11 @@ export function ConsolePopup(props: tProps) {
                           position: 'absolute',
                           right: 6,
                           color: 'white',
+                          fontSize: ICON_FONTSIZE,
                         }}
                         onClick={handleClose}
                       >
-                        <CloseIcon fontSize="small" />
+                        <CloseIcon fontSize="inherit" />
                       </IconButton>
                     </Tooltip>
 
@@ -1413,8 +1417,10 @@ export function ConsolePopup(props: tProps) {
                       enterDelay={500}
                       enterNextDelay={500}
                       title="Open in New Tab"
-                      PopperProps={{
-                        style: { zIndex: zIndex },
+                      slotProps={{
+                        popper: {
+                          style: { zIndex },
+                        },
                       }}
                     >
                       <IconButton
@@ -1422,10 +1428,11 @@ export function ConsolePopup(props: tProps) {
                           position: 'absolute',
                           right: 36,
                           color: 'white',
+                          fontSize: ICON_FONTSIZE,
                         }}
                         onClick={handleLaunch}
                       >
-                        <LaunchIcon fontSize="small" />
+                        <LaunchIcon fontSize="inherit" />
                       </IconButton>
                     </Tooltip>
 
@@ -1434,8 +1441,10 @@ export function ConsolePopup(props: tProps) {
                       enterDelay={500}
                       enterNextDelay={500}
                       title="Fullscreen Toggle"
-                      PopperProps={{
-                        style: { zIndex: zIndex },
+                      slotProps={{
+                        popper: {
+                          style: { zIndex },
+                        },
                       }}
                     >
                       <IconButton
@@ -1443,13 +1452,14 @@ export function ConsolePopup(props: tProps) {
                           position: 'absolute',
                           right: 66,
                           color: 'white',
+                          fontSize: ICON_FONTSIZE,
                         }}
                         onClick={handleMaximizeToggle}
                       >
                         {isMaximizedRef.current ? (
-                          <CloseFullscreenIcon fontSize="small" />
+                          <CloseFullscreenIcon fontSize="inherit" />
                         ) : (
-                          <OpenInFullIcon fontSize="small" />
+                          <OpenInFullIcon fontSize="inherit" />
                         )}
                       </IconButton>
                     </Tooltip>
@@ -1461,8 +1471,10 @@ export function ConsolePopup(props: tProps) {
                   enterDelay={500}
                   enterNextDelay={500}
                   title="Keyboard"
-                  PopperProps={{
-                    style: { zIndex: zIndex },
+                  slotProps={{
+                    popper: {
+                      style: { zIndex },
+                    },
                   }}
                 >
                   <IconButton
@@ -1470,11 +1482,12 @@ export function ConsolePopup(props: tProps) {
                       position: 'absolute',
                       right: isTab ? 36 : 96,
                       color: 'white',
+                      fontSize: ICON_FONTSIZE,
                     }}
                     onClick={handleVirtualKeyboardToggle}
                   >
-                    {!isKeyboardOpen && <KeyboardIcon fontSize="small" />}
-                    {isKeyboardOpen && <KeyboardHideIcon fontSize="small" />}
+                    {!isKeyboardOpen && <KeyboardIcon fontSize="inherit" />}
+                    {isKeyboardOpen && <KeyboardHideIcon fontSize="inherit" />}
                   </IconButton>
                 </Tooltip>
 
@@ -1483,8 +1496,10 @@ export function ConsolePopup(props: tProps) {
                   enterDelay={500}
                   enterNextDelay={500}
                   title="Ctrl-Alt-Del"
-                  PopperProps={{
-                    style: { zIndex: zIndex },
+                  slotProps={{
+                    popper: {
+                      style: { zIndex },
+                    },
                   }}
                 >
                   <IconButton
@@ -1492,10 +1507,11 @@ export function ConsolePopup(props: tProps) {
                       position: 'absolute',
                       right: isTab ? 6 : 126,
                       color: 'white',
+                      fontSize: ICON_FONTSIZE,
                     }}
                     onClick={handleCtrlAltDeleteClick}
                   >
-                    <LoginIcon fontSize="small" />
+                    <LoginIcon fontSize="inherit" />
                   </IconButton>
                 </Tooltip>
 
@@ -1505,8 +1521,10 @@ export function ConsolePopup(props: tProps) {
                     enterDelay={500}
                     enterNextDelay={500}
                     title="Copy to Clipboard"
-                    PopperProps={{
-                      style: { zIndex: zIndex },
+                    slotProps={{
+                      popper: {
+                        style: { zIndex },
+                      },
                     }}
                   >
                     <IconButton
@@ -1514,10 +1532,11 @@ export function ConsolePopup(props: tProps) {
                         position: 'absolute',
                         right: isTab ? 66 : 156,
                         color: 'white',
+                        fontSize: ICON_FONTSIZE,
                       }}
                       onClick={handleLocalClipboardPaste}
                     >
-                      <ContentPasteGoIcon fontSize="small" />
+                      <ContentPasteGoIcon fontSize="inherit" />
                     </IconButton>
                   </Tooltip>
                 )}

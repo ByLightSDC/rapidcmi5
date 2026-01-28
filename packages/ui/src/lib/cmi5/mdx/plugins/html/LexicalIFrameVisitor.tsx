@@ -18,7 +18,6 @@ export const LexicalIFrameVisitor: LexicalExportVisitor<
       attributes: lexicalNode.getAttributes(),
       children: [],
     };
-
     actions.appendToParent(mdastParent, md);
   },
   priority: 1000,

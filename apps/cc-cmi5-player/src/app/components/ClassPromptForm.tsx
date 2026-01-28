@@ -3,14 +3,9 @@
 import { UseFormReturn } from 'react-hook-form';
 
 import * as yup from 'yup';
-import { NAME_GROUP } from '@rapid-cmi5/ui';
 
 /* Branded */
-import {
-  FormControlTextField,
-  FormStateType,
-  SharedFormWithProvider,
-} from '@rapid-cmi5/ui';
+
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
@@ -19,14 +14,12 @@ import Grid from '@mui/material/Grid2';
 //import { defaultPostPutData, navId } from './constants';
 
 /* API Topic */
-import {
-  Topic,
-  usePostInitializeCMI5Scenarios,
-} from '@rapid-cmi5/ui';
+
 
 import { ClassEntry, defaultClassEntryData } from '../session/constants';
 import { useEffect } from 'react';
-import { FormCrudType } from '@rapid-cmi5/ui';
+import { FormCrudType, NAME_GROUP, FormStateType, FormControlTextField, SharedFormWithProvider } from '@rapid-cmi5/ui';
+import { Topic, usePostInitializeCMI5Scenarios } from '@rangeos-nx/frontend/clients/hooks';
 
 /**
  * @typedef {Object} tFormProps

@@ -34,6 +34,7 @@ export type SerializedVideoNode = Spread<
     height?: number;
     src: string;
     rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
+    videoId?: string; // Unique persistent ID for animation targeting
     type: 'video';
     version: 1;
   },
@@ -53,18 +54,20 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
   __width: 'inherit' | number;
   /** @internal */
   __height: 'inherit' | number;
+  /** @internal */
+  __videoId: string; // Unique persistent ID for animation targeting
 
   /** @internal */
   __rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
 
   /** @internal */
-  static override getType(): string {
+  static getType(): string {
     return 'video';
   }
 
   /** @internal */
-  static override clone(node: VideoNode): VideoNode {
-    return new VideoNode(
+  static clone(node: VideoNode): VideoNode {
+    const cloned = new VideoNode(
       node.__src,
       node.__title,
       node.__width,
@@ -72,23 +75,26 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
       node.__rest,
       node.__key,
     );
+    cloned.__videoId = node.__videoId; // Preserve videoId on clone
+    return cloned;
   }
 
   /** @internal */
-  static override importJSON(serializedNode: SerializedVideoNode): VideoNode {
-    const { title, src, width, rest, height } = serializedNode;
+  static importJSON(serializedNode: SerializedVideoNode): VideoNode {
+    const { title, src, width, rest, height, videoId } = serializedNode;
     const node = $createVideoNode({
       title,
       src,
       height,
       width,
       rest,
+      videoId, // Restore videoId from saved state
     });
     return node;
   }
 
   /** @internal */
-  override exportDOM(): DOMExportOutput {
+  exportDOM(): DOMExportOutput {
     const element = document.createElement('video');
     element.setAttribute('src', this.__src);
     element.setAttribute('controls', 'true');
@@ -105,7 +111,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  static override importDOM(): DOMConversionMap | null {
+  static importDOM(): DOMConversionMap | null {
     return {
       video: () => ({
         conversion: convertVideoElement,
@@ -125,6 +131,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
     height?: 'inherit' | number,
     rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[],
     key?: NodeKey,
+    videoId?: string,
   ) {
     super(key);
     this.__src = src;
@@ -132,16 +139,29 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
     this.__width = width ? width : 'inherit';
     this.__height = height ? height : 'inherit';
     this.__rest = rest ?? [];
+    // Generate or restore unique videoId for animation targeting
+    this.__videoId = videoId || this.generateVideoId();
   }
 
   /** @internal */
-  override exportJSON(): SerializedVideoNode {
+  private generateVideoId(): string {
+    // Use crypto.randomUUID() if available, otherwise fallback to timestamp + random
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    // Fallback for older browsers
+    return `vid-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  /** @internal */
+  exportJSON(): SerializedVideoNode {
     return {
       title: this.getTitle(),
       height: this.__height === 'inherit' ? 0 : this.__height,
       width: this.__width === 'inherit' ? 0 : this.__width,
       src: this.getSrc(),
       rest: this.__rest,
+      videoId: this.__videoId, // Save videoId for persistence
       type: 'video',
       version: 1,
     };
@@ -160,7 +180,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  override createDOM(config: EditorConfig): HTMLElement {
+  createDOM(config: EditorConfig): HTMLElement {
     const span = document.createElement('span');
     const theme = config.theme;
     const className = theme.video;
@@ -171,7 +191,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  override updateDOM(): false {
+  updateDOM(): false {
     return false;
   }
 
@@ -195,6 +215,10 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
     return this.__rest;
   }
 
+  getVideoId(): string {
+    return this.__videoId;
+  }
+
   setTitle(title: string | undefined): void {
     this.getWritable().__title = title;
   }
@@ -211,15 +235,14 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
 
   /** @internal */
   shouldBeSerializedAsElement(): boolean {
-    return (
-      this.__width !== 'inherit' ||
-      this.__height !== 'inherit' ||
-      this.__rest.length > 0
-    );
+    // ALWAYS serialize as HTML element to preserve videoId for animations!
+    // Previously only returned true for videos with custom dimensions or attributes,
+    // but we need the data-video-id attribute on ALL videos for animation persistence.
+    return true;
   }
 
   /** @internal */
-  override decorate(_parentEditor: LexicalEditor): JSX.Element {
+  decorate(_parentEditor: LexicalEditor): JSX.Element {
     return (
       <VideoEditor
         src={this.getSrc()}
@@ -228,6 +251,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
         width={this.__width}
         height={this.__height}
         rest={this.__rest}
+        videoId={this.__videoId}
       />
     );
   }
@@ -244,6 +268,7 @@ export interface CreateVideoNodeParameters {
   key?: NodeKey;
   rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   src: string;
+  videoId?: string;
 }
 
 /**
@@ -252,8 +277,8 @@ export interface CreateVideoNodeParameters {
  * @group Video
  */
 export function $createVideoNode(params: CreateVideoNodeParameters): VideoNode {
-  const { title, src, key, width, height, rest } = params;
-  return new VideoNode(src, title, width, height, rest, key);
+  const { title, src, key, width, height, rest, videoId } = params;
+  return new VideoNode(src, title, width, height, rest, key, videoId);
 }
 
 /**

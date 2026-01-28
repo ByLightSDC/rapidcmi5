@@ -1,23 +1,30 @@
 import { useEffect } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { usePublisher, useRealm } from '@mdxeditor/gurx';
-import { slideAnimations$, setAnimations$ } from '../state/animationCells';
+import {
+  slideAnimations$,
+  setAnimations$,
+  currentSlideIndex$,
+} from '../state/animationCells';
 import { resolveAnimations } from '../utils/stableIdentifiers';
 import { resolveDirectiveAnimations } from '../utils/directiveResolver';
 import { updateAnimationIndicators } from '../utils/updateAnimationIndicators';
-import { addAnimationIdsToElements } from '../utils/lexicalDomBridge';
-import { debugLog } from '@rapid-cmi5/ui';
+import { slideAnimationsForDirectives$, debugLog } from '@rapid-cmi5/ui';
 
 /**
  * Internal component that resolves animation IDs to current node keys when loading from markdown
  *
- * ARCHITECTURE (prevents infinite loop):
+ * ARCHITECTURE V2 (self-sufficient directives):
  * - Subscribes to setAnimations$ signal (one-time load events from markdown)
  * - Resolves directiveId/stableId → targetNodeKey using editor state
- * - Publishes resolved animations DIRECTLY to slideAnimations$ cell
- * - Does NOT observe slideAnimations$ cell (that would create infinite loop)
+ * - Publishes resolved animations to BOTH:
+ *   1. slideAnimations$ cell (for app layer / drawer)
+ *   2. slideAnimationsForDirectives$ cell (for directive components to read order)
+ * - Directives subscribe to slideAnimationsForDirectives$ and display order directly
+ * - No more DOM attribute bridging for order numbers!
+ * - updateAnimationIndicators() still sets hover/selection/disabled states
  *
- * Flow: markdown → setAnimations$ signal → AnimationResolver → slideAnimations$ cell
+ * Flow: markdown → setAnimations$ signal → AnimationResolver → slideAnimations$ + slideAnimationsForDirectives$ → Directives
  */
 export function AnimationResolver() {
   const [editor] = useLexicalComposerContext();
@@ -27,22 +34,48 @@ export function AnimationResolver() {
   useEffect(() => {
     // Keep indicators in sync with ANY change to slideAnimations$ (adds/reorders/deletes)
     const unsubscribeIndicators = realm.sub(slideAnimations$, (animations) => {
-      // Small async defer to ensure DOM updates settle before tagging
-      setTimeout(() => updateAnimationIndicators(animations), 0);
+      // NEW ARCHITECTURE: Publish to slideAnimationsForDirectives$ cell
+      // This allows directives to read order directly instead of via DOM attributes
+      realm.pub(slideAnimationsForDirectives$, animations);
+
+      // Defer to next frame to ensure directive components have rendered and set their attributes
+      requestAnimationFrame(() => {
+        updateAnimationIndicators(animations);
+      });
     });
 
     // Subscribe to setAnimations$ signal and handle resolution
-    const unsubscribe = realm.sub(setAnimations$, (rawAnimations) => {
+    const unsubscribe = realm.sub(setAnimations$, (payload) => {
+      // CRITICAL: Validate slideIndex to prevent cross-slide contamination
+      const payloadSlideIndex = payload?.slideIndex ?? -1;
+      const currentSlideInRealm = realm.getValue(currentSlideIndex$);
+
       debugLog(
-        `📥 AnimationResolver received setAnimations$ signal with ${rawAnimations.length} items`,
+        `📥 AnimationResolver received setAnimations$ signal for slide ${payloadSlideIndex}`,
+        undefined,
+        undefined,
+        'plugin',
       );
 
-      // Re-tag DOM elements with animation IDs whenever animations are loaded (e.g., slide switch)
-      // This ensures elements can be selected for animations on the new slide
-      setTimeout(() => {
-        addAnimationIdsToElements(editor);
-        debugLog('🔄 Re-tagged animation IDs after loading animations');
-      }, 150);
+      // Reject stale signals from previous slides
+      if (payloadSlideIndex !== currentSlideInRealm) {
+        debugLog(
+          `⚠️ REJECTED stale setAnimations$ signal: payload slide=${payloadSlideIndex}, current slide=${currentSlideInRealm}`,
+          { payloadCount: payload?.animations?.length ?? 0 },
+          undefined,
+          'plugin',
+        );
+        return; // IGNORE this signal - it's from a stale editor instance
+      }
+
+      const rawAnimations = payload?.animations ?? [];
+
+      debugLog(
+        `📥 AnimationResolver processing setAnimations$ signal with ${rawAnimations.length} items for slide ${payloadSlideIndex}`,
+        undefined,
+        undefined,
+        'plugin',
+      );
 
       // If empty, just clear the cell
       if (rawAnimations.length === 0) {
@@ -61,11 +94,7 @@ export function AnimationResolver() {
           '✅ Animations have no IDs to resolve, passing through without resolution',
         );
         publishSlideAnimations(rawAnimations);
-
-        // Still update indicators
-        setTimeout(() => {
-          updateAnimationIndicators(rawAnimations);
-        }, 100);
+        updateAnimationIndicators(rawAnimations);
         return;
       }
 
@@ -83,14 +112,14 @@ export function AnimationResolver() {
       // Publish resolved animations to the cell
       debugLog(
         `📤 Publishing ${resolved.length} resolved animations to slideAnimations$ cell`,
+        undefined,
+        undefined,
+        'plugin',
       );
       publishSlideAnimations(resolved);
 
       // Update visual indicators
-      setTimeout(() => {
-        debugLog('🔄 Updating animation indicators');
-        updateAnimationIndicators(resolved);
-      }, 100);
+      updateAnimationIndicators(resolved);
     });
 
     return () => {

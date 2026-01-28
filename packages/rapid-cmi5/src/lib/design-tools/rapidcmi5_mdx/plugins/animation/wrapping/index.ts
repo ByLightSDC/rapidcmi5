@@ -1,19 +1,18 @@
 /**
- * Phase 5.1: Animation Wrapping Module
+ * Animation Wrapping Module (Refactored)
  *
  * Exports utilities for selecting and wrapping content with animation directives
+ *
+ * NEW: Uses wrapSelectionOrBlock pattern from InsertLayoutBox
+
  */
 
 // Core utilities
 export { SelectionValidator } from './SelectionValidator';
-export { MdastExtractor } from './MdastExtractor';
 export { DirectiveWrapper } from './DirectiveWrapper';
 
 // Types
-export type {
-  SelectionInfo,
-  ValidationResult,
-} from './types/Selection.types';
+export type { SelectionInfo, ValidationResult } from './types/Selection.types';
 
 export type {
   WrapOptions,

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-
 /* MUI */
 import Divider, { DividerProps } from '@mui/material/Divider';
 import Grid from '@mui/material/Grid2';

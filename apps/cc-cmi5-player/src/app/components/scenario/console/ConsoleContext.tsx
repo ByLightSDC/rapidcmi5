@@ -124,6 +124,7 @@ export function ConsoleProvider(props: tProviderProps) {
     resizeMethod: string | null | undefined,
     protocol: string | null,
     overrideRangeId?: string,
+    overrideScenarioId?: string,
   ) => {
     // don't add the window if it is already open, but center it in the browser
     if (ConsoleWindowManager.isWindowAlreadyOpen(connectionId)) {
@@ -161,7 +162,7 @@ export function ConsoleProvider(props: tProviderProps) {
           protocol={protocol}
           // Note: unable to use the token we already use for API calls. must grab new
           // app. However, if you pass an empty string, a new token will be grabbed.
-          scenarioId={scenarioId}
+          scenarioId={overrideScenarioId || scenarioId}
           token=""
         />,
       );

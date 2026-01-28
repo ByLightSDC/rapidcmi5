@@ -14,11 +14,21 @@ import {
 
 import FormatColorTextIcon from '@mui/icons-material/FormatColorText';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { ColorSelectionPopover } from './ColorSelectionPopover';
-import { TEXT_PRESET_COLORS } from '../constants';
+import { TEXT_PRESET_COLORS } from '@rapid-cmi5/ui';
+import { ColorSelectionPopover } from 'packages/ui/src/lib/colors/ColorSelectionPopover';
+
 
 const DEFAULT_COLOR = '#FFFFFF';
 export const textColorLast$ = Cell<string>(DEFAULT_COLOR);
+export const buttonWithTooltipStyle = {
+  width: '10px',
+  minWidth: 0,
+  padding: 0,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  lineHeight: 1,
+};
 
 /**
  * Displays two buttons:
@@ -86,14 +96,9 @@ export function ColorTextSplitButton() {
   return (
     <>
       <ButtonWithTooltip
-        title={
-          showDefaultIcon
-            ? 'Apply text color'
-            : `Apply text color (${lastColor})`
-        }
+        title="Change text color"
         onClick={handleMainClick}
         disabled={disabled}
-        aria-label="Apply text color"
       >
         <FormatColorTextIcon
           fontSize="small"
@@ -102,10 +107,9 @@ export function ColorTextSplitButton() {
       </ButtonWithTooltip>
 
       <ButtonWithTooltip
-        title="Choose text color"
+        title="Select text color"
         onClick={openPicker}
         disabled={disabled}
-        aria-label="Open text color menu"
         style={{
           width: '10px',
           minWidth: 0,

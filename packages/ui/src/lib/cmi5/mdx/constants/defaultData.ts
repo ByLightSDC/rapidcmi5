@@ -1,20 +1,5 @@
-import {
-  CourseAU,
-  CourseData,
-  CTFContent,
-  DownloadFilesContent,
-  JobeContent,
-  MoveOnCriteriaEnum,
-  QuestionGrading,
-  QuestionResponse,
-  QuizCompletionEnum,
-  QuizContent,
-  RC5ScenarioContent,
-  ScenarioContent,
-  SlideTypeEnum,
-  TeamConsolesContent,
-} from '@rapid-cmi5/cmi5-build-common';
-import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import { SlideTypeEnum, CourseAU, JobeContent, MoveOnCriteriaEnum, QuestionResponse, QuestionGrading, ScenarioContent, CourseData, QuizContent, QuizCompletionEnum, CTFContent, DownloadFilesContent, RC5ScenarioContent, TeamConsolesContent, RC5ActivityTypeEnum } from "@rapid-cmi5/cmi5-build-common";
+
 
 export const jsonFormatSpaces = 1;
 
@@ -46,6 +31,8 @@ export const defaultCreateCourseData = {
   courseId: 'https://',
   firstAuName: 'Introduction',
   importCmi5Zip: false,
+  useAi: false,
+  aiPrompt: '',
 };
 
 export const defaultCreateLessonData = {
@@ -59,7 +46,7 @@ export const defaultCloneRepoData = {
   repoUsername: '',
   repoPassword: '',
   authorName: '',
-  authorEmail: ''
+  authorEmail: '',
 };
 
 export const defaultImportRepoZipData = {

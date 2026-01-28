@@ -11,23 +11,17 @@ import {
   updateLink$,
   useCellValues,
   usePublisher,
+  viewMode$,
 } from '@mdxeditor/editor';
-
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import * as yup from 'yup';
-import {
-  ButtonTooltip,
-  debugLog,
-  editorInPlayback$,
-  FormControlTextField,
-  FormControlUIProvider,
-  FormStateType,
-  MiniForm,
-  ModalDialog,
-} from '@rapid-cmi5/ui';
+
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import Grid from '@mui/material/Grid2';
 
 import { UseFormReturn } from 'react-hook-form';
+
+/* MUI */
+import Grid from '@mui/material/Grid2';
 import { IconButton, Stack } from '@mui/material';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
@@ -40,6 +34,10 @@ import EditIcon from '@mui/icons-material/Edit';
 
 import { $setSelection } from 'lexical';
 import { useClickOutside } from './useClickOutside';
+import RC5LinkEditor from './RC5LinkEditor';
+import { useSelector } from 'react-redux';
+import { editorInPlayback$, debugLog, FormStateType, FormControlTextField, ModalDialog, FormControlUIProvider, MiniForm, delay } from '@rapid-cmi5/ui';
+import { currentSlideNum } from 'packages/rapid-cmi5/src/lib/redux/courseBuilderReducer';
 
 /**
  * Dialog for previewing and editing links in MdxEditor
@@ -48,13 +46,21 @@ import { useClickOutside } from './useClickOutside';
 export const RC5LinkDialog: React.FC = () => {
   const theme = useTheme();
 
-  const [activeEditor, linkDialogState, isPlayback, currentSelection] =
-    useCellValues(
-      activeEditor$,
-      linkDialogState$,
-      editorInPlayback$,
-      currentSelection$,
-    );
+  const [
+    activeEditor,
+    linkDialogState,
+    isPlayback,
+    currentSelection,
+    viewMode,
+  ] = useCellValues(
+    activeEditor$,
+    linkDialogState$,
+    editorInPlayback$,
+    currentSelection$,
+    viewMode$,
+  );
+  const currentSlideIndex = useSelector(currentSlideNum); //would be better to detect lexical refresh
+  const [editor] = useLexicalComposerContext();
   const publishWindowChange = usePublisher(onWindowChange$);
   const updateLinkDialogState = usePublisher(linkDialogState$);
   const updateLink = usePublisher(updateLink$);
@@ -65,10 +71,10 @@ export const RC5LinkDialog: React.FC = () => {
   const removeLink = usePublisher(removeLink$);
 
   const ref = useRef<HTMLDivElement>(null);
-  const mouseDownRef = useRef<number>(0);
+  const mouseDownRef = useRef<number>(-1);
 
   const secondsSincePreviewTrigger = useRef<number>(0);
-  const [copyUrlTooltipOpen, setCopyUrlTooltipOpen] = useState(false);
+
   const theURL = linkDialogState?.type === 'preview' ? linkDialogState.url : '';
   const urlIsExternal =
     linkDialogState?.type === 'preview' && theURL.startsWith('http');
@@ -155,6 +161,22 @@ export const RC5LinkDialog: React.FC = () => {
     secondsSincePreviewTrigger.current = Date.now();
   }, [currentSelection]);
 
+  /** UE set linkDialogState to inactive
+   * this addresses a bug due to lexical focusing last element in the view
+   * focusing a link triggers linkDialogState active
+   * which causes the link display to appear
+   */
+  useEffect(() => {
+    debugLog('set link state to inactive');
+    const hideLink = async () => {
+      await delay(100);
+      updateLinkDialogState({
+        type: 'inactive',
+      });
+    };
+    hideLink();
+  }, [viewMode, updateLinkDialogState, currentSlideIndex]);
+
   //nothing to display
 
   if (linkDialogState.type === 'inactive') return null;
@@ -237,7 +259,7 @@ export const RC5LinkDialog: React.FC = () => {
           <MiniForm
             dataCache={linkDialogState}
             doAction={(req: EditLinkDialog) => {
-              updateLink({text: req.title, title: req.title, url: req.url});
+              updateLink({ text: req.title, title: req.title, url: req.url });
             }}
             formTitle="Link"
             getFormFields={getFormFields}
@@ -250,83 +272,17 @@ export const RC5LinkDialog: React.FC = () => {
         </FormControlUIProvider>
       </ModalDialog>
       {/* preview link */}
-      <Popper
-        open={linkDialogState.type === 'preview' && !isPlayback}
-        anchorEl={virtualElement}
-        autoFocus={true}
-        placement={'bottom-start'}
-      >
-        <div
-          key={linkDialogState.linkNodeKey}
-          ref={ref}
-          className="paper-form"
-          style={{
-            backgroundColor: theme.palette['background']['paper'],
-            borderStyle: 'solid',
-            // borderColor: (theme as CustomTheme).input.outlineColor,
-            borderWidth: '1px',
-            padding: '8px',
-            display: 'flex',
-            justifyContent: 'flex-start',
-            alignContent: 'flex-start',
-            alignItems: 'flex-start',
-            flexDirection: 'row',
-            marginTop: '20px',
-          }}
-        >
-          <a
-            href={linkDialogState.url}
-            {...(urlIsExternal ? { target: '_blank', rel: 'noreferrer' } : {})}
-            //title={`Open ${linkDialogState.url} in new window`}
-            title=""
-          >
-            <span>{linkDialogState.url}</span>
-            {urlIsExternal && (
-              <IconButton>
-                <ButtonTooltip title="Open Link">
-                  <LaunchIcon />
-                </ButtonTooltip>
-              </IconButton>
-            )}
-          </a>
-          <Stack direction="row" sx={{ marginLeft: '48px' }}>
-            <IconButton
-              onMouseUp={(e) => {
-                onEditLink();
-              }}
-            >
-              <ButtonTooltip title="Edit Link">
-                <EditIcon />
-              </ButtonTooltip>
-            </IconButton>
-            <IconButton
-              onClick={() => {
-                window.navigator.clipboard
-                  .writeText(linkDialogState.url)
-                  .then(() => {
-                    setCopyUrlTooltipOpen(true);
-                    setTimeout(() => {
-                      setCopyUrlTooltipOpen(false);
-                    }, 1000);
-                  });
-              }}
-            >
-              <ButtonTooltip title="Copy Link">
-                <FileCopyIcon />
-              </ButtonTooltip>
-            </IconButton>
-            <IconButton
-              onClick={() => {
-                onRemoveLink();
-              }}
-            >
-              <ButtonTooltip title="Remove Link">
-                <LinkOffIcon />
-              </ButtonTooltip>
-            </IconButton>
-          </Stack>
-        </div>
-      </Popper>
+      <RC5LinkEditor
+        isOpen={linkDialogState.type === 'preview' && !isPlayback}
+        onEditLink={onEditLink}
+        onRemoveLink={onRemoveLink}
+        linkNodeKey={linkDialogState.linkNodeKey}
+        ref={ref}
+        url={linkDialogState.url}
+        urlIsExternal={urlIsExternal}
+        virtualElement={virtualElement}
+      />
+      {/* playback link */}
       <Popper
         open={linkDialogState.type === 'preview' && isPlayback}
         anchorEl={virtualElement}

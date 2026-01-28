@@ -1,10 +1,8 @@
-import {
-  useQueryDetails,
-  Topic,
-  useGetRangeResourceAutoGraders,
-} from '@rapid-cmi5/ui';
+
 import { useState } from 'react';
 import AutograderSubscription from '../subscriptions/AutograderSubscription';
+import { Topic, useGetRangeResourceAutoGraders } from '@rangeos-nx/frontend/clients/hooks';
+import { useQueryDetails } from '@rapid-cmi5/ui';
 
 /**
  * Queries graph for vm updates

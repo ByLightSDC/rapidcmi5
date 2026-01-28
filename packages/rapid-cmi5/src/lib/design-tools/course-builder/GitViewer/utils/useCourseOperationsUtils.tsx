@@ -719,11 +719,14 @@ const stripSlideContent = (course: CourseData): CourseData => ({
       // Remove duplicates and map to structured format
       const uniqueKsats = [...new Set(allKsats)];
 
-      return {
+      const auClean: CourseAU = {
         ...au,
-        slides: au.slides.map(({ content, ...rest }) => rest),
+        slides: au.slides.map(({ content, ...rest }) => {
+          return { ...rest, content: '' };
+        }),
         ksats: uniqueKsats,
       };
+      return auClean;
     }),
   })),
 });

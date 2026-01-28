@@ -17,7 +17,13 @@ import {
   createEditor,
 } from 'lexical';
 import * as Mdast from 'mdast';
-import React, { ElementType, useEffect, useState } from 'react';
+import React, {
+  ElementType,
+  useEffect,
+  useState,
+  useRef,
+  useLayoutEffect,
+} from 'react';
 import { TableNode } from './TableNode';
 
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -51,8 +57,8 @@ import {
 } from '@mdxeditor/editor';
 import { useCellValues } from '@mdxeditor/gurx';
 
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ColorPickerButton from './ColorPickerButton';
+import { TableStyleDialog } from './TableStyleDialog';
 
 // helper to extract background color
 const getBackgroundColor = (cell: any): string => {
@@ -63,6 +69,63 @@ const getBackgroundColor = (cell: any): string => {
     if (match) return match[1].trim();
   }
   return 'transparent';
+};
+
+/**
+ * Parses a CSS string to find table styles (border and radius).
+ * Returns a React.CSSProperties object.
+ */
+const getTableStyles = (
+  styleString: string | undefined,
+): React.CSSProperties | undefined => {
+  if (!styleString) return undefined;
+
+  const styles: React.CSSProperties = {};
+
+  // 1. Extract Border
+  let borderShorthand = undefined;
+
+  const widthMatch = styleString.match(/border-width:\s*([^;]+)/i);
+  const styleMatch = styleString.match(/border-style:\s*([^;]+)/i);
+  const colorMatch = styleString.match(/border-color:\s*([^;]+)/i);
+
+  if (widthMatch || styleMatch || colorMatch) {
+    const w = widthMatch ? widthMatch[1].trim() : '0px';
+    const s = styleMatch ? styleMatch[1].trim() : 'solid';
+    const c = colorMatch ? colorMatch[1].trim() : 'transparent';
+
+    // Only apply if width is non-zero
+    if (parseFloat(w) !== 0) {
+      borderShorthand = `${w} ${s} ${c}`;
+    }
+  } else {
+    // Fallback to shorthand
+    const shorthandMatch = styleString.match(/border:\s*([^;]+)/i);
+    if (shorthandMatch) {
+      borderShorthand = shorthandMatch[1].trim();
+    }
+  }
+
+  if (borderShorthand) {
+    styles.border = borderShorthand;
+  }
+
+  // 2. Extract Radius
+  const radiusMatch = styleString.match(/border-radius:\s*([^;]+)/i);
+  if (radiusMatch) {
+    styles.borderRadius = radiusMatch[1].trim();
+    styles.borderCollapse = 'separate';
+    styles.borderSpacing = '0';
+    styles.overflow = 'hidden';
+  }
+
+  // 3. Extract Shadow
+  const shadowMatch = styleString.match(/box-shadow:\s*([^;]+)/i);
+  if (shadowMatch) {
+    styles.boxShadow = shadowMatch[1].trim();
+  }
+
+  return Object.keys(styles).length > 0 ? styles : undefined;
 };
 
 /**
@@ -91,10 +154,10 @@ export interface TableEditorProps {
 }
 
 export const TableEditor: React.FC<TableEditorProps> = ({
-                                                          mdastNode,
-                                                          parentEditor,
-                                                          lexicalTable,
-                                                        }) => {
+  mdastNode,
+  parentEditor,
+  lexicalTable,
+}) => {
   const [activeCell, setActiveCell] = React.useState<[number, number] | null>(
     null,
   );
@@ -231,12 +294,120 @@ export const TableEditor: React.FC<TableEditorProps> = ({
     console.log('lexicalTable', lexicalTable);
   }, []);
 
+  // get styles to apply to the table
+  const tableStyle = mdastNode.data?.hProperties?.style as string | undefined;
+
+  // Calculate computed styles (including border and radius)
+  const computedTableStyle = getTableStyles(tableStyle);
+
+  // Extract parts for cell perimeter logic
+  const fullBorderStyle = computedTableStyle?.border as string | undefined;
+  const borderRadius = computedTableStyle?.borderRadius as string | undefined;
+  const fullShadowStyle = computedTableStyle?.boxShadow as string | undefined;
+
+  // Determine styles for the <table> element
+  // In Edit mode, we strip border/shadow properties so they don't wrap the tool headers.
+  const tableElementStyle = React.useMemo(() => {
+    if (!computedTableStyle) return undefined;
+    if (readOnly) return computedTableStyle;
+
+    const editModeStyle = { ...computedTableStyle };
+    delete editModeStyle.border;
+    delete editModeStyle.borderWidth;
+    delete editModeStyle.borderStyle;
+    delete editModeStyle.borderColor;
+    delete editModeStyle.boxShadow;
+    return editModeStyle;
+  }, [readOnly, computedTableStyle]);
+
+  // --- Shadow Underlay Logic ---
+  const tableRef = useRef<HTMLTableElement>(null);
+  const [dataArea, setDataArea] = useState<{
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  } | null>(null);
+
+  useLayoutEffect(() => {
+    if (readOnly || !tableRef.current) return;
+
+    const measure = () => {
+      if (!tableRef.current) return;
+      const table = tableRef.current;
+
+      const thead = table.querySelector('thead');
+      const tfoot = table.querySelector('tfoot');
+
+      // 1. Top/Bottom offsets (Header/Footer UI)
+      const topOffset = thead ? thead.offsetHeight : 0;
+      const bottomOffset = tfoot ? tfoot.offsetHeight : 0;
+
+      // 2. Left/Right offsets (Tool Columns)
+      // We inspect the first row of the body to find the tool cells
+      const firstRow = table.querySelector('tbody tr:first-child');
+      let leftOffset = 0;
+      let rightOffset = 0;
+
+      if (firstRow) {
+        const firstCell = firstRow.firstElementChild as HTMLElement;
+        const lastCell = firstRow.lastElementChild as HTMLElement;
+
+        // Left Tool Cell: usually has 'data-tool-cell' attribute
+        if (firstCell && firstCell.hasAttribute('data-tool-cell')) {
+          leftOffset = firstCell.offsetWidth;
+        }
+
+        // Right Tool Cell (Add Column Button): also has 'data-tool-cell'
+        // We ensure it's not the same as the first cell (in case of 1 column + no tools, unlikely but safe)
+        if (
+          lastCell &&
+          lastCell !== firstCell &&
+          lastCell.hasAttribute('data-tool-cell')
+        ) {
+          rightOffset = lastCell.offsetWidth;
+        }
+      }
+
+      setDataArea({
+        top: topOffset,
+        left: leftOffset,
+        width: table.offsetWidth - leftOffset - rightOffset,
+        height: table.offsetHeight - topOffset - bottomOffset,
+      });
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(tableRef.current);
+
+    return () => observer.disconnect();
+  }, [readOnly, mdastNode]);
+
   // remove tool cols in readOnly mode
   return (
-    // eslint-disable-next-line react/jsx-no-useless-fragment
-    <>
+    <div style={{ position: 'relative' }}>
+      {/* Shadow Underlay - Only in Edit Mode */}
+      {!readOnly && fullShadowStyle && dataArea && (
+        <div
+          style={{
+            position: 'absolute',
+            top: dataArea.top,
+            left: dataArea.left,
+            width: dataArea.width,
+            height: dataArea.height,
+            boxShadow: fullShadowStyle,
+            borderRadius: borderRadius,
+            pointerEvents: 'none',
+            zIndex: 0, // Behind the table cells
+          }}
+        />
+      )}
+
       <table
+        ref={tableRef}
         className={styles.tableEditor}
+        style={{ ...tableElementStyle, position: 'relative', zIndex: 1 }}
         onMouseOver={onTableMouseOver}
         onMouseLeave={() => {
           setHighlightedCoordinates([-1, -1]);
@@ -262,136 +433,198 @@ export const TableEditor: React.FC<TableEditorProps> = ({
 
             {readOnly || (
               <thead>
-              <tr>
-                <th className={styles.tableToolsColumn}></th>
-                {Array.from(
-                  { length: mdastNode.children[0].children.length },
-                  (_, colIndex) => {
-                    return (
-                      <th key={colIndex} data-tool-cell={true}>
-                        <ColumnEditor
-                          {...{
-                            setActiveCellWithBoundaries,
-                            parentEditor,
-                            colIndex,
-                            highlightedCoordinates,
-                            lexicalTable,
-                            align: (mdastNode.align ?? [])[colIndex],
-                          }}
-                        />
-                      </th>
-                    );
-                  },
-                )}
+                <tr>
+                  <th className={styles.tableToolsColumn}></th>
+                  {Array.from(
+                    { length: mdastNode.children[0].children.length },
+                    (_, colIndex) => {
+                      return (
+                        <th key={colIndex} data-tool-cell={true}>
+                          <ColumnEditor
+                            {...{
+                              setActiveCellWithBoundaries,
+                              parentEditor,
+                              colIndex,
+                              highlightedCoordinates,
+                              lexicalTable,
+                              align: (mdastNode.align ?? [])[colIndex],
+                            }}
+                          />
+                        </th>
+                      );
+                    },
+                  )}
 
-                <th className={styles.tableToolsColumn} data-tool-cell={true}>
-                  <button
-                    className={styles.iconButton}
-                    type="button"
-                    title={t('table.deleteTable', 'Delete table')}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      parentEditor.update(() => {
-                        lexicalTable.selectNext();
-                        lexicalTable.remove();
-                      });
-                    }}
-                  >
-                    {iconComponentFor('delete_small')}
-                  </button>
-                </th>
-              </tr>
+                  <th className={styles.tableToolsColumn} data-tool-cell={true}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <TableSettingsButton
+                        parentEditor={parentEditor}
+                        lexicalTable={lexicalTable}
+                      />
+                      <button
+                        className={styles.iconButton}
+                        type="button"
+                        title={t('table.deleteTable', 'Delete table')}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          parentEditor.update(() => {
+                            lexicalTable.selectNext();
+                            lexicalTable.remove();
+                          });
+                        }}
+                      >
+                        {iconComponentFor('delete_small')}
+                      </button>
+                    </div>
+                  </th>
+                </tr>
               </thead>
             )}
 
             <tbody>
-            {mdastNode.children.map((row, rowIndex) => {
-              const CellElement = getCellType(rowIndex);
-              return (
-                <tr key={rowIndex}>
-                  {readOnly || (
-                    <CellElement
-                      className={styles.toolCell}
-                      data-tool-cell={true}
-                    >
-                      <RowEditor
-                        {...{
-                          setActiveCellWithBoundaries,
-                          parentEditor,
-                          rowIndex,
-                          highlightedCoordinates,
-                          lexicalTable,
-                        }}
-                      />
-                    </CellElement>
-                  )}
-                  {row.children.map((mdastCell, colIndex) => {
-                    // START CHANGE: Use helper to extract color
-                    const dynamicColor = getBackgroundColor(mdastCell);
-                    // END CHANGE
+              {mdastNode.children.map((row, rowIndex) => {
+                const CellElement = getCellType(rowIndex);
+                // Identify row edges for border application
+                const isFirstRow = rowIndex === 0;
+                const isLastRow = rowIndex === mdastNode.children.length - 1;
 
-                    return (
-                      <Cell
-                        align={mdastNode.align?.[colIndex]}
-                        cellBackgroundColor={dynamicColor}
-                        key={getCellKey(mdastCell)}
-                        contents={mdastCell.children}
-                        setActiveCell={setActiveCellWithBoundaries}
-                        {...{
-                          rowIndex,
-                          colIndex,
-                          lexicalTable,
-                          parentEditor,
-                          activeCell: readOnly ? [-1, -1] : activeCell,
-                        }}
-                      />
-                    );
-                  })}
-                  {readOnly ||
-                    (rowIndex === 0 && (
-                      <th
-                        rowSpan={lexicalTable.getRowCount()}
+                return (
+                  <tr key={rowIndex}>
+                    {readOnly || (
+                      <CellElement
+                        className={styles.toolCell}
                         data-tool-cell={true}
                       >
-                        <button
-                          type="button"
-                          className={styles.addColumnButton}
-                          onClick={addColumnToRight}
+                        <RowEditor
+                          {...{
+                            setActiveCellWithBoundaries,
+                            parentEditor,
+                            rowIndex,
+                            highlightedCoordinates,
+                            lexicalTable,
+                          }}
+                        />
+                      </CellElement>
+                    )}
+                    {row.children.map((mdastCell, colIndex) => {
+                      // Use helper to extract color
+                      const dynamicColor = getBackgroundColor(mdastCell);
+
+                      // Determine if this cell needs perimeter borders (Edit mode only)
+                      const isFirstCol = colIndex === 0;
+                      const isLastCol = colIndex === row.children.length - 1;
+
+                      const perimeterStyle: React.CSSProperties = {};
+
+                      // While editing, we simulate the table border by applying borders to the outer cells.
+                      if (!readOnly) {
+                        // --- 1. Borders ---
+                        if (fullBorderStyle) {
+                          if (isFirstRow)
+                            perimeterStyle.borderTop = fullBorderStyle;
+                          if (isLastRow)
+                            perimeterStyle.borderBottom = fullBorderStyle;
+                          if (isFirstCol)
+                            perimeterStyle.borderLeft = fullBorderStyle;
+                          if (isLastCol)
+                            perimeterStyle.borderRight = fullBorderStyle;
+                        }
+
+                        // --- 2. Radius ---
+                        if (borderRadius) {
+                          if (isFirstRow && isFirstCol)
+                            perimeterStyle.borderTopLeftRadius = borderRadius;
+                          if (isFirstRow && isLastCol)
+                            perimeterStyle.borderTopRightRadius = borderRadius;
+                          if (isLastRow && isFirstCol)
+                            perimeterStyle.borderBottomLeftRadius =
+                              borderRadius;
+                          if (isLastRow && isLastCol)
+                            perimeterStyle.borderBottomRightRadius =
+                              borderRadius;
+
+                          // Clip background at corners
+                          if (
+                            (isFirstRow || isLastRow) &&
+                            (isFirstCol || isLastCol)
+                          ) {
+                            perimeterStyle.overflow = 'hidden';
+                          }
+                        }
+                        // --- 3. Shadow is handled by underlay ---
+                      }
+
+                      return (
+                        <Cell
+                          align={mdastNode.align?.[colIndex]}
+                          cellBackgroundColor={dynamicColor}
+                          perimeterStyle={perimeterStyle} // Pass style
+                          key={getCellKey(mdastCell)}
+                          contents={mdastCell.children}
+                          setActiveCell={setActiveCellWithBoundaries}
+                          {...{
+                            rowIndex,
+                            colIndex,
+                            lexicalTable,
+                            parentEditor,
+                            activeCell: readOnly ? [-1, -1] : activeCell,
+                          }}
+                        />
+                      );
+                    })}
+                    {readOnly ||
+                      (rowIndex === 0 && (
+                        <th
+                          rowSpan={lexicalTable.getRowCount()}
+                          data-tool-cell={true}
                         >
-                          {iconComponentFor('add_column')}
-                        </button>
-                      </th>
-                    ))}
-                </tr>
-              );
-            })}
+                          <button
+                            type="button"
+                            className={styles.addColumnButton}
+                            onClick={addColumnToRight}
+                          >
+                            {iconComponentFor('add_column')}
+                          </button>
+                        </th>
+                      ))}
+                  </tr>
+                );
+              })}
             </tbody>
             {readOnly || (
               <tfoot>
-              <tr>
-                <th></th>
-                <th colSpan={lexicalTable.getColCount()}>
-                  <button
-                    type="button"
-                    className={styles.addRowButton}
-                    onClick={addRowToBottom}
-                  >
-                    {iconComponentFor('add_row')}
-                  </button>
-                </th>
-                <th></th>
-              </tr>
+                <tr>
+                  <th></th>
+                  <th colSpan={lexicalTable.getColCount()}>
+                    <button
+                      type="button"
+                      className={styles.addRowButton}
+                      onClick={addRowToBottom}
+                    >
+                      {iconComponentFor('add_row')}
+                    </button>
+                  </th>
+                  <th></th>
+                </tr>
               </tfoot>
             )}
           </>
         )}
       </table>
-    </>
+    </div>
   );
 };
 
 export interface CellProps {
   cellBackgroundColor: string;
+  perimeterStyle?: React.CSSProperties;
   parentEditor: LexicalEditor;
   lexicalTable: TableNode;
   contents: Mdast.PhrasingContent[];
@@ -407,12 +640,14 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
   const { activeCell, setActiveCell } = props;
   const isActive = Boolean(
     activeCell &&
-    activeCell[0] === props.colIndex &&
-    activeCell[1] === props.rowIndex,
+      activeCell[0] === props.colIndex &&
+      activeCell[1] === props.rowIndex,
   );
 
   const className = AlignToTailwindClassMap[align ?? 'left'];
-  const [currentColor, setColor] = useState<string>(props.cellBackgroundColor || 'transparent');
+  const [currentColor, setColor] = useState<string>(
+    props.cellBackgroundColor || 'transparent',
+  );
 
   useEffect(() => {
     setColor(props.cellBackgroundColor || 'transparent');
@@ -436,7 +671,7 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
     <CellElement
       className={className}
       data-active={isActive}
-      style={{ backgroundColor: currentColor }}
+      style={{ backgroundColor: currentColor, ...props.perimeterStyle }}
       onClick={() => {
         setActiveCell([props.colIndex, props.rowIndex]);
       }}
@@ -519,14 +754,7 @@ const CellEditor: React.FC<CellProps> = ({
 
       //setActiveCell(nextCell);
     },
-    [
-      colIndex,
-      editor,
-      lexicalTable,
-      parentEditor,
-      rowIndex,
-      setActiveCell,
-    ],
+    [colIndex, editor, lexicalTable, parentEditor, rowIndex, setActiveCell],
   );
 
   const saveAndFocus = React.useCallback(
@@ -863,5 +1091,54 @@ const RowEditor: React.FC<RowEditorProps> = ({
         </RadixPopover.PopoverContent>
       </RadixPopover.Portal>
     </RadixPopover.Root>
+  );
+};
+
+// TableSettingsButton
+const TableSettingsButton: React.FC<{
+  parentEditor: LexicalEditor;
+  lexicalTable: TableNode;
+}> = ({ parentEditor, lexicalTable }) => {
+  const [iconComponentFor] = useCellValues(iconComponentFor$);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentStyle, setCurrentStyle] = useState('');
+
+  const openDialog = React.useCallback(() => {
+    parentEditor.getEditorState().read(() => {
+      const styleStr = lexicalTable.getMdastNode().data?.hProperties?.style as
+        | string
+        | undefined;
+      setCurrentStyle(styleStr || '');
+      setIsDialogOpen(true);
+    });
+  }, [lexicalTable, parentEditor]);
+
+  const handleSetTableStyle = (newStyle: string) => {
+    parentEditor.update(() => {
+      // Use the new setTableStyle method we added to TableNode
+      lexicalTable.setTableStyle(newStyle);
+    });
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        className={styles.iconButton}
+        title="Table Settings"
+        onClick={openDialog}
+      >
+        {iconComponentFor('settings')}
+      </button>
+
+      {isDialogOpen && (
+        <TableStyleDialog
+          isOpen={isDialogOpen}
+          style={currentStyle}
+          setTableStyle={handleSetTableStyle}
+          setIsStyleDialogOpen={setIsDialogOpen}
+        />
+      )}
+    </>
   );
 };

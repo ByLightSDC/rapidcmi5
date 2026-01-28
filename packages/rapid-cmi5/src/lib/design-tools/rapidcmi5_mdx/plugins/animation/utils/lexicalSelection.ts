@@ -15,6 +15,10 @@ export interface SelectedElementInfo {
   nodeType: string;
   label: string;
   isEmpty: boolean;
+  /** The actual selected text (for inline selections) */
+  selectedText?: string;
+  /** Selection type: 'block' for full elements, 'inline' for partial text */
+  selectionType?: 'block' | 'inline';
 }
 
 /**
@@ -115,6 +119,25 @@ export function getSelectedElementInfo(
       // Continue processing - the selection is real even though Lexical thinks it's collapsed
     }
 
+    // Check for stale Lexical selection cache:
+    // If DOM says nothing is selected but Lexical thinks something is,
+    // the Lexical selection is stale (cached from previous selection)
+    const domSelection = window.getSelection();
+    const domSelectedText = domSelection?.isCollapsed
+      ? ''
+      : (domSelection?.toString().trim() ?? '');
+    const lexicalSelectedText = selection.getTextContent().trim();
+
+    if (!domSelectedText && lexicalSelectedText) {
+      debugLog(
+        '⚠️ Stale Lexical cache detected - DOM empty but Lexical has text, returning null',
+        { domSelectedText, lexicalSelectedText },
+        undefined,
+        'selection',
+      );
+      return;
+    }
+
     debugLog('✅ Valid RangeSelection with actual range, proceeding...', undefined, undefined, 'selection');
 
     // Get the anchor node (where selection starts/cursor is)
@@ -168,11 +191,16 @@ export function getSelectedElementInfo(
         }
       }
 
+      // Get the actual selected text (for inline selections)
+      // Use DOM selection as source of truth since Lexical can be stale
+      const actualSelectedText = domSelectedText || lexicalSelectedText;
+
       selectedInfo = {
         nodeKey,
         nodeType,
         label,
         isEmpty,
+        selectedText: actualSelectedText || undefined,
       };
     } catch (error) {
       console.error('Error getting element info:', error);

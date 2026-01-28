@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { cmi5Instance } from '../session/cmi5';
 import { debugLog, logger } from '../debug';
 import { checkForDevMode } from './DevMode';
-import { config } from '@rapid-cmi5/ui';
 import sha256 from 'crypto-js/sha256';
 
 // Imports for progress management functions
@@ -20,10 +19,7 @@ import {
   saveCourseAUProgressToLRS,
   calculateProgressPercentage,
 } from './CourseAUProgressHelpers';
-import {
-  ActivityScore,
-  getActivityTypeFromDisplayName,
-} from '@rapid-cmi5/cmi5-build-common';
+
 import {
   calculateQuizScore,
   sendDetailedInteractionStatements,
@@ -34,6 +30,8 @@ import {
   SlideActivityScore,
   SlideActivityType,
 } from '../types/SlideActivityStatusState';
+import { ActivityScore, getActivityTypeFromDisplayName } from '@rapid-cmi5/cmi5-build-common';
+import { config } from '@rapid-cmi5/ui';
 
 /**
  * Extract activity ID from activity content based on content type
@@ -67,8 +65,23 @@ function getActivityId(activityContent: any): string {
  */
 export type SlideEventType =
   | 'navigation'
+  | 'scroll_complete'
+  // Audio events
+  | 'audio_play'
+  | 'audio_pause'
   | 'audio_complete'
-  | 'scroll_complete';
+  | 'audio_progress_25'
+  | 'audio_progress_50'
+  | 'audio_progress_75'
+  // Video events
+  | 'video_play'
+  | 'video_pause'
+  | 'video_complete'
+  | 'video_progress_25'
+  | 'video_progress_50'
+  | 'video_progress_75'
+  | 'video_fullscreen_enter'
+  | 'video_fullscreen_exit';
 
 /**
  * Centralized LMS Statement Manager
@@ -157,8 +170,7 @@ async function sendStatement(statement: Statement): Promise<void> {
   }
 
   try {
-    // This needs to be fixed, cmi5 xapi using an old version of xapi lib
-    await xapi.sendStatement({ statement: statement as any });
+    await xapi.sendStatement({ statement });
     logger.debug(
       `LRS Statement sent: ${statement.verb?.display?.['en-US'] || 'Unknown'}`,
       undefined,

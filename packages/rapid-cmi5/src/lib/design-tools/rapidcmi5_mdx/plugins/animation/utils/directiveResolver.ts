@@ -5,8 +5,8 @@
 
 import { $getRoot, LexicalEditor } from 'lexical';
 import { $isDirectiveNode } from '@mdxeditor/editor';
-import { debugWrap } from '../utils/debug';
-import { AnimationConfig, debugLog } from '@rapid-cmi5/ui';
+import { debugLog, AnimationConfig } from '@rapid-cmi5/ui';
+
 
 /**
  * Find a directive node by its id attribute
@@ -58,9 +58,11 @@ export function findDirectiveNodeKeyById(
         console.warn(
           `❌ Could not find anim directive with id: ${directiveId}`,
         );
-        debugWrap.log(
+        debugLog(
           'ℹ️ Available anim directive ids in document:',
           Array.from(new Set(seenIds)),
+          undefined,
+          'wrap',
         );
       }
     } catch (error) {

@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-no-useless-fragment */
-
 import {
   activeEditor$,
   currentSelection$,
@@ -42,14 +41,21 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { fromMarkdown, type Options } from 'mdast-util-from-markdown';
 import { toMarkdown } from 'mdast-util-to-markdown';
 
-import { AdmonitionTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import {
+  getAdmonitionColor,
+  getAdmonitionHexColor,
+  getAdmonitionIcon,
+  getSeverityHexBorderColor,
+  getSeverityHexColor,
+} from '../../markdown/components/AdmonitionStyles';
+
 import { AdmonitionDirectiveNode } from './AdmonitionDirectiveDescriptor';
 import DeleteIconButton from '../components/DeleteIconButton';
 import SettingsIconButton from '../components/SettingsIconButton';
 import RightMenuContainer from '../components/RightMenuContainer';
+import { AdmonitionTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { SelectorMainUi } from '../../../inputs/selectors/selectors';
 import { debugLogError } from '../../../utility/logger';
-import { getAdmonitionColor, getAdmonitionHexColor, getSeverityHexColor, getSeverityHexBorderColor, getAdmonitionIcon } from '../../markdown/components/AdmonitionStyles';
 import { editorInPlayback$ } from '../state/vars';
 
 export declare interface AdmonitionDirectiveEditorProps<
@@ -281,7 +287,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
     }
     if (adHexColor) {
       return (
-        <div style={{ color: adHexColor }}>
+        <div style={{ color: '#FFFFFFBF' }}>
           <ExpandCircleDownIcon color={adColor} />
         </div>
       );

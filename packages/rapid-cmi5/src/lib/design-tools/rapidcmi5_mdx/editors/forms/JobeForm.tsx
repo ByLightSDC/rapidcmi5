@@ -1,22 +1,15 @@
 import { UseFormReturn } from 'react-hook-form';
-import {
-  FormControlSelectField,
-  FormControlTextField,
-  FormControlUIProvider,
-  FormCrudType,
-  FormStateType,
-  MiniForm,
-} from '@rapid-cmi5/ui';
+
+/* MUI */
 import Grid from '@mui/material/Grid2';
+import MenuItem from '@mui/material/MenuItem';
 
-import { MenuItem } from '@mui/material';
 import * as yup from 'yup';
-import {
-  JobeContent,
-  moveOnCriteriaOptions,
-} from '@rapid-cmi5/cmi5-build-common';
 
-import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
+import { JobeContent, moveOnCriteriaOptions, RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import { FormCrudType, REQUIRED_ENTRY, FormStateType, FormControlTextField, FormControlSelectField, FormControlUIProvider, MiniForm } from '@rapid-cmi5/ui';
+import { featureFlagShouldShowKSATs } from 'packages/rapid-cmi5/src/lib/featureFlags';
 
 export const JobeForm = ({
   crudType,
@@ -30,14 +23,16 @@ export const JobeForm = ({
   handleCloseModal?: () => void;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
+  // Get the unique rc5id from the form data for scoping ksats to individual activity
+  const rc5id = defaultFormData?.rc5id;
   const validationSchema = yup.object().shape({
     // student: DESCRIPTION_GROUP,
     // evaluator: DESCRIPTION_GROUP,
-    // ksats: yup.array().of(
-    //   yup.object().optional().shape({
-    //     element_identifier: REQUIRED_ENTRY,
-    //   }),
-    // ),
+    ksats: yup.array().of(
+      yup.object().optional().shape({
+        element_identifier: REQUIRED_ENTRY,
+      }),
+    ),
   });
 
   const onSaveAction = (data: any) => {
@@ -113,9 +108,11 @@ export const JobeForm = ({
             sxProps={{ height: '30%' }}
           />
         </Grid>
-        {/* <Grid size={11.5}>
-          <KSATsFieldGroup formMethods={formMethods} crudType={crudType} />
-        </Grid> */}
+        {featureFlagShouldShowKSATs && (
+          <Grid size={11.5}>
+            <KSATsFieldGroup formMethods={formMethods} crudType={crudType} />
+          </Grid>
+        )}
       </>
     );
   };

@@ -32,6 +32,7 @@ export const LexicalImageVisitor: LexicalExportVisitor<
     const rest = lexicalNode.getRest();
     const width = lexicalNode.getWidth();
     const height = lexicalNode.getHeight();
+    const id = lexicalNode.getId(); // ✅ Get id for persistence
 
     const imageMdast: Mdast.Image = {
       type: 'image',
@@ -62,6 +63,9 @@ export const LexicalImageVisitor: LexicalExportVisitor<
         if (title) {
           img.title = title;
         }
+        if (id) {
+          img.id = id;
+        }
         for (const attr of rest) {
           if (
             attr.type === 'mdxJsxAttribute' &&
@@ -70,7 +74,8 @@ export const LexicalImageVisitor: LexicalExportVisitor<
             img.setAttribute(attr.name, attr.value);
           }
         }
-        img.src = src;
+        // ❌ DO NOT set img.src - it resolves blob URLs!
+        // img.src = src;
 
         const imgHtml = getOuterImgHtml(img.outerHTML, src);
         const linkedHtml = `<a href="${href}" target="_blank">${imgHtml}</a>`;
@@ -96,6 +101,9 @@ export const LexicalImageVisitor: LexicalExportVisitor<
         if (title) {
           img.title = title;
         }
+        if (id) {
+          img.id = id;
+        }
         for (const attr of rest) {
           if (
             attr.type === 'mdxJsxAttribute' &&
@@ -105,8 +113,9 @@ export const LexicalImageVisitor: LexicalExportVisitor<
           }
         }
 
-        img.src = src;
-        const imgHtml = getOuterImgHtml(img.outerHTML, lexicalNode.getSrc());
+        // ❌ DO NOT set img.src - it resolves blob URLs!
+        // img.src = src;
+        const imgHtml = getOuterImgHtml(img.outerHTML, src);
         actions.appendToParent(mdastParent, {
           type: 'html',
           value: imgHtml,

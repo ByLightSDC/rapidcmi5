@@ -1,9 +1,4 @@
-import {
-  AuContextProps,
-  JobeContent,
-  RC5ActivityTypeEnum,
-  ActivityScore,
-} from '@rapid-cmi5/cmi5-build-common';
+
 import Editor from 'react-simple-code-editor';
 // @ts-expect-error - prismjs types are not fully compatible
 import { highlight, languages } from 'prismjs/components/prism-core';
@@ -16,10 +11,11 @@ import CheckIcon from '@mui/icons-material/Check';
 
 import useJobeGrader from './useJobeGrader';
 import { useEffect, useState } from 'react';
-
 import { useSelector } from 'react-redux';
+import { AuContextProps, JobeContent, ActivityScore, RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { dividerColor } from '../../redux/commonAppReducer';
 import { ButtonMainUi } from '../../utility/buttons';
+
 export function JobeInTheBox({
   auProps,
   content,
@@ -143,7 +139,8 @@ export function JobeInTheBox({
         backgroundColor: 'background.default',
         minWidth: '320px',
         maxWidth: '1152px',
-        width: '100%',
+        marginLeft: 'auto',
+        marginRight: 'auto',
         marginBottom: '12px',
       }}
     >

@@ -2,11 +2,11 @@ import React from 'react';
 import { Paper, Typography, IconButton, Tooltip, Divider } from '@mui/material';
 import { Stack } from '@mui/system';
 import { OverflowTypography } from '../../data-display/OverflowTypography';
-import { QuizContent } from '@rapid-cmi5/cmi5-build-common';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import EditIcon from '@mui/icons-material/Edit';
+import { QuizContent } from '@rapid-cmi5/cmi5-build-common';
 
 export type QuizReviewProps = {
   content: QuizContent;

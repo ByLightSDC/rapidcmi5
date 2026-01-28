@@ -1,6 +1,4 @@
 import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
-import * as Mdast from 'mdast';
-import { toMarkdown } from 'mdast-util-to-markdown';
 
 import {
   DirectiveEditorProps,
@@ -20,7 +18,8 @@ import {
 
 import { ContainerDirective } from 'mdast-util-directive';
 import { LayoutBoxToolbar } from './LayoutBoxToolbar';
-import { ModalDialog } from '@rapid-cmi5/ui';
+
+/* MUI */
 import {
   Box,
   Paper,
@@ -35,6 +34,7 @@ import Grid from '@mui/material/Grid2';
 import VerticalAlignCenterIcon from '@mui/icons-material/VerticalAlignCenter';
 import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
+import { convertMdastToMarkdown, ModalDialog } from '@rapid-cmi5/ui';
 
 /**
  * Custom editor component for the Layout Box directive
@@ -88,13 +88,13 @@ export const LayoutBoxEditor: React.FC<
   };
 
   const handleClearLayout = async () => {
-    // handle multiple children
-    const mdChitlen =
-      mdastNode.children.length > 0
-        ? mdastNode.children[0]
-        : { type: 'paragraph', children: [] };
+    // Convert all children to markdown
+    // Use 'root' type for BlockContent[] (not 'paragraph' which expects PhrasingContent[])
+    const childMarkdown = convertMdastToMarkdown({
+      type: 'root',
+      children: mdastNode.children,
+    });
 
-    const childMarkdown = toMarkdown(mdChitlen as Mdast.RootContent);
     parentEditor.update(() => {
       lexicalNode.selectPrevious();
     });
@@ -290,7 +290,12 @@ export const LayoutBoxEditor: React.FC<
               <Paper variant="outlined" sx={{ p: 2 }}>
                 <Stack spacing={0.1}>
                   {/* Justification */}
-                  <Grid container alignItems="center" spacing={2}>
+                  <Grid
+                    container
+                    alignItems="center"
+                    spacing={2}
+                    sx={{ width: '100%' }}
+                  >
                     <Grid size={3}>
                       <Typography gutterBottom>Horizontal Alignment</Typography>
                     </Grid>
@@ -326,7 +331,12 @@ export const LayoutBoxEditor: React.FC<
                   </Grid>
 
                   {/* Vertical Alignment */}
-                  <Grid container alignItems="center" spacing={2}>
+                  <Grid
+                    container
+                    alignItems="center"
+                    spacing={2}
+                    sx={{ width: '100%' }}
+                  >
                     <Grid size={3}>
                       <Typography gutterBottom>Vertical Alignment</Typography>
                     </Grid>
@@ -356,7 +366,12 @@ export const LayoutBoxEditor: React.FC<
                   </Grid>
 
                   {/* Width */}
-                  <Grid container alignItems="center" spacing={2}>
+                  <Grid
+                    container
+                    alignItems="center"
+                    spacing={2}
+                    sx={{ width: '100%' }}
+                  >
                     <Grid size={3}>
                       <Typography gutterBottom>Width</Typography>
                     </Grid>
@@ -379,7 +394,12 @@ export const LayoutBoxEditor: React.FC<
                   </Grid>
 
                   {/* Height */}
-                  <Grid container alignItems="center" spacing={2}>
+                  <Grid
+                    container
+                    alignItems="center"
+                    spacing={2}
+                    sx={{ width: '100%' }}
+                  >
                     <Grid size={3}>
                       <Typography gutterBottom>Height</Typography>
                     </Grid>

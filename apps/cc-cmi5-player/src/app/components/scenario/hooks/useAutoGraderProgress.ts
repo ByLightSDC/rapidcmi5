@@ -10,14 +10,12 @@ import {
   SetCmi5ProgressHandler,
   SubmitCmiScoreHandler,
 } from '@rapid-cmi5/cmi5-build-common';
-import {
-  DevopsApiClient,
-  AutoGrader,
-} from '@rapid-cmi5/ui';
+
 import { cmi5Instance } from '../../../session/cmi5';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
 import { debugLogError } from '@rapid-cmi5/ui';
 import { logger } from '../../../debug';
+import { AutoGrader, DevopsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
 
 type UseAutoGraderProgressArgs = {
   isTestMode?: boolean;

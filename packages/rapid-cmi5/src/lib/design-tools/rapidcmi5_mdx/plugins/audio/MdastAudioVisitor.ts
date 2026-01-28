@@ -32,10 +32,12 @@ export const MdastHtmlAudioVisitor: MdastImportVisitor<Mdast.Html> = {
 
     const src = audio.getAttribute('src') || audio.src;
     const title = audio.getAttribute('title') || audio.title;
+    const id = audio.getAttribute('data-audio-id') || undefined; // ✅ Extract id from HTML
 
     const audioNode = $createAudioNode({
       src: src || '',
       title,
+      id, // ✅ Pass id to preserve GUID
     });
 
     if (lexicalParent.getType() === 'root') {
@@ -65,11 +67,12 @@ export const MdastJsxAudioVisitor: MdastImportVisitor<
     }
 
     const title = getAttributeValue(mdastNode, 'title');
+    const id = getAttributeValue(mdastNode, 'data-audio-id'); // ✅ Extract id
 
     const rest = mdastNode.attributes.filter((a) => {
       return (
         a.type === 'mdxJsxAttribute' &&
-        !['src', 'title', 'controls'].includes(a.name)
+        !['src', 'title', 'controls', 'data-audio-id'].includes(a.name) // ✅ Filter out data-audio-id
       );
     });
 
@@ -77,6 +80,7 @@ export const MdastJsxAudioVisitor: MdastImportVisitor<
       src,
       title,
       rest,
+      id, // ✅ Pass id to preserve GUID
     });
 
     if (lexicalParent.getType() === 'root') {

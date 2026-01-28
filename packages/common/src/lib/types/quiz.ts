@@ -41,6 +41,7 @@ export type BasicResponse = {
   grading: QuestionGrading;
   options?: Array<QuizOption> | undefined;
   matching?: Array<MatchingOption> | undefined;
+  shuffleAnswers?: boolean;
 };
 
 export enum QuestionGrading {

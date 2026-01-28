@@ -18,53 +18,25 @@ import {
   LexicalNode,
 } from 'lexical';
 
+import {
+  directiveToMarkdown,
+} from 'mdast-util-directive';
+import { mdxJsxToMarkdown } from 'mdast-util-mdx-jsx';
+import {
+  gfmStrikethroughToMarkdown,
+} from 'mdast-util-gfm-strikethrough';
+
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 
 import ViewComfyIcon from '@mui/icons-material/ViewComfy';
 
-import { exportMarkdownFromLexical } from '@rapid-cmi5/ui';
+
 
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { Options as ToMarkdownOptions } from 'mdast-util-to-markdown';
-
-/**
- * Helper function to try to focus inside a directive over the course of a
- * defined number of frames.
- * @param editor
- * @param insertedKey
- * @param attempts
- */
-function placeCaretInsideDirective(
-  editor: LexicalEditor,
-  insertedKey: string,
-  attempts = 0,
-) {
-  if (attempts > 6) return; // give up after ~6 frames
-
-  requestAnimationFrame(() => {
-    editor.update(() => {
-      const node = $getNodeByKey<DirectiveNode>(insertedKey);
-      if (!node) {
-        placeCaretInsideDirective(editor, insertedKey, attempts + 1);
-        return;
-      }
-
-      // enter the directive’s inner editable content
-      (node as any).select?.();
-
-      // if the inner structure is available, move the caret to the end of the first paragraph
-      const firstChild = (node as any).getFirstChild?.();
-      if (firstChild?.selectEnd) {
-        firstChild.selectEnd();
-      } else {
-        // Try again next frame until children exist
-        placeCaretInsideDirective(editor, insertedKey, attempts + 1);
-      }
-    });
-  });
-}
+import { exportMarkdownFromLexical, defaultToMarkdownExtensions, placeCaretInsideDirective } from '@rapid-cmi5/ui';
 
 const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
   listItemIndent: 'one',
@@ -136,7 +108,7 @@ export const InsertLayoutBox = () => {
             root: node,
             visitors: exportVisitors,
             jsxComponentDescriptors,
-            toMarkdownExtensions: [],
+            toMarkdownExtensions: defaultToMarkdownExtensions,
             toMarkdownOptions: DEFAULT_MARKDOWN_OPTIONS,
             jsxIsAvailable,
           });

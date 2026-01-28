@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { MDXEditorMethods } from '@mdxeditor/editor';
-import { debugLog, debugLogError } from '@rapid-cmi5/ui';
+
 import React, {
   createContext,
   RefObject,
@@ -11,35 +11,9 @@ import React, {
 } from 'react';
 import { Message, MessageType } from '../../course-builder/CourseBuilderTypes';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  addCourseOperation,
-  changeViewMode,
-  courseDataCache,
-  currentAu,
-  currentBlock,
-  currentCourse,
-  currentSlideNum,
-  navigateSlide,
-  removeCourseAu,
-  resetCourseOperations,
-  saveSlideContent,
-  setIsLessonMounted,
-  updateAuIndex,
-  updateBlockIndex,
-  updateCourseAuData,
-  updateCourseData,
-  updateCourseSlideData,
-  updateDirtyDisplay,
-  updateDisplayText,
-} from '../../../redux/courseBuilderReducer';
+
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
-import { setModal } from '@rapid-cmi5/ui';
-import {
-  CourseAU,
-  MoveOnCriteriaEnum,
-  Operation,
-  SlideType,
-} from '@rapid-cmi5/cmi5-build-common';
+
 
 import {
   createCourseModalId,
@@ -48,6 +22,9 @@ import {
   warningModalId,
 } from '../modals/constants';
 import { ILessonNode } from '../drawers/components/LessonTreeNode';
+import { SlideType, MoveOnCriteriaEnum, Operation, CourseAU } from '@rapid-cmi5/cmi5-build-common';
+import { debugLog, debugLogError, setModal, validateYamlFrontmatter } from '@rapid-cmi5/ui';
+import { currentCourse, currentSlideNum, courseDataCache, currentAu, currentBlock, updateBlockIndex, updateAuIndex, navigateSlide, updateDisplayText, addCourseOperation, removeCourseAu, updateDirtyDisplay, updateCourseData, updateCourseAuData, updateCourseSlideData, resetCourseOperations, saveSlideContent, setIsLessonMounted, changeViewMode } from '../../../redux/courseBuilderReducer';
 
 interface tProviderProps {
   isEnabled?: boolean;
@@ -389,6 +366,34 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
     const slideContent = getMarkdownData();
 
     if (typeof slideContent !== 'undefined' && slideContent !== null) {
+      // Validate YAML frontmatter before saving
+      const validationResult = validateYamlFrontmatter(slideContent);
+
+      if (!validationResult.isValid) {
+        // Show error modal to user
+        const errorMsg = validationResult.lineNumber
+          ? `Cannot save slide: Invalid YAML frontmatter at line ${validationResult.lineNumber}\n\n${validationResult.details}`
+          : `Cannot save slide: Invalid YAML frontmatter\n\n${validationResult.details}`;
+
+        console.error('YAML validation error:', validationResult);
+
+        dispatch(
+          setModal({
+            type: warningModalId,
+            id: null,
+            name: null,
+            meta: {
+              title: 'Invalid YAML Frontmatter',
+              message: errorMsg,
+            },
+          }),
+        );
+
+        // Do NOT save - return early
+        return;
+      }
+
+      // YAML is valid - proceed with save
       dispatch(
         saveSlideContent({
           position: currentSlideIndex,

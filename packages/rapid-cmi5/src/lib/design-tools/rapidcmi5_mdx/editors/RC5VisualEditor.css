@@ -40,15 +40,23 @@ a:visited {
 
 .nested-editable-dark {
   --basePageBg: #212125;
+
   /* inline code block 
   original color matches bg so its invisible */
+  /*nested editor bg transparent to support rough notation highlight color. bg color here was obscurring highlight */
   ._code_1tncs_52 {
     background-color: #0d1118;
+  }
+  ._nestedEditor_1e2ox_961 {
+    background-color: transparent;
   }
 }
 
 .nested-editable-light {
   --basePageBg: #f8f8f8;
+  ._nestedEditor_1e2ox_961 {
+    background-color: transparent;
+  }
 }
 
 .mdxeditor-diff-source-wrapper {

@@ -26,10 +26,10 @@ export type Cmi5Scenario = {
 export type CourseAU = {
   auName: string;
   assetsPath?: string;
-  autoGraders?: AuAutoGrader[];
   description?: string;
   backgroundImage?: string;
   promptClassId?: boolean;
+  defaultClassId?: string;
   // CMI5 moveOn rule for this AU. Defaults to "CompletedOrPassed" if omitted
   // Allowed values per CMI5 spec: Passed | Completed | CompletedAndPassed | CompletedOrPassed | NotApplicable
   moveOn?:
@@ -75,3 +75,9 @@ export type CourseData = {
   designer?: any;
   rc5Version?: string;
 };
+
+export enum CourseLevel {
+  Beginner = 'beginner',
+  Intermediate = 'intermediate',
+  Advanced = 'advanced',
+}

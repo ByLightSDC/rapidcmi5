@@ -11,56 +11,52 @@ import {
 } from '@rapid-cmi5/cmi5-build-common';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './store';
-import {
-  debugLog,
-  defaultCourseData,
-  resetPersistance,
-} from '@rapid-cmi5/ui';
+import { debugLog, defaultCourseData, resetPersistance } from '@rapid-cmi5/ui';
 import { ViewModeEnum } from '../design-tools/course-builder/CourseBuilderTypes';
 
 export interface Scenario {
-    /**
-     * 
-     * @type {string}
-     * @memberof Scenario
-     */
-    'uuid'?: string;
-    /**
-     * Date when the object was created.
-     * @type {string}
-     * @memberof Scenario
-     */
-    'dateCreated'?: string;
-    /**
-     * Date when the object was last edited.
-     * @type {string}
-     * @memberof Scenario
-     */
-    'dateEdited'?: string;
-    /**
-     * A user provided human readable description.
-     * @type {string}
-     * @memberof Scenario
-     */
-    'description'?: string;
-    /**
-     * A user provided human readable name.
-     * @type {string}
-     * @memberof Scenario
-     */
-    'name'?: string;
-    /**
-     * The author of the package.
-     * @type {string}
-     * @memberof Scenario
-     */
-    'author'?: string;
-    /**
-     * User provided metadata
-     * @type {object}
-     * @memberof Scenario
-     */
-    'metadata'?: object;
+  /**
+   *
+   * @type {string}
+   * @memberof Scenario
+   */
+  uuid?: string;
+  /**
+   * Date when the object was created.
+   * @type {string}
+   * @memberof Scenario
+   */
+  dateCreated?: string;
+  /**
+   * Date when the object was last edited.
+   * @type {string}
+   * @memberof Scenario
+   */
+  dateEdited?: string;
+  /**
+   * A user provided human readable description.
+   * @type {string}
+   * @memberof Scenario
+   */
+  description?: string;
+  /**
+   * A user provided human readable name.
+   * @type {string}
+   * @memberof Scenario
+   */
+  name?: string;
+  /**
+   * The author of the package.
+   * @type {string}
+   * @memberof Scenario
+   */
+  author?: string;
+  /**
+   * User provided metadata
+   * @type {object}
+   * @memberof Scenario
+   */
+  metadata?: object;
 }
 /**
  * Before user is connected to repo, they can play in slides sandbox
@@ -131,7 +127,7 @@ export type RepoCache = {
     @type {ProjectState}
     @default
 */
-export const initialState: CourseBuilderState = {
+export const initialStateCourseBuilder: CourseBuilderState = {
   courseOperations: {},
   currentSlideIndex: 0,
   currentRepo: '',
@@ -172,10 +168,10 @@ type tDirtyState = { reason?: string; counter?: number };
  */
 export const courseBuilderSlice = createSlice({
   name: 'courseBuilder',
-  initialState,
+  initialState: initialStateCourseBuilder,
   extraReducers: (builder) =>
     builder.addCase(resetPersistance, () => {
-      return { ...initialState };
+      return { ...initialStateCourseBuilder };
     }),
   reducers: {
     loadCourse: (state, action: PayloadAction<CourseData>) => {
@@ -453,7 +449,7 @@ export const courseBuilderSlice = createSlice({
         action.payload.position,
         state.slides.length - 1,
       );
-      theSlides[slideIndex].content = action.payload.content;
+      theSlides[slideIndex].content = action.payload.content.toString();
       theSlides[slideIndex].display = action.payload.display;
       state.slides = theSlides;
       if (!action.payload.skipShouldDirty) {
@@ -692,7 +688,7 @@ export const courseBuilderSlice = createSlice({
       delete newRepoCache[deletedRepo];
 
       return {
-        ...initialState,
+        ...initialStateCourseBuilder,
         viewMode: ViewModeEnum.GitEditor, // stay on git repo view
         repoCache: newRepoCache,
       };

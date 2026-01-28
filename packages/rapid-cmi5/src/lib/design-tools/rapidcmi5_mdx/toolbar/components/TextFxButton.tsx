@@ -27,11 +27,11 @@ import {
 /* mdast */
 import type { PhrasingContent } from 'mdast';
 import {
-  directiveFromMarkdown,
+
   directiveToMarkdown,
 } from 'mdast-util-directive';
 import { Options as ToMarkdownOptions } from 'mdast-util-to-markdown';
-import { mdxJsxFromMarkdown, mdxJsxToMarkdown } from 'mdast-util-mdx-jsx';
+import {  mdxJsxToMarkdown } from 'mdast-util-mdx-jsx';
 import {
   gfmStrikethroughFromMarkdown,
   gfmStrikethroughToMarkdown,
@@ -43,27 +43,18 @@ import {
 import { gfmTableFromMarkdown, gfmTableToMarkdown } from 'mdast-util-gfm-table';
 import { TextDirective } from 'mdast-util-directive';
 import { fromMarkdown } from 'mdast-util-from-markdown';
-import { dirtyDisplay } from '../../../../redux/courseBuilderReducer';
+
+import { TextFxPopover } from './TextFxPopover';
+
+
 
 /** MUI  */
 import RttIcon from '@mui/icons-material/Rtt';
 import { Stack } from '@mui/material';
 import CircleIcon from '@mui/icons-material/Circle';
 import { useSelector } from 'react-redux';
-import {
-  debugLog,
-  DEFAULT_SHAPE,
-  defaultFxColor,
-  exportMarkdownFromLexical,
-  FxDirectiveAttributes,
-  placeCaretInsideDirective,
-  refreshDelay,
-  refreshTextFx$,
-  selFxNode$,
-  showTextFx$,
-} from '@rapid-cmi5/ui';
-import { convertMarkdownToMdast } from 'packages/ui/src/lib/cmi5/mdx/util/conversion';
-import { TextFxPopover } from './TextFxPopover';
+import { FxDirectiveAttributes, DEFAULT_SHAPE, selFxNode$, showTextFx$, refreshDelay, debugLog, exportMarkdownFromLexical, defaultToMarkdownExtensions, convertMarkdownToMdast, placeCaretInsideDirective, refreshTextFx$, defaultFxColor } from '@rapid-cmi5/ui';
+import { dirtyDisplay } from 'packages/rapid-cmi5/src/lib/redux/courseBuilderReducer';
 
 export const shapeStyleLast$ = Cell<FxDirectiveAttributes>(DEFAULT_SHAPE);
 
@@ -183,11 +174,7 @@ export function TextFxButton() {
               root: node,
               visitors: exportVisitors,
               jsxComponentDescriptors,
-              toMarkdownExtensions: [
-                directiveToMarkdown(),
-                mdxJsxToMarkdown(),
-                gfmStrikethroughToMarkdown(),
-              ],
+              toMarkdownExtensions: defaultToMarkdownExtensions,
               toMarkdownOptions: DEFAULT_MARKDOWN_OPTIONS,
               jsxIsAvailable,
             });

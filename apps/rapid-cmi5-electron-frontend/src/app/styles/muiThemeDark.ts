@@ -73,6 +73,9 @@ export const darkTheme = createTheme({
     instructionsColor: colorPop ? '#edb445' : '#edb445',
     formInstructionsColor: '#212125',
   },
+  form: {
+    backgroundColor: '#282b30',
+  },
   header: {
     border: '#ffffffb0',
     buttonColor: '#C5C5C5',

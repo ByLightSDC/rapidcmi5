@@ -143,7 +143,6 @@ function LessonTree({
 
           if (!repoAccessObject) return;
 
-          const repoPath = getRepoPath(repoAccessObject);
           dispatch(
             addASlide({
               content: defaultSlideContent,

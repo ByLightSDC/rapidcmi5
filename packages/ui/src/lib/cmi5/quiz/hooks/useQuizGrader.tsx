@@ -1,9 +1,5 @@
-import {
-  AnswerType,
-  QuestionGrading,
-  QuestionResponse,
-  QuizQuestion,
-} from '@rapid-cmi5/cmi5-build-common';
+
+import { QuizQuestion, AnswerType, QuestionGrading, QuestionResponse } from '@rapid-cmi5/cmi5-build-common';
 import { useState } from 'react';
 
 export default function useQuizGrader() {
@@ -40,12 +36,24 @@ export default function useQuizGrader() {
     } else if (question.type === QuestionResponse.SelectAll) {
       const answers = answer as number[];
       let isCorrect = true;
+      // first check that given answer(s) are correct
       answers.forEach((answer) => {
         if (!gradeOption(answer, question)) {
           isCorrect = false;
         }
       });
-
+      // now check if any correct answers are missing
+      if (isCorrect && question.typeAttributes.options) {
+        for (let i = 0; i < question.typeAttributes.options.length; i++) {
+          if (
+            question.typeAttributes.options[i].correct === true &&
+            answers.indexOf(i) === -1
+          ) {
+            isCorrect = false;
+            break;
+          }
+        }
+      }
       return isCorrect;
     } else if (
       question.type === QuestionResponse.FreeResponse ||

@@ -65,6 +65,9 @@ export const lightTheme = createTheme({
     titleColor: '#FFFFFF',
     formInstructionsColor: '#E5F6FDBF',
   },
+  form: {
+    backgroundColor: '#EEEEEE',
+  },
   header: {
     border: '#ffffffc3', //active se
     buttonColor: '#C5C5C5',

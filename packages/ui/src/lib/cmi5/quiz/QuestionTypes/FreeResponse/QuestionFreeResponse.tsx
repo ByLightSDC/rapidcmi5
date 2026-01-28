@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
 import { Stack, TextField, Typography } from '@mui/material';
 
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
+import { QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
 
 function FreeResponse({
   question,
@@ -75,7 +75,9 @@ function FreeResponse({
               ? 'w-full p-2 border border-gray-900 rounded-lg text-grey'
               : 'w-full p-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500'
           }
-          InputLabelProps={{ shrink: true }} // always put label above box even if empty
+          slotProps={{
+            inputLabel: { shrink: true }, // always put label above box even if empty
+          }}
           autoComplete="off"
           type="text"
           fullWidth={true}

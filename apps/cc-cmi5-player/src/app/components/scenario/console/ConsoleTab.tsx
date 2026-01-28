@@ -1,10 +1,10 @@
 import { useParams } from 'react-router';
 import React, { useRef, useState } from 'react';
+
 import { Alert } from '@mui/material';
-import { LoadingUi } from '../../indicators/Loading';
+import { useGetRangeResourceConsolesGraph } from '@rangeos-nx/frontend/clients/hooks';
+import { useQueryDetails, LoadingUi } from '@rapid-cmi5/ui';
 import ConsolePopup from './ConsolePopup';
-import { useQueryDetails } from '../../api/useQueryDetails';
-import { useGetRangeResourceConsolesGraph } from '../../api/useRangeResourceConsolesGraph';
 
 /**
  * Used in a tab to display a full screen console.

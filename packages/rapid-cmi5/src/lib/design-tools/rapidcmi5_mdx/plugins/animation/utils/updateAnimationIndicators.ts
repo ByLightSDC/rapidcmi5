@@ -1,11 +1,15 @@
 import { AnimationConfig, debugLog } from "@rapid-cmi5/ui";
 
+
 /**
  * Update visual indicators on elements to show they have animations
+ * @param animations - Animations to display indicators for
  */
-export function updateAnimationIndicators(animations: AnimationConfig[]): void {
+export function updateAnimationIndicators(
+  animations: AnimationConfig[],
+): void {
   debugLog(
-    '🔄 [updateAnimationIndicators] Updating animation indicators',
+    `🔄 [updateAnimationIndicators] Updating animation indicators`,
     {
       ids: animations.map((a) => a.id),
       targets: animations.map((a) => a.targetNodeKey),
@@ -20,27 +24,29 @@ export function updateAnimationIndicators(animations: AnimationConfig[]): void {
 
   if (animations.length === 0) return;
 
-  // Group animations by a stable-ish target key:
-  // - V2 directives: directiveId (stable across Lexical re-keys)
-  // - V1/other: targetNodeKey (runtime)
+  // Group animations by directiveId (V2 - required for all animations)
   const animationsByTarget = new Map<string, AnimationConfig[]>();
 
   animations.forEach((anim) => {
-    const targetKey = anim.directiveId || anim.targetNodeKey;
-    const existing = animationsByTarget.get(targetKey) || [];
+    if (!anim.directiveId) {
+      console.warn(
+        'Animation missing directiveId, skipping indicator:',
+        anim.id,
+      );
+      return;
+    }
+    const existing = animationsByTarget.get(anim.directiveId) || [];
     existing.push(anim);
-    animationsByTarget.set(targetKey, existing);
+    animationsByTarget.set(anim.directiveId, existing);
   });
 
   // Add indicators to each animated element
-  animationsByTarget.forEach((targetAnimations, targetKey) => {
-    const element = targetAnimations[0]?.directiveId
-      ? findElementByDirectiveId(targetAnimations[0].directiveId)
-      : findElementByKey(targetKey);
+  animationsByTarget.forEach((targetAnimations, directiveId) => {
+    const element = findElementByDirectiveId(directiveId);
     if (!element) {
       debugLog(
         '⚠️ Element not found for animation indicator',
-        { targetKey },
+        { directiveId },
         undefined,
         'indicators',
       );
@@ -72,7 +78,7 @@ export function updateAnimationIndicators(animations: AnimationConfig[]): void {
     debugLog(
       '✅ [updateAnimationIndicators] Applied indicators',
       {
-        targetKey,
+        directiveId,
         minOrder,
         count: targetAnimations.length,
         allDisabled,
@@ -118,8 +124,7 @@ export function highlightAnimatedElement(nodeKey: string | null): void {
 
   // Highlight new element
   if (nodeKey) {
-    const element =
-      findElementByKey(nodeKey) ?? findElementByDirectiveId(nodeKey);
+    const element = findElementByDirectiveId(nodeKey);
     if (element) {
       element.setAttribute('data-animation-selected', 'true');
 
@@ -136,8 +141,7 @@ export function markAnimationPlaying(
   nodeKey: string,
   isPlaying: boolean,
 ): void {
-  const element =
-    findElementByKey(nodeKey) ?? findElementByDirectiveId(nodeKey);
+  const element = findElementByDirectiveId(nodeKey);
   if (element) {
     if (isPlaying) {
       element.setAttribute('data-animation-playing', 'true');
@@ -145,32 +149,6 @@ export function markAnimationPlaying(
       element.removeAttribute('data-animation-playing');
     }
   }
-}
-
-/**
- * Find element by Lexical node key
- */
-function findElementByKey(nodeKey: string): HTMLElement | null {
-  // Try data-animation-id first (primary method)
-  let element = document.querySelector<HTMLElement>(
-    `[data-animation-id="${nodeKey}"]`,
-  );
-
-  // Try data-animation-target (fallback)
-  if (!element) {
-    element = document.querySelector<HTMLElement>(
-      `[data-animation-target="${nodeKey}"]`,
-    );
-  }
-
-  // Try data-lexical-key (legacy fallback)
-  if (!element) {
-    element = document.querySelector<HTMLElement>(
-      `[data-lexical-key="${nodeKey}"]`,
-    );
-  }
-
-  return element;
 }
 
 /**

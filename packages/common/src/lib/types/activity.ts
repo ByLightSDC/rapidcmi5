@@ -1,18 +1,13 @@
 // Ensure that whenever the types change ./utils/ajv-schema-generator.sh is ran
 
+//the BE type name "Element' conflicts with React Element type, so duplicating here
 export interface KSATElement {
-  element_identifier: string;
-  element_type: 'task' | 'knowledge' | 'skill';
-  title: string;
-  text: string;
-  doc_identifier: string;
+  element_identifier?: string;
+  element_type?: 'task' | 'knowledge' | 'skill';
+  title?: string;
+  text?: string;
+  doc_identifier?: string;
 }
-
-// export type BaseActivity = {
-//   rc5id?: string;
-//   skills?: Array<string>; // Array of skill UUIDs
-//   ksats?: KSATElement[]; // Array of KSAT elements
-// };
 
 export type BaseActivity = {
   rc5id?: string;

@@ -1,0 +1,146 @@
+/**
+ * Visual indicators for animated elements
+ * PowerPoint-inspired design: Numbered badges show animation sequence
+ */
+
+/* All animated elements need relative positioning for badges */
+[data-has-animation='true'] {
+  position: relative;
+}
+
+/* ============================================
+ * POWERPOINT-STYLE NUMBERED BADGES
+ * ============================================ */
+
+/* Default state: Gray numbered badge (not selected) */
+/* IMPORTANT: Exclude directive wrappers - they have their own React-rendered badges */
+[data-has-animation="true"]:not(.anim-directive-wrapper):not(.anim-directive-inline)::before {
+  content: attr(data-animation-order);
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
+  background: #d0d0d0; /* Subtle gray like PowerPoint */
+  color: #666;
+  border: 2px solid #fff;
+  border-radius: 2px; /* Slight rounding like PowerPoint */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0.85;
+  transition: all 0.2s ease;
+}
+
+/* Hover state: Increase visibility */
+[data-has-animation="true"]:not(.anim-directive-wrapper):not(.anim-directive-inline):hover::before {
+  opacity: 1;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+}
+
+/* Selected state: PowerPoint orange badge */
+[data-has-animation="true"]:not(.anim-directive-wrapper):not(.anim-directive-inline)[data-animation-selected="true"]::before {
+  background: #f4b183;  /* PowerPoint orange/tan color */
+  color: #000;
+  opacity: 1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transform: scale(1.05); /* Slightly larger when selected */
+  z-index: 20;
+}
+
+/* ============================================
+ * COMMENTED OUT - Original green border styles
+ * Uncomment to restore
+ * ============================================ */
+
+/*
+[data-has-animation="true"]::after {
+  content: '🎬';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  background: #1976d2;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+[data-has-animation="true"]:hover::after {
+  opacity: 1;
+}
+
+[data-has-animation="true"]:hover {
+  outline: 2px dashed rgba(25, 118, 210, 0.3);
+  outline-offset: 2px;
+}
+
+[data-has-animation="true"][data-animation-selected="true"] {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+  background-color: rgba(25, 118, 210, 0.05);
+}
+
+[data-animation-count]::before {
+  content: attr(data-animation-count);
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  width: 18px;
+  height: 18px;
+  background: #ff9800;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  z-index: 11;
+}
+*/
+
+/* Animation is playing indicator */
+[data-animation-playing='true'] {
+  outline: 2px solid #4caf50 !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+}
+
+/* Editor mode: Hide indicators during playback */
+.animation-playback-mode [data-has-animation='true']::before {
+  display: none;
+}
+
+/* Disabled animation indicator */
+[data-animation-disabled='true']::before {
+  opacity: 0.3;
+  filter: grayscale(100%);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  [data-has-animation='true']::before {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+}

@@ -25,6 +25,11 @@
             "input": "packages/ui/src/assets/rapid-cmi5",
             "glob": "**/*",
             "output": "assets/rapid-cmi5"
+          },
+          {
+            "input": "apps/cc-cmi5-player/src/test/",
+            "glob": "**/*",
+            "output": "."
           }
         ],
         "styles": [

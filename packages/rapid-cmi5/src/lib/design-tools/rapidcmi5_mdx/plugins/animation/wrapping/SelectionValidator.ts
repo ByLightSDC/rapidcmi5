@@ -1,8 +1,14 @@
 /**
- * Phase 5.1: Selection Validator
+ * Selection Validator
  *
  * Validates whether selected content can be wrapped with an animation directive.
- * Uses RESTRICTIVE validation rules for MVP - only allow simple, single elements.
+ * Supports single and multiple element selection.
+ *
+ * Rules:
+ * - Supports multiple element selection (header + paragraph, etc.)
+ * - Each selected element must be fully selected (no partial)
+ * - All elements must be supported types
+ * - Cannot wrap already-animated content
  */
 
 import {
@@ -17,8 +23,9 @@ import {
   type RangeSelection,
 } from 'lexical';
 import type { ValidationResult } from './types/Selection.types';
+import { debugLog } from '@rapid-cmi5/ui';
 
-// Phase 5.1 MVP: Only allow these node types
+// Allowed node types for animation wrapping
 const ALLOWED_NODE_TYPES_MVP = [
   'paragraph',
   'heading',
@@ -26,24 +33,25 @@ const ALLOWED_NODE_TYPES_MVP = [
   'image',
   'video',
   'audio',
+  'list', // Ordered and unordered lists
 ] as const;
 
 export class SelectionValidator {
   /**
    * Validate whether current selection can be wrapped
    *
-   * Phase 5.1 MVP Rules (RESTRICTIVE):
+   * Rules:
    * - Only validate when drawer is open (performance)
-   * - Must be a valid range selection
+   * - Must be a valid range or node selection
    * - Must have content selected
-   * - Must be single element only (no multi-select)
-   * - Must be supported node type
+   * - Supports single or multiple elements
+   * - All elements must be supported node types
    * - Must not be inside existing directive
-   * - Must be full element selection (no partial)
+   * - Must be full element selection (no partial for single, auto-accept for multi)
    */
   static validateForWrapping(
     editor: LexicalEditor,
-    animationDrawerOpen: boolean
+    animationDrawerOpen: boolean,
   ): ValidationResult {
     // PERFORMANCE GATE: Only validate if drawer is open
     if (!animationDrawerOpen) {
@@ -69,37 +77,32 @@ export class SelectionValidator {
       // Branch: Decorator nodes (images/video/audio) use NodeSelection
       if ($isNodeSelection(selection)) {
         const nodes = selection.getNodes();
-        if (nodes.length !== 1) {
-          return {
-            isValid: false,
-            reason: 'Multiple elements selected',
-            suggestion:
-              'Phase 5.1: Select only one element at a time. Multi-select coming in Phase 5.2!',
-          };
+
+        // Allow multiple nodes - validate each individually
+        for (const node of nodes) {
+          const nodeType = node.getType();
+
+          if (!this.isNodeTypeSupported(nodeType)) {
+            return {
+              isValid: false,
+              reason: `"${nodeType}" elements not yet supported`,
+              suggestion:
+                'Animation supports: paragraphs, headings, lists, images, videos, and audio',
+            };
+          }
+
+          if (this.isInsideAnimationDirective(node)) {
+            return {
+              isValid: false,
+              reason:
+                'One or more elements already inside an animation directive',
+              suggestion:
+                'Cannot nest animation directives. Unwrap the outer directive first.',
+            };
+          }
         }
 
-        const node = nodes[0];
-        const nodeType = node.getType();
-
-        if (!this.isNodeTypeSupported(nodeType)) {
-          return {
-            isValid: false,
-            reason: `"${nodeType}" elements not yet supported`,
-            suggestion:
-              'Phase 5.1 supports: paragraphs, headings, images, videos, and audio',
-          };
-        }
-
-        if (this.isInsideAnimationDirective(node)) {
-          return {
-            isValid: false,
-            reason: 'Already inside an animation directive',
-            suggestion:
-              'Cannot nest animation directives. Unwrap the outer directive first.',
-          };
-        }
-
-        // NodeSelection of supported media is considered a full selection
+        // All nodes validated - NodeSelection is considered full selection
         return { isValid: true };
       }
 
@@ -113,18 +116,66 @@ export class SelectionValidator {
         };
       }
 
+      debugLog(
+        '[SelectionValidator] Range selection snapshot',
+        {
+          isCollapsed: selection.isCollapsed(),
+          selectedTextLength: selection.getTextContent().trim().length,
+          nodeCount: selection.getNodes().length,
+        },
+        undefined,
+        'selection',
+      );
+
       // Check 2: Anything selected?
-      if (selection.isCollapsed()) {
+      const domSelection = window.getSelection();
+      const domSelectedText = domSelection?.isCollapsed
+        ? ''
+        : (domSelection?.toString().trim() ?? '');
+
+      // Check for stale Lexical selection cache:
+      // If DOM says nothing is selected but Lexical thinks something is,
+      // the Lexical selection is stale (cached from previous selection)
+      const lexicalSelectedText = selection.getTextContent().trim();
+      if (!domSelectedText && lexicalSelectedText) {
+        debugLog(
+          '[SelectionValidator] Rejecting stale cached selection',
+          {
+            domSelectedText,
+            lexicalSelectedText,
+            note: 'DOM and Lexical selection mismatch - Lexical cache is stale',
+          },
+          undefined,
+          'selection',
+        );
         return {
           isValid: false,
           reason: 'Nothing selected',
-          suggestion: 'Select a heading, paragraph, or image to animate',
+          suggestion: 'Select a heading, paragraph, list, or image to animate',
+        };
+      }
+
+      if (selection.isCollapsed() && !domSelectedText) {
+        debugLog(
+          '[SelectionValidator] Rejecting collapsed selection',
+          undefined,
+          undefined,
+          'selection',
+        );
+        return {
+          isValid: false,
+          reason: 'Nothing selected',
+          suggestion: 'Select a heading, paragraph, list, or image to animate',
         };
       }
 
       // Check 3: Get selected nodes
       const nodes = selection.getNodes();
-      if (nodes.length === 0) {
+      const nodesFallback =
+        nodes.length === 0 && selection.isCollapsed()
+          ? this.getTopLevelElementFromSelection(selection)
+          : null;
+      if (nodes.length === 0 && !nodesFallback) {
         return {
           isValid: false,
           reason: 'No nodes selected',
@@ -132,56 +183,112 @@ export class SelectionValidator {
         };
       }
 
-      // Check 4: MVP - Single element only
-      // Phase 5.2 will relax this restriction
-      const topLevelNodes = this.getTopLevelElements(nodes);
-      if (topLevelNodes.length > 1) {
+      const topLevelNodes = nodesFallback
+        ? [nodesFallback]
+        : this.getTopLevelElements(nodes);
+      debugLog(
+        '[SelectionValidator] Top-level nodes',
+        topLevelNodes.map((n) => ({ key: n.getKey(), type: n.getType() })),
+        undefined,
+        'selection',
+      );
+
+      // Allow multiple nodes - validate each individually
+      if (topLevelNodes.length === 0) {
         return {
           isValid: false,
-          reason: 'Multiple elements selected',
-          suggestion:
-            'Phase 5.1: Select only one element at a time. Multi-select coming in Phase 5.2!',
+          reason: 'Could not determine top-level elements',
+          suggestion: 'Select complete paragraphs or headings',
         };
       }
 
-      const topLevelNode = topLevelNodes[0];
-      if (!topLevelNode) {
-        return {
-          isValid: false,
-          reason: 'Could not determine top-level element',
-          suggestion: 'Select a complete paragraph or heading',
-        };
+      // Validate each top-level node
+      for (const topLevelNode of topLevelNodes) {
+        // Check 5: Supported node type?
+        const nodeType = topLevelNode.getType();
+        if (!this.isNodeTypeSupported(nodeType)) {
+          return {
+            isValid: false,
+            reason: `"${nodeType}" elements not yet supported`,
+            suggestion:
+              'Animation supports: paragraphs, headings, lists, images, videos, and audio',
+          };
+        }
+
+        // Check 6: Not inside existing directive?
+        if (this.isInsideAnimationDirective(topLevelNode)) {
+          return {
+            isValid: false,
+            reason:
+              'One or more elements already inside an animation directive',
+            suggestion:
+              'Cannot nest animation directives. Unwrap the outer directive first.',
+          };
+        }
       }
 
-      // Check 5: Supported node type?
-      const nodeType = topLevelNode.getType();
-      if (!this.isNodeTypeSupported(nodeType)) {
-        return {
-          isValid: false,
-          reason: `"${nodeType}" elements not yet supported`,
-          suggestion:
-            'Phase 5.1 supports: paragraphs, headings, images, videos, and audio',
-        };
-      }
+      // Check 7: Selection type detection (block vs inline)
+      // For multi-select, we validate against the first and last nodes
+      const firstNode = topLevelNodes[0];
 
-      // Check 6: Not inside existing directive?
-      if (this.isInsideAnimationDirective(topLevelNode)) {
-        return {
-          isValid: false,
-          reason: 'Already inside an animation directive',
-          suggestion: 'Cannot nest animation directives. Unwrap the outer directive first.',
-        };
-      }
+      // Determine selection type
+      const selectionType = this.getSelectionType(
+        selection,
+        topLevelNodes,
+        domSelectedText,
+      );
 
-      // Check 7: Full element selected? (MVP - no partial selections)
-      // Phase 5.4 will add partial selection support
-      if (!this.isFullElementSelected(selection, topLevelNode)) {
-        return {
-          isValid: false,
-          reason: 'Partial selection detected',
-          suggestion:
-            'Select the entire element (not just part of it). Partial selections coming in Phase 5.4!',
-        };
+      debugLog(
+        '[SelectionValidator] Selection type detected',
+        { selectionType, nodeCount: topLevelNodes.length },
+        undefined,
+        'selection',
+      );
+
+      // If single node, check if it's inline or block
+      if (topLevelNodes.length === 1) {
+        if (selectionType === 'inline') {
+          // Inline selection is valid!
+          const selectedText =
+            domSelectedText ?? selection.getTextContent().trim();
+          debugLog(
+            '[SelectionValidator] Accepting inline selection',
+            {
+              nodeType: firstNode.getType(),
+              selectedTextLength: selectedText.length,
+              elementTextLength: firstNode.getTextContent().trim().length,
+              usedDomSelection: !!domSelectedText,
+            },
+            undefined,
+            'selection',
+          );
+          return {
+            isValid: true,
+            selectionType: 'inline',
+          };
+        } else if (selectionType === 'invalid') {
+          // Invalid partial selection (e.g., media node)
+          return {
+            isValid: false,
+            reason: 'Partial selection not supported for this element type',
+            suggestion:
+              'Select the entire element or select text within a paragraph/heading',
+          };
+        }
+        // selectionType === 'block' - continue to existing validation below
+      } else {
+        // Multiple nodes selected
+        // For multi-select, we accept the selection as-is (user selected complete elements)
+        // The wrapping logic will handle extracting and wrapping all top-level nodes
+        debugLog(
+          '[SelectionValidator] Multi-node selection accepted',
+          {
+            nodeCount: topLevelNodes.length,
+            types: topLevelNodes.map((n) => n.getType()),
+          },
+          undefined,
+          'selection',
+        );
       }
 
       // All checks passed! ✅
@@ -192,7 +299,7 @@ export class SelectionValidator {
   }
 
   /**
-   * Check if node type is supported for wrapping (Phase 5.1 MVP)
+   * Check if node type is supported for wrapping
    */
   private static isNodeTypeSupported(nodeType: string): boolean {
     return (ALLOWED_NODE_TYPES_MVP as readonly string[]).includes(nodeType);
@@ -209,7 +316,11 @@ export class SelectionValidator {
       // We need to check the type and then access mdast if it's a directive
       if (current.getType() === 'directive') {
         // Try to get mdast node (directive nodes have this method)
-        const mdastNode = (current as any).getMdastNode?.();
+        const mdastNode = (
+          current as unknown as {
+            getMdastNode?: () => { name?: string } | null;
+          }
+        ).getMdastNode?.();
         if (mdastNode && mdastNode.name === 'anim') {
           return true; // Inside an anim directive
         }
@@ -247,6 +358,26 @@ export class SelectionValidator {
   }
 
   /**
+   * When the RangeSelection is collapsed but the browser selection has text,
+   * derive the top-level element from the anchor node.
+   */
+  private static getTopLevelElementFromSelection(
+    selection: RangeSelection,
+  ): ElementNode | null {
+    let current: LexicalNode | null = selection.anchor.getNode();
+
+    while (current) {
+      const parent: LexicalNode | null = current.getParent();
+      if (!parent || $isRootNode(parent)) {
+        return $isElementNode(current) ? current : null;
+      }
+      current = parent;
+    }
+
+    return null;
+  }
+
+  /**
    * Check if entire element is selected (not partial)
    *
    * For text nodes: selection must match full content
@@ -254,7 +385,8 @@ export class SelectionValidator {
    */
   private static isFullElementSelected(
     selection: RangeSelection,
-    element: ElementNode
+    element: ElementNode,
+    domSelectedText?: string,
   ): boolean {
     const nodeType = element.getType();
 
@@ -264,10 +396,8 @@ export class SelectionValidator {
       return true;
     }
 
-    // For text-containing nodes: Check if selection spans the entire element
-    // More robust than comparing text content (which can have formatting issues)
-    const anchor = selection.anchor;
-    const focus = selection.focus;
+    const selectedTextRaw = domSelectedText ?? selection.getTextContent();
+    const selectedText = selectedTextRaw.trim();
 
     // Get the selected nodes - should only include this element or its children
     const selectedNodes = selection.getNodes();
@@ -284,7 +414,7 @@ export class SelectionValidator {
 
     // Check if selection includes all children by comparing node count
     // For a paragraph with mixed formatting, we should get all text nodes
-    const allChildrenSelected = selectedNodes.some(node => {
+    const allChildrenSelected = selectedNodes.some((node) => {
       let current: LexicalNode | null = node;
       while (current) {
         if (current === element) {
@@ -297,13 +427,153 @@ export class SelectionValidator {
 
     // Also check text content as a fallback
     const elementText = element.getTextContent();
-    const selectedText = selection.getTextContent();
+
+    debugLog(
+      'isFullElementSelected',
+      {
+        nodeType,
+        elementTextLength: elementText.trim().length,
+        selectedTextLength: selectedText.length,
+        allChildrenSelected,
+        elementTextPreview: elementText.trim().slice(0, 50),
+        selectedTextPreview: selectedText.slice(0, 50),
+      },
+      undefined,
+      'selection',
+    );
+
+    const lengthMatch =
+      selectedText === elementText.trim() ||
+      selectedText.length >= elementText.trim().length * 0.95;
+
+    // If we came from DOM selection with no Lexical nodes, use length heuristic
+    // as a stand-in for child coverage.
+    if (!allChildrenSelected && selectedNodes.length === 0) {
+      return lengthMatch;
+    }
 
     // Consider it fully selected if text matches OR if we have good node coverage
     return (
-      allChildrenSelected &&
-      (selectedText.trim() === elementText.trim() ||
-       selectedText.trim().length >= elementText.trim().length * 0.95) // 95% threshold
+      allChildrenSelected && lengthMatch // 95% threshold
     );
+  }
+
+  /**
+   * Determine selection type: 'block', 'inline', or 'invalid'
+   *
+   * Support inline selections for text elements
+   *
+   * - 'block': Full element selected OR media node
+   * - 'inline': Partial text within single text element (paragraph/heading)
+   * - 'invalid': Multi-element or unsupported partial selection
+   */
+  private static getSelectionType(
+    selection: RangeSelection,
+    topLevelNodes: ElementNode[],
+    domSelectedText?: string,
+  ): 'block' | 'inline' | 'invalid' {
+    // Multi-element selection is always block-level
+    if (topLevelNodes.length > 1) {
+      return 'block';
+    }
+
+    if (topLevelNodes.length === 0) {
+      return 'invalid';
+    }
+
+    const element = topLevelNodes[0];
+    const nodeType = element.getType();
+
+    // Media nodes are always block-level (can't partially select)
+    if (['image', 'video', 'audio'].includes(nodeType)) {
+      return 'block';
+    }
+
+    // Check if this is a text-containing element
+    const isTextElement = ['paragraph', 'heading', 'toc-heading'].includes(
+      nodeType,
+    );
+    if (!isTextElement) {
+      // Non-text elements (lists, etc.) must be fully selected
+      return this.isFullElementSelected(selection, element, domSelectedText)
+        ? 'block'
+        : 'invalid';
+    }
+
+    // For text elements, check if it's a partial selection
+    const isFullSelection = this.isFullElementSelected(
+      selection,
+      element,
+      domSelectedText,
+    );
+
+    if (isFullSelection) {
+      return 'block'; // Full element selected
+    }
+
+    // Partial text selection within a single element - this is inline!
+    if (this.isInlineSelection(selection, element, domSelectedText)) {
+      return 'inline';
+    }
+
+    return 'invalid';
+  }
+
+  /**
+   * Check if selection is a valid inline selection
+   *
+   * An inline selection is:
+   * - Within a single paragraph/heading
+   * - Does NOT span full element text
+   * - Has actual text content selected
+   */
+  private static isInlineSelection(
+    selection: RangeSelection,
+    element: ElementNode,
+    domSelectedText?: string,
+  ): boolean {
+    const nodeType = element.getType();
+
+    // Only text elements support inline selections
+    if (!['paragraph', 'heading', 'toc-heading'].includes(nodeType)) {
+      return false;
+    }
+
+    // Must have text selected (check both Lexical and DOM selections)
+    const selectedText = domSelectedText ?? selection.getTextContent().trim();
+    debugLog(
+      '[SelectionValidator] isInlineSelection check',
+      {
+        nodeType,
+        domSelectedText,
+        lexicalSelectedText: selection.getTextContent().trim(),
+        finalSelectedText: selectedText,
+      },
+      undefined,
+      'selection',
+    );
+    if (!selectedText) {
+      return false;
+    }
+
+    // Selection must be within this single element
+    const selectedNodes = selection.getNodes();
+    const allNodesInElement = selectedNodes.every((node) => {
+      let current: LexicalNode | null = node;
+      while (current) {
+        if (current === element) {
+          return true;
+        }
+        current = current.getParent();
+      }
+      return false;
+    });
+
+    if (!allNodesInElement) {
+      return false; // Selection spans multiple elements
+    }
+
+    // It's a valid inline selection!
+    return true;
   }
 }

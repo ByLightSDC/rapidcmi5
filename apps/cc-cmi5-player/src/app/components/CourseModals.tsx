@@ -1,11 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { FormCrudType, modal, setModal } from '@rapid-cmi5/ui';
 
-/* Branded */
-import {
-  FormControlUIProvider,
-  ModalDialog,
-} from '@rapid-cmi5/ui';
 
 /* Constants */
 import { useEffect, useState } from 'react';
@@ -19,6 +13,7 @@ import theForm from './ClassPromptForm';
 import { defaultClassEntryData } from '../session/constants';
 import { sendClassEventVerb } from '../utils/LmsStatementManager';
 import { debugLog, debugLogError } from '../debug';
+import { modal, setModal, ModalDialog, FormControlUIProvider, FormCrudType } from '@rapid-cmi5/ui';
 
 export const classPromptModalId = 'prompt-class-id';
 export const classChangeModalId = 'change-class-id';
@@ -112,6 +107,10 @@ export default function CourseModals() {
       //console.log('nothing found');
     }
   }, [previousRegistrationId, previousClassId]);
+
+  useEffect(() => {
+    //console.log('inject localClassId', localClassId);
+  }, [localClassId]);
 
   const StyledForm = theForm;
 

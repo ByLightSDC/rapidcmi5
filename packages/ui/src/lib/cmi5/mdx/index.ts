@@ -32,6 +32,7 @@ export * from './plugins/footnote/vars';
 export * from './plugins/link/util';
 export * from './plugins/animation-directive';
 export * from './editors/FxDirectiveDescriptor';
+
 export * from './plugins/fx/vars';
 export * from './plugins/fx/types';
 export * from './icons/Icons';
@@ -45,5 +46,25 @@ export * from './util/mergeStyleAttributes';
 export * from './util/mergeStyleAttributes';
 export * from './animation/engine/AnimationEngine';
 export * from './animation/types/Animation.types';
+import './animation/styles/animations.css';
+
 export * from './util/mergeStyleAttributes';
 
+export * from './editors/AdmonitionEditor';
+export * from './editors/AnimDirectiveDescriptor';
+export { InlineAnimDirectiveDescriptor } from './editors/AnimDirectiveDescriptor';
+export * from './editors/AnimationDirectiveRegistry';
+export * from './editors/AdmonitionDirectiveDescriptor';
+export * from './editors/FxDirectiveDescriptor';
+export * from './editors/YouTubeDirectiveDescriptor';
+export * from './plugins/tabs/InsertTabs';
+export * from './plugins/tabs/TabContentDirectiveDescriptor';
+export * from './plugins/tabs/TabsDirectiveDescriptor';
+export * from './plugins/accordion/AccordionContentDirectiveDescriptor';
+export * from './plugins/accordion/AccordionContentEditor';
+export * from './plugins/accordion/AccordionDirectiveDescriptor';
+export * from './plugins/accordion/InsertAccordion';
+export * from './plugins/image-label/constants';
+export * from './plugins/image-label/ImageLabelDirectiveDescriptor';
+export * from './plugins/image-label/methods';
+export * from './util/validateYamlFrontmatter';

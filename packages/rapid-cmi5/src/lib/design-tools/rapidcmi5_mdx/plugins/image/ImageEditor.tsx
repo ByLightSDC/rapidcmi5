@@ -1,13 +1,22 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import type { BaseSelection, LexicalEditor } from 'lexical';
-
+import { $isLinkNode } from '@lexical/link';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 import { mergeRegister } from '@lexical/utils';
 import { useCellValues } from '@mdxeditor/gurx';
 import classNames from 'classnames';
 import {
+  $createLineBreakNode,
+  $createParagraphNode,
+  $createTextNode,
   $getNodeByKey,
   $getSelection,
   $isNodeSelection,
@@ -26,20 +35,33 @@ import {
   MdxJsxExpressionAttribute,
   MdxJsxAttributeValueExpression,
 } from 'mdast-util-mdx-jsx';
+import type { ContainerDirective } from 'mdast-util-directive';
+import type { BlockContent } from 'mdast';
 import {
   disableImageResize$,
   editImageToolbarComponent$,
+  ImageNode,
   imagePlaceholder$ as imagePlaceholderComponent$,
   imagePreviewHandler$,
 } from './index';
 import styles from './styles/image-plugin.module.css';
-import { readOnly$ } from '@mdxeditor/editor';
+import {
+  $createDirectiveNode,
+  readOnly$,
+  syntaxExtensions$,
+  viewMode$,
+  DirectiveNode,
+} from '@mdxeditor/editor';
 import { $isImageNode } from './ImageNode';
 import ImageResizer from './ImageResizer';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 import { useSelector } from 'react-redux';
-import { debugLogError, editorInPlayback$ } from '@rapid-cmi5/ui';
-import { currentAuPath } from '../../../../redux/courseBuilderReducer';
+
+import RC5LinkEditor from '../link/RC5LinkEditor';
+import { debugLogError, editorInPlayback$, useTimeStampUUID, onCheckClickOutsideImageLabel, debugLog, convertMarkdownToMdast, DEFAULT_IMAGE_LABEL_CONTENT, MARKER_HALF_WIDTH, MARKER_HALF_HEIGHT } from '@rapid-cmi5/ui';
+import { currentAuPath } from 'packages/rapid-cmi5/src/lib/redux/courseBuilderReducer';
+import { isLabelDropping$, clickPosition$ } from 'packages/ui/src/lib/cmi5/mdx/plugins/image-label/vars';
+
 
 const BROKEN_IMG_URI =
   'data:image/svg+xml;charset=utf-8,' +
@@ -59,6 +81,7 @@ export interface ImageEditorProps {
   height: number | 'inherit';
   rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   href?: string;
+  id?: string; // Unique persistent ID for animation targeting
 }
 
 // https://css-tricks.com/pre-caching-image-with-react-suspense/
@@ -123,6 +146,11 @@ function parseCssString(
   return style;
 }
 
+/**
+ * LazyImage for Editor
+ * @param param0
+ * @returns
+ */
 function LazyImage({
   title,
   alt,
@@ -133,6 +161,7 @@ function LazyImage({
   height,
   rest,
   style,
+  id,
 }: {
   title: string;
   alt: string;
@@ -143,6 +172,7 @@ function LazyImage({
   height: number | 'inherit';
   rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   style?: React.CSSProperties;
+  id?: string;
 }) {
   const [url, setUrl] = useState<string>(src);
 
@@ -198,10 +228,11 @@ function LazyImage({
       width={width}
       height={height}
       style={style}
+      id={id}
     />
   );
 }
-
+//
 export function ImageEditor({
   src,
   title,
@@ -211,6 +242,7 @@ export function ImageEditor({
   height,
   rest,
   href,
+  id,
 }: ImageEditorProps): JSX.Element | null {
   const [
     ImagePlaceholderComponent,
@@ -219,6 +251,8 @@ export function ImageEditor({
     readOnly,
     EditImageToolbar,
     isPlayback,
+    syntaxExtensions,
+    viewMode,
   ] = useCellValues(
     imagePlaceholderComponent$,
     disableImageResize$,
@@ -226,9 +260,13 @@ export function ImageEditor({
     readOnly$,
     editImageToolbarComponent$,
     editorInPlayback$,
+    syntaxExtensions$,
+    viewMode$,
   );
 
   const imageRef = React.useRef<null | HTMLImageElement>(null);
+  const labelsRef = React.useRef<null | HTMLImageElement>(null);
+  const urlRef = React.useRef<string | null>(null);
   const buttonRef = React.useRef<HTMLButtonElement | null>(null);
   const [isSelected, setSelected, clearSelection] =
     useLexicalNodeSelection(nodeKey);
@@ -240,6 +278,9 @@ export function ImageEditor({
   const [initialImagePath, setInitialImagePath] = React.useState<string | null>(
     null,
   );
+  const [isUrlShowing, setIsUrlShowing] = React.useState<boolean>(false);
+  const anchorRef = useRef(null);
+  const { generateId } = useTimeStampUUID();
 
   // determine styles
   // NOTE: wrapper style is required because of the way the image plugin uses
@@ -262,6 +303,44 @@ export function ImageEditor({
       }
     }
   }
+
+  /**
+   * Check click outside for Image Label feature
+   * For images with links, flag to show url panel
+   */
+  const onClickImage = useCallback(() => {
+    if (id) {
+      onCheckClickOutsideImageLabel(id);
+    }
+
+    editor.update(() => {
+      let node = $getNodeByKey(nodeKey);
+
+      if (node) {
+        let linkUrl: string | undefined = undefined;
+        if (node.getType() === 'image') {
+          linkUrl = (node as ImageNode).getHref();
+        } else {
+          const parent = node.getParent();
+          if ($isLinkNode(parent)) {
+            linkUrl = parent.getURL();
+          } else {
+            //NOT link
+          }
+          node = parent;
+        }
+
+        if (linkUrl) {
+          if (isPlayback) {
+            window.open(linkUrl, '_blank', 'noreferrer');
+          } else {
+            urlRef.current = linkUrl;
+            setIsUrlShowing(true);
+          }
+        }
+      }
+    });
+  }, [isPlayback]);
 
   const onDelete = React.useCallback(
     (payload: KeyboardEvent) => {
@@ -316,105 +395,6 @@ export function ImageEditor({
     [editor, setSelected],
   );
 
-  React.useEffect(() => {
-    if (imagePreviewHandler) {
-      const callPreviewHandler = async () => {
-        if (!initialImagePath) setInitialImagePath(src);
-        const updatedSrc = await imagePreviewHandler(src);
-        setImageSource(updatedSrc);
-      };
-      callPreviewHandler().catch((e: unknown) => {
-        console.error(e);
-      });
-    } else {
-      setImageSource(src);
-    }
-  }, [src, imagePreviewHandler, initialImagePath]);
-
-  React.useEffect(() => {
-    let isMounted = true;
-    const unregister = mergeRegister(
-      editor.registerUpdateListener(({ editorState }) => {
-        if (isMounted) {
-          setSelection(editorState.read(() => $getSelection()));
-        }
-      }),
-      editor.registerCommand(
-        SELECTION_CHANGE_COMMAND,
-        (_, activeEditor) => {
-          activeEditorRef.current = activeEditor;
-          return false;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-      editor.registerCommand<MouseEvent>(
-        CLICK_COMMAND,
-        (payload) => {
-          const event = payload;
-
-          if (isResizing) {
-            return true;
-          }
-          if (event.target === imageRef.current) {
-            if (event.shiftKey) {
-              setSelected(!isSelected);
-            } else {
-              clearSelection();
-              setSelected(true);
-            }
-            return true;
-          }
-
-          return false;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-      editor.registerCommand(
-        DRAGSTART_COMMAND,
-        (event) => {
-          if (event.target === imageRef.current) {
-            // TODO This is just a temporary workaround for FF to behave like other browsers.
-            // Ideally, this handles drag & drop too (and all browsers).
-            event.preventDefault();
-            return true;
-          }
-          return false;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-      editor.registerCommand(
-        KEY_DELETE_COMMAND,
-        onDelete,
-        COMMAND_PRIORITY_LOW,
-      ),
-      editor.registerCommand(
-        KEY_BACKSPACE_COMMAND,
-        onDelete,
-        COMMAND_PRIORITY_LOW,
-      ),
-      editor.registerCommand(KEY_ENTER_COMMAND, onEnter, COMMAND_PRIORITY_LOW),
-      editor.registerCommand(
-        KEY_ESCAPE_COMMAND,
-        onEscape,
-        COMMAND_PRIORITY_LOW,
-      ),
-    );
-    return () => {
-      isMounted = false;
-      unregister();
-    };
-  }, [
-    clearSelection,
-    editor,
-    isResizing,
-    isSelected,
-    nodeKey,
-    onDelete,
-    onEnter,
-    onEscape,
-    setSelected,
-  ]);
-
   const onResizeEnd = (
     nextWidth: 'inherit' | number,
     nextHeight: 'inherit' | number,
@@ -467,6 +447,7 @@ export function ImageEditor({
 
   const imageElement = (
     <LazyImage
+      id={id}
       width={width}
       height={height}
       className={classNames(
@@ -484,24 +465,192 @@ export function ImageEditor({
     />
   );
 
-  const imageWithOptionalLink = href ? (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={(e) => {
-        // Prevent link navigation when in edit mode
-        if (!readOnly) {
-          e.preventDefault();
+  /**
+   * Insert Image Label Directive
+   * @param xPos X position relative to image top left corner
+   * @param yPos Y position relative to image top left corner
+   * @returns
+   */
+  const insertImageLabel = (xPos: string, yPos: string) => {
+    if (!editor) return;
+
+    editor.update(() => {
+      const targetNode = $getNodeByKey(nodeKey);
+
+      if (!targetNode) return;
+      let targetImageId = id;
+      if (!targetImageId) {
+        debugLog('set image id for label');
+        targetImageId = generateId();
+        (targetNode as ImageNode).setId(targetImageId);
+      }
+
+      // create children tabs content nodes
+      const theChildMDast = convertMarkdownToMdast(
+        DEFAULT_IMAGE_LABEL_CONTENT,
+        syntaxExtensions,
+      );
+
+      // create image label node
+      const mdastAccordion: ContainerDirective = {
+        type: 'containerDirective',
+        name: 'imageLabel',
+        attributes: {
+          title: '**Label Title**',
+          imageId: targetImageId,
+          x: xPos,
+          y: yPos,
+        },
+        children: (theChildMDast?.children as BlockContent[]) || [],
+      };
+      //insert after image (ordering not important)
+      const labelNode = $createDirectiveNode(mdastAccordion) as DirectiveNode;
+      const lineBreakNode = $createLineBreakNode();
+      targetNode.insertAfter(lineBreakNode);
+      lineBreakNode.insertAfter(labelNode);
+
+      //turn off dropping flag
+      isLabelDropping$.value = false;
+    });
+  };
+
+  useEffect(() => {
+    if (imagePreviewHandler) {
+      const callPreviewHandler = async () => {
+        if (!initialImagePath) setInitialImagePath(src);
+        const updatedSrc = await imagePreviewHandler(src);
+        setImageSource(updatedSrc);
+      };
+      callPreviewHandler().catch((e: unknown) => {
+        console.error(e);
+      });
+    } else {
+      setImageSource(src);
+    }
+  }, [src, imagePreviewHandler, initialImagePath]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const unregister = mergeRegister(
+      editor.registerUpdateListener(({ editorState }) => {
+        if (isMounted) {
+          setSelection(editorState.read(() => $getSelection()));
         }
-      }}
-      style={{ display: 'inline-block' }}
-    >
-      {imageElement}
-    </a>
-  ) : (
-    imageElement
-  );
+      }),
+      editor.registerCommand(
+        SELECTION_CHANGE_COMMAND,
+        (_, activeEditor) => {
+          activeEditorRef.current = activeEditor;
+          return false;
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand<MouseEvent>(
+        CLICK_COMMAND,
+        (payload) => {
+          const event = payload;
+          if (isResizing) {
+            return true;
+          }
+
+          if (
+            event.target === imageRef.current ||
+            event.target === labelsRef.current
+          ) {
+            if (id) {
+              onCheckClickOutsideImageLabel(id);
+            }
+            if (event.shiftKey) {
+              setSelected(!isSelected);
+            } else {
+              clearSelection();
+              setSelected(true);
+            }
+
+            if (isLabelDropping$.value && event.currentTarget) {
+              const target = event.target as HTMLElement;
+              const rect = target.getBoundingClientRect();
+              const xx = event.clientX - rect.left - MARKER_HALF_WIDTH;
+              const yy = event.clientY - rect.top - MARKER_HALF_HEIGHT;
+              insertImageLabel('' + xx, '' + yy);
+            }
+            return true;
+          } else {
+            if (isLabelDropping$.value && event.target) {
+              if (clickPosition$.value[0] !== event.clientX) {
+                isLabelDropping$.value = false;
+              }
+            }
+          }
+
+          return false;
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(
+        DRAGSTART_COMMAND,
+        (event) => {
+          if (event.target === imageRef.current) {
+            // TODO This is just a temporary workaround for FF to behave like other browsers.
+            // Ideally, this handles drag & drop too (and all browsers).
+            event.preventDefault();
+            return true;
+          }
+          return false;
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(
+        KEY_DELETE_COMMAND,
+        onDelete,
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(
+        KEY_BACKSPACE_COMMAND,
+        onDelete,
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerCommand(KEY_ENTER_COMMAND, onEnter, COMMAND_PRIORITY_LOW),
+      editor.registerCommand(
+        KEY_ESCAPE_COMMAND,
+        onEscape,
+        COMMAND_PRIORITY_LOW,
+      ),
+    );
+    return () => {
+      isMounted = false;
+      unregister();
+    };
+  }, [
+    clearSelection,
+    editor,
+    isResizing,
+    isSelected,
+    nodeKey,
+    onDelete,
+    onEnter,
+    onEscape,
+    setSelected,
+  ]);
+
+  /**
+   * UE determines if this image is nested in a n <a> node
+   * if so, retrieves url
+   */
+  useEffect(() => {
+    editor.update(() => {
+      if (!isSelected) {
+        setIsUrlShowing(false);
+      }
+    });
+  }, [isSelected, editor]);
+
+  /** UE hides lnik when switching to raw mode */
+  useEffect(() => {
+    if (viewMode === 'source') {
+      setIsUrlShowing(false);
+    }
+  }, [viewMode]);
 
   return imageSource !== null ? (
     <React.Suspense
@@ -511,8 +660,20 @@ export function ImageEditor({
     >
       <div style={wrapperStyle}>
         <div className={styles['imageWrapper']} data-editor-block-type="image">
-          <div draggable={draggable}>{imageWithOptionalLink}</div>
-          {draggable && isFocused && !disableImageResize && (
+          <div
+            id={`image-labels-${id}`}
+            ref={labelsRef}
+            style={{
+              position: 'absolute',
+              left: 0,
+              width: '100%',
+              height: '100%',
+            }}
+          />
+          <div draggable={draggable} ref={anchorRef} onClick={onClickImage}>
+            {imageElement}
+          </div>
+          {!isPlayback && draggable && isFocused && !disableImageResize && (
             <ImageResizer
               editor={editor}
               imageRef={imageRef}
@@ -535,6 +696,15 @@ export function ImageEditor({
           )}
         </div>
       </div>
+      {isUrlShowing && urlRef.current && (
+        <RC5LinkEditor
+          isOpen={isUrlShowing}
+          linkNodeKey={nodeKey}
+          url={urlRef.current}
+          urlIsExternal={urlRef.current.startsWith('http')}
+          virtualElement={anchorRef.current}
+        />
+      )}
     </React.Suspense>
   ) : null;
 }

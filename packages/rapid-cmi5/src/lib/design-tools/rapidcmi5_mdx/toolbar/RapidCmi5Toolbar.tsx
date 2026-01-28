@@ -8,7 +8,6 @@ import {
   CreateLink,
   DiffSourceToggleWrapper,
   InsertCodeBlock,
-  InsertTable,
   InsertThematicBreak,
   ListsToggle,
   ShowSandpackInfo,
@@ -30,35 +29,42 @@ import { InsertVideo } from './components/InsertVideo';
 import { InsertLayoutBox } from './components/InsertLayoutBox';
 
 /** Icons */
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
 
-import { Box, IconButton, Tooltip } from '@mui/material';
 import {
-  ActivityType,
-  AdmonitionTypeEnum,
-  AdmonitionTypes,
-  RC5ActivityTypeEnum,
-} from '@rapid-cmi5/cmi5-build-common';
+  Box,
+  Drawer,
+  IconButton,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+
 import { InsertAdmonition } from './components/InsertAdmonition';
 import {
   iconButtonSize,
   iconButtonStyle,
   tooltipStyle,
 } from '../styles/styles';
-import { CONTENT_UPDATED_COMMAND, editorInPlayback$ } from '@rapid-cmi5/ui';
+
 import { useSelector } from 'react-redux';
-import { dividerColor } from '@rapid-cmi5/ui';
 import { BlockTypeSelect } from './components/BlockTypeSelect';
-import { displayData } from '../../../redux/courseBuilderReducer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { RC5Context } from '../contexts/RC5Context';
 import { ColorTextSplitButton } from './components/ColorTextSplitButton';
 import { HighlightSplitButton } from './components/HighlightSplitButton';
+import { TextFxButton } from './components/TextFxButton';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { InsertAudio } from './components/InsertAudio';
+import { InsertTable } from './components/InsertTable';
 import { InsertAnimation } from './components/InsertAnimation';
-import { TextFxButton } from './components/TextFxButton';
+import { AdmonitionTypeEnum, AdmonitionTypes, ActivityType, RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import { editorInPlayback$, CONTENT_UPDATED_COMMAND, InsertTabs, InsertAccordion, dividerColor, iconColor } from '@rapid-cmi5/ui';
+import { displayData } from '../../../redux/courseBuilderReducer';
 
 //Admonition
 export type RapidAdmonitionKind =
@@ -104,6 +110,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
   const realm = useRealm();
   const [isToolGroup1Visible, setIsToolGroup1Visible] = useState(true);
   const isPlayback = useCellValue(editorInPlayback$);
+  const themeIconColor = useSelector(iconColor);
   const themedDividerColor = useSelector(dividerColor);
   const content = useSelector(displayData);
   const [editor] = useLexicalComposerContext();
@@ -200,9 +207,10 @@ export const RapidCmi5Toolbar: React.FC = () => {
                   <InsertImage />
                   <InsertAudio />
                   <InsertVideo />
-
                   <Separator />
                   <InsertTable />
+                  <InsertTabs />
+                  <InsertAccordion />
                   <InsertThematicBreak />
                   <Separator />
                   <InsertCodeBlock />
@@ -214,14 +222,20 @@ export const RapidCmi5Toolbar: React.FC = () => {
                   <IconPortal>
                     <IconButton
                       aria-label="toggle-playback"
-                      color="inherit"
                       size={iconButtonSize}
                       style={iconButtonStyle}
                       onClick={() => {
                         realm.pub(editorInPlayback$, !isPlayback);
                       }}
                     >
-                      <>
+                      <Box
+                        sx={{
+                          color: themeIconColor,
+                          display: 'flex',
+                          justifyContent: 'center',
+                          height: '32px',
+                        }}
+                      >
                         {isPlayback && (
                           <Tooltip title="Toggle Preview OFF" {...tooltipStyle}>
                             <StopScreenShareIcon color="inherit" />
@@ -232,7 +246,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                             <ScreenShareIcon color="inherit" />
                           </Tooltip>
                         )}
-                      </>
+                      </Box>
                     </IconButton>
                   </IconPortal>
                 </>
@@ -256,7 +270,9 @@ function IconPortal({ children }: { children: JSX.Element | JSX.Element[] }) {
     return <div style={{ width: '100%', height: '100%' }} />;
   }
   return ReactDOM.createPortal(
-    <div className="modal-content">{children}</div>,
+    <Box className="modal-content" sx={{ color: 'primary' }}>
+      {children}
+    </Box>,
     modalRoot, // Render the children into the modalRoot DOM node
   );
 }

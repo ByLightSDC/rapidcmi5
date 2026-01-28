@@ -11,36 +11,19 @@ import { Stack, Typography } from '@mui/material';
 import { ScenarioForm } from '../forms/ScenarioForm';
 import { JobeForm } from '../forms/JobeForm';
 
-import {
-  ActivityJsonNode,
-  CTFContent,
-  JobeContent,
-  RC5ActivityTypeEnum,
-} from '@rapid-cmi5/cmi5-build-common';
-import {
-  AuCTF,
-  AuQuiz,
-  debugLogError,
-  editorInPlayback$,
-  jsonFormatSpaces,
-  JobeInTheBox,
-  debugLog,
-  useTimeStampUUID,
-} from '@rapid-cmi5/ui';
+
 
 import { QuizForm } from '../forms/QuizForm';
-import { QuizContent } from '@rapid-cmi5/cmi5-build-common';
 import { useAuContext } from '../../data-hooks/useAuContext';
 import DeleteIconButton from '../components/DeleteIconButton';
 import RightMenuContainer from '../components/RightMenuContainer';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  updateScenario,
-  updateTeamScenario,
-} from '../../../../redux/courseBuilderReducer';
-import { dividerColor, FormCrudType } from '@rapid-cmi5/ui';
+
 import { TeamConsolesForm } from '../forms/TeamConsolesForm';
 import { DownloadFilesForm } from './DownloadFilesForm';
+import { RC5ActivityTypeEnum, ActivityJsonNode, QuizContent, CTFContent, JobeContent } from '@rapid-cmi5/cmi5-build-common';
+import { useTimeStampUUID, editorInPlayback$, dividerColor, debugLog, debugLogError, jsonFormatSpaces, FormCrudType, AuQuiz, AuCTF, JobeInTheBox } from '@rapid-cmi5/ui';
+import { updateScenario, updateTeamScenario } from '@rapid-cmi5/react-editor';
 
 /**
  * MDX Editor for Activities

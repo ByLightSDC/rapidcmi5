@@ -1,6 +1,5 @@
 import { useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setModal } from '@rapid-cmi5/ui';
 import {
   rangeConsoleDataAttemptsSel,
   rangeConsoleDataErrorSel,
@@ -13,22 +12,9 @@ import {
 // Console
 
 import { ScenarioUpdatesContext } from './ScenarioUpdatesContext';
-import {
-  OverflowTypography,
-  TabMainUi,
-} from '@rapid-cmi5/ui';
-import {
-  AutoGraderEvent,
-  ButtonMainUi,
-  ButtonMinorUi,
-  getScenarioStatusIcon,
-  queryKeyRangeResourceContainers,
-  Topic,
-} from '@rapid-cmi5/ui';
-import {
-  DeployedScenario,
-  DeployedScenarioDetailStatusEnum,
-} from '@rapid-cmi5/ui';
+
+
+
 
 /* MUI */
 import {
@@ -61,10 +47,13 @@ import ScenarioModals from './ScenarioModals';
 import TimeClock from './TimeClock';
 import { numRetries } from '../../hooks/useCMI5Session';
 import { classChangeModalId } from '../CourseModals';
-import { AuContextProps, ScenarioContent } from '@rapid-cmi5/cmi5-build-common';
 import ScenarioProgress from './ScenarioProgress';
 import { useAutoGraderProgress } from './hooks/useAutoGraderProgress';
 import AutoGraderSubscription from './graph/AutoGraderSubscription';
+import { DeployedScenario, DeployedScenarioDetailStatusEnum } from '@rangeos-nx/frontend/clients/devops-api';
+import { queryKeyRangeResourceContainers, getScenarioStatusIcon, Topic, AutoGraderEvent } from '@rangeos-nx/frontend/clients/hooks';
+import { AuContextProps, ScenarioContent } from '@rapid-cmi5/cmi5-build-common';
+import { ButtonMainUi, setModal, ButtonMinorUi, OverflowTypography, TabMainUi } from '@rapid-cmi5/ui';
 
 /**
  * Slide that displays a Deployed Scenario status, VMs, Containers, and provides Consoles access

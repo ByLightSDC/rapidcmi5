@@ -1,13 +1,29 @@
 import { Cell, Signal, Action, map, withLatestFrom } from '@mdxeditor/gurx';
-import { AnimationConfig, PlaybackState } from '@rapid-cmi5/ui';
+import { debugLog } from '@rapid-cmi5/ui';
+import { AnimationConfig, PlaybackState } from '../types/Animation.types';
 
 /**
  * Helper to log slideAnimations$ updates with stack trace
  */
 function logAnimationsUpdate(source: string, animations: AnimationConfig[]) {
-  console.log(`[slideAnimations$] ${source} → ${animations.length} items`);
-  console.log(`[slideAnimations$] Stack:`, new Error().stack?.split('\n').slice(2, 5).join('\n'));
+  debugLog(
+    `[slideAnimations$] ${source} → ${animations.length} items`,
+    undefined,
+    undefined,
+    'plugin',
+  );
 }
+
+/**
+ * Current slide index (used to validate cross-slide contamination)
+ */
+export const currentSlideIndex$ = Cell<number>(-1);
+
+/**
+ * Callback to notify React component of animation changes
+ * Stored as a cell so it can be updated without recreating subscriptions
+ */
+export const onAnimationsChangeCb$ = Cell<((animations: AnimationConfig[]) => void) | null>(null);
 
 /**
  * All animations for the current slide
@@ -25,7 +41,14 @@ export const slideAnimations$ = Cell<AnimationConfig[]>([], (r) => {
         order: nextOrder,
       };
 
+      debugLog('➕ [addAnimation$] Adding new animation with order:', nextOrder, undefined, 'plugin');
+      debugLog('➕ [addAnimation$] Current animations before add:', currentAnims.map(a => ({ id: a.id, order: a.order, label: a.targetLabel })), undefined, 'plugin');
+      debugLog('➕ [addAnimation$] New animation:', { id: animation.id, order: animation.order, label: animation.targetLabel }, undefined, 'plugin');
+
       const updated = [...currentAnims, animation];
+
+      debugLog('➕ [addAnimation$] After adding:', updated.map(a => ({ id: a.id, order: a.order, label: a.targetLabel })), undefined, 'plugin');
+
       logAnimationsUpdate('addAnimation$', updated);
       r.pub(slideAnimations$, updated);
       r.pub(selectedAnimation$, animation.id);
@@ -48,12 +71,18 @@ export const slideAnimations$ = Cell<AnimationConfig[]>([], (r) => {
   r.sub(
     r.pipe(deleteAnimation$, withLatestFrom(slideAnimations$)),
     ([id, currentAnims]) => {
+      debugLog('🗑️ [deleteAnimation$] Deleting animation:', id, undefined, 'plugin');
+      debugLog('🗑️ [deleteAnimation$] Before deletion:', currentAnims.map(a => ({ id: a.id, order: a.order, label: a.targetLabel })), undefined, 'plugin');
+
       const filtered = currentAnims.filter((anim) => anim.id !== id);
       // Reorder remaining animations
       const reordered = filtered.map((anim, index) => ({
         ...anim,
         order: index + 1,
       }));
+
+      debugLog('🗑️ [deleteAnimation$] After deletion & reordering:', reordered.map(a => ({ id: a.id, order: a.order, label: a.targetLabel })), undefined, 'plugin');
+
       logAnimationsUpdate('deleteAnimation$', reordered);
       r.pub(slideAnimations$, reordered);
 
@@ -203,8 +232,12 @@ export const reorderAnimations$ = Signal<{
 
 /**
  * Set all animations (used when loading from markdown)
+ * Payload includes slideIndex to prevent cross-slide contamination
  */
-export const setAnimations$ = Signal<AnimationConfig[]>();
+export const setAnimations$ = Signal<{
+  animations: AnimationConfig[];
+  slideIndex: number;
+}>();
 
 /**
  * Play a single animation (preview)

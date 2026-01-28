@@ -13,7 +13,7 @@ import {
   useRealm,
 } from '@mdxeditor/gurx';
 import { markdown$ } from '@mdxeditor/editor';
-import { debugLog } from '../../../utility/logger';
+import { debugLog } from '@rapid-cmi5/ui';
 
 /**
  * Animation Directive Registry

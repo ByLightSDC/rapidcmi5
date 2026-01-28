@@ -2,6 +2,8 @@
 export { animationPlugin } from './AnimationPlugin';
 export type { AnimationPluginParams } from './AnimationPlugin';
 
+// Types
+export * from './types/Animation.types';
 
 // State (for external access)
 export {
@@ -34,6 +36,9 @@ export { WrapWithAnimDirective } from './components/WrapWithAnimDirective';
 // Utilities for frontmatter handling
 export { parseAnimationsFromFrontmatter } from './visitors/MdastAnimationImport';
 export { injectAnimationsIntoFrontmatter } from './visitors/LexicalAnimationExport';
+
+
+
 // Utilities
 export * from './utils/lexicalSelection';
 export {
@@ -41,12 +46,6 @@ export {
   clearAnimationIndicators,
   highlightAnimatedElement,
 } from './utils/updateAnimationIndicators';
-export {
-  addAnimationIdsToElements,
-  findElementByNodeKey,
-  setupAnimationIdRefresh,
-  getOrphanedAnimationKeys,
-} from './utils/lexicalDomBridge';
 export {
   generateStableId,
   findNodeKeyByStableId,
@@ -58,11 +57,4 @@ export {
   getAllDirectiveIds,
   isDirectiveIdInUse,
 } from './utils/directiveResolver';
-export { cleanupOrphanedAnimations } from './utils/cleanupOrphanedAnimations';
-export {
-  cleanupOrphanedDirectiveAnimations,
-  findAnimationsByDirectiveId,
-  hasAnimationsForDirective,
-  getUnusedDirectiveIds,
-} from './utils/cleanupOrphanedDirectives';
 export { areAnimationsEqual } from './utils/animationComparison';

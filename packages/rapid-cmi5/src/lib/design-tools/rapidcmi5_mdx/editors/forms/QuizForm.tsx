@@ -1,38 +1,18 @@
 import { MenuItem } from '@mui/material';
 import { UseFormReturn } from 'react-hook-form';
-import {
-  defaultQuestion,
-  ENUM_GROUP,
-  FormControlIntegerField,
-  FormControlSelectField,
-  FormControlTextField,
-  FormControlUIProvider,
-  FormCrudType,
-  FormFieldArray,
-  FormStateType,
-  MiniForm,
-  REQUIRED_ENTRY,
-  REQUIRED_ERROR,
-  SPECIFY_AT_LEAST_ONE_ERROR,
-  tFormFieldRendererProps,
-} from '@rapid-cmi5/ui';
+
+
+/* MUI */
 import Grid from '@mui/material/Grid2';
+
 import * as yup from 'yup';
-import {
-  MoveOnCriteriaEnum,
-  moveOnCriteriaOptions,
-  QuestionGrading,
-  QuestionResponse,
-  QuizCompletionEnum,
-  QuizContent,
-  SlideTypeEnum,
-} from '@rapid-cmi5/cmi5-build-common';
 
-
-import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { QuizQuestionsFieldGroup } from '../../../course-builder/QuizQuestionsFieldGroup';
 import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
 import LrsHeaderWithDetails from './LrsStatementHelper';
+import { RC5ActivityTypeEnum, QuizContent, SlideTypeEnum, QuizCompletionEnum, MoveOnCriteriaEnum, QuestionResponse, QuestionGrading, moveOnCriteriaOptions } from '@rapid-cmi5/cmi5-build-common';
+import { ENUM_GROUP, REQUIRED_ERROR, REQUIRED_ENTRY, SPECIFY_AT_LEAST_ONE_ERROR, defaultQuestion, FormControlIntegerField, FormControlSelectField, FormControlTextField, FormControlUIProvider, FormCrudType, FormFieldArray, FormStateType, MiniForm, tFormFieldRendererProps } from '@rapid-cmi5/ui';
+import { featureFlagShouldShowKSATs } from 'packages/rapid-cmi5/src/lib/featureFlags';
 
 export const QuizForm = ({
   activityKind,
@@ -54,9 +34,7 @@ export const QuizForm = ({
       : SlideTypeEnum.CTF;
 
   // Get the unique rc5id from the form data for scoping ksats to individual activity
-  //#REF
-  // const rc5id = defaultFormData?.rc5id;
-  // const scopedKsatsFieldName = rc5id ? `ksats_${rc5id}` : 'ksats';
+  const rc5id = defaultFormData?.rc5id;
 
   const validationSchema = yup.object().shape({
     //cmi5QuizId: read-only field auto populated/updated
@@ -74,7 +52,6 @@ export const QuizForm = ({
         element_identifier: REQUIRED_ENTRY,
       }),
     ),
-    //#REF [scopedKsatsFieldName]: yup.array().of(yup.string()).optional(),
     questions: yup
       .array()
       .of(
@@ -244,13 +221,15 @@ export const QuizForm = ({
             onReorderEntry={handleReorderQuestions}
           />
         </Grid>
-        {/* <Grid size={11.5}>
-          <KSATsFieldGroup
-            formMethods={formMethods}
-            crudType={crudType}
-            //#REF scopedKsatsFieldName={scopedKsatsFieldName}
-          />
-        </Grid> */}
+        {featureFlagShouldShowKSATs && (
+          <Grid size={11.5}>
+            <KSATsFieldGroup
+              formMethods={formMethods}
+              crudType={crudType}
+              //#REF scopedKsatsFieldName={scopedKsatsFieldName}
+            />
+          </Grid>
+        )}
 
         <Grid size={11}>
           <LrsHeaderWithDetails activityType={RC5ActivityTypeEnum.quiz} />

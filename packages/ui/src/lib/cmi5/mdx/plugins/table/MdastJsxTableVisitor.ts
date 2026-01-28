@@ -20,10 +20,23 @@ export const MdastJsxTableVisitor: MdastImportVisitor<MdxJsxFlowElement | MdxJsx
     // Convert children into mdast table rows + cells
     const rows = extractRows(mdastNode);
 
+    // Extract attributes
+    let data = undefined;
+    if (mdastNode.attributes) {
+      const styleAttr = mdastNode.attributes.find(
+        (a) => a.type === 'mdxJsxAttribute' && a.name === 'style'
+      );
+
+      if (styleAttr && typeof styleAttr.value === 'string') {
+        data = { hProperties: { style: styleAttr.value } };
+      }
+    }
+
     const tableNode: Mdast.Table = {
       type: 'table',
       align: [],
       children: rows,
+      data: data, // Pass data to node
     };
 
     const table = $createTableNode(tableNode);

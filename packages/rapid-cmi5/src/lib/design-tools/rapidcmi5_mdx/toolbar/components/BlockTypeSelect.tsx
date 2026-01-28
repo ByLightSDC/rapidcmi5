@@ -17,13 +17,10 @@ import {
   Select,
   useTranslation,
 } from '@mdxeditor/editor';
-import {
-  $createFootnoteReferenceNode,
-  $createTocHeadingNode,
-  githubSlugger$,
-} from '@rapid-cmi5/ui';
+
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getSelection, $isRangeSelection } from 'lexical';
+import { $createFootnoteReferenceNode, $createTocHeadingNode, githubSlugger$ } from '@rapid-cmi5/ui';
 
 type RC5BlockType = '' | 'paragraph' | 'quote' | HeadingTagType | 'footnote';
 

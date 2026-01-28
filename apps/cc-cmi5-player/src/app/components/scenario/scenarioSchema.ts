@@ -1,4 +1,3 @@
-import { SlideType, SlideTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * @typedef {Object} ScenarioContentType
@@ -18,8 +17,3 @@ export type ScenarioContentType = {
   stopScenarioTitle?: string;
 };
 
-export interface ScenarioSlide extends SlideType {
-  type: SlideTypeEnum;
-  slideTitle: string;
-  content: ScenarioContentType;
-}

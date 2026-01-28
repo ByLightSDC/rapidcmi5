@@ -1,13 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* User Portal Flavor - Without Notifications*/
 
-import {
-  useGetRangeResourceConsolesGraph,
-  useQueryDetails,
-  Topic,
-} from '@rapid-cmi5/ui';
 import { useState } from 'react';
 import ConsoleSubscription from '../subscriptions/ConsoleSubscription';
+import { Topic, useGetRangeResourceConsolesGraph } from '@rangeos-nx/frontend/clients/hooks';
+import { useQueryDetails } from '@rapid-cmi5/ui';
 
 /**
  * Queries graph for console updates

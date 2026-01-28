@@ -1,24 +1,16 @@
 import { commitChangesModalId } from '../../modals/constants';
-import {
-  FormControlTextField,
-  FormControlUIProvider,
-  FormStateType,
-  MiniForm,
-  modal,
-  ModalDialog,
-  SelectorMainUi,
-} from '@rapid-cmi5/ui';
-import Grid from '@mui/material/Grid2';
 
 import { UseFormReturn } from 'react-hook-form';
-import { Typography } from '@mui/material';
+
+/* MUI */
+import Grid from '@mui/material/Grid2';
+import Typography from '@mui/material/Typography';
+
 import * as yup from 'yup';
 import { useSelector } from 'react-redux';
 import React from 'react';
-import {
-  MoveOnCriteriaEnum,
-  moveOnCriteriaOptions,
-} from '@rapid-cmi5/cmi5-build-common';
+import { MoveOnCriteriaEnum, moveOnCriteriaOptions } from '@rapid-cmi5/cmi5-build-common';
+import { modal, FormStateType, SelectorMainUi, ModalDialog, FormControlUIProvider, MiniForm } from '@rapid-cmi5/ui';
 
 const moveOnOptionDescriptions = new Map<string, string>([
   [
@@ -79,7 +71,7 @@ export function MoveOnCriteriaForm({
       <>
         <Grid size={11.5}>
           <SelectorMainUi
-            value={moveOnCriteria}
+            defaultValue={moveOnCriteria}
             options={moveOnCriteriaOptions}
             onSelect={setMoveOnCriteria}
             listItemProps={{

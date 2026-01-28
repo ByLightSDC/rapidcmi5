@@ -1,8 +1,6 @@
 import {
   debugLog,
   debugLogError,
-  defaultCourseData,
-  defaultEmptySlide,
 } from '@rapid-cmi5/ui';
 import {
   addCourseOperation,

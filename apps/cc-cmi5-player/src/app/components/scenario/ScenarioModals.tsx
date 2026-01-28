@@ -1,16 +1,12 @@
 import { useSelector } from 'react-redux';
-import { modal } from '@rapid-cmi5/ui';
 
-/* API */
-import {
-  useDeleteRangeResourceScenario,
-} from '@rapid-cmi5/ui';
 
-/* Branded */
-import { CrudModals } from '@rapid-cmi5/ui';
+
 
 /* Constants */
 import { deleteModalId } from './constants';
+import { useDeleteRangeResourceScenario } from '@rangeos-nx/frontend/clients/hooks';
+import { modal, CrudModals } from '@rapid-cmi5/ui';
 
 /**
  * Props for SelectionModals

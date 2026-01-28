@@ -1,4 +1,5 @@
-
+/* eslint-disable array-callback-return */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { ExtraProps } from 'react-markdown';
 import ReactPlayer from 'react-player';
@@ -14,13 +15,13 @@ import CollapsibleThing from './CollapsibleThing';
 import CollapsibleTOC, { TOC_LINK_CLICK } from './CollapsibleTOC';
 import MDMuiAlert from './components/MDMuiAlert';
 
-import { AuContextProps } from '@rapid-cmi5/cmi5-build-common';
 
 import EmbeddedQuiz from './EmbeddedQuiz';
 import MarkdownImage from './MarkdownImage';
 import { SlideEvent } from './constants/SlideEvents';
 import MDTextEffects from './components/MDTextEffects';
 import MDAnimation from './components/MDAnimation';
+import { AuContextProps } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Take an html-like tag and extract its attributes into a record of key-value
@@ -49,7 +50,7 @@ const extractAttributes = (node: any) => {
  * Convert an inline style string into a JS object.
  * @param style
  */
-const parseStyleString = (style: string): React.CSSProperties => {
+export const parseStyleString = (style: string): React.CSSProperties => {
   return Object.fromEntries(
     style
       .split(';')

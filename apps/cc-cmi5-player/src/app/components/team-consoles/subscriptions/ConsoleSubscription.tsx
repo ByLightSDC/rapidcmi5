@@ -6,8 +6,8 @@ import {
   graphqlConsoleFields,
   useSubscription,
   Topic,
-} from '@rapid-cmi5/ui';
-import { DeployedRangeConsole } from '@rapid-cmi5/ui';
+} from '@rangeos-nx/frontend/clients/hooks';
+import { DeployedRangeConsole } from '@rangeos-nx/frontend/clients/devops-api';
 import { useEffect } from 'react';
 
 /**

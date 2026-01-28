@@ -11,7 +11,6 @@ import { toMarkdown } from 'mdast-util-to-markdown';
 import { Nodes } from 'mdast';
 
 /* mdast */
-import type { PhrasingContent } from 'mdast';
 import {
   directiveFromMarkdown,
   directiveToMarkdown,
@@ -22,19 +21,12 @@ import {
   gfmTaskListItemToMarkdown,
 } from 'mdast-util-gfm-task-list-item';
 import { gfmTableFromMarkdown, gfmTableToMarkdown } from 'mdast-util-gfm-table';
-import { TextDirective } from 'mdast-util-directive';
 import { Options, Value, fromMarkdown } from 'mdast-util-from-markdown';
 import { Extension } from 'micromark-util-types';
 
 export const convertMdastToMarkdown = (tree: Nodes) => {
   const childMarkdown = toMarkdown(tree, {
-    extensions: [
-      mdxJsxToMarkdown(),
-      gfmStrikethroughToMarkdown(),
-      frontmatterToMarkdown('yaml'),
-      gfmTaskListItemToMarkdown(),
-      gfmTableToMarkdown(),
-    ],
+    extensions: defaultToMarkdownExtensions,
     bullet: '-',
     unsafe: [
       {
@@ -73,3 +65,16 @@ export const convertMarkdownToMdast = (
   });
   return theChildMDast;
 };
+
+/**
+ * Convenient list of extensions supported in our editor
+ * when you add a plugin, add the appropriate extensions here
+ */
+export const defaultToMarkdownExtensions = [
+  directiveToMarkdown(),
+  mdxJsxToMarkdown(),
+  gfmStrikethroughToMarkdown(),
+  frontmatterToMarkdown('yaml'),
+  gfmTaskListItemToMarkdown(),
+  gfmTableToMarkdown(),
+];

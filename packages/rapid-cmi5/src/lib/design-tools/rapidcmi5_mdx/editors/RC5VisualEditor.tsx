@@ -1,4 +1,5 @@
 import './RC5VisualEditor.css';
+import '../plugins/animation/styles/animationIndicators.css';
 
 import {
   MDXEditor,
@@ -7,7 +8,6 @@ import {
   listsPlugin,
   linkPlugin,
   linkDialogPlugin,
-  tablePlugin,
   thematicBreakPlugin,
   codeBlockPlugin,
   directivesPlugin,
@@ -23,6 +23,7 @@ import '@mdxeditor/editor/style.css';
 import { RapidCmi5Toolbar } from '../toolbar/RapidCmi5Toolbar';
 
 import React, {
+  RefObject,
   useCallback,
   useContext,
   useEffect,
@@ -31,12 +32,7 @@ import React, {
   useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  AnimationConfig,
-  animationDirectivePlugin,
-  appHeaderVisible,
-  themeColor,
-} from '@rapid-cmi5/ui';
+
 // import SharedFormModals from '../../../shared-modals/SharedFormModals';
 import { Box, useTheme } from '@mui/material';
 import { RC5Context } from '../contexts/RC5Context';
@@ -57,7 +53,27 @@ import {
   htmlPlugin,
   diffSourcePlugin,
   debugLog,
+  FxDirectiveDescriptor,
+  AnimDirectiveDescriptor,
+  InlineAnimDirectiveDescriptor,
+  animationDirectivePlugin,
+  rc5TablePlugin,
+  TabsDirectiveDescriptor,
+  TabContentDirectiveDescriptor,
+  AccordionDirectiveDescriptor,
+  AccordionContentDirectiveDescriptor,
+  ImageLabelDirectiveDescriptor,
+  appHeaderVisible,
 } from '@rapid-cmi5/ui';
+
+import {
+  animationPlugin,
+  AnimationConfig,
+  parseAnimationsFromFrontmatter,
+  injectAnimationsIntoFrontmatter,
+  areAnimationsEqual,
+} from '../plugins/animation';
+
 import { imagePlugin } from '../plugins/image';
 import { videoPlugin } from '../plugins/video';
 import { audioPlugin } from '../plugins/audio';
@@ -78,11 +94,6 @@ import { RC5LinkDialog } from '../plugins/link/RC5LinkDialog';
 import { directiveLinter } from './code/codeMirrorUtils';
 import { LayoutBoxDirectiveDescriptor } from './directives/layout-box/LayoutBoxDirectiveDescriptor';
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
-import {
-  animationPlugin,
-  areAnimationsEqual,
-  injectAnimationsIntoFrontmatter,
-} from '../plugins/animation';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -113,14 +124,21 @@ function RC5VisualEditor() {
   //WARNING NOT SURE WHY THIS WORKS-------------------------------------------------------
 
   const debouncer = useRef<NodeJS.Timeout>();
+  const lastFrontmatterRef = useRef<string | null>(null);
 
   // Store animations per slide (keyed by slide index)
   const slideAnimationsRef = useRef<Map<number, AnimationConfig[]>>(new Map());
   const [animationsVersion, setAnimationsVersion] = useState(0);
-  const initialAnimationsForSlide = useMemo(
-    () => slideAnimationsRef.current.get(currentSlideIndex) || [],
-    [currentSlideIndex, animationsVersion],
-  );
+  const initialAnimationsForSlide = useMemo(() => {
+    const cached = slideAnimationsRef.current.get(currentSlideIndex) || [];
+    debugLog(
+      `[RC5] build plugins: initialAnimationsForSlide for slide ${currentSlideIndex}`,
+      { count: cached.length },
+      undefined,
+      'plugin',
+    );
+    return cached;
+  }, [currentSlideIndex, animationsVersion]);
 
   const getMarkdownCb = useCallback(() => ref.current?.getMarkdown() || '', []);
 
@@ -128,19 +146,32 @@ function RC5VisualEditor() {
     ref.current?.setMarkdown(markdown);
   }, []);
 
-  const onAnimationsChangeCb = useCallback(
+ const onAnimationsChangeCb = useCallback(
     (animations: AnimationConfig[]) => {
-      debugLog('🔔 onAnimationsChange triggered');
       const currentAnims =
         slideAnimationsRef.current.get(currentSlideIndex) || [];
-      debugLog(`  Current animations: ${currentAnims.length} items`);
-      debugLog(`  New animations: ${animations.length} items`);
+
+      debugLog(
+        `🔔 onAnimationsChange triggered for slide ${currentSlideIndex}`,
+        { prevCount: currentAnims.length, nextCount: animations.length },
+        undefined,
+        'plugin',
+      );
 
       // ALWAYS update the ref (needed for save to work correctly)
       const oldAnimations =
         slideAnimationsRef.current.get(currentSlideIndex) || [];
       slideAnimationsRef.current.set(currentSlideIndex, animations);
-      setAnimationsVersion((v) => v + 1);
+      setAnimationsVersion((v) => {
+        const newVersion = v + 1;
+        debugLog(
+          `🔢 animationsVersion: ${v} → ${newVersion} (slide ${currentSlideIndex}, reason: onAnimationsChange)`,
+          undefined,
+          undefined,
+          'plugin',
+        );
+        return newVersion;
+      });
 
       // Check if animations actually changed (deep comparison of relevant fields)
       const hasActuallyChanged = !areAnimationsEqual(oldAnimations, animations);
@@ -268,6 +299,7 @@ function RC5VisualEditor() {
     const initialList: RealmPlugin[] = [
       //DEBUG
       //catchAllPlugin(),
+      frontmatterPlugin(), // ✅ Parse and hide YAML frontmatter
       mathPlugin({ mathEditorDescriptors: [MathDescriptor] }),
       codeBlockPlugin({
         defaultCodeBlockLanguage: 'js',
@@ -282,10 +314,18 @@ function RC5VisualEditor() {
       }),
       directivesPlugin({
         directiveDescriptors: [
+          AccordionDirectiveDescriptor,
+          AccordionContentDirectiveDescriptor,
           AdmonitionDirectiveDescriptor,
           ActivityDirectiveDescriptor,
+          FxDirectiveDescriptor,
+          ImageLabelDirectiveDescriptor,
           YoutubeDirectiveDescriptor,
           LayoutBoxDirectiveDescriptor,
+          TabsDirectiveDescriptor,
+          TabContentDirectiveDescriptor,
+          AnimDirectiveDescriptor,
+          InlineAnimDirectiveDescriptor,
         ],
       }),
       codeMirrorPlugin({
@@ -296,14 +336,7 @@ function RC5VisualEditor() {
         footnoteDefinitionEditorDescriptors: [FootnoteDefinitionDescriptor],
         footnoteReferenceEditorDescriptors: [FootnoteReferenceDescriptor],
       }),
-      frontmatterPlugin(),
       animationDirectivePlugin(),
-      animationPlugin({
-        initialAnimations: initialAnimationsForSlide,
-        getMarkdown: getMarkdownCb,
-        setMarkdown: setMarkdownCb,
-        onAnimationsChange: onAnimationsChangeCb,
-      }),
       imagePlugin({
         imageUploadHandler: imageUploadHandler,
         imageFilePath: imageFilePath,
@@ -319,23 +352,40 @@ function RC5VisualEditor() {
         audioFilePath: audioFilePath,
         audioPreviewHandler: audioPreviewHandler,
       }),
+      animationPlugin({
+        initialAnimations: initialAnimationsForSlide,
+        slideIndex: currentSlideIndex,
+        getMarkdown: getMarkdownCb,
+        setMarkdown: setMarkdownCb,
+        onAnimationsChange: onAnimationsChangeCb,
+      }),
       htmlPlugin(),
       listsPlugin(),
       linkPlugin({ disableAutoLink: false }),
       linkDialogPlugin({
         LinkDialog: () => <RC5LinkDialog />,
         onClickLinkCallback(url) {
-          console.log(`clicked ${url} in the edit link dialog`);
+          debugLog(
+            `clicked ${url} in the edit link dialog`,
+            undefined,
+            undefined,
+            'editor',
+          );
         },
         onReadOnlyClickLinkCallback(e, _node, url) {
           //there is no read only editor, playback mode is a simulation of read only
           e.preventDefault();
-          console.log(`clicked ${url} in the read-only editor mode`);
+          debugLog(
+            `clicked ${url} in the read-only editor mode`,
+            undefined,
+            undefined,
+            'editor',
+          );
           window.open(url, '_blank', 'noreferrer');
         },
       }),
       quotePlugin(),
-      tablePlugin(),
+      rc5TablePlugin(),
       thematicBreakPlugin(),
       headingsPlugin({ topOffset: 112 }),
     ];
@@ -373,23 +423,130 @@ function RC5VisualEditor() {
     audioFilePath,
     audioUploadHandler,
     audioPreviewHandler,
+    // NOTE: currentAnimations is intentionally NOT in the dependency array
+    // to prevent plugin rebuilds on animation changes. The onAnimationsChange
+    // callback handles animation updates via the cell/signal system.
+    currentSlideIndex,
+    dispatch,
+    initialAnimationsForSlide,
+    getMarkdownCb,
+    setMarkdownCb,
+    onAnimationsChangeCb,
+    animationsVersion,
   ]);
 
   const onChange = (e: string) => {
+    // Keep the in-memory animation cache in sync with the markdown.
+    //
+    // IMPORTANT: Save uses wrappedRef.getMarkdown() which injects animations from slideAnimationsRef.
+    // If the user edits markdown source and removes/changes animations, but we don't sync slideAnimationsRef,
+    // stale animations can be re-injected on save (appearing like "old markdown got reloaded").
+    try {
+      const frontmatterMatch = e.match(/^---\s*\n([\s\S]*?)\n---/);
+      const frontmatter = frontmatterMatch?.[1] ?? '';
+
+      if (frontmatter !== (lastFrontmatterRef.current ?? '')) {
+        lastFrontmatterRef.current = frontmatter;
+        const parsed = parseAnimationsFromFrontmatter(e);
+        const existing =
+          slideAnimationsRef.current.get(currentSlideIndex) || [];
+        console.info('[Animations][RC5] onChange frontmatter parsed', {
+          slide: currentSlideIndex,
+          parsedCount: parsed.length,
+          existingCount: existing.length,
+          equal: areAnimationsEqual(existing, parsed),
+        });
+
+        if (!areAnimationsEqual(existing, parsed)) {
+          debugLog(
+            '🧬 Source markdown frontmatter changed → syncing animations',
+            {
+              slide: currentSlideIndex,
+              prevCount: existing.length,
+              nextCount: parsed.length,
+              parsed,
+            },
+          );
+          slideAnimationsRef.current.set(currentSlideIndex, parsed);
+
+          // CRITICAL: Increment version to trigger useMemo recompute of initialAnimationsForSlide
+          // Without this, the plugin never receives the updated animations from frontmatter changes
+          setAnimationsVersion((v) => v + 1);
+        }
+      }
+    } catch (err) {
+      // Don't break editing if parsing fails; just log and continue.
+      const message = err instanceof Error ? err.message : String(err);
+      debugLogError(
+        `❌ Failed to sync animations from markdown onChange: ${message}`,
+      );
+    }
+
     if (debouncer.current !== undefined) {
       clearTimeout(debouncer.current);
     }
     debouncer.current = setTimeout(() => {
+      debugLog(
+        '💾 Setting dirty flag: slide content edited (debounced after 1s)',
+      );
       dispatch(updateDirtyDisplay({ reason: 'slide edited' }));
     }, 1000);
   };
+
+  /**
+   * Create a wrapped ref that intercepts getMarkdown to inject animations
+   */
+  const wrappedRef = useMemo(() => {
+    return {
+      current: ref.current
+        ? {
+            ...ref.current,
+            getMarkdown: () => {
+              const baseMarkdown = ref.current?.getMarkdown() || '';
+              const cachedAnims =
+                slideAnimationsRef.current.get(currentSlideIndex) || [];
+
+              // IMPORTANT: If the user modified animations in source mode (or otherwise),
+              // the markdown frontmatter is the source of truth. Do NOT resurrect stale
+              // in-memory animations by injecting the cache over the markdown.
+              const parsedFromMarkdown =
+                parseAnimationsFromFrontmatter(baseMarkdown);
+              const animsToPersist = areAnimationsEqual(
+                cachedAnims,
+                parsedFromMarkdown,
+              )
+                ? cachedAnims
+                : parsedFromMarkdown;
+
+              // Keep cache aligned for subsequent saves/publishes
+              if (!areAnimationsEqual(cachedAnims, animsToPersist)) {
+                slideAnimationsRef.current.set(
+                  currentSlideIndex,
+                  animsToPersist,
+                );
+              }
+
+              const markdownWithAnimations = injectAnimationsIntoFrontmatter(
+                baseMarkdown,
+                animsToPersist,
+              );
+              debugLog(
+                `Injecting animations into markdown for slide ${currentSlideIndex}:`,
+                animsToPersist,
+              );
+              return markdownWithAnimations;
+            },
+          }
+        : null,
+    };
+  }, [ref.current, currentSlideIndex]);
 
   /**
    * Persist reference to editor so we can save data
    */
   useEffect(() => {
     if (ref.current) {
-      addEditor(ref);
+      addEditor(wrappedRef as RefObject<MDXEditorMethods>);
     }
     return () => {
       removeEditor();
@@ -397,7 +554,7 @@ function RC5VisualEditor() {
         clearTimeout(debouncer.current);
       }
     };
-  }, [ref?.current]);
+  }, [ref?.current, wrappedRef]);
 
   /**
    * UE sets mdx theme when MUI theme changes
@@ -409,6 +566,19 @@ function RC5VisualEditor() {
   }, [themeMode]);
 
   /**
+   * Load animations for current slide when slide changes
+   * This runs BEFORE markdown is parsed, so it loads from our in-memory store
+   * The import visitor will then update if frontmatter has different data
+   */
+  useEffect(() => {
+    const savedAnimations =
+      slideAnimationsRef.current.get(currentSlideIndex) || [];
+    debugLog(
+      `Pre-loading animations for slide ${currentSlideIndex}`,
+      savedAnimations,
+    );
+  }, [currentSlideIndex]);
+  /**
    * UE injects markdown from lesson into editor and resets focus
    */
   useEffect(() => {
@@ -418,6 +588,12 @@ function RC5VisualEditor() {
         ref.current.setMarkdown('This slide data could not be presented ');
       } else {
         if (content !== ref.current.getMarkdown()) {
+          debugLog(
+            'sees content !== ref.current.getMarkdown()',
+            undefined,
+            undefined,
+            'editor',
+          );
           try {
             debugLog('updateTeamScenario (load slide)');
             const teamScenario =
@@ -425,9 +601,65 @@ function RC5VisualEditor() {
                 ? { scenario: { uuid: 'unknown' } }
                 : { scenario: undefined };
             dispatch(updateTeamScenario(teamScenario));
+
+            // Parse animations from frontmatter before setting markdown.
+            // If we already have unsaved animations in memory for this slide, keep them
+            // when the frontmatter is empty so navigating away/back does not drop them.
+            const parsedAnimations = parseAnimationsFromFrontmatter(content);
+            const existingAnimations =
+              slideAnimationsRef.current.get(currentSlideIndex) || [];
+
+            const shouldKeepExisting =
+              existingAnimations.length > 0 && parsedAnimations.length === 0;
+
+            const animationsToUse = shouldKeepExisting
+              ? existingAnimations
+              : parsedAnimations;
+
+            // Only update if animations actually changed to avoid unnecessary plugin rebuilds
+            const animationsChanged = !areAnimationsEqual(
+              existingAnimations,
+              animationsToUse,
+            );
+
+            if (animationsChanged) {
+              slideAnimationsRef.current.set(
+                currentSlideIndex,
+                animationsToUse,
+              );
+              setAnimationsVersion((v) => {
+                const newVersion = v + 1;
+                debugLog(
+                  `🔢 animationsVersion: ${v} → ${newVersion} (loading slide ${currentSlideIndex}, ${animationsToUse.length} animations, keepExisting=${shouldKeepExisting})`,
+                  undefined,
+                  undefined,
+                  'plugin',
+                );
+                return newVersion;
+              });
+            } else {
+              debugLog(
+                `⏭️ Skipping animationsVersion update - animations unchanged for slide ${currentSlideIndex}`,
+                undefined,
+                undefined,
+                'plugin',
+              );
+            }
+
+            debugLog(
+              `Loaded animations for slide ${currentSlideIndex}:`,
+              animationsToUse,
+            );
+            if (shouldKeepExisting) {
+              debugLog(
+                '↩️  Keeping in-memory animations because parsed frontmatter was empty',
+              );
+            }
+
+            debugLog('setting markdown to', content, undefined, 'editor');
             ref.current.setMarkdown(content);
           } catch (error: any) {
-            console.log('Could not set markdown', error);
+            debugLog('Could not set markdown', error, undefined, 'editor');
           }
         }
       }
@@ -436,10 +668,14 @@ function RC5VisualEditor() {
     }
   }, [content, currentSlideIndex]); //DO NOT REMOVE currentSlideIndex
 
-  const onErrorHelper = (payload: { error: string; source: string }) => {
-    console.log('erorr src', payload);
-  };
+  /**
+   * Note: Animation indicators are now updated by AnimationResolver
+   * after key resolution to ensure targetNodeKey values are current
+   */
 
+  const onErrorHelper = (payload: { error: string; source: string }) => {
+    debugLog('error src', payload, undefined, 'editor');
+  };
   return (
     // eslint-disable-next-line react/jsx-no-useless-fragment
     <>

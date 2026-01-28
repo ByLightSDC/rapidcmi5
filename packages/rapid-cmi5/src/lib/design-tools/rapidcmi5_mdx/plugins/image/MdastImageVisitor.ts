@@ -13,6 +13,7 @@ export const MdastImageVisitor: MdastImportVisitor<Mdast.Image> = {
         src: mdastNode.url,
         altText: mdastNode.alt ?? '',
         title: mdastNode.title ?? '',
+        // Note: Basic markdown images don't have data-image-id, they'll get a new GUID
       }),
     );
   },
@@ -40,6 +41,7 @@ export const MdastHtmlImageVisitor: MdastImportVisitor<Mdast.Html> = {
     const title = img.title;
     const width = img.width;
     const height = img.height;
+    const id = img.id;
 
     const image = $createImageNode({
       src: src || '',
@@ -47,6 +49,7 @@ export const MdastHtmlImageVisitor: MdastImportVisitor<Mdast.Html> = {
       title,
       width,
       height,
+      id,
     });
 
     if (lexicalParent.getType() === 'root') {
@@ -107,6 +110,7 @@ export const MdastJsxImageVisitor: MdastImportVisitor<
     const title = getAttributeValue(imageNode, 'title');
     const height = getAttributeValue(imageNode, 'height');
     const width = getAttributeValue(imageNode, 'width');
+    const id = getAttributeValue(imageNode, 'id');
     if (!href) {
       //if not found in a parent <a then look here
       href = getAttributeValue(imageNode, 'href');
@@ -115,7 +119,15 @@ export const MdastJsxImageVisitor: MdastImportVisitor<
     const rest = imageNode.attributes.filter((a) => {
       return (
         a.type === 'mdxJsxAttribute' &&
-        !['src', 'alt', 'title', 'height', 'width', 'href'].includes(a.name)
+        ![
+          'src',
+          'alt',
+          'title',
+          'height',
+          'width',
+          'href',
+          'id',
+        ].includes(a.name)
       );
     });
 
@@ -127,6 +139,7 @@ export const MdastJsxImageVisitor: MdastImportVisitor<
       height: height ? parseInt(height, 10) : undefined,
       rest,
       href,
+      id, 
     });
 
     if (lexicalParent.getType() === 'root') {
@@ -157,6 +170,7 @@ export const MdastLinkImageVisitor: MdastImportVisitor<Mdast.Link> = {
       altText: image.alt ?? '',
       title: image.title ?? '',
       href: mdastNode.url,
+      // Note: Markdown linked images don't have data-image-id, they'll get a new GUID
     });
 
     if (lexicalParent.getType() === 'root') {
@@ -192,12 +206,15 @@ export const MdastHtmlLinkedImageVisitor: MdastImportVisitor<Mdast.Html> = {
     const title = img.title ?? '';
     const width = img.width || undefined;
     const height = img.height || undefined;
+    const id = img.getAttribute('id') || undefined; 
 
-    // Collect other img attributes as 'rest'
+    // Collect other img attributes as 'rest' (excluding data-image-id)
     const rest = Array.from(img.attributes)
       .filter(
         (attr) =>
-          !['src', 'alt', 'title', 'width', 'height'].includes(attr.name),
+          !['src', 'alt', 'title', 'width', 'height', 'id'].includes(
+            attr.name,
+          ),
       )
       .map((attr) => ({
         type: 'mdxJsxAttribute' as const,
@@ -213,6 +230,7 @@ export const MdastHtmlLinkedImageVisitor: MdastImportVisitor<Mdast.Html> = {
       height,
       rest,
       href,
+      id, // ✅ Pass id to preserve GUID
     });
 
     if (lexicalParent.getType() === 'root') {

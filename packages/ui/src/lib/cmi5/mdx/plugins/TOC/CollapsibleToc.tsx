@@ -11,8 +11,7 @@ import {
 } from '@mui/material';
 import TocIcon from '@mui/icons-material/Toc';
 import { TableOfContentsEntry } from './TocPlugin';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { Box } from '@mui/system';
+
 
 /**
  * TOCComponent (Table of Contents Component)
@@ -76,7 +75,7 @@ export const TOCComponent = ({
       key="TOC"
       variant="outlined"
       sx={{
-        zIndex: 9990,
+        zIndex: 999,
         height: isExpanded ? '80%' : undefined, //fixes inf rendering issue in authoring mode
         overflow: 'auto',
         position: 'absolute',

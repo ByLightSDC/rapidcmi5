@@ -4,13 +4,10 @@
 
 import { useContext } from 'react';
 
-import {
-  useGetRangeResourceConsolesGraph,
-  useQueryDetails,
-  Topic,
-} from '@rapid-cmi5/ui';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
 import ConsoleSubscription from './ConsoleSubscription';
+import { Topic, useGetRangeResourceConsolesGraph } from '@rangeos-nx/frontend/clients/hooks';
+import { useQueryDetails } from '@rapid-cmi5/ui';
 
 /**
  * Queries graph for console updates

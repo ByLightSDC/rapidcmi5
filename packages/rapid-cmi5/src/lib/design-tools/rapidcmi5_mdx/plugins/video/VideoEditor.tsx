@@ -58,6 +58,7 @@ interface LazyVideoProps {
   width: 'inherit' | number;
   height: 'inherit' | number;
   resizable: boolean;
+  videoId: string;
 }
 
 function LazyVideo({
@@ -67,6 +68,7 @@ function LazyVideo({
   width,
   height,
   resizable,
+  videoId,
 }: LazyVideoProps): JSX.Element {
   useSuspenseImage(src);
   return (
@@ -77,6 +79,7 @@ function LazyVideo({
       width={width}
       height={height}
       resizable={resizable}
+      videoId={videoId}
     />
   );
 }
@@ -88,6 +91,7 @@ interface VideoComponentProps {
   width: 'inherit' | number;
   height: 'inherit' | number;
   resizable: boolean;
+  videoId: string;
 }
 
 function VideoComponent({
@@ -97,6 +101,7 @@ function VideoComponent({
   width,
   height,
   resizable,
+  videoId,
 }: VideoComponentProps): JSX.Element {
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
   const [isSelected, setSelected, clearSelection] =
@@ -286,6 +291,7 @@ function VideoComponent({
             controls
             muted={false}
             draggable={false}
+            data-video-id={videoId}
           />
           {resizable && isFocused && (
             <VideoResizer
@@ -308,6 +314,7 @@ export interface VideoEditorProps {
   width: 'inherit' | number;
   height: 'inherit' | number;
   rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
+  videoId: string;
 }
 
 export function VideoEditor({
@@ -317,6 +324,7 @@ export function VideoEditor({
   width,
   height,
   rest,
+  videoId,
 }: VideoEditorProps): JSX.Element {
   const [videoFilePath] = useCellValues(videoFilePath$);
   const [Placeholder] = useCellValues(videoPlaceholder$);
@@ -350,6 +358,7 @@ export function VideoEditor({
           width={width}
           height={height}
           resizable={!disableResize}
+          videoId={videoId}
         />
         {isSelected && !disableSettingsButton && EditVideoToolbar && (
           <EditVideoToolbar
