@@ -37,8 +37,8 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { ImageLabelDirectiveNode } from './types';
 import { imageLabelKeys$ } from './vars';
 import { useSelector } from 'react-redux';
-import { ButtonIcon } from 'packages/ui/src/lib/utility/buttons';
-import { debugLog } from 'packages/ui/src/lib/utility/logger';
+import { ButtonIcon } from '../../../../utility/buttons';
+import { debugLog } from '../../../../utility/logger';
 import { editorInPlayback$ } from '../../state/vars';
 import { dividerColor } from '@rapid-cmi5/ui';
 

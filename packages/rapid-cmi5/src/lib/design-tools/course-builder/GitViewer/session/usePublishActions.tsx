@@ -28,25 +28,34 @@ export const usePublishActions = (
   const currentCourse = fileState.selectedCourse;
 
   const handleDownloadCmi5Zip = async (req: DownloadCmi5Type) => {
-    if (!buildCmi5Zip) {
-      debugLog('Build cmi5 zip function was not passed into the hook');
-      return;
-    }
 
     const r = getRepoAccess(repoAccessObject);
     if (!currentBranch || !currentCourse) return null;
+    console.log(currentBranch, currentCourse, r);
+
     debugLog('Downloading cmi5 zip', currentCourse.basePath);
 
     try {
       let res = null;
       const repoPath = getRepoPath(r);
       if (fsInstance.isElectron) {
+        console.log(
+          'Donwloading electron zip',
+          r.fileSystemType,
+          r.repoName,
+          currentCourse,
+          req,
+        );
         await window.ipc.cmi5Build(
           join(r.fileSystemType, r.repoName),
           currentCourse.basePath,
           req.zipName,
         );
       } else {
+        if (!buildCmi5Zip) {
+          debugLog('Build cmi5 zip function was not passed into the hook');
+          throw Error('No build function');
+        }
         const zip = await fsInstance.generateCourseZip(
           r,
           currentCourse.basePath,

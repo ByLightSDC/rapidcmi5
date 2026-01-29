@@ -2,13 +2,13 @@ import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { DownloadFilesContent, RC5ActivityTypeEnum, DownloadFileData } from '@rapid-cmi5/cmi5-build-common';
 import { FormCrudType, FormStateType, FileFormFieldArray, FileDownloadLink, FormControlUIProvider, MiniForm } from '@rapid-cmi5/ui';
-import { currentAuPath } from 'packages/rapid-cmi5/src/lib/redux/courseBuilderReducer';
 import { useState, useContext } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 import { useImageFile } from '../../data-hooks/useImageFile';
 import * as yup from 'yup';
+import { currentAuPath } from '@rapid-cmi5/react-editor';
 
 /**
  * Form course creators can use to attack files to a Lesson AU

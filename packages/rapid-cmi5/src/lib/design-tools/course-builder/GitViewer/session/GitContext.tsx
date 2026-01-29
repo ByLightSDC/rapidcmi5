@@ -187,9 +187,9 @@ interface IGitContext {
   publishToPCTE: (repoSrc: string, repoDest: string) => void;
   handleGetCourseData: (coursePath: string) => Promise<CourseData>;
   directoryTree: INode<IFlatMetadata>[];
-  handleRenameCourse: (newCourseName: string) => void;
+  handleRenameCourse: (newCourseName: string, courseData: CourseData) => void;
   handleImportRepoZip: (req: ImportRepoZipType) => void;
-  handleCreateLocalCourse: (req: CreateLocalRepoType) => Promise<void>;
+  handleCreateLocalRepo: (req: CreateLocalRepoType) => Promise<void>;
   openSandbox: () => Promise<void>;
   getLocalFolders: () => Promise<DirMeta[]>;
   openLocalRepo: (id?: string) => Promise<void>;
@@ -304,7 +304,7 @@ const defaultGitContext: IGitContext = {
   directoryTree: [],
   handleRenameCourse: () => {},
   handleImportRepoZip: () => {},
-  handleCreateLocalCourse: async () => {},
+  handleCreateLocalRepo: async () => {},
   numStaged: 0,
   getLocalFolders: async (): Promise<DirMeta[]> => [],
   openSandbox: async (): Promise<void> => {},
@@ -346,8 +346,6 @@ export const GitContextProvider = (props: tProviderProps) => {
   }: RepoState = useSelector((state: RootState) => state.repoManager);
 
   const GetScenariosForm = rapidCmi5Opts.GetScenariosForm;
-  // const currentAuth = useSelector(auth);
-  // TODO
 
   const currentAuth = { parsedUserToken: { email: 'test', name: 'test' } };
 
@@ -416,7 +414,7 @@ export const GitContextProvider = (props: tProviderProps) => {
     createCourse,
     syncCurrentCourseWithGit,
     deleteCourse,
-    handleRenameCourse,
+    renameCourse,
     getFirstCoursePath,
   } = useCourseOperations(
     gitFs,
@@ -449,11 +447,10 @@ export const GitContextProvider = (props: tProviderProps) => {
   } = useGitOperations(gitFs, repoAccessObject);
 
   const handleNavToDesigner = async () => {
-    const r = getRepoAccess(repoAccessObject);
-    await navToDesigner(r);
+    dispatch(changeViewMode(ViewModeEnum.Designer));
   };
 
-  const navToDesigner = async (r: RepoAccessObject) => {
+  const setUpCourseData = async (r: RepoAccessObject) => {
     let courseDataToUse = defaultCourseData;
 
     if (currentCourse) {
@@ -476,8 +473,13 @@ export const GitContextProvider = (props: tProviderProps) => {
     dispatch(recalculateFileTree(r));
     dispatch(updateCourseData(courseDataToUse));
     dispatch(setIsLessonMounted(false));
-    dispatch(changeViewMode(ViewModeEnum.Designer));
   };
+
+  useEffect(() => {
+    if (!repoAccessObject) return;
+    const r = getRepoAccess(repoAccessObject);
+    setUpCourseData(r);
+  }, [currentCourse?.basePath, repoAccessObject]);
 
   const handleDeleteCurrentRepo = async () => {
     const r = getRepoAccess(repoAccessObject);
@@ -549,6 +551,10 @@ export const GitContextProvider = (props: tProviderProps) => {
     const cleanedName = slugifyPath(req.repoDirName);
     dispatch(setLoadingState(LoadingState.cloningRepo));
 
+    const r = {
+      fileSystemType: fsType.localFileSystem,
+      repoName: req.repoDirName,
+    };
     try {
       await gitFs.createRepoInDir(
         req.repoDirName,
@@ -558,6 +564,12 @@ export const GitContextProvider = (props: tProviderProps) => {
       await resetRepoStatus();
 
       await handleChangeRepo(cleanedName);
+
+      await configureNewCourse(r, {
+        authorEmail: req.authorEmail,
+        authorName: req.authorName,
+        remoteRepoUrl: req.repoRemoteUrl,
+      });
       dispatch(setCurrentFileSystemType(fsType.localFileSystem));
 
       await resetRepoStatus();
@@ -566,10 +578,7 @@ export const GitContextProvider = (props: tProviderProps) => {
 
       setLocalFileSystemLoaded(true);
       setBrowserFileSystemLoaded(true);
-      await resolveCurrentRepo({
-        fileSystemType: fsType.localFileSystem,
-        repoName: req.repoDirName,
-      });
+      await resolveCurrentRepo(r);
     } finally {
       dispatch(setLoadingState(LoadingState.loaded));
     }
@@ -737,6 +746,15 @@ export const GitContextProvider = (props: tProviderProps) => {
     gitFs.deleteFile(r, filepath);
     await resolveFile(r, filepath);
     dispatch(recalculateFileTree(r));
+  };
+
+  const handleRenameCourse = async (
+    newCourseName: string,
+    courseData: CourseData,
+  ) => {
+    const r = getRepoAccess(repoAccessObject);
+    await renameCourse(r, newCourseName, courseData);
+    await resolveGitRepoStatus(r);
   };
 
   const handleChangeRepoName = async (name: string) => {
@@ -1013,18 +1031,24 @@ export const GitContextProvider = (props: tProviderProps) => {
     await configureNewCourse(r);
   };
 
-  const configureNewCourse = async (r: RepoAccessObject) => {
+  const configureNewCourse = async (
+    r: RepoAccessObject,
+    config?: GitConfigType,
+  ) => {
     // Set the initial config for a user so they can make git operations in the sandbox such as stash
-    await setConfig(r, {
+    const defaultConfig: GitConfigType = {
       authorEmail:
         currentGitConfig.authorEmail ||
         currentAuth?.parsedUserToken?.email?.toLowerCase(),
       authorName:
         currentGitConfig.authorName || currentAuth?.parsedUserToken?.name,
       remoteRepoUrl: '',
-    });
+    };
+    await setConfig(r, config || defaultConfig);
 
-    await gitFs.writeModifiedFiles(r, []);
+    if (!gitFs.isElectron) {
+      await gitFs.writeModifiedFiles(r, []);
+    }
 
     dispatch(addRepo(r.repoName));
     dispatch(setCurrentRepo(r.repoName));
@@ -1033,7 +1057,7 @@ export const GitContextProvider = (props: tProviderProps) => {
   // This function creates an environment where the user can test changes without being connected to a remote git repo
   // It needs to not use the handle functions as most of those use the current repo variable set in redux,
   // instead this function expliciltly calls filesystem functions itself to get around having to wait for redux state
-  const handleCreateLocalCourse = async (req: CreateLocalRepoType) => {
+  const handleCreateLocalRepo = async (req: CreateLocalRepoType) => {
     const cleanedName = slugifyPath(req.repoDirName);
     dispatch(setLoadingState(LoadingState.loadingRepo));
 
@@ -1043,21 +1067,17 @@ export const GitContextProvider = (props: tProviderProps) => {
         fileSystemType: fsType.localFileSystem,
       };
 
-      // // @ts-ignore
-      // let dirHandle = (await window.showDirectoryPicker({
-      //   mode: 'readwrite',
-      //   startIn: 'documents',
-      // })) as FileSystemDirectoryHandle;
-      // if (!dirHandle) throw Error('No directory selected for clone');
-      // await gitFs.openLocalDirectory(dirHandle, true);
-
       try {
         await gitFs.createRepoInDir(
           req.repoDirName,
           async () => await gitOperator.initGitRepo(r, req.repoBranch),
         );
 
-        await configureNewCourse(r);
+        await configureNewCourse(r, {
+          authorEmail: req.authorEmail,
+          authorName: req.authorName,
+          remoteRepoUrl: req.repoRemoteUrl,
+        });
 
         if (req.repoRemoteUrl) setIsRepoConnectedToRemote(true);
       } catch (error: any) {
@@ -1065,24 +1085,17 @@ export const GitContextProvider = (props: tProviderProps) => {
         throw error;
       }
 
-      // // verify repo dir actually exits
-      // const repoDir = await dirHandle.getDirectoryHandle(req.repoDirName);
-
-      // await gitFs.setDirHandle(repoDir);
-
-      // await gitFs.openLocalDirectory(repoDir);
-
       dispatch(setCurrentFileSystemType(fsType.localFileSystem));
 
       await resetRepoStatus();
-      dispatch(setCurrentRepo(req.repoDirName));
+      dispatch(setCurrentRepo(cleanedName));
       setIsGitLoaded(false);
 
       setLocalFileSystemLoaded(true);
       setBrowserFileSystemLoaded(true);
       await resolveCurrentRepo({
         fileSystemType: fsType.localFileSystem,
-        repoName: req.repoDirName,
+        repoName: cleanedName,
       });
     } finally {
       dispatch(setLoadingState(LoadingState.loaded));
@@ -1140,7 +1153,7 @@ export const GitContextProvider = (props: tProviderProps) => {
     await resolveRemoteRepoStatus(r);
 
     await resolvePushStatus(r);
-    await navToDesigner(r);
+    await handleNavToDesigner();
   };
 
   return (
@@ -1211,7 +1224,7 @@ export const GitContextProvider = (props: tProviderProps) => {
         directoryTree,
         handleRenameCourse,
         handleImportRepoZip,
-        handleCreateLocalCourse,
+        handleCreateLocalRepo,
         handleRemoveFile,
         handleGetDiff,
         numStaged,

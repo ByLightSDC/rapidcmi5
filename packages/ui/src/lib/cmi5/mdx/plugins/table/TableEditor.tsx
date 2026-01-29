@@ -142,9 +142,9 @@ const getCellType = (rowIndex: number): ElementType => {
 };
 
 const AlignToTailwindClassMap = {
-  center: styles.centeredCell,
-  left: styles.leftAlignedCell,
-  right: styles.rightAlignedCell,
+  center: styles['centeredCell'],
+  left: styles['leftAlignedCell'],
+  right: styles['rightAlignedCell'],
 };
 
 export interface TableEditorProps {
@@ -295,7 +295,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
   }, []);
 
   // get styles to apply to the table
-  const tableStyle = mdastNode.data?.hProperties?.style as string | undefined;
+  const tableStyle = mdastNode.data?.hProperties?.['style'] as string | undefined;
 
   // Calculate computed styles (including border and radius)
   const computedTableStyle = getTableStyles(tableStyle);
@@ -406,7 +406,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
 
       <table
         ref={tableRef}
-        className={styles.tableEditor}
+        className={styles['tableEditor']}
         style={{ ...tableElementStyle, position: 'relative', zIndex: 1 }}
         onMouseOver={onTableMouseOver}
         onMouseLeave={() => {
@@ -434,7 +434,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
             {readOnly || (
               <thead>
                 <tr>
-                  <th className={styles.tableToolsColumn}></th>
+                  <th className={styles['tableToolsColumn']}></th>
                   {Array.from(
                     { length: mdastNode.children[0].children.length },
                     (_, colIndex) => {
@@ -455,7 +455,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                     },
                   )}
 
-                  <th className={styles.tableToolsColumn} data-tool-cell={true}>
+                  <th className={styles['tableToolsColumn']} data-tool-cell={true}>
                     <div
                       style={{
                         display: 'flex',
@@ -469,7 +469,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                         lexicalTable={lexicalTable}
                       />
                       <button
-                        className={styles.iconButton}
+                        className={styles['iconButton']}
                         type="button"
                         title={t('table.deleteTable', 'Delete table')}
                         onClick={(e) => {
@@ -499,7 +499,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                   <tr key={rowIndex}>
                     {readOnly || (
                       <CellElement
-                        className={styles.toolCell}
+                        className={styles['toolCell']}
                         data-tool-cell={true}
                       >
                         <RowEditor
@@ -587,7 +587,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                         >
                           <button
                             type="button"
-                            className={styles.addColumnButton}
+                            className={styles['addColumnButton']}
                             onClick={addColumnToRight}
                           >
                             {iconComponentFor('add_column')}
@@ -605,7 +605,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                   <th colSpan={lexicalTable.getColCount()}>
                     <button
                       type="button"
-                      className={styles.addRowButton}
+                      className={styles['addRowButton']}
                       onClick={addRowToBottom}
                     >
                       {iconComponentFor('add_row')}
@@ -933,7 +933,7 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
   return (
     <RadixPopover.Root>
       <RadixPopover.PopoverTrigger
-        className={styles.tableColumnEditorTrigger}
+        className={styles['tableColumnEditorTrigger']}
         data-active={highlightedCoordinates[0] === colIndex + 1}
         title={t('table.columnMenu', 'Column menu')}
       >
@@ -941,16 +941,16 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
       </RadixPopover.PopoverTrigger>
       <RadixPopover.Portal container={editorRootElementRef?.current}>
         <RadixPopover.PopoverContent
-          className={classNames(styles.tableColumnEditorPopoverContent)}
+          className={classNames(styles['tableColumnEditorPopoverContent'])}
           onOpenAutoFocus={(e) => {
             e.preventDefault();
           }}
           sideOffset={5}
           side="top"
         >
-          <RadixToolbar.Root className={styles.tableColumnEditorToolbar}>
+          <RadixToolbar.Root className={styles['tableColumnEditorToolbar']}>
             <RadixToolbar.ToggleGroup
-              className={styles.toggleGroupRoot}
+              className={styles['toggleGroupRoot']}
               onValueChange={(value) => {
                 setColumnAlign(colIndex, value as Mdast.AlignType);
               }}
@@ -1003,7 +1003,7 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
               {iconComponentFor('delete_small')}
             </RadixToolbar.Button>
           </RadixToolbar.Root>
-          <RadixPopover.Arrow className={styles.popoverArrow} />
+          <RadixPopover.Arrow className={styles['popoverArrow']} />
         </RadixPopover.PopoverContent>
       </RadixPopover.Portal>
     </RadixPopover.Root>
@@ -1052,7 +1052,7 @@ const RowEditor: React.FC<RowEditorProps> = ({
   return (
     <RadixPopover.Root>
       <RadixPopover.PopoverTrigger
-        className={styles.tableColumnEditorTrigger}
+        className={styles['tableColumnEditorTrigger']}
         data-active={highlightedCoordinates[1] === rowIndex}
         title={t('table.rowMenu', 'Row menu')}
       >
@@ -1060,14 +1060,14 @@ const RowEditor: React.FC<RowEditorProps> = ({
       </RadixPopover.PopoverTrigger>
       <RadixPopover.Portal container={editorRootElementRef?.current}>
         <RadixPopover.PopoverContent
-          className={classNames(styles.tableColumnEditorPopoverContent)}
+          className={classNames(styles['tableColumnEditorPopoverContent'])}
           onOpenAutoFocus={(e) => {
             e.preventDefault();
           }}
           sideOffset={5}
           side="bottom"
         >
-          <RadixToolbar.Root className={styles.tableColumnEditorToolbar}>
+          <RadixToolbar.Root className={styles['tableColumnEditorToolbar']}>
             <RadixToolbar.Button
               onClick={insertRowAt.bind(null, rowIndex)}
               title={t('table.insertRowAbove', 'Insert a row above this one')}
@@ -1087,7 +1087,7 @@ const RowEditor: React.FC<RowEditorProps> = ({
               {iconComponentFor('delete_small')}
             </RadixToolbar.Button>
           </RadixToolbar.Root>
-          <RadixPopover.Arrow className={styles.popoverArrow} />
+          <RadixPopover.Arrow className={styles['popoverArrow']} />
         </RadixPopover.PopoverContent>
       </RadixPopover.Portal>
     </RadixPopover.Root>
@@ -1105,7 +1105,7 @@ const TableSettingsButton: React.FC<{
 
   const openDialog = React.useCallback(() => {
     parentEditor.getEditorState().read(() => {
-      const styleStr = lexicalTable.getMdastNode().data?.hProperties?.style as
+      const styleStr = lexicalTable.getMdastNode().data?.hProperties?.['style'] as
         | string
         | undefined;
       setCurrentStyle(styleStr || '');
@@ -1124,7 +1124,7 @@ const TableSettingsButton: React.FC<{
     <>
       <button
         type="button"
-        className={styles.iconButton}
+        className={styles['iconButton']}
         title="Table Settings"
         onClick={openDialog}
       >

@@ -1,7 +1,53 @@
 /* Branded */
 
+// TODO 
+// pass in the form through the UI
+export const ElementElementTypeEnum = {
+    Category: 'category',
+    CompetencyArea: 'competency_area',
+    Knowledge: 'knowledge',
+    OpmCode: 'opm_code',
+    Skill: 'skill',
+    Sort: 'sort',
+    Task: 'task',
+    WorkRole: 'work_role'
+} as const;
+export type ElementElementTypeEnum = typeof ElementElementTypeEnum[keyof typeof ElementElementTypeEnum];
 
-import { Element } from '@rangeos-nx/frontend/clients/lms-api';
+export interface Element {
+  [key: string]: any;
+
+  /**
+   * the short name of the related document
+   * @type {string}
+   * @memberof Element
+   */
+  doc_identifier?: string;
+  /**
+   * The type of element as given by the related document.
+   * @type {string}
+   * @memberof Element
+   */
+  element_type?: ElementElementTypeEnum;
+  /**
+   * the name of the element. This property might be the identifier that is given to the element by the given document like \'ID.AM-1\' or \'S0009\'. Default value is the string \'N/A\'.
+   * @type {string}
+   * @memberof Element
+   */
+  element_identifier?: string;
+  /**
+   * The title of the element. Some elements may not have titles e.g. ID.AM-1 or S0009. Default value is the string \'N/A\'.
+   * @type {string}
+   * @memberof Element
+   */
+  title?: string;
+  /**
+   * This field represents the text within an element.
+   * @type {string}
+   * @memberof Element
+   */
+  text?: string;
+}
 import { tFormFieldRendererProps, ReadOnlyTextField } from '@rapid-cmi5/ui';
 
 /**

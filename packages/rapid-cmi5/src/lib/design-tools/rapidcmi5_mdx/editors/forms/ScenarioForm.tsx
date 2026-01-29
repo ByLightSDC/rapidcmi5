@@ -107,7 +107,7 @@ export const ScenarioForm = ({
         </Grid>
         {GetScenariosForm ? (
           <Grid size={7.5}>
-            <GetScenariosForm submitForm={onApplyScenario} />
+            <GetScenariosForm submitForm={onApplyScenario} formType={crudType} errors={errors} formMethods={formMethods}/>
           </Grid>
         ) : (
           <>

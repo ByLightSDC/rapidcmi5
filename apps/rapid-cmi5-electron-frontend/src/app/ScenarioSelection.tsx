@@ -50,7 +50,7 @@ interface ScenarioFormData {
   selectedScenarioId: string;
 }
 
-export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
+export function MyScenariosForm({ submitForm, token}: ScenarioFormProps) {
   const [open, setOpen] = useState(false);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [isLoading, setIsLoading] = useState(false);

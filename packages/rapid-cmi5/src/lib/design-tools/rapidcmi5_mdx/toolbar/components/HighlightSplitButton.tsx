@@ -9,8 +9,7 @@ import {
 
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { HIGHLIGHT_PRESET_COLORS } from '@rapid-cmi5/ui';
-import { ColorSelectionPopover } from 'packages/ui/src/lib/colors/ColorSelectionPopover';
+import { ColorSelectionPopover, HIGHLIGHT_PRESET_COLORS } from '@rapid-cmi5/ui';
 
 const DEFAULT_HIGHLIGHT = '#FFFF00';
 export const highlightColorLast$ = Cell<string>(DEFAULT_HIGHLIGHT);

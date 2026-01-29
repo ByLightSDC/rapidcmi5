@@ -26,23 +26,10 @@ import {
 
 /* mdast */
 import type { PhrasingContent } from 'mdast';
-import {
 
-  directiveToMarkdown,
-} from 'mdast-util-directive';
 import { Options as ToMarkdownOptions } from 'mdast-util-to-markdown';
-import {  mdxJsxToMarkdown } from 'mdast-util-mdx-jsx';
-import {
-  gfmStrikethroughFromMarkdown,
-  gfmStrikethroughToMarkdown,
-} from 'mdast-util-gfm-strikethrough';
-import {
-  gfmTaskListItemFromMarkdown,
-  gfmTaskListItemToMarkdown,
-} from 'mdast-util-gfm-task-list-item';
-import { gfmTableFromMarkdown, gfmTableToMarkdown } from 'mdast-util-gfm-table';
+
 import { TextDirective } from 'mdast-util-directive';
-import { fromMarkdown } from 'mdast-util-from-markdown';
 
 import { TextFxPopover } from './TextFxPopover';
 
@@ -54,7 +41,7 @@ import { Stack } from '@mui/material';
 import CircleIcon from '@mui/icons-material/Circle';
 import { useSelector } from 'react-redux';
 import { FxDirectiveAttributes, DEFAULT_SHAPE, selFxNode$, showTextFx$, refreshDelay, debugLog, exportMarkdownFromLexical, defaultToMarkdownExtensions, convertMarkdownToMdast, placeCaretInsideDirective, refreshTextFx$, defaultFxColor } from '@rapid-cmi5/ui';
-import { dirtyDisplay } from 'packages/rapid-cmi5/src/lib/redux/courseBuilderReducer';
+import { dirtyDisplay } from '../../../../redux/courseBuilderReducer';
 
 export const shapeStyleLast$ = Cell<FxDirectiveAttributes>(DEFAULT_SHAPE);
 

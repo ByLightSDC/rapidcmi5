@@ -1,5 +1,5 @@
 {
-  "name": "ui-components-branded",
+  "name": "rapid-cmi5-ui",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/ui/src",
   "projectType": "library",
@@ -15,7 +15,19 @@
         "outputPath": "dist/packages/ui",
         "tsConfig": "packages/ui/tsconfig.lib.json",
         "package.json": "packages/ui/package.json",
-        "updateBuildableProjectDepsInPackageJson": true
+        "updateBuildableProjectDepsInPackageJson": true,
+        "assets": [
+          {
+            "input": "packages/ui/src",
+            "glob": "**/*.css",
+            "output": "src"
+          },
+          {
+            "input": "packages/ui/src",
+            "glob": "**/*.{png,svg,jpg,jpeg,gif}",
+            "output": "src"
+          }
+        ]
       }
     },
     "lint": {

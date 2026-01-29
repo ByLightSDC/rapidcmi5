@@ -58,9 +58,8 @@ import { GitContext } from '../../../course-builder/GitViewer/session/GitContext
 import { useSelector } from 'react-redux';
 
 import RC5LinkEditor from '../link/RC5LinkEditor';
-import { debugLogError, editorInPlayback$, useTimeStampUUID, onCheckClickOutsideImageLabel, debugLog, convertMarkdownToMdast, DEFAULT_IMAGE_LABEL_CONTENT, MARKER_HALF_WIDTH, MARKER_HALF_HEIGHT } from '@rapid-cmi5/ui';
-import { currentAuPath } from 'packages/rapid-cmi5/src/lib/redux/courseBuilderReducer';
-import { isLabelDropping$, clickPosition$ } from 'packages/ui/src/lib/cmi5/mdx/plugins/image-label/vars';
+import { debugLogError, editorInPlayback$, useTimeStampUUID, onCheckClickOutsideImageLabel, debugLog, convertMarkdownToMdast, DEFAULT_IMAGE_LABEL_CONTENT, MARKER_HALF_WIDTH, MARKER_HALF_HEIGHT, isLabelDropping$, clickPosition$ } from '@rapid-cmi5/ui';
+import { currentAuPath } from '@rapid-cmi5/react-editor';
 
 
 const BROKEN_IMG_URI =

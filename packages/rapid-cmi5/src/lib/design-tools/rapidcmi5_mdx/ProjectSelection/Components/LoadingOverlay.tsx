@@ -7,7 +7,7 @@ import {
 import { CloudDownload } from '@mui/icons-material';
 import { alpha, keyframes, useTheme } from '@mui/system';
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
-import { LoadingState } from 'packages/rapid-cmi5/src/lib/redux/repoManagerReducer';
+import { LoadingState } from '@rapid-cmi5/react-editor';
 interface CloneLoadingOverlayProps {
   loadingVariant: LoadingState;
 }

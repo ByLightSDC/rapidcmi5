@@ -110,6 +110,7 @@ export class GitFS {
     r: RepoAccessObject,
     modifiedFiles: ModifiedFile[],
   ) => {
+
     const path = join(getRepoPath(r), modifiedFileCache);
     const filteredFiles = modifiedFiles
       .filter((f) => f.name !== modifiedFileCache)
@@ -156,7 +157,6 @@ export class GitFS {
         // zenFs.umount('/localFileSystem');
 
         // zenFs.mount('/localFileSystem', webacess);
-
       }
       this.isBrowserFsLoaded = true;
     } catch (error: any) {
@@ -345,7 +345,7 @@ export class GitFS {
     });
   };
 
-  getDirHandle = async (id?: string) => {
+  getDirHandle = async (id: string) => {
     console.log('Let see whats here', id);
     const saved = await get<DirMeta>('courses/' + id || 'rootdir');
     console.log('Let see whats here saved', saved);
@@ -359,7 +359,14 @@ export class GitFS {
         });
         if (!permission) return;
       }
+
+      const newDirMeta: DirMeta = {
+        ...saved,
+        lastAccessed: new Date().toISOString(),
+      };
+      await set('courses/' + id || 'rootdir', newDirMeta);
     }
+
     return saved?.dirHandle;
   };
   /**

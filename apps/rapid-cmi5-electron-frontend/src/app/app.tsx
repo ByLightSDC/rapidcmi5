@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter as RouterWrapper } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { setDividerColor, setIconColor, themeColor } from '@rapid-cmi5/ui';
+import { ClearedUuidValue, DynamicSelectorFieldGroup, FormCrudType, setDividerColor, setIconColor, themeColor } from '@rapid-cmi5/ui';
 
 /* Shared */
 import AppHeader from './shared/AppHeader';
@@ -24,12 +24,44 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import {
   buildCmi5ZipParams,
   GetScenarioFormProps,
+  ScenarioFormProps,
   RapidCmi5,
 } from '@rapid-cmi5/react-editor';
 import { MyScenariosForm } from './ScenarioSelection';
 import { authToken, isAuthenticated } from '@rapid-cmi5/keycloak';
 import { darkTheme } from './styles/muiThemeDark';
 import { lightTheme } from './styles/muiTheme';
+import { queryKeyScenarios, Topic, useGetScenario } from '@rangeos-nx/frontend/clients/hooks';
+
+function ScenarioForm({
+  submitForm,
+  formMethods,
+  formType,
+  errors,
+}: ScenarioFormProps) {
+  return (
+    <DynamicSelectorFieldGroup
+      allowClear={true}
+      clearedUuidValue={ClearedUuidValue.Undefined}
+      apiHook={useGetScenario}
+      crudType={formType}
+      formProps={{
+        formMethods,
+        fieldName: 'uuid',
+        indexedArrayField: 'uuid',
+        indexedErrors: errors?.uuid,
+        placeholder: '',
+        readOnly: formType !== FormCrudType.edit,
+      }}
+      inspectorProps={{}}
+      queryKey={queryKeyScenarios}
+      selectionTargetId={Topic.CMI5Course}
+      shouldApplySelections={false}
+      topicId={Topic.Scenario}
+      onApplySelection={submitForm}
+    />
+  );
+}
 
 function RapidCmi5WithAuth({
   isAuthenticated,
@@ -57,7 +89,13 @@ function RapidCmi5WithAuth({
         );
       }}
       GetScenariosForm={(props: GetScenarioFormProps) => (
-        <MyScenariosForm token={token} submitForm={props.submitForm} />
+        <ScenarioForm
+          token={token}
+          submitForm={props.submitForm}
+          formType={props.formType}
+          errors={props.errors}
+          formMethods={props.formMethods}
+        />
       )}
     />
   );
@@ -79,9 +117,7 @@ export default function App({ authEnabled }: { authEnabled: boolean }) {
       theme === 'dark'
         ? darkTheme.palette.primary.main
         : lightTheme.palette.primary.main;
-    // theme === 'dark'
-    //   ? darkTheme.typography.outlineColor
-    //   : lightTheme.typography.outlineColor;
+
     dispatch(setIconColor(iconColor));
     dispatch(setDividerColor(dividerColor || 'grey'));
     console.log('Theme chanbge', theme);

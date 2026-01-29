@@ -19,7 +19,7 @@ function rowToHast(
     properties: {},
     children: row.children.map((cell) => {
       // 1. Extract style from our custom data storage
-      const style = cell.data?.hProperties?.style;
+      const style = cell.data?.hProperties?.['style'];
       const properties: any = {};
       if (style) {
         properties.style = style;

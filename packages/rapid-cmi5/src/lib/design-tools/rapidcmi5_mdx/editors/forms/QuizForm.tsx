@@ -12,7 +12,7 @@ import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
 import LrsHeaderWithDetails from './LrsStatementHelper';
 import { RC5ActivityTypeEnum, QuizContent, SlideTypeEnum, QuizCompletionEnum, MoveOnCriteriaEnum, QuestionResponse, QuestionGrading, moveOnCriteriaOptions } from '@rapid-cmi5/cmi5-build-common';
 import { ENUM_GROUP, REQUIRED_ERROR, REQUIRED_ENTRY, SPECIFY_AT_LEAST_ONE_ERROR, defaultQuestion, FormControlIntegerField, FormControlSelectField, FormControlTextField, FormControlUIProvider, FormCrudType, FormFieldArray, FormStateType, MiniForm, tFormFieldRendererProps } from '@rapid-cmi5/ui';
-import { featureFlagShouldShowKSATs } from 'packages/rapid-cmi5/src/lib/featureFlags';
+import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 
 export const QuizForm = ({
   activityKind,

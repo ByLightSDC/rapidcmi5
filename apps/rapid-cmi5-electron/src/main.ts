@@ -414,6 +414,8 @@ ipcMain.handle(
     courseFolder: string,
     projectName: string,
   ) => {
+
+    console.log("download cmi5 zip", projectName, projectPath, courseFolder)
     try {
       const zip = new JSZip();
       const courseRoot = zip.folder(courseFolder);

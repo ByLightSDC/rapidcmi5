@@ -325,7 +325,7 @@ export class GitOperations {
           // This is super needed, please do not remove
           // The file system access api does not allow the . operator
           // when it is the base mounted directory
-          filter: (filepath) => filepath.endsWith('.md'),
+          filter: (filepath) => filepath !== '.',
         });
       }
 

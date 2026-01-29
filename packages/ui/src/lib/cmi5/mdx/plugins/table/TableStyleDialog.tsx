@@ -13,8 +13,8 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { MuiColorInput } from 'mui-color-input';
-import { SelectorMainUi } from 'packages/ui/src/lib/inputs/selectors/selectors';
-import ModalDialog from 'packages/ui/src/lib/modals/ModalDialog';
+import { SelectorMainUi } from '../../../../inputs/selectors/selectors';
+import ModalDialog from '../../../../modals/ModalDialog';
 
 
 

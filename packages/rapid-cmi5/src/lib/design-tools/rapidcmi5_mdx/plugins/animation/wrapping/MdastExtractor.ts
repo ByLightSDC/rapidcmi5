@@ -13,7 +13,6 @@
 
 import type * as Mdast from 'mdast';
 import type { LexicalNode } from 'lexical';
-import { debugLog } from '@rangeos-nx/ui/branded';
 import { $isDirectiveNode } from '@mdxeditor/editor';
 import {
   $isParagraphNode,
@@ -26,6 +25,7 @@ import { $isHeadingNode, type HeadingNode } from '@lexical/rich-text';
 // Import custom node types and type guards
 // We'll adapt the conversion logic from existing export visitors
 import type { SupportedMdastContent } from './types/Wrapping.types';
+import { debugLog } from '@rapid-cmi5/ui';
 
 /**
  * Main MDAST Extractor class

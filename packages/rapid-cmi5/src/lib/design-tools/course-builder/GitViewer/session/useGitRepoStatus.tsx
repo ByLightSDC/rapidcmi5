@@ -41,7 +41,6 @@ export function useGitRepoStatus(
   const [isRepoConnectedToRemote, setIsRepoConnectedToRemote] = useState(true);
 
   const resolvePushStatus = async (r: RepoAccessObject) => {
-    if (!fsInstance.isBrowserFsLoaded) return;
     try {
       if (!currentBranch) return;
 
@@ -88,7 +87,9 @@ export function useGitRepoStatus(
         modifiedFilesAfter = [...modifiedFilesAfter, modifiedFile];
       }
     }
-    await fsInstance.writeModifiedFiles(r, modifiedFilesAfter);
+    if (!fsInstance.isElectron) {
+      await fsInstance.writeModifiedFiles(r, modifiedFilesAfter);
+    }
     await resolveStashStatus(r, modifiedFilesAfter);
 
     setModifiedFiles(modifiedFilesAfter);
@@ -102,7 +103,9 @@ export function useGitRepoStatus(
     status = status.filter((f) => !newFiles.includes(f.name));
     status = [...status, ...changedFiles];
 
-    await fsInstance.writeModifiedFiles(r, status);
+    if (!fsInstance.isElectron) {
+      await fsInstance.writeModifiedFiles(r, status);
+    }
 
     setModifiedFiles(status);
   };
@@ -119,7 +122,7 @@ export function useGitRepoStatus(
         try {
           let status: ModifiedFile[];
 
-          if (fullResolve) {
+          if (fullResolve || fsInstance.isElectron) {
             status = await gitOperator.gitRepoStatus(r);
           } else if (changedFiles) {
             const newFiles = changedFiles.map((f) => f.name);
@@ -132,7 +135,9 @@ export function useGitRepoStatus(
             status = await gitOperator.gitRepoStatus(r, savedFiles);
           }
 
-          await fsInstance.writeModifiedFiles(r, status);
+          if (!fsInstance.isElectron) {
+            await fsInstance.writeModifiedFiles(r, status);
+          }
 
           setModifiedFiles((prev) => {
             const isSame = JSON.stringify(prev) === JSON.stringify(status);

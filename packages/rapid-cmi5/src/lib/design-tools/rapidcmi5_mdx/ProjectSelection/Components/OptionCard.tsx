@@ -18,19 +18,23 @@ const OptionCard = ({
   handleShowDocs,
   subText,
   icon,
+  'data-testid': dataTestId, // Accept data-testid prop
 }: {
   title: string;
   handleSelect: () => void;
   handleShowDocs: () => void;
   subText: JSX.Element;
   icon: JSX.Element;
+  'data-testid'?: string; // Add to type definition
 }) => {
   const theme = useTheme();
   const { palette } = theme;
 
   return (
     <ThemedOptionCard>
+      {/* Apply to outer or inner element */}
       <ListItemButton
+        data-testid='create-repo-button'
         onClick={handleSelect}
         sx={{
           borderRadius: 2,

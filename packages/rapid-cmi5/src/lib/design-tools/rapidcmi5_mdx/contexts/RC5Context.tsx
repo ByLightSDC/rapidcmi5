@@ -14,7 +14,6 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
-
 import {
   createCourseModalId,
   downloadCmi5ZipModalId,
@@ -22,9 +21,43 @@ import {
   warningModalId,
 } from '../modals/constants';
 import { ILessonNode } from '../drawers/components/LessonTreeNode';
-import { SlideType, MoveOnCriteriaEnum, Operation, CourseAU } from '@rapid-cmi5/cmi5-build-common';
-import { debugLog, debugLogError, setModal, validateYamlFrontmatter } from '@rapid-cmi5/ui';
-import { currentCourse, currentSlideNum, courseDataCache, currentAu, currentBlock, updateBlockIndex, updateAuIndex, navigateSlide, updateDisplayText, addCourseOperation, removeCourseAu, updateDirtyDisplay, updateCourseData, updateCourseAuData, updateCourseSlideData, resetCourseOperations, saveSlideContent, setIsLessonMounted, changeViewMode } from '../../../redux/courseBuilderReducer';
+import {
+  SlideType,
+  MoveOnCriteriaEnum,
+  Operation,
+  CourseAU,
+  CourseBlock,
+  CourseData,
+} from '@rapid-cmi5/cmi5-build-common';
+import {
+  debugLog,
+  debugLogError,
+  setModal,
+  validateYamlFrontmatter,
+} from '@rapid-cmi5/ui';
+import {
+  currentCourse,
+  currentSlideNum,
+  courseDataCache,
+  currentAu,
+  currentBlock,
+  updateBlockIndex,
+  updateAuIndex,
+  navigateSlide,
+  updateDisplayText,
+  addCourseOperation,
+  removeCourseAu,
+  updateDirtyDisplay,
+  updateCourseData,
+  updateCourseAuData,
+  updateCourseSlideData,
+  resetCourseOperations,
+  saveSlideContent,
+  setIsLessonMounted,
+  changeViewMode,
+} from '../../../redux/courseBuilderReducer';
+import { slugifyPath } from '../../course-builder/GitViewer/utils/useCourseOperationsUtils';
+import path, { join } from 'path-browserify';
 
 interface tProviderProps {
   isEnabled?: boolean;
@@ -237,14 +270,15 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
       if (!newName) {
         return;
       }
-      const newCourseData = {
+
+      const newCourseData: CourseData = {
         ...courseData,
-        courseTitle: newName,
       };
+
       dispatch(updateCourseData(newCourseData));
 
       dispatch(updateDirtyDisplay({ reason: 'change course name' }));
-      handleRenameCourse(newName);
+      handleRenameCourse(newName, newCourseData);
     },
     [courseData, dispatch],
   );

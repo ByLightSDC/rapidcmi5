@@ -19,7 +19,7 @@ import { useTheme } from '@mui/system';
 
 
 import { useSignalEffect } from '@preact/signals-react';
-import { clickPosition$, isLabelDropping$ } from 'packages/ui/src/lib/cmi5/mdx/plugins/image-label/vars';
+import { clickPosition$, isLabelDropping$ } from '@rapid-cmi5/ui';
 
 export interface EditImageToolbarProps {
   nodeKey: string;

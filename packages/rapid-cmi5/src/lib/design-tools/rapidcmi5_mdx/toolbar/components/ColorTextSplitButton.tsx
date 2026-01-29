@@ -14,8 +14,7 @@ import {
 
 import FormatColorTextIcon from '@mui/icons-material/FormatColorText';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { TEXT_PRESET_COLORS } from '@rapid-cmi5/ui';
-import { ColorSelectionPopover } from 'packages/ui/src/lib/colors/ColorSelectionPopover';
+import { ColorSelectionPopover, TEXT_PRESET_COLORS } from '@rapid-cmi5/ui';
 
 
 const DEFAULT_COLOR = '#FFFFFF';

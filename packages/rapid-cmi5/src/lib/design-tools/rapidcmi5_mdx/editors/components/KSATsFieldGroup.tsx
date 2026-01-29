@@ -1,9 +1,10 @@
 import { UseFormReturn } from 'react-hook-form';
 import { useEffect } from 'react';
-import {queryKeyKSATs, Topic} from '@rangeos-nx/frontend/clients/hooks'
 import KsatFieldDetail from './KsatFieldDetail';
 import { FormCrudType, FormFieldArray, tFormFieldRendererProps, DynamicSelectorFieldGroup } from '@rapid-cmi5/ui';
 
+const queryKeyKSATs = 'ksats'
+const TopicKsat = 'KSAT'
 /**
  * @type tFieldGroupProps
  * @property {UseFormReturn} formMethods
@@ -161,7 +162,7 @@ export function KSATsFieldGroup(props: tFieldGroupProps) {
         const ksatFieldName = props.indexedArrayField + '.element_identifier';
         return (
           <DynamicSelectorFieldGroup
-            topicId={Topic.KSAT}
+            topicId={TopicKsat}
             crudType={crudType}
             dataIdField="element_identifier"
             formProps={{
@@ -221,7 +222,7 @@ export function KSATsFieldGroup(props: tFieldGroupProps) {
       formMethods={formMethods}
       multiSelectButtonProps={{
         formMethods: formMethods,
-        topicId: Topic.KSAT,
+        topicId: TopicKsat,
         onApply: handleSelectMultipleKsats,
       }}
       //#REF  onDeleteEntry={handleDeleteKsat}

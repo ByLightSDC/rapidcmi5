@@ -43,8 +43,8 @@ import { AccordionContentDirectiveNode, AccordionDirectiveNode } from './types';
 
 import { $isElementNode } from 'lexical';
 import { DEFAULT_ACCORDION } from './constants';
-import ModalDialog from 'packages/ui/src/lib/modals/ModalDialog';
-import { ButtonMinorUi, ButtonOptions } from 'packages/ui/src/lib/utility/buttons';
+import ModalDialog from '../../../../modals/ModalDialog';
+import { ButtonMinorUi, ButtonOptions } from '../../../../utility/buttons';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';

@@ -95,7 +95,7 @@ export const TeamConsolesForm = ({
         </Grid>
         {GetScenariosForm ? (
           <Grid size={7.5}>
-            <GetScenariosForm submitForm={onApplyScenario} />
+            <GetScenariosForm submitForm={onApplyScenario} errors={errors} formType={crudType} formMethods={formMethods}/>
           </Grid>
         ) : (
           <>

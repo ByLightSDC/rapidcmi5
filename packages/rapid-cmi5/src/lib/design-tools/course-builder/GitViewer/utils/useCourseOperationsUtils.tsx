@@ -746,3 +746,103 @@ const extractKsatsFromSlide = (slideContent: string): KSATElement[] => {
   }
   return [];
 };
+
+export interface RenameCourseInFsOptions extends FsContextOptions {
+  oldCoursePath: string;
+  newCourseTitle: string;
+}
+
+/**
+ * Renames a course directory and updates all internal paths in the course structure.
+ * This includes:
+ * - Renaming the course directory itself
+ * - Updating all block paths
+ * - Updating all AU directory paths
+ * - Updating all slide file paths
+ * - Updating the RC5.yaml metadata
+ *
+ * @param r - Repository access object
+ * @param fsInstance - File system instance
+ * @param oldCoursePath - Current course directory path
+ * @param newCourseTitle - New title for the course (will be slugified)
+ * @returns Updated Course object with new paths
+ */
+export const renameCourseInFs = async ({
+  r,
+  fsInstance,
+  oldCoursePath,
+  newCourseTitle,
+}: RenameCourseInFsOptions): Promise<Course> => {
+  const repoPath = getRepoPath(r);
+  const cleanedCourseName = slugifyPath(newCourseTitle);
+
+  // Read the existing course data
+  const courseData = await getCourseDataInFs({
+    r,
+    fsInstance,
+    coursePath: oldCoursePath,
+    getContents: true,
+  });
+
+  if (!courseData) {
+    throw new Error(`Course not found at path: ${oldCoursePath}`);
+  }
+
+  // If the name hasn't actually changed, just update the title
+  if (oldCoursePath === cleanedCourseName) {
+    courseData.courseTitle = newCourseTitle;
+    await fsInstance.updateFile(
+      r,
+      `${oldCoursePath}/${rc5MetaFilename}`,
+      YAML.stringify(stripSlideContent(courseData)),
+    );
+
+    return {
+      basePath: oldCoursePath,
+      courseData,
+    };
+  }
+
+  // Update the course title in metadata
+  courseData.courseTitle = newCourseTitle;
+
+  // Update all block and AU paths in the course data
+  for (const block of courseData.blocks) {
+    // Update block name to use new course path
+    block.blockName = cleanedCourseName;
+
+    for (const au of block.aus) {
+      // Get the AU's relative path within the old course
+      const auRelativePath = basename(au.dirPath)
+
+
+      // Build new AU path under new course name
+      const newAuPath = join(cleanedCourseName, auRelativePath);
+      au.dirPath = newAuPath;
+
+      // Update all slide paths
+      for (const slide of au.slides) {
+        // Get the slide's filename
+        const slideFilename = basename(slide.filepath);
+
+        // Build new slide path under new AU path
+        slide.filepath = join(newAuPath, slideFilename);
+      }
+    }
+  }
+
+  // Rename the course directory in the filesystem
+  await fsInstance.mvFile(repoPath, oldCoursePath, cleanedCourseName);
+
+  // Update the RC5.yaml with new paths and title
+  await fsInstance.updateFile(
+    r,
+    `${cleanedCourseName}/${rc5MetaFilename}`,
+    YAML.stringify(stripSlideContent(courseData)),
+  );
+
+  return {
+    basePath: cleanedCourseName,
+    courseData,
+  };
+};

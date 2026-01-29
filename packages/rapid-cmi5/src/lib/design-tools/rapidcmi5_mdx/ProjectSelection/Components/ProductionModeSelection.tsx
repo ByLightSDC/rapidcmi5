@@ -94,6 +94,7 @@ export default function ProductionModeSelection({
       <List sx={{ p: 0 }}>
         {/* Clone Git Repository */}
         <OptionCard
+          data-testid="clone-repo-button"
           title={'Clone Git Repository'}
           handleSelect={cloneRepo}
           handleShowDocs={() => handleShowDocs('clone')}
@@ -112,6 +113,7 @@ export default function ProductionModeSelection({
         {/* Open Existing Repository */}
         {!isElectron && (
           <OptionCard
+            data-testid="open-repo-button"
             title={'Open Existing Repository'}
             handleSelect={() => openLocalFolder()}
             handleShowDocs={() => handleShowDocs('open')}
@@ -123,7 +125,7 @@ export default function ProductionModeSelection({
         )}
         {/* Create New Repository */}
         <OptionCard
-          data-testid='create-repo-button'
+          data-testid="create-repo-button"
           title={'Create New Repository'}
           handleSelect={() => createRepo()}
           handleShowDocs={() => handleShowDocs('create')}

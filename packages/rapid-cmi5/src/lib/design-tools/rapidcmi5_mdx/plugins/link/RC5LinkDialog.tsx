@@ -16,28 +16,22 @@ import {
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import * as yup from 'yup';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 import { UseFormReturn } from 'react-hook-form';
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
-import { IconButton, Stack } from '@mui/material';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
-import LinkOffIcon from '@mui/icons-material/LinkOff';
-
 import Popper from '@mui/material/Popper';
 import { useTheme } from '@mui/system';
 
-import LaunchIcon from '@mui/icons-material/Launch';
-import EditIcon from '@mui/icons-material/Edit';
 
 import { $setSelection } from 'lexical';
 import { useClickOutside } from './useClickOutside';
 import RC5LinkEditor from './RC5LinkEditor';
 import { useSelector } from 'react-redux';
 import { editorInPlayback$, debugLog, FormStateType, FormControlTextField, ModalDialog, FormControlUIProvider, MiniForm, delay } from '@rapid-cmi5/ui';
-import { currentSlideNum } from 'packages/rapid-cmi5/src/lib/redux/courseBuilderReducer';
+import { currentSlideNum } from '../../../../redux/courseBuilderReducer';
 
 /**
  * Dialog for previewing and editing links in MdxEditor

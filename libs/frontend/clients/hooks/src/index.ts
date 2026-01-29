@@ -12,18 +12,9 @@ export * from './lib/api/useCMI5Scenarios'
 export * from './lib/api/useRangeResourceAutoGraders'
 export * from './lib/api/errorMessages'
 export * from './lib/api/lms/useKSATs'
+export * from './lib/api/useScenarios'
+
 export * from './lib/api/config'
-
-
-
-
-
-
-
-
-
-
-
 export * from './lib/api/status'
 
 

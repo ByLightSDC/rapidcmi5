@@ -96,4 +96,5 @@ export * from './lib/styles/muiThemeDark';
 export * from './lib/utility/useQueryCache';
 export * from './lib/utility/useQueryDetails';
 export * from './lib/cmi5/mdx/util/conversion';
+export * from './lib/colors/ColorSelectionPopover';
 

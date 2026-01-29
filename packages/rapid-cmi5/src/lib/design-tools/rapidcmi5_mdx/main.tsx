@@ -6,8 +6,9 @@ import { AxiosResponse } from 'axios';
 import { Provider } from 'react-redux';
 import { persistor, store } from '../../redux/store';
 import { PersistGate } from 'redux-persist/integration/react';
-import WelcomePage from './ProjectSelection/SelectProject';
-import { useState } from 'react';
+
+import { UseFormReturn } from 'react-hook-form';
+import { FormCrudType } from '@rapid-cmi5/ui';
 
 export interface buildCmi5ZipParams {
   zipBlob: File;
@@ -23,10 +24,16 @@ export type SubmitScenarioFormFn<T = any> = (item: T) => void;
 export interface ScenarioFormProps {
   submitForm: SubmitScenarioFormFn;
   token: string;
+  formMethods: UseFormReturn;
+  formType: FormCrudType;
+  errors: any;
 }
 
 export interface GetScenarioFormProps {
   submitForm: SubmitScenarioFormFn;
+  formMethods: UseFormReturn;
+  formType: FormCrudType;
+  errors: any;
 }
 
 export interface RapidCmi5Opts {
@@ -42,6 +49,7 @@ export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
+
         <GitContextProvider rapidCmi5Opts={rapidCmi5Opts}>
           <RC5ContextProvider>
             <RC5Modals />

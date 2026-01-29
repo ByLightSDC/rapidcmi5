@@ -33,7 +33,6 @@ import { useEffect } from 'react';
 export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
   const viewMode = useSelector(currentViewMode);
   const themedDividerColor = useSelector(dividerColor);
-  console.log(viewMode);
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(changeViewMode(ViewModeEnum.RepoSelector));

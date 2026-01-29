@@ -1,4 +1,4 @@
-import { debugLog } from 'packages/ui/src/lib/utility/logger';
+import { debugLog } from '../../../../utility/logger';
 import {
   AnimationConfig,
   AnimationTrigger,

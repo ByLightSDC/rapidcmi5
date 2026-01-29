@@ -1,6 +1,12 @@
-import { ActionRowProps, listStyles, OverflowTypography, iListItemType, actionRowHeaderColor, ActionRow } from "@rapid-cmi5/ui";
-import { Element } from '@rangeos-nx/frontend/clients/lms-api';
-
+import {
+  ActionRowProps,
+  listStyles,
+  OverflowTypography,
+  iListItemType,
+  actionRowHeaderColor,
+  ActionRow,
+} from '@rapid-cmi5/ui';
+import { Element } from './KsatFieldDetail';
 export default function ActionRowKsat(props: ActionRowProps) {
   const { data } = props;
   const childProps = {

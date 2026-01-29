@@ -9,7 +9,7 @@ import * as yup from 'yup';
 import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
 import { JobeContent, moveOnCriteriaOptions, RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { FormCrudType, REQUIRED_ENTRY, FormStateType, FormControlTextField, FormControlSelectField, FormControlUIProvider, MiniForm } from '@rapid-cmi5/ui';
-import { featureFlagShouldShowKSATs } from 'packages/rapid-cmi5/src/lib/featureFlags';
+import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 
 export const JobeForm = ({
   crudType,

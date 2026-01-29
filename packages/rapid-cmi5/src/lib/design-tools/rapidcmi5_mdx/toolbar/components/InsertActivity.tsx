@@ -8,7 +8,7 @@ import { useMemo } from 'react';
 import { Typography } from '@mui/material';
 import { RC5ActivityTypeEnum, getActivityTypeFromDisplayName, activityLabels } from '@rapid-cmi5/cmi5-build-common';
 import { getDefaultData, debugLogError, SelectorMainUi } from '@rapid-cmi5/ui';
-import { scenario, teamScenario } from 'packages/rapid-cmi5/src/lib/redux/courseBuilderReducer';
+import { scenario, teamScenario } from '../../../../redux/courseBuilderReducer';
 
 /**
  * A toolbar dropdown button that allows the user to insert admonitions.

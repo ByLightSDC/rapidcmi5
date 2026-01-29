@@ -37,7 +37,7 @@ export function CreateLocalRepoForm({
     data?: any,
   ) => void;
 }) {
-  const { handleCreateLocalCourse } = useContext(GitContext);
+  const { handleCreateLocalRepo } = useContext(GitContext);
 
   const validationSchema = yup.object().shape({
     repoDirName: NAME_GROUP,
@@ -172,7 +172,7 @@ export function CreateLocalRepoForm({
       <FormControlUIProvider>
         <MiniForm
           dataCache={defaultData}
-          doAction={handleCreateLocalCourse}
+          doAction={handleCreateLocalRepo}
           formTitle="Create Local Repository"
           getFormFields={getFormFields}
           instructions="Fill out the form to create a new local repository"

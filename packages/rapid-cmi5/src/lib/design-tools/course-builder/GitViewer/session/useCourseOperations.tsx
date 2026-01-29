@@ -34,6 +34,8 @@ import {
   createCourseInFs,
   findAllCourses,
   getCourseDataInFs,
+  renameCourseInFs,
+  slugifyPath,
 } from '../utils/useCourseOperationsUtils';
 
 export const useCourseOperations = (
@@ -108,11 +110,36 @@ export const useCourseOperations = (
     [repoAccessObject, dispatch, findCourse, viewMode],
   );
 
-  const handleRenameCourse = async (newCourseName: string) => {
-    if (availableCourses.find((course) => course.basePath === newCourseName)) {
+  const renameCourse = async (
+    r: RepoAccessObject,
+    newCourseName: string,
+    courseData: CourseData,
+  ) => {
+    if (!currentCourse?.basePath) throw Error('No course selected');
+    const cleanedCourseName = slugifyPath(newCourseName);
+    if (
+      availableCourses.find((course) => course.basePath === cleanedCourseName)
+    ) {
       throw Error(courseNameInUseMessage);
     }
 
+    // await fsInstance.renameFileOrFolder(
+    //   r,
+    //   currentCourse.basePath,
+    //   cleanedCourseName,
+    // );
+
+    await computeCourseFromJson(r, {
+      basePath: currentCourse.basePath,
+      courseData,
+    });
+
+    await renameCourseInFs({
+      r,
+      fsInstance,
+      newCourseTitle: newCourseName,
+      oldCoursePath: currentCourse.basePath,
+    });
     dispatch(renameCurrentCourse(newCourseName));
   };
 
@@ -161,15 +188,18 @@ export const useCourseOperations = (
     const { courseName, courseDescription, firstAuName, courseId, zipFile } =
       req;
 
+    const cleanedCourseName = slugifyPath(courseName);
+    const cleanedAuName = slugifyPath(firstAuName);
+
     const course = await createCourseInFs({
       availableCourses,
-      courseTitle: courseName,
+      courseTitle: cleanedCourseName,
       zipFile,
       fsInstance,
       r,
       courseDescription,
       courseId,
-      courseAu: firstAuName,
+      courseAu: cleanedAuName,
     });
 
     dispatch(selectCourse(course));
@@ -295,7 +325,7 @@ export const useCourseOperations = (
     handleAutoSelectCourse,
     getCourseData,
     setAllCourses,
-    handleRenameCourse,
+    renameCourse,
     getFirstCoursePath,
   };
 };

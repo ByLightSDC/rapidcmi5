@@ -67,4 +67,6 @@ export * from './plugins/accordion/InsertAccordion';
 export * from './plugins/image-label/constants';
 export * from './plugins/image-label/ImageLabelDirectiveDescriptor';
 export * from './plugins/image-label/methods';
+export * from './plugins/image-label/vars';
+
 export * from './util/validateYamlFrontmatter';

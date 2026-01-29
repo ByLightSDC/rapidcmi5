@@ -60,7 +60,7 @@ export function SelectGitDialogs() {
   // need to fix
   // TODO
 
-  const currentAuth = { parsedUserToken: { email: 'test', name: 'test' } };
+  const currentAuth = { parsedUserToken: { email: '', name: '' } };
   const { currentBranch }: RepoState = useSelector(
     (state: RootState) => state.repoManager,
   );
