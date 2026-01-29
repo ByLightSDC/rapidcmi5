@@ -7,7 +7,7 @@ import {
   graphqlVmFields,
   useSubscription,
   Topic,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rangeos-nx/frontend/clients/hooks';
 import { RangeVM } from '@rangeos-nx/frontend/clients/devops-api';
 
 /**

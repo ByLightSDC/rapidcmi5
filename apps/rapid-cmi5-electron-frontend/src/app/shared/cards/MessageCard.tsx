@@ -1,7 +1,7 @@
 import { MessageCardProps } from '../../types/cardTypes';
 
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import Paper from '@mui/material/Paper';
 
 import Typography from '@mui/material/Typography';
@@ -14,7 +14,7 @@ export default function MessageCard({ props }: { props: MessageCardProps }) {
           <Grid container columns={1} direction="column" wrap="nowrap">
             {/* Title */}
             {props.title && (
-              <Grid item xs={12}>
+              <Grid size={12}>
                 {' '}
                 <Typography align="center" variant="h3">
                   {props.title}
@@ -23,14 +23,14 @@ export default function MessageCard({ props }: { props: MessageCardProps }) {
             )}
             {/* Subtitle */}
             {props.subtitle && (
-              <Grid item xs={12} margin={1}>
+              <Grid size={12} margin={1}>
                 <Typography align="center" variant="h4">
                   {props.subtitle}
                 </Typography>
               </Grid>
             )}
             {props.message && (
-              <Grid item xs={12} margin={1}>
+              <Grid size={12} margin={1}>
                 <Typography align="center" variant="body1">
                   {props.message}
                 </Typography>

@@ -6,7 +6,7 @@ import {
   graphqlConsoleFields,
   useSubscription,
   Topic,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rangeos-nx/frontend/clients/hooks';
 import { DeployedRangeConsole } from '@rangeos-nx/frontend/clients/devops-api';
 import { useEffect } from 'react';
 

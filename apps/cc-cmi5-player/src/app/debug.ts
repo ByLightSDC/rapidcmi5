@@ -1,4 +1,5 @@
-import { config } from '@rangeos-nx/frontend/environment';
+import { config } from "@rapid-cmi5/ui";
+
 const currentMinLogLevel = config.CLIENT_LOG ? 0 : -1;
 export const debugColorSuccess = 'background:lightgreen';
 export const debugColor2 = 'background:lightblue';
@@ -29,6 +30,8 @@ export const componentColors = {
   performance:
     'background:#fff8e1; color:#f9a825; padding:2px 4px; border-radius:2px;',
   lms: 'background:#e1f5fe; color:#0277bd; padding:2px 4px; border-radius:2px;',
+  media:
+    'background:#fce4ec; color:#d81b60; padding:2px 4px; border-radius:2px;',
 };
 // Enhanced logging functions
 type ComponentType = keyof typeof componentColors;
@@ -46,6 +49,7 @@ interface LoggingConfig {
     api: boolean;
     performance: boolean;
     lms: boolean;
+    media: boolean;
     all: boolean;
   };
 }
@@ -105,6 +109,7 @@ const getDefaultLoggingConfig = (): LoggingConfig => {
     api: true,
     performance: true,
     lms: true,
+    media: true,
     all: true,
   };
 
@@ -290,6 +295,7 @@ export const enableAllLogging = () => {
       api: true,
       performance: true,
       lms: true,
+      media: true,
       all: true,
     },
   });

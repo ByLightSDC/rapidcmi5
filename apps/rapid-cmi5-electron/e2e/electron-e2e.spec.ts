@@ -21,6 +21,7 @@ import {
   createLesson,
   cloneRepo,
   verifyRepoName,
+  createRepo,
 } from './e2e-utils.';
 
 const PUBLIC_TEST_REPO =
@@ -72,10 +73,22 @@ async function closeElectronWindow(): Promise<void> {
 // ============================================================================
 
 test.describe('Electron App', () => {
+   test('Should create repo', async () => {
+    const window = await getElectronWindow();
+
+    try {
+     
+      await createRepo(window, 'e2e-test-repo', 'main', 'test', 'test@gmai.com')
+     
+    } finally {
+      await closeElectronWindow();
+    }
+  });
   test('Should reset repos', async () => {
     const window = await getElectronWindow();
 
     try {
+
       await navigateToGitEditor(window);
 
       // Get repository name

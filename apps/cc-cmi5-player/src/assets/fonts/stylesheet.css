@@ -44,8 +44,7 @@
   font-family: 'BarlowCondensed';
   src:
     local('BarlowCondensed-Bold'),
-    url('/assets/fonts/BarlowCondensed/BarlowCondensed-Bold.ttf')
-      format('truetype');
+    url('/assets/fonts/BarlowCondensed/BarlowCondensed-Bold.ttf') format('truetype');
   font-weight: normal;
 }
 
@@ -53,8 +52,7 @@
   font-family: 'BarlowCondensed';
   src:
     local('BarlowCondensed-Italic'),
-    url('/assets/fonts/BarlowCondensed/BarlowCondensed-Italic.ttf')
-      format('truetype');
+    url('/assets/fonts/BarlowCondensed/BarlowCondensed-Italic.ttf') format('truetype');
   font-weight: normal;
 }
 
@@ -62,8 +60,7 @@
   font-family: 'BarlowCondensed';
   src:
     local('BarlowCondensed-Medium'),
-    url('/assets/fonts/BarlowCondensed/BarlowCondensed-Medium.ttf')
-      format('truetype');
+    url('/assets/fonts/BarlowCondensed/BarlowCondensed-Medium.ttf') format('truetype');
   font-weight: normal;
 }
 
@@ -71,8 +68,7 @@
   font-family: 'BarlowCondensed';
   src:
     local('BarlowCondensed-MediumItalic'),
-    url('/assets/fonts/BarlowCondensed/BarlowCondensed-MediumItalic.ttf')
-      format('truetype');
+    url('/assets/fonts/BarlowCondensed/BarlowCondensed-MediumItalic.ttf') format('truetype');
   font-weight: normal;
 }
 
@@ -80,7 +76,6 @@
   font-family: 'BarlowCondensed';
   src:
     local('BarlowCondensed-Regular'),
-    url('/assets/fonts/BarlowCondensed/BarlowCondensed-Regular.ttf')
-      format('truetype');
+    url('/assets/fonts/BarlowCondensed/BarlowCondensed-Regular.ttf') format('truetype');
   font-weight: normal;
 }

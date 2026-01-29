@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { RootState } from './store';
 
 import { rangeDataType, rangeConsoleDataType } from '../types/AuState';
-import { CourseAU } from '@rangeos-nx/types/cmi5';
+import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
 import { defaultCourseAuData } from '../session/constants';
 import { CourseAUProgress } from '../types/CourseAUProgress';
 import { initializeCourseAUProgress as createCourseAUProgress } from '../utils/CourseAUProgressHelpers';

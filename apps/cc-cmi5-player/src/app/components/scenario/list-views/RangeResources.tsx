@@ -5,9 +5,7 @@
 import { useContext } from 'react';
 
 /* Branded */
-import { iListItemType, ListView } from '@rangeos-nx/ui/branded';
 
-import { queryKeyRangeResourceVMs, Topic } from '@rangeos-nx/ui/api/hooks';
 
 /* MUI */
 import Box from '@mui/material/Box';
@@ -15,6 +13,8 @@ import Box from '@mui/material/Box';
 import RangeResourceVMActionRow from './RangeResourceVMActionRow';
 import RangeResourceContainerActionRow from './RangeResourceContainerActionRow';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
+import { queryKeyRangeResourceVMs, Topic } from '@rangeos-nx/frontend/clients/hooks';
+import { ListView, iListItemType } from '@rapid-cmi5/ui';
 
 /**
  * Displays Deployed Scenario VMs & Containers from Scenario Context

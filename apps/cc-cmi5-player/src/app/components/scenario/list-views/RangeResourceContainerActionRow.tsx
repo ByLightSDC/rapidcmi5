@@ -4,14 +4,7 @@
 /* CCMI5 Flavor */
 import { useContext, useEffect, useMemo } from 'react';
 
-/* Branded */
-import {
-  getVmImageIcon,
-  listStyles,
-  OverflowTypography,
-  actionRowHeaderColor,
-  ConsoleList,
-} from '@rangeos-nx/ui/branded';
+
 
 /* MUI */
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -21,7 +14,10 @@ import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
 
 /* Constants */
 import { RangeContainerStatusEnum } from '@rangeos-nx/frontend/clients/devops-api';
-import { getContainerStatusIcon } from '@rangeos-nx/ui/api/hooks';
+import { listStyles, OverflowTypography, actionRowHeaderColor } from '@rapid-cmi5/ui';
+import ConsoleList from '../console/ConsoleList';
+import { getVmImageIcon } from '../icons/iconConstants';
+import { getContainerStatusIcon } from '@rangeos-nx/frontend/clients/hooks';
 
 // widths so name doesn't run into consoles if they exist
 const nameFieldDefaultWidth = '90%';

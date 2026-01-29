@@ -16,7 +16,7 @@ global.structuredClone = (val) => JSON.parse(JSON.stringify(val));
 
 /** Jest does not like using router navigate in a custom hook */
 jest.mock(
-  '../../../libs/ui/components/branded/src/lib/hooks/useNavigateAlias',
+  '../../../packages/ui/src/lib/hooks/useNavigateAlias',
   () => ({
     useNavigateAlias: () => jest.fn(),
   }),
@@ -40,13 +40,13 @@ const mockIsVisible = () => {
   return true;
 };
 jest.mock(
-  `../../../libs/ui/components/branded/src/lib/hooks/useVisibility`,
+  `../../../packages/ui/src/lib/hooks/useVisibility`,
   () => ({
     useIsVisible: mockIsVisible,
   }),
 );
 jest.mock(
-  `../../../libs/ui/components/branded/src/lib/hooks/useDisplayDateFormatter`,
+  `../../../packages/ui/src/lib/hooks/useDisplayDateFormatter`,
   () => ({
     useDisplayDateFormatter: mockDateFormatter,
   }),
@@ -375,7 +375,7 @@ jest.mock('@mdxeditor/gurx', () => ({
 }));
 
 jest.mock(
-  '../../../libs/ui/components/branded/src/lib/cmi5/mdx/state/vars',
+  '../../../packages/ui/src/lib/cmi5/mdx/state/vars',
   () => ({
     editorInPlayback$: false,
     setProgress$: () => jest.fn(),

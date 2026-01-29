@@ -1,9 +1,9 @@
 import path from 'path';
 import { generateAllAuMappings } from './generateAuMappings';
-import { generateCourseJson } from '@rangeos-nx/cmi5-build/common';
-import { getFolderStructureBackend } from '@rangeos-nx/cmi5-build/backend';
+import { generateCourseJson } from '@rapid-cmi5/cmi5-build-common';
+import { getFolderStructureBackend } from '@rapid-cmi5/cmi5-build/backend';
 
-import { coursePaths } from '@rangeos-nx/cmi5-build/backend';
+import { coursePaths } from '@rapid-cmi5/cmi5-build/backend';
 
 describe('Create AU mapping tf file', () => {
   it('should generate correct au mapping tf.json from basicCourseNoNav', async () => {

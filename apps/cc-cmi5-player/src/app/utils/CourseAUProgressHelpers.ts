@@ -23,7 +23,7 @@ import { cmi5Instance } from '../session/cmi5';
 
 // import { SlideActivityStatusState } from '../types/SlideActivityStatusState'; // Commented out - not used
 import { logger } from '../debug';
-import { CourseAU } from '@rangeos-nx/types/cmi5';
+import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Create slide identifiers from CourseAU data

@@ -1,14 +1,13 @@
 /* CMI5 Flavor */
 
-import { ConsolePopup, LoadingUi } from '@rangeos-nx/ui/branded';
 import { useEffect, useRef, useState } from 'react';
-import {
-  useGetRangeResourceConsolesGraph,
-  useQueryDetails,
-} from '@rangeos-nx/ui/api/hooks';
+
 import { Alert } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { rangeConsoleDataSel, rangeDataSel } from '../../redux/auReducer';
+import { useGetRangeResourceConsolesGraph } from '@rangeos-nx/frontend/clients/hooks';
+import { LoadingUi, useQueryDetails } from '@rapid-cmi5/ui';
+import ConsolePopup from './console/ConsolePopup';
 
 export const routeDelim = 'A';
 
@@ -100,9 +99,13 @@ export function ScenarioConsoleTab() {
         (creds) => creds.scenarioUUID === rangeData?.deployedScenarios[0],
       );
 
+      // work around for older version of api in pcte
       if (found) {
         setUsername(found.username);
         setPassword(found.password);
+      } else {
+        setUsername(rangeConsoleData.credentials[0].username);
+        setPassword(rangeConsoleData.credentials[0].password);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

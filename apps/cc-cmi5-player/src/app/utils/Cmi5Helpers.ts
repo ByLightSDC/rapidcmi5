@@ -1,3 +1,9 @@
+import XAPI, {
+  Agent,
+  InteractionComponent,
+  LanguageMap,
+  Statement,
+} from '@xapi/xapi';
 import { cmi5Instance } from '../session/cmi5';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -11,17 +17,7 @@ import {
 import { AxiosPromise } from 'axios';
 import { checkForDevMode } from './DevMode';
 import { logger } from '../debug';
-import {
-  ActivityScore,
-  CTFContent,
-  CTFResponse,
-  QuestionResponse,
-  QuizContent,
-  QuizQuestion,
-  QuizScore,
-  QuizState,
-  RC5ActivityTypeEnum,
-} from '@rangeos-nx/types/cmi5';
+
 
 import { sendActivityCompletedVerb } from './LmsStatementManager';
 import { gradeActivity, createSlideActivityScore } from './gradeActivity';
@@ -30,7 +26,7 @@ import {
   SlideActivityScore,
   SlideActivityType,
 } from '../types/SlideActivityStatusState';
-import XAPI, { LanguageMap, InteractionComponent, Statement } from '@xapi/xapi';
+import { ActivityScore, RC5ActivityTypeEnum, CTFContent, QuizScore, QuizContent, QuestionResponse, CTFResponse, QuizQuestion, QuizState } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Extract activity ID from activity content based on content type
@@ -748,52 +744,30 @@ export async function setAutoGradersProgress(uuid: string): Promise<void> {
   }
 
   // 3. Send ANSWERED statement for audit/tracking
-  // const statement: Statement = {
-  //   id: uuidv4(),
-  //   actor,
-  //   verb: XAPI.Verbs.ANSWERED,
-  //   object: {
-  //     objectType: 'Activity',
-  //     id: `${activityId}/autograder/${uuid}`,
-  //     definition: {
-  //       name: { 'en-US': 'AutoGrader Task Completed' },
-  //       description: { 'en-US': `AutoGrader task with UUID ${uuid}` },
-  //       type: 'http://adlnet.gov/expapi/activities/assessment',
-  //     },
-  //   },
-  //   context: {
-  //     registration,
-  //     extensions: cmi5Instance.getLaunchData().contextTemplate.extensions,
-  //     contextActivities:
-  //       cmi5Instance.getLaunchData().contextTemplate.contextActivities,
-  //   },
-  //   timestamp: new Date().toISOString(),
-  // };
+  const statement: Statement = {
+    id: uuidv4(),
+    actor,
+    verb: XAPI.Verbs.ANSWERED,
+    object: {
+      objectType: 'Activity',
+      id: `${activityId}/autograder/${uuid}`,
+      definition: {
+        name: { 'en-US': 'AutoGrader Task Completed' },
+        description: { 'en-US': `AutoGrader task with UUID ${uuid}` },
+        type: 'http://adlnet.gov/expapi/activities/assessment',
+      },
+    },
+    context: {
+      registration,
+      extensions: cmi5Instance.getLaunchData().contextTemplate.extensions,
+      contextActivities:
+        cmi5Instance.getLaunchData().contextTemplate.contextActivities,
+    },
+    timestamp: new Date().toISOString(),
+  };
 
   try {
-    await xapi.sendStatement({
-      statement: {
-        id: uuidv4(),
-        actor,
-        verb: XAPI.Verbs.ANSWERED,
-        object: {
-          objectType: 'Activity',
-          id: `${activityId}/autograder/${uuid}`,
-          definition: {
-            name: { 'en-US': 'AutoGrader Task Completed' },
-            description: { 'en-US': `AutoGrader task with UUID ${uuid}` },
-            type: 'http://adlnet.gov/expapi/activities/assessment',
-          },
-        },
-        context: {
-          registration,
-          extensions: cmi5Instance.getLaunchData().contextTemplate.extensions,
-          contextActivities:
-            cmi5Instance.getLaunchData().contextTemplate.contextActivities,
-        },
-        timestamp: new Date().toISOString(),
-      },
-    });
+    await xapi.sendStatement({ statement });
     console.log(`Sent statement for UUID ${uuid}`);
   } catch (error) {
     console.error('Failed to send statement for AutoGrader UUID:', error);

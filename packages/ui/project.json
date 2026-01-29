@@ -1,0 +1,49 @@
+{
+  "name": "rapid-cmi5-ui",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/ui/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "main": "packages/ui/src/index.ts",
+        "outputPath": "dist/packages/ui",
+        "tsConfig": "packages/ui/tsconfig.lib.json",
+        "package.json": "packages/ui/package.json",
+        "updateBuildableProjectDepsInPackageJson": true,
+        "assets": [
+          {
+            "input": "packages/ui/src",
+            "glob": "**/*.css",
+            "output": "src"
+          },
+          {
+            "input": "packages/ui/src",
+            "glob": "**/*.{png,svg,jpg,jpeg,gif}",
+            "output": "src"
+          }
+        ]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": [
+        "{options.outputFile}"
+      ]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": [
+        "{workspaceRoot}/coverage/packages/ui"
+      ],
+      "options": {
+        "jestConfig": "packages/ui/jest.config.ts"
+      }
+    }
+  }
+}

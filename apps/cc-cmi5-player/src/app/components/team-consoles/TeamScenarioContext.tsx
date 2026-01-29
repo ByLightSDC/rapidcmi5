@@ -10,34 +10,31 @@ import {
 } from 'react';
 import { defaultScenarioResourceData, ScenarioResources } from './types';
 import {
+
   defaultSortOrder,
   getErrorMessageDetail,
+
   infiniteRecordLimit,
+
   queryHooksConfig,
+
   Topic,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rangeos-nx/frontend/clients/hooks';
+
 import {
   DeployedRangeConsole,
   DevopsApiClient,
 } from '@rangeos-nx/frontend/clients/devops-api';
 
-import {
-  ConsoleProvider,
-  ConsolesDisplay,
-  debugLog,
-  submitScore$,
-} from '@rangeos-nx/ui/branded';
 import { routeDelim } from '../scenario/ScenarioConsoleTab';
 import { sendScenarioEventVerb } from '../../utils/LmsStatementManager';
-import { debugLogError, logger } from '../../debug';
-import {
-  ActivityScore,
-  RC5ActivityTypeEnum,
-  ScenarioSubmitResponse,
-  TeamConsolesContent,
-} from '@rangeos-nx/types/cmi5';
+import { debugLog, debugLogError, logger } from '../../debug';
+
 import { useCellValue } from '@mdxeditor/editor';
 import { AuManagerContext } from '../../session/AuManager';
+import { TeamConsolesContent, ScenarioSubmitResponse, ActivityScore, RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import { ConsoleProvider } from '../scenario/console/ConsoleContext';
+import ConsolesDisplay from '../scenario/console/ConsolesDisplay';
 
 interface iTeamConsolesContext {
   isContextInitialized: boolean;

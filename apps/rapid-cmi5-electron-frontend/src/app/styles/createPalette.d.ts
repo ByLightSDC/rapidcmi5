@@ -26,6 +26,9 @@ declare module '@mui/material/styles' {
       instructionsColor: React.CSSProperties['color'];
       titleColor: React.CSSProperties['color'];
     };
+    form: {
+      backgroundColor: React.CSSProperties['color'];
+    };
     header: {
       border: React.CSSProperties['color'];
       buttonColor: React.CSSProperties['color'];

@@ -8,7 +8,7 @@ import {
   useSubscription,
   Topic,
   AutoGraderEvent,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rangeos-nx/frontend/clients/hooks';
 
 /**
  * Queries graph for vm updates

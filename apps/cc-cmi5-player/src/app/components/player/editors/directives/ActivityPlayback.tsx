@@ -1,41 +1,17 @@
 import React, { useState } from 'react';
 import { DirectiveEditorProps, useCellValues } from '@mdxeditor/editor';
 
-import {
-  AuContextProps,
-  CTFContent,
-  JobeContent,
-  ScenarioContent,
-  RC5ScenarioContent,
-  TeamConsolesContent,
-  DownloadFileData,
-  QuizState,
-  SlideTypeEnum,
-  RC5ActivityTypeEnum,
-  ActivityCacheGetState,
-  ActivityCacheSetState,
-} from '@rangeos-nx/types/cmi5';
-import { SlideActivityType } from '../../../../types/SlideActivityStatusState';
-import {
-  AuCTF,
-  AuQuiz,
-  debugLogError,
-  FileDownloadLink,
-  JobeInTheBox,
-  setProgress$,
-  submitScore$,
-  debugLog,
-  getActivityCache$,
-  setActivityCache$,
-} from '@rangeos-nx/ui/branded';
 
-import { QuizContent } from '@rangeos-nx/types/cmi5';
+
 import ScenarioConsoles from '../../../scenario/ScenarioConsoles';
 import TeamScenarioExercise from '../../../team-consoles/TeamScenarioExercise';
 import { useSelector } from 'react-redux';
 import { activeTabSel } from '../../../../redux/navigationReducer';
 import { useCMI5Session } from '../../../../hooks/useCMI5Session';
 import { Box } from '@mui/material';
+import { AuContextProps, RC5ScenarioContent, ScenarioContent, QuizContent, CTFContent, JobeContent, TeamConsolesContent, DownloadFileData } from '@rapid-cmi5/cmi5-build-common';
+import { setProgress$, submitScore$, getActivityCache$, setActivityCache$, debugLogError, AuQuiz, AuCTF, JobeInTheBox, FileDownloadLink } from '@rapid-cmi5/ui';
+import { SlideActivityType } from 'apps/cc-cmi5-player/src/app/types/SlideActivityStatusState';
 
 /**
  * Non editable Activity View

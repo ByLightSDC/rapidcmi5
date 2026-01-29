@@ -1,14 +1,10 @@
 import * as ReactDOM from 'react-dom/client';
 import AppWrapper from './app/AppWrapper';
-import { config } from '@rangeos-nx/frontend/environment';
-import { worker } from './mocks/browser';
-import { http } from 'msw';
-import { fsApi, ipc, store } from '@rangeos-nx/rapid-cmi5';
+import { fsApi, ipc, store } from '@rapid-cmi5/react-editor';
 
 import './styles.css';
 import './assets/fonts/stylesheet.css';
 
-import { debugLog } from '@rangeos-nx/ui/branded';
 declare global {
   interface Window {
     msw: any;

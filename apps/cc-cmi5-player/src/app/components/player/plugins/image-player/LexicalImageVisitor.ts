@@ -24,6 +24,11 @@ export const LexicalImageVisitor: LexicalExportVisitor<ImageNode, Mdast.Image> =
           img.alt = lexicalNode.getAltText();
         }
 
+        const lexId = lexicalNode.getId();
+        if (lexId) {
+          img.id = lexId;
+        }
+
         if (lexicalNode.getTitle()) {
           img.title = lexicalNode.getTitle()!;
         }

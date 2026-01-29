@@ -48,7 +48,10 @@ export const lightTheme = createTheme({
   button: {
     disabledBackgroundColor: '#7f8cb9',
     disabledColor: '#C1C9DB',
+    gradient: 'linear-gradient(180deg, #405CA7 0%, #2C4B93 100%)',
     minorBackgroundColor: '#3C59A2',
+    indicatorColor: mainColor,
+    iconColor: mainColor,
   },
   breadcrumbs: {
     default: '#202020',
@@ -62,6 +65,9 @@ export const lightTheme = createTheme({
     borderColor: '#8AA6D0',
     titleColor: '#FFFFFF',
     formInstructionsColor: '#E5F6FD',
+  },
+  form: {
+    backgroundColor: '#EEEEEE',
   },
   header: {
     border: '#ffffffc3', //active se
@@ -82,7 +88,7 @@ export const lightTheme = createTheme({
   },
   nav: {
     fill: '',
-    fillSelected: 'red',
+    fillSelected: '#DDDDDD',
     icon: '#071285d0', // overriden
     iconSelected: '#071285',
     border: '#071285',

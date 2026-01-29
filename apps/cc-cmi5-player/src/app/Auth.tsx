@@ -1,14 +1,12 @@
-import { KeycloakUi } from '@rangeos-nx/ui/keycloak';
-import { config } from '@rangeos-nx/frontend/environment';
 import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { authToken } from '@rangeos-nx/ui/keycloak';
-import { queryHooksConfig } from '@rangeos-nx/ui/api/hooks';
 import {
   auConfigInitializedSel,
   setIsDisplayInitialized,
 } from './redux/auReducer';
-import { debugLog } from '@rangeos-nx/ui/branded';
+import { config, debugLog } from '@rapid-cmi5/ui';
+import { authToken, KeycloakUi } from '@rapid-cmi5/keycloak';
+import { queryHooksConfig } from 'libs/frontend/clients/hooks/src/lib/api/config';
 
 /* eslint-disable-next-line */
 export interface AuthProps {

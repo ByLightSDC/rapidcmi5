@@ -35,6 +35,7 @@ export const MdastHtmlImageVisitor: MdastImportVisitor<Mdast.Html> = {
     const title = img.title;
     const width = img.width;
     const height = img.height;
+    const id = img.id;
 
     const image = $createImageNode({
       src: src || '',
@@ -42,6 +43,7 @@ export const MdastHtmlImageVisitor: MdastImportVisitor<Mdast.Html> = {
       title,
       width,
       height,
+      id,
     });
 
     if (lexicalParent.getType() === 'root') {
@@ -87,7 +89,7 @@ export const MdastJsxImageVisitor: MdastImportVisitor<
     const title = getAttributeValue(mdastNode, 'title');
     const height = getAttributeValue(mdastNode, 'height');
     const width = getAttributeValue(mdastNode, 'width');
-
+    const id = getAttributeValue(mdastNode, 'id');
     const rest = mdastNode.attributes.filter((a) => {
       return (
         a.type === 'mdxJsxAttribute' &&
@@ -101,6 +103,7 @@ export const MdastJsxImageVisitor: MdastImportVisitor<
       title,
       width: width ? parseInt(width, 10) : undefined,
       height: height ? parseInt(height, 10) : undefined,
+      id,
       rest,
     });
 

@@ -1,5 +1,4 @@
 // This is unchanged from the original
-
 import React from 'react';
 import ImageIcon from '@mui/icons-material/Image';
 import styles from './styles/image-plugin.module.css'; // Adjust path if needed

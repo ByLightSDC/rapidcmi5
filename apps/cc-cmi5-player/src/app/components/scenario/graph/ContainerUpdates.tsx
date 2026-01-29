@@ -4,13 +4,10 @@
 
 import { useContext } from 'react';
 
-import {
-  useGetRangeResourceContainersGraph,
-  useQueryDetails,
-  Topic,
-} from '@rangeos-nx/ui/api/hooks';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
 import ContainerSubscription from './ContainerSubscription';
+import { Topic, useGetRangeResourceContainersGraph } from '@rangeos-nx/frontend/clients/hooks';
+import { useQueryDetails } from '@rapid-cmi5/ui';
 
 /**
  * Queries graph for container updates

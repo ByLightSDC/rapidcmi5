@@ -2,14 +2,14 @@ import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useOverrideConfigs } from '../hooks/useOverrideConfig';
-import { debugLog } from '@rangeos-nx/ui/branded';
+import { debugLog } from '@rapid-cmi5/ui';
 
 import { Alert, AlertTitle, CircularProgress, Typography } from '@mui/material';
 
-import { authToken } from '@rangeos-nx/ui/keycloak';
 import ScenarioConsoleTab from '../components/scenario/ScenarioConsoleTab';
 import { useCMI5Session } from '../hooks/useCMI5Session';
 import { checkForDevMode } from '../utils/DevMode';
+import { authToken } from '@rapid-cmi5/keycloak';
 
 enum NoAuManagerState {
   waiting = 'Loading...',

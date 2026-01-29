@@ -7,7 +7,7 @@ import {
   setActivityCache$,
   setProgress$,
   submitScore$,
-} from '@rangeos-nx/ui/branded';
+} from '@rapid-cmi5/ui';
 import { useContext, useEffect } from 'react';
 import { AuManagerContext } from '../../session/AuManager';
 

@@ -5,7 +5,7 @@ import path, { basename, dirname, join } from 'path';
 import fs from 'fs/promises';
 import yaml from 'js-yaml';
 
-import { getFolderStructureBackend } from '@rangeos-nx/cmi5-build/backend';
+import { getFolderStructureBackend } from '@rapid-cmi5/cmi5-build/backend';
 import AdmZip from 'adm-zip';
 import { generateAllAuMappings } from './commands/generateAuMappings';
 import { AuMappingService } from './services/auMappingService';
@@ -19,7 +19,7 @@ import {
   QuizContent,
   SlideType,
   SlideTypeEnum,
-} from '@rangeos-nx/types/cmi5';
+} from '@rapid-cmi5/cmi5-build-common';
 
 import YAML from 'yaml';
 import 'dotenv/config';
@@ -31,11 +31,11 @@ import {
   FolderStruct,
   generateCourseJson,
   RC5_VERSION,
-} from '@rangeos-nx/cmi5-build/common';
+} from '@rapid-cmi5/cmi5-build-common';
 import {
   generateCourseDist,
   generateCmi5Xml,
-} from '@rangeos-nx/cmi5-build/backend';
+} from '@rapid-cmi5/cmi5-build/backend';
 
 export interface CourseMeta {
   courseName?: string;

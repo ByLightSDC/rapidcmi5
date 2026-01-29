@@ -1,0 +1,43 @@
+{
+  "name": "ui-api-hooks",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/clients/hooks/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/rollup:rollup",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/frontend/clients/hooks",
+        "tsConfig": "libs/frontend/clients/hooks/tsconfig.lib.json",
+        "project": "libs/frontend/clients/hooks/package.json",
+        "entryFile": "libs/frontend/clients/hooks/src/index.ts",
+        "external": ["react/jsx-runtime"],
+        "rollupConfig": "@nx/react/plugins/bundle-rollup",
+        "package.json" : "libs/frontend/clients/hooks/package.json",
+        "compiler": "babel",
+        "assets": [
+          {
+            "glob": "libs/frontend/clients/hooks/README.md",
+            "input": ".",
+            "output": "."
+          }
+        ],
+        "babelUpwardRootMode": true,
+        "updateBuildableProjectDepsInPackageJson": true
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/clients/hooks"],
+      "options": {
+        "jestConfig": "libs/frontend/clients/hooks/jest.config.ts"
+      }
+    }
+  }
+}

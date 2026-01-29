@@ -1,5 +1,5 @@
-import { CourseData } from '@rangeos-nx/types/cmi5';
-import { generateAuId, generateBlockId } from '@rangeos-nx/cmi5-build/backend';
+import { CourseData } from '@rapid-cmi5/cmi5-build-common';
+import { generateAuId, generateBlockId } from '@rapid-cmi5/cmi5-build/backend';
 
 type TfDict = {
   resource: {

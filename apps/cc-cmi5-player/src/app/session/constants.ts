@@ -1,4 +1,4 @@
-import { CourseAU } from '@rangeos-nx/types/cmi5';
+import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
 
 export type ClassEntry = {
   classId: string;

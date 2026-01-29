@@ -1,5 +1,5 @@
-import { tFormFieldRendererProps } from '@rangeos-nx/ui/branded';
-import { FormCrudType } from '@rangeos-nx/ui/redux';
+import { tFormFieldRendererProps } from '@rapid-cmi5/ui';
+import { FormCrudType } from '@rapid-cmi5/ui';
 
 // Shared Field constants
 export const minCpuCores = 1;

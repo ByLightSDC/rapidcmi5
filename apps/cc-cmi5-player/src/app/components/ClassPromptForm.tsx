@@ -3,30 +3,23 @@
 import { UseFormReturn } from 'react-hook-form';
 
 import * as yup from 'yup';
-import { NAME_GROUP } from '@rangeos-nx/ui/validation';
 
 /* Branded */
-import {
-  FormControlTextField,
-  FormStateType,
-  SharedFormWithProvider,
-} from '@rangeos-nx/ui/branded';
+
 
 /* MUI */
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 
 /* Constants */
 //import { defaultPostPutData, navId } from './constants';
 
 /* API Topic */
-import {
-  Topic,
-  usePostInitializeCMI5Scenarios,
-} from '@rangeos-nx/ui/api/hooks';
+
 
 import { ClassEntry, defaultClassEntryData } from '../session/constants';
 import { useEffect } from 'react';
-import { FormCrudType } from '@rangeos-nx/ui/redux';
+import { FormCrudType, NAME_GROUP, FormStateType, FormControlTextField, SharedFormWithProvider } from '@rapid-cmi5/ui';
+import { Topic, usePostInitializeCMI5Scenarios } from '@rangeos-nx/frontend/clients/hooks';
 
 /**
  * @typedef {Object} tFormProps
@@ -78,7 +71,7 @@ export default function ClassPromptForm(props: tFormProps) {
     return (
       // eslint-disable-next-line react/jsx-no-useless-fragment
       <>
-        <Grid item xs={5}>
+        <Grid size={5}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.name)}

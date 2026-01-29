@@ -106,6 +106,42 @@ export async function waitForInitializationModal(window: Page): Promise<void> {
   await expect(initModal).toBeHidden({ timeout: 30000 });
 }
 
+export const createRepo = async (
+  window: Page,
+  repoName: string,
+  branch: string,
+  authorName: string,
+  authorEmail: string,
+  remoteUrl?: string,
+) => {
+  const createRepoButton = window.getByTestId('create-repo-button');
+  await expect(createRepoButton).toBeVisible();
+  createRepoButton.click();
+
+  // Fill out course form
+  const modal = window.getByRole('dialog');
+  await expect(modal).toBeVisible();
+
+  if (remoteUrl) {
+    await window.getByTestId('field-repoRemoteUrl').fill(remoteUrl);
+  }
+
+  await window.getByTestId('field-repoDirName').fill(repoName);
+  await window.getByTestId('field-repoBranch').fill(branch);
+  await window.getByTestId('field-authorName').fill(authorName);
+  await window.getByTestId('field-authorEmail').fill(authorEmail);
+
+  // Submit form
+  const submitButton = window.getByTestId('submit-button');
+  await expect(submitButton).toBeEnabled();
+  await submitButton.click();
+  await waitForModalToClose(window);
+
+  // Verify course was created
+  // const courseSelector = window.getByTestId('courses-selector');
+  // await expect(courseSelector).toHaveText(courseName);
+};
+
 export const createCourse = async (
   window: Page,
   courseName: string,

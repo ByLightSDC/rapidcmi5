@@ -2,7 +2,7 @@ import {
   setAppHeaderVisible,
   setBreadCrumbVisible,
   setTheme,
-} from '@rangeos-nx/ui/redux';
+} from '@rapid-cmi5/ui';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 

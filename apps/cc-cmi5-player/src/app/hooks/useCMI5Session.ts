@@ -5,8 +5,7 @@ import sha256 from 'crypto-js/sha256';
 import { Statement } from '@xapi/xapi';
 import Cmi5 from '@xapi/cmi5';
 import { debugLog } from '../debug';
-import { setAuthToken } from '@rangeos-nx/ui/keycloak';
-import { queryHooksConfig, useToaster } from '@rangeos-nx/ui/api/hooks';
+
 import {
   sendInitializedVerb,
   sendRangeosAuthVerb,
@@ -32,12 +31,14 @@ import {
   InitScenarioResponse,
   ScenarioConsolesResponse,
 } from '../types/SlideState';
-import { config } from '@rangeos-nx/frontend/environment';
+import { config, useToaster } from '@rapid-cmi5/ui';
 import { cmi5Instance } from '../session/cmi5';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { setModal } from '@rangeos-nx/ui/redux';
+import { setModal } from '@rapid-cmi5/ui';
 import { classPromptModalId } from '../components/CourseModals';
 import { checkForDevMode } from '../utils/DevMode';
+import { setAuthToken } from '@rapid-cmi5/keycloak';
+import { queryHooksConfig } from 'libs/frontend/clients/hooks/src/lib/api/config';
 
 type sessionState = {
   authToken: string;

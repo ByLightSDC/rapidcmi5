@@ -2,13 +2,12 @@
 
 import {
   useGetRangeResourceContainersGraph,
-  useQueryDetails,
   Topic,
-} from '@rangeos-nx/ui/api/hooks';
+} from '@rangeos-nx/frontend/clients/hooks';
 
-import { debugLogError } from '@rangeos-nx/ui/branded';
 import { useState } from 'react';
 import ContainerSubscription from '../subscriptions/ContainerSubscription';
+import { useQueryDetails, debugLogError } from '@rapid-cmi5/ui';
 
 /**
  * Queries graph for container updates

@@ -1,4 +1,4 @@
-import { FolderStruct } from '@rangeos-nx/cmi5-build/common';
+import { FolderStruct } from '@rapid-cmi5/cmi5-build-common';
 
 import fs, { constants } from 'fs';
 

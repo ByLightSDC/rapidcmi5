@@ -1,8 +1,8 @@
-import { CourseAU, CourseData } from '@rangeos-nx/types/cmi5';
+import { CourseAU, CourseData } from '@rapid-cmi5/cmi5-build-common';
 import { AxiosRequestConfig, isAxiosError } from 'axios';
 
 import { createAuMappingName } from '../commands/generateAuMappings';
-import { generateAuId, generateBlockId } from '@rangeos-nx/cmi5-build/backend';
+import { generateAuId, generateBlockId } from '@rapid-cmi5/cmi5-build/backend';
 import {
   Cmi5AUMapping,
   Cmi5AUMappingApiFactory,

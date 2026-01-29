@@ -2,13 +2,11 @@
 
 import { useContext } from 'react';
 
-import {
-  useGetRangeResourceVmsGraph,
-  useQueryDetails,
-  Topic,
-} from '@rangeos-nx/ui/api/hooks';
+
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
 import VMSubscription from './VMSubscription';
+import { useGetRangeResourceVmsGraph, Topic } from '@rangeos-nx/frontend/clients/hooks';
+import { useQueryDetails } from '@rapid-cmi5/ui';
 
 /**
  * Queries graph for vm updates

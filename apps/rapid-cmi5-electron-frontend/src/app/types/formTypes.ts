@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { FormCrudType } from "@rangeos-nx/ui/redux";
+import { FormCrudType } from "@rapid-cmi5/ui";
 
 /* Branded */
 export type RangeResourceFormProps = {

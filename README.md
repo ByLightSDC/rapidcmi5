@@ -119,7 +119,15 @@ This will run all unit tests in rapid cmi5
 
 ### E2E testing
 `npx nx serve rapid-cmi5-electron-frontend`
-`nx run rapid-cmi5-electron:e2e`
+`npx nx run rapid-cmi5-electron:e2e`
 
 For interactive tests run
-`nx run rapid-cmi5-electron:e2e --ui`
+`npx nx run rapid-cmi5-electron:e2e --ui`
+
+
+### Publishing to npm
+to test a npm package you have built locally, first build with the nx.
+then go to the output at ./dist/your-lib
+run npm pack
+then copy to the place you would wish to test the install with npm i <lib.version>.tgz
+`

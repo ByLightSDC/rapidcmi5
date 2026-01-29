@@ -20,118 +20,22 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@rangeos-nx/backend/alert/error": [
-        "libs/backend/alert/error/src/index.ts"
-      ],
-      "@rangeos-nx/backend/alert/error-handler": [
-        "libs/backend/alert/error-handler/src/index.ts"
-      ],
-      "@rangeos-nx/backend/alert/log": ["libs/backend/alert/log/src/index.ts"],
-      "@rangeos-nx/backend/common/exporter": [
-        "libs/backend/common/exporter/src/index.ts"
-      ],
-      "@rangeos-nx/backend/common/express": [
-        "libs/backend/common/express/src/index.ts"
-      ],
-      "@rangeos-nx/backend/common/helpers": [
-        "libs/backend/common/helpers/src/index.ts"
-      ],
-      "@rangeos-nx/backend/common/kubernetes": [
-        "libs/backend/common/kubernetes/src/index.ts"
-      ],
-      "@rangeos-nx/backend/common/models": [
-        "libs/backend/common/models/src/index.ts"
-      ],
-      "@rangeos-nx/backend/common/pagination": [
-        "libs/backend/common/pagination/src/index.ts"
-      ],
-      "@rangeos-nx/backend/common/postgres": [
-        "libs/backend/common/postgres/src/index.ts"
-      ],
-      "@rangeos-nx/backend/common/protocols": [
-        "libs/backend/common/protocols/src/index.ts"
-      ],
-      "@rangeos-nx/backend/common/services": [
-        "libs/backend/common/services/src/index.ts"
-      ],
-      "@rangeos-nx/backend/common/task-utils": [
-        "libs/backend/common/task-utils/src/index.ts"
-      ],
-      "@rangeos-nx/backend/common/tasks": [
-        "libs/backend/common/tasks/src/index.ts"
-      ],
-      "@rangeos-nx/backend/common/terraform": [
-        "libs/backend/common/terraform/src/index.ts"
-      ],
-      "@rangeos-nx/backend/environment": [
-        "libs/backend/environment/src/index.ts"
-      ],
-      "@rangeos-nx/backend/middleware/authorization": [
-        "libs/backend/middleware/authorization/src/index.ts"
-      ],
-      "@rangeos-nx/backend/middleware/filter": [
-        "libs/backend/middleware/filter/src/index.ts"
-      ],
-      "@rangeos-nx/backend/middleware/log-requests": [
-        "libs/backend/middleware/log-requests/src/index.ts"
-      ],
-      "@rangeos-nx/backend/middleware/multer-dynamic-storage": [
-        "libs/backend/middleware/multer-dynamic-storage/src/index.ts"
-      ],
-      "@rangeos-nx/backend/opa": ["libs/backend/opa/src/index.ts"],
-      "@rangeos-nx/cmi5-build/backend": [
-        "libs/cmi5-build/backend/src/index.ts"
-      ],
-      "@rangeos-nx/cmi5-build/common": ["libs/cmi5-build/common/src/index.ts"],
-      "@rangeos-nx/constants": ["libs/constants/src/index.ts"],
-      "@rangeos-nx/frontend/auth/keycloak": [
-        "libs/frontend/auth/keycloak/src/index.ts"
-      ],
       "@rangeos-nx/frontend/clients/devops-api": [
         "libs/frontend/clients/devops-api/src/index.ts"
       ],
       "@rangeos-nx/frontend/clients/lms-api": [
         "libs/frontend/clients/lms-api/src/index.ts"
       ],
-      "@rangeos-nx/frontend/common/history": [
-        "libs/frontend/common/history/src/index.ts"
+      "@rangeos-nx/frontend/clients/hooks": [
+        "libs/frontend/clients/hooks/src/index.ts"
       ],
-      "@rangeos-nx/frontend/common/query": [
-        "libs/frontend/common/query/src/index.ts"
+      "@rapid-cmi5/cmi5-build/backend": [
+        "libs/cmi5-build/backend/src/index.ts"
       ],
-      "@rangeos-nx/frontend/environment": [
-        "libs/frontend/environment/src/index.ts"
-      ],
-      "@rangeos-nx/frontend/ui/snack": ["libs/frontend/ui/snack/src/index.ts"],
-      "@rangeos-nx/rapid-cmi5": ["libs/rapid-cmi5/src/index.ts"],
-      "@rangeos-nx/types/cmi5": ["libs/types/cmi5/src/index.ts"],
-      "@rangeos-nx/types/elk": ["libs/types/elk/src/index.ts"],
-      "@rangeos-nx/types/internal/common": [
-        "libs/types/internal/common/src/index.ts"
-      ],
-      "@rangeos-nx/types/internal/content-management": [
-        "libs/types/internal/content-management/src/index.ts"
-      ],
-      "@rangeos-nx/types/internal/grey-space-management": [
-        "libs/types/internal/grey-space-management/src/index.ts"
-      ],
-      "@rangeos-nx/types/internal/metova-verification-aid": [
-        "libs/types/internal/metova-verification-aid/src/index.ts"
-      ],
-      "@rangeos-nx/types/kasm": ["libs/types/kasm/src/index.ts"],
-      "@rangeos-nx/types/keycloak/admin": [
-        "libs/types/keycloak/admin/src/index.ts"
-      ],
-      "@rangeos-nx/types/keycloak/user": [
-        "libs/types/keycloak/user/src/index.ts"
-      ],
-      "@rangeos-nx/types/portal": ["libs/types/portal/src/index.ts"],
-      "@rangeos-nx/types/vcenter": ["libs/types/vcenter/src/index.ts"],
-      "@rangeos-nx/ui/api/hooks": ["libs/ui/api/hooks/src/index.ts"],
-      "@rangeos-nx/ui/branded": ["libs/ui/components/branded/src/index.ts"],
-      "@rangeos-nx/ui/keycloak": ["libs/ui/auth/keycloak/src/index.ts"],
-      "@rangeos-nx/ui/redux": ["libs/ui/redux/src/index.ts"],
-      "@rangeos-nx/ui/validation": ["libs/ui/validation/src/index.ts"]
+      "@rapid-cmi5/keycloak": ["libs/keycloak/src/index.ts"],
+      "@rapid-cmi5/cmi5-build-common": ["packages/common/src/index.ts"],
+      "@rapid-cmi5/react-editor": ["packages/rapid-cmi5/src/index.ts"],
+      "@rapid-cmi5/ui": ["packages/ui/src/index.ts"]
     }
   },
   "exclude": ["**/node_modules", "**/.*/", "tmp"]

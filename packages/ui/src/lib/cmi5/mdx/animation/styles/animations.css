@@ -1,0 +1,532 @@
+/**
+ * Animation Keyframes and CSS Classes
+ * PowerPoint-style animations for slide content
+ */
+
+/* =============================================================================
+   ENTRANCE EFFECTS
+   ============================================================================= */
+
+/* Fade In */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.anim-entrance-fadeIn {
+  animation-name: fadeIn;
+  animation-fill-mode: both;
+}
+
+/* Appear (instant) */
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.anim-entrance-appear {
+  animation-name: appear;
+  animation-duration: 0.01s !important; /* Instant appearance */
+  animation-fill-mode: both;
+}
+
+/* Fly In - Default (bottom) */
+@keyframes flyInBottom {
+  0% {
+    opacity: 0;
+    transform: translateY(100vh);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.anim-entrance-flyIn {
+  animation-name: flyInBottom;
+  animation-fill-mode: both;
+}
+
+/* Fly In - Top */
+@keyframes flyInTop {
+  0% {
+    opacity: 0;
+    transform: translateY(-100vh);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.anim-entrance-flyIn-top {
+  animation-name: flyInTop;
+  animation-fill-mode: both;
+}
+
+/* Fly In - Bottom */
+.anim-entrance-flyIn-bottom {
+  animation-name: flyInBottom;
+  animation-fill-mode: both;
+}
+
+/* Fly In - Left */
+@keyframes flyInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-100vw);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.anim-entrance-flyIn-left {
+  animation-name: flyInLeft;
+  animation-fill-mode: both;
+}
+
+/* Fly In - Right */
+@keyframes flyInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(100vw);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.anim-entrance-flyIn-right {
+  animation-name: flyInRight;
+  animation-fill-mode: both;
+}
+
+/* Zoom In */
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.anim-entrance-zoomIn {
+  animation-name: zoomIn;
+  animation-fill-mode: both;
+}
+
+/* Slide In - Top */
+@keyframes slideInTop {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.anim-entrance-slideIn-top {
+  animation-name: slideInTop;
+  animation-fill-mode: both;
+}
+
+/* Slide In - Bottom */
+@keyframes slideInBottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.anim-entrance-slideIn-bottom {
+  animation-name: slideInBottom;
+  animation-fill-mode: both;
+}
+
+/* Slide In - Left */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.anim-entrance-slideIn-left {
+  animation-name: slideInLeft;
+  animation-fill-mode: both;
+}
+
+/* Slide In - Right */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.anim-entrance-slideIn-right {
+  animation-name: slideInRight;
+  animation-fill-mode: both;
+}
+
+/* =============================================================================
+   EXIT EFFECTS
+   ============================================================================= */
+
+/* Fade Out */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.anim-exit-fadeOut {
+  animation-name: fadeOut;
+  animation-fill-mode: both;
+}
+
+/* Disappear (instant) */
+@keyframes disappear {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.anim-exit-disappear {
+  animation-name: disappear;
+  animation-duration: 0.01s !important; /* Instant disappearance */
+  animation-fill-mode: both;
+}
+
+/* Fly Out - Default (bottom) */
+@keyframes flyOutBottom {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh);
+  }
+}
+
+.anim-exit-flyOut {
+  animation-name: flyOutBottom;
+  animation-fill-mode: both;
+}
+
+/* Fly Out - Top */
+@keyframes flyOutTop {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100vh);
+  }
+}
+
+.anim-exit-flyOut-top {
+  animation-name: flyOutTop;
+  animation-fill-mode: both;
+}
+
+/* Fly Out - Bottom */
+.anim-exit-flyOut-bottom {
+  animation-name: flyOutBottom;
+  animation-fill-mode: both;
+}
+
+/* Fly Out - Left */
+@keyframes flyOutLeft {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-100vw);
+  }
+}
+
+.anim-exit-flyOut-left {
+  animation-name: flyOutLeft;
+  animation-fill-mode: both;
+}
+
+/* Fly Out - Right */
+@keyframes flyOutRight {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100vw);
+  }
+}
+
+.anim-exit-flyOut-right {
+  animation-name: flyOutRight;
+  animation-fill-mode: both;
+}
+
+/* Zoom Out */
+@keyframes zoomOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+}
+
+.anim-exit-zoomOut {
+  animation-name: zoomOut;
+  animation-fill-mode: both;
+}
+
+/* Slide Out - Top */
+@keyframes slideOutTop {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+.anim-exit-slideOut-top {
+  animation-name: slideOutTop;
+  animation-fill-mode: both;
+}
+
+/* Slide Out - Bottom */
+@keyframes slideOutBottom {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+.anim-exit-slideOut-bottom {
+  animation-name: slideOutBottom;
+  animation-fill-mode: both;
+}
+
+/* Slide Out - Left */
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.anim-exit-slideOut-left {
+  animation-name: slideOutLeft;
+  animation-fill-mode: both;
+}
+
+/* Slide Out - Right */
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.anim-exit-slideOut-right {
+  animation-name: slideOutRight;
+  animation-fill-mode: both;
+}
+
+/* =============================================================================
+   EMPHASIS EFFECTS (Future)
+   ============================================================================= */
+
+/* Pulse */
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.anim-emphasis-pulse {
+  animation-name: pulse;
+  animation-fill-mode: both;
+}
+
+/* Shake */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-10px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(10px);
+  }
+}
+
+.anim-emphasis-shake {
+  animation-name: shake;
+  animation-fill-mode: both;
+}
+
+/* Spin */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.anim-emphasis-spin {
+  animation-name: spin;
+  animation-fill-mode: both;
+}
+
+/* =============================================================================
+   UTILITY CLASSES
+   ============================================================================= */
+
+/* Hidden state before animation */
+.anim-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Visible state after animation */
+.anim-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Prevent animation during setup */
+.anim-no-transition {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Preserve 3D transformations */
+.anim-preserve-3d {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+/* Animation state indicators (for debugging) */
+.anim-debug-running {
+  outline: 2px solid blue !important;
+}
+
+.anim-debug-complete {
+  outline: 2px solid green !important;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .anim-entrance-fadeIn,
+  .anim-entrance-appear,
+  .anim-entrance-flyIn,
+  .anim-entrance-flyIn-top,
+  .anim-entrance-flyIn-bottom,
+  .anim-entrance-flyIn-left,
+  .anim-entrance-flyIn-right,
+  .anim-entrance-zoomIn,
+  .anim-entrance-slideIn-top,
+  .anim-entrance-slideIn-bottom,
+  .anim-entrance-slideIn-left,
+  .anim-entrance-slideIn-right,
+  .anim-exit-fadeOut,
+  .anim-exit-disappear,
+  .anim-exit-flyOut,
+  .anim-exit-flyOut-top,
+  .anim-exit-flyOut-bottom,
+  .anim-exit-flyOut-left,
+  .anim-exit-flyOut-right,
+  .anim-exit-zoomOut,
+  .anim-exit-slideOut-top,
+  .anim-exit-slideOut-bottom,
+  .anim-exit-slideOut-left,
+  .anim-exit-slideOut-right,
+  .anim-emphasis-pulse,
+  .anim-emphasis-shake,
+  .anim-emphasis-spin {
+    animation-duration: 0.01s !important;
+    animation-delay: 0s !important;
+  }
+}

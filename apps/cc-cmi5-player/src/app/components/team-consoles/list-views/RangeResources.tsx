@@ -4,14 +4,6 @@
 
 import { useEffect, useMemo } from 'react';
 
-/* Branded */
-import { iListItemType, ListView, LoadingUi } from '@rangeos-nx/ui/branded';
-
-import {
-  DeployedAutoGrader,
-  queryKeyRangeResourceVMs,
-  Topic,
-} from '@rangeos-nx/ui/api/hooks';
 
 /* MUI */
 import { Alert } from '@mui/material';
@@ -22,6 +14,8 @@ import TeamRangeResourceContainerActionRow from './TeamRangeResourceContainerAct
 import { DeployedRangeConsole } from '@rangeos-nx/frontend/clients/devops-api';
 import TeamRangeResourceAutoGraderActionActionRow from './TeamRangeResourceAutoGraderActionRow';
 import AutoGraderProgressDisplay from './AutoGraderProgressDisplay';
+import { DeployedAutoGrader, queryKeyRangeResourceVMs, Topic } from '@rangeos-nx/frontend/clients/hooks';
+import { ListView, iListItemType, LoadingUi } from '@rapid-cmi5/ui';
 
 /**
  * Displays Deployed Scenario VMs, Containers, and Autograders

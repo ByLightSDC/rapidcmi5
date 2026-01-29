@@ -9,6 +9,20 @@
       "type": "markdown",
       "filepath": "test/test/slide-1.md",
       "content": "## AI With Class Id\n\n:::scenario\n```json\n{\n \"uuid\": \"9a277b3c-33fa-4792-ae34-2135f3e1138e\",\n \"name\": \"Testing - Auto Grader\",\n \"promptClass\": true\n}\n```\n:::"
+    },
+    {
+      "display": "# Slide",
+      "slideTitle": "Slide 33",
+      "type": "markdown",
+      "filepath": "Security+/introduction/slide-33.md",
+      "content": ":fx[# Slide]{type=\"highlight\" color=\"#3ec157\"}\n\n\n\n\n\n\n\n:fx[aaasssss]{type=\"bracket\" color=\"#aa0000\"}"
+    },
+    {
+      "display": "# Slide",
+      "slideTitle": "Slide 34",
+      "type": "markdown",
+      "filepath": "Security+/introduction/slide-34.md",
+      "content": "---\nanimations:\n  - id: anim_1769625652217_1tbj5wwwi\n    order: 1\n    targetNodeKey: \"96\"\n    directiveId: anim_1769625652190_u2aggh\n    targetLabel: \"Toc-heading: Slide\"\n    entranceEffect: fadeIn\n    trigger: onSlideOpen\n    duration: 4\n    delay: 0\n    enabled: true\n  - id: anim_1769625685486_x8k3cgxzv\n    order: 2\n    targetNodeKey: \"167\"\n    directiveId: anim_1769625685462_d3l6d1\n    targetLabel: \"Paragraph: aaaa\"\n    entranceEffect: flyIn\n    trigger: onSlideOpen\n    duration: 4\n    delay: 0\n    enabled: true\n---\n\n:::anim{#anim_1769625652190_u2aggh}\n# Slide\n\ntestter\n:::\n\n<img alt=\"RangeOS_Logo (1) (1)\" id=\"20260128133812-0b1d0964-1e62-4947-bff7-9364d2aa901b\" src=\"./Assets/Images/RangeOS_Logo (1) (1).png\" />\n\n::::accordion{color=\"transparent\"}\n:::accordionContent{title=\"ffff\"}\nassasaa\n:::\n\n:::accordionContent{title=\"Accorfffdion 2 Title\"}\nAccordion 2 Content Goes Here\n:::\n\n:::accordionContent{title=\"Accordionff 3 Title\"}\nAccordion 3 Content aaaa\n\nHere\n:::\n::::\n\n::::tabs{color=\"transparent\"}\n:::tabContent{title=\"Tab 1 Titlesdsad\"}\nTab 1 Content Goes Heressss\n:::\n\n:::tabContent{title=\"Tab 2 Titlesaddsa\"}\nTab 2 Content Goes Heresss\n:::\n\n:::tabContent{title=\"Tab 3 Titledsasad\"}\nTab 3 Contenaat Goes Here\n:::\n::::\n\n:::imageLabel{title=\"**Label Titlecasass**&#xA;\" imageId=\"20260128133812-0b1d0964-1e62-4947-bff7-9364d2aa901b\" x=\"101.234375\" y=\"161.125\"}\nLabel Content\n:::\n\n:::anim{#anim_1769625685462_d3l6d1}\naaaa\n:::"
     }
   ],
   "dirPath": "test/test",

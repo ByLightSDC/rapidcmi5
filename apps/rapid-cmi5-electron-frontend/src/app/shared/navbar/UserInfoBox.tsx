@@ -1,31 +1,31 @@
-import { AppDispatch } from '@rangeos-nx/rapid-cmi5';
+import { AppDispatch } from '@rapid-cmi5/react-editor';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { modal, setModal, themeColor, setTheme, resetPersistance } from '@rangeos-nx/ui/redux';
+import {
+  modal,
+  setModal,
+  themeColor,
+  setTheme,
+  resetPersistance,
+} from '@rapid-cmi5/ui';
 
 import { useLogOut } from '../../hooks/useLogOut';
 
 /* Branded */
-import {
-  ModalDialog,
-} from '@rangeos-nx/ui/branded';
+import { ModalDialog } from '@rapid-cmi5/ui';
 
 /*Material*/
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { Stack } from '@mui/system';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 
 /* Icons */
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import Brightness6Icon from '@mui/icons-material/Brightness6';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useState } from 'react';
-
-import { BuildVersionInfo } from '@rangeos-nx/frontend/clients/devops-api';
 
 /**
  * @typedef propTypes - User Info Box props
@@ -46,34 +46,11 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
   //#region About
   const [isAboutDisabled, setAboutDisabled] = useState(false);
   const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
-  const [aboutBuildVersionData, setAboutBuildVersionData] =
-    useState<BuildVersionInfo>({
-      buildId: 0,
-      gitBranch: '',
-      gitCommit: '',
-    });
-  const handleAboutClick = () => {
-    onClose();
-    setAboutDialogOpen(true);
-  };
+
   const handleAboutDialogClose = () => {
     setAboutDialogOpen(false);
   };
 
-  /**
-   * Build Version Data is loaded via fetcher component
-   */
-  const handleInitialDataLoad = (data: BuildVersionInfo) => {
-    setAboutBuildVersionData(data);
-  };
-  /**
-   * Handles error returned from API call
-   * @param {any} error error returned from api call
-   */
-  const handleInitialDataError = (error: string) => {
-    // wont be able to view About Build Version Information
-    setAboutDisabled(true);
-  };
   //#endregion
 
   /**
@@ -96,6 +73,7 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
 
   const handleThemeToggle = () => {
     const newTheme = appThemeColor === 'dark' ? 'light' : 'dark';
+    console.log('setting theme', newTheme);
 
     localStorage.setItem('themeColor', newTheme);
 
@@ -130,7 +108,6 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
       <div data-testid="modals">
         <AboutBuildVersionDialog
           appThemeColor={appThemeColor}
-          versionData={aboutBuildVersionData}
           isOpen={aboutDialogOpen}
           onClose={handleAboutDialogClose}
         />
@@ -210,12 +187,11 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
 
 type tAboutProps = {
   appThemeColor: string;
-  versionData: BuildVersionInfo;
   isOpen: boolean;
   onClose: () => void;
 };
 function AboutBuildVersionDialog(props: tAboutProps) {
-  const { appThemeColor, versionData, isOpen, onClose } = props;
+  const { appThemeColor, isOpen, onClose } = props;
   return (
     <div data-testid="about-build-version-modal">
       <ModalDialog
@@ -252,7 +228,7 @@ function AboutBuildVersionDialog(props: tAboutProps) {
             paddingLeft: '24px',
           }}
         >
-          <Stack direction="column" style={{}}>
+          {/* <Stack direction="column" style={{}}>
             <Typography variant="body2">
               <strong>Build ID: </strong>
               {`${versionData?.buildId}`}
@@ -265,7 +241,7 @@ function AboutBuildVersionDialog(props: tAboutProps) {
               <strong>Git Commit: </strong>
               {`${versionData?.gitCommit}`}
             </Typography>
-          </Stack>
+          </Stack> */}
         </Box>
       </ModalDialog>
     </div>

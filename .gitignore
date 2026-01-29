@@ -17,7 +17,7 @@ cc-cmi5-player-dist
 build-output/
 .nx
 migration.json/
-
+audit.json
 
 libs/ui/components/branded/src/assets/cmi5-player/background.png
 libs/ui/components/branded/src/assets/cmi5-player/**
@@ -26,3 +26,6 @@ cmi5-test-lessons/**
 
 vite.config.*.timestamp*
 vitest.config.*.timestamp*
+temp.package
+temp.project
+allpackages.json

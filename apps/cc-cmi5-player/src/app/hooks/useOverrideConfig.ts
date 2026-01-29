@@ -1,4 +1,4 @@
-import { config } from '@rangeos-nx/frontend/environment';
+import { config } from '@rapid-cmi5/ui';
 import { logger, debugLog } from '../debug';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';

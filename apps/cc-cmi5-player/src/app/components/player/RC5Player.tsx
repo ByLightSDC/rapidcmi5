@@ -11,27 +11,17 @@ import {
   directivesPlugin,
   frontmatterPlugin,
   quotePlugin,
+  AdmonitionDirectiveDescriptor,
+  CodeMirrorEditor,
+  codeMirrorPlugin,
+  headingsPlugin,
 } from '@mdxeditor/editor';
 import { imagePlayerPlugin } from './plugins/image-player/';
+
 import '@mdxeditor/editor/style.css';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import {
-  AdmonitionDirectiveDescriptor,
-  codeMirrorPlugin,
-  debugLogError,
-  YoutubeDirectiveDescriptor,
-  headingsPlugin,
-  footnotePlugin,
-  FootnoteDefinitionDescriptor,
-  FootnoteReferenceDescriptor,
-  mathPlugin,
-  MathDescriptor,
-  MathCodeBlockDescriptor,
-  languageList,
-  htmlPlugin,
-  CodeMirrorEditor,
-} from '@rangeos-nx/ui/branded';
+
 
 import { RC5PlayerToolbar } from './RC5PlayerToolbar';
 import { ActivityDirectiveDescriptor } from './editors/directives/ActivityDirectiveDescriptor';
@@ -39,6 +29,10 @@ import { AuManagerContext } from '../../session/AuManager';
 import { kebabToCamel } from '../../utils/StringUtils';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { LayoutBoxDirectiveDescriptor } from './editors/directives/LayoutBoxDirectiveDescriptor';
+import { debugLog, debugLogError, logger } from '../../debug';
+import { AnimationConfig, mathPlugin, MathDescriptor, MathCodeBlockDescriptor, AccordionDirectiveDescriptor, AccordionContentDirectiveDescriptor, FxDirectiveDescriptor, AnimDirectiveDescriptor, YoutubeDirectiveDescriptor, TabsDirectiveDescriptor, TabContentDirectiveDescriptor, ImageLabelDirectiveDescriptor, languageList, footnotePlugin, FootnoteDefinitionDescriptor, FootnoteReferenceDescriptor, htmlPlugin, onCheckClickOutsideImageLabel } from '@rapid-cmi5/ui';
+import { animationPlayerPlugin, parseFrontmatterAnimations, useAnimationPlayback } from './plugins/animation-player';
+import { mediaEventManager } from '../../utils/MediaEventManager';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -49,11 +43,13 @@ function RC5Player() {
   const { slideData, activeTab } = useContext(AuManagerContext);
   const [fullScreenImage, setFullScreenImage] = useState<string>('');
   const [fullScreenImageStyle, setFullScreenImageStyle] = useState({});
+  const [slideAnimations, setSlideAnimations] = useState<AnimationConfig[]>([]);
 
   const pixelTop = '40px';
 
   const thePlugins = useMemo(() => {
     const initialList = [
+      frontmatterPlugin(), // CRITICAL: Hide frontmatter (animations, etc) from rendering
       mathPlugin({ mathEditorDescriptors: [MathDescriptor] }),
       codeBlockPlugin({
         defaultCodeBlockLanguage: 'js',
@@ -68,10 +64,17 @@ function RC5Player() {
       }),
       directivesPlugin({
         directiveDescriptors: [
+          AccordionDirectiveDescriptor,
+          AccordionContentDirectiveDescriptor,
           AdmonitionDirectiveDescriptor,
           ActivityDirectiveDescriptor,
+          FxDirectiveDescriptor,
+          AnimDirectiveDescriptor,
           YoutubeDirectiveDescriptor,
           LayoutBoxDirectiveDescriptor,
+          TabsDirectiveDescriptor,
+          TabContentDirectiveDescriptor,
+          ImageLabelDirectiveDescriptor,
         ],
       }),
       codeMirrorPlugin({
@@ -82,10 +85,10 @@ function RC5Player() {
         footnoteDefinitionEditorDescriptors: [FootnoteDefinitionDescriptor],
         footnoteReferenceEditorDescriptors: [FootnoteReferenceDescriptor],
       }),
-      frontmatterPlugin(),
       headingsPlugin(),
       htmlPlugin(),
       imagePlayerPlugin(),
+      animationPlayerPlugin(),
       listsPlugin(),
       linkPlugin(),
       linkDialogPlugin({
@@ -111,40 +114,61 @@ function RC5Player() {
    * Resize Image full screen
    * @param event
    */
-  const onClickSlide = (event: any) => {
-    if (event.target.nodeName === 'IMG') {
-      event.stopPropagation();
-      const srcAttr = event.target.attributes['src'];
-      const styleObj = event.target.style;
-      if (srcAttr) {
-        // don't set the image to full screen if the image is the child of an
-        // anchor tag
-        const hasAnchorAncestor = event.target.closest('a') !== null;
-        if (hasAnchorAncestor) {
-          return;
-        }
+  const onClickSlide = (event: React.MouseEvent<HTMLDivElement>) => {
+    const target = event.target as HTMLElement | null;
+    const id = target?.id ?? null;
 
-        // set the style of the full screen image if it exists on the image that
-        // was clicked
-        if (styleObj) {
-          // create a usable object of style properties
-          const inlineStyles: Record<string, string> = {};
-          for (let i = 0; i < styleObj.length; i++) {
-            const propName = styleObj.item(i);
-            const propNameCamelCase = kebabToCamel(styleObj.item(i));
-            const propValue = styleObj.getPropertyValue(propName);
-            if (propValue) {
-              inlineStyles[propNameCamelCase] = propValue;
-            }
+    if (!target || !id) {
+      return;
+    }
+
+    // image labels covers image width and height 100%
+    if (target.nodeName === 'DIV' && id && id.startsWith('image-labels')) {
+      event.stopPropagation();
+
+      const imageId = id.replace('image-labels-', '');
+      debugLog('clicked imageId', imageId);
+
+      if (onCheckClickOutsideImageLabel(imageId)) {
+        // clickoutside of open label content so block full screen
+        return;
+      }
+      const imgEl = document.getElementById(imageId);
+      if (imgEl) {
+        const src = imgEl.getAttribute('src');
+        const styleObj = imgEl.style;
+        if (src) {
+          //check whether to go fullscreen 
+
+          // don't set the image to full screen if the image is the child of an
+          // anchor tag
+          const hasAnchorAncestor = imgEl.closest('a') !== null;
+          if (hasAnchorAncestor) {
+            return;
           }
 
-          setFullScreenImageStyle(inlineStyles);
-        } else {
-          setFullScreenImageStyle({});
-        }
+          // set the style of the full screen image if it exists on the image that
+          // was clicked
+          if (styleObj) {
+            // create a usable object of style properties
+            const inlineStyles: Record<string, string> = {};
+            for (let i = 0; i < styleObj.length; i++) {
+              const propName = styleObj.item(i);
+              const propNameCamelCase = kebabToCamel(styleObj.item(i));
+              const propValue = styleObj.getPropertyValue(propName);
+              if (propValue) {
+                inlineStyles[propNameCamelCase] = propValue;
+              }
+            }
 
-        // set the full screen image
-        setFullScreenImage(srcAttr.value);
+            setFullScreenImageStyle(inlineStyles);
+          } else {
+            setFullScreenImageStyle({});
+          }
+
+          // set the full screen image
+          setFullScreenImage(src);
+        }
       }
     }
   };
@@ -173,10 +197,23 @@ function RC5Player() {
   const editorContainerRef = React.useRef<HTMLDivElement>(null);
 
   /**
-   * UE injects markdown from lesson into editor and resets focus
+   * Parse animations from markdown BEFORE loading into editor
+   * This runs every time slide content changes
    */
   useEffect(() => {
-    //REF debugLog(displayData);
+    if (typeof slideData === 'string') {
+      console.log('🔄 Slide changed, parsing animations...');
+      const animations = parseFrontmatterAnimations(slideData);
+      setSlideAnimations(animations);
+    } else {
+      setSlideAnimations([]);
+    }
+  }, [slideData, activeTab]);
+
+  /**
+   * Inject markdown into editor and reset focus
+   */
+  useEffect(() => {
     if (ref.current) {
       if (typeof slideData !== 'string') {
         debugLogError('Attempting to inject non string data into MdxEditor');
@@ -187,6 +224,29 @@ function RC5Player() {
       ref.current?.focus();
     }
   }, [slideData]);
+
+  /**
+   * Attach media event listeners after slide content renders
+   * This enables audio/video playback tracking for LRS events
+   */
+  useEffect(() => {
+    // Small delay to ensure DOM is fully rendered after MDX content loads
+    const timeoutId = setTimeout(() => {
+      logger.debug(
+        `Attaching media event listeners for slide ${activeTab}`,
+        undefined,
+        'media',
+      );
+      mediaEventManager.attachMediaEventListeners();
+    }, 100);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [slideData, activeTab]);
+
+  // Use the animation playback hook with parsed animations
+  useAnimationPlayback(slideAnimations, activeTab, true);
 
   return (
     <>

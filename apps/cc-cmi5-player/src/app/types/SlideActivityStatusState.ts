@@ -5,7 +5,7 @@
  * in the LRS Activity State system.
  */
 
-import { ActivityScore } from '@rangeos-nx/types/cmi5';
+import { ActivityScore } from '@rapid-cmi5/cmi5-build-common';
 
 export interface SlideActivityScore {
   raw: number;

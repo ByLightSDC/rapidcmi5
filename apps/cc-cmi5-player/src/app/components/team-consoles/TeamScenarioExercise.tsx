@@ -7,13 +7,7 @@ import {
   useRef,
 } from 'react';
 
-import { OverflowTypography, TabMainUi } from '@rangeos-nx/ui/branded';
-import {
-  getScenarioStatusIcon,
-  queryKeyRangeResourceAutoGraders,
-  queryKeyRangeResourceContainers,
-  Topic,
-} from '@rangeos-nx/ui/api/hooks';
+
 import {
   DeployedScenario,
   DeployedScenarioDetailStatusEnum,
@@ -36,7 +30,6 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AutoModeIcon from '@mui/icons-material/AutoMode';
 import TerminalIcon from '@mui/icons-material/Terminal';
 
-import { AuContextProps, TeamConsolesContent } from '@rangeos-nx/types/cmi5';
 
 import TimeClock from '../scenario/TimeClock';
 import RangeResources from './list-views/RangeResources';
@@ -46,6 +39,9 @@ import TeamVMUpdates from './queries/TeamVMUpdates';
 import TeamContainerUpdates from './queries/TeamContainerUpdates';
 import TeamConsoleUpdates from './queries/TeamConsoleUpdates';
 import TeamAutoGraderUpdates from './queries/TeamAutoGraderUpdates';
+import { getScenarioStatusIcon, queryKeyRangeResourceAutoGraders, queryKeyRangeResourceContainers, Topic } from '@rangeos-nx/frontend/clients/hooks';
+import { AuContextProps, TeamConsolesContent } from '@rapid-cmi5/cmi5-build-common';
+import { OverflowTypography, TabMainUi } from '@rapid-cmi5/ui';
 
 /**
  * Activity displays a Deployed Scenario status, VMs, Containers, and Autograders
@@ -291,11 +287,13 @@ function TeamScenarioExercise({
                 }}
                 value={currentTab}
                 onChange={handleChangeTab}
-                TabIndicatorProps={{
-                  sx: {
-                    height: 4,
-                    margin: '12px',
-                    marginLeft: '0px',
+                slotProps={{
+                  indicator: {
+                    sx: {
+                      height: 4,
+                      margin: '12px',
+                      marginLeft: '0px',
+                    },
                   },
                 }}
               >

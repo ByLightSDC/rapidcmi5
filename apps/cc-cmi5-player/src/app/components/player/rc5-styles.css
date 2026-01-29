@@ -5,11 +5,18 @@
 .mdxeditor {
   /* --basePageBg:#dff11e; */
   height: inherit;
+  overflow: visible;
 }
 
 /* makes accordion nested content dark */
 .dark-editor {
   --basePageBg: #212125;
+}
+
+/* Ensure nested editors (like :::anim directive content) don't render with their own grey panels in playback.
+   The hashed class comes from @mdxeditor/editor styles. */
+.dark-editor ._nestedEditor_1e2ox_961 {
+  background-color: transparent !important;
 }
 
 .nested-editable-dark {
@@ -19,10 +26,16 @@
   ._code_1tncs_52 {
     background-color: #0d1118;
   }
+  ._nestedEditor_1e2ox_961 {
+    background-color: transparent !important;
+  }
 }
 
 .nested-editable-light {
   --basePageBg: #f8f8f8;
+  ._nestedEditor_1e2ox_961 {
+    background-color: transparent;
+  }
 }
 
 .mdxeditor-diff-source-wrapper {
@@ -44,6 +57,8 @@
   margin-left: 12px;
   margin-right: 12px;
   text-align: start;
+  padding-top: 24px;
+  padding-bottom: 32px;
 }
 
 .mdxeditor-source-editor {
