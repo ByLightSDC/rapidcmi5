@@ -143,6 +143,7 @@
     "socket.io-stream": "^0.5.3",
     "style-loader": "^4.0.0",
     "uniqid": "^5.4.0",
+    "util": "^0.12.5",
     "uuid": "^8.3.2",
     "webpack-merge": "^6.0.1",
     "yn": "^3.1.1",
