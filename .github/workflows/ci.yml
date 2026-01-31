@@ -44,19 +44,25 @@ jobs:
       - name: Run tests
         run: npx nx run-many --target=test --all --parallel=3 --coverage
 
-  build-electron-macos:
-    name: Build Electron (macOS)
-    runs-on: macos-latest
+  build-electron:
+    name: Build Electron (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     needs: [lint, test]
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            platform: darwin
+          - os: ubuntu-latest
+            platform: linux
+          - os: windows-latest
+            platform: win32
     env:
       APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
       APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-    strategy:
-      matrix:
-        arch: [x64, arm64]
     steps:
       - uses: actions/checkout@v4
 
@@ -69,8 +75,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Import Code Signing Certificate
-        if: ${{ env.APPLE_CERTIFICATE != '' }}
+      - name: Import Code Signing Certificate (macOS)
+        if: ${{ matrix.platform == 'darwin' && env.APPLE_CERTIFICATE != '' }}
         run: |
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
           KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
@@ -93,24 +99,29 @@ jobs:
       - name: Build Electron app
         run: npm run nxe:make:app
         env:
-          APPLE_ARCH: ${{ matrix.arch }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
 
-      - name: Notarize DMG
-        if: ${{ env.APPLE_ID != '' && env.SIGNING_IDENTITY != '' }}
+      - name: Notarize DMG (macOS)
+        if: ${{ matrix.platform == 'darwin' && env.APPLE_ID != '' && env.SIGNING_IDENTITY != '' }}
         run: |
-          DMG_PATH=$(find dist/executables -name "*.dmg" -type f | grep "${{ matrix.arch }}" | head -1)
-          if [ -n "$DMG_PATH" ]; then
-            echo "Notarizing $DMG_PATH..."
-            xcrun notarytool submit "$DMG_PATH" \
-              --apple-id "$APPLE_ID" \
-              --password "$APPLE_ID_PASSWORD" \
-              --team-id "$APPLE_TEAM_ID" \
-              --wait || echo "Notarization failed, continuing..."
-            xcrun stapler staple "$DMG_PATH" || echo "Stapling failed, continuing..."
-          fi
+          for DMG_PATH in dist/executables/*.dmg; do
+            if [ -f "$DMG_PATH" ]; then
+              echo "Notarizing $DMG_PATH..."
+              xcrun notarytool submit "$DMG_PATH" \
+                --apple-id "$APPLE_ID" \
+                --password "$APPLE_ID_PASSWORD" \
+                --team-id "$APPLE_TEAM_ID" \
+                --wait || echo "Notarization failed, continuing..."
+              xcrun stapler staple "$DMG_PATH" || echo "Stapling failed, continuing..."
+            fi
+          done
 
-      - name: Upload artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: rapidcmi5-darwin-${{ matrix.arch }}
-          path: dist/executables/*.dmg
+          name: rapidcmi5-${{ matrix.platform }}
+          path: |
+            dist/executables/*.dmg
+            dist/executables/*.AppImage
+            dist/executables/*.exe
+          if-no-files-found: ignore

@@ -50,8 +50,18 @@ jobs:
             ### Downloads
 
             #### Desktop Application
-            - **macOS (Apple Silicon)**: `RapidCMI5-${{ steps.get_version.outputs.version }}-arm64.dmg`
-            - **macOS (Intel)**: `RapidCMI5-${{ steps.get_version.outputs.version }}.dmg`
+
+            **macOS:**
+            - Apple Silicon (M1/M2/M3): `RapidCMI5-${{ steps.get_version.outputs.version }}-arm64.dmg`
+            - Intel: `RapidCMI5-${{ steps.get_version.outputs.version }}.dmg`
+
+            **Windows:**
+            - x64: `RapidCMI5 Setup ${{ steps.get_version.outputs.version }}.exe`
+            - ARM64: `RapidCMI5 Setup ${{ steps.get_version.outputs.version }}-arm64.exe`
+
+            **Linux:**
+            - x64: `RapidCMI5-${{ steps.get_version.outputs.version }}.AppImage`
+            - ARM64: `RapidCMI5-${{ steps.get_version.outputs.version }}-arm64.AppImage`
 
             ### Installation
 
@@ -61,26 +71,38 @@ jobs:
             3. Drag RapidCMI5 to your Applications folder
             4. The first time you open it, right-click and select "Open" to bypass Gatekeeper
 
+            **Windows:**
+            1. Download the appropriate .exe installer
+            2. Run the installer
+            3. Follow the installation wizard
+
+            **Linux:**
+            1. Download the AppImage file
+            2. Make it executable: `chmod +x RapidCMI5-*.AppImage`
+            3. Run it: `./RapidCMI5-*.AppImage`
+
             ### Changelog
             <!-- Add changelog here -->
 
-  build-electron-macos:
-    name: Build Electron (macOS)
-    runs-on: macos-latest
+  build-electron:
+    name: Build Electron (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     needs: create-release
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            platform: darwin
+          - os: ubuntu-latest
+            platform: linux
+          - os: windows-latest
+            platform: win32
     env:
       APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
       APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-    strategy:
-      matrix:
-        include:
-          - arch: arm64
-            suffix: arm64
-          - arch: x64
-            suffix: ""
     steps:
       - uses: actions/checkout@v4
 
@@ -97,8 +119,8 @@ jobs:
         run: |
           npm version ${{ needs.create-release.outputs.version }} --no-git-tag-version --allow-same-version
 
-      - name: Import Code Signing Certificate
-        if: ${{ env.APPLE_CERTIFICATE != '' }}
+      - name: Import Code Signing Certificate (macOS)
+        if: ${{ matrix.platform == 'darwin' && env.APPLE_CERTIFICATE != '' }}
         run: |
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
           KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
@@ -119,73 +141,32 @@ jobs:
       - name: Build Electron app
         run: npm run nxe:make:app
         env:
-          APPLE_ARCH: ${{ matrix.arch }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
-      - name: Notarize DMG
-        if: ${{ env.APPLE_ID != '' && env.APPLE_CERTIFICATE != '' }}
+      - name: Notarize DMG (macOS)
+        if: ${{ matrix.platform == 'darwin' && env.APPLE_ID != '' && env.APPLE_CERTIFICATE != '' }}
         run: |
-          if [ "${{ matrix.arch }}" = "arm64" ]; then
-            DMG_PATH=$(find dist/executables -name "*-arm64.dmg" -type f | head -1)
-          else
-            DMG_PATH=$(find dist/executables -name "RapidCMI5-*.dmg" -type f | grep -v "arm64" | head -1)
-          fi
+          for DMG_PATH in dist/executables/*.dmg; do
+            if [ -f "$DMG_PATH" ]; then
+              echo "Notarizing $DMG_PATH..."
+              xcrun notarytool submit "$DMG_PATH" \
+                --apple-id "$APPLE_ID" \
+                --password "$APPLE_ID_PASSWORD" \
+                --team-id "$APPLE_TEAM_ID" \
+                --wait || echo "Notarization failed, continuing..."
+              xcrun stapler staple "$DMG_PATH" || echo "Stapling failed, continuing..."
+            fi
+          done
 
-          if [ -n "$DMG_PATH" ]; then
-            echo "Notarizing $DMG_PATH..."
-            xcrun notarytool submit "$DMG_PATH" \
-              --apple-id "$APPLE_ID" \
-              --password "$APPLE_ID_PASSWORD" \
-              --team-id "$APPLE_TEAM_ID" \
-              --wait || echo "Notarization failed, continuing..."
-            xcrun stapler staple "$DMG_PATH" || echo "Stapling failed, continuing..."
-          fi
-
-      - name: Upload DMG to Release (arm64)
-        if: matrix.arch == 'arm64'
-        uses: actions/upload-release-asset@v1
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/executables/*.dmg
+            dist/executables/*.dmg.blockmap
+            dist/executables/*.AppImage
+            dist/executables/*.exe
+          fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: dist/executables/RapidCMI5-${{ needs.create-release.outputs.version }}-arm64.dmg
-          asset_name: RapidCMI5-${{ needs.create-release.outputs.version }}-arm64.dmg
-          asset_content_type: application/octet-stream
-        continue-on-error: true
-
-      - name: Upload DMG to Release (x64)
-        if: matrix.arch == 'x64'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: dist/executables/RapidCMI5-${{ needs.create-release.outputs.version }}.dmg
-          asset_name: RapidCMI5-${{ needs.create-release.outputs.version }}.dmg
-          asset_content_type: application/octet-stream
-        continue-on-error: true
-
-      - name: Upload blockmap (arm64)
-        if: matrix.arch == 'arm64'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: dist/executables/RapidCMI5-${{ needs.create-release.outputs.version }}-arm64.dmg.blockmap
-          asset_name: RapidCMI5-${{ needs.create-release.outputs.version }}-arm64.dmg.blockmap
-          asset_content_type: application/octet-stream
-        continue-on-error: true
-
-      - name: Upload blockmap (x64)
-        if: matrix.arch == 'x64'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: dist/executables/RapidCMI5-${{ needs.create-release.outputs.version }}.dmg.blockmap
-          asset_name: RapidCMI5-${{ needs.create-release.outputs.version }}.dmg.blockmap
-          asset_content_type: application/octet-stream
-        continue-on-error: true
