@@ -12,15 +12,16 @@ import {
 } from '../../../../redux/repoManagerReducer';
 import { RootState } from '../../../../redux/store';
 import { getRepoAccess } from './GitContext';
-import { getRepoPath, GitFS } from '../utils/fileSystem';
+import { GitFS } from '../utils/fileSystem';
 import { join } from 'path-browserify';
-import { buildCmi5ZipParams } from '../../../rapidcmi5_mdx/main';
+import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
 
 export const usePublishActions = (
   fsInstance: GitFS,
   repoAccessObject: RepoAccessObject | null,
   token?: string,
-  buildCmi5Zip?: (params: buildCmi5ZipParams) => Promise<AxiosResponse<object>>,
+  downloadCmi5Zip?: () => Promise<any>,
+  processAu?: (au: CourseAU, blockId: string) => Promise<void>,
 ) => {
   const { currentBranch, fileState }: RepoState = useSelector(
     (state: RootState) => state.repoManager,
@@ -28,69 +29,27 @@ export const usePublishActions = (
   const currentCourse = fileState.selectedCourse;
 
   const handleDownloadCmi5Zip = async (req: DownloadCmi5Type) => {
-
     const r = getRepoAccess(repoAccessObject);
     if (!currentBranch || !currentCourse) return null;
-    console.log(currentBranch, currentCourse, r);
-
-    debugLog('Downloading cmi5 zip', currentCourse.basePath);
 
     try {
       let res = null;
-      const repoPath = getRepoPath(r);
       if (fsInstance.isElectron) {
-        console.log(
-          'Donwloading electron zip',
-          r.fileSystemType,
-          r.repoName,
-          currentCourse,
-          req,
-        );
         await window.ipc.cmi5Build(
           join(r.fileSystemType, r.repoName),
           currentCourse.basePath,
           req.zipName,
         );
       } else {
-        if (!buildCmi5Zip) {
-          debugLog('Build cmi5 zip function was not passed into the hook');
-          throw Error('No build function');
-        }
-        const zip = await fsInstance.generateCourseZip(
+        if (!downloadCmi5Zip) throw Error('Download cmi5 zip is not defined');
+        await fsInstance.downloadCmi5PlayerIfNeeded('0.7.0', downloadCmi5Zip);
+
+        await fsInstance.buildCmi5Course(
           r,
           currentCourse.basePath,
+          req.zipName,
+          req.createAuMappings ? processAu : undefined,
         );
-
-        const zipFiles = Object.keys(zip.files);
-
-        if (zipFiles.length === 0) {
-          console.error('Generated ZIP is empty');
-          return;
-        }
-
-        const zipBlob = await zip.generateAsync({ type: 'blob' });
-
-        res = await buildCmi5Zip({
-          zipBlob: zipBlob as File,
-          zipName: req.zipName,
-          createAuMappings: req.createAuMappings,
-        });
-
-        // res = await buildCmi5Zip(
-        //   zipBlob as File,
-        //   req.zipName,
-        //   req.createAuMappings,
-        //   {
-        //     headers: {
-        //       Authorization: `Bearer ${token}`,
-        //     },
-        //     responseType: 'blob',
-        //   },
-        // );
-      }
-
-      if (res?.data) {
-        saveAs(res.data as Blob, req.zipName);
       }
     } catch (err: any) {
       debugLog('Failed downloading cmi5 zip', currentCourse.basePath);

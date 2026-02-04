@@ -4,7 +4,6 @@ import {
   Stack,
   Tooltip,
   Typography,
-  useTheme,
 } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -15,6 +14,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import {
   iconButtonSize,
   iconButtonStyle,
+  textColorGray,
   tooltipStyle,
 } from '../styles/styles';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,10 +26,7 @@ import {
   isDisplayDirty,
   navigateSlide,
 } from '../../../redux/courseBuilderReducer';
-import {
-  defaultSlideContent,
-  SlideTypeEnum,
-} from '@rapid-cmi5/cmi5-build-common';
+import { defaultSlideContent, SlideTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { MessageType } from '../../course-builder/CourseBuilderTypes';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
 import { RC5Context } from '../contexts/RC5Context';
@@ -48,11 +45,7 @@ import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
  * @param param0
  * @returns
  */
-export const SlideMenu = ({
-  extraOptions,
-}: {
-  extraOptions?: JSX.Element[];
-}) => {
+export const SlideMenu = () => {
   const dispatch = useDispatch();
   const currentSlideIndex = useSelector(currentSlideNum);
   const currentAuDir = useSelector(currentAuPath);
@@ -112,8 +105,7 @@ export const SlideMenu = ({
   const topOffset = useMemo(() => {
     return isAppHeaderVisible ? 88 : 48;
   }, [isAppHeaderVisible]);
-  const theme = useTheme();
-  const { palette } = theme;
+
   return (
     <Stack
       direction="row"
@@ -127,18 +119,22 @@ export const SlideMenu = ({
       <Stack
         direction="row"
         sx={{
+          zIndex: 999,
+          position: 'absolute',
+          top: topOffset, //128 to bump out of toolbar area in toolbar area 82,
+          marginRight: '320px', //this might be my width
           backgroundColor: 'transparent', //'#2222260D', //'background.paper' with 10% transparent,
-          borderRadius: '6px',
+          borderRadius: '12px',
+          height: '32px',
+          display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          // background: palette.primary.main,
-          padding: 0.25,
         }}
       >
         {/* <Divider orientation="vertical" flexItem /> */}
         <IconButton
           aria-label="delete-slide"
-          color="secondary"
+          color="primary"
           size={iconButtonSize}
           style={iconButtonStyle}
           disabled={lessonSlides.length <= 1}
@@ -162,7 +158,7 @@ export const SlideMenu = ({
         <Typography
           sx={{
             height: '20px',
-            color: palette.text.secondary,
+            color: textColorGray,
           }}
         >
           {`${currentSlideIndex + 1} / ${lessonSlides.length}`}
@@ -219,7 +215,6 @@ export const SlideMenu = ({
             <CircularProgress size="1.5rem" />
           </Tooltip>
         )}
-        {extraOptions}
         {/* <IconButton
           aria-label="download-cmi5-zip"
           color="inherit"
@@ -237,6 +232,10 @@ export const SlideMenu = ({
             </Stack>
           </Tooltip>
         </IconButton> */}
+        <div
+          id="preview-icon-target"
+          style={{ width: '60px', height: '30px' }}
+        ></div>
       </Stack>
     </Stack>
   );

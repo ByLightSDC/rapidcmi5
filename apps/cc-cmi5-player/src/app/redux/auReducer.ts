@@ -46,10 +46,11 @@ export const initialState: tAuState = {
   rangeData: {
     rangeId: '',
     deployedScenarios: [],
-  } as rangeDataType,
+    scheduledScenarios: [],
+  },
   rangeConsoleData: {
     credentials: [],
-  } as rangeConsoleDataType,
+  },
   rangeDataAttempts: 0,
   rangeConsoleDataAttempts: 0,
   studentId: '',

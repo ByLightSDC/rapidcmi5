@@ -10,7 +10,7 @@ import {
   RepoState,
 } from '../../../../redux/repoManagerReducer';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
-import { GitFS } from '../utils/fileSystem';
+import { FolderStructWithMtime, getRepoPath, GitFS } from '../utils/fileSystem';
 import { failedMergePath, GitOperations } from '../utils/gitOperations';
 
 export function useGitRepoStatus(
@@ -23,7 +23,8 @@ export function useGitRepoStatus(
   );
   const gitOperator = new GitOperations(fsInstance);
 
-  const gettingRepoStatus = useRef(false);
+  const inFlightRef = useRef(false);
+  const [isGettingRepoStatus, setIsGettingRepoStatus] = useState(false);
 
   const [modifiedFiles, setModifiedFiles] = useState<ModifiedFile[]>([]);
   const [stashFiles, setStashFiles] = useState<ModifiedFile[]>([]);
@@ -87,9 +88,9 @@ export function useGitRepoStatus(
         modifiedFilesAfter = [...modifiedFilesAfter, modifiedFile];
       }
     }
-    if (!fsInstance.isElectron) {
-      await fsInstance.writeModifiedFiles(r, modifiedFilesAfter);
-    }
+    // if (!fsInstance.isElectron) {
+    //   await fsInstance.writeModifiedFiles(r, modifiedFilesAfter);
+    // }
     await resolveStashStatus(r, modifiedFilesAfter);
 
     setModifiedFiles(modifiedFilesAfter);
@@ -103,80 +104,133 @@ export function useGitRepoStatus(
     status = status.filter((f) => !newFiles.includes(f.name));
     status = [...status, ...changedFiles];
 
-    if (!fsInstance.isElectron) {
-      await fsInstance.writeModifiedFiles(r, status);
-    }
+    // if (!fsInstance.isElectron) {
+    //   await fsInstance.writeModifiedFiles(r, status);
+    // }
 
     setModifiedFiles(status);
   };
+  const flattenFolders = (
+    folders: FolderStructWithMtime[],
+  ): FolderStructWithMtime[] => {
+    const result: FolderStructWithMtime[] = [];
+
+    function recurse(folderList: FolderStructWithMtime[]) {
+      for (const folder of folderList) {
+        result.push(folder);
+        if (folder.children) {
+          recurse(folder.children);
+        }
+      }
+    }
+
+    recurse(folders);
+    return result;
+  };
 
   const resolveGitRepoStatus = useCallback(
-    async (
-      r: RepoAccessObject,
-      changedFiles?: ModifiedFile[] | undefined,
-      fullResolve?: boolean,
-    ) => {
-      if (!gettingRepoStatus.current) {
-        gettingRepoStatus.current = true;
+    async (r: RepoAccessObject) => {
+      if (inFlightRef.current) return;
+
+      inFlightRef.current = true;
+      setIsGettingRepoStatus(true);
+
+      try {
+        const repoPath = getRepoPath(r);
+        const folderStructure = await fsInstance.getFolderStructureWithMtime(
+          repoPath,
+          '',
+        );
+        const flattenedStruct = flattenFolders(folderStructure).filter(
+          (node) => !node.isBranch,
+        );
+        const lastCommitTime = await gitOperator.gitGetLastCommitTime(r);
+
+        // Get all file paths
+        const allFilePaths = flattenedStruct.map((folder) => folder.id);
+
+        // Get untracked files
+        const { untracked, deleted } =
+          await gitOperator.gitGetUntrackedAndDeletedFiles(r, allFilePaths);
+
+        const untrackedSet = new Set(untracked);
+
+        // Filter to only tracked files modified after last commit
+        const recentlyModified = flattenedStruct
+          .filter((folder) => {
+            // Only include files (not directories)
+            if (folder.isBranch) return false;
+            if (!folder.mtime) return false;
+
+            // Exclude untracked files
+            if (untrackedSet.has(folder.id)) return false;
+
+            // Include if modified after last commit
+            return folder.mtime > lastCommitTime;
+          })
+          .map((folder) => folder.id);
+
+        const untrackedStatus: ModifiedFile[] = untracked.map((file) => {
+          return { name: file, status: 'untracked' };
+        });
+
+        let status: ModifiedFile[];
+
+        if (fsInstance.isElectron) {
+          status = await gitOperator.gitRepoStatus(r);
+        } else {
+          // Only check recently modified tracked files
+          const combined = [...deleted, ...recentlyModified];
+          status =
+            combined.length > 0
+              ? await gitOperator.gitRepoStatus(r, combined)
+              : [];
+          status = [...status, ...untrackedStatus];
+        }
+
+        // if (!fsInstance.isElectron) {
+        //   await fsInstance.writeModifiedFiles(r, status);
+        // }
+
+        setModifiedFiles((prev) => {
+          const isSame = JSON.stringify(prev) === JSON.stringify(status);
+          return isSame ? prev : status;
+        });
+
+        const commits = await gitOperator.gitCommits(r);
+        setGitRepoCommits(commits);
+
+        await resolveStashStatus(r, status);
 
         try {
-          let status: ModifiedFile[];
+          const res = await fsInstance.getFileContent(r, failedMergePath);
+          const mergeFileExists = res != null;
+          setIsInMerge(mergeFileExists);
+          if (mergeFileExists) {
+            for (const file of status) {
+              // this could be a file with merge conflicts
+              if (
+                file.status === 'staged_with_changes' ||
+                file.status === 'modified'
+              ) {
+                const res = await fsInstance.getFileContent(r, file.name);
+                if (!res) continue;
 
-          if (fullResolve || fsInstance.isElectron) {
-            status = await gitOperator.gitRepoStatus(r);
-          } else if (changedFiles) {
-            const newFiles = changedFiles.map((f) => f.name);
-            status = [...modifiedFiles];
-            status = status.filter((f) => !newFiles.includes(f.name));
-            status = [...status, ...changedFiles];
-          } else {
-            const savedFiles = await fsInstance.readModifiedFiles(r);
-
-            status = await gitOperator.gitRepoStatus(r, savedFiles);
-          }
-
-          if (!fsInstance.isElectron) {
-            await fsInstance.writeModifiedFiles(r, status);
-          }
-
-          setModifiedFiles((prev) => {
-            const isSame = JSON.stringify(prev) === JSON.stringify(status);
-            return isSame ? prev : status;
-          });
-
-          const commits = await gitOperator.gitCommits(r);
-          setGitRepoCommits(commits);
-
-          await resolveStashStatus(r, status);
-
-          try {
-            const res = await fsInstance.getFileContent(r, failedMergePath);
-            const mergeFileExists = res != null;
-            setIsInMerge(mergeFileExists);
-            if (mergeFileExists) {
-              for (const file of status) {
-                // this could be a file with merge conflicts
-                if (
-                  file.status === 'staged_with_changes' ||
-                  file.status === 'modified'
-                ) {
-                  const res = await fsInstance.getFileContent(r, file.name);
-                  if (!res) continue;
-
-                  const conflictRegex = /^<{7}[\s\S]*?={7}[\s\S]*?>{7}/m;
-                  if (conflictRegex.test(res?.content)) {
-                    file.hasMergeConflict = true;
-                  }
+                const conflictRegex = /^<{7}[\s\S]*?={7}[\s\S]*?>{7}/m;
+                if (conflictRegex.test(res?.content)) {
+                  file.hasMergeConflict = true;
                 }
               }
             }
-          } catch (error: any) {
-            setIsInMerge(false);
           }
         } catch (error: any) {
-          throw error;
+          setIsInMerge(false);
         }
-        gettingRepoStatus.current = false;
+      } catch (error: any) {
+        throw error;
+      } finally {
+        inFlightRef.current = false;
+        setIsGettingRepoStatus(false);
       }
     },
     [modifiedFiles],
@@ -283,5 +337,6 @@ export function useGitRepoStatus(
     resolveFile,
     resolveDir,
     resolveStashStatus,
+    gettingRepoStatus: isGettingRepoStatus,
   };
 }

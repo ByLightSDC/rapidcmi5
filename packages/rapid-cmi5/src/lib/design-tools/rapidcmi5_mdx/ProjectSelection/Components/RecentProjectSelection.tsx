@@ -81,6 +81,7 @@ export default function RecentProjectSelection({
       icon={<History sx={{ color: 'white' }} />}
     >
       <Box
+        data-testid="recent-projects-card"
         sx={{
           height: '100%',
           display: 'flex',

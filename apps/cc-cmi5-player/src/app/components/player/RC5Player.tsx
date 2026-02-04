@@ -11,17 +11,42 @@ import {
   directivesPlugin,
   frontmatterPlugin,
   quotePlugin,
-  AdmonitionDirectiveDescriptor,
-  CodeMirrorEditor,
-  codeMirrorPlugin,
-  headingsPlugin,
 } from '@mdxeditor/editor';
 import { imagePlayerPlugin } from './plugins/image-player/';
-
+import {
+  animationPlayerPlugin,
+  parseFrontmatterAnimations,
+  useAnimationPlayback,
+} from './plugins/animation-player';
 import '@mdxeditor/editor/style.css';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-
+import {
+  AdmonitionDirectiveDescriptor,
+  codeMirrorPlugin,
+  debugLogError,
+  YoutubeDirectiveDescriptor,
+  headingsPlugin,
+  footnotePlugin,
+  FootnoteDefinitionDescriptor,
+  FootnoteReferenceDescriptor,
+  mathPlugin,
+  MathDescriptor,
+  MathCodeBlockDescriptor,
+  languageList,
+  htmlPlugin,
+  CodeMirrorEditor,
+  FxDirectiveDescriptor,
+  AnimDirectiveDescriptor,
+  TabsDirectiveDescriptor,
+  TabContentDirectiveDescriptor,
+  AccordionDirectiveDescriptor,
+  AccordionContentDirectiveDescriptor,
+  ImageLabelDirectiveDescriptor,
+  onCheckClickOutsideImageLabel,
+  debugLog,
+  AnimationConfig
+} from '@rapid-cmi5/ui';
 
 import { RC5PlayerToolbar } from './RC5PlayerToolbar';
 import { ActivityDirectiveDescriptor } from './editors/directives/ActivityDirectiveDescriptor';
@@ -29,11 +54,8 @@ import { AuManagerContext } from '../../session/AuManager';
 import { kebabToCamel } from '../../utils/StringUtils';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { LayoutBoxDirectiveDescriptor } from './editors/directives/LayoutBoxDirectiveDescriptor';
-import { debugLog, debugLogError, logger } from '../../debug';
-import { AnimationConfig, mathPlugin, MathDescriptor, MathCodeBlockDescriptor, AccordionDirectiveDescriptor, AccordionContentDirectiveDescriptor, FxDirectiveDescriptor, AnimDirectiveDescriptor, YoutubeDirectiveDescriptor, TabsDirectiveDescriptor, TabContentDirectiveDescriptor, ImageLabelDirectiveDescriptor, languageList, footnotePlugin, FootnoteDefinitionDescriptor, FootnoteReferenceDescriptor, htmlPlugin, onCheckClickOutsideImageLabel } from '@rapid-cmi5/ui';
-import { animationPlayerPlugin, parseFrontmatterAnimations, useAnimationPlayback } from './plugins/animation-player';
 import { mediaEventManager } from '../../utils/MediaEventManager';
-
+import { logger } from '../../debug';
 /**
  * Rapid CMI5 Visual Editor
  * @returns
@@ -138,7 +160,7 @@ function RC5Player() {
         const src = imgEl.getAttribute('src');
         const styleObj = imgEl.style;
         if (src) {
-          //check whether to go fullscreen 
+          //check whether to go fullscreen
 
           // don't set the image to full screen if the image is the child of an
           // anchor tag

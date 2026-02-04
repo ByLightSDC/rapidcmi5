@@ -526,10 +526,10 @@ function LessonTree({
                     width: '100%',
                     height: 36,
                     minHeight: 36,
-                    justifyContent: 'flex-start',
+                    justifyContent: 'center',
                     px: 1.5,
                     borderRadius: 1,
-                    fontWeight: 500,
+                    fontWeight: 700,
                     fontSize: '0.875rem',
                   }}
                   onClick={onCreateLesson}

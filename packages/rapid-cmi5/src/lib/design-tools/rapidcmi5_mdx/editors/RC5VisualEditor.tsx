@@ -680,7 +680,8 @@ function RC5VisualEditor() {
     // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
       {thePlugins && thePlugins.length > 0 && (
-        <Box sx={{ height: `calc(100vh - ${pixelTop}px)` }}>
+        // Relative allows the TOC to be placed correctly when using an absolute position
+        <Box sx={{ height: `calc(100vh - ${pixelTop}px)`, position: 'relative'}}>
           <MDXEditor
             className={mdxTheme}
             onChange={onChange}

@@ -38,8 +38,7 @@ import { debugLogError, RowAction } from '@rapid-cmi5/ui';
 import { listItemProps } from './components/LessonTreeNode';
 import { useSelector } from 'react-redux';
 import { Renamer } from './components/Renamer';
-import { RootState } from '../../../redux/store';
-import { RepoState } from '../../../redux/repoManagerReducer';
+
 import { ButtonOptions, ButtonMinorUi } from '@rapid-cmi5/ui';
 
 /** Order important actions */
@@ -179,126 +178,163 @@ export const LessonDrawer = () => {
       <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
         VISUAL DESIGNER
       </Typography>
+
       <Stack
-        direction="row"
+        direction="column"
         spacing={1}
         sx={{
           mb: 1,
           p: 1,
           borderRadius: 1,
-          alignItems: 'center',
         }}
       >
-        <Box sx={{ flex: 1 }}>
-          <CourseSelector
-            currentCoursePath={currentCourse?.basePath || undefined}
-            currentRepo={currentRepo || undefined}
-            availableCourses={availableCourses}
-            disabled={!availableCourses || availableCourses?.length === 0}
-            onSelect={(coursePath: string) => {
-              saveSlide();
-              promptChangeCourse(coursePath);
-            }}
-          />
-        </Box>
-
-        <ButtonOptions
-          optionButton={(handleClick: any) => (
-            <Tooltip title="More Options">
-              <span>
-                <IconButton
-                  aria-label="course options"
-                  className="nodrag"
-                  disabled={!currentRepo}
-                  size="small"
-                  onClick={handleClick}
-                  sx={{
-                    borderRadius: 1,
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                    },
-                  }}
-                >
-                  <MoreVertIcon fontSize="small" />
-                </IconButton>
-              </span>
-            </Tooltip>
-          )}
-          closeOnClick={true}
-          onTrigger={(event?: any) => {
-            onCourseContextAction(event, CourseActionEnum.TriggerRename);
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: '1fr auto auto',
+            gap: 1,
+            alignItems: 'center',
+            width: '100%',
+            minWidth: 0,
           }}
         >
-          <List
-            sx={{
-              backgroundColor: (theme: any) => `${theme.nav.fill}`,
-              color: (theme: any) => `${theme.nav.icon}`,
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-              height: 'auto',
-            }}
-            component="nav"
-          >
-            <Typography sx={{ marginLeft: '12px' }} variant="caption">
-              {courseData?.courseTitle || 'No Course Selected'}
-            </Typography>
-            {courseActions.map((option: RowAction, index: number) => (
-              <React.Fragment key={option.tooltip}>
-                {!option.hidden && (
-                  <>
-                    {index > 0 && <Divider />}
-                    <ListItemButton
-                      sx={{
-                        height: 30,
-                      }}
-                      onClick={(event) => {
-                        onCourseContextAction(event, index);
-                      }}
-                    >
-                      <ListItemIcon
-                        sx={{
-                          padding: '0px',
-                          margin: '0px',
-                          marginRight: '2px',
-                          minWidth: '0px',
-                        }}
-                      >
-                        {option.icon}
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={option.tooltip}
-                        slotProps={{ primary: listItemProps }}
-                      />
-                    </ListItemButton>
-                  </>
-                )}
-              </React.Fragment>
-            ))}
-          </List>
-        </ButtonOptions>
-      </Stack>
+          {/* Col 1 */}
+          <Box>
+            <CourseSelector
+              currentCoursePath={currentCourse?.basePath || undefined}
+              currentRepo={currentRepo || undefined}
+              availableCourses={availableCourses}
+              disabled={!availableCourses || availableCourses?.length === 0}
+              onSelect={(coursePath: string) => {
+                saveSlide();
+                promptChangeCourse(coursePath);
+              }}
+            />
+          </Box>
 
-      {/* Action buttons below selector */}
-      <Stack direction="row" spacing={1} sx={{ mb: 2, px: 1 }}>
-        <ButtonMinorUi
-          id="create-course-button"
-          startIcon={<AddIcon />}
-          disabled={!currentRepo}
-          onClick={promptCreateCourse}
-          sx={{ flex: 1 }}
-        >
-          Course
-        </ButtonMinorUi>
-        <ButtonMinorUi
-          id="publish-course-button"
-          startIcon={<PublishIcon />}
-          disabled={!currentRepo}
-          onClick={publishCourse}
-          sx={{ flex: 1 }}
-        >
-          Publish
-        </ButtonMinorUi>
+          {/* Col 2 */}
+          <Tooltip
+            title={
+              currentRepo ? 'Create course' : 'Select a repo to create a course'
+            }
+          >
+            <span>
+              <IconButton
+                aria-label="create new course"
+                id="create-course-button"
+                data-testid="create-course-button"
+                disabled={!currentRepo}
+                onClick={promptCreateCourse}
+                size="small"
+                sx={(theme) => ({
+                  borderRadius: 1,
+                  border: `1px solid ${theme.palette.divider}`,
+                  transition:
+                    'transform 120ms ease, background-color 120ms ease',
+                  '&:hover': {
+                    bgcolor: theme.palette.action.selected,
+                    transform: 'translateY(-1px)',
+                  },
+                  '&.Mui-disabled': { opacity: 0.45 },
+                })}
+              >
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+
+          {/* Col 3 */}
+          <ButtonOptions
+            optionButton={(handleClick: any) => (
+              <Tooltip title="More Options">
+                <span>
+                  <IconButton
+                    aria-label="course options"
+                    className="nodrag"
+                    disabled={!currentRepo}
+                    size="small"
+                    onClick={handleClick}
+                    sx={(theme) => ({
+                      borderRadius: 1,
+                      border: `1px solid ${theme.palette.divider}`,
+                      '&:hover': { bgcolor: theme.palette.action.selected },
+                      '&.Mui-disabled': { opacity: 0.45 },
+                    })}
+                  >
+                    <MoreVertIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
+            closeOnClick
+            onTrigger={(event?: any) => {
+              onCourseContextAction(event, CourseActionEnum.TriggerRename);
+            }}
+          >
+            <List
+              sx={{
+                backgroundColor: (theme: any) => `${theme.nav.fill}`,
+                color: (theme: any) => `${theme.nav.icon}`,
+                display: 'flex',
+                flexDirection: 'column',
+                width: '100%',
+                height: 'auto',
+              }}
+              component="nav"
+            >
+              <Typography sx={{ marginLeft: '12px' }} variant="caption">
+                {courseData?.courseTitle || 'No Course Selected'}
+              </Typography>
+
+              {courseActions.map((option: RowAction, index: number) => (
+                <React.Fragment key={option.tooltip}>
+                  {!option.hidden && (
+                    <>
+                      {index > 0 && <Divider />}
+                      <ListItemButton
+                        sx={{ height: 30 }}
+                        onClick={(event) => onCourseContextAction(event, index)}
+                      >
+                        <ListItemIcon
+                          sx={{
+                            p: 0,
+                            m: 0,
+                            mr: '2px',
+                            minWidth: 0,
+                          }}
+                        >
+                          {option.icon}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={option.tooltip}
+                          slotProps={{ primary: listItemProps }}
+                        />
+                      </ListItemButton>
+                    </>
+                  )}
+                </React.Fragment>
+              ))}
+            </List>
+          </ButtonOptions>
+
+          {/* Row 2: Publish spans ALL columns */}
+          <Box sx={{ gridColumn: '1 / -1' }}>
+            <ButtonMinorUi
+              id="publish-course-button"
+              startIcon={<PublishIcon />}
+              disabled={!currentRepo}
+              onClick={publishCourse}
+              fullWidth
+              sx={(theme) => ({
+                borderRadius: 1,
+                fontWeight: 700,
+                border: `1px solid ${theme.palette.divider}`,
+              })}
+            >
+              Publish
+            </ButtonMinorUi>
+          </Box>
+        </Box>
       </Stack>
 
       {menuAnchor && (

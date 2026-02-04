@@ -11,6 +11,7 @@ const initialActivityState = {
   autoGraderCache: null,
 } as ActivitySessionState;
 
+
 const activitySessionSlice = createSlice({
   name: 'activitySession',
   initialState: initialActivityState,

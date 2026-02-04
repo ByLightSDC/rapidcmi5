@@ -130,7 +130,7 @@ function parseToMdast(input: string) {
 }
 
 function mkdocsToMdxRawTextCleanup(content: string) {
-  let cleaned = content.replaceAll('<br>', '<br/>');
+  let cleaned = content.replaceAll('<br>', '\n').replaceAll('</br>', '');
 
   cleaned = cleaned.replaceAll('quizdownb.init();', '');
 

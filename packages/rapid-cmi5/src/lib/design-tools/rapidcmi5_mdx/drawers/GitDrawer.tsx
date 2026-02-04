@@ -40,8 +40,8 @@ import { Renamer } from './components/Renamer';
 import { ButtonOptions, ButtonMinorUi } from '@rapid-cmi5/ui';
 
 enum RepoActionEnum {
-  TriggerRename,
-  Rename,
+  // TriggerRename,
+  // Rename,
   Delete,
   Config,
 }
@@ -50,15 +50,15 @@ enum RepoActionEnum {
  * context menu for course
  */
 const repoActions = [
-  {
-    tooltip: 'Rename Repository',
-    icon: <EditIcon color="inherit" />,
-    hidden: true, // hidden for showing the edit field to rename course
-  },
-  {
-    tooltip: 'Rename Repository',
-    icon: <EditIcon color="inherit" />,
-  },
+  // {
+  //   tooltip: 'Rename Repository',
+  //   icon: <EditIcon color="inherit" />,
+  //   hidden: true, // hidden for showing the edit field to rename course
+  // },
+  // {
+  //   tooltip: 'Rename Repository',
+  //   icon: <EditIcon color="inherit" />,
+  // },
   {
     tooltip: 'Delete Local Repository',
     icon: <DeleteForeverIcon color="inherit" />,
@@ -80,27 +80,24 @@ export const GitDrawer = () => {
     (state: RootState) => state.repoManager,
   );
   const { promptDeleteRepo } = useRC5Prompts();
-  const {
-    isRepoConnectedToRemote,
-    handleChangeRepoName,
-    currentRepo,
-  } = useContext(GitContext);
+  const { isRepoConnectedToRemote, handleChangeRepoName, currentRepo } =
+    useContext(GitContext);
   const { gitIcon } = useMDStyleIcons();
 
   const currentTab = useSelector(gitViewCurrentTab);
 
   const { promptAttachRemoteRepo, promptGitConfig } = useRC5Prompts();
 
-  const [menuAnchor, setMenuAnchor] = useState<any>(null);
-  const [menuAnchorPos, setMenuAnchorPos] = useState<number[]>([0, 0]);
+  // const [menuAnchor, setMenuAnchor] = useState<any>(null);
+  // const [menuAnchorPos, setMenuAnchorPos] = useState<number[]>([0, 0]);
 
-  const handleCancelNameChange = () => {
-    setMenuAnchor(null);
-  };
+  // const handleCancelNameChange = () => {
+  //   setMenuAnchor(null);
+  // };
 
-  const updateRepositoryName = (newName: string, record: any) => {
-    handleChangeRepoName(newName);
-  };
+  // const updateRepositoryName = (newName: string, record: any) => {
+  //   handleChangeRepoName(newName);
+  // };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     dispatch(setGitViewCurrentTab(newValue));
@@ -115,13 +112,13 @@ export const GitDrawer = () => {
       case RepoActionEnum.Delete:
         promptDeleteRepo(currentRepo);
         break;
-      case RepoActionEnum.Rename:
-        setMenuAnchor(event.target);
+      // case RepoActionEnum.Rename:
+      //   setMenuAnchor(event.target);
 
-        break;
-      case RepoActionEnum.TriggerRename:
-        setMenuAnchorPos([event.clientX - 60, event.clientY + 20]);
-        break;
+      //   break;
+      // case RepoActionEnum.TriggerRename:
+      //   setMenuAnchorPos([event.clientX - 60, event.clientY + 20]);
+      //   break;
       case RepoActionEnum.Config:
         promptGitConfig();
         break;
@@ -179,9 +176,9 @@ export const GitDrawer = () => {
               );
             }}
             closeOnClick={true}
-            onTrigger={(event?: any) => {
-              onRepoContextAction(event, RepoActionEnum.TriggerRename);
-            }}
+            // onTrigger={(event?: any) => {
+            //   onRepoContextAction(event, RepoActionEnum.TriggerRename);
+            // }}
           >
             <List
               sx={{
@@ -194,7 +191,11 @@ export const GitDrawer = () => {
               }}
               component="nav"
             >
-              <Typography sx={{ ml: 3, pl: 3 }} variant="caption">
+              <Typography
+                sx={{ ml: 3, pl: 3 }}
+                data-testid="current-repo-name"
+                variant="caption"
+              >
                 {currentRepo}...
               </Typography>
               {repoActions.map((option: RowAction, index: number) => (
@@ -278,10 +279,10 @@ export const GitDrawer = () => {
       >
         <TabMainUi label="File Status" style={{ marginBottom: '8px' }} />
         <TabMainUi label="Commit History" style={{ marginBottom: '8px' }} />
-        <TabMainUi label="Stashes" style={{ marginBottom: '8px' }} />
+        {/* <TabMainUi label="Stashes" style={{ marginBottom: '8px' }} /> */}
       </Tabs>
 
-      {menuAnchor && (
+      {/* {menuAnchor && (
         <Renamer
           anchor={menuAnchor}
           anchorPos={menuAnchorPos}
@@ -294,7 +295,7 @@ export const GitDrawer = () => {
           onClose={handleCancelNameChange}
           onSave={updateRepositoryName}
         />
-      )}
+      )} */}
     </Stack>
   );
 };

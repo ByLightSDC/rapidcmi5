@@ -23,7 +23,6 @@ import SpokeIcon from '@mui/icons-material/Spoke';
 
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
-import { iconButtonStyle, tooltipStyle } from '../styles/styles';
 
 import GitLogs from '../../course-builder/GitViewer/Components/GitActions/GitLogs';
 import { gitViewCurrentTab } from '../../../redux/courseBuilderReducer';
@@ -68,6 +67,7 @@ export default function RC5GitEditor({ top = '0px' }: { top?: string }) {
     currentRepo,
     isFsLoaded,
     isGitLoaded,
+    gettingRepoStatus
   } = useContext(GitContext);
 
   const {
@@ -191,7 +191,7 @@ export default function RC5GitEditor({ top = '0px' }: { top?: string }) {
                 <ButtonMinorUi
                   onClick={() => handleResolveMerge()}
                   disabled={!canCommit || !isFsLoaded}
-                  startIcon=<AddIcon />
+                  startIcon={<AddIcon />}
                 >
                   Merge Changes
                 </ButtonMinorUi>
@@ -199,7 +199,7 @@ export default function RC5GitEditor({ top = '0px' }: { top?: string }) {
                 <ButtonMinorUi
                   disabled={!canCommit || !isFsLoaded}
                   onClick={promptCommit}
-                  startIcon=<AddIcon />
+                  startIcon={<AddIcon />}
                 >
                   Commit Changes
                 </ButtonMinorUi>
@@ -225,7 +225,7 @@ export default function RC5GitEditor({ top = '0px' }: { top?: string }) {
 
             <Stack direction="row" sx={{ position: 'relative' }}>
               <ButtonMinorUi
-                startIcon=<ArrowUpwardIcon />
+                startIcon={<ArrowUpwardIcon />}
                 disabled={!canPush || !isRepoConnectedToRemote || !isFsLoaded}
                 onClick={promptPush}
               >
@@ -248,20 +248,20 @@ export default function RC5GitEditor({ top = '0px' }: { top?: string }) {
               />
             </Stack>
             <ButtonMinorUi
-              startIcon=<ArrowDownwardIcon />
+              startIcon={<ArrowDownwardIcon />}
               disabled={!isRepoConnectedToRemote || !isFsLoaded}
               onClick={promptPull}
             >
               Pull from Remote
             </ButtonMinorUi>
 
-            <ButtonMinorUi
+            {/* <ButtonMinorUi
               disabled={!canStash || !isFsLoaded}
               onClick={handeGitStash}
-              startIcon=<SpokeIcon />
+              startIcon={<SpokeIcon />}
             >
               Stash Changes
-            </ButtonMinorUi>
+            </ButtonMinorUi> */}
           </Stack>
 
           {currentTab === 0 && (
@@ -275,6 +275,7 @@ export default function RC5GitEditor({ top = '0px' }: { top?: string }) {
               handleRemoveFile={handleRemoveFile}
               handleGetDiff={handleGetDiff}
               handleNavToFile={handleNavToFile}
+              gettingRepoStatus={gettingRepoStatus}
             />
           )}
           {currentTab === 1 && (
@@ -312,6 +313,7 @@ export default function RC5GitEditor({ top = '0px' }: { top?: string }) {
                 <GitFileStatus
                   modifiedFiles={stashFiles}
                   handleGetDiff={handleGetDiff}
+                  gettingRepoStatus={gettingRepoStatus}
                 />
               )}
             </>

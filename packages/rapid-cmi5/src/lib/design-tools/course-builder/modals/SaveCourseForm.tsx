@@ -143,9 +143,8 @@ export function SaveCourseForm({
 
           // Stage
           setSaveProgressMessage('Staging Files...');
-          const stagePath = currentCourse
-            ? [currentCourse.basePath]
-            : changedFiles;
+          const stagePath = changedFiles;
+
           await handleStageAll(false, stagePath);
 
           //Commit

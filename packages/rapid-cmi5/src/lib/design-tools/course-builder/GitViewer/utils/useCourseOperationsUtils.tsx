@@ -63,7 +63,7 @@ export const getCourseDataInFs = async ({
 
     const folderStructure = await fsInstance.getFolderStructure(
       itemPath,
-      repoPath,
+      coursePath,
       getContents,
     );
 
@@ -247,10 +247,7 @@ export const findAllCourses = async ({
 }: FsContextOptions): Promise<Course[]> => {
   const repoPath = getRepoPath(r);
 
-  const folderStructure = await fsInstance.getFolderStructure(
-    repoPath,
-    repoPath,
-  );
+  const folderStructure = await fsInstance.getFolderStructure(repoPath, '');
   const flatFolder = flattenFolders(folderStructure);
 
   const rc5Nodes = flatFolder.filter((n) => n.name === rc5MetaFilename);
@@ -382,10 +379,11 @@ export async function updatePaths(
   courseData: CourseData,
   currentRepo: string,
   fsInstance: GitFS,
+  changedFiles: string[],
 ) {
   for (const block of courseData.blocks) {
     for (const au of block.aus) {
-      await updateAUPath(au, currentRepo, fsInstance);
+      await updateAUPath(au, currentRepo, fsInstance, changedFiles);
     }
   }
 }
@@ -400,6 +398,7 @@ export async function updateAUPath(
   au: CourseAU,
   repo: string,
   fsInstance: GitFS,
+  changedFiles: string[],
 ): Promise<void> {
   const baseFolder = dirname(au.dirPath);
   const auSlug = slugifyPath(au.auName);
@@ -418,11 +417,20 @@ export async function updateAUPath(
   const isPathChanged = newDirPath !== oldDirPath;
   if (isPathChanged) {
     await fsInstance.mvFile(repo, oldDirPath, newDirPath);
+    changedFiles.push(oldDirPath);
+    changedFiles.push(newDirPath);
+
     au.dirPath = newDirPath;
   }
 
   //update indivisual & team scenarios at the root
-  const response = await updateSlidePaths(au, repo, isPathChanged, fsInstance);
+  const response = await updateSlidePaths(
+    au,
+    repo,
+    isPathChanged,
+    fsInstance,
+    changedFiles,
+  );
 
   au.rangeosScenarioName = response.firstScenario?.name;
   au.rangeosScenarioUUID = response.firstScenario?.uuid;
@@ -439,6 +447,7 @@ export async function updateSlidePaths(
   repo: string,
   isAuPathChanged: boolean,
   fsInstance: GitFS,
+  changedFiles: string[],
 ): Promise<{
   firstScenario?: RC5ScenarioContent;
   firstTeamScenario?: TeamConsolesContent;
@@ -471,6 +480,8 @@ export async function updateSlidePaths(
 
       if (isDifferentFile) {
         await fsInstance.mvFile(repo, currentPath, uniquePath);
+        changedFiles.push(currentPath);
+        changedFiles.push(uniquePath);
       }
 
       slide.filepath = uniquePath;
@@ -618,6 +629,7 @@ export const computeCourseFromJsonFs = async ({
 
   if (!rc5Meta) throw Error('RC5 file is empty');
   const flatSlides = flattenSlides(editableCourseData);
+  const changedFiles: string[] = [];
 
   const courseOperationsList = Object.entries(courseOperationsSet).map(
     ([filepath, operation]) => ({
@@ -649,6 +661,7 @@ export const computeCourseFromJsonFs = async ({
             } else {
               await fsInstance.deleteFile(r, filepath);
             }
+            changedFiles.push(filepath);
           } catch (err) {
             debugLogError(`Failed to delete ${filepath}, ${err}`);
           }
@@ -665,6 +678,7 @@ export const computeCourseFromJsonFs = async ({
             const content = slide.content?.toString() || '';
 
             await fsInstance.createFile(r, filepath, content);
+            changedFiles.push(filepath);
           } catch (err) {
             debugLogError(
               `Failed to handle ${operation} for ${filepath}, ${err}`,
@@ -676,8 +690,7 @@ export const computeCourseFromJsonFs = async ({
           debugLogError(`Unknown operation type for ${filepath}: ${operation}`);
       }
     }
-
-    await updatePaths(editableCourseData, repoPath, fsInstance);
+    await updatePaths(editableCourseData, repoPath, fsInstance, changedFiles);
     // update the file system
     await fsInstance.updateFile(
       r,
@@ -685,10 +698,11 @@ export const computeCourseFromJsonFs = async ({
       YAML.stringify(stripSlideContent(editableCourseData)),
     );
     // update our current course data in visual designer
-    const changedFiles = [
-      ...courseOperationsList.map((file) => file.filepath),
-      `${course.basePath}/${rc5MetaFilename}`,
-    ];
+    // const changedFiles = [
+    //   ...courseOperationsList.map((file) => file.filepath),
+    //   `${course.basePath}/${rc5MetaFilename}`,
+    // ];
+    changedFiles.push(`${course.basePath}/${rc5MetaFilename}`);
     return {
       changedFiles: changedFiles,
       courseData: editableCourseData,
@@ -813,8 +827,7 @@ export const renameCourseInFs = async ({
 
     for (const au of block.aus) {
       // Get the AU's relative path within the old course
-      const auRelativePath = basename(au.dirPath)
-
+      const auRelativePath = basename(au.dirPath);
 
       // Build new AU path under new course name
       const newAuPath = join(cleanedCourseName, auRelativePath);

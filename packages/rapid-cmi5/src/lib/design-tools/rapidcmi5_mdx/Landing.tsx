@@ -19,7 +19,7 @@ import RC5FileEditor from './editors/RC5FileEditor';
 import RC5VisualEditor from './editors/RC5VisualEditor';
 import RC5GitEditor from './editors/RC5GitEditor';
 import { GitDrawer } from './drawers/GitDrawer';
-import { SlideMenu } from './menu/SlideMenu';
+import { SlideMenu } from './menu/ArchiveSlideMenu';
 import { dividerColor } from '@rapid-cmi5/ui';
 import WelcomePage from './ProjectSelection/SelectProject';
 import { useEffect } from 'react';
@@ -58,7 +58,7 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
           <NavViewMenu showHomeButton={showHomeButton} />
           <Divider orientation="vertical" />
           <PanelGroup direction="horizontal">
-            <Panel defaultSize={20} minSize={5}>
+            <Panel defaultSize={22} minSize={5}>
               {viewMode === ViewModeEnum.Designer && <LessonDrawer />}
               {viewMode === ViewModeEnum.CodeEditor && <FileDrawer />}
               {viewMode === ViewModeEnum.GitEditor && <GitDrawer />}
@@ -73,7 +73,7 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
             <Panel>
               {viewMode === ViewModeEnum.Designer && (
                 <>
-                  <SlideMenu />
+                  {/* <SlideMenu /> */}
                   <RC5VisualEditor />
                 </>
               )}
