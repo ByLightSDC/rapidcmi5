@@ -1,6 +1,6 @@
 {
   "name": "@rapid-cmi5/cmi5-build-common",
-  "version": "0.2.0",
+  "version": "0.8.0",
   "description": "A markdown cmi5 editor with built in git version control and made for react.",
   "publishConfig": {
     "access": "public"
