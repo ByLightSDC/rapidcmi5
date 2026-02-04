@@ -53,7 +53,13 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
   });
 
   config.resolve.extensions.push('.mdx');
-  
+
+  // Add Node.js polyfills for webpack 5
+  config.resolve.fallback = {
+    ...config.resolve.fallback,
+    util: require.resolve('util/'),
+  };
+
   const theConfig = merge(config, {
     ignoreWarnings: [/Failed to parse source map/],
     devServer: {

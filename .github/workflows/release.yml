@@ -1,0 +1,172 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g., v0.7.0)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.tag }}"
+            VERSION="${VERSION#v}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          fi
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          release_name: Release v${{ steps.get_version.outputs.version }}
+          draft: true
+          prerelease: false
+          body: |
+            ## RapidCMI5 v${{ steps.get_version.outputs.version }}
+
+            ### Downloads
+
+            #### Desktop Application
+
+            **macOS:**
+            - Apple Silicon (M1/M2/M3): `RapidCMI5-${{ steps.get_version.outputs.version }}-arm64.dmg`
+            - Intel: `RapidCMI5-${{ steps.get_version.outputs.version }}.dmg`
+
+            **Windows:**
+            - x64: `RapidCMI5 Setup ${{ steps.get_version.outputs.version }}.exe`
+            - ARM64: `RapidCMI5 Setup ${{ steps.get_version.outputs.version }}-arm64.exe`
+
+            **Linux:**
+            - x64: `RapidCMI5-${{ steps.get_version.outputs.version }}.AppImage`
+            - ARM64: `RapidCMI5-${{ steps.get_version.outputs.version }}-arm64.AppImage`
+
+            ### Installation
+
+            **macOS:**
+            1. Download the appropriate DMG file for your Mac
+            2. Open the DMG file
+            3. Drag RapidCMI5 to your Applications folder
+            4. The first time you open it, right-click and select "Open" to bypass Gatekeeper
+
+            **Windows:**
+            1. Download the appropriate .exe installer
+            2. Run the installer
+            3. Follow the installation wizard
+
+            **Linux:**
+            1. Download the AppImage file
+            2. Make it executable: `chmod +x RapidCMI5-*.AppImage`
+            3. Run it: `./RapidCMI5-*.AppImage`
+
+            ### Changelog
+            <!-- Add changelog here -->
+
+  build-electron:
+    name: Build Electron (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: create-release
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            platform: darwin
+          - os: ubuntu-latest
+            platform: linux
+          - os: windows-latest
+            platform: win32
+    env:
+      APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+      APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update package.json version
+        run: |
+          npm version ${{ needs.create-release.outputs.version }} --no-git-tag-version --allow-same-version
+
+      - name: Import Code Signing Certificate (macOS)
+        if: ${{ matrix.platform == 'darwin' && env.APPLE_CERTIFICATE != '' }}
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          echo "$APPLE_CERTIFICATE" | base64 --decode > $RUNNER_TEMP/certificate.p12
+          security import $RUNNER_TEMP/certificate.p12 -P "$APPLE_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+      - name: Build frontend
+        run: npm run nxe:build:frontend
+
+      - name: Build backend
+        run: npm run nxe:build:backend
+
+      - name: Build Electron app
+        run: npm run nxe:make:app
+        env:
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+      - name: Notarize DMG (macOS)
+        if: ${{ matrix.platform == 'darwin' && env.APPLE_ID != '' && env.APPLE_CERTIFICATE != '' }}
+        run: |
+          for DMG_PATH in dist/executables/*.dmg; do
+            if [ -f "$DMG_PATH" ]; then
+              echo "Notarizing $DMG_PATH..."
+              xcrun notarytool submit "$DMG_PATH" \
+                --apple-id "$APPLE_ID" \
+                --password "$APPLE_ID_PASSWORD" \
+                --team-id "$APPLE_TEAM_ID" \
+                --wait || echo "Notarization failed, continuing..."
+              xcrun stapler staple "$DMG_PATH" || echo "Stapling failed, continuing..."
+            fi
+          done
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/executables/*.dmg
+            dist/executables/*.dmg.blockmap
+            dist/executables/*.AppImage
+            dist/executables/*.exe
+          fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
