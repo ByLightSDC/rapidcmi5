@@ -384,7 +384,6 @@ export function DynamicSelectorFieldGroup(
   }, [selectionArr, messageObj.message, messageObj.meta?.indexedArrayField]);
 
   const handleOpenSelection = (event: any) => {
-    console.log('clickerd opn');
     const selectionData = {
       dataIdField,
       modalId: selectionModalId,
@@ -403,7 +402,6 @@ export function DynamicSelectorFieldGroup(
       topicId,
     };
 
-    console.log("se3lection data", selectionData);
     selectionHelper.openSelection(selectionData);
   };
 

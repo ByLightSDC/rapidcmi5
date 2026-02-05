@@ -58,7 +58,7 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
           <NavViewMenu showHomeButton={showHomeButton} />
           <Divider orientation="vertical" />
           <PanelGroup direction="horizontal">
-            <Panel defaultSize={22} minSize={5}>
+            <Panel defaultSize={2} minSize={5}>
               {viewMode === ViewModeEnum.Designer && <LessonDrawer />}
               {viewMode === ViewModeEnum.CodeEditor && <FileDrawer />}
               {viewMode === ViewModeEnum.GitEditor && <GitDrawer />}

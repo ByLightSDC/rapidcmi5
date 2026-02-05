@@ -328,7 +328,6 @@ export const LessonDrawer = () => {
               sx={(theme) => ({
                 borderRadius: 1,
                 fontWeight: 700,
-                border: `1px solid ${theme.palette.divider}`,
               })}
             >
               Publish
@@ -360,6 +359,7 @@ export const LessonDrawer = () => {
             Lessons
           </Typography>
           <LessonTree courseData={courseData} onCreateLesson={onCreateLesson} />
+          
         </>
       ) : (
         <Typography

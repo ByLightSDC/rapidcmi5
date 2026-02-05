@@ -1,24 +1,13 @@
 import {
-  Paper,
   Typography,
-  Card,
-  CardContent,
   IconButton,
-  Box as MuiBox,
   ListItemText,
-  Tooltip,
   ListItemButton,
   TextField,
   InputAdornment,
 } from '@mui/material';
-import { alpha, Box, palette, Stack, useTheme } from '@mui/system';
-import {
-  History,
-  ChevronLeft,
-  ChevronRight,
-  Search,
-  Clear,
-} from '@mui/icons-material';
+import { alpha, Box, Stack, useTheme } from '@mui/system';
+import { History, Search, Clear } from '@mui/icons-material';
 import { useState, useMemo } from 'react';
 import { DirMeta } from '../../../course-builder/GitViewer/utils/fileSystem';
 import { GlassCard } from './GlassCard';

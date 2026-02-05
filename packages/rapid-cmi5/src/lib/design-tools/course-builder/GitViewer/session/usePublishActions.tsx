@@ -42,7 +42,7 @@ export const usePublishActions = (
         );
       } else {
         if (!downloadCmi5Zip) throw Error('Download cmi5 zip is not defined');
-        await fsInstance.downloadCmi5PlayerIfNeeded('0.7.0', downloadCmi5Zip);
+        await fsInstance.downloadCmi5PlayerIfNeeded(downloadCmi5Zip);
 
         await fsInstance.buildCmi5Course(
           r,

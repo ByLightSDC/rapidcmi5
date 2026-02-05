@@ -61,14 +61,14 @@ export default function WebAppSelection({
         />
       </Box>
 
-      <DesktopDownload
+      {/* <DesktopDownload
         baseUrl="https://github.com/ByLightSDC/rapidcmi5/releases/download"
         version="v0.7.0"
         macName="RapidCMI5-0.7.0"
         windowsName="RapidCMI5.Setup.0.7.0"
         linuxName="RapidCMI5-0.7.0"
         macArmName="RapidCMI5-0.7.0-arm64"
-      />
+      /> */}
     </>
   );
 }

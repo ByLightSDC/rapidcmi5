@@ -27,9 +27,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 import {
-  buildCmi5ZipParams,
   GetScenarioFormProps,
-  ScenarioFormProps,
   RapidCmi5,
 } from '@rapid-cmi5/react-editor';
 import { MyScenariosForm } from './ScenarioSelection';
@@ -37,7 +35,6 @@ import { auth, authToken, isAuthenticated } from '@rapid-cmi5/keycloak';
 import { darkTheme } from './styles/muiThemeDark';
 import { lightTheme } from './styles/muiTheme';
 import { CourseAU, generateAuId } from '@rapid-cmi5/cmi5-build-common';
-import { Cmi5AUMappingApi } from 'libs/frontend/clients/devops-api/src/lib/api';
 
 function RapidCmi5WithAuth({
   isAuthenticated,
@@ -87,7 +84,6 @@ function RapidCmi5WithAuth({
   };
   return (
     <RapidCmi5
-      showHomeButton={true}
       userAuth={{
         token,
         userEmail: currentAuth?.parsedUserToken?.email?.toLowerCase(),

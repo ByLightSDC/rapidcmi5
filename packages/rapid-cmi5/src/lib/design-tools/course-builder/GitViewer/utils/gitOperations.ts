@@ -501,8 +501,6 @@ export class GitOperations {
 
     const dir = getRepoPath(r);
 
-    console.log(`📁 Unstaging ${files.length} files`);
-
     try {
       if (this.gitFs.isElectron) {
         // Electron: Process in parallel
@@ -990,7 +988,7 @@ export class GitOperations {
 
       return timestamp;
     } catch (error: any) {
-      console.error(`Failed to get last commit time: ${error.message}`);
+      debugLogError(`Failed to get last commit time: ${error.message}`);
       return 0;
     }
   };

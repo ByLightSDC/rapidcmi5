@@ -36,7 +36,6 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
 import React from 'react';
 import { listItemProps } from './components/LessonTreeNode';
-import { Renamer } from './components/Renamer';
 import { ButtonOptions, ButtonMinorUi } from '@rapid-cmi5/ui';
 
 enum RepoActionEnum {
@@ -155,7 +154,19 @@ export const GitDrawer = () => {
           //RED onAction={promptCloneRepo}
           onSelect={handleCheckoutBranch}
         /> */}
-        <Typography>{currentRepo}</Typography>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 'bold',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {currentRepo}
+          </Typography>
+        </Stack>{' '}
         <div style={{ flexGrow: 1 }} />
         <Stack direction="row">
           <ButtonOptions
