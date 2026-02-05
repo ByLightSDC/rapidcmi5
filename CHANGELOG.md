@@ -1,3 +1,7 @@
+## 0.9.0 (2026-02-05)
+
+This was a version bump only, there were no code changes.
+
 ## 0.8.1 (2026-02-04)
 
 This was a version bump only, there were no code changes.
