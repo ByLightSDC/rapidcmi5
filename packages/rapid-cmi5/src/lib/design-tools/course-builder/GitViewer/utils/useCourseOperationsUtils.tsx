@@ -703,8 +703,9 @@ export const computeCourseFromJsonFs = async ({
     //   `${course.basePath}/${rc5MetaFilename}`,
     // ];
     changedFiles.push(`${course.basePath}/${rc5MetaFilename}`);
+
     return {
-      changedFiles: changedFiles,
+      changedFiles: [...new Set(changedFiles)],
       courseData: editableCourseData,
     };
   } catch (err: any) {

@@ -137,49 +137,56 @@ export function useGitRepoStatus(
 
       try {
         const repoPath = getRepoPath(r);
-        const folderStructure = await fsInstance.getFolderStructureWithMtime(
-          repoPath,
-          '',
-        );
-        const flattenedStruct = flattenFolders(folderStructure).filter(
-          (node) => !node.isBranch,
-        );
-        const lastCommitTime = await gitOperator.gitGetLastCommitTime(r);
-
-        // Get all file paths
-        const allFilePaths = flattenedStruct.map((folder) => folder.id);
-
-        // Get untracked files
-        const { untracked, deleted } =
-          await gitOperator.gitGetUntrackedAndDeletedFiles(r, allFilePaths);
-
-        const untrackedSet = new Set(untracked);
-
-        // Filter to only tracked files modified after last commit
-        const recentlyModified = flattenedStruct
-          .filter((folder) => {
-            // Only include files (not directories)
-            if (folder.isBranch) return false;
-            if (!folder.mtime) return false;
-
-            // Exclude untracked files
-            if (untrackedSet.has(folder.id)) return false;
-
-            // Include if modified after last commit
-            return folder.mtime > lastCommitTime;
-          })
-          .map((folder) => folder.id);
-
-        const untrackedStatus: ModifiedFile[] = untracked.map((file) => {
-          return { name: file, status: 'untracked' };
-        });
-
         let status: ModifiedFile[];
 
         if (fsInstance.isElectron) {
           status = await gitOperator.gitRepoStatus(r);
         } else {
+          const folderStructure = await fsInstance.getFolderStructureWithMtime(
+            repoPath,
+            '',
+          );
+          const flattenedStruct = flattenFolders(folderStructure).filter(
+            (node) => !node.isBranch,
+          );
+          const lastCommitTime = await gitOperator.gitGetLastCommitTime(r);
+
+          // Get all file paths
+          const allFilePaths = flattenedStruct.map((folder) => folder.id);
+
+          // Get untracked files
+          const { untracked, deleted, needsUnstage} =
+            await gitOperator.gitGetUntrackedAndDeletedFiles(r, allFilePaths);
+
+          const untrackedSet = new Set(untracked);
+          const needsUnstageSet = new Set(needsUnstage);
+
+
+          // Filter to only tracked files modified after last commit
+          const recentlyModified = flattenedStruct
+            .filter((folder) => {
+              // Only include files (not directories)
+              if (folder.isBranch) return false;
+              if (!folder.mtime) return false;
+
+              // Exclude untracked files
+              if (untrackedSet.has(folder.id)) return false;
+
+              // Include if modified after last commit
+              return folder.mtime > lastCommitTime;
+            })
+            .map((folder) => folder.id);
+
+          const untrackedStatus: ModifiedFile[] = untracked.map((file) => {
+            return { name: file, status: 'untracked' };
+          });
+
+          // unstage these files
+          const unstageFiles = await gitOperator.gitRepoStatus(r, needsUnstage)
+          const removedFiles = await gitOperator.gitRemoveAllModified(r,unstageFiles);
+          
           // Only check recently modified tracked files
+          
           const combined = [...deleted, ...recentlyModified];
           status =
             combined.length > 0

@@ -5,6 +5,8 @@ import {
   ListItemButton,
   TextField,
   InputAdornment,
+  Alert,
+  AlertTitle,
 } from '@mui/material';
 import { alpha, Box, Stack, useTheme } from '@mui/system';
 import { History, Search, Clear } from '@mui/icons-material';
@@ -12,6 +14,7 @@ import { useState, useMemo } from 'react';
 import { DirMeta } from '../../../course-builder/GitViewer/utils/fileSystem';
 import { GlassCard } from './GlassCard';
 import ThemedOptionCard from './ThemedOption';
+import { ButtonMinorUi } from '@rapid-cmi5/ui';
 
 const formatRelativeTime = (isoDate: string): string => {
   const now = new Date();
@@ -192,7 +195,7 @@ export default function RecentProjectSelection({
                       }}
                     />
 
-                    {!project.isValid && (
+                    {/* {!project.isValid && (
                       <Box
                         sx={{
                           display: 'inline-flex',
@@ -216,7 +219,7 @@ export default function RecentProjectSelection({
                           ⚠ Needs permission
                         </Typography>
                       </Box>
-                    )}
+                    )} */}
                   </Box>
                   <Stack spacing={0.5}>
                     <Typography
@@ -284,6 +287,17 @@ export default function RecentProjectSelection({
               No recent projects yet
             </Typography>
           </Box>
+        )}
+        {filteredProjects.some((project) => project.isValid === false) && (
+          <Alert severity="warning" sx={{ lineHeight: 1, mt: 2 }}>
+            <AlertTitle sx={{ lineHeight: 1, fontWeight: 'bold' }}>
+              Browser Access Required
+            </AlertTitle>
+            <Stack direction="column">
+              In order to access local projects, you must click allow access
+              when the browser prompts you.
+            </Stack>
+          </Alert>
         )}
       </Box>
     </GlassCard>

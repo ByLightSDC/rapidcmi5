@@ -60,6 +60,7 @@ const statusLabels: Record<FileStatus, string> = {
   deleted_staged: 'Deleted',
   deleted_staged_with_changes: 'Deleted (Staged, Modified)',
   deleted_staged_with_rename: 'Deleted (Staged, Renamed)',
+  added_then_deleted: 'Added Then Delete',
   unknown: 'Unknown',
 };
 
@@ -78,6 +79,7 @@ const statusMap: Record<
   deleted_staged: { color: 'success' },
   deleted_staged_with_changes: { color: 'warning' },
   deleted_staged_with_rename: { color: 'success' },
+  added_then_deleted: { color: 'default' },
   unknown: { color: 'default' },
 };
 

@@ -1,4 +1,4 @@
-import { getFileStatus, mapGitStatus } from './StatusMatrix';
+import { FileStatus, getFileStatus, mapGitStatus } from './StatusMatrix';
 import { GitFS } from './fileSystem';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import * as git from 'isomorphic-git';
@@ -430,10 +430,22 @@ export class GitOperations {
   ): Promise<ModifiedFile[]> => {
     const dir = getRepoPath(r);
 
-    const filesToRemove = files.filter((f) => f.status === 'deleted_unstaged');
-    const filesToAdd = files.filter(
-      (f) => f.status !== 'deleted_staged' && f.status !== 'deleted_unstaged',
+    const removeStatuses: FileStatus[] = [
+      'deleted_unstaged',
+      'added_then_deleted',
+    ];
+    const skipStatuses: FileStatus[] = [
+      'deleted_staged',
+      'deleted_unstaged',
+      'added_then_deleted',
+    ];
+
+    const filesToRemove = files.filter((f) =>
+      removeStatuses.includes(f.status),
     );
+
+    const filesToAdd = files.filter((f) => !skipStatuses.includes(f.status));
+    
     try {
       if (this.gitFs.isElectron) {
         // Electron path - process in parallel
@@ -1022,7 +1034,11 @@ export class GitOperations {
   gitGetUntrackedAndDeletedFiles = async (
     r: RepoAccessObject,
     allFiles: string[],
-  ): Promise<{ untracked: string[]; deleted: string[] }> => {
+  ): Promise<{
+    untracked: string[];
+    deleted: string[];
+    needsUnstage: string[];
+  }> => {
     const dir = getRepoPath(r);
 
     try {
@@ -1053,11 +1069,12 @@ export class GitOperations {
       const trackedSet = new Set(trackedFiles);
 
       const untracked = allFiles.filter((file) => !trackedSet.has(file));
+      const needsUnstage = trackedFiles.filter((file) => !workingSet.has(file));
 
-      return { untracked, deleted };
+      return { untracked, deleted, needsUnstage };
     } catch (error: any) {
       debugLogError(`Failed to get untracked/deleted files: ${error.message}`);
-      return { untracked: [], deleted: [] };
+      return { untracked: [], deleted: [], needsUnstage: [] };
     }
   };
   handleGetFileDiff = async (r: RepoAccessObject, filepath: string) => {
