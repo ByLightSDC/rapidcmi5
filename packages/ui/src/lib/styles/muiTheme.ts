@@ -15,7 +15,7 @@ const mainColor = '#3C59A2'; //icons, button fills
 const hoverMainColor = '#8AA6D0'; //button hover
 
 export const lightTheme = createTheme({
-  palette: {
+ palette: {
     mode: 'light',
     primary: {
       main: mainColor,
@@ -51,6 +51,8 @@ export const lightTheme = createTheme({
     disabledBackgroundColor: '#7f8cb9',
     disabledColor: '#C1C9DB',
     minorBackgroundColor: '#3C59A2',
+    indicatorColor: mainColor,
+    iconColor: mainColor,
   },
   breadcrumbs: {
     default: '#202020',
@@ -63,7 +65,10 @@ export const lightTheme = createTheme({
     defaultHover: 'linear-gradient(180deg, #8AA6D0 0%, #8AA6D0 100%)',
     borderColor: '#8AA6D0',
     titleColor: '#FFFFFF',
-    formInstructionsColor: '#E5F6FDBF',
+    formInstructionsColor: '#E5F6FD',
+  },
+  form: {
+    backgroundColor: '#EEEEEE',
   },
   header: {
     border: '#ffffffc3', //active se
@@ -89,6 +94,15 @@ export const lightTheme = createTheme({
     iconSelected: '#071285',
     border: '#071285',
     borderSelected: '#071285',
+  },
+  scenarioDesigner: {
+    toolIcon: mainColor,
+    toolIconBorder: mainColor,
+    toolIconBackground: '#F8F8F8',
+    mapBackground: '#F8F8F8',
+    mapPanel: '#EEEEEE',
+    mapPanelOutline: 'LightGrey',
+    mapPanelText: '#656565',
   },
   typography: {
     fontFamily: [

@@ -18,9 +18,7 @@
   },
   "release": {
     "projects": [
-      "libs/rapid-cmi5",
-      "libs/ui/components/branded",
-      "libs/cmi5-build/common"
+      "packages/*"
     ]
   },
   "defaultProject": "rapid-cmi5-electron-frontend",

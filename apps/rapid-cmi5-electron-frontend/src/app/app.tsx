@@ -2,7 +2,12 @@ import { useEffect } from 'react';
 import { BrowserRouter as RouterWrapper } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ClearedUuidValue, DynamicSelectorFieldGroup, FormCrudType, setDividerColor, setIconColor, themeColor } from '@rapid-cmi5/ui';
+import {
+  debugLogError,
+  setDividerColor,
+  setIconColor,
+  themeColor,
+} from '@rapid-cmi5/ui';
 
 /* Shared */
 import AppHeader from './shared/AppHeader';
@@ -21,47 +26,12 @@ import { ThemeProvider } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
-import {
-  buildCmi5ZipParams,
-  GetScenarioFormProps,
-  ScenarioFormProps,
-  RapidCmi5,
-} from '@rapid-cmi5/react-editor';
+import { GetScenarioFormProps, RapidCmi5 } from '@rapid-cmi5/react-editor';
 import { MyScenariosForm } from './ScenarioSelection';
-import { authToken, isAuthenticated } from '@rapid-cmi5/keycloak';
+import { auth, authToken, isAuthenticated } from '@rapid-cmi5/keycloak';
 import { darkTheme } from './styles/muiThemeDark';
 import { lightTheme } from './styles/muiTheme';
-import { queryKeyScenarios, Topic, useGetScenario } from '@rangeos-nx/frontend/clients/hooks';
-
-function ScenarioForm({
-  submitForm,
-  formMethods,
-  formType,
-  errors,
-}: ScenarioFormProps) {
-  return (
-    <DynamicSelectorFieldGroup
-      allowClear={true}
-      clearedUuidValue={ClearedUuidValue.Undefined}
-      apiHook={useGetScenario}
-      crudType={formType}
-      formProps={{
-        formMethods,
-        fieldName: 'uuid',
-        indexedArrayField: 'uuid',
-        indexedErrors: errors?.uuid,
-        placeholder: '',
-        readOnly: formType !== FormCrudType.edit,
-      }}
-      inspectorProps={{}}
-      queryKey={queryKeyScenarios}
-      selectionTargetId={Topic.CMI5Course}
-      shouldApplySelections={false}
-      topicId={Topic.Scenario}
-      onApplySelection={submitForm}
-    />
-  );
-}
+import { CourseAU, generateAuId } from '@rapid-cmi5/cmi5-build-common';
 
 function RapidCmi5WithAuth({
   isAuthenticated,
@@ -70,26 +40,134 @@ function RapidCmi5WithAuth({
   isAuthenticated: boolean;
   token: string | undefined;
 }) {
-  console.log(isAuthenticated, token);
   if (!token) return null;
+  const currentAuth = useSelector(auth);
+  const getAuScenarioUUID = async (au: CourseAU) => {
+    let scenarioUUID = null;
+
+    if (au.rangeosScenarioUUID) {
+      scenarioUUID = au.rangeosScenarioUUID;
+    } else if (au.rangeosScenarioName) {
+      const matchingScenarios = await DevopsApiClient.scenariosList(
+        undefined,
+        au.rangeosScenarioName,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (
+        !matchingScenarios.data.data ||
+        matchingScenarios.data.totalCount === 0
+      ) {
+        debugLogError(`No matching scenario found for AU "${au.auName}"`);
+        return null;
+      }
+
+      scenarioUUID = matchingScenarios.data.data?.at(0)?.uuid;
+    }
+    return scenarioUUID;
+  };
   return (
     <RapidCmi5
-      authToken={token}
-      buildCmi5Zip={async (params: buildCmi5ZipParams) => {
-        return await DevopsApiClient.cmi5BuildBuild(
-          params.zipBlob,
-          params.zipName,
-          params.createAuMappings,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            responseType: 'blob',
-          },
-        );
+      userAuth={{
+        token,
+        userEmail: currentAuth?.parsedUserToken?.email?.toLowerCase(),
+        userName: currentAuth?.parsedUserToken?.name,
       }}
+      downloadCmi5Player={async () => {
+        const response = await fetch('/assets/cc-cmi5-player.zip');
+        return response;
+      }}
+      processAu={async (au: CourseAU, blockId: string) => {
+        const scenarioUUID = await getAuScenarioUUID(au);
+
+        if (!scenarioUUID) return;
+
+        const auId = generateAuId({ blockId, auName: au.auName });
+        let cmi5CourseMapping;
+        try {
+          cmi5CourseMapping = await DevopsApiClient.cmi5AuMappingRetrieve(
+            auId,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
+        } catch (err: any) {
+          if (err.status !== 404) {
+            throw err;
+          }
+        }
+
+        // update if mapping exists
+        if (cmi5CourseMapping) {
+          try {
+            await DevopsApiClient.cmi5AuMappingUpdate(
+              auId,
+              {
+                scenarios: [scenarioUUID],
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              },
+            );
+          } catch (err) {
+            debugLogError(`Could not update au mapping for auId: ${auId}`);
+            throw err;
+          }
+        }
+        // create if mapping does not
+        else {
+          try {
+            await DevopsApiClient.cmi5AuMappingCreate(
+              {
+                auId,
+                scenarios: [scenarioUUID],
+                name: 'test',
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              },
+            );
+          } catch (err) {
+            debugLogError(`Could not create au mapping for auId: ${auId}`);
+            throw err;
+          }
+        }
+      }}
+      // buildCmi5Zip={async (params: buildCmi5ZipParams) => {
+
+      //   // return await DevopsApiClient.cmi5BuildBuild(
+      //   //   params.zipBlob,
+      //   //   params.zipName,
+      //   //   params.createAuMappings,
+      //   //   {
+      //   //     headers: {
+      //   //       Authorization: `Bearer ${token}`,
+      //   //     },
+      //   //     responseType: 'blob',
+      //   //   },
+      //   // );
+      // }}
       GetScenariosForm={(props: GetScenarioFormProps) => (
-        <ScenarioForm
+        <MyScenariosForm
           token={token}
           submitForm={props.submitForm}
           formType={props.formType}
@@ -120,7 +198,6 @@ export default function App({ authEnabled }: { authEnabled: boolean }) {
 
     dispatch(setIconColor(iconColor));
     dispatch(setDividerColor(dividerColor || 'grey'));
-    console.log('Theme chanbge', theme);
   }, [theme]);
 
   return (
@@ -147,7 +224,7 @@ export default function App({ authEnabled }: { authEnabled: boolean }) {
               >
                 <SizingContextProvider>
                   <TimePickerProvider>
-                    <AppHeader />
+                    <AppHeader authEnabled={authEnabled} />
 
                     <main
                       id="app-routes"
@@ -164,7 +241,15 @@ export default function App({ authEnabled }: { authEnabled: boolean }) {
                           token={token}
                         />
                       ) : (
-                        <RapidCmi5 showHomeButton={true} />
+                        <RapidCmi5
+                          showHomeButton={true}
+                          downloadCmi5Player={async () => {
+                            const response = await fetch(
+                              '/assets/cc-cmi5-player.zip',
+                            );
+                            return response;
+                          }}
+                        />
                       )}
                     </main>
                   </TimePickerProvider>

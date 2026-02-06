@@ -22,6 +22,7 @@
     "**/*.d.ts",
     "jest.config.ts"
   ],
+  "exclude": ["./e2e"],
   "files": [
     "../../node_modules/@nx/react/typings/cssmodule.d.ts",
     "../../node_modules/@nx/react/typings/image.d.ts"

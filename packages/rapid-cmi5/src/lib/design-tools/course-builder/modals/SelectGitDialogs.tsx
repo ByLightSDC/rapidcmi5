@@ -60,7 +60,6 @@ export function SelectGitDialogs() {
   // need to fix
   // TODO
 
-  const currentAuth = { parsedUserToken: { email: '', name: '' } };
   const { currentBranch }: RepoState = useSelector(
     (state: RootState) => state.repoManager,
   );
@@ -76,7 +75,7 @@ export function SelectGitDialogs() {
     directoryTree,
     handleGitCommitReset,
     isElectron,
-    getDirHandle,
+    currentAuth,
   } = useContext(GitContext);
   const { sendMessage } = useContext(RC5Context);
 
@@ -266,9 +265,8 @@ export function SelectGitDialogs() {
         <CloneRepoForm
           defaultData={{
             ...defaultCloneRepoData,
-            authorEmail:
-              currentAuth?.parsedUserToken?.email?.toLowerCase() || '',
-            authorName: currentAuth?.parsedUserToken?.name || '',
+            authorEmail: currentAuth?.userEmail?.toLowerCase() || '',
+            authorName: currentAuth?.userName || '',
             shallowClone: false,
           }}
           modalObj={modalObj}
@@ -281,10 +279,8 @@ export function SelectGitDialogs() {
           defaultData={{
             ...defaultCloneRepoData,
             repoRemoteUrl: '',
-            authorEmail: '',
-            authorName: '',
-            // authorEmail: currentAuth?.parsedUserToken?.email?.toLowerCase(),
-            // authorName: currentAuth?.parsedUserToken?.name,
+            authorEmail: currentAuth?.userEmail?.toLowerCase() || '',
+            authorName: currentAuth?.userName || '',
             shallowClone: false,
           }}
           modalObj={modalObj}
@@ -296,8 +292,8 @@ export function SelectGitDialogs() {
         <ImportRepoZipForm
           defaultData={{
             ...defaultImportRepoZipData,
-            authorEmail: currentAuth?.parsedUserToken?.email?.toLowerCase(),
-            authorName: currentAuth?.parsedUserToken?.name,
+            authorEmail: currentAuth?.userEmail?.toLowerCase() || '',
+            authorName: currentAuth?.userName || '',
           }}
           modalObj={modalObj}
           handleCloseModal={handleCloseModal}
@@ -309,8 +305,8 @@ export function SelectGitDialogs() {
         <AttachRemoteRepoForm
           defaultData={{
             ...defaultGitConfigData,
-            authorEmail: currentAuth?.parsedUserToken?.email?.toLowerCase(),
-            authorName: currentAuth?.parsedUserToken?.name,
+            authorEmail: currentAuth?.userEmail?.toLowerCase() || '',
+            authorName: currentAuth?.userName || '',
           }}
           modalObj={modalObj}
           handleCloseModal={handleCloseModal}

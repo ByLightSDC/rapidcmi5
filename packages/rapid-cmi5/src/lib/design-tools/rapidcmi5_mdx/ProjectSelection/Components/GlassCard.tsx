@@ -28,6 +28,7 @@ export function GlassCard({
     <Paper
       elevation={0}
       {...props}
+      
       sx={{
         display: 'flex',
         flexDirection: 'column',

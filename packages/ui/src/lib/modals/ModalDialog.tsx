@@ -24,8 +24,9 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
-import { Fragment } from 'react';
+
 import { ButtonModalCancelUi } from '../inputs/buttons/buttonsmodal';
+import React, { Fragment } from 'react';
 import { ButtonLoadingUi } from '../utility/buttons';
 
 /**
@@ -37,6 +38,7 @@ import { ButtonLoadingUi } from '../utility/buttons';
  * @prop {string[]} [buttons] Override button(s) to display at bottom of dialog (vs just OK)
  * @prop {JSX.Element} [children] Additional item(s) to render in dialog
  * @prop {boolean} [disableSubmit] Indication to disable the Submit button (should be last button in button array prop)
+ * @prop {boolean} [disableButtons] Indication to disable ALL buttons in the dialog
  * @prop {boolean} [isLoading] Indication that data is currently loading
  * @prop {any} [maxWidth] Override maximum width of dialog
  * @prop {string | JSX.Element} [message] Message to display at top of dialog
@@ -56,6 +58,7 @@ interface ModalDialogProps {
   children?: JSX.Element;
 
   disableSubmit?: boolean;
+  disableButtons?: boolean;
   isLoading?: boolean;
   maxWidth?: any;
   message?: string | JSX.Element;
@@ -89,6 +92,7 @@ export function ModalDialog(props: ModalDialogProps) {
     dialogProps,
     dialogContentProps,
     disableSubmit = false,
+    disableButtons = false,
     isLoading = false,
     shouldBlockInteraction = true,
     shouldClickAway = false,
@@ -245,7 +249,6 @@ export function ModalDialog(props: ModalDialogProps) {
               if (index === buttons.length - 1) {
                 return (
                   <ButtonLoadingUi
-                    data-testid={'modal_button_' + button}
                     key={'button_' + index}
                     startIcon={buttonIcon}
                     onClick={(event) => {
@@ -253,7 +256,7 @@ export function ModalDialog(props: ModalDialogProps) {
                       event.stopPropagation();
                       handleClick(index);
                     }}
-                    disabled={disableSubmit}
+                    disabled={disableSubmit || disableButtons}
                     loading={isLoading}
                     type="button"
                   >
@@ -265,8 +268,8 @@ export function ModalDialog(props: ModalDialogProps) {
               return (
                 <Fragment key={`button_${index}`}>
                   <ButtonModalCancelUi
-                    data-testid={'modal_button_' + button}
                     startIcon={buttonIcon}
+                    disabled={disableButtons}
                     onClick={(event) => {
                       //  solves issue where click on modal button fires an action row click
                       event.stopPropagation();

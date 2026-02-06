@@ -132,6 +132,7 @@ describe('useCourseLoader utility functions', () => {
             slideTitle: 'Slide One',
             filepath: `${auDirPath}/old-slide.md`,
             type: SlideTypeEnum.Markdown,
+            content: ''
           },
         ],
       };
@@ -151,6 +152,7 @@ describe('useCourseLoader utility functions', () => {
             slideTitle: 'Slide One',
             filepath: `unit1/au-title/${slug}.md`,
             type: SlideTypeEnum.Markdown,
+            content: ''
           },
         ],
       };
@@ -188,11 +190,13 @@ describe('useCourseLoader utility functions', () => {
                     slideTitle: 'Slide 1',
                     filepath: `${firstAuDirPath}/slide-1.md`,
                     type: SlideTypeEnum.Markdown,
+                    content: ''
                   },
                   {
                     slideTitle: 'Slide 2',
                     filepath: `${firstAuDirPath}/slide-2.md`,
                     type: SlideTypeEnum.Markdown,
+                    content: ''
                   },
                 ],
               },
@@ -204,11 +208,13 @@ describe('useCourseLoader utility functions', () => {
                     slideTitle: 'Slide 1',
                     filepath: `${secondAuDirPath}/slide-1.md`,
                     type: SlideTypeEnum.Markdown,
+                    content: ''
                   },
                   {
                     slideTitle: 'Slide 2',
                     filepath: `${secondAuDirPath}/slide-2.md`,
                     type: SlideTypeEnum.Markdown,
+                    content: ''
                   },
                 ],
               },
@@ -231,11 +237,13 @@ describe('useCourseLoader utility functions', () => {
           slideTitle: 'Slide 1',
           filepath: `${newFirstAuDirPath}/slide-1.md`,
           type: SlideTypeEnum.Markdown,
+          content: ''
         },
         {
           slideTitle: 'Slide 2',
           filepath: `${newFirstAuDirPath}/slide-2.md`,
           type: SlideTypeEnum.Markdown,
+          content: ''
         },
       ];
       await updatePaths(data, '/inBrowser/repo', instance);
@@ -267,6 +275,7 @@ describe('useCourseLoader utility functions', () => {
         slideTitle: 'new name slide',
         filepath: `${firstAuDirPath}/slide-3.md`,
         type: SlideTypeEnum.Markdown,
+        content: ''
       });
       await updatePaths(data, 'inBrowser/repo', instance);
       expect(data.blocks[0].aus[0].dirPath).toEqual(newFirstAuDirPath);
@@ -284,11 +293,13 @@ describe('useCourseLoader utility functions', () => {
         slideTitle: 'new name slide',
         filepath: `${firstAuDirPath}/slide-3.md`,
         type: SlideTypeEnum.Markdown,
+        content: ''
       });
       data.blocks[0].aus[0].slides.push({
         slideTitle: 'new name slide',
         filepath: `${firstAuDirPath}/slide-4.md`,
         type: SlideTypeEnum.Markdown,
+        content: ''
       });
       await updatePaths(data, 'inBrowser/repo', instance);
 
@@ -332,11 +343,13 @@ describe('useCourseLoader utility functions', () => {
             slideTitle: 'Slide 1',
             filepath: `${thirdAuDirPath}/slide-1.md`,
             type: SlideTypeEnum.Markdown,
+            content: ''
           },
           {
             slideTitle: 'Slide 2',
             filepath: `${thirdAuDirPath}/slide-2.md`,
             type: SlideTypeEnum.Markdown,
+            content: ''
           },
         ],
       });
@@ -371,6 +384,7 @@ describe('useCourseLoader utility functions', () => {
             slideTitle: badTitle,
             filepath: `${auDirPath}/empty.md`,
             type: SlideTypeEnum.Markdown,
+            content: ''
           },
         ],
       };

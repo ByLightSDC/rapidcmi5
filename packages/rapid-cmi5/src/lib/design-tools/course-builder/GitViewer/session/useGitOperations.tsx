@@ -44,6 +44,8 @@ export const useGitOperations = (
   fsInstance: GitFS,
   repoAccessObject: RepoAccessObject | null,
 ) => {
+  const [isPerformingOperation, setIsPerformingOperation] = useState(false);
+
   const dispatch = useDispatch<AppDispatch>();
   const gitOperator = new GitOperations(fsInstance);
 
@@ -75,7 +77,7 @@ export const useGitOperations = (
         req.shallowClone,
       );
 
-      await fsInstance.writeModifiedFiles(r, []);
+      // await fsInstance.writeModifiedFiles(r, []);
       debugLog('adding repo', r.repoName);
       dispatch(setRepoViewScrollTop(0));
       dispatch(addRepo(r.repoName));
@@ -162,34 +164,54 @@ export const useGitOperations = (
 
   const stageFile = useCallback(
     async (filepath: string) => {
-      const r: RepoAccessObject = getRepoAccess(repoAccessObject);
-      await gitOperator.gitStageFile(r, filepath);
+      try {
+        setIsPerformingOperation(true);
+        const r: RepoAccessObject = getRepoAccess(repoAccessObject);
+        await gitOperator.gitStageFile(r, filepath);
+      } finally {
+        setIsPerformingOperation(false);
+      }
     },
-    [repoAccessObject],
+    [repoAccessObject, setIsPerformingOperation],
   );
 
   const unStageFile = useCallback(
     async (filepath: string) => {
-      const r: RepoAccessObject = getRepoAccess(repoAccessObject);
-      await gitOperator.gitUnStageFile(r, filepath);
+      try {
+        setIsPerformingOperation(true);
+        const r: RepoAccessObject = getRepoAccess(repoAccessObject);
+        await gitOperator.gitUnStageFile(r, filepath);
+      } finally {
+        setIsPerformingOperation(false);
+      }
     },
-    [repoAccessObject],
+    [repoAccessObject, setIsPerformingOperation],
   );
 
   const stageFiles = useCallback(
     async (modifiedFiles: ModifiedFile[]) => {
-      const r: RepoAccessObject = getRepoAccess(repoAccessObject);
-      return await gitOperator.gitAddAllModified(r, modifiedFiles);
+      try {
+        setIsPerformingOperation(true);
+        const r: RepoAccessObject = getRepoAccess(repoAccessObject);
+        return await gitOperator.gitAddAllModified(r, modifiedFiles);
+      } finally {
+        setIsPerformingOperation(false);
+      }
     },
-    [repoAccessObject],
+    [repoAccessObject, setIsPerformingOperation],
   );
 
   const unstageFiles = useCallback(
     async (modifiedFiles: ModifiedFile[]) => {
-      const r: RepoAccessObject = getRepoAccess(repoAccessObject);
-      return await gitOperator.gitRemoveAllModified(r, modifiedFiles);
+      try {
+        setIsPerformingOperation(true);
+        const r: RepoAccessObject = getRepoAccess(repoAccessObject);
+        return await gitOperator.gitRemoveAllModified(r, modifiedFiles);
+      } finally {
+        setIsPerformingOperation(false);
+      }
     },
-    [repoAccessObject],
+    [repoAccessObject, isPerformingOperation, setIsPerformingOperation],
   );
 
   const commit = useCallback(
@@ -353,5 +375,6 @@ export const useGitOperations = (
     getFileDiff,
     handleRenameCurrentRepo,
     resolveGitConfig,
+    isPerformingOperation,
   };
 };

@@ -1,5 +1,6 @@
-// import MultiSelectionModals from './MultiSelectionModals';
-// import SelectionModals from './SelectionModals';
+
+// import {SelectionModals} from './SelectionModals';
+// import MultiSelectionModals, {} from './MultiSelectionModals';
 
 // /**
 //  * Form Modals component

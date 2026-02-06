@@ -24,7 +24,7 @@ export const lightTheme = createTheme({
       contrastText: '#FFFFFF',
     },
     secondary: {
-      main: '#D2042D',
+      main: mainColor,
       dark: '#3C59A2',
       light: '#D2042D',
       contrastText: '#3C59A2',
@@ -50,7 +50,10 @@ export const lightTheme = createTheme({
   button: {
     disabledBackgroundColor: '#7f8cb9',
     disabledColor: '#C1C9DB',
+    gradient: 'linear-gradient(180deg, #405CA7 0%, #2C4B93 100%)',
     minorBackgroundColor: '#3C59A2',
+    indicatorColor: mainColor,
+    iconColor: mainColor,
   },
   breadcrumbs: {
     default: '#202020',
@@ -87,11 +90,20 @@ export const lightTheme = createTheme({
   },
   nav: {
     fill: '',
-    fillSelected: 'red',
+    fillSelected: '#DDDDDD', // Package Menu
     icon: '#071285d0', // overriden
     iconSelected: '#071285',
-    border: '#071285',
+    border: '#071285', // Package Menu
     borderSelected: '#071285',
+  },
+  scenarioDesigner: {
+    toolIcon: mainColor,
+    toolIconBorder: mainColor,
+    toolIconBackground: '#F8F8F8',
+    mapBackground: '#F8F8F8',
+    mapPanel: '#EEEEEE',
+    mapPanelOutline: 'LightGrey',
+    mapPanelText: '#656565',
   },
   typography: {
     fontFamily: [
@@ -202,6 +214,11 @@ export const lightTheme = createTheme({
           padding: '0px',
           width: 'auto',
         },
+      },
+    },
+    MuiFormHelperText: {
+      defaultProps: {
+        component: 'div',
       },
     },
     MuiListItemIcon: {

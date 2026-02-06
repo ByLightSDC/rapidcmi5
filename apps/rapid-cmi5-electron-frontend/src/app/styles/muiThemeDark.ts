@@ -9,7 +9,7 @@ export const dividerColor = '#2E2E2E';
 
 const tabHeight = '38px';
 const tooltipColor = '#6F96FF'; //'#303030';
-const tooltipOutline = '0px solid #505050'; //'2px solid #505050';
+const tooltipOutline = '0px solid #5c4d4d'; //'2px solid #505050';
 const tooltipPadding = '4px 16px';
 
 const colorPop = true;
@@ -23,15 +23,15 @@ export const darkTheme = createTheme({
     },
     mode: 'dark',
     primary: {
-      main: mainColor,
+      main: '#6F96FF',
       dark: '#3C59A2',
       light: hoverMainColor,
-      contrastText: '#212121',
+      contrastText: '#fff',
     },
     secondary: {
-      main: '#ed6c02', //#A5BEFF
-      dark: '#FFFFFF',
-      light: '#FFFFFF',
+      main: '#6F96FF',
+      dark: '#3C59A2',
+      light: '#6F96FF',
       contrastText: '#FFFFFF',
     },
     text: {
@@ -61,8 +61,10 @@ export const darkTheme = createTheme({
   button: {
     disabledBackgroundColor: '#293658', //'#07128580',
     disabledColor: '#C1C9DB99',
+    gradient: 'linear-gradient(180deg, #405CA7 0%, #2C4B93 100%)',
     minorBackgroundColor: '#213157', //'#333333',
-    indicatorColor: 'pink', //'#FFC840', //
+    indicatorColor: mainColor, //leading action row icon, should match override in MUIListItem
+    iconColor: mainColor, //action row icon color, should match override MUIIconButton
   },
   card: {
     default: 'linear-gradient(180deg, #3E5BA5BF 0%, #2E4C94BF 100%)',
@@ -70,7 +72,7 @@ export const darkTheme = createTheme({
     defaultHover: 'linear-gradient(180deg, #8AA6D0 0%, #8AA6D0 100%)',
 
     titleColor: '#FFFFFF', // white
-    instructionsColor: colorPop ? '#edb445' : '#edb445',
+    instructionsColor: colorPop ? '#edb445' : '#edb445', //unused
     formInstructionsColor: '#212125',
   },
   form: {
@@ -79,7 +81,7 @@ export const darkTheme = createTheme({
   header: {
     border: '#ffffffb0',
     buttonColor: '#C5C5C5',
-    selColor: '#A5BEFF', //'#a4c9eb', //selColor: '#A5BEFF',
+    selColor: '#A5BEFF',
     default: '#282b30',
     hoverColor: '#FFFFFF',
     light: '#9AA8CD', //loading bar color
@@ -96,11 +98,20 @@ export const darkTheme = createTheme({
   },
   nav: {
     fill: '',
-    fillSelected: '#FFC84018',
+    fillSelected: '#3D4047', // Package Menu
     icon: '#ffffffc0',
-    iconSelected: '#FFC840',
-    border: '#FFC840d0',
-    borderSelected: '#FFC840',
+    iconSelected: '#FFC840', //unused
+    border: '#666666', // Package Menu
+    borderSelected: '#FFC840', //unused
+  },
+  scenarioDesigner: {
+    toolIcon: mainColor,
+    toolIconBorder: mainColor,
+    toolIconBackground: '#212125',
+    mapBackground: '#212125',
+    mapPanel: '#282b30',
+    mapPanelOutline: '#666666',
+    mapPanelText: 'rgba(255, 255, 255, 0.6)',
   },
   typography: {
     fontFamily: [
@@ -263,6 +274,11 @@ export const darkTheme = createTheme({
         },
       },
     },
+    MuiFormHelperText: {
+      defaultProps: {
+        component: 'div', //forces form helper text to render as a div to avoid jest Warning: validateDOMNesting
+      },
+    },
     MuiTooltip: {
       styleOverrides: {
         arrow: {
@@ -295,6 +311,21 @@ export const darkTheme = createTheme({
           },
           '&&:after': {
             borderBottom: '1px solid #59595930',
+          },
+        },
+      },
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          textDecorationColor: '#a9ff6fff',
+          '&:hover': {
+            color: '#0f9f3aff',
+            textDecorationColor: '#0f9f3aff',
+          },
+          '&:visited': {
+            color: '#9023dfff',
+            textDecorationColor: '#9023dfff',
           },
         },
       },

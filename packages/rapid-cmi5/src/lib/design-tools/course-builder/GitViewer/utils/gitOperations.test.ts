@@ -6,7 +6,7 @@ import {
   RepoAccessObject,
   fsType,
   initFileState,
-} from 'libs/rapid-cmi5/src/lib/redux/repoManagerReducer';
+} from '../../../../redux/repoManagerReducer';
 import { createNewFsInstance } from './gitFsInstance';
 import { join } from 'path-browserify';
 import {

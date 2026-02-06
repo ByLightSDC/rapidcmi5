@@ -1,28 +1,20 @@
 import {
-  Paper,
   Typography,
-  Card,
-  CardContent,
   IconButton,
-  Box as MuiBox,
   ListItemText,
-  Tooltip,
   ListItemButton,
   TextField,
   InputAdornment,
+  Alert,
+  AlertTitle,
 } from '@mui/material';
-import { alpha, Box, palette, Stack, useTheme } from '@mui/system';
-import {
-  History,
-  ChevronLeft,
-  ChevronRight,
-  Search,
-  Clear,
-} from '@mui/icons-material';
+import { alpha, Box, Stack, useTheme } from '@mui/system';
+import { History, Search, Clear } from '@mui/icons-material';
 import { useState, useMemo } from 'react';
 import { DirMeta } from '../../../course-builder/GitViewer/utils/fileSystem';
 import { GlassCard } from './GlassCard';
 import ThemedOptionCard from './ThemedOption';
+import { ButtonMinorUi } from '@rapid-cmi5/ui';
 
 const formatRelativeTime = (isoDate: string): string => {
   const now = new Date();
@@ -81,6 +73,7 @@ export default function RecentProjectSelection({
       icon={<History sx={{ color: 'white' }} />}
     >
       <Box
+        data-testid="recent-projects-card"
         sx={{
           height: '100%',
           display: 'flex',
@@ -202,7 +195,7 @@ export default function RecentProjectSelection({
                       }}
                     />
 
-                    {!project.isValid && (
+                    {/* {!project.isValid && (
                       <Box
                         sx={{
                           display: 'inline-flex',
@@ -211,8 +204,8 @@ export default function RecentProjectSelection({
                           px: 1,
                           py: 0.25,
                           borderRadius: 1,
-                          background: alpha(palette.warning.main, 0.1),
-                          border: `1px solid ${alpha(palette.warning.main, 0.3)}`,
+                          background: alpha(palette.warning.light, 0.1),
+                          border: `1px solid ${alpha(palette.warning.main, 0.5)}`,
                         }}
                       >
                         <Typography
@@ -220,13 +213,13 @@ export default function RecentProjectSelection({
                           sx={{
                             fontFamily: '"Space Mono", monospace',
                             fontSize: '0.7rem',
-                            color: palette.warning.light,
+                            color: palette.warning.main,
                           }}
                         >
                           ⚠ Needs permission
                         </Typography>
                       </Box>
-                    )}
+                    )} */}
                   </Box>
                   <Stack spacing={0.5}>
                     <Typography
@@ -294,6 +287,16 @@ export default function RecentProjectSelection({
               No recent projects yet
             </Typography>
           </Box>
+        )}
+        {filteredProjects.some((project) => project.isValid === false) && (
+          <Alert severity="warning" sx={{ lineHeight: 1, mt: 2 }}>
+            <AlertTitle sx={{ lineHeight: 1, fontWeight: 'bold' }}>
+              Browser Requires Permission to Access Desktop Files
+            </AlertTitle>
+            <Stack direction="column">
+              You must click allow access when the browser prompts you.
+            </Stack>
+          </Alert>
         )}
       </Box>
     </GlassCard>

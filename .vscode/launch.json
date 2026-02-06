@@ -8,6 +8,10 @@
       "url": "http://localhost:4200",
       "userDataDir": true,
       "webRoot": "${workspaceFolder}/apps/rapid-cmi5-electron-frontend",
+      "runtimeArgs": [
+        "--disable-web-security",
+        "--disable-site-isolation-trials"
+      ],
       "sourceMapPathOverrides": {
         "webpack:///./*": "${webRoot}/*",
         "webpack:///*": "${webRoot}/*",

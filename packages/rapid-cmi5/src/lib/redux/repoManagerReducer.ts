@@ -245,7 +245,7 @@ const renderTree = async (r: RepoAccessObject) => {
   const repoPath = getRepoPath(r);
   const gitFs = getFsInstance();
 
-  const treeData = await gitFs.getFolderStructure(repoPath, repoPath);
+  const treeData = await gitFs.getFolderStructure(repoPath, '');
 
   const dirRoot = {
     id: '/', // Use repo name as the ID

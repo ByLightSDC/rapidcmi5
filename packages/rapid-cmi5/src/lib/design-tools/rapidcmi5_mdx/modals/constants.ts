@@ -1,5 +1,5 @@
 export const attachRemoteRepoModalId = 'attachRemoteRepoModalId';
-export const cacheWarning = 'Content will be saved in your web browser.';
+export const cacheWarning = 'Content will be saved locally.';
 export const cloneRepoModalId = 'cloneRepoModalId';
 export const createLocalRepoModalId = 'createLocalRepoModalId';
 export const importRepoZipModalId = 'importRepoZipModalId';
@@ -22,4 +22,4 @@ export const setGitConfigModalId = 'setGitConfigModalId';
 export const warningModalId = 'warning';
 
 export const remindFileSystem =
-  'Content is stored in your browser. Use Version Control  to back up your work!';
+  'Content is stored locally, Use Version Control to back up your work!';

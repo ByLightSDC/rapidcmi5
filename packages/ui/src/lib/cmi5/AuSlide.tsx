@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { AuContextProps, SlideTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import AuMarkDownSlide from './markdown/MarkDownSlide';
+import { AuContextProps, SlideTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Sample Slide

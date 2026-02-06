@@ -1,28 +1,45 @@
 import {
   cleanMkdocs,
   FolderStruct,
+  generateCourseJson,
   rc5MetaFilename,
+  CourseData,
+  generateCourseDist,
+  FsOperations,
+  generateCmi5Xml,
+  generateBlockId,
+  CourseAU,
 } from '@rapid-cmi5/cmi5-build-common';
 import JSZip from 'jszip';
-import path, { basename, dirname, join } from 'path-browserify';
+import path, { basename, dirname, join, relative } from 'path-browserify';
 import YAML from 'yaml';
 import { configure, fs as zenFs } from '@zenfs/core';
 import { IndexedDB, WebAccess } from '@zenfs/dom';
 import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { set, get, keys, getMany } from 'idb-keyval';
-import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import { electronFs } from './ElectronFsApi';
-import { CourseData } from '@rapid-cmi5/cmi5-build-common';
 import { IFs } from 'memfs';
+import saveAs from 'file-saver';
+import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 
 export const getRepoPath = (r: RepoAccessObject) =>
   `/${r.fileSystemType}/${r.repoName}`;
 
 export type FileSystemObject = typeof zenFs | typeof electronFs | IFs;
 
-export const gitCache = `/gitfs/gittemp`;
-export const modifiedFileCache = 'rc5ModifiedFiles.json';
+export const cmi5BuildCache = `/gitfs/cmi5-player`;
+export const cmi5BuildOutput = `/gitfs/outPut`;
+
+// Update the FolderStruct type to include modification time
+// You'll need to add this to your @rapid-cmi5/cmi5-build-common package
+// or create a local extended type:
+
+export type FolderStructWithMtime = FolderStruct & {
+  mtime?: number; // milliseconds since epoch
+  mtimeDate?: string; // ISO string
+};
+
 export type DirMeta = {
   // not needed for electron
   dirHandle?: FileSystemDirectoryHandle;
@@ -89,11 +106,6 @@ export class GitFS {
       });
 
       try {
-        await this.fs.promises.mkdir(gitCache, { recursive: true });
-      } catch (error: any) {
-        debugLogError(error);
-      }
-      try {
         await this.fs.promises.mkdir('/inBrowser', { recursive: true });
       } catch (error: any) {
         debugLogError(error);
@@ -105,39 +117,194 @@ export class GitFS {
       throw error;
     }
   };
-  // Write a file to the individual repo so that we don't have to scan the entire git repo for files
-  writeModifiedFiles = async (
+
+  buildCmi5Course = async (
     r: RepoAccessObject,
-    modifiedFiles: ModifiedFile[],
+    coursePath: string,
+    zipName: string,
+    processAu?: (au: CourseAU, blockId: string) => Promise<void>,
   ) => {
+    const repoPath = getRepoPath(r);
 
-    const path = join(getRepoPath(r), modifiedFileCache);
-    const filteredFiles = modifiedFiles
-      .filter((f) => f.name !== modifiedFileCache)
-      .map((f) => f.name);
-
-    await this.fs.promises.writeFile(
-      path,
-      JSON.stringify(filteredFiles, null, 4),
-    );
-  };
-  // A cache so that we don't have to scan the entire git repo for files
-  readModifiedFiles = async (
-    r: RepoAccessObject,
-  ): Promise<string[] | undefined> => {
-    const res = await this.getFileContent(r, modifiedFileCache);
-    if (res === null) return;
-    return JSON.parse(res.content) as string[];
-  };
-  clearGitDir = async (handle: FileSystemDirectoryHandle) => {
     try {
-      //@ts-ignore
-      await handle.remove({ recursive: true });
+      const folderStructure = await this.getFolderStructure(
+        join(repoPath, coursePath),
+        coursePath,
+        true,
+      );
+
+      if (!folderStructure) throw new Error('Course folder was empty');
+
+      const courseData = generateCourseJson(folderStructure);
+      if (!courseData) {
+        throw new Error('Course data was null');
+      }
+
+      const fsOps: FsOperations = {
+        readFile: async (path: string, encoding?: string) => {
+          const content = await this.fs.promises.readFile(path);
+          if (encoding === 'utf-8') {
+            return new TextDecoder().decode(content as Uint8Array);
+          }
+          return content;
+        },
+        writeFile: async (
+          path: string,
+          content: string | Uint8Array,
+          encoding?: string,
+        ) => {
+          await this.fs.promises.writeFile(path, content);
+        },
+        deleteFolder: async (
+          path: string,
+          options: { recursive: boolean; force: boolean },
+        ) => {
+          try {
+            await this.fs.promises.rm(path, options);
+          } catch (err) {
+            if (!options.force) throw err;
+          }
+        },
+        copy: async (
+          src: string,
+          dest: string,
+          options: { recursive: boolean },
+        ) => {
+          await this.copyRecursive(src, dest);
+        },
+        mkdir: async (path: string, options: { recursive: boolean }) => {
+          await this.fs.promises.mkdir(path, options);
+        },
+      };
+      await generateCourseDist(
+        join(repoPath, coursePath),
+        cmi5BuildCache,
+        courseData,
+        fsOps,
+        join,
+        relative,
+        coursePath,
+      );
+      const cmi5Xml = generateCmi5Xml(courseData);
+      const cmi5Path = path.join(cmi5BuildCache, 'cmi5.xml');
+
+      await this.fs.promises.writeFile(cmi5Path, cmi5Xml.trim());
+
+      if (processAu) {
+        for (const block of courseData.blocks) {
+          const blockId = generateBlockId({
+            courseId: courseData.courseId,
+            blockName: block.blockName,
+          });
+
+          for (const au of block.aus) {
+            await processAu(au, blockId);
+          }
+        }
+      }
+
+      const builtZip = await this.generateZip(cmi5BuildCache, '');
+
+      const zipBlob = await builtZip.generateAsync({ type: 'blob' });
+
+      saveAs(zipBlob, zipName);
     } catch (error: any) {
-      debugLogError(error);
+      throw error;
+    } finally {
+      try {
+        await this.clearDirectory(join(cmi5BuildCache, 'compiled_course'));
+      } catch {}
+
+      try {
+        await this.fs.promises.rmdir(join(cmi5BuildCache, 'compiled_course'));
+      } catch {}
     }
   };
+  /**
+   * Downloads and extracts the cmi5-player zip file if it doesn't already exist.
+   *
+   * @param version - Version to download (e.g., 'v0.7.0')
+   * @param playerVersion - Player version string (e.g., '0.7.0')
+   * @returns Promise<void>
+   */
+  downloadCmi5PlayerIfNeeded = async (
+    downloadPlayer: () => Promise<any>,
+  ): Promise<void> => {
+    // const playerPath = join(cmi5BuildCache, `cmi5-player-${playerVersion}`);
 
+    // // Check if cmi5-player folder already exists
+    // const exists = await this.dirExists(playerPath);
+    // if (exists) {
+    //   debugLog('cmi5-player folder already exists, skipping download');
+    //   return;
+    // }
+    try {
+      await this.clearDirectory(cmi5BuildCache);
+    } catch {}
+
+    try {
+      await this.fs.promises.rmdir(cmi5BuildCache);
+    } catch {}
+    try {
+      // debugLog(`Downloading cmi5-player ${playerVersion}...`);
+
+      // Download the zip file
+      const response = await downloadPlayer();
+
+      // Get the zip data
+      const zipBlob = await response.blob();
+      const zipArrayBuffer = await zipBlob.arrayBuffer();
+
+      // Load the zip using JSZip
+      const zip = await JSZip.loadAsync(zipArrayBuffer);
+
+      debugLog('Extracting cmi5-player...');
+      // Determine if zip has a single top-level folder
+      const fileNames = Object.keys(zip.files).filter((p) => p && p !== '/');
+      const topLevels = new Set(
+        fileNames.map((p) => p.split('/')[0]).filter(Boolean),
+      );
+      const stripRoot =
+        topLevels.size === 1 && fileNames.some((p) => p.includes('/'));
+
+      await this.createDirRecursive(cmi5BuildCache);
+
+      await Promise.all(
+        fileNames.map(async (relativePath) => {
+          const entry = zip.files[relativePath];
+          if (!entry) return;
+
+          let cleanedPath = relativePath;
+          if (stripRoot) {
+            const parts = relativePath.split('/');
+            parts.shift(); // remove the single root folder
+            cleanedPath = parts.join('/');
+          }
+
+          // Skip empty path (root folder itself)
+          if (!cleanedPath) return;
+
+          const fullPath = join(cmi5BuildCache, cleanedPath);
+
+          if (entry.dir) {
+            await this.createDirRecursive(fullPath);
+            return;
+          }
+
+          // // Ensure parent directory exists
+          await this.createDirRecursive(dirname(fullPath));
+
+          const content = await entry.async('uint8array');
+          await this.fs.promises.writeFile(fullPath, content);
+        }),
+      );
+
+      debugLog('cmi5-player downloaded and extracted successfully');
+    } catch (error: any) {
+      debugLogError(`Error downloading cmi5-player: ${error}`);
+      throw new Error(`Failed to download cmi5-player: ${error}`);
+    }
+  };
   // this is browser specific
   openLocalDirectory = async (
     dirHandle: FileSystemDirectoryHandle,
@@ -154,9 +321,7 @@ export class GitFS {
         zenFs.umount('/localFileSystem/' + dirHandle.name);
 
         zenFs.mount('/localFileSystem/' + dirHandle.name, webacess);
-        // zenFs.umount('/localFileSystem');
 
-        // zenFs.mount('/localFileSystem', webacess);
       }
       this.isBrowserFsLoaded = true;
     } catch (error: any) {
@@ -291,7 +456,6 @@ export class GitFS {
       remoteUrl: await this.getGitRemoteUrl(dirHandle),
     };
 
-    console.log('Set dir ', dirMeta);
     await set('courses/' + id || 'rootdir', dirMeta);
   };
 
@@ -306,7 +470,6 @@ export class GitFS {
           const stats = await this.fs.promises.stat(
             fsType.localFileSystem + '/' + dir.toString(),
           );
-          console.log(stats);
           newMetas.push({
             createdAt: new Date(stats.ctimeMs as number).toISOString(),
             lastAccessed: new Date(stats.mtimeMs as number).toISOString(),
@@ -332,7 +495,7 @@ export class GitFS {
       for (const meta of dirMetas) {
         if (!meta.dirHandle) continue;
         const status = await verifyHandlePermission(meta.dirHandle);
-        const newMeta: DirMeta = { ...meta, isValid: status };
+        const newMeta: DirMeta = { ...meta, isValid: status, remoteUrl: await this.getGitRemoteUrl(meta.dirHandle) || 'No remote URL' };
 
         newMetas.push(newMeta);
         await set('courses/' + meta.id, meta);
@@ -346,9 +509,7 @@ export class GitFS {
   };
 
   getDirHandle = async (id: string) => {
-    console.log('Let see whats here', id);
     const saved = await get<DirMeta>('courses/' + id || 'rootdir');
-    console.log('Let see whats here saved', saved);
 
     if (saved?.dirHandle) {
       const valid = await verifyHandlePermission(saved.dirHandle);
@@ -646,6 +807,114 @@ export class GitFS {
     return zip;
   };
 
+  /**
+   * Generates a zip file from the current course.
+   *
+   * @param repoName - The name of the repository where the file exists. Must not be null or an empty string.
+   * @param repoName - The relative path to the course (where the mkdocs.yaml file exists).
+   *
+   */
+  generateZip = async (path: string, basePath: string) => {
+    const zip = new JSZip();
+    const courseRoot = zip.folder(basePath);
+    const fullPath = join(path);
+    const files = await this.getFolderStructure(
+      fullPath,
+      path,
+      true,
+      courseRoot,
+    );
+
+    return zip;
+  };
+
+  /**
+   * Gets folder structure with file modification times
+   */
+  getFolderStructureWithMtime = async (
+    dir: string,
+    basePath: string,
+    getContents = false,
+    zip: JSZip | null = null,
+  ): Promise<FolderStructWithMtime[]> => {
+    const folderStruct = await this.getFolderStructureRecWithMtime(
+      dir,
+      getContents,
+      zip,
+      basePath,
+    );
+    return folderStruct;
+  };
+
+  /**
+   * Recursive helper that captures modification times
+   */
+  getFolderStructureRecWithMtime = async (
+    dir: string,
+    getContents = false,
+    zip: JSZip | null = null,
+    basePath: string,
+  ): Promise<FolderStructWithMtime[]> => {
+    const childItems: FolderStructWithMtime[] = [];
+
+    try {
+      const items = (await this.fs.promises.readdir(dir)).sort();
+
+      for (const item of items) {
+        const itemPath = `${dir}/${item}`;
+        const stat = await this.fs.promises.stat(itemPath);
+
+        const name = item.toString();
+        const id = join(basePath, name);
+
+        // Capture modification time
+        const mtime = stat.mtimeMs as number;
+        const mtimeDate = new Date(mtime).toISOString();
+
+        const node: FolderStructWithMtime = {
+          id,
+          name,
+          isBranch: true,
+          mtime,
+          mtimeDate,
+        };
+
+        if (stat.isFile()) {
+          node.isBranch = false;
+
+          if (getContents || zip) {
+            const raw = await this.fs.promises.readFile(itemPath);
+            const array = Uint8Array.from(raw as any);
+            const text = new TextDecoder().decode(array);
+
+            node.content = text;
+            if (zip) {
+              zip.file(name, text);
+            }
+          }
+        } else if (stat.isDirectory()) {
+          if (name === '.git') continue;
+
+          node.isBranch = true;
+          node.children = await this.getFolderStructureRecWithMtime(
+            itemPath,
+            getContents,
+            zip?.folder(name),
+            join(basePath, node.name),
+          );
+        }
+
+        childItems.push(node);
+      }
+    } catch (error: any) {
+      if (error?.code !== 'ENOENT') {
+        console.error(`Error reading directory: ${dir}`, error);
+      }
+    }
+
+    return childItems;
+  };
+
   getFolderStructure = async (
     dir: string,
     basePath: string,
@@ -663,7 +932,13 @@ export class GitFS {
       }
       return folderStruct;
     } else {
-      return await this.getFolderStructureRec(dir, getContents, zip);
+      const folderStruct = await this.getFolderStructureRec(
+        dir,
+        getContents,
+        zip,
+        basePath,
+      );
+      return folderStruct;
     }
   };
 
@@ -695,6 +970,7 @@ export class GitFS {
     dir: string,
     getContents = false,
     zip: JSZip | null = null,
+    baseBath: string,
   ): Promise<FolderStruct[]> => {
     const childItems: FolderStruct[] = [];
     try {
@@ -704,8 +980,9 @@ export class GitFS {
         const itemPath = `${dir}/${item}`;
         const stat = await this.fs.promises.stat(itemPath);
 
-        const id = itemPath.split('/').slice(3).join('/');
         const name = item.toString();
+        const id = join(baseBath, name);
+
         const node: FolderStruct = { id, name, isBranch: true };
 
         if (stat.isFile()) {
@@ -721,12 +998,14 @@ export class GitFS {
             }
           }
         } else if (stat.isDirectory()) {
+          if (name === '.git') continue;
           node.isBranch = true;
 
           node.children = await this.getFolderStructureRec(
             itemPath,
             getContents,
             zip?.folder(name),
+            join(baseBath, node.name),
           );
         }
 
@@ -812,7 +1091,7 @@ export class GitFS {
     if (stat.isFile()) {
       await this.copyFile(absSrcPath, absDestDirPath);
     } else if (stat.isDirectory()) {
-      const items = await this.getFolderStructure(absSrcPath, repoPath, true);
+      const items = await this.getFolderStructure(absSrcPath, '', true);
       const folderName = absSrcPath.split('/').pop();
       if (!folderName) return;
 
@@ -826,92 +1105,35 @@ export class GitFS {
     }
   };
 
-  /**
-   * Copies the `.git` directory of a given repository into a temporary directory.
-   *
-   *
-   * @async
-   * @function copyGit
-   * @param {RepoAccessObject} r - The repository access object containing metadata
-   *   used to resolve the repository path via `getRepoPath(r)`.
-   *
-   * @returns {Promise<void>} Resolves when the copy operation completes.
-   *
-   *
-   * @remarks
-   * - This method is needed due to the slow nature of the file system access api
-   * - The cp method on OPFS has had issues in the past with nested directories,
-   *   that is why we are using a more drawn out recursive copy function
-   */
-  copyGit = async (r: RepoAccessObject): Promise<void> => {
-    if (this.isElectron) return;
-
-    const repoPath = getRepoPath(r);
-    const absSrcPath = path.join(repoPath, '.git');
-    const absDestDirPath = gitCache;
-
-    try {
-      await this.fs.promises.stat(absSrcPath);
-    } catch {
-      debugLogError('file does not exist');
-      return;
-    }
-    try {
-      await this.fs.promises.rm(absDestDirPath, {
-        recursive: true,
-        force: true,
-      });
-    } catch (error) {
-      console.error('Error deleting dir:', error);
-    }
-
-    try {
-      await this.fs.promises.mkdir(absDestDirPath, { recursive: true });
-    } catch (error) {
-      console.error('Error creating dir:', error);
-    }
-
-    const retries = 4;
-    const delayMs = 1000;
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      try {
-        await this.copyRecursive(absSrcPath, absDestDirPath);
-        return; // success
-      } catch (err) {
-        console.error(`Attempt ${attempt} failed:`, err);
-        if (attempt < retries) {
-          console.log(`Retrying in ${delayMs}ms...`);
-          await new Promise((resolve) => setTimeout(resolve, delayMs));
-        } else {
-          console.error('All attempts failed');
-          throw err; // rethrow after final failure
-        }
-      }
-    }
-  };
-
   async copyRecursive(src: string, dest: string) {
-    const st = await this.fs.promises.stat(src);
-    if (st.isDirectory()) {
-      await this.fs.promises.mkdir(dest, { recursive: true });
-      const entries = await this.fs.promises.readdir(src);
-      Promise.resolve();
-      await Promise.all(
-        entries.map((name) =>
-          this.copyRecursive(
+    try {
+      const st = await this.fs.promises.stat(src);
+
+      if (st.isDirectory()) {
+        // Create destination directory
+        await this.fs.promises.mkdir(dest, { recursive: true });
+
+        // Read all entries in the directory
+        const entries = await this.fs.promises.readdir(src);
+
+        // Recursively copy all entries sequentially
+        for (const name of entries) {
+          await this.copyRecursive(
             join(src, name.toString()),
             join(dest, name.toString()),
-          ),
-        ),
-      );
-    } else {
-      await this.fs.promises.mkdir(dirname(dest), { recursive: true });
-      try {
+          );
+        }
+      } else {
+        // It's a file - ensure parent directory exists
+        await this.fs.promises.mkdir(dirname(dest), { recursive: true });
+
+        // Copy the file
         const content = await this.fs.promises.readFile(src);
         await this.fs.promises.writeFile(dest, content);
-      } catch (error) {
-        debugLogError(`Failed to copy ${src}: ${error}`);
       }
+    } catch (error) {
+      debugLogError(`Failed to copy ${src} to ${dest}: ${error}`);
+      throw error; // Re-throw so caller knows it failed
     }
   }
 

@@ -14,7 +14,6 @@ import { ButtonModalCancelUi } from '@rapid-cmi5/ui';
 /* Icons */
 import { Stack, useTheme } from '@mui/system';
 import path from 'path-browserify';
-import { themeColor } from '@rapid-cmi5/ui';
 import { getMonacoTheme } from '../../utils/monacoEditor';
 import { validateMarkdownDirectives } from '@rapid-cmi5/cmi5-build-common';
 import {

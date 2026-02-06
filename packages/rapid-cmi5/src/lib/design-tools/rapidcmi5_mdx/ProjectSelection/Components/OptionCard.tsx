@@ -34,7 +34,7 @@ const OptionCard = ({
     <ThemedOptionCard>
       {/* Apply to outer or inner element */}
       <ListItemButton
-        data-testid='create-repo-button'
+        data-testid={dataTestId}
         onClick={handleSelect}
         sx={{
           borderRadius: 2,

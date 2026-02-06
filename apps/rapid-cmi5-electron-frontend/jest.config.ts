@@ -10,6 +10,7 @@ export default {
     'node_modules/(?!cidr-tools)*',
     'node_modules/(?!@mdxeditor)*',
   ],
+  testPathIgnorePatterns: ['/node_modules/', '/e2e/'],
 
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '../../coverage/apps/rapid-cmi5-electron-frontend',

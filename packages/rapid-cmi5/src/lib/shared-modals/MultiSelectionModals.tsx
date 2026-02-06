@@ -4,18 +4,13 @@
 // import {
 //   ActionRow,
 //   MultipleSelectWrapper,
-//   Topic,
 //   actionRowSortableColumns,
-//   apiTopicsHookData,
 //   modal,
 // } from '@rapid-cmi5/ui';
 
 // /* Constants */
 // import {
 //   rowsPerPageDefault,
-//   rowsPerPage_Certificate,
-//   rowsPerPage_DnsZone,
-//   rowsPerPage_Scenario,
 // } from '../constants';
 
 // /**
@@ -25,6 +20,8 @@
 // export const getMultiSelectModal = (
 //   modalObjType: string,
 //   topicId?: string | null,
+//   apiHook?: any,
+//   queryKey?: any,
 //   shouldSkipQuery?: any,
 //   defaultPageData?: any[],
 // ) => {
@@ -40,28 +37,19 @@
 //     return null;
 //   }
 
-//   const topicHookData = apiTopicsHookData[topicId];
-
 //   //Custom Params based on topic
 //   let rowsPerPage = rowsPerPageDefault;
-//   if (topicId === Topic.Certificate) {
-//     rowsPerPage = rowsPerPage_Certificate;
-//   } else if (topicId === Topic.DnsZone) {
-//     rowsPerPage = rowsPerPage_DnsZone;
-//   } else if (topicId === Topic.ResourceScenario) {
-//     rowsPerPage = rowsPerPage_Scenario;
-//   }
 
-//   if (topicHookData || (shouldSkipQuery && defaultPageData)) {
+//   if ((shouldSkipQuery && defaultPageData)) {
 //     return (
 //       <MultipleSelectWrapper
 //         allowCreateNew={!shouldSkipQuery}
-//         apiHook={shouldSkipQuery ? null : topicHookData.listApiHook}
+//         apiHook={apiHook}
 //         dataIdField={'uuid'}
 //         defaultPageData={shouldSkipQuery ? defaultPageData : []}
 //         isTopicEditable={!shouldSkipQuery}
 //         pageLabel={`${topicId}:s`}
-//         queryKey={topicHookData.queryKey}
+//         queryKey={queryKey}
 //         renderItem={ActionRow}
 //         rowsPerPage={rowsPerPage}
 //         sortableColumns={actionRowSortableColumns}

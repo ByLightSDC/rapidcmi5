@@ -30,6 +30,7 @@ export type FileStatus =
   | 'deleted_staged'
   | 'deleted_staged_with_changes'
   | 'deleted_staged_with_rename'
+  | 'added_then_deleted'
   | 'unknown';
 
 const FILE = 0;
@@ -100,6 +101,7 @@ export const getFileStatus = (
   if (HEAD === 1 && WORKDIR === 2 && STAGE === 3) return 'staged_with_changes'; // Modified, staged, with unstaged changes
   if (HEAD === 1 && WORKDIR === 0 && STAGE === 1) return 'deleted_unstaged'; // Deleted, unstaged
   if (HEAD === 1 && WORKDIR === 0 && STAGE === 0) return 'deleted_staged'; // Deleted, staged
+  if (HEAD === 0 && WORKDIR === 0 && STAGE === 3) return 'added_then_deleted';
   if (HEAD === 1 && WORKDIR === 2 && STAGE === 0)
     return 'deleted_staged_with_changes'; // Deleted, staged, with unstaged-modified changes (new file of the same name)
   if (HEAD === 1 && WORKDIR === 1 && STAGE === 0)
@@ -125,19 +127,33 @@ type GitStatus =
 
 export function mapGitStatus(status: GitStatus): FileStatus {
   switch (status) {
-    case 'ignored':               return 'unknown';            // or return 'ignored' if you support it
-    case 'unmodified':            return 'unmodified';
-    case '*added':                return 'untracked';          // untracked, not staged
-    case 'added':                 return 'added';              // staged new file
-    case '*modified':             return 'modified';           // unstaged mods
-    case 'modified':              return 'staged';             // staged mods
-    case '*deleted':              return 'deleted_unstaged';   // removed in WD, not staged
-    case 'deleted':               return 'deleted_staged';     // removed, staged
-    case '*unmodified':           return 'unmodified';             // index differs, WD==HEAD
-    case '*undeleted':            return 'deleted_staged_with_rename';      // index deleted, WD still has file
-    case '*undeletemodified':     return 'deleted_staged_with_changes';     // index deleted, WD has modified file
-    case '*absent':               return 'unknown';             // present only in index (index differs)
-    case 'absent':                return 'unknown';            // nowhere (HEAD/WD/index)
-    default:                      return 'unknown';
+    case 'ignored':
+      return 'unknown'; // or return 'ignored' if you support it
+    case 'unmodified':
+      return 'unmodified';
+    case '*added':
+      return 'untracked'; // untracked, not staged
+    case 'added':
+      return 'added'; // staged new file
+    case '*modified':
+      return 'modified'; // unstaged mods
+    case 'modified':
+      return 'staged'; // staged mods
+    case '*deleted':
+      return 'deleted_unstaged'; // removed in WD, not staged
+    case 'deleted':
+      return 'deleted_staged'; // removed, staged
+    case '*unmodified':
+      return 'unmodified'; // index differs, WD==HEAD
+    case '*undeleted':
+      return 'deleted_staged_with_rename'; // index deleted, WD still has file
+    case '*undeletemodified':
+      return 'deleted_staged_with_changes'; // index deleted, WD has modified file
+    case '*absent':
+      return 'unknown'; // present only in index (index differs)
+    case 'absent':
+      return 'unknown'; // nowhere (HEAD/WD/index)
+    default:
+      return 'unknown';
   }
 }

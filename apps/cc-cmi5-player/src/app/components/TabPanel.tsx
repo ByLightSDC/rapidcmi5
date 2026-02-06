@@ -8,6 +8,7 @@ import { auJsonSel, auLogoSel, courseAUProgressSel } from '../redux/auReducer';
 import { activeTabSel, setActiveTab } from '../redux/navigationReducer';
 import ProgressBar from './ProgressBar';
 import { Box, Stack, Typography } from '@mui/material';
+
 export default function TabPanel() {
   const auJson = useSelector(auJsonSel);
   const auLogo = useSelector(auLogoSel);
@@ -88,7 +89,6 @@ export default function TabPanel() {
   // Helper function to get status icon for accessibility
   const getSlideStatusIcon = (slideIndex: number) => {
     const status = getSlideStatus(slideIndex);
-    const isActive = slideIndex === activeTab;
 
     if (status.failed) {
       return (
@@ -117,21 +117,26 @@ export default function TabPanel() {
   };
 
   return (
-    <div
-      className="max-w-64 center bg-zinc-900 flex flex-col items-center"
-      style={{ maxWidth: '260px', width: '100%' }}
+    <Box
+      sx={{
+        maxWidth: '260px',
+        width: '100%',
+        bgcolor: 'grey.900',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
     >
-      <div className="z-50 pt-3">
-      
-        {/* {auLogo && (
+      <Box sx={{ zIndex: 50, pt: 3 }}>
+        {auLogo && (
           <img
             alt="logo"
-            width="200px" //without this img scales huge, TODO match
-            className="p-4 pb-0 filter"
+            width="200px"
+            style={{ padding: '16px', paddingBottom: 0 }}
             src={auLogo}
           />
-        )} */}
-      </div>
+        )}
+      </Box>
 
       <ProgressBar />
 
@@ -144,25 +149,24 @@ export default function TabPanel() {
         aria-label="Slides"
         sx={{
           width: '100%',
-          backgroundColor: 'zinc-800',
+          bgcolor: 'grey.800',
           color: 'white',
           '& .MuiTabs-indicator': {
             backgroundColor: getActiveTabIndicatorColor(),
             width: '4px',
           },
           '& .MuiTab-root': {
-            minHeight: '48px', // Ensure consistent height for all tabs
-            padding: '12px 16px', // Consistent padding
-            textTransform: 'none', // Prevent uppercase transformation
-            fontSize: '14px', // Consistent font size
-            fontWeight: 'normal', // Consistent font weight
-            lineHeight: '1.2', // Consistent line height
+            minHeight: '48px',
+            padding: '12px 16px',
+            textTransform: 'none',
+            fontSize: '14px',
+            fontWeight: 'normal',
+            lineHeight: '1.2',
           },
           '& .MuiTab-root.Mui-selected': {
-            fontWeight: 'bold', // Only make active tab bold
+            fontWeight: 'bold',
           },
         }}
-        className="w-full prose text-white"
         textColor="inherit"
       >
         {auJson?.slides?.map((slide, index) => (
@@ -171,13 +175,13 @@ export default function TabPanel() {
               width: '100%',
               backgroundColor: getSlideBackgroundColor(index),
               borderRight: getSlideRightBorder(index),
-              position: 'relative', // Enable positioning for icon
-              paddingRight: '4px', // Extra padding to make room for icon
-              minHeight: '48px', // Ensure consistent height
-              alignItems: 'center', // Center content vertically
-              justifyContent: 'center', // Center content horizontally
-              textAlign: 'center', // Center text
-              display: 'flex', // Use flexbox for consistent alignment
+              position: 'relative',
+              paddingRight: '4px',
+              minHeight: '48px',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              display: 'flex',
             }}
             key={index}
             label={
@@ -188,7 +192,7 @@ export default function TabPanel() {
                   width: '100%',
                   display: 'flex',
                   alignItems: 'center',
-                  minHeight: '24px', // Ensure consistent height for label container
+                  minHeight: '24px',
                 }}
               >
                 <Typography
@@ -205,6 +209,6 @@ export default function TabPanel() {
           />
         ))}
       </Tabs>
-    </div>
+    </Box>
   );
 }

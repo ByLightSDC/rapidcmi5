@@ -49,7 +49,7 @@ export const AudioDialog: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [fileOptions, setFileOptions] = useState<string[]>([]);
 
-  const { isFsLoaded, handleGetFolderStructure, handlePathExists } =
+  const { isFsLoaded, handleGetFolderStructure } =
     useContext(GitContext);
 
   // get the state from Gurx

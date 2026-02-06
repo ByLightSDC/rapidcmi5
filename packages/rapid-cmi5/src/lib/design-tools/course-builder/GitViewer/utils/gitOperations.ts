@@ -1,5 +1,5 @@
 import { FileStatus, getFileStatus, mapGitStatus } from './StatusMatrix';
-import { gitCache, GitFS } from './fileSystem';
+import { GitFS } from './fileSystem';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import * as git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
@@ -25,6 +25,11 @@ export class GitOperations {
 
   constructor(gitFs: GitFS) {
     this.gitFs = gitFs;
+  }
+
+  cache = {};
+  clearCache() {
+    this.cache = {};
   }
 
   listRepos = async (fileSystem: fsType): Promise<string[]> => {
@@ -92,8 +97,8 @@ export class GitOperations {
           depth: shallowClone ? 1 : undefined,
           singleBranch: true,
           onAuth: () => ({ username, password }),
+          cache: this.cache,
         });
-        await this.gitFs.copyGit(r);
       }
     } catch (err: any) {
       // If there was an error lets clean up anything that was created
@@ -114,7 +119,6 @@ export class GitOperations {
         await window.fsApi.gitInitRepo(dir, defaultBranch);
       } else {
         await git.init({ fs: this.gitFs.fs, dir, defaultBranch });
-        await this.gitFs.copyGit(r);
       }
     } catch (err: any) {
       debugLogError(
@@ -152,14 +156,6 @@ export class GitOperations {
         await git.addRemote({
           fs: this.gitFs.fs,
           dir,
-          gitdir: gitCache,
-          remote: 'origin',
-          url: remoteUrl,
-        });
-
-        await git.addRemote({
-          fs: this.gitFs.fs,
-          dir,
           remote: 'origin',
           url: remoteUrl,
         });
@@ -180,7 +176,7 @@ export class GitOperations {
         return await git.log({
           fs: this.gitFs.fs,
           dir,
-          gitdir: this.gitFs.isElectron ? undefined : gitCache,
+          cache: this.cache,
         });
       }
     } catch (error: any) {
@@ -203,6 +199,7 @@ export class GitOperations {
         dir,
         ref: branch,
         singleBranch: true,
+        cache: this.cache,
         onAuth: () => ({ username, password }),
       });
 
@@ -210,6 +207,7 @@ export class GitOperations {
         fs: this.gitFs.fs,
         ours: branch,
         dir,
+        cache: this.cache,
         theirs: '/remotes/origin/' + branch,
         abortOnConflict: false,
       });
@@ -241,6 +239,7 @@ export class GitOperations {
         author: { name: authorName, email: authorEmail },
         message: `Merge '${branch}' into origin ${branch}`,
         parent: [branch, '/remotes/origin/' + branch],
+        cache: this.cache,
       });
 
       await this.gitFs.deleteFile(r, failedMergePath);
@@ -266,13 +265,12 @@ export class GitOperations {
           fs: this.gitFs.fs,
           http,
           dir,
+
           ref: branch,
           singleBranch: true,
-          fastForward: false,
+          fastForward: true,
           onAuth: () => ({ username, password }),
         });
-
-        await this.gitFs.copyGit(r);
       }
     } catch (error: any) {
       if (
@@ -314,17 +312,14 @@ export class GitOperations {
       if (this.gitFs.isElectron) {
         status = await window.fsApi.getStatus(dir);
       } else {
-        // const files = await this.gitFs.fs.promises.readdir(dir);
-        // console.log(files)
         status = await git.statusMatrix({
           fs: this.gitFs.fs,
           dir,
           filepaths: changedFiles,
-          gitdir: gitCache,
-
           // This is super needed, please do not remove
           // The file system access api does not allow the . operator
           // when it is the base mounted directory
+          cache: this.cache,
           filter: (filepath) => filepath !== '.',
         });
       }
@@ -354,7 +349,9 @@ export class GitOperations {
         const raw = await git.walk({
           fs: this.gitFs.fs,
           dir,
-          gitdir: this.gitFs.isElectron ? undefined : gitCache,
+          cache: this.cache,
+
+          // gitdir: this.gitFs.isElectron ? undefined : gitCache,
           trees: [git.TREE({ ref: 'HEAD' }), git.TREE({ ref: 'refs/stash' })],
 
           map: async (filepath, [left, right]) => {
@@ -409,7 +406,7 @@ export class GitOperations {
           fs: this.gitFs.fs,
           dir,
           filepath,
-          gitdir: gitCache,
+          cache: this.cache,
         });
       }
 
@@ -433,43 +430,75 @@ export class GitOperations {
   ): Promise<ModifiedFile[]> => {
     const dir = getRepoPath(r);
 
-    for (const file of files) {
-      try {
-        if (file.status === 'deleted_unstaged') {
-          if (this.gitFs.isElectron) {
-            await window.fsApi.gitRemove(dir, file.name);
-          } else {
-            await git.remove({
-              fs: this.gitFs.fs,
-              dir,
-              gitdir: gitCache,
-              filepath: file.name,
-            });
+    const removeStatuses: FileStatus[] = [
+      'deleted_unstaged',
+      'added_then_deleted',
+    ];
+    const skipStatuses: FileStatus[] = [
+      'deleted_staged',
+      'deleted_unstaged',
+      'added_then_deleted',
+    ];
 
-            git.remove({ fs: this.gitFs.fs, dir, filepath: file.name });
-          }
-        } else if (file.status !== 'deleted_staged') {
-          if (this.gitFs.isElectron) {
-            await window.fsApi.gitAdd(dir, file.name);
-          } else {
-            await git.add({
-              fs: this.gitFs.fs,
-              dir,
-              filepath: file.name,
-              gitdir: gitCache,
-            });
+    const filesToRemove = files.filter((f) =>
+      removeStatuses.includes(f.status),
+    );
 
-            await git.add({
-              fs: this.gitFs.fs,
-              dir,
-              filepath: file.name,
-            });
-          }
+    const filesToAdd = files.filter((f) => !skipStatuses.includes(f.status));
+    
+    try {
+      if (this.gitFs.isElectron) {
+        // Electron path - process in parallel
+        await Promise.all([
+          ...filesToRemove.map((file) =>
+            window.fsApi
+              .gitRemove(dir, file.name)
+              .catch((error) =>
+                debugLogError(`Error removing ${file.name}, ${error}`),
+              ),
+          ),
+          ...filesToAdd.map((file) =>
+            window.fsApi
+              .gitAdd(dir, file.name)
+              .catch((error) =>
+                debugLogError(`Error staging ${file.name}, ${error}`),
+              ),
+          ),
+        ]);
+      } else {
+        // Browser path with shared cache
+        // Add all files at once (isomorphic-git supports array)
+        if (filesToAdd.length > 0) {
+          await git.add({
+            fs: this.gitFs.fs,
+            dir,
+            cache: this.cache,
+            filepath: filesToAdd.map((file) => file.name),
+          });
         }
-      } catch (error: any) {
-        debugLogError(`Error staging file ${file.name}, ${error}`);
+
+        // Remove files in parallel
+        if (filesToRemove.length > 0) {
+          await Promise.all(
+            filesToRemove.map((file) =>
+              git
+                .remove({
+                  fs: this.gitFs.fs,
+                  dir,
+                  cache: this.cache,
+                  filepath: file.name,
+                })
+                .catch((error) => {
+                  debugLogError(`Error removing ${file.name}, ${error}`);
+                }),
+            ),
+          );
+        }
       }
+    } catch (error: any) {
+      throw new Error(`Could not stage files: ${error.message}`);
     }
+
     return await this.gitRepoStatus(
       r,
       files.map((f) => f.name),
@@ -480,39 +509,45 @@ export class GitOperations {
     r: RepoAccessObject,
     files: ModifiedFile[],
   ): Promise<ModifiedFile[]> => {
+    if (!files || files.length === 0) return [];
+
     const dir = getRepoPath(r);
-    const cache = {};
-    for (const file of files) {
-      try {
-        if (this.gitFs.isElectron) {
-          await window.fsApi.gitResetIndex(dir, file.name);
-        } else {
-          await git.resetIndex({
-            fs: this.gitFs.fs,
-            gitdir: gitCache,
-            dir,
-            cache,
-            filepath: file.name,
-          });
 
-          await git.resetIndex({
-            fs: this.gitFs.fs,
-            dir,
-            filepath: file.name,
-          });
-        }
-
-        // const resolvedFile = await gitResolveFile(r, file.name);
-        // file.status = resolvedFile.status;
-      } catch (error: any) {
-        debugLogError(`Error removing staged file ${file.name}, ${error}`);
+    try {
+      if (this.gitFs.isElectron) {
+        // Electron: Process in parallel
+        await Promise.all(
+          files.map((file) =>
+            window.fsApi.gitResetIndex(dir, file.name).catch((error) => {
+              debugLogError(`Error unstaging ${file.name}, ${error}`);
+            }),
+          ),
+        );
+      } else {
+        // Browser: Use shared cache and parallel processing
+        await Promise.all(
+          files.map((file) =>
+            git
+              .resetIndex({
+                fs: this.gitFs.fs,
+                dir,
+                cache: this.cache,
+                filepath: file.name,
+              })
+              .catch((error) => {
+                debugLogError(`Error unstaging ${file.name}, ${error}`);
+              }),
+          ),
+        );
       }
-    }
 
-    return await this.gitRepoStatus(
-      r,
-      files.map((f) => f.name),
-    );
+      return await this.gitRepoStatus(
+        r,
+        files.map((f) => f.name),
+      );
+    } catch (error: any) {
+      throw new Error(`Could not unstage files: ${error.message}`);
+    }
   };
 
   setGitConfig = async (
@@ -526,22 +561,6 @@ export class GitOperations {
         await window.fsApi.setGitConfig(dir, 'user.name', req.authorName);
         await window.fsApi.setGitConfig(dir, 'user.email', req.authorEmail);
       } else {
-        await git.setConfig({
-          fs: this.gitFs.fs,
-          dir,
-          gitdir: gitCache,
-          path: 'user.name',
-          value: req.authorName,
-        });
-
-        await git.setConfig({
-          fs: this.gitFs.fs,
-          dir,
-          gitdir: gitCache,
-          path: 'user.email',
-          value: req.authorEmail,
-        });
-
         await git.setConfig({
           fs: this.gitFs.fs,
           dir,
@@ -607,8 +626,6 @@ export class GitOperations {
         dir,
         message: 'Stash changes',
       });
-
-      await this.gitFs.copyGit(r);
     }
   };
 
@@ -621,7 +638,6 @@ export class GitOperations {
       stash = await git.stash({
         fs: this.gitFs.fs,
         dir,
-        gitdir: this.gitFs.isElectron ? undefined : gitCache,
         op: 'list',
       });
     }
@@ -644,7 +660,7 @@ export class GitOperations {
         await window.fsApi.gitStash(dir, 'pop');
       } else {
         await git.stash({ fs: this.gitFs.fs, dir, op: 'pop' });
-        await this.gitFs.copyGit(r);
+        // await this.gitFs.copyGit(r);
       }
 
       return await this.gitRepoStatus(
@@ -659,7 +675,7 @@ export class GitOperations {
   gitStashDelete = async (r: RepoAccessObject): Promise<void> => {
     const dir = getRepoPath(r);
     await git.stash({ fs: this.gitFs.fs, dir, op: 'drop' });
-    await this.gitFs.copyGit(r);
+    // await this.gitFs.copyGit(r);
   };
 
   gitCommit = async (
@@ -678,14 +694,6 @@ export class GitOperations {
           committerEmail,
         );
       } else {
-        await git.commit({
-          fs: this.gitFs.fs,
-          dir,
-          gitdir: gitCache,
-          message,
-          author: { name: committerName, email: committerEmail },
-        });
-
         await git.commit({
           fs: this.gitFs.fs,
           dir,
@@ -716,6 +724,7 @@ export class GitOperations {
           dir,
           force,
           onAuth: () => ({ username, password }),
+          cache: this.cache,
         });
       }
     } catch (error: any) {
@@ -756,6 +765,7 @@ export class GitOperations {
         fs: this.gitFs.fs,
         dir,
         ref: branch,
+        cache: this.cache,
       });
     }
   };
@@ -804,7 +814,6 @@ export class GitOperations {
         remoteRef = await git.resolveRef({
           fs: this.gitFs.fs,
           dir,
-          gitdir: this.gitFs.isElectron ? undefined : gitCache,
           ref: `refs/remotes/origin/${branch}`,
         });
       }
@@ -816,8 +825,8 @@ export class GitOperations {
           .log({
             fs: this.gitFs.fs,
             dir,
-            gitdir: this.gitFs.isElectron ? undefined : gitCache,
             ref: branch,
+            cache: this.cache,
           })
           .then((log) => log.length);
       }
@@ -830,8 +839,8 @@ export class GitOperations {
       localCommits = await git.log({
         fs: this.gitFs.fs,
         dir,
-        gitdir: this.gitFs.isElectron ? undefined : gitCache,
         ref: 'HEAD',
+        cache: this.cache,
       });
     }
 
@@ -863,13 +872,8 @@ export class GitOperations {
           await git.add({
             fs: this.gitFs.fs,
             dir,
-            gitdir: gitCache,
             filepath,
-          });
-          await git.add({
-            fs: this.gitFs.fs,
-            dir,
-            filepath,
+            cache: this.cache,
           });
         }
       } else {
@@ -879,10 +883,9 @@ export class GitOperations {
           await git.remove({
             fs: this.gitFs.fs,
             dir,
-            gitdir: gitCache,
             filepath,
+            cache: this.cache,
           });
-          await git.remove({ fs: this.gitFs.fs, dir, filepath });
         }
       }
     } catch (error) {
@@ -900,15 +903,9 @@ export class GitOperations {
       } else {
         await git.resetIndex({
           fs: this.gitFs.fs,
-          gitdir: gitCache,
           dir,
           filepath,
-        });
-
-        await git.resetIndex({
-          fs: this.gitFs.fs,
-          dir,
-          filepath,
+          cache: this.cache,
         });
       }
     } catch (err: any) {
@@ -942,9 +939,8 @@ export class GitOperations {
           dir,
           ref: currentBranch,
           force: true,
+          cache: this.cache,
         });
-
-        await this.gitFs.copyGit(r);
       }
     } catch (error: any) {
       debugLogError(`Failed to reset branch to ${commitHash}`);
@@ -969,14 +965,118 @@ export class GitOperations {
         dir,
         oid: headOid,
         filepath,
+        cache: this.cache,
       });
 
       await this.gitFs.createFile(r, filepath, blob);
-      await git.add({ fs: this.gitFs.fs, dir, filepath });
-      await this.gitFs.copyGit(r);
+      await git.add({ fs: this.gitFs.fs, dir, filepath, cache: this.cache });
+    }
+  };
+  /**
+   * Gets the timestamp of the last commit in the current branch
+   * @returns timestamp in milliseconds, or 0 if no commits exist
+   */
+  gitGetLastCommitTime = async (r: RepoAccessObject): Promise<number> => {
+    const dir = getRepoPath(r);
+
+    try {
+      // Get the most recent commit
+      const log = await git.log({
+        fs: this.gitFs.fs,
+        dir,
+        cache: this.cache,
+        depth: 1, // Only get the last commit
+      });
+
+      if (log.length === 0) {
+        // No commits yet
+        return 0;
+      }
+
+      const lastCommit = log[0];
+
+      // Get committer timestamp (in seconds) and convert to milliseconds
+      const timestamp = lastCommit.commit.committer.timestamp * 1000;
+
+      return timestamp;
+    } catch (error: any) {
+      debugLogError(`Failed to get last commit time: ${error.message}`);
+      return 0;
     }
   };
 
+  private async walkTree(
+    dir: string,
+    treeOid: string,
+    prefix = '',
+  ): Promise<string[]> {
+    const files: string[] = [];
+
+    const { tree } = await git.readTree({
+      fs: this.gitFs.fs,
+      dir,
+      oid: treeOid,
+    });
+
+    for (const entry of tree) {
+      const fullPath = prefix ? `${prefix}/${entry.path}` : entry.path;
+
+      if (entry.type === 'blob') {
+        files.push(fullPath);
+      } else if (entry.type === 'tree') {
+        const subfiles = await this.walkTree(dir, entry.oid, fullPath);
+        files.push(...subfiles);
+      }
+    }
+
+    return files;
+  }
+  gitGetUntrackedAndDeletedFiles = async (
+    r: RepoAccessObject,
+    allFiles: string[],
+  ): Promise<{
+    untracked: string[];
+    deleted: string[];
+    needsUnstage: string[];
+  }> => {
+    const dir = getRepoPath(r);
+
+    try {
+      // Get all files that are tracked in the current commit
+      const headOid = await git.resolveRef({
+        fs: this.gitFs.fs,
+        dir,
+        ref: 'HEAD',
+      });
+
+      // Read commit object
+      const { commit } = await git.readCommit({
+        fs: this.gitFs.fs,
+        dir,
+        oid: headOid,
+      });
+
+      // Walk the tree to get all files
+      const commitFiles = await this.walkTree(dir, commit.tree);
+      const workingSet = new Set(allFiles);
+
+      const deleted = commitFiles.filter((file) => !workingSet.has(file));
+
+      const trackedFiles = await git.listFiles({
+        fs: this.gitFs.fs,
+        dir,
+      });
+      const trackedSet = new Set(trackedFiles);
+
+      const untracked = allFiles.filter((file) => !trackedSet.has(file));
+      const needsUnstage = trackedFiles.filter((file) => !workingSet.has(file));
+
+      return { untracked, deleted, needsUnstage };
+    } catch (error: any) {
+      debugLogError(`Failed to get untracked/deleted files: ${error.message}`);
+      return { untracked: [], deleted: [], needsUnstage: [] };
+    }
+  };
   handleGetFileDiff = async (r: RepoAccessObject, filepath: string) => {
     const dir = getRepoPath(r);
 
@@ -993,6 +1093,7 @@ export class GitOperations {
         dir,
         oid: headOid,
         filepath,
+        cache: this.cache,
       });
 
       const oldFile = new TextDecoder('utf-8').decode(blob);

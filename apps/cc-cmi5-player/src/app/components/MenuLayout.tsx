@@ -22,11 +22,9 @@ import { cmi5Instance } from '../session/cmi5';
 
 import { classChangeModalId } from './CourseModals';
 import RC5Player from './player/RC5Player';
-import { AuManagerContext } from '../session/AuManager';
 
 import ScenarioWrapper from './scenario/ScenarioWrapper';
 import {
-  TeamConsolesContext,
   TeamScenarioContextProvider,
 } from './team-consoles/TeamScenarioContext';
 import { useCMI5Session } from '../hooks/useCMI5Session';
@@ -129,11 +127,7 @@ export default function MenuLayout() {
             style={{
               height: '100%',
               width: '100%',
-              overflowX: 'visible',
-              overflowY: 'auto',
-              paddingTop: '32px',
-              paddingBottom: '24px',
-              boxSizing: 'border-box',
+              overflow: 'auto',
             }}
           >
             <Stack

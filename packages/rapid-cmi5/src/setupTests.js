@@ -15,13 +15,9 @@ global.structuredClone = (val) => JSON.parse(JSON.stringify(val));
 /** jest hates isomorpphic git */
 
 /** Jest does not like using router navigate in a custom hook */
-jest.mock(
-  '../../../packages/ui/src/lib/hooks/useNavigateAlias',
-  () => ({
-    useNavigateAlias: () => jest.fn(),
-  }),
-);
-
+jest.mock('../../../packages/ui/src/lib/hooks/useNavigateAlias', () => ({
+  useNavigateAlias: () => jest.fn(),
+}));
 
 /** Local Date Display Snapshots Break  */
 const mockDateFormatter = () => {
@@ -35,19 +31,12 @@ const mockDateFormatter = () => {
 const mockIsVisible = () => {
   return true;
 };
-jest.mock(
-  `../../../packages/ui/src/lib/hooks/useVisibility`,
-  () => ({
-    useIsVisible: mockIsVisible,
-  }),
-);
-jest.mock(
-  `../../../packages/ui/src/lib/hooks/useDisplayDateFormatter`,
-  () => ({
-    useDisplayDateFormatter: mockDateFormatter,
-  }),
-);
-
+jest.mock(`../../../packages/ui/src/lib/hooks/useVisibility`, () => ({
+  useIsVisible: mockIsVisible,
+}));
+jest.mock(`../../../packages/ui/src/lib/hooks/useDisplayDateFormatter`, () => ({
+  useDisplayDateFormatter: mockDateFormatter,
+}));
 
 /** Mock Intersection Observer */
 class IntersectionObserver {
@@ -72,119 +61,6 @@ Object.defineProperty(global, 'IntersectionObserver', {
 Jest can't handle ES6 modules without turning on experimental feature
 Mocking the module is easier if you don't need to test it with jest
 */
-
-jest.mock('d3-transition', () => ({
-  __esModule: true,
-  default: 'd3-selection',
-  namedExport: jest.fn(),
-  containsCidr: () => true,
-}));
-
-jest.mock('d3-transition', () => ({
-  __esModule: true,
-  default: 'd3-transition',
-  namedExport: jest.fn(),
-  containsCidr: () => true,
-}));
-
-jest.mock('d3-geo', () => ({
-  __esModule: true,
-  default: 'd3-geo',
-  namedExport: jest.fn(),
-  containsCidr: () => true,
-}));
-
-jest.mock('cidr-tools', () => ({
-  __esModule: true,
-  default: 'cidr-tools',
-  namedExport: jest.fn(),
-  containsCidr: () => true,
-}));
-
-jest.mock('ip-bigint', () => ({
-  __esModule: true,
-  default: 'ip-bigint',
-  namedExport: jest.fn(),
-  stringifyIp: () => '10.10.10.10',
-}));
-
-jest.mock('ol/Map', () => ({
-  __esModule: true,
-  default: 'ol/Map',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('ol/source/OSM', () => ({
-  __esModule: true,
-  default: 'ol/source/OSM',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('ol/View', () => ({
-  __esModule: true,
-  default: 'ol/View',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('ol/layer/Tile', () => ({
-  __esModule: true,
-  default: 'ol/layer/Tile',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('ol/proj', () => ({
-  __esModule: true,
-  default: 'ol/proj',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('ol/Feature', () => ({
-  __esModule: true,
-  default: 'ol/Feature',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('ol/geom/Point', () => ({
-  __esModule: true,
-  default: 'ol/geom/Point',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('ol/layer/Vector', () => ({
-  __esModule: true,
-  default: 'ol/layer/Vector',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('ol/source/Vector', () => ({
-  __esModule: true,
-  default: 'ol/source/Vector',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('ol/style/Circle', () => ({
-  __esModule: true,
-  default: 'ol/style/Circle',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('ol/style/Fill', () => ({
-  __esModule: true,
-  default: 'ol/style/Fill',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('ol/style/Icon', () => ({
-  __esModule: true,
-  default: 'ol/style/Icon',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('ol/style/Style', () => ({
-  __esModule: true,
-  default: 'ol/style/Style',
-  namedExport: jest.fn(),
-}));
 
 jest.mock('github-slugger', () => ({
   __esModule: true,
@@ -223,6 +99,15 @@ jest.mock('monaco-editor', () => ({
   },
 }));
 
+jest.mock('react-syntax-highlighter', () => ({
+  __esModule: true,
+  Prism: {},
+}));
+
+jest.mock('hastscript', () => ({
+  __esModule: true,
+}));
+
 /**
  * MDX stuff
  */
@@ -259,14 +144,12 @@ Object.defineProperty(global.navigator, 'storage', {
 
 // zen fs does not work in the browser, we will instead use lightning fs instead
 jest.mock('@zenfs/core', () => {
-
   return {
     __esModule: true,
     configure: jest.fn().mockResolvedValue(undefined),
   };
 });
 jest.mock('@zenfs/dom', () => ({
-  
   __esModule: true,
   IndexedDB: {
     create: jest.fn(),
@@ -303,6 +186,7 @@ jest.mock('mdast-util-gfm-task-list-item', () => ({
 jest.mock('mdast-util-gfm-table', () => ({
   __esModule: true,
   gfmTable: jest.fn(),
+  gfmTableToMarkdown: jest.fn(),
 }));
 
 jest.mock('micromark-extension-gfm-task-list-item', () => ({
@@ -323,6 +207,16 @@ jest.mock('micromark-extension-mdx-md', () => ({
 jest.mock('micromark-extension-gfm-table', () => ({
   __esModule: true,
   gfmTable: jest.fn(),
+}));
+
+jest.mock('mdast-util-to-hast', () => ({
+  __esModule: true,
+  toHast: jest.fn(),
+}));
+
+jest.mock('hast-util-to-html', () => ({
+  __esModule: true,
+  toHtml: jest.fn(),
 }));
 
 jest.mock('mdast-util-to-markdown', () => ({
@@ -373,14 +267,11 @@ jest.mock('@mdxeditor/gurx', () => ({
   namedExport: jest.fn(),
 }));
 
-jest.mock(
-  '../../../packages/ui/src/lib/cmi5/mdx/state/vars',
-  () => ({
-    editorInPlayback$: false,
-    setProgress$: () => jest.fn(),
-    submitScore$: () => jest.fn(),
-  }),
-);
+jest.mock('../../../packages/ui/src/lib/cmi5/mdx/state/vars', () => ({
+  editorInPlayback$: false,
+  setProgress$: () => jest.fn(),
+  submitScore$: () => jest.fn(),
+}));
 
 jest.mock('micromark-extension-math', () => ({
   __esModule: true,

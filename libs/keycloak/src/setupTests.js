@@ -12,49 +12,6 @@ Element.prototype.scrollIntoView = jest.fn();
 Jest can't handle ES6 modules without turning on experimental feature
 Mocking the module is easier if you don't need to test it with jest
 */
-jest.mock('cidr-tools', () => ({
-  __esModule: true,
-  default: 'cidr-tools',
-  namedExport: jest.fn(),
-  containsCidr: () => true,
-}));
-
-jest.mock('ip-bigint', () => ({
-  __esModule: true,
-  default: 'ip-bigint',
-  namedExport: jest.fn(),
-  stringifyIp: () => '10.10.10.10',
-}));
-
-jest.mock('d3-timer', () => ({
-  __esModule: true,
-  default: 'd3-timer',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('d3-ease', () => ({
-  __esModule: true,
-  default: 'd3-timer',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('d3-transition', () => ({
-  __esModule: true,
-  default: 'd3-selection',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('d3-transition', () => ({
-  __esModule: true,
-  default: 'd3-transition',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('d3-geo', () => ({
-  __esModule: true,
-  default: 'd3-geo',
-  namedExport: jest.fn(),
-}));
 
 jest.mock('github-slugger', () => ({
   __esModule: true,
@@ -208,14 +165,11 @@ jest.mock('@mdxeditor/gurx', () => ({
   namedExport: jest.fn(),
 }));
 
-jest.mock(
-  '../../../../../packages/ui/src/lib/cmi5/mdx/state/vars',
-  () => ({
-    editorInPlayback$: false,
-    setProgress$: () => jest.fn(),
-    submitScore$: () => jest.fn(),
-  }),
-);
+jest.mock('../../../../../packages/ui/src/lib/cmi5/mdx/state/vars', () => ({
+  editorInPlayback$: false,
+  setProgress$: () => jest.fn(),
+  submitScore$: () => jest.fn(),
+}));
 
 const mockKeycloak = jest.fn(() => ({
   init: jest.fn().mockResolvedValue(true), // Mock the init() method to resolve with true

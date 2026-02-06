@@ -14,7 +14,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { createCourseModalId } from '../../rapidcmi5_mdx/modals/constants';
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
-import { Alert, Button, IconButton, Tooltip } from '@mui/material';
+import { Alert, Box, Button, IconButton, Tooltip } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import { useForm, UseFormReturn } from 'react-hook-form';
@@ -155,16 +155,24 @@ export function CreateCourseForm({
           />
         </Grid>
         <Grid size={6}>
-          <FormControlTextField
-            control={control}
-            error={Boolean(errors?.courseId)}
-            helperText={errors?.courseId?.message}
-            name="courseId"
-            required
-            label="Course Id"
-          />
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+            <Box sx={{ flex: 1 }}>
+              <FormControlTextField
+                control={control}
+                error={Boolean(errors?.courseId)}
+                helperText={errors?.courseId?.message}
+                name="courseId"
+                required
+                label="Course ID"
+              />
+            </Box>
+            <Tooltip title="This course id is used for tracking LRS statements made by a student to this specific course. It is also used to deploy scenarios associated with this course. Please ensure this course id is unique.">
+              <IconButton size="small" sx={{ mt: 1 }}>
+                <InfoOutlinedIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Grid>
-        <Grid size={6} />
         <Grid size={12}>
           <FormControlTextField
             control={control}

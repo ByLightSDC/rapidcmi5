@@ -32,11 +32,19 @@ import { useState } from 'react';
  * @property {HTMLElement | null} anchorEl Display Element to anchor the User Info to (hidden when null)
  * @property {() => void} onClose Function to call to close the User Info menu
  */
-type propTypes = { anchorEl: HTMLElement | null; onClose: () => void };
+type propTypes = {
+  anchorEl: HTMLElement | null;
+  onClose: () => void;
+  authEnabled: boolean;
+};
 
 const clearStoragePromptModalId = 'reset-persistence';
 
-export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
+export default function UserInfoBox({
+  anchorEl,
+  onClose,
+  authEnabled,
+}: propTypes) {
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
   const appThemeColor = useSelector(themeColor);
@@ -44,7 +52,6 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
   const modalObj = useSelector(modal);
 
   //#region About
-  const [isAboutDisabled, setAboutDisabled] = useState(false);
   const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
 
   const handleAboutDialogClose = () => {
@@ -168,18 +175,20 @@ export default function UserInfoBox({ anchorEl, onClose }: propTypes) {
             }}
           />
         </MenuItem>
-        <MenuItem onClick={handleLogout}>
-          <ListItemIcon>
-            <ExitToAppIcon />
-          </ListItemIcon>
-          <ListItemText
-            primary="Logout"
-            primaryTypographyProps={{
-              color: 'secondary.contrastText',
-              variant: 'body2',
-            }}
-          />
-        </MenuItem>
+        {authEnabled && (
+          <MenuItem onClick={handleLogout}>
+            <ListItemIcon>
+              <ExitToAppIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Logout"
+              primaryTypographyProps={{
+                color: 'secondary.contrastText',
+                variant: 'body2',
+              }}
+            />
+          </MenuItem>
+        )}
       </Menu>
     </section>
   );

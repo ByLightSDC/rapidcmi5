@@ -45,12 +45,11 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
-import { getRepoPath } from '../../../course-builder/GitViewer/utils/fileSystem';
 import { currentRepoAccessObjectSel } from '../../../../redux/repoManagerReducer';
 import { slugifyPath } from '../../../course-builder/GitViewer/utils/useCourseOperationsUtils';
 import { ButtonMinorUi, useToaster } from '@rapid-cmi5/ui';
-import { Divider, Typography } from '@mui/material';
-import { Box, maxWidth, Stack } from '@mui/system';
+import { Divider } from '@mui/material';
+import { Box, minWidth } from '@mui/system';
 
 const textColor = 'text.hint';
 
@@ -524,13 +523,10 @@ function LessonTree({
                   startIcon={<AddIcon />}
                   sxProps={{
                     width: '100%',
-                    height: 36,
-                    minHeight: 36,
-                    justifyContent: 'flex-start',
-                    px: 1.5,
-                    borderRadius: 1,
-                    fontWeight: 500,
-                    fontSize: '0.875rem',
+                    justifyContent: 'center',
+                    px: 1,
+                    fontWeight: 700,
+                    minWidth: 200,
                   }}
                   onClick={onCreateLesson}
                   data-testid="create-lesson-button"

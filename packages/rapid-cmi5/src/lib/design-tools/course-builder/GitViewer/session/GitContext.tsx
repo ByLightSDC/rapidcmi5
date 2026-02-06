@@ -82,7 +82,9 @@ import {
 import {
   GetScenarioFormProps,
   RapidCmi5Opts,
+  UserAuth,
 } from '../../../rapidcmi5_mdx/main';
+import { boolean } from 'yup';
 
 interface IGitContext {
   currentCourse?: Course | null;
@@ -102,6 +104,7 @@ interface IGitContext {
   currentGitConfig: GitConfigType;
   isElectron: boolean;
   GetScenariosForm?: React.ComponentType<GetScenarioFormProps>;
+  currentAuth?: UserAuth;
   handleChangeRepo: (name: string) => void;
   handleChangeFileSystem: (fsType: fsType) => void;
   handleChangeRepoName: (name: string) => void;
@@ -194,6 +197,7 @@ interface IGitContext {
   getLocalFolders: () => Promise<DirMeta[]>;
   openLocalRepo: (id?: string) => Promise<void>;
   getDirHandle: () => Promise<FileSystemDirectoryHandle | null>;
+  gettingRepoStatus: boolean;
 }
 
 interface tProviderProps {
@@ -224,6 +228,7 @@ const defaultGitContext: IGitContext = {
   currentGitConfig: {} as GitConfigType,
   gitRepoCommits: [],
   GetScenariosForm: undefined,
+  currentAuth: undefined,
   handlePathExists: async () => false,
   handleBlobImageFile: async (r, filePath, fileType) => null,
   handleGetFolderStructure: async () => [],
@@ -310,6 +315,7 @@ const defaultGitContext: IGitContext = {
   openSandbox: async (): Promise<void> => {},
   openLocalRepo: async (): Promise<void> => {},
   getDirHandle: async (): Promise<FileSystemDirectoryHandle | null> => null,
+  gettingRepoStatus: false,
 };
 
 export const GitContext = createContext<IGitContext>(defaultGitContext);
@@ -347,7 +353,7 @@ export const GitContextProvider = (props: tProviderProps) => {
 
   const GetScenariosForm = rapidCmi5Opts.GetScenariosForm;
 
-  const currentAuth = { parsedUserToken: { email: 'test', name: 'test' } };
+  const currentAuth: UserAuth | undefined = rapidCmi5Opts.userAuth;
 
   const availableCourses = fileState?.availableCourses ?? [];
   const currentCourse = fileState.selectedCourse;
@@ -371,8 +377,9 @@ export const GitContextProvider = (props: tProviderProps) => {
     usePublishActions(
       gitFs,
       repoAccessObject,
-      rapidCmi5Opts.authToken,
-      rapidCmi5Opts.buildCmi5Zip,
+      rapidCmi5Opts.userAuth?.token,
+      rapidCmi5Opts.downloadCmi5Player,
+      rapidCmi5Opts.processAu,
     );
 
   const { getLocalFileBlob, getLocalFileBlobUrl } = useImageCache(
@@ -403,6 +410,7 @@ export const GitContextProvider = (props: tProviderProps) => {
     resolveFile,
     setCanCommit,
     resolveDir,
+    gettingRepoStatus,
   } = useGitRepoStatus(repoAccessObject, isGitLoaded, gitFs);
 
   const courseOperationsSet = useSelector(courseOperations);
@@ -444,6 +452,7 @@ export const GitContextProvider = (props: tProviderProps) => {
     getFileDiff,
     handleRenameCurrentRepo,
     resolveGitConfig,
+    isPerformingOperation,
   } = useGitOperations(gitFs, repoAccessObject);
 
   const handleNavToDesigner = async () => {
@@ -464,6 +473,7 @@ export const GitContextProvider = (props: tProviderProps) => {
       if (firstCourse) {
         await loadCourse(firstCourse.basePath, r);
         const courseData = await getCourseData(r, firstCourse.basePath);
+
         if (courseData) {
           courseDataToUse = courseData;
         }
@@ -507,7 +517,7 @@ export const GitContextProvider = (props: tProviderProps) => {
         : await gitOperator.gitRepoStatus(r, changedFiles);
 
       const afterStage = await stageFiles(filesForStaging);
-      await resolveGitRepoStatus(r, afterStage);
+      await resolveGitRepoStatus(r);
       setCanCommit(true);
     },
     [modifiedFiles, resolveGitRepoStatus, stageFiles],
@@ -517,7 +527,7 @@ export const GitContextProvider = (props: tProviderProps) => {
     const r = getRepoAccess(repoAccessObject);
 
     const chagnedFiles = await unstageFiles(modifiedFiles);
-    await resolveGitRepoStatus(r, chagnedFiles);
+    await resolveGitRepoStatus(r);
     setCanCommit(false);
   };
 
@@ -752,17 +762,17 @@ export const GitContextProvider = (props: tProviderProps) => {
     newCourseName: string,
     courseData: CourseData,
   ) => {
+    if (!currentCourse) throw Error('No course is currently selected.');
     const r = getRepoAccess(repoAccessObject);
+    const cleanedCourseNewName = slugifyPath(newCourseName);
     await renameCourse(r, newCourseName, courseData);
-    await resolveGitRepoStatus(r);
+    await handleStageAll(false, [cleanedCourseNewName, currentCourse.basePath]);
   };
 
   const handleChangeRepoName = async (name: string) => {
     const cleanedName = slugifyPath(name);
     const r: RepoAccessObject = { fileSystemType, repoName: cleanedName };
     await handleRenameCurrentRepo(r);
-
-    // resolveGitRepos(r);
   };
   const handlePull = async (req: PullType) => {
     const r = getRepoAccess(repoAccessObject);
@@ -779,7 +789,7 @@ export const GitContextProvider = (props: tProviderProps) => {
     } catch (error: any) {
       throw error;
     } finally {
-      await resolveGitRepoStatus(r, undefined, true);
+      await resolveGitRepoStatus(r);
       await resolvePushStatus(r);
     }
   };
@@ -941,7 +951,6 @@ export const GitContextProvider = (props: tProviderProps) => {
 
   const handleCommit = async (req: CreateCommitType) => {
     const r = getRepoAccess(repoAccessObject);
-
     await commit(req);
     await resolveGitRepoStatus(r);
     await resolvePushStatus(r);
@@ -959,7 +968,7 @@ export const GitContextProvider = (props: tProviderProps) => {
     const r = getRepoAccess(repoAccessObject);
 
     const changedFiles = await stashPopChanges();
-    await resolveGitRepoStatus(r, changedFiles);
+    await resolveGitRepoStatus(r);
     dispatch(recalculateFileTree(r));
   };
 
@@ -991,7 +1000,7 @@ export const GitContextProvider = (props: tProviderProps) => {
     try {
       const r = getRepoAccess(repoAccessObject);
       const repoPath = getRepoPath(r);
-      return await gitFs.getFolderStructure(dir, repoPath, getContents, zip);
+      return await gitFs.getFolderStructure(dir, '', getContents, zip);
     } catch {
       return [];
     }
@@ -1016,7 +1025,7 @@ export const GitContextProvider = (props: tProviderProps) => {
       baseSlideContent: sandboxIntro,
     });
 
-    await gitFs.copyGit(r);
+    // await gitFs.copyGit(r);
     const modifiedFiles: ModifiedFile[] = await gitOperator.gitRepoStatus(r);
 
     await gitOperator.gitAddAllModified(r, modifiedFiles);
@@ -1037,18 +1046,15 @@ export const GitContextProvider = (props: tProviderProps) => {
   ) => {
     // Set the initial config for a user so they can make git operations in the sandbox such as stash
     const defaultConfig: GitConfigType = {
-      authorEmail:
-        currentGitConfig.authorEmail ||
-        currentAuth?.parsedUserToken?.email?.toLowerCase(),
-      authorName:
-        currentGitConfig.authorName || currentAuth?.parsedUserToken?.name,
+      authorEmail: currentGitConfig.authorEmail,
+      authorName: currentGitConfig.authorName,
       remoteRepoUrl: '',
     };
     await setConfig(r, config || defaultConfig);
 
-    if (!gitFs.isElectron) {
-      await gitFs.writeModifiedFiles(r, []);
-    }
+    // if (!gitFs.isElectron) {
+    //   await gitFs.writeModifiedFiles(r, []);
+    // }
 
     dispatch(addRepo(r.repoName));
     dispatch(setCurrentRepo(r.repoName));
@@ -1122,18 +1128,6 @@ export const GitContextProvider = (props: tProviderProps) => {
 
     dispatch(recalculateFileTree(r));
 
-    // prevent a double copy at the same time due to use effect
-    if (!isCopyingGit.current) {
-      try {
-        isCopyingGit.current = true;
-        await gitFs.copyGit(r);
-      } finally {
-        isCopyingGit.current = false;
-      }
-    } else {
-      return;
-    }
-
     await handleAutoSelectCourse(r);
 
     const branch = await gitOperator.getCurrentGitBranch(r);
@@ -1159,7 +1153,9 @@ export const GitContextProvider = (props: tProviderProps) => {
   return (
     <GitContext.Provider
       value={{
+        gettingRepoStatus: gettingRepoStatus || isPerformingOperation,
         GetScenariosForm,
+        currentAuth,
         isElectron,
         isFsLoaded,
         isGitLoaded,
