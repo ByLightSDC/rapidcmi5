@@ -358,7 +358,7 @@ export const NavViewMenu = ({
             }}
             sx={{ backgroundColor: 'inherit' }}
           >
-            <Tooltip arrow placement="right" title="Repo Selection">
+            <Tooltip arrow placement="right" title="Project Selection">
               {viewMode === ViewModeEnum.RepoSelector ? (
                 <div
                   style={{

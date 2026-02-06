@@ -173,12 +173,12 @@ export function CreateLocalRepoForm({
         <MiniForm
           dataCache={defaultData}
           doAction={handleCreateLocalRepo}
-          formTitle="Create Local Repository"
+          formTitle="Create Project"
           getFormFields={getFormFields}
-          instructions="Fill out the form to create a new local repository"
+          instructions="Fill out the form to create a new project"
           submitButtonText="Create"
-          failToasterMessage="Repository Creation Failed"
-          successToasterMessage="Repository Created Successfully"
+          failToasterMessage="Project Creation Failed"
+          successToasterMessage="Project Created Successfully"
           onClose={onClose}
           onCancel={onCancel}
           onResponse={onResponse}

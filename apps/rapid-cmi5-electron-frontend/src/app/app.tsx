@@ -26,10 +26,7 @@ import { ThemeProvider } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
-import {
-  GetScenarioFormProps,
-  RapidCmi5,
-} from '@rapid-cmi5/react-editor';
+import { GetScenarioFormProps, RapidCmi5 } from '@rapid-cmi5/react-editor';
 import { MyScenariosForm } from './ScenarioSelection';
 import { auth, authToken, isAuthenticated } from '@rapid-cmi5/keycloak';
 import { darkTheme } from './styles/muiThemeDark';
@@ -227,7 +224,7 @@ export default function App({ authEnabled }: { authEnabled: boolean }) {
               >
                 <SizingContextProvider>
                   <TimePickerProvider>
-                    <AppHeader />
+                    <AppHeader authEnabled={authEnabled} />
 
                     <main
                       id="app-routes"
