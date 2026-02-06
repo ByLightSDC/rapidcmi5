@@ -291,11 +291,10 @@ export default function RecentProjectSelection({
         {filteredProjects.some((project) => project.isValid === false) && (
           <Alert severity="warning" sx={{ lineHeight: 1, mt: 2 }}>
             <AlertTitle sx={{ lineHeight: 1, fontWeight: 'bold' }}>
-              Browser Access Required
+              Browser Requires Permission to Access Desktop Files
             </AlertTitle>
             <Stack direction="column">
-              In order to access local projects, you must click allow access
-              when the browser prompts you.
+              You must click allow access when the browser prompts you.
             </Stack>
           </Alert>
         )}
