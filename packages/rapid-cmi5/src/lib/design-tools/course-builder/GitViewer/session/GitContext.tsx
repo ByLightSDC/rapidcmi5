@@ -473,6 +473,7 @@ export const GitContextProvider = (props: tProviderProps) => {
       if (firstCourse) {
         await loadCourse(firstCourse.basePath, r);
         const courseData = await getCourseData(r, firstCourse.basePath);
+
         if (courseData) {
           courseDataToUse = courseData;
         }
@@ -950,11 +951,8 @@ export const GitContextProvider = (props: tProviderProps) => {
 
   const handleCommit = async (req: CreateCommitType) => {
     const r = getRepoAccess(repoAccessObject);
-    let start = performance.now();
     await commit(req);
-    start = performance.now();
     await resolveGitRepoStatus(r);
-
     await resolvePushStatus(r);
   };
 
@@ -1142,10 +1140,8 @@ export const GitContextProvider = (props: tProviderProps) => {
     if (allBranches) {
       dispatch(setAllBranches(allBranches));
     }
-    const start = performance.now();
     await resolveGitRepoStatus(r);
 
-    console.log('resolve time ', performance.now() - start);
     setIsGitLoaded(true);
 
     await resolveRemoteRepoStatus(r);

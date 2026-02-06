@@ -201,8 +201,8 @@ export default function RecentProjectSelection({
                           px: 1,
                           py: 0.25,
                           borderRadius: 1,
-                          background: alpha(palette.warning.main, 0.1),
-                          border: `1px solid ${alpha(palette.warning.main, 0.3)}`,
+                          background: alpha(palette.warning.light, 0.1),
+                          border: `1px solid ${alpha(palette.warning.main, 0.5)}`,
                         }}
                       >
                         <Typography
@@ -210,7 +210,7 @@ export default function RecentProjectSelection({
                           sx={{
                             fontFamily: '"Space Mono", monospace',
                             fontSize: '0.7rem',
-                            color: palette.warning.light,
+                            color: palette.warning.main,
                           }}
                         >
                           ⚠ Needs permission

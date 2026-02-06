@@ -29,7 +29,6 @@ import {
 /* Icons */
 import AddIcon from '@mui/icons-material/Add';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SettingsIcon from '@mui/icons-material/Settings';
 
@@ -59,11 +58,11 @@ const repoActions = [
   //   icon: <EditIcon color="inherit" />,
   // },
   {
-    tooltip: 'Delete Local Repository',
+    tooltip: 'Delete Project',
     icon: <DeleteForeverIcon color="inherit" />,
   },
   {
-    tooltip: 'Config Settings',
+    tooltip: 'Configure Git',
     icon: <SettingsIcon color="inherit" />,
   },
 ];
@@ -247,7 +246,7 @@ export const GitDrawer = () => {
         </Stack>
       </Stack>
 
-      {!isRepoConnectedToRemote && (
+      {/* {!isRepoConnectedToRemote && (
         <Alert severity="warning" sx={{ lineHeight: 1, padding: 1 }}>
           <AlertTitle sx={{ lineHeight: 1, fontWeight: 'bold' }}>
             No Repository Connected
@@ -265,23 +264,21 @@ export const GitDrawer = () => {
             </ButtonMinorUi>
           </Stack>
         </Alert>
-      )}
+      )} */}
 
-      {isRepoConnectedToRemote && (
-        <Stack direction="column">
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{
-              marginTop: '4px',
-            }}
-          >
-            {gitIcon}
-            <Typography>Branch</Typography>
-          </Stack>
-          <Typography>{currentBranch}</Typography>
+      <Stack direction="column">
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            marginTop: '4px',
+          }}
+        >
+          {gitIcon}
+          <Typography>Branch</Typography>
         </Stack>
-      )}
+        <Typography>{currentBranch}</Typography>
+      </Stack>
       <Tabs
         orientation="vertical"
         sx={{ marginTop: '12px' }}

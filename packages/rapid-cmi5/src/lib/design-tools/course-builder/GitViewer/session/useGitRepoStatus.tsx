@@ -188,10 +188,6 @@ export function useGitRepoStatus(
           status = [...status, ...untrackedStatus];
         }
 
-        // if (!fsInstance.isElectron) {
-        //   await fsInstance.writeModifiedFiles(r, status);
-        // }
-
         setModifiedFiles((prev) => {
           const isSame = JSON.stringify(prev) === JSON.stringify(status);
           return isSame ? prev : status;
@@ -286,16 +282,6 @@ export function useGitRepoStatus(
     let hasStaged = false;
     let hasUnstaged = false;
     let numOfStaged = 0;
-
-    // ensure that the modified file cache is not in this list, otherwise remove it
-    // for (const file of modifiedFiles) {
-    //   if (file.name.endsWith(modifiedFileCache)) {
-    //     setModifiedFiles((prev) =>
-    //       prev.filter((f) => f.name.endsWith(modifiedFileCache)),
-    //     );
-    //     return;
-    //   }
-    // }
 
     for (let file of modifiedFiles) {
       if (stagedStatuses.includes(file.status)) {

@@ -125,9 +125,9 @@ export function SaveCourseForm({
         console.time('saveCourseFile');
 
         let successMessage = 'Files Saved Locally';
-        if (superSaveData.shouldAutoCommit && superSaveData.shouldAutoPush) {
+        if (isRepoConnectedToRemote && superSaveData.shouldAutoCommit && superSaveData.shouldAutoPush) {
           successMessage = 'Files Saved & Pushed to Remote';
-        } else if (superSaveData.shouldAutoPush) {
+        } else if (isRepoConnectedToRemote && superSaveData.shouldAutoPush) {
           successMessage = 'Files Saved & Pushed to Remote';
         } else if (superSaveData.shouldAutoCommit) {
           successMessage = 'Files Saved & Committed Locally';
@@ -196,6 +196,7 @@ export function SaveCourseForm({
       modalId,
       saveCourseFile,
       sendMessage,
+      isRepoConnectedToRemote
     ],
   );
 
@@ -225,7 +226,7 @@ export function SaveCourseForm({
     const shouldPush = watch('shouldAutoPush');
     return (
       <>
-        {!isRepoConnectedToRemote && (
+        {/* {!isRepoConnectedToRemote && (
           <>
             <Grid size={12}>
               <Typography sx={{ whiteSpace: 'preWrap', paddingBottom: '8px' }}>
@@ -249,7 +250,7 @@ export function SaveCourseForm({
               </Alert>
             </Grid>
           </>
-        )}
+        )} */}
 
         <>
           <Grid size={12}>

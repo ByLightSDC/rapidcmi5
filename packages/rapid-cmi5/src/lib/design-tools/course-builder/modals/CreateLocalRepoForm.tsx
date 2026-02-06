@@ -100,18 +100,6 @@ export function CreateLocalRepoForm({
 
     return (
       <>
-        <Grid size={12}>
-          <FormControlTextField
-            control={control}
-            error={Boolean(errors?.repoRemoteUrl)}
-            helperText={errors?.repoRemoteUrl?.message}
-            name="repoRemoteUrl"
-            label="Remote Repository URL"
-            multiline={true}
-            readOnly={false}
-            data-testid=''
-          />
-        </Grid>
         <Grid size={6}>
           <FormControlTextField
             control={control}
@@ -154,6 +142,18 @@ export function CreateLocalRepoForm({
             required
             label="Email"
             readOnly={false}
+          />
+        </Grid>
+        <Grid size={12}>
+          <FormControlTextField
+            control={control}
+            error={Boolean(errors?.repoRemoteUrl)}
+            helperText={errors?.repoRemoteUrl?.message}
+            name="repoRemoteUrl"
+            label="Remote Repository URL"
+            multiline={true}
+            readOnly={false}
+            data-testid=""
           />
         </Grid>
       </>

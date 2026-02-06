@@ -34,7 +34,7 @@ import React, {
 import { useDispatch, useSelector } from 'react-redux';
 
 // import SharedFormModals from '../../../shared-modals/SharedFormModals';
-import { Box, useTheme } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { RC5Context } from '../contexts/RC5Context';
 import {
   AdmonitionDirectiveDescriptor,
@@ -115,7 +115,8 @@ function RC5VisualEditor() {
   const content = useSelector(displayData); //CAREFUL here, retrieving from context causes inf rendering loop
   const currentAuPathSel = useSelector(currentAuPath);
   const currentRepoAccessObject = useSelector(currentRepoAccessObjectSel);
-  const { handleBlobImageFile, isFsLoaded } = useContext(GitContext);
+  const { handleBlobImageFile, isFsLoaded, currentCourse } =
+    useContext(GitContext);
 
   const isEditing = true;
   const pixelTop = (isAppHeaderShowing ? 40 : 0) + (isEditing ? 87 : 0);
@@ -146,7 +147,7 @@ function RC5VisualEditor() {
     ref.current?.setMarkdown(markdown);
   }, []);
 
- const onAnimationsChangeCb = useCallback(
+  const onAnimationsChangeCb = useCallback(
     (animations: AnimationConfig[]) => {
       const currentAnims =
         slideAnimationsRef.current.get(currentSlideIndex) || [];
@@ -679,9 +680,10 @@ function RC5VisualEditor() {
   return (
     // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
-      {thePlugins && thePlugins.length > 0 && (
-        // Relative allows the TOC to be placed correctly when using an absolute position
-        <Box sx={{ height: `calc(100vh - ${pixelTop}px)`, position: 'relative'}}>
+      {thePlugins && thePlugins.length > 0 && currentCourse ? (
+        <Box
+          sx={{ height: `calc(100vh - ${pixelTop}px)`, position: 'relative' }}
+        >
           <MDXEditor
             className={mdxTheme}
             onChange={onChange}
@@ -691,6 +693,26 @@ function RC5VisualEditor() {
             readOnly={!isEditing}
             onError={onErrorHelper}
           />
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            height: `calc(100vh - ${pixelTop}px)`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              color: 'text.secondary',
+              fontWeight: 400,
+              letterSpacing: '0.02em',
+            }}
+          >
+            Please create or open a course to begin editing
+          </Typography>
         </Box>
       )}
       {/* <SharedFormModals isModal={false} /> */}

@@ -8,6 +8,8 @@ import {
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { alpha } from '@mui/system';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface DocumentationDialogProps {
   open: boolean;
@@ -22,43 +24,6 @@ export default function DocumentationDialog({
   title,
   content,
 }: DocumentationDialogProps) {
-  // Split content into paragraphs and format code blocks
-  const formatContent = (text: string) => {
-    const paragraphs = text.split('\n\n');
-
-    return paragraphs.map((paragraph, index) => {
-      // Check if it's a code-like line (contains specific patterns)
-      const isCodeBlock =
-        paragraph.includes('→') ||
-        paragraph.includes('•') ||
-        paragraph.startsWith('-');
-
-      return (
-        <Typography
-          key={index}
-          sx={{
-            color: 'text.primary',
-            fontSize: '0.875rem',
-            fontFamily: isCodeBlock ? 'monospace' : 'inherit',
-            lineHeight: 1.7,
-            mb: 2,
-            whiteSpace: 'pre-line',
-            bgcolor: isCodeBlock
-              ? (theme) => alpha(theme.palette.primary.main, 0.05)
-              : 'transparent',
-            p: isCodeBlock ? 2 : 0,
-            borderRadius: isCodeBlock ? 1 : 0,
-            border: isCodeBlock
-              ? (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.2)}`
-              : 'none',
-          }}
-        >
-          {paragraph}
-        </Typography>
-      );
-    });
-  };
-
   return (
     <Dialog
       open={open}
@@ -165,9 +130,74 @@ export default function DocumentationDialog({
               bgcolor: (theme) => alpha(theme.palette.primary.main, 0.3),
             },
           },
+          // Markdown styling
+          '& h1, & h2, & h3, & h4, & h5, & h6': {
+            color: 'text.primary',
+            fontWeight: 600,
+            mt: 2,
+            mb: 1,
+          },
+          '& h1': { fontSize: '1.5rem' },
+          '& h2': { fontSize: '1.25rem' },
+          '& h3': { fontSize: '1.1rem' },
+          '& p': {
+            color: 'text.primary',
+            fontSize: '0.875rem',
+            lineHeight: 1.7,
+            mb: 2,
+          },
+          '& ul, & ol': {
+            color: 'text.primary',
+            fontSize: '0.875rem',
+            lineHeight: 1.7,
+            pl: 3,
+            mb: 2,
+          },
+          '& li': {
+            mb: 0.5,
+          },
+          '& code': {
+            fontFamily: 'monospace',
+            fontSize: '0.85em',
+            bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
+            color: 'primary.main',
+            px: 0.75,
+            py: 0.25,
+            borderRadius: 0.5,
+          },
+          '& pre': {
+            bgcolor: (theme) => alpha(theme.palette.primary.main, 0.05),
+            border: (theme) =>
+              `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+            borderRadius: 1,
+            p: 2,
+            mb: 2,
+            overflow: 'auto',
+            '& code': {
+              bgcolor: 'transparent',
+              p: 0,
+              fontSize: '0.8rem',
+            },
+          },
+          '& strong': {
+            fontWeight: 600,
+            color: 'text.primary',
+          },
+          '& em': {
+            fontStyle: 'italic',
+          },
+          '& a': {
+            color: 'primary.main',
+            textDecoration: 'none',
+            '&:hover': {
+              textDecoration: 'underline',
+            },
+          },
         }}
       >
-        {formatContent(content)}
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {content}
+        </ReactMarkdown>
       </DialogContent>
     </Dialog>
   );

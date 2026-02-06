@@ -341,7 +341,7 @@ export const NavViewMenu = ({
         </Tooltip>
       </IconButton>
       {showHomeButton && (
-        <Box sx={{ mt: 'auto', mb: 2}}>
+        <Box sx={{ mt: 'auto', mb: 2 }}>
           <IconButton
             aria-label="repo-selection-button"
             data-testid="repo-selection-button"
@@ -349,9 +349,14 @@ export const NavViewMenu = ({
             size={iconButtonSize}
             style={menuIconStyle}
             onClick={() => {
-              dispatch(changeViewMode(ViewModeEnum.RepoSelector));
+              if (viewMode === ViewModeEnum.Designer) {
+                saveSlide();
+                promptNavAway(ViewModeEnum.RepoSelector);
+              } else {
+                dispatch(changeViewMode(ViewModeEnum.RepoSelector));
+              }
             }}
-            sx={{backgroundColor: 'inherit'}}
+            sx={{ backgroundColor: 'inherit' }}
           >
             <Tooltip arrow placement="right" title="Repo Selection">
               {viewMode === ViewModeEnum.RepoSelector ? (

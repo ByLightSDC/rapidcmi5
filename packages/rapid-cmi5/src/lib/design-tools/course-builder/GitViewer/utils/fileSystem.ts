@@ -495,7 +495,7 @@ export class GitFS {
       for (const meta of dirMetas) {
         if (!meta.dirHandle) continue;
         const status = await verifyHandlePermission(meta.dirHandle);
-        const newMeta: DirMeta = { ...meta, isValid: status };
+        const newMeta: DirMeta = { ...meta, isValid: status, remoteUrl: await this.getGitRemoteUrl(meta.dirHandle) || 'No remote URL' };
 
         newMetas.push(newMeta);
         await set('courses/' + meta.id, meta);

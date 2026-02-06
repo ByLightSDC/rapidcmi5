@@ -29,7 +29,6 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import PublishIcon from '@mui/icons-material/Publish';
 import FolderZipIcon from '@mui/icons-material/FolderZip';
 import ImportExportIcon from '@mui/icons-material/ImportExport';
 
@@ -64,7 +63,7 @@ const courseActions = [
     hidden: true, // hidden for showing the edit field to rename course
   },
   {
-    tooltip: 'Course',
+    tooltip: 'Create Course',
     icon: <AddIcon color="inherit" />,
   },
   {
@@ -321,7 +320,7 @@ export const LessonDrawer = () => {
           <Box sx={{ gridColumn: '1 / -1' }}>
             <ButtonMinorUi
               id="publish-course-button"
-              startIcon={<PublishIcon />}
+              startIcon={<ImportExportIcon />}
               disabled={!currentRepo}
               onClick={publishCourse}
               fullWidth
@@ -330,7 +329,7 @@ export const LessonDrawer = () => {
                 fontWeight: 700,
               })}
             >
-              Publish
+              Publish Course
             </ButtonMinorUi>
           </Box>
         </Box>
