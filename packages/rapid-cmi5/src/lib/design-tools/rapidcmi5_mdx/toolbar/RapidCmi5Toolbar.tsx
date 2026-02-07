@@ -63,7 +63,7 @@ import { InsertAudio } from './components/InsertAudio';
 import { InsertTable } from './components/InsertTable';
 import { InsertAnimation } from './components/InsertAnimation';
 import { AdmonitionTypeEnum, AdmonitionTypes, ActivityType, RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
-import { editorInPlayback$, CONTENT_UPDATED_COMMAND, InsertTabs, InsertAccordion, dividerColor, iconColor } from '@rapid-cmi5/ui';
+import { editorInPlayback$, CONTENT_UPDATED_COMMAND, InsertTabs, InsertAccordion, InsertGrid, dividerColor, iconColor } from '@rapid-cmi5/ui';
 import { displayData } from '../../../redux/courseBuilderReducer';
 
 //Admonition
@@ -211,6 +211,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                   <InsertTable />
                   <InsertTabs />
                   <InsertAccordion />
+                  <InsertGrid />
                   <InsertThematicBreak />
                   <Separator />
                   <InsertCodeBlock />

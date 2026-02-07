@@ -265,6 +265,7 @@ export const ImageLabelEditor: React.FC<
           transition
           sx={{ zIndex: 2 }}
           disablePortal
+          keepMounted
         >
           {({ TransitionProps }) => (
             <Fade {...TransitionProps} timeout={350}>

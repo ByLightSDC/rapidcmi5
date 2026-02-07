@@ -12,7 +12,7 @@ export const AccordionContentDirectiveDescriptor: DirectiveDescriptor<AccordionC
     testNode(node) {
       return node.name === 'accordionContent';
     },
-    attributes: ['title'],
+    attributes: ['title', 'textAlign'],
     hasChildren: true,
     Editor: AccordionContentEditor,
   };

@@ -3,6 +3,7 @@ export * from './constants/colors';
 
 export * from './components/DeleteIconButton';
 export * from './components/RightMenuContainer';
+export * from './components/AlignmentToolbarControls';
 export * from './components/SettingsIconButton';
 export * from './editors/AdmonitionEditor';
 export * from './editors/AdmonitionDirectiveDescriptor';
@@ -60,6 +61,9 @@ export * from './editors/YouTubeDirectiveDescriptor';
 export * from './plugins/tabs/InsertTabs';
 export * from './plugins/tabs/TabContentDirectiveDescriptor';
 export * from './plugins/tabs/TabsDirectiveDescriptor';
+export * from './plugins/grid/GridCellDirectiveDescriptor';
+export * from './plugins/grid/GridContainerDirectiveDescriptor';
+export * from './plugins/grid/InsertGrid';
 export * from './plugins/accordion/AccordionContentDirectiveDescriptor';
 export * from './plugins/accordion/AccordionContentEditor';
 export * from './plugins/accordion/AccordionDirectiveDescriptor';

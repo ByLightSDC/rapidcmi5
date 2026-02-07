@@ -12,7 +12,7 @@ export const TabContentDirectiveDescriptor: DirectiveDescriptor<TabContentDirect
     testNode(node) {
       return node.name === 'tabContent';
     },
-    attributes: ['title'],
+    attributes: ['title', 'textAlign'],
     hasChildren: true,
     Editor: TabContentEditor,
   };
