@@ -63,6 +63,8 @@ import {
   AccordionDirectiveDescriptor,
   AccordionContentDirectiveDescriptor,
   ImageLabelDirectiveDescriptor,
+  GridContainerDirectiveDescriptor,
+  GridCellDirectiveDescriptor,
   appHeaderVisible,
 } from '@rapid-cmi5/ui';
 
@@ -326,6 +328,8 @@ function RC5VisualEditor() {
           TabContentDirectiveDescriptor,
           AnimDirectiveDescriptor,
           InlineAnimDirectiveDescriptor,
+          GridContainerDirectiveDescriptor,
+          GridCellDirectiveDescriptor,
         ],
       }),
       codeMirrorPlugin({

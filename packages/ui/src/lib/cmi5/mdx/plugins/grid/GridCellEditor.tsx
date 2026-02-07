@@ -5,34 +5,31 @@ import {
   useCellValues,
   useMdastNodeUpdater,
 } from '@mdxeditor/editor';
-import { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { TabsContext } from './TabsContext';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ContainerDirective } from 'mdast-util-directive';
-import { TabContentDirectiveNode } from './types';
+import { GridCellDirectiveNode } from './types';
 import { Box, useTheme } from '@mui/material';
 import { editorInPlayback$ } from '../../state/vars';
 import { AlignmentToolbarControls } from '../../components/AlignmentToolbarControls';
 
 /**
- * Tab Content Editor for tabs plugin
- * @param props
- * @returns
+ * Grid Cell Editor for the Grid Layout plugin.
+ * Renders a single cell within a grid container with a nested editor.
+ * Cells automatically fill equal-width columns in the parent grid.
  */
-export const TabContentEditor: React.FC<
-  DirectiveEditorProps<TabContentDirectiveNode>
+export const GridCellEditor: React.FC<
+  DirectiveEditorProps<GridCellDirectiveNode>
 > = ({ lexicalNode, mdastNode, parentEditor }) => {
-  const { tab } = useContext(TabsContext);
+  const [cellIndex, setCellIndex] = useState(-1);
+  const [isFocused, setIsFocused] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
   const muiTheme = useTheme();
   const updateMdastNode = useMdastNodeUpdater();
   const [isPlayback, readOnly] = useCellValues(editorInPlayback$, readOnly$);
 
-  const [contentIsVisible, setContentIsVisible] = useState(false);
-  const [tabIndex, setTabIndex] = useState(-1);
-  const [isFocused, setIsFocused] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
-
   const textAlign = mdastNode.attributes?.textAlign ?? 'left';
 
+  // Map text-align values to flex justify-content values
   const justifyContent =
     textAlign === 'center'
       ? 'center'
@@ -40,34 +37,24 @@ export const TabContentEditor: React.FC<
         ? 'flex-end'
         : 'flex-start';
 
+  // Scoped CSS class unique to this cell instance
   const scopedClass = useRef(
-    `tab-content-${Math.random().toString(36).slice(2, 9)}`,
+    `grid-cell-${Math.random().toString(36).slice(2, 9)}`,
   ).current;
 
   /**
-   * determine tab index for aria labels
-   * check current tab selection to see if content should be displayed or hidden
+   * Determine cell index for accessibility labels
    */
   useMemo(() => {
     parentEditor.update(() => {
-      let myTabIndex = -1;
+      let myCellIndex = -1;
       const parentKeys = lexicalNode.getParent()?.getChildrenKeys();
       if (parentKeys) {
-        myTabIndex = parentKeys?.indexOf(lexicalNode.getKey());
-        setTabIndex(myTabIndex);
-        if (myTabIndex === tab) {
-          setContentIsVisible(true);
-          return;
-        }
-
-        setContentIsVisible(false);
+        myCellIndex = parentKeys?.indexOf(lexicalNode.getKey());
+        setCellIndex(myCellIndex);
       }
     });
-  }, [lexicalNode, parentEditor, tab]);
-
-  useEffect(() => {
-    //REF console.log('visible');
-  }, [contentIsVisible]);
+  }, [lexicalNode, parentEditor]);
 
   /**
    * Track focus state for showing/hiding the alignment toolbar
@@ -103,24 +90,24 @@ export const TabContentEditor: React.FC<
     });
   };
 
-  /**
-   * Renders editable tab content
-   */
   return (
-    <div
+    <Box
       ref={contentRef}
-      style={{
-        display: contentIsVisible ? undefined : 'none',
+      sx={{
         position: 'relative',
-        border: isFocused ? '1px dashed' : '1px dashed transparent',
-        borderColor: isFocused ? muiTheme.palette.divider : 'transparent',
-        borderRadius: 4,
-        padding: 4,
+        minHeight: '60px',
+        border: '1px dashed',
+        borderColor: isFocused ? 'primary.main' : 'divider',
+        borderRadius: 1,
+        p: 1,
+        '&:hover': {
+          borderColor: 'primary.main',
+        },
       }}
-      role="tabpanel"
-      id={`tabpanel-${tabIndex}`}
-      aria-labelledby={`tab-${tabIndex}`}
+      role="gridcell"
+      aria-label={`Grid cell ${cellIndex + 1}`}
     >
+      {/* Scoped flex layout CSS — only applied when alignment is non-default */}
       {textAlign !== 'left' && (
         <style>{`
           .${scopedClass} {
@@ -132,6 +119,7 @@ export const TabContentEditor: React.FC<
             list-style-position: inside;
           }
 
+          /* Full-row block elements with mapped text-align */
           .${scopedClass} p,
           .${scopedClass} [data-lexical-paragraph="true"],
           .${scopedClass} ul,
@@ -148,16 +136,19 @@ export const TabContentEditor: React.FC<
             text-align: ${textAlign};
           }
 
+          /* Reset default list padding so items center properly */
           .${scopedClass} ul,
           .${scopedClass} ol {
             padding-inline-start: 0;
           }
 
+          /* Checkbox list items: center text, keep ::before click target intact */
           .${scopedClass} li[role="checkbox"] {
             text-align: ${textAlign};
             margin-inline-start: 0;
           }
 
+          /* Decorator nodes (nested directives) tile side-by-side */
           .${scopedClass} [data-lexical-decorator="true"] {
             flex: 0 0 auto;
             min-width: auto;
@@ -169,8 +160,8 @@ export const TabContentEditor: React.FC<
         <Box
           sx={{
             position: 'absolute',
-            top: 4,
-            right: 4,
+            top: -32,
+            right: 0,
             zIndex: 10,
             display: 'flex',
             backgroundColor:
@@ -197,6 +188,6 @@ export const TabContentEditor: React.FC<
           className: scopedClass,
         }}
       />
-    </div>
+    </Box>
   );
 };

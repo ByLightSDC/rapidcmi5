@@ -43,5 +43,6 @@ export interface AccordionContentDirectiveNode extends ContainerDirective {
   attributes: {
     id?: string;
     title?: string;
+    textAlign?: string;
   };
 }
