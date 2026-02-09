@@ -29,6 +29,8 @@ import { AuManagerContext } from '../../session/AuManager';
 import { kebabToCamel } from '../../utils/StringUtils';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { LayoutBoxDirectiveDescriptor } from './editors/directives/LayoutBoxDirectiveDescriptor';
+import { GridContainerDirectiveDescriptor } from './editors/directives/GridContainerDirectiveDescriptor';
+import { GridCellDirectiveDescriptor } from './editors/directives/GridCellDirectiveDescriptor';
 import { debugLog, debugLogError, logger } from '../../debug';
 import { AnimationConfig, mathPlugin, MathDescriptor, MathCodeBlockDescriptor, AccordionDirectiveDescriptor, AccordionContentDirectiveDescriptor, FxDirectiveDescriptor, AnimDirectiveDescriptor, YoutubeDirectiveDescriptor, TabsDirectiveDescriptor, TabContentDirectiveDescriptor, ImageLabelDirectiveDescriptor, languageList, footnotePlugin, FootnoteDefinitionDescriptor, FootnoteReferenceDescriptor, htmlPlugin, onCheckClickOutsideImageLabel } from '@rapid-cmi5/ui';
 import { animationPlayerPlugin, parseFrontmatterAnimations, useAnimationPlayback } from './plugins/animation-player';
@@ -72,6 +74,8 @@ function RC5Player() {
           AnimDirectiveDescriptor,
           YoutubeDirectiveDescriptor,
           LayoutBoxDirectiveDescriptor,
+          GridContainerDirectiveDescriptor,
+          GridCellDirectiveDescriptor,
           TabsDirectiveDescriptor,
           TabContentDirectiveDescriptor,
           ImageLabelDirectiveDescriptor,
