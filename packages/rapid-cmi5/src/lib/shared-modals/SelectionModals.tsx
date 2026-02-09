@@ -28,8 +28,6 @@
 //     return null;
 //   }
 
-//   const topicHookData = apiTopicsHookData[topicId];
-
 //   //Custom Params based on topic
 //   let rowsPerPage = rowsPerPageDefault;
 
@@ -42,7 +40,7 @@
 //         filters={filters}
 //         isTopicEditable={!shouldSkipQuery}
 //         pageLabel={`${topicId}:s`}
-//         queryKey={topicHookData.queryKey}
+//         queryKey={queryKey}
 //         renderItem={ActionRow}
 //         rowsPerPage={rowsPerPage}
 //         sortableColumns={actionRowSortableColumns}

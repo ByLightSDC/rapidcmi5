@@ -1,7 +1,7 @@
 /* eslint-disable */
 export default {
   displayName: 'ui-auth-keycloak',
-  preset: '../../../../jest.preset.js',
+  preset: '../../jest.preset.js',
   transform: {
     '^.+\\.[tj]sx?$': ['babel-jest', { presets: ['@nx/react/babel'] }],
     '^.+\\.svg$': '<rootDir>/jest-svg-transformer.js',

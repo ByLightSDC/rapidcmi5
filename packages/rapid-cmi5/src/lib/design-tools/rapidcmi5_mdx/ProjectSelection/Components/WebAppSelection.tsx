@@ -5,6 +5,7 @@ import ProductionModeSelection from './ProductionModeSelection';
 import RecentProjectSelection from './RecentProjectSelection';
 import SandBoxSelection from './SandBoxSelection';
 import { LoadingState } from 'packages/rapid-cmi5/src/lib/redux/repoManagerReducer';
+import DesktopDownload from './DesktopDownloader';
 
 interface OptionDocumentation {
   title: string;
@@ -29,6 +30,7 @@ export default function WebAppSelection({
   handleCloneRepo: () => void;
 }) {
   return (
+    <>
       <Box
         sx={{
           display: 'grid',
@@ -58,5 +60,15 @@ export default function WebAppSelection({
           openRecentProject={openLocalRecentProject}
         />
       </Box>
+
+      {/* <DesktopDownload
+        baseUrl="https://github.com/ByLightSDC/rapidcmi5/releases/download"
+        version="v0.7.0"
+        macName="RapidCMI5-0.7.0"
+        windowsName="RapidCMI5.Setup.0.7.0"
+        linuxName="RapidCMI5-0.7.0"
+        macArmName="RapidCMI5-0.7.0-arm64"
+      /> */}
+    </>
   );
 }

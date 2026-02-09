@@ -29,19 +29,14 @@ import { InsertVideo } from './components/InsertVideo';
 import { InsertLayoutBox } from './components/InsertLayoutBox';
 
 /** Icons */
-import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
+
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
 
 import {
   Box,
-  Drawer,
   IconButton,
-  Stack,
-  TextField,
   Tooltip,
-  Typography,
 } from '@mui/material';
 
 import { InsertAdmonition } from './components/InsertAdmonition';
@@ -58,13 +53,25 @@ import { RC5Context } from '../contexts/RC5Context';
 import { ColorTextSplitButton } from './components/ColorTextSplitButton';
 import { HighlightSplitButton } from './components/HighlightSplitButton';
 import { TextFxButton } from './components/TextFxButton';
-import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { InsertAudio } from './components/InsertAudio';
 import { InsertTable } from './components/InsertTable';
 import { InsertAnimation } from './components/InsertAnimation';
-import { AdmonitionTypeEnum, AdmonitionTypes, ActivityType, RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
-import { editorInPlayback$, CONTENT_UPDATED_COMMAND, InsertTabs, InsertAccordion, dividerColor, iconColor } from '@rapid-cmi5/ui';
+import {
+  AdmonitionTypeEnum,
+  AdmonitionTypes,
+  ActivityType,
+  RC5ActivityTypeEnum,
+} from '@rapid-cmi5/cmi5-build-common';
+import {
+  editorInPlayback$,
+  CONTENT_UPDATED_COMMAND,
+  InsertTabs,
+  InsertAccordion,
+  dividerColor,
+  iconColor,
+} from '@rapid-cmi5/ui';
 import { displayData } from '../../../redux/courseBuilderReducer';
+import { SlideMenu } from '../menu/SlideMenu';
 
 //Admonition
 export type RapidAdmonitionKind =
@@ -114,7 +121,6 @@ export const RapidCmi5Toolbar: React.FC = () => {
   const themedDividerColor = useSelector(dividerColor);
   const content = useSelector(displayData);
   const [editor] = useLexicalComposerContext();
-  const { isGitLoaded } = useContext(GitContext);
 
   const toggleGroup = useCallback(
     (whichGroup: number) => {
@@ -126,7 +132,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
   );
 
   /**
-   * UE sets view to Riche Text Editor on mount
+   * UE sets view to Rich Text Editor on mount
    */
   useEffect(() => {
     realm.pub(editorInPlayback$, false);
@@ -144,135 +150,135 @@ export const RapidCmi5Toolbar: React.FC = () => {
     <Box
       sx={{
         backgroundColor: 'background.default',
-        width: '100%',
-        padding: '8px',
-        minHeight: '84px',
-        borderColor: themedDividerColor,
-        borderStyle: 'solid',
-        borderWidth: '1px',
+        width: '100vw',
+        borderBottom: `1px solid ${themedDividerColor}`,
+        position: 'sticky',
+        top: 0,
+        left: 0,
+        zIndex: 100,
       }}
     >
-      <DiffSourceToggleWrapper options={['rich-text', 'source']}>
-        <ConditionalContents
-          options={[
-            {
-              when: (editor) => editor?.editorType === 'sandpack',
-              contents: () => <ShowSandpackInfo />,
-            },
-            {
-              fallback: () => (
-                <>
-                  <UndoRedo />
-                  <Separator />
-                  <BoldItalicUnderlineToggles />
-                  <StrikeThroughSupSubToggles />
-                  <ColorTextSplitButton />
-                  <HighlightSplitButton />
-                  <TextFxButton />
-                  <Separator />
-                  <CodeToggle />
-                  <ListsToggle />
-                  <Separator />
+      {/* Scroll container */}
+      <Box
+        sx={{
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        {/* Centerer */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            px: 1,
+          }}
+        >
+          {/* Actual toolbar row (shrink-to-fit) */}
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              width: 'max-content',
+              p: 1,
+              gap: 1,
+              overflowX: 'hidden',
+            }}
+          >
+            <DiffSourceToggleWrapper options={['rich-text', 'source']}>
+              <ConditionalContents
+                options={[
+                  {
+                    when: (editor) => editor?.editorType === 'sandpack',
+                    contents: () => <ShowSandpackInfo />,
+                  },
+                  {
+                    fallback: () => (
+                      <>
+                        <UndoRedo />
+                        <Separator />
+                        <BoldItalicUnderlineToggles />
+                        <StrikeThroughSupSubToggles />
+                        <ColorTextSplitButton />
+                        <HighlightSplitButton />
+                        <TextFxButton />
+                        <Separator />
+                        <CodeToggle />
+                        <ListsToggle />
+                        <Separator />
 
-                  <ConditionalContents
-                    options={[
-                      {
-                        when: whenInAdmonition,
-                        contents: () => (
-                          // eslint-disable-next-line react/jsx-no-useless-fragment
-                          <></>
-                        ),
-                      },
-                      {
-                        when: whenInActivity,
-                        contents: () => (
-                          // eslint-disable-next-line react/jsx-no-useless-fragment
-                          <></>
-                        ),
-                      },
-                      {
-                        fallback: () => (
-                          // eslint-disable-next-line react/jsx-no-useless-fragment
-                          <BlockTypeSelect />
-                        ),
-                      },
-                    ]}
-                  />
+                        <ConditionalContents
+                          options={[
+                            { when: whenInAdmonition, contents: () => <></> },
+                            { when: whenInActivity, contents: () => <></> },
+                            { fallback: () => <BlockTypeSelect /> },
+                          ]}
+                        />
 
-                  <InsertAdmonition />
-                  <InsertActivity />
-                  <Separator />
+                        <InsertAdmonition />
+                        <InsertActivity />
+                        <Separator />
 
-                  <CreateLink />
-                  <InsertImage />
-                  <InsertAudio />
-                  <InsertVideo />
-                  <Separator />
-                  <InsertTable />
-                  <InsertTabs />
-                  <InsertAccordion />
-                  <InsertThematicBreak />
-                  <Separator />
-                  <InsertCodeBlock />
-                  <InsertLayoutBox />
-                  <InsertAnimation />
-                  {/*REF <InsertSandpack />
-                  <InsertFrontmatter /> */}
-                  <Separator />
-                  <IconPortal>
-                    <IconButton
-                      aria-label="toggle-playback"
-                      size={iconButtonSize}
-                      style={iconButtonStyle}
-                      onClick={() => {
-                        realm.pub(editorInPlayback$, !isPlayback);
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          color: themeIconColor,
-                          display: 'flex',
-                          justifyContent: 'center',
-                          height: '32px',
-                        }}
-                      >
-                        {isPlayback && (
-                          <Tooltip title="Toggle Preview OFF" {...tooltipStyle}>
-                            <StopScreenShareIcon color="inherit" />
-                          </Tooltip>
-                        )}
-                        {!isPlayback && (
-                          <Tooltip title="Toggle Preview ON" {...tooltipStyle}>
-                            <ScreenShareIcon color="inherit" />
-                          </Tooltip>
-                        )}
-                      </Box>
-                    </IconButton>
-                  </IconPortal>
-                </>
-              ),
-            },
+                        <CreateLink />
+                        <InsertImage />
+                        <InsertAudio />
+                        <InsertVideo />
+                        <Separator />
+                        <InsertTable />
+                        <InsertTabs />
+                        <InsertAccordion />
+                        <InsertThematicBreak />
+                        <Separator />
+                        <InsertCodeBlock />
+                        <InsertLayoutBox />
+                        <InsertAnimation />
+                        <Separator />
+                      </>
+                    ),
+                  },
+                ]}
+              />
+            </DiffSourceToggleWrapper>
+          </Box>
+        </Box>
+      </Box>
+      {/* SlideMenu row: if you want it centered relative to the same width, keep it inside the same centered area */}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          width: '100%',
+          my: 0.5,
+        }}
+      >
+        <SlideMenu
+          extraOptions={[
+            <IconButton
+              aria-label="toggle-playback"
+              size={iconButtonSize}
+              style={iconButtonStyle}
+              onClick={() => realm.pub(editorInPlayback$, !isPlayback)}
+            >
+              <Box
+                sx={{
+                  color: themeIconColor,
+                  display: 'flex',
+                }}
+              >
+                {isPlayback ? (
+                  <Tooltip title="Toggle Preview OFF" {...tooltipStyle}>
+                    <StopScreenShareIcon color="inherit" />
+                  </Tooltip>
+                ) : (
+                  <Tooltip title="Toggle Preview ON" {...tooltipStyle}>
+                    <ScreenShareIcon color="inherit" />
+                  </Tooltip>
+                )}
+              </Box>
+            </IconButton>,
           ]}
         />
-      </DiffSourceToggleWrapper>
+      </Box>
     </Box>
   );
 };
-
-/**
- * Portal to render Mdx Editor dependent icon in the slide menu
- * @param param0
- * @returns
- */
-function IconPortal({ children }: { children: JSX.Element | JSX.Element[] }) {
-  const modalRoot = document.getElementById('preview-icon-target'); // Get the target DOM node
-  if (!modalRoot) {
-    return <div style={{ width: '100%', height: '100%' }} />;
-  }
-  return ReactDOM.createPortal(
-    <Box className="modal-content" sx={{ color: 'primary' }}>
-      {children}
-    </Box>,
-    modalRoot, // Render the children into the modalRoot DOM node
-  );
-}

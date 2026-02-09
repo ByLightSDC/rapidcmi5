@@ -3,9 +3,10 @@ import { createFsFromVolume } from 'memfs';
 import { GitOperations } from './gitOperations';
 import { Operation } from '@rapid-cmi5/cmi5-build-common';
 import { computeCourseFromJsonFs, createCourseInFs, createLesson, getCourseDataInFs, slugifyPath } from './useCourseOperationsUtils';
-import { FileState, fsType, initFileState, RepoAccessObject } from 'libs/rapid-cmi5/src/lib/redux/repoManagerReducer';
+
 import { GitFS } from './fileSystem';
 import { createNewFsInstance } from './gitFsInstance';
+import { FileState, fsType, initFileState, RepoAccessObject } from '../../../../redux/repoManagerReducer';
 
 // ============================================================================
 // Test Fixtures and Types

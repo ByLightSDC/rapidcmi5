@@ -14,6 +14,7 @@
 export type rangeDataType = {
   rangeId: string;
   deployedScenarios: Array<string>;
+  scheduledScenarios: Array<string>;
 };
 
 export type rangeConsoleDataType = {

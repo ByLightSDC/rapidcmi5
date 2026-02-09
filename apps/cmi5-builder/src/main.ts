@@ -772,6 +772,7 @@ async function getConvertedFolderStructure(
           filepath: fullSlidePath,
           slideTitle: title,
           type: SlideTypeEnum.Markdown,
+          content: ''
         };
 
         au.slides.push(slide);
@@ -820,6 +821,7 @@ async function getConvertedFolderStructure(
         filepath: fullPath,
         slideTitle: lesson,
         type: SlideTypeEnum.Markdown,
+        content: ''
       };
 
       au.slides.push(slide);

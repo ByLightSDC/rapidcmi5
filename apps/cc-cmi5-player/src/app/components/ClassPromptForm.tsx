@@ -6,7 +6,6 @@ import * as yup from 'yup';
 
 /* Branded */
 
-
 /* MUI */
 import Grid from '@mui/material/Grid2';
 
@@ -15,11 +14,20 @@ import Grid from '@mui/material/Grid2';
 
 /* API Topic */
 
-
 import { ClassEntry, defaultClassEntryData } from '../session/constants';
 import { useEffect } from 'react';
-import { FormCrudType, NAME_GROUP, FormStateType, FormControlTextField, SharedFormWithProvider } from '@rapid-cmi5/ui';
-import { Topic, usePostInitializeCMI5Scenarios } from '@rangeos-nx/frontend/clients/hooks';
+import {
+  FormCrudType,
+  NAME_GROUP,
+  FormStateType,
+  FormControlTextField,
+  SharedFormWithProvider,
+} from '@rapid-cmi5/ui';
+import {
+  Topic,
+  usePostInitializeCMI5Scenarios,
+} from '@rangeos-nx/frontend/clients/hooks';
+import { DateTimePicker } from '@mui/x-date-pickers';
 
 /**
  * @typedef {Object} tFormProps
@@ -54,6 +62,7 @@ export default function ClassPromptForm(props: tFormProps) {
   const formTopic = Topic.ClassEntry;
   const validationSchema = yup.object().shape({
     classId: NAME_GROUP,
+    endDate: yup.date(),
   });
 
   /**
@@ -68,6 +77,9 @@ export default function ClassPromptForm(props: tFormProps) {
   ): JSX.Element => {
     const { control } = formMethods;
     const { errors } = formState;
+    const handleEndDateChange = (value: Date | null) => {
+      formMethods.setValue('endDate', value?.toISOString());
+    };
     return (
       // eslint-disable-next-line react/jsx-no-useless-fragment
       <>
@@ -79,6 +91,16 @@ export default function ClassPromptForm(props: tFormProps) {
             name="classId"
             required
             label="Class Id"
+            readOnly={crudType === FormCrudType.view}
+          />
+        </Grid>
+        <Grid size={8}>
+          <DateTimePicker
+            label="End Date"
+            name="endDate"
+            disablePast
+            slotProps={{ textField: { required: true } }}
+            onChange={handleEndDateChange}
             readOnly={crudType === FormCrudType.view}
           />
         </Grid>

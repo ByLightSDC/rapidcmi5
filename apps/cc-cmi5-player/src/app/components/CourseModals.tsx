@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 
-
 /* Constants */
 import { useEffect, useState } from 'react';
 import { cmi5Instance } from '../session/cmi5';
@@ -13,7 +12,13 @@ import theForm from './ClassPromptForm';
 import { defaultClassEntryData } from '../session/constants';
 import { sendClassEventVerb } from '../utils/LmsStatementManager';
 import { debugLog, debugLogError } from '../debug';
-import { modal, setModal, ModalDialog, FormControlUIProvider, FormCrudType } from '@rapid-cmi5/ui';
+import {
+  modal,
+  setModal,
+  ModalDialog,
+  FormControlUIProvider,
+  FormCrudType,
+} from '@rapid-cmi5/ui';
 
 export const classPromptModalId = 'prompt-class-id';
 export const classChangeModalId = 'change-class-id';

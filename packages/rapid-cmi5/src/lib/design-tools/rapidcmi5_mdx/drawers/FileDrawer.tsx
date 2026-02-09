@@ -62,7 +62,7 @@ export const FileDrawer = () => {
           alignItems="center"
         >
           <Typography variant="h6" fontWeight="bold" sx={{ ml: 1 }}>
-            COURSE FILES
+            PROJECT FILES
           </Typography>
 
           <Stack direction="row">

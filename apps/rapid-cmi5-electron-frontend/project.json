@@ -161,6 +161,15 @@
           "buildTarget": "rapid-cmi5-electron-frontend:build-storybook:ci"
         }
       }
+    },
+    "e2e": {
+      "executor": "@nx/playwright:playwright",
+      "outputs": [
+        "{workspaceRoot}/dist/.playwright/apps/rapid-cmi5-electron-frontend"
+      ],
+      "options": {
+        "config": "apps/rapid-cmi5-electron-frontend/playwright.config.ts"
+      }
     }
   }
 }

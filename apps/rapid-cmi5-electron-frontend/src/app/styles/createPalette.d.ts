@@ -15,8 +15,10 @@ declare module '@mui/material/styles' {
     button: {
       disabledBackgroundColor: React.CSSProperties['color'];
       disabledColor: React.CSSProperties['color'];
+      gradient: React.CSSProperties['color'];
       minorBackgroundColor: React.CSSProperties['color'];
       indicatorColor: React.CSSProperties['color'];
+      iconColor: React.CSSProperties['color'];
     };
     card: {
       default: React.CSSProperties['color'];
@@ -66,6 +68,7 @@ declare module '@mui/material/styles' {
     button: {
       disabledBackgroundColor: React.CSSProperties['color'];
       disabledColor: React.CSSProperties['color'];
+      gradient: React.CSSProperties['color'];
       minorBackgroundColor: React.CSSProperties['color'];
     };
     card: {
@@ -75,6 +78,9 @@ declare module '@mui/material/styles' {
       formInstructionsColor: React.CSSProperties['color'];
       instructionsColor: React.CSSProperties['color'];
       titleColor: React.CSSProperties['color'];
+    };
+    form: {
+      backgroundColor: React.CSSProperties['color'];
     };
     header: {
       border: React.CSSProperties['color'];

@@ -276,7 +276,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
   const isCurrentLessonFolder =
     typeof currentLesson !== 'undefined' && currentLesson === element.id;
 
-  const focusColor = 'secondary.dark';
+  const focusColor = 'primary.main';
 
   const isCurrentSlide =
     element.type === LessonTreeNodeType.Slide &&
