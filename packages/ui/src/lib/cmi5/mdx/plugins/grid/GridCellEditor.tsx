@@ -5,12 +5,17 @@ import {
   useCellValues,
   useMdastNodeUpdater,
 } from '@mdxeditor/editor';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ContainerDirective } from 'mdast-util-directive';
 import { GridCellDirectiveNode } from './types';
 import { Box, useTheme } from '@mui/material';
 import { editorInPlayback$ } from '../../state/vars';
 import { AlignmentToolbarControls } from '../../components/AlignmentToolbarControls';
+import {
+  TextAlign,
+  useScopedAlignmentStyles,
+} from '../shared/useScopedAlignmentStyles';
+import { useFocusWithin } from '../shared/useFocusWithin';
 
 /**
  * Grid Cell Editor for the Grid Layout plugin.
@@ -21,26 +26,20 @@ export const GridCellEditor: React.FC<
   DirectiveEditorProps<GridCellDirectiveNode>
 > = ({ lexicalNode, mdastNode, parentEditor }) => {
   const [cellIndex, setCellIndex] = useState(-1);
-  const [isFocused, setIsFocused] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const { isFocused, ref: contentRef } = useFocusWithin<HTMLDivElement>();
   const muiTheme = useTheme();
   const updateMdastNode = useMdastNodeUpdater();
   const [isPlayback, readOnly] = useCellValues(editorInPlayback$, readOnly$);
 
-  const textAlign = mdastNode.attributes?.textAlign ?? 'left';
-
-  // Map text-align values to flex justify-content values
-  const justifyContent =
-    textAlign === 'center'
-      ? 'center'
-      : textAlign === 'right'
-        ? 'flex-end'
-        : 'flex-start';
-
-  // Scoped CSS class unique to this cell instance
-  const scopedClass = useRef(
-    `grid-cell-${Math.random().toString(36).slice(2, 9)}`,
-  ).current;
+  const rawTextAlign = mdastNode.attributes?.textAlign;
+  const textAlign: TextAlign =
+    rawTextAlign === 'center' || rawTextAlign === 'right'
+      ? rawTextAlign
+      : 'left';
+  const { scopedClass, alignmentStyles } = useScopedAlignmentStyles(
+    textAlign,
+    'grid-cell',
+  );
 
   /**
    * Determine cell index for accessibility labels
@@ -55,30 +54,6 @@ export const GridCellEditor: React.FC<
       }
     });
   }, [lexicalNode, parentEditor]);
-
-  /**
-   * Track focus state for showing/hiding the alignment toolbar
-   */
-  useEffect(() => {
-    const div = contentRef.current;
-    if (!div) return;
-
-    const handleFocusIn = () => setIsFocused(true);
-    const handleFocusOut = (e: FocusEvent) => {
-      const next = e.relatedTarget;
-      if (!(next instanceof Node) || !div.contains(next)) {
-        setIsFocused(false);
-      }
-    };
-
-    div.addEventListener('focusin', handleFocusIn);
-    div.addEventListener('focusout', handleFocusOut);
-
-    return () => {
-      div.removeEventListener('focusin', handleFocusIn);
-      div.removeEventListener('focusout', handleFocusOut);
-    };
-  }, []);
 
   const handleAlignmentChange = (value: 'left' | 'center' | 'right') => {
     updateMdastNode({
@@ -107,54 +82,8 @@ export const GridCellEditor: React.FC<
       role="gridcell"
       aria-label={`Grid cell ${cellIndex + 1}`}
     >
-      {/* Scoped flex layout CSS — only applied when alignment is non-default */}
-      {textAlign !== 'left' && (
-        <style>{`
-          .${scopedClass} {
-            display: flex;
-            flex-direction: row;
-            justify-content: ${justifyContent};
-            flex-wrap: wrap;
-            gap: 0;
-            list-style-position: inside;
-          }
-
-          /* Full-row block elements with mapped text-align */
-          .${scopedClass} p,
-          .${scopedClass} [data-lexical-paragraph="true"],
-          .${scopedClass} ul,
-          .${scopedClass} ol,
-          .${scopedClass} blockquote,
-          .${scopedClass} h1,
-          .${scopedClass} h2,
-          .${scopedClass} h3,
-          .${scopedClass} h4,
-          .${scopedClass} h5,
-          .${scopedClass} h6 {
-            flex: 0 0 100%;
-            min-width: 100%;
-            text-align: ${textAlign};
-          }
-
-          /* Reset default list padding so items center properly */
-          .${scopedClass} ul,
-          .${scopedClass} ol {
-            padding-inline-start: 0;
-          }
-
-          /* Checkbox list items: center text, keep ::before click target intact */
-          .${scopedClass} li[role="checkbox"] {
-            text-align: ${textAlign};
-            margin-inline-start: 0;
-          }
-
-          /* Decorator nodes (nested directives) tile side-by-side */
-          .${scopedClass} [data-lexical-decorator="true"] {
-            flex: 0 0 auto;
-            min-width: auto;
-          }
-        `}</style>
-      )}
+      {/* Scoped flex layout CSS (only when alignment is non-default) */}
+      {alignmentStyles}
 
       {isFocused && !isPlayback && (
         <Box
