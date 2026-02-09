@@ -30,7 +30,10 @@ import {
   SlideActivityScore,
   SlideActivityType,
 } from '../types/SlideActivityStatusState';
-import { ActivityScore, getActivityTypeFromDisplayName } from '@rapid-cmi5/cmi5-build-common';
+import {
+  ActivityScore,
+  getActivityTypeFromDisplayName,
+} from '@rapid-cmi5/cmi5-build-common';
 import { config } from '@rapid-cmi5/ui';
 
 /**
@@ -170,7 +173,7 @@ async function sendStatement(statement: Statement): Promise<void> {
   }
 
   try {
-    await xapi.sendStatement({ statement });
+    await xapi.sendStatement({ statement: statement as any });
     logger.debug(
       `LRS Statement sent: ${statement.verb?.display?.['en-US'] || 'Unknown'}`,
       undefined,

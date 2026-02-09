@@ -36,7 +36,7 @@ const appsKey = 0;
 const settingsKey = 1;
 const logoutKey = 2;
 
-export default function AppHeader() {
+export default function AppHeader({ authEnabled }: { authEnabled: boolean }) {
   const logOut = useLogOut();
   const showAppHeader = useSelector(appHeaderVisible);
   const appThemeColor = useSelector(themeColor);
@@ -142,6 +142,7 @@ export default function AppHeader() {
             <UserInfoBox
               anchorEl={settingsMenuAnchor}
               onClose={() => setSettingsMenuAnchor(null)}
+              authEnabled={authEnabled}
             />
           </Box>
         </Box>

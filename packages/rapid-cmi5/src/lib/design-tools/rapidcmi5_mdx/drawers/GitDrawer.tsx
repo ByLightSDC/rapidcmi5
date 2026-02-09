@@ -29,19 +29,17 @@ import {
 /* Icons */
 import AddIcon from '@mui/icons-material/Add';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 import { useRC5Prompts } from '../modals/useRC5Prompts';
 import React from 'react';
 import { listItemProps } from './components/LessonTreeNode';
-import { Renamer } from './components/Renamer';
 import { ButtonOptions, ButtonMinorUi } from '@rapid-cmi5/ui';
 
 enum RepoActionEnum {
-  TriggerRename,
-  Rename,
+  // TriggerRename,
+  // Rename,
   Delete,
   Config,
 }
@@ -50,21 +48,21 @@ enum RepoActionEnum {
  * context menu for course
  */
 const repoActions = [
+  // {
+  //   tooltip: 'Rename Repository',
+  //   icon: <EditIcon color="inherit" />,
+  //   hidden: true, // hidden for showing the edit field to rename course
+  // },
+  // {
+  //   tooltip: 'Rename Repository',
+  //   icon: <EditIcon color="inherit" />,
+  // },
   {
-    tooltip: 'Rename Repository',
-    icon: <EditIcon color="inherit" />,
-    hidden: true, // hidden for showing the edit field to rename course
-  },
-  {
-    tooltip: 'Rename Repository',
-    icon: <EditIcon color="inherit" />,
-  },
-  {
-    tooltip: 'Delete Local Repository',
+    tooltip: 'Delete Project',
     icon: <DeleteForeverIcon color="inherit" />,
   },
   {
-    tooltip: 'Config Settings',
+    tooltip: 'Configure Git',
     icon: <SettingsIcon color="inherit" />,
   },
 ];
@@ -80,27 +78,24 @@ export const GitDrawer = () => {
     (state: RootState) => state.repoManager,
   );
   const { promptDeleteRepo } = useRC5Prompts();
-  const {
-    isRepoConnectedToRemote,
-    handleChangeRepoName,
-    currentRepo,
-  } = useContext(GitContext);
+  const { isRepoConnectedToRemote, handleChangeRepoName, currentRepo } =
+    useContext(GitContext);
   const { gitIcon } = useMDStyleIcons();
 
   const currentTab = useSelector(gitViewCurrentTab);
 
   const { promptAttachRemoteRepo, promptGitConfig } = useRC5Prompts();
 
-  const [menuAnchor, setMenuAnchor] = useState<any>(null);
-  const [menuAnchorPos, setMenuAnchorPos] = useState<number[]>([0, 0]);
+  // const [menuAnchor, setMenuAnchor] = useState<any>(null);
+  // const [menuAnchorPos, setMenuAnchorPos] = useState<number[]>([0, 0]);
 
-  const handleCancelNameChange = () => {
-    setMenuAnchor(null);
-  };
+  // const handleCancelNameChange = () => {
+  //   setMenuAnchor(null);
+  // };
 
-  const updateRepositoryName = (newName: string, record: any) => {
-    handleChangeRepoName(newName);
-  };
+  // const updateRepositoryName = (newName: string, record: any) => {
+  //   handleChangeRepoName(newName);
+  // };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     dispatch(setGitViewCurrentTab(newValue));
@@ -115,13 +110,13 @@ export const GitDrawer = () => {
       case RepoActionEnum.Delete:
         promptDeleteRepo(currentRepo);
         break;
-      case RepoActionEnum.Rename:
-        setMenuAnchor(event.target);
+      // case RepoActionEnum.Rename:
+      //   setMenuAnchor(event.target);
 
-        break;
-      case RepoActionEnum.TriggerRename:
-        setMenuAnchorPos([event.clientX - 60, event.clientY + 20]);
-        break;
+      //   break;
+      // case RepoActionEnum.TriggerRename:
+      //   setMenuAnchorPos([event.clientX - 60, event.clientY + 20]);
+      //   break;
       case RepoActionEnum.Config:
         promptGitConfig();
         break;
@@ -158,7 +153,19 @@ export const GitDrawer = () => {
           //RED onAction={promptCloneRepo}
           onSelect={handleCheckoutBranch}
         /> */}
-        <Typography>{currentRepo}</Typography>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 'bold',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {currentRepo}
+          </Typography>
+        </Stack>{' '}
         <div style={{ flexGrow: 1 }} />
         <Stack direction="row">
           <ButtonOptions
@@ -179,9 +186,9 @@ export const GitDrawer = () => {
               );
             }}
             closeOnClick={true}
-            onTrigger={(event?: any) => {
-              onRepoContextAction(event, RepoActionEnum.TriggerRename);
-            }}
+            // onTrigger={(event?: any) => {
+            //   onRepoContextAction(event, RepoActionEnum.TriggerRename);
+            // }}
           >
             <List
               sx={{
@@ -194,7 +201,11 @@ export const GitDrawer = () => {
               }}
               component="nav"
             >
-              <Typography sx={{ ml: 3, pl: 3 }} variant="caption">
+              <Typography
+                sx={{ ml: 3, pl: 3 }}
+                data-testid="current-repo-name"
+                variant="caption"
+              >
                 {currentRepo}...
               </Typography>
               {repoActions.map((option: RowAction, index: number) => (
@@ -235,7 +246,7 @@ export const GitDrawer = () => {
         </Stack>
       </Stack>
 
-      {!isRepoConnectedToRemote && (
+      {/* {!isRepoConnectedToRemote && (
         <Alert severity="warning" sx={{ lineHeight: 1, padding: 1 }}>
           <AlertTitle sx={{ lineHeight: 1, fontWeight: 'bold' }}>
             No Repository Connected
@@ -253,23 +264,21 @@ export const GitDrawer = () => {
             </ButtonMinorUi>
           </Stack>
         </Alert>
-      )}
+      )} */}
 
-      {isRepoConnectedToRemote && (
-        <Stack direction="column">
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{
-              marginTop: '4px',
-            }}
-          >
-            {gitIcon}
-            <Typography>Branch</Typography>
-          </Stack>
-          <Typography>{currentBranch}</Typography>
+      <Stack direction="column">
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            marginTop: '4px',
+          }}
+        >
+          {gitIcon}
+          <Typography>Branch</Typography>
         </Stack>
-      )}
+        <Typography>{currentBranch}</Typography>
+      </Stack>
       <Tabs
         orientation="vertical"
         sx={{ marginTop: '12px' }}
@@ -278,10 +287,10 @@ export const GitDrawer = () => {
       >
         <TabMainUi label="File Status" style={{ marginBottom: '8px' }} />
         <TabMainUi label="Commit History" style={{ marginBottom: '8px' }} />
-        <TabMainUi label="Stashes" style={{ marginBottom: '8px' }} />
+        {/* <TabMainUi label="Stashes" style={{ marginBottom: '8px' }} /> */}
       </Tabs>
 
-      {menuAnchor && (
+      {/* {menuAnchor && (
         <Renamer
           anchor={menuAnchor}
           anchorPos={menuAnchorPos}
@@ -294,7 +303,7 @@ export const GitDrawer = () => {
           onClose={handleCancelNameChange}
           onSave={updateRepositoryName}
         />
-      )}
+      )} */}
     </Stack>
   );
 };

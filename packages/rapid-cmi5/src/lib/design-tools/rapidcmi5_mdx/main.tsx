@@ -9,6 +9,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 
 import { UseFormReturn } from 'react-hook-form';
 import { FormCrudType } from '@rapid-cmi5/ui';
+import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
 
 export interface buildCmi5ZipParams {
   zipBlob: File;
@@ -37,19 +38,26 @@ export interface GetScenarioFormProps {
 }
 
 export interface RapidCmi5Opts {
-  authToken?: string;
-  buildCmi5Zip?: (params: buildCmi5ZipParams) => Promise<AxiosResponse<object>>;
+  userAuth?: UserAuth,
+  // buildCmi5Zip?: (params: buildCmi5ZipParams) => Promise<AxiosResponse<object>>;
+  downloadCmi5Player?: () => Promise<any>;
+  processAu?:(au: CourseAU, blockId: string) => Promise<void>;
   GetScenariosForm?: React.ComponentType<GetScenarioFormProps>;
   clearData?: () => void;
   showHomeButton?: boolean;
   clearCache?: () => void;
 }
 
+export type UserAuth = {
+  token: string;
+  userName: string;
+  userEmail: string;
+};
+
 export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-
         <GitContextProvider rapidCmi5Opts={rapidCmi5Opts}>
           <RC5ContextProvider>
             <RC5Modals />

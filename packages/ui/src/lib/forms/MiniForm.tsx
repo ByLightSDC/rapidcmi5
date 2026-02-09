@@ -78,7 +78,6 @@ export type MiniFormProps = {
   onClose?: () => void;
   onResponse?: (isSuccess: boolean, data: any, message: string) => void;
 };
-
 export function MiniForm({
   autoSaveDebounceTime = 3000,
   crudType = FormCrudType.edit,
@@ -135,17 +134,7 @@ export function MiniForm({
     trigger,
     formState,
   } = methods;
-  const { isValid, isDirty, isSubmitSuccessful } = formState;
-
-  /**
-   * Debug UE
-   */
-  // useEffect(() => {
-  //    console.log('isValid', isValid);
-  //    console.log('isSubmitSuccessful', isSubmitSuccessful);
-  //    console.log('isDirty', isDirty);
-  //    console.log('dirtyFields', dirtyFields);
-  // }, [isValid, isDirty, isSubmitSuccessful, dirtyFields]);
+  const { isValid, isDirty } = formState;
 
   //#region handlers
   /**
@@ -178,13 +167,8 @@ export function MiniForm({
     }
   }, [getValues, doAction]);
 
-  /**
-   * Clears form data persisted to bookmarks
-   * Cleans data & submits form
-   * Waits for API Response
-   * Triggers success or fail display
-   * @param {any} data Form data
-   */
+  const hasSubmittedSuccessfully = useRef(false);
+
   const onSubmit = useCallback(
     async (data: any) => {
       //resets
@@ -195,6 +179,8 @@ export function MiniForm({
         }
       } else {
         setIsSubmitting(true);
+        hasSubmittedSuccessfully.current = true;
+
         try {
           if (doAction) {
             await doAction(data);
@@ -209,6 +195,11 @@ export function MiniForm({
             }
             onResponse(true, data, '');
           }
+
+          // Instead of handleInitialDataLoad, just reset with current data
+          // This keeps the form values visible but marks them as "clean"
+          reset(data, { keepValues: true });
+
           setIsSubmitting(false);
         } catch (error: any) {
           if (onResponse) {
@@ -221,6 +212,7 @@ export function MiniForm({
                     severity: 'error',
                   });
                 }
+                setIsSubmitting(false);
                 return;
               }
             }
@@ -259,6 +251,7 @@ export function MiniForm({
       onClose,
       onResponse,
       successToasterMessage,
+      reset,
     ],
   );
 
@@ -284,7 +277,7 @@ export function MiniForm({
     if (methods) {
       setFormMethods(methods);
     }
-  }, [methods]);
+  }, [methods, setFormMethods]);
 
   /**
    * Use Effect
@@ -307,21 +300,13 @@ export function MiniForm({
    * form data comes from bookmarks, API response, or cached data injected via props
    */
   useEffect(() => {
-    if (dataCache) {
+    // Only load initial data if we haven't successfully submitted yet
+    if (dataCache && !hasSubmittedSuccessfully.current) {
       handleInitialDataLoad(dataCache);
     }
   }, [dataCache]);
 
-  /**
-   * will trigger data to be reset to success values
-   * this is needed to update dirty flags after submission
-   * so submit disables
-   */
-  useEffect(() => {
-    if (isSubmitSuccessful) {
-      handleInitialDataLoad(getValues());
-    }
-  }, [isSubmitSuccessful]);
+  // REMOVED: The problematic useEffect that was resetting on isSubmitSuccessful
 
   // Watch all form values, but only trigger re-render in this component
   const allFormValues = useWatch({ control });
@@ -345,7 +330,7 @@ export function MiniForm({
         }
       }
     }
-  }, [isDirty, allFormValues]);
+  }, [isDirty, allFormValues, shouldAutoSave, autoSaveDebounceTime, autoSave]);
 
   return (
     <>

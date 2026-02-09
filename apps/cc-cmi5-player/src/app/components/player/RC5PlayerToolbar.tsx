@@ -13,8 +13,8 @@ import { AuManagerContext } from '../../session/AuManager';
 
 export const RC5PlayerToolbar: React.FC = () => {
   const realm = useRealm();
-  const { setProgress, submitScore, getActivityCache, setActivityCache } = useContext(AuManagerContext);
-
+  const { setProgress, submitScore, getActivityCache, setActivityCache } =
+    useContext(AuManagerContext);
 
   useEffect(() => {
     realm.pub(editorInPlayback$, true);

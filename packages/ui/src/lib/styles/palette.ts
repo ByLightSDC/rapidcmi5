@@ -17,6 +17,7 @@ declare module '@mui/material/styles' {
       disabledColor: React.CSSProperties['color'];
       minorBackgroundColor: React.CSSProperties['color'];
       indicatorColor: React.CSSProperties['color'];
+      iconColor: React.CSSProperties['color'];
     };
     card: {
       default: React.CSSProperties['color'];

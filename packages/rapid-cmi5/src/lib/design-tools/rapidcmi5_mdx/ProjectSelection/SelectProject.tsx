@@ -10,6 +10,7 @@ import { RootState } from '../../../redux/store';
 import WebAppSelection from './Components/WebAppSelection';
 import ElectronAppSelection from './Components/ElectronSelection';
 import CloneLoadingOverlay from './Components/LoadingOverlay';
+import { useToaster } from '@rapid-cmi5/ui';
 
 interface OptionDocumentation {
   title: string;
@@ -23,6 +24,7 @@ export default function WelcomePage({
 }) {
   const theme = useTheme();
   const { palette } = theme;
+  const toast = useToaster();
 
   const { getLocalFolders, openSandbox, openLocalRepo, isElectron } =
     useContext(GitContext);
@@ -32,6 +34,25 @@ export default function WelcomePage({
   const { loadingState }: RepoState = useSelector(
     (state: RootState) => state.repoManager,
   );
+
+  const openLocalFolderWithToast = async (id?: string) => {
+    try {
+      await openLocalRepo(id);
+
+      toast({
+        message: 'Repository opened successfully.',
+        severity: 'success',
+      });
+    } catch (e: any) {
+      const msg =
+        e?.message || e?.name || 'Failed to open repository. Please try again.';
+
+      toast({
+        message: `Open repository failed: ${msg}`,
+        severity: 'error',
+      });
+    }
+  };
 
   const backgroundGradient = `linear-gradient(
   135deg,
@@ -123,7 +144,7 @@ export default function WelcomePage({
               handleShowDocumentation={handleShowDocumentation}
               handleCloneRepo={promptCloneRepo}
               handleCreateRepo={promptCreateLocalRepo}
-              openLocalFolderAndSet={openLocalFolderAndSet}
+              openLocalFolderAndSet={openLocalFolderWithToast}
               openLocalRecentProject={openLocalRecentProject}
             />
           ) : (
@@ -133,7 +154,7 @@ export default function WelcomePage({
               handleShowDocumentation={handleShowDocumentation}
               handleCloneRepo={promptCloneRepo}
               handleCreateRepo={promptCreateLocalRepo}
-              openLocalFolderAndSet={openLocalFolderAndSet}
+              openLocalFolderAndSet={openLocalFolderWithToast}
               openLocalRecentProject={openLocalRecentProject}
             />
           )}

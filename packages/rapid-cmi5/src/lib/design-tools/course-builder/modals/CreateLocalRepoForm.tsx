@@ -100,18 +100,6 @@ export function CreateLocalRepoForm({
 
     return (
       <>
-        <Grid size={12}>
-          <FormControlTextField
-            control={control}
-            error={Boolean(errors?.repoRemoteUrl)}
-            helperText={errors?.repoRemoteUrl?.message}
-            name="repoRemoteUrl"
-            label="Remote Repository URL"
-            multiline={true}
-            readOnly={false}
-            data-testid=''
-          />
-        </Grid>
         <Grid size={6}>
           <FormControlTextField
             control={control}
@@ -156,6 +144,18 @@ export function CreateLocalRepoForm({
             readOnly={false}
           />
         </Grid>
+        <Grid size={12}>
+          <FormControlTextField
+            control={control}
+            error={Boolean(errors?.repoRemoteUrl)}
+            helperText={errors?.repoRemoteUrl?.message}
+            name="repoRemoteUrl"
+            label="Remote Repository URL"
+            multiline={true}
+            readOnly={false}
+            data-testid=""
+          />
+        </Grid>
       </>
     );
   };
@@ -173,12 +173,12 @@ export function CreateLocalRepoForm({
         <MiniForm
           dataCache={defaultData}
           doAction={handleCreateLocalRepo}
-          formTitle="Create Local Repository"
+          formTitle="Create Project"
           getFormFields={getFormFields}
-          instructions="Fill out the form to create a new local repository"
+          instructions="Fill out the form to create a new project"
           submitButtonText="Create"
-          failToasterMessage="Repository Creation Failed"
-          successToasterMessage="Repository Created Successfully"
+          failToasterMessage="Project Creation Failed"
+          successToasterMessage="Project Created Successfully"
           onClose={onClose}
           onCancel={onCancel}
           onResponse={onResponse}

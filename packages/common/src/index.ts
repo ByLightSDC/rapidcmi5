@@ -1,5 +1,8 @@
 export * from './lib/courseParser';
 export * from './lib/courseCreator';
+export * from './lib/generateAuConfigs';
+export * from './lib/generateCmi5Xml';
+
 export * from './lib/codeValidators/directiveValidators';
 export * from './lib/codeValidators/markdownValidator';
 

@@ -4,7 +4,7 @@ import fs, { constants } from 'fs';
 
 import { app } from 'electron';
 
-import path from 'path';
+import path, { join } from 'path';
 import git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
 
@@ -226,15 +226,13 @@ export class ElectronFsHandler {
     zip = false,
   ): Promise<FolderStruct[]> => {
     const full = await this.getFullPath(p);
-    const fullBase = await this.getFullPath(repoPath);
 
     const struct = await this.getFolderStructureRec(
       full,
-      fullBase,
+      repoPath,
       getContents,
       zip,
     );
-
     return struct;
   };
 
@@ -262,7 +260,7 @@ export class ElectronFsHandler {
 
           const itemPath = path.join(dir, name);
 
-          const id = toPosix(path.relative(basePath, itemPath));
+          const id = toPosix(join(basePath, name));
           const node: FolderStruct = {
             id,
             name,
@@ -288,8 +286,8 @@ export class ElectronFsHandler {
             // 3) Recurse for directories
             node.isBranch = true;
             node.children = await this.getFolderStructureRec(
-              itemPath,
-              basePath,
+              path.join(dir, name),
+              toPosix(join(basePath, name)),
               getContents,
               zip,
             );

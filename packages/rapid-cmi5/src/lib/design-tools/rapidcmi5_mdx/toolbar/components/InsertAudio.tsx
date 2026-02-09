@@ -1,8 +1,8 @@
-import React from 'react';
+
 import { usePublisher } from '@mdxeditor/gurx';
-import { Tooltip, IconButton } from '@mui/material';
 import AudioFileIcon from '@mui/icons-material/AudioFile';
 import { openNewAudioDialog$ } from '../../plugins/audio';
+import { ButtonWithTooltip } from '@mdxeditor/editor';
 
 /**
  * A toolbar button that allows the user to insert audio.
@@ -13,15 +13,14 @@ export const InsertAudio = () => {
   const openNewAudioDialog = usePublisher(openNewAudioDialog$);
 
   return (
-    <Tooltip title="Insert Audio">
-      <IconButton
-        onClick={() => {
-          openNewAudioDialog();
-        }}
-        size="small"
-      >
-        <AudioFileIcon fontSize="inherit" />
-      </IconButton>
-    </Tooltip>
+    <ButtonWithTooltip
+      title={'Insert Audio'}
+      aria-label="insert-audio"
+      onClick={() => {
+        openNewAudioDialog();
+      }}
+    >
+      <AudioFileIcon fontSize="inherit" />
+    </ButtonWithTooltip>
   );
 };

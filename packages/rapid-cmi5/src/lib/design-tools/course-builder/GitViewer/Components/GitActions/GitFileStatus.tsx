@@ -16,6 +16,7 @@ import {
   Stack,
   Typography,
   Box,
+  CircularProgress,
 } from '@mui/material';
 import {
   FileStatus,
@@ -24,6 +25,8 @@ import {
 } from '../../utils/StatusMatrix';
 import path from 'path-browserify';
 import RestoreIcon from '@mui/icons-material/Restore';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+
 import { useState } from 'react';
 
 export interface ModifiedFile {
@@ -57,6 +60,7 @@ const statusLabels: Record<FileStatus, string> = {
   deleted_staged: 'Deleted',
   deleted_staged_with_changes: 'Deleted (Staged, Modified)',
   deleted_staged_with_rename: 'Deleted (Staged, Renamed)',
+  added_then_deleted: 'Added Then Delete',
   unknown: 'Unknown',
 };
 
@@ -75,6 +79,7 @@ const statusMap: Record<
   deleted_staged: { color: 'success' },
   deleted_staged_with_changes: { color: 'warning' },
   deleted_staged_with_rename: { color: 'success' },
+  added_then_deleted: { color: 'default' },
   unknown: { color: 'default' },
 };
 
@@ -102,6 +107,7 @@ export default function GitFileStatus({
   handleRemoveFile,
   handleGetDiff,
   handleNavToFile,
+  gettingRepoStatus,
 }: {
   modifiedFiles: ModifiedFile[];
   handleStageAll?: () => Promise<void>;
@@ -114,258 +120,252 @@ export default function GitFileStatus({
   handleGetDiff?: (
     filepath: string,
   ) => Promise<{ oldFile: string; newFile: string }>;
+  gettingRepoStatus: boolean;
 }) {
   const [shouldStageAll, setShouldStageAll] = useState(false);
 
-  // we will use this later for diff view
-
-  // const [oldFile, setOldFile] = useState('');
-  // const [newFile, setNewFile] = useState('');
-
-  // const getDiff = async (file: string) => {
-  //   if (!handleGetDiff) return;
-  //   const files = await handleGetDiff(file);
-  //   setOldFile(files.oldFile);
-  //   setNewFile(files.newFile);
-  // };
-
   return (
-    <>
-      <TableContainer
-        component={Paper}
-        sx={{
-          width: '100%',
-          height: 'auto',
-          minHeight: 300,
-          borderRadius: 2,
-          padding: 2,
-          mt: 3,
-        }}
-      >
+    <TableContainer
+      component={Paper}
+      elevation={0}
+      sx={{
+        width: '100%',
+        maxHeight: '80vh',
+        minHeight: 250,
+        borderRadius: 2,
+        border: '1px solid',
+        borderColor: 'divider',
+        mt: 3,
+        overflowY: 'auto',
+      }}
+    >
+      {gettingRepoStatus && (
         <Box
           sx={{
             display: 'flex',
-            flexDirection: 'row',
             alignItems: 'center',
-            height: '52px',
-            verticalAlign: 'middle',
+            gap: 1.5,
+            py: 1.5,
+            px: 2.5,
+            backgroundColor: 'primary.lighter',
+            borderBottom: '1px solid',
+            borderColor: 'divider',
           }}
         >
-          {handleStageAll && handleUnstageAll && (
-            <Checkbox
-              sx={{ color: 'primary.main' }}
-              key="stage-all"
-              id="stage-all"
-              aria-label="Toggle Stage All"
-              checked={shouldStageAll}
-              disabled={modifiedFiles.length <= 0}
-              onChange={(event, value) => {
-                setShouldStageAll(value);
-                if (value) {
-                  handleStageAll();
-                } else {
-                  handleUnstageAll();
-                }
-              }}
-            />
-          )}
-          <Typography variant="body2">Stage All Changes</Typography>
+          <CircularProgress size={18} thickness={4} />
+          <Typography variant="body2" color="text.primary" fontWeight={500}>
+            Calculating repository status...
+          </Typography>
         </Box>
-        <Table sx={{ width: '100%' }}>
-          <TableHead>
-            <TableRow>
-              {handeleStageFile && handeleUnStageFile && (
-                <TableCell sx={gitTableCellHeaderStyle}>
-                  <Typography fontWeight="bold" fontSize="0.875rem">
-                    Stage
-                  </Typography>
-                </TableCell>
-              )}
+      )}
 
-              <TableCell sx={gitTableCellHeaderStyle}>
-                <Typography fontWeight="bold" fontSize="0.875rem">
-                  File Name
-                </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          px: 2.5,
+          py: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+        }}
+      >
+        {handleStageAll && handleUnstageAll && (
+          <Checkbox
+            size="small"
+            checked={shouldStageAll}
+            disabled={modifiedFiles.length <= 0 || gettingRepoStatus}
+            onChange={(event, value) => {
+              setShouldStageAll(value);
+              if (value) {
+                handleStageAll();
+              } else {
+                handleUnstageAll();
+              }
+            }}
+          />
+        )}
+        <Typography variant="body2" fontWeight={500} ml={0.5}>
+          Stage All Changes
+        </Typography>
+        {modifiedFiles.length > 0 && (
+          <Chip
+            size="small"
+            label={modifiedFiles.length}
+            sx={{ ml: 1.5, height: 22, fontSize: '0.75rem' }}
+          />
+        )}
+      </Box>
+
+      <Table stickyHeader sx={{ width: '100%' }}>
+        <TableHead
+          sx={{
+            '& .MuiTableCell-root': {
+              backgroundColor: 'background.paper',
+            },
+          }}
+        >
+          {' '}
+          <TableRow>
+            {handeleStageFile && handeleUnStageFile && (
+              <TableCell sx={{ ...gitTableCellHeaderStyle, width: '60px' }}>
+                Stage
               </TableCell>
-              <TableCell sx={gitTableCellHeaderStyle}>
-                <Typography fontWeight="bold" fontSize="0.875rem">
-                  File Path
-                </Typography>
-              </TableCell>
+            )}
+            <TableCell sx={{ ...gitTableCellHeaderStyle, width: '25%' }}>
+              File Name
+            </TableCell>
+            <TableCell sx={{ ...gitTableCellHeaderStyle, width: '35%' }}>
+              File Path
+            </TableCell>
+            <TableCell
+              sx={{
+                ...gitTableCellHeaderStyle,
+                width: '20%',
+                textAlign: 'center',
+              }}
+            >
+              Status
+            </TableCell>
+            <TableCell
+              sx={{
+                ...gitTableCellHeaderStyle,
+                width: '20%',
+                textAlign: 'right',
+              }}
+            >
+              Actions
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {modifiedFiles.length === 0 ? (
+            <TableRow>
               <TableCell
-                sx={{ ...gitTableCellHeaderStyle, textAlign: 'center' }}
+                colSpan={5}
+                align="center"
+                sx={{ py: 8, borderBottom: 'none' }}
               >
-                <Typography fontWeight="bold" fontSize="0.875rem">
-                  Status
+                <Typography variant="body2" color="text.secondary">
+                  {gettingRepoStatus
+                    ? 'Loading changes...'
+                    : 'No changes found'}
                 </Typography>
               </TableCell>
             </TableRow>
-          </TableHead>
-          <TableBody>
-            {modifiedFiles.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={3} align="center" sx={{ py: 1 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    No changes found
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            ) : (
-              modifiedFiles.map((file, index) => {
-                const deleted = isDeletedStatus(file.status);
-                return (
-                  <>
-                    <TableRow key={index} hover sx={{ borderBottom: 'none' }}>
-                      {handeleStageFile && handeleUnStageFile && (
-                        <TableCell sx={{ borderBottom: 'none', py: 0.5 }}>
-                          <Checkbox
-                            sx={{ color: 'primary.main' }}
-                            key="stage-all"
-                            id="stage-all"
-                            aria-label="Toggle Stage All"
-                            checked={stagedStatuses.includes(file.status)}
-                            disabled={false}
-                            onChange={(event, value) => {
-                              if (value) {
-                                handeleStageFile(file.name);
-                              } else {
-                                handeleUnStageFile(file.name);
-                              }
-                            }}
-                          />
-                        </TableCell>
-                      )}
+          ) : (
+            modifiedFiles.map((file, index) => {
+              const deleted = isDeletedStatus(file.status);
+              const isUntracked =
+                file.status === 'untracked' || file.status === 'added';
 
-                      <TableCell sx={{ borderBottom: 'none', py: 0.5 }}>
-                        <Typography
-                          fontWeight="medium"
-                          fontSize="0.875rem"
-                          sx={{
-                            textDecoration: deleted ? 'line-through' : 'none',
-                          }}
-                        >
-                          {path.basename(file.name)}
-                        </Typography>
-                      </TableCell>
+              return (
+                <TableRow
+                  key={index}
+                  hover
+                  sx={{
+                    '&:last-child td': { borderBottom: 'none' },
+                    opacity: gettingRepoStatus ? 0.6 : 1,
+                    transition: 'opacity 0.2s',
+                  }}
+                >
+                  {handeleStageFile && handeleUnStageFile && (
+                    <TableCell sx={{ py: 1.5 }}>
+                      <Checkbox
+                        size="small"
+                        checked={stagedStatuses.includes(file.status)}
+                        disabled={gettingRepoStatus}
+                        onChange={(event, value) => {
+                          if (value) {
+                            handeleStageFile(file.name);
+                          } else {
+                            handeleUnStageFile(file.name);
+                          }
+                        }}
+                      />
+                    </TableCell>
+                  )}
 
-                      <TableCell sx={{ borderBottom: 'none', py: 0.5 }}>
-                        <NoMaxWidthTooltip title={file.name}>
-                          <Typography
-                            fontSize="0.8rem"
-                            color="text.secondary"
-                            sx={{
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              maxWidth: '300px',
-                              textDecoration: deleted ? 'line-through' : 'none',
-                            }}
-                          >
-                            {file.name}
-                          </Typography>
-                        </NoMaxWidthTooltip>
-                      </TableCell>
-                      <TableCell
+                  <TableCell sx={{ py: 1.5 }}>
+                    <Typography
+                      variant="body2"
+                      fontWeight={500}
+                      sx={{
+                        textDecoration: deleted ? 'line-through' : 'none',
+                        color: deleted ? 'text.secondary' : 'text.primary',
+                      }}
+                    >
+                      {path.basename(file.name)}
+                    </Typography>
+                  </TableCell>
+
+                  <TableCell sx={{ py: 1.5 }}>
+                    <NoMaxWidthTooltip title={file.name}>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
                         sx={{
-                          borderBottom: 'none',
-                          py: 0.5,
-                          textAlign: 'center',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          maxWidth: '400px',
+                          textDecoration: deleted ? 'line-through' : 'none',
                         }}
                       >
-                        <Stack direction="column" spacing={1.2} flexWrap="wrap">
-                          {getStatusChip(file.status)}
-                          {file.hasMergeConflict && (
-                            <Chip
-                              onClick={() => handleNavToFile?.(file.name)}
-                              sx={{
-                                fontSize: '0.75rem',
-                                height: 'auto',
-                                padding: '2px 4px',
-                              }}
-                              label="Merge Conflict"
-                              color="error"
-                            />
-                          )}
-                        </Stack>
-                      </TableCell>
-                      <TableCell sx={{ borderBottom: 'none', py: 0.5 }}>
-                        <Stack direction="row" spacing={1.2} flexWrap="wrap">
-                          {handleRemoveFile && handleRevertFile && (
-                            <Tooltip
-                              title={
-                                file.status === 'untracked' ||
-                                file.status === 'added'
-                                  ? 'Remove file from Repo'
-                                  : 'Restore file from last commit'
-                              }
-                            >
-                              <Button
-                                variant="outlined"
-                                size="small"
-                                color="error"
-                                sx={{
-                                  textTransform: 'none',
-                                  px: 1,
-                                  fontSize: '0.75rem',
-                                }}
-                                startIcon={<RestoreIcon />}
-                                onClick={() =>
-                                  file.status === 'untracked' ||
-                                  file.status === 'added'
-                                    ? handleRemoveFile(file.name)
-                                    : handleRevertFile(file.name)
-                                }
-                              >
-                                {file.status === 'untracked' ||
-                                file.status === 'added'
-                                  ? 'Remove'
-                                  : 'Revert'}
-                              </Button>
-                            </Tooltip>
-                          )}
-                        </Stack>
-                      </TableCell>
+                        {file.name}
+                      </Typography>
+                    </NoMaxWidthTooltip>
+                  </TableCell>
 
-                      {/* <TableCell sx={{ borderBottom: 'none', py: 0.5 }}>
-                        <Stack direction="row" spacing={1.2} flexWrap="wrap">
-                          {handleGetDiff && (
-                            <Tooltip
-                              title={
-                                file.status === 'untracked' ||
-                                file.status === 'added'
-                                  ? 'Remove file from Repo'
-                                  : 'Restore file from last commit'
-                              }
-                            >
-                              <Button
-                                variant="outlined"
-                                size="small"
-                                color="error"
-                                sx={{
-                                  textTransform: 'none',
-                                  px: 1,
-                                  fontSize: '0.75rem',
-                                }}
-                                startIcon={<RestoreIcon />}
-                                onClick={() => getDiff(file.name)}
-                              >
-                                Get Diff
-                              </Button>
-                            </Tooltip>
-                          )}
-                        </Stack>
-                      </TableCell> */}
-                    </TableRow>
-                  </>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      {/* {newFile && oldFile && (
-        <MonacoDiff modified={newFile} original={oldFile}></MonacoDiff>
-      )} */}
-    </>
+                  <TableCell sx={{ py: 1.5, textAlign: 'center' }}>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      justifyContent="center"
+                      flexWrap="wrap"
+                    >
+                      {getStatusChip(file.status)}
+                      {file.hasMergeConflict && (
+                        <Chip
+                          size="small"
+                          label="Merge Conflict"
+                          color="error"
+                          onClick={() => handleNavToFile?.(file.name)}
+                          sx={{ cursor: 'pointer' }}
+                        />
+                      )}
+                    </Stack>
+                  </TableCell>
+
+                  <TableCell sx={{ py: 1.5, textAlign: 'right' }}>
+                    {handleRemoveFile && handleRevertFile && (
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        color={isUntracked ? 'error' : 'primary'}
+                        disabled={gettingRepoStatus}
+                        sx={{
+                          textTransform: 'none',
+                          minWidth: 'auto',
+                        }}
+                        startIcon={
+                          isUntracked ? <DeleteOutlineIcon /> : <RestoreIcon />
+                        }
+                        onClick={() =>
+                          isUntracked
+                            ? handleRemoveFile(file.name)
+                            : handleRevertFile(file.name)
+                        }
+                      >
+                        {isUntracked ? 'Remove' : 'Revert'}
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }
