@@ -15,7 +15,6 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { $getRoot } from 'lexical';
 
-
 import {
   Box,
   IconButton,
@@ -296,14 +295,6 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
       }
     }
   }, [tab, mdastNode]);
-
-  /**
-   * UE Synchs form data when node changes
-   */
-  useEffect(() => {
-    //update content
-    setFormData(mdastNode.children);
-  }, [mdastNode]);
 
   /**
    * Render Tabs and Nested Content

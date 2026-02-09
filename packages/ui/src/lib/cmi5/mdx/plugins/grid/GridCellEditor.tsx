@@ -5,10 +5,9 @@ import {
   useCellValues,
   useMdastNodeUpdater,
 } from '@mdxeditor/editor';
-import { useContext, useEffect, useMemo, useState } from 'react';
-import { TabsContext } from './TabsContext';
+import { useMemo, useState } from 'react';
 import { ContainerDirective } from 'mdast-util-directive';
-import { TabContentDirectiveNode } from './types';
+import { GridCellDirectiveNode } from './types';
 import { Box, useTheme } from '@mui/material';
 import { editorInPlayback$ } from '../../state/vars';
 import { AlignmentToolbarControls } from '../../components/AlignmentToolbarControls';
@@ -19,21 +18,18 @@ import {
 import { useFocusWithin } from '../shared/useFocusWithin';
 
 /**
- * Tab Content Editor for tabs plugin
- * @param props
- * @returns
+ * Grid Cell Editor for the Grid Layout plugin.
+ * Renders a single cell within a grid container with a nested editor.
+ * Cells automatically fill equal-width columns in the parent grid.
  */
-export const TabContentEditor: React.FC<
-  DirectiveEditorProps<TabContentDirectiveNode>
+export const GridCellEditor: React.FC<
+  DirectiveEditorProps<GridCellDirectiveNode>
 > = ({ lexicalNode, mdastNode, parentEditor }) => {
-  const { tab } = useContext(TabsContext);
+  const [cellIndex, setCellIndex] = useState(-1);
+  const { isFocused, ref: contentRef } = useFocusWithin<HTMLDivElement>();
   const muiTheme = useTheme();
   const updateMdastNode = useMdastNodeUpdater();
   const [isPlayback, readOnly] = useCellValues(editorInPlayback$, readOnly$);
-
-  const [contentIsVisible, setContentIsVisible] = useState(false);
-  const [tabIndex, setTabIndex] = useState(-1);
-  const { isFocused, ref: contentRef } = useFocusWithin<HTMLDivElement>();
 
   const rawTextAlign = mdastNode.attributes?.textAlign;
   const textAlign: TextAlign =
@@ -42,33 +38,22 @@ export const TabContentEditor: React.FC<
       : 'left';
   const { scopedClass, alignmentStyles } = useScopedAlignmentStyles(
     textAlign,
-    'tab-content',
+    'grid-cell',
   );
 
   /**
-   * determine tab index for aria labels
-   * check current tab selection to see if content should be displayed or hidden
+   * Determine cell index for accessibility labels
    */
   useMemo(() => {
     parentEditor.update(() => {
-      let myTabIndex = -1;
+      let myCellIndex = -1;
       const parentKeys = lexicalNode.getParent()?.getChildrenKeys();
       if (parentKeys) {
-        myTabIndex = parentKeys?.indexOf(lexicalNode.getKey());
-        setTabIndex(myTabIndex);
-        if (myTabIndex === tab) {
-          setContentIsVisible(true);
-          return;
-        }
-
-        setContentIsVisible(false);
+        myCellIndex = parentKeys?.indexOf(lexicalNode.getKey());
+        setCellIndex(myCellIndex);
       }
     });
-  }, [lexicalNode, parentEditor, tab]);
-
-  useEffect(() => {
-    //REF console.log('visible');
-  }, [contentIsVisible]);
+  }, [lexicalNode, parentEditor]);
 
   const handleAlignmentChange = (value: 'left' | 'center' | 'right') => {
     updateMdastNode({
@@ -80,32 +65,32 @@ export const TabContentEditor: React.FC<
     });
   };
 
-  /**
-   * Renders editable tab content
-   */
   return (
-    <div
+    <Box
       ref={contentRef}
-      style={{
-        display: contentIsVisible ? undefined : 'none',
+      sx={{
         position: 'relative',
-        border: isFocused ? '1px dashed' : '1px dashed transparent',
-        borderColor: isFocused ? muiTheme.palette.divider : 'transparent',
-        borderRadius: 4,
-        padding: 4,
+        minHeight: '60px',
+        border: '1px dashed',
+        borderColor: isFocused ? 'primary.main' : 'divider',
+        borderRadius: 1,
+        p: 1,
+        '&:hover': {
+          borderColor: 'primary.main',
+        },
       }}
-      role="tabpanel"
-      id={`tabpanel-${tabIndex}`}
-      aria-labelledby={`tab-${tabIndex}`}
+      role="gridcell"
+      aria-label={`Grid cell ${cellIndex + 1}`}
     >
+      {/* Scoped flex layout CSS (only when alignment is non-default) */}
       {alignmentStyles}
 
       {isFocused && !isPlayback && (
         <Box
           sx={{
             position: 'absolute',
-            top: 4,
-            right: 4,
+            top: -32,
+            right: 0,
             zIndex: 10,
             display: 'flex',
             backgroundColor:
@@ -132,6 +117,6 @@ export const TabContentEditor: React.FC<
           className: scopedClass,
         }}
       />
-    </div>
+    </Box>
   );
 };
