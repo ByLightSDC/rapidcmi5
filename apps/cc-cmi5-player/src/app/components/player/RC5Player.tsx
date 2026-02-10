@@ -45,7 +45,8 @@ import {
   ImageLabelDirectiveDescriptor,
   onCheckClickOutsideImageLabel,
   debugLog,
-  AnimationConfig
+  AnimationConfig,
+  themeColor,
 } from '@rapid-cmi5/ui';
 
 import { RC5PlayerToolbar } from './RC5PlayerToolbar';
@@ -56,6 +57,7 @@ import { githubDark } from '@uiw/codemirror-theme-github';
 import { LayoutBoxDirectiveDescriptor } from './editors/directives/LayoutBoxDirectiveDescriptor';
 import { mediaEventManager } from '../../utils/MediaEventManager';
 import { logger } from '../../debug';
+import { useSelector } from 'react-redux';
 /**
  * Rapid CMI5 Visual Editor
  * @returns
@@ -65,6 +67,10 @@ function RC5Player() {
   const { slideData, activeTab } = useContext(AuManagerContext);
   const [fullScreenImage, setFullScreenImage] = useState<string>('');
   const [fullScreenImageStyle, setFullScreenImageStyle] = useState({});
+  const themeSel = useSelector(themeColor);
+  const [mdxTheme, setMdxTheme] = useState(
+    `${themeSel}-theme ${themeSel}-editor nested-editable-${themeSel}`,
+  );
   const [slideAnimations, setSlideAnimations] = useState<AnimationConfig[]>([]);
 
   const pixelTop = '40px';
@@ -267,19 +273,31 @@ function RC5Player() {
     };
   }, [slideData, activeTab]);
 
+  /**
+   * UE sets mdx theme when MUI theme changes
+   */
+  useEffect(() => {
+    setMdxTheme(
+      `${themeSel}-theme ${themeSel}-editor nested-editable-${themeSel}`,
+    );
+  }, [themeSel]);
+  
   // Use the animation playback hook with parsed animations
   useAnimationPlayback(slideAnimations, activeTab, true);
 
   return (
     <>
       <Box
-        sx={{ marginTop: pixelTop, height: `calc(100vh - ${pixelTop})` }}
+        sx={{
+          marginTop: pixelTop,
+          height: `calc(100vh - ${pixelTop})`,
+        }}
         onClick={onClickSlide}
         ref={editorContainerRef}
       >
         {thePlugins && thePlugins.length > 0 && (
           <MDXEditor
-            className="dark-theme dark-editor"
+            className={mdxTheme}
             ref={ref}
             markdown={''}
             plugins={thePlugins}
@@ -298,7 +316,7 @@ function RC5Player() {
           style={{
             position: 'absolute',
             zIndex: 9999,
-            backgroundColor: 'black',
+            //backgroundColor: 'black',
             width: '100vw',
             height: '100vh',
             left: 0,
