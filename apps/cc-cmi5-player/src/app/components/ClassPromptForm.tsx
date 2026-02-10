@@ -82,7 +82,7 @@ export default function ClassPromptForm(props: tFormProps) {
     };
     return (
       <>
-        <Grid size={12}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.name)}
@@ -93,7 +93,7 @@ export default function ClassPromptForm(props: tFormProps) {
             readOnly={crudType === FormCrudType.view}
           />
         </Grid>
-        <Grid size={12}>
+        <Grid size={6}>
           <DateTimePicker
             label="End Date"
             name="endDate"
