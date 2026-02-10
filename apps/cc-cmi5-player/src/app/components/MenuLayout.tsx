@@ -17,7 +17,7 @@ import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import { Box, Tooltip, Typography, useTheme } from '@mui/material';
+import { Box, Switch, Tooltip, Typography, useTheme } from '@mui/material';
 import { classIdSel, studentIdSel } from '../redux/auReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { cmi5Instance } from '../session/cmi5';
@@ -150,9 +150,7 @@ export default function MenuLayout() {
           <Box
             ref={slideRef}
             sx={{
-              //was
-              //TODO Make New Presentation Background
-              //backgroundColor: 'black',
+              //presentation background color
               backgroundColor: palette.background.paper,
               height: '100%',
               width: '100%',
@@ -164,9 +162,6 @@ export default function MenuLayout() {
               sx={{
                 position: 'absolute',
                 //backgroundColor: leave blank so it matches presentation background
-                //backgroundColor: palette.background.default,
-                //backgroundColor: 'pink',
-                //backgroundColor: 'rgba(0, 0, 0, 0.75)',
               }}
             >
               <IconButton
@@ -219,7 +214,33 @@ export default function MenuLayout() {
               >
                 <ReorderIcon />
               </IconButton>
-
+              <Switch
+                icon=<LightModeIcon
+                    color="primary"
+                  fontSize="small"
+                  sx={{
+                    backgroundColor: 'background.default',
+                    borderRadius: '12px',
+                    borderStyle: 1,
+                  }}
+                />
+                checkedIcon=<DarkModeIcon
+                  color="primary"
+                  fontSize="small"
+                  sx={{
+                    backgroundColor: 'background.default',
+                    borderRadius: '12px',
+                    borderStyle: 1,
+                  }}
+                />
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  if (event.target.checked) {
+                    dispatch(setTheme('dark'));
+                    return;
+                  }
+                  dispatch(setTheme('light'));
+                }}
+              />
               {featureFlagChangeClassRoom && (
                 <ButtonInfoField
                   alertSxProps={{
@@ -333,37 +354,6 @@ export default function MenuLayout() {
                   </Tooltip>
                 </IconButton>
               )}
-
-              <IconButton
-                aria-label="split"
-                color="primary"
-                //disabled={!isSplitPanelShown}
-                onClick={() => {
-                  dispatch(setTheme('dark'));
-                }}
-              >
-                <DarkModeIcon />
-              </IconButton>
-              <IconButton
-                aria-label="split"
-                color="primary"
-                //disabled={!isSplitPanelShown}
-                onClick={() => {
-                  dispatch(setTheme('light'));
-                }}
-              >
-                <LightModeIcon />
-              </IconButton>
-              <IconButton
-                aria-label="split"
-                color="primary"
-                //disabled={!isSplitPanelShown}
-                onClick={() => {
-                  dispatch(setTheme('og'));
-                }}
-              >
-                <RestartAltIcon />
-              </IconButton>
             </Stack>
 
             <>
