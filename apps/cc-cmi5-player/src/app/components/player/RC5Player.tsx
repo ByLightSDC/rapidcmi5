@@ -46,7 +46,7 @@ import {
   onCheckClickOutsideImageLabel,
   debugLog,
   AnimationConfig,
-  themeColor,,
+  themeColor,
 } from '@rapid-cmi5/ui';
 
 import { RC5PlayerToolbar } from './RC5PlayerToolbar';
@@ -111,7 +111,6 @@ function RC5Player() {
       }),
       codeMirrorPlugin({
         codeBlockLanguages: languageList,
-        codeMirrorExtensions: [githubDark],
       }),
       footnotePlugin({
         footnoteDefinitionEditorDescriptors: [FootnoteDefinitionDescriptor],
