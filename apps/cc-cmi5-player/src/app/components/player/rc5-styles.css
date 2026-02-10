@@ -38,6 +38,14 @@
   }
 }
 
+/* Ensure nested editors in AccordionSummary (like admonition titles) align properly */
+.MuiAccordionSummary-root ._nestedEditor_1e2ox_961 {
+  padding: 0;
+  margin: 0;
+  line-height: inherit;
+  min-height: 0;
+}
+
 .mdxeditor-diff-source-wrapper {
   overflow-y: auto;
   height: 100%;

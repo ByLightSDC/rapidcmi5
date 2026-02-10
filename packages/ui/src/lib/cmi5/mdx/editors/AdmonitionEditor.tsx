@@ -347,6 +347,14 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
             borderStyle: 'solid',
             borderWidth: isFocused ? '1px' : '1px',
             zIndex: 100,
+            alignItems: 'center', // Ensure vertical alignment of icon and text
+            '& .MuiAccordionSummary-content': {
+              alignItems: 'center', // Ensure content wrapper aligns items vertically
+              margin: 0, // Remove default margin that might affect alignment
+            },
+            '& .MuiAccordionSummary-contentGutters': {
+              padding: 0, // Remove padding between icon and text to match player view
+            },
           }}
         >
           {getAdmonitionIcon(adType)}
@@ -355,6 +363,10 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
               // @ts-ignore
               '--basePageBg': 'transparent',
               //backgroundColor: 'adSeverityHexColor || adHexColor || adColor',
+              display: 'flex',
+              alignItems: 'center', // Align nested editor content vertically
+              minHeight: 0, // Prevent extra height from affecting alignment
+              marginLeft: '8px', // Add consistent spacing between icon and text
             }}
           >
             <NestedLexicalEditor<Paragraph>
