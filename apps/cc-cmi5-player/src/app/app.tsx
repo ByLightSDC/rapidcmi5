@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 import { NotificationsProvider } from '@toolpad/core';
 import AppRoutes from './AppRoutes';
 import { debugLog } from './debug';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 export function App() {
   // Handle session termination when user leaves the page
@@ -37,15 +39,17 @@ export function App() {
 
   return (
     <ThemeProvider theme={darkTheme}>
-      <NotificationsProvider
-        slotProps={{
-          snackbar: {
-            anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
-          },
-        }}
-      >
-        <AppRoutes />
-      </NotificationsProvider>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <NotificationsProvider
+          slotProps={{
+            snackbar: {
+              anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
+            },
+          }}
+        >
+          <AppRoutes />
+        </NotificationsProvider>
+      </LocalizationProvider>
     </ThemeProvider>
   );
 }

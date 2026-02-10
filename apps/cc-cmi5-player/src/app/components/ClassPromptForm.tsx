@@ -81,9 +81,8 @@ export default function ClassPromptForm(props: tFormProps) {
       formMethods.setValue('endDate', value?.toISOString());
     };
     return (
-      // eslint-disable-next-line react/jsx-no-useless-fragment
       <>
-        <Grid size={5}>
+        <Grid size={12}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.name)}
@@ -94,12 +93,12 @@ export default function ClassPromptForm(props: tFormProps) {
             readOnly={crudType === FormCrudType.view}
           />
         </Grid>
-        <Grid size={8}>
+        <Grid size={12}>
           <DateTimePicker
             label="End Date"
             name="endDate"
             disablePast
-            slotProps={{ textField: { required: true } }}
+            slotProps={{ textField: { required: true, fullWidth: true } }}
             onChange={handleEndDateChange}
             readOnly={crudType === FormCrudType.view}
           />
@@ -107,8 +106,6 @@ export default function ClassPromptForm(props: tFormProps) {
       </>
     );
   };
-
-  useEffect(() => {}, []);
 
   return (
     <SharedFormWithProvider<ClassEntry, ClassEntry, ClassEntry>
