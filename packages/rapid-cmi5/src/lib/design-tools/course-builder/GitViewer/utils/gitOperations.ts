@@ -13,7 +13,7 @@ import { repoNameInUseMessage, sandBoxName } from '../session/constants';
 const AuthenticationErrorMessage =
   'The credentials provided are invalid; authentication has failed.';
 const AuthorizationErrorMessage =
-  'The credentials provided are invalid; authentication has failed.';
+  'The credentials provided do not have proper access; authorization has failed. Please give the personal access token proper repository access.';
 
 export const failedMergePath = '.git/failedMerge.txt';
 

@@ -8,6 +8,12 @@ import path, { join } from 'path';
 import git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
 
+
+const AuthenticationErrorMessage =
+  'The credentials provided are invalid; authentication has failed.';
+const AuthorizationErrorMessage =
+  'The credentials provided do not have proper access; authorization has failed. Please give the personal access token proper repository access.';
+
 const fsp = fs.promises;
 
 function toPosix(p: string) {
@@ -492,12 +498,41 @@ export class ElectronFsHandler {
   async pushRepo(p: string, username: string, password: string) {
     const fullPath = await this.getFullPath(p);
 
-    await git.push({
-      fs,
-      http,
-      dir: fullPath,
-      onAuth: () => ({ username, password }),
-    });
+    try {
+      await git.push({
+        fs,
+        http,
+        dir: fullPath,
+        onAuth: () => ({ username, password }),
+      });
+    } catch (error: any) {
+      if (error?.code === 'NotFoundError') {
+        throw Error(
+          'No branch was found to push. Please ensure your course has a branch to be pushed to the remote.',
+        );
+      }
+      if (error?.data?.reason === 'not-fast-forward') {
+        throw Error(
+          'Push failed because it was not a simple fast forward. Additional commits exist on the remote; please pull and try again.',
+        );
+      }
+
+      if (error?.message === 'Failed to fetch') {
+        throw Error(
+          'Push failed because it could not reach the remote URL. Please check that your network connection is stable and that the remote URL is correct.',
+        );
+      }
+
+      if (error?.data?.statusCode === 401) {
+        throw Error(AuthenticationErrorMessage);
+      }
+
+      if (error?.data?.statusCode === 403) {
+        throw Error(AuthorizationErrorMessage);
+      }
+
+      throw error;
+    }
   }
 
   async pullRepo(

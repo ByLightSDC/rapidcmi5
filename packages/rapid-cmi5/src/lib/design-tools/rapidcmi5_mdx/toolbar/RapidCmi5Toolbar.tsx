@@ -33,11 +33,7 @@ import { InsertLayoutBox } from './components/InsertLayoutBox';
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
 
-import {
-  Box,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
+import { Box, IconButton, Tooltip } from '@mui/material';
 
 import { InsertAdmonition } from './components/InsertAdmonition';
 import {
@@ -69,6 +65,7 @@ import {
   InsertAccordion,
   dividerColor,
   iconColor,
+  InsertGrid,
 } from '@rapid-cmi5/ui';
 import { displayData } from '../../../redux/courseBuilderReducer';
 import { SlideMenu } from '../menu/SlideMenu';
@@ -227,6 +224,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                         <InsertTable />
                         <InsertTabs />
                         <InsertAccordion />
+                        <InsertGrid />
                         <InsertThematicBreak />
                         <Separator />
                         <InsertCodeBlock />

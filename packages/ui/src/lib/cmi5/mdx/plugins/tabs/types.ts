@@ -43,5 +43,6 @@ export interface TabContentDirectiveNode extends ContainerDirective {
    */
   attributes: {
     title?: string;
+    textAlign?: string;
   };
 }

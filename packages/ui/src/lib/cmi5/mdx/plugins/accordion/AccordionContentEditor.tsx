@@ -1,4 +1,10 @@
-import { DirectiveEditorProps, NestedLexicalEditor } from '@mdxeditor/editor';
+import {
+  DirectiveEditorProps,
+  NestedLexicalEditor,
+  readOnly$,
+  useCellValues,
+  useMdastNodeUpdater,
+} from '@mdxeditor/editor';
 import { useMemo, useState } from 'react';
 
 import { ContainerDirective } from 'mdast-util-directive';
@@ -7,11 +13,19 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Box,
   Typography,
   useTheme,
 } from '@mui/material';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { editorInPlayback$ } from '../../state/vars';
+import { AlignmentToolbarControls } from '../../components/AlignmentToolbarControls';
+import {
+  TextAlign,
+  useScopedAlignmentStyles,
+} from '../shared/useScopedAlignmentStyles';
+import { useFocusWithin } from '../shared/useFocusWithin';
 
 /**
  * Accordion Content Editor for accordion plugin
@@ -22,7 +36,20 @@ export const AccordionContentEditor: React.FC<
   DirectiveEditorProps<AccordionContentDirectiveNode>
 > = ({ lexicalNode, mdastNode, parentEditor }) => {
   const [accordionIndex, setAccordionIndex] = useState(-1);
+  const { isFocused, ref: contentRef } = useFocusWithin<HTMLDivElement>();
   const muiTheme = useTheme();
+  const updateMdastNode = useMdastNodeUpdater();
+  const [isPlayback, readOnly] = useCellValues(editorInPlayback$, readOnly$);
+
+  const rawTextAlign = mdastNode.attributes?.textAlign;
+  const textAlign: TextAlign =
+    rawTextAlign === 'center' || rawTextAlign === 'right'
+      ? rawTextAlign
+      : 'left';
+  const { scopedClass, alignmentStyles } = useScopedAlignmentStyles(
+    textAlign,
+    'accordion-content',
+  );
 
   /**
    * accordion content background color to contrast with title background
@@ -47,6 +74,16 @@ export const AccordionContentEditor: React.FC<
       }
     });
   }, [lexicalNode, parentEditor]);
+
+  const handleAlignmentChange = (value: 'left' | 'center' | 'right') => {
+    updateMdastNode({
+      ...mdastNode,
+      attributes: {
+        ...mdastNode.attributes,
+        textAlign: value === 'left' ? undefined : value,
+      },
+    });
+  };
 
   return (
     <Accordion
@@ -75,8 +112,32 @@ export const AccordionContentEditor: React.FC<
         id={`panel${accordionIndex}-content`}
         role="region"
         aria-labelledby={`panel${accordionIndex}-header`}
-        sx={{ backgroundColor: basePageBg }}
+        sx={{ backgroundColor: basePageBg, position: 'relative' }}
+        ref={contentRef}
       >
+        {alignmentStyles}
+
+        {isFocused && !isPlayback && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 4,
+              right: 4,
+              zIndex: 10,
+              display: 'flex',
+              backgroundColor:
+                muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
+              borderRadius: 1,
+            }}
+          >
+            <AlignmentToolbarControls
+              currentAlignment={textAlign}
+              onAlignmentChange={handleAlignmentChange}
+              disabled={readOnly}
+            />
+          </Box>
+        )}
+
         <NestedLexicalEditor<ContainerDirective>
           block={true}
           getContent={(node) => {
@@ -86,6 +147,9 @@ export const AccordionContentEditor: React.FC<
             ...node,
             children,
           })}
+          contentEditableProps={{
+            className: scopedClass,
+          }}
         />
       </AccordionDetails>
     </Accordion>

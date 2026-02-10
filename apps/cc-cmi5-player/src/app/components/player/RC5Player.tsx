@@ -46,7 +46,7 @@ import {
   onCheckClickOutsideImageLabel,
   debugLog,
   AnimationConfig,
-  themeColor,
+  themeColor,,
 } from '@rapid-cmi5/ui';
 
 import { RC5PlayerToolbar } from './RC5PlayerToolbar';
@@ -55,6 +55,8 @@ import { AuManagerContext } from '../../session/AuManager';
 import { kebabToCamel } from '../../utils/StringUtils';
 import { githubDark } from '@uiw/codemirror-theme-github';
 import { LayoutBoxDirectiveDescriptor } from './editors/directives/LayoutBoxDirectiveDescriptor';
+import { GridContainerDirectiveDescriptor } from './editors/directives/GridContainerDirectiveDescriptor';
+import { GridCellDirectiveDescriptor } from './editors/directives/GridCellDirectiveDescriptor';
 import { mediaEventManager } from '../../utils/MediaEventManager';
 import { logger } from '../../debug';
 import { useSelector } from 'react-redux';
@@ -100,6 +102,8 @@ function RC5Player() {
           AnimDirectiveDescriptor,
           YoutubeDirectiveDescriptor,
           LayoutBoxDirectiveDescriptor,
+          GridContainerDirectiveDescriptor,
+          GridCellDirectiveDescriptor,
           TabsDirectiveDescriptor,
           TabContentDirectiveDescriptor,
           ImageLabelDirectiveDescriptor,
