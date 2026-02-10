@@ -107,3 +107,5 @@ declare module '@mui/material/styles' {
     };
   }
 }
+
+export type CustomTheme = Theme | ThemeOptions;
