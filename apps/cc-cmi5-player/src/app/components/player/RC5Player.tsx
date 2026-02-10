@@ -319,7 +319,6 @@ function RC5Player() {
           style={{
             position: 'absolute',
             zIndex: 9999,
-            //backgroundColor: 'black',
             width: '100vw',
             height: '100vh',
             left: 0,
