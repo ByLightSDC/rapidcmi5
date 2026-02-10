@@ -5,16 +5,15 @@ declare global {
     _env_?: {
       NX_PUBLIC_AUTH_URL?: string;
       NX_PUBLIC_CLIENT_LOG?: boolean;
-
+      NX_PUBLIC_CMI5_SSO_ENABLED?: boolean;
       NX_PUBLIC_DEVOPS_API_URL?: string;
       NX_PUBLIC_DEVOPS_GQL_URL?: string;
-
+      NX_PUBLIC_DEVOPS_GQL_SUBSCRIPTIONS_URL?: string;
       NX_PUBLIC_KEYCLOAK_URL?: string;
       NX_PUBLIC_KEYCLOAK_REALM?: string;
       NX_PUBLIC_KEYCLOAK_CLIENT_ID?: string;
       NX_PUBLIC_KEYCLOAK_SCOPE?: string;
-      NX_PUBLIC_DEVOPS_GQL_SUBSCRIPTIONS_URL?: string;
-      NX_PUBLIC_CMI5_SSO_ENABLED?: boolean;
+      NX_PUBLIC_MSW_MOCK?: boolean;
     };
   }
 }
@@ -93,6 +92,11 @@ let DEVOPS_GQL_URL =
   process.env['NX_PUBLIC_DEVOPS_GQL_URL'];
 DEVOPS_GQL_URL = checkEnv(DEVOPS_GQL_URL, 'NX_PUBLIC_DEVOPS_GQL_URL');
 
+let MSW_MOCK =
+  window._env_?.NX_PUBLIC_MSW_MOCK ||
+  yn(process.env['NX_PUBLIC_MSW_MOCK'], { default: false });
+MSW_MOCK = checkEnv(MSW_MOCK, 'NX_PUBLIC_MSW_MOCK');
+
 //Static
 const DEVOPS_API_CMI_VERSION = '/v1/cmi5';
 const DEVOPS_API_CONTENT_VERSION = '/v1/content';
@@ -112,6 +116,7 @@ export const config = {
   DEVOPS_GQL_SUBSCRIPTIONS_URL,
   DEVOPS_GQL_URL,
   CMI5_SSO_ENABLED,
+  MSW_MOCK,
   THEME: {
     SLIDE_BACKGROUND: '',
     SLIDE_LOGO: './assets/rapid-cmi5/RapidCMI5.png',

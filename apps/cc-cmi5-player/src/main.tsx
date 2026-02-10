@@ -7,6 +7,7 @@ import './assets/fonts/stylesheet.css';
 import './styles.css';
 import './app/components/player/rc5-styles.css';
 import { debugLog } from './app/debug';
+import { config } from '@rapid-cmi5/ui';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare global {
@@ -22,11 +23,11 @@ async function enableMocking() {
   //   window.store = store;
   // }
 
-  // if (config.MSW_MOCK === true) {
-  //   debugLog('[main]  MOCK ', true);
-  //   window.msw = { worker, http };
-  //   return worker.start();
-  // }
+  if (config.MSW_MOCK === true) {
+    debugLog('[main]  MOCK ', true);
+    window.msw = { worker, http };
+    return worker.start();
+  }
 
   return Promise.resolve();
 }
