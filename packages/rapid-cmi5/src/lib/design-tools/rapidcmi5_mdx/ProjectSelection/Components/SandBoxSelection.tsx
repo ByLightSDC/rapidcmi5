@@ -9,8 +9,10 @@ import { GlassCard } from './GlassCard';
 
 export default function SandBoxSelection({
   openSandbox,
+  isLaunching = false,
 }: {
   openSandbox: () => void;
+  isLaunching?: boolean;
 }) {
   const theme = useTheme();
   const { palette } = theme;
@@ -35,7 +37,7 @@ export default function SandBoxSelection({
         variant="contained"
         size="large"
         fullWidth
-        endIcon={<ArrowForward sx={{mt: 0.5}}/>}
+        endIcon={!isLaunching ? <ArrowForward sx={{ mt: 0.5 }} /> : undefined}
         sx={{
           background: `linear-gradient(135deg, ${palette.primary.main} 0%, ${alpha(palette.primary.main, 0.9)} 100%)`,
           fontFamily: '"Space Mono", monospace',
@@ -52,8 +54,9 @@ export default function SandBoxSelection({
           },
         }}
         onClick={openSandbox}
+        disabled={isLaunching}
       >
-        Launch Sandbox
+        {isLaunching ? 'Launching Sandbox...' : 'Launch Sandbox'}
       </Button>
 
       <Box

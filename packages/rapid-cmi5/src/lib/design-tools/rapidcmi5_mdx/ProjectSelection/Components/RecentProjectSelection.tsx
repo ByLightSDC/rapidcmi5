@@ -35,13 +35,17 @@ const formatRelativeTime = (isoDate: string): string => {
   return `${diffDays} days ago`;
 };
 
+export type RecentProjectSelectionProps = {
+  recentProjects: DirMeta[];
+  openRecentProject: (path: string) => void;
+  isDisabled?: boolean;
+};
+
 export default function RecentProjectSelection({
   recentProjects,
   openRecentProject,
-}: {
-  recentProjects: DirMeta[];
-  openRecentProject: (path: string) => void;
-}) {
+  isDisabled = false,
+}: RecentProjectSelectionProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const theme = useTheme();
   const { palette } = theme;
@@ -88,6 +92,7 @@ export default function RecentProjectSelection({
             placeholder="Search projects..."
             value={searchQuery}
             onChange={handleSearchChange}
+            disabled={isDisabled}
             sx={{
               mb: 2,
               flexShrink: 0,
@@ -118,6 +123,7 @@ export default function RecentProjectSelection({
                     size="small"
                     onClick={handleClearSearch}
                     edge="end"
+                    disabled={isDisabled}
                     sx={{
                       width: 24,
                       height: 24,
@@ -169,6 +175,7 @@ export default function RecentProjectSelection({
               <ThemedOptionCard key={project.id}>
                 <ListItemButton
                   onClick={() => openRecentProject(project.id)}
+                  disabled={isDisabled}
                   sx={{
                     borderRadius: 2,
                     p: 1.2,

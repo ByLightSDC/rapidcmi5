@@ -30,6 +30,7 @@ export default function WelcomePage({
     useContext(GitContext);
   const { promptCloneRepo, promptCreateLocalRepo } = useRC5Prompts();
   const [recentProjects, setRecentProjects] = useState<DirMeta[]>([]);
+  const [isSandboxLaunching, setIsSandboxLaunching] = useState(false);
 
   const { loadingState }: RepoState = useSelector(
     (state: RootState) => state.repoManager,
@@ -106,8 +107,14 @@ export default function WelcomePage({
   };
 
   const handleOpenSandbox = async () => {
-    await openSandbox();
-    setRepoSelected();
+    if (isSandboxLaunching) return;
+    setIsSandboxLaunching(true);
+    try {
+      await openSandbox();
+      setRepoSelected();
+    } finally {
+      setIsSandboxLaunching(false);
+    }
   };
 
   return (
@@ -150,6 +157,7 @@ export default function WelcomePage({
           ) : (
             <WebAppSelection
               handleOpenSandbox={handleOpenSandbox}
+              isSandboxLaunching={isSandboxLaunching}
               recentProjects={recentProjects}
               handleShowDocumentation={handleShowDocumentation}
               handleCloneRepo={promptCloneRepo}
@@ -159,7 +167,11 @@ export default function WelcomePage({
             />
           )}
         </Container>
-        <CloneLoadingOverlay loadingVariant={loadingState} />
+        <CloneLoadingOverlay
+          loadingVariant={loadingState}
+          forceShow={isSandboxLaunching}
+          overrideMessage="Launching sandbox..."
+        />
 
         <DocumentationDialog
           open={docDialogOpen}

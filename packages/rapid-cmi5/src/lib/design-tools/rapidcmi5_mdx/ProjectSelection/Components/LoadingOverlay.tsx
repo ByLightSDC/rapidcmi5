@@ -10,6 +10,8 @@ import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import { LoadingState } from '@rapid-cmi5/react-editor';
 interface CloneLoadingOverlayProps {
   loadingVariant: LoadingState;
+  forceShow?: boolean;
+  overrideMessage?: string;
 }
 
 const pulseAnimation = keyframes`
@@ -36,8 +38,10 @@ const slideInAnimation = keyframes`
 
 export function CloneLoadingOverlay({
   loadingVariant,
+  forceShow = false,
+  overrideMessage,
 }: CloneLoadingOverlayProps) {
-  if (loadingVariant === LoadingState.loaded) return null;
+  if (!forceShow && loadingVariant === LoadingState.loaded) return null;
   const theme = useTheme();
   const { palette } = theme;
 
@@ -53,9 +57,12 @@ export function CloneLoadingOverlay({
   transparent 55%
 )`;
   const message =
-    loadingVariant === LoadingState.cloningRepo
+    overrideMessage ||
+    (loadingVariant === LoadingState.cloningRepo
       ? 'Cloning repository...'
-      : 'Loading Repository...';
+      : 'Loading Repository...');
+  const showHourglass =
+    forceShow || loadingVariant === LoadingState.loadingRepo;
   return (
     <Box
       sx={{
@@ -120,7 +127,7 @@ export function CloneLoadingOverlay({
               zIndex: 1,
             }}
           >
-            {loadingVariant === LoadingState.loadingRepo ? (
+            {showHourglass ? (
               <HourglassBottomIcon sx={{ fontSize: 40, color: 'white' }} />
             ) : (
               <CloudDownload sx={{ fontSize: 40, color: 'white' }} />
