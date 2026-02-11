@@ -248,16 +248,12 @@ export class GitFS {
 
       const fileNames = Object.keys(zip.files).filter((p) => p && p !== '/');
 
-      console.log('Total entries:', fileNames.length);
-
       const topLevels = new Set(
         fileNames.map((p) => p.split('/')[0]).filter(Boolean),
       );
 
       const stripRoot =
         topLevels.size === 1 && fileNames.some((p) => p.includes('/'));
-
-      console.log('Will strip root?', stripRoot);
 
       await this.createDirRecursive(cmi5BuildCache);
 
@@ -305,8 +301,6 @@ export class GitFS {
           // Get content as uint8array
           const content = await entry.async('uint8array');
 
-          console.log(`Writing: ${fullPath} (${content.length} bytes)`);
-
           // Write the file
           await this.fs.promises.writeFile(fullPath, content);
 
@@ -321,7 +315,6 @@ export class GitFS {
               );
               failCount++;
             } else {
-              console.log(`✓ Verified: ${fullPath}`);
               successCount++;
             }
           } catch (verifyError) {
@@ -334,20 +327,11 @@ export class GitFS {
         }
       }
 
-      console.log(
-        `Extraction complete: ${successCount} succeeded, ${failCount} failed`,
-      );
-
       const folders = await this.getFolderStructure(cmi5BuildCache, '', false);
-      console.log(
-        'Final folder structure file count:',
-        this.countFiles(folders),
-      );
 
       if (failCount > 0) {
         throw new Error(`Failed to extract ${failCount} files`);
       }
-
       debugLog('cmi5-player downloaded and extracted successfully');
     } catch (error: any) {
       debugLogError(`Error downloading cmi5-player: ${error}`);
