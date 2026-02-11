@@ -14,10 +14,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
 import { UseFormReturn, useForm, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import Grid from '@mui/material/Grid2';
 
 /* MUI */
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 
 /* Icons */
 import Check from '@mui/icons-material/Check';
@@ -916,9 +916,13 @@ export function SharedFormWithProvider<
             showBorder={!isModal}
             // 8px below fixes top row getting clipped in Blueprint and VM Image forms
             formFields={
-              <Grid container spacing={2} sx={{ paddingTop: '8px' }}>
+              <Grid
+                container
+                spacing={2}
+                sx={{ paddingTop: '8px', width: '100%' }}
+              >
                 {hasFile && crudType === FormCrudType.create ? (
-                  <Grid item xs={12}>
+                  <Grid size={12}>
                     <FileUpload
                       buttonTitle={fileButtonTitle}
                       dataCache={fileFormData}

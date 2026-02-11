@@ -47,7 +47,6 @@ import {
 import { debugLogError } from '../debug';
 import { config } from '@rapid-cmi5/ui';
 import { useActivitySession } from '../hooks/useActivitySession';
-import Auth from '../Auth';
 import { handleActivityScoring } from '../utils/LmsStatementManager';
 import { debugLog } from '@rapid-cmi5/ui';
 

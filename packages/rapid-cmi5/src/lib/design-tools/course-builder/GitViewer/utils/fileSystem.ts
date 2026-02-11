@@ -230,14 +230,6 @@ export class GitFS {
   downloadCmi5PlayerIfNeeded = async (
     downloadPlayer: () => Promise<any>,
   ): Promise<void> => {
-    // const playerPath = join(cmi5BuildCache, `cmi5-player-${playerVersion}`);
-
-    // // Check if cmi5-player folder already exists
-    // const exists = await this.dirExists(playerPath);
-    // if (exists) {
-    //   debugLog('cmi5-player folder already exists, skipping download');
-    //   return;
-    // }
     try {
       await this.clearDirectory(cmi5BuildCache);
     } catch {}
@@ -245,66 +237,120 @@ export class GitFS {
     try {
       await this.fs.promises.rmdir(cmi5BuildCache);
     } catch {}
+
     try {
-      // debugLog(`Downloading cmi5-player ${playerVersion}...`);
-
-      // Download the zip file
       const response = await downloadPlayer();
-
-      // Get the zip data
       const zipBlob = await response.blob();
       const zipArrayBuffer = await zipBlob.arrayBuffer();
-
-      // Load the zip using JSZip
       const zip = await JSZip.loadAsync(zipArrayBuffer);
 
       debugLog('Extracting cmi5-player...');
-      // Determine if zip has a single top-level folder
+
       const fileNames = Object.keys(zip.files).filter((p) => p && p !== '/');
+
       const topLevels = new Set(
         fileNames.map((p) => p.split('/')[0]).filter(Boolean),
       );
+
       const stripRoot =
         topLevels.size === 1 && fileNames.some((p) => p.includes('/'));
 
       await this.createDirRecursive(cmi5BuildCache);
 
-      await Promise.all(
-        fileNames.map(async (relativePath) => {
-          const entry = zip.files[relativePath];
-          if (!entry) return;
+      // First pass: create all directories
+      for (const relativePath of fileNames) {
+        const entry = zip.files[relativePath];
+        if (!entry || !entry.dir) continue;
 
-          let cleanedPath = relativePath;
-          if (stripRoot) {
-            const parts = relativePath.split('/');
-            parts.shift(); // remove the single root folder
-            cleanedPath = parts.join('/');
-          }
+        let cleanedPath = relativePath;
+        if (stripRoot) {
+          const parts = relativePath.split('/');
+          parts.shift();
+          cleanedPath = parts.join('/');
+        }
 
-          // Skip empty path (root folder itself)
-          if (!cleanedPath) return;
+        if (!cleanedPath) continue;
 
-          const fullPath = join(cmi5BuildCache, cleanedPath);
+        const fullPath = join(cmi5BuildCache, cleanedPath);
+        await this.createDirRecursive(fullPath);
+      }
 
-          if (entry.dir) {
-            await this.createDirRecursive(fullPath);
-            return;
-          }
+      // Second pass: write all files
+      let successCount = 0;
+      let failCount = 0;
 
-          // // Ensure parent directory exists
+      for (const relativePath of fileNames) {
+        const entry = zip.files[relativePath];
+        if (!entry || entry.dir) continue;
+
+        let cleanedPath = relativePath;
+        if (stripRoot) {
+          const parts = relativePath.split('/');
+          parts.shift();
+          cleanedPath = parts.join('/');
+        }
+
+        if (!cleanedPath) continue;
+
+        const fullPath = join(cmi5BuildCache, cleanedPath);
+
+        try {
+          // Ensure parent directory exists
           await this.createDirRecursive(dirname(fullPath));
 
+          // Get content as uint8array
           const content = await entry.async('uint8array');
-          await this.fs.promises.writeFile(fullPath, content);
-        }),
-      );
 
+          // Write the file
+          await this.fs.promises.writeFile(fullPath, content);
+
+          // IMPORTANT: Verify the write was successful
+          try {
+            const stat = await this.fs.promises.stat(fullPath);
+            const actualSize = stat.size;
+
+            if (actualSize !== content.length) {
+              console.error(
+                `Size mismatch for ${fullPath}: expected ${content.length}, got ${actualSize}`,
+              );
+              failCount++;
+            } else {
+              successCount++;
+            }
+          } catch (verifyError) {
+            console.error(`Failed to verify ${fullPath}:`, verifyError);
+            failCount++;
+          }
+        } catch (writeError) {
+          console.error(`Failed to write ${fullPath}:`, writeError);
+          failCount++;
+        }
+      }
+
+      const folders = await this.getFolderStructure(cmi5BuildCache, '', false);
+
+      if (failCount > 0) {
+        throw new Error(`Failed to extract ${failCount} files`);
+      }
       debugLog('cmi5-player downloaded and extracted successfully');
     } catch (error: any) {
       debugLogError(`Error downloading cmi5-player: ${error}`);
       throw new Error(`Failed to download cmi5-player: ${error}`);
     }
   };
+
+  // Helper to count files
+  private countFiles(folders: FolderStruct[]): number {
+    let count = 0;
+    for (const item of folders) {
+      if (!item.isBranch) {
+        count++;
+      } else if (item.children) {
+        count += this.countFiles(item.children);
+      }
+    }
+    return count;
+  }
   // this is browser specific
   openLocalDirectory = async (
     dirHandle: FileSystemDirectoryHandle,

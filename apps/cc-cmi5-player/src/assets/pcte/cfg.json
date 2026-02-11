@@ -1,0 +1,8 @@
+{
+  "DEVOPS_API_URL": "https://rangeos-api.prod-cp.rangeos.engineering",
+  "DEVOPS_GQL_URL": "https://rangeos-graphql.prod-cp.rangeos.engineering/",
+  "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.prod-cp.rangeos.engineering",
+  "KEYCLOAK_URL": "https://keycloak.global.cloudcents.bylight.com/auth/",
+  "SLIDE_BACKGROUND": "",
+  "SLIDE_LOGO": "./assets/pcte/pcte.png"
+}

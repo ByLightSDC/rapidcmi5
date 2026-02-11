@@ -4,7 +4,12 @@ import { config } from '@rapid-cmi5/ui';
 
 export const defaultSortOrderBy = 'dateEdited';
 export const defaultSortOrder = 'desc'; // this will put the last edited at the top
-
+export const defaultSortByOptions = [
+  'author',
+  'dateCreated',
+  'dateEdited',
+  'name',
+];
 // FOR PERM CACHING ADD : staleTime: Infinity,
 export const defaultQueryConfig: any = {
   // DEFAULT CONFIG FOR CALLING ON MOUNT AND AVOIDING MULTI ERROR MESSAGES
