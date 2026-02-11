@@ -265,6 +265,12 @@ export interface AnsiblePlaybook {
      */
     'scenarioGroups'?: Array<ScenarioGroup>;
     /**
+     * Indicates whether RangeAnsiblePlaybook requires elevated privileges to execute
+     * @type {boolean}
+     * @memberof AnsiblePlaybook
+     */
+    'requiresElevatedPrivileges'?: boolean;
+    /**
      * Array of Parent Playbook UUIDs
      * @type {Array<string>}
      * @memberof AnsiblePlaybook
@@ -288,12 +294,6 @@ export interface AnsiblePlaybook {
      * @memberof AnsiblePlaybook
      */
     'containerSpecification'?: string | null;
-    /**
-     * Indicates whether RangeAnsiblePlaybook requires elevated privileges to execute
-     * @type {boolean}
-     * @memberof AnsiblePlaybook
-     */
-    'requiresElevatedPrivileges'?: boolean;
 }
 /**
  * 
@@ -2887,6 +2887,12 @@ export interface ChartCreate {
      * @memberof ChartCreate
      */
     'iconType': ChartCreateIconTypeEnum;
+    /**
+     * 
+     * @type {ResourceRequirements}
+     * @memberof ChartCreate
+     */
+    'requests': ResourceRequirements;
 }
 
 export const ChartCreateIconTypeEnum = {
@@ -2987,6 +2993,12 @@ export interface ChartVersion {
      * @memberof ChartVersion
      */
     'version'?: string;
+    /**
+     * 
+     * @type {ResourceRequirements}
+     * @memberof ChartVersion
+     */
+    'requests'?: ResourceRequirements | null;
 }
 
 export const ChartVersionIconTypeEnum = {
@@ -3383,6 +3395,12 @@ export interface Cmi5AUMapping {
      */
     'name'?: string;
     /**
+     * Duration of the scenarios in hours
+     * @type {number}
+     * @memberof Cmi5AUMapping
+     */
+    'durationHours'?: number;
+    /**
      * The scenarios associated with the au
      * @type {Array<string>}
      * @memberof Cmi5AUMapping
@@ -3407,6 +3425,12 @@ export interface Cmi5AuMappingCreate {
      * @memberof Cmi5AuMappingCreate
      */
     'name': string;
+    /**
+     * Duration of the scenarios in hours
+     * @type {number}
+     * @memberof Cmi5AuMappingCreate
+     */
+    'durationHours'?: number;
     /**
      * The scenarios associated with the au
      * @type {Array<string>}
@@ -3464,12 +3488,100 @@ export interface Cmi5AuMappingUpdate {
      */
     'name'?: string;
     /**
+     * Duration of the scenarios in hours
+     * @type {number}
+     * @memberof Cmi5AuMappingUpdate
+     */
+    'durationHours'?: number;
+    /**
      * The scenarios associated with the au
      * @type {Array<string>}
      * @memberof Cmi5AuMappingUpdate
      */
     'scenarios': Array<string>;
 }
+/**
+ * 
+ * @export
+ * @interface Cmi5BuildContent
+ */
+export interface Cmi5BuildContent {
+    /**
+     * The amount of time the course will take
+     * @type {number}
+     * @memberof Cmi5BuildContent
+     */
+    'duration'?: number;
+    /**
+     * If a user can self enroll in the course
+     * @type {boolean}
+     * @memberof Cmi5BuildContent
+     */
+    'selfEnrollable'?: boolean;
+    /**
+     * The number of users which can be enrolled into this course
+     * @type {number}
+     * @memberof Cmi5BuildContent
+     */
+    'seats'?: number;
+    /**
+     * The list of work roles this task works towards
+     * @type {Array<string>}
+     * @memberof Cmi5BuildContent
+     */
+    'workRoles'?: Array<string>;
+    /**
+     * General topic tags that are related to the course
+     * @type {Array<string>}
+     * @memberof Cmi5BuildContent
+     */
+    'topicTags'?: Array<string>;
+    /**
+     * The platforms which this course utilizes
+     * @type {Array<string>}
+     * @memberof Cmi5BuildContent
+     */
+    'platforms'?: Array<string>;
+    /**
+     * A list of user requirments for the course
+     * @type {Array<string>}
+     * @memberof Cmi5BuildContent
+     */
+    'requirements'?: Array<string>;
+    /**
+     * The difficulty level of the course
+     * @type {string}
+     * @memberof Cmi5BuildContent
+     */
+    'courseLevel'?: Cmi5BuildContentCourseLevelEnum;
+    /**
+     * 
+     * @type {File}
+     * @memberof Cmi5BuildContent
+     */
+    'file': File;
+    /**
+     * Whether or not to create / update au mappings for a course
+     * @type {boolean}
+     * @memberof Cmi5BuildContent
+     */
+    'createAuMappings': boolean;
+    /**
+     * Optional project name for the cmi5 course upload
+     * @type {string}
+     * @memberof Cmi5BuildContent
+     */
+    'projectName'?: string;
+}
+
+export const Cmi5BuildContentCourseLevelEnum = {
+    Beginner: 'beginner',
+    Intermediate: 'intermediate',
+    Advanced: 'advanced'
+} as const;
+
+export type Cmi5BuildContentCourseLevelEnum = typeof Cmi5BuildContentCourseLevelEnum[keyof typeof Cmi5BuildContentCourseLevelEnum];
+
 /**
  * 
  * @export
@@ -3525,6 +3637,31 @@ export interface Cmi5CourseRegistrationList200Response {
      * @memberof Cmi5CourseRegistrationList200Response
      */
     'data'?: Array<Cmi5Registration>;
+}
+/**
+ * 
+ * @export
+ * @interface Cmi5Details
+ */
+export interface Cmi5Details {
+    /**
+     * The user will be added to the scenario in this group
+     * @type {object}
+     * @memberof Cmi5Details
+     */
+    'group'?: object;
+    /**
+     * This user will be added to the scenario after deployment
+     * @type {string}
+     * @memberof Cmi5Details
+     */
+    'username'?: string;
+    /**
+     * Registration ID for the CMI5 deployment
+     * @type {string}
+     * @memberof Cmi5Details
+     */
+    'registrationId'?: string;
 }
 /**
  * 
@@ -3624,6 +3761,12 @@ export interface Cmi5RegistrationAu {
      * @memberof Cmi5RegistrationAu
      */
     'classId'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof Cmi5RegistrationAu
+     */
+    'scheduledScenarios'?: Array<string>;
 }
 /**
  * 
@@ -8504,6 +8647,12 @@ export interface DeployedScenario {
      * @memberof DeployedScenario
      */
     'classId'?: string | null;
+    /**
+     * 
+     * @type {Schedule}
+     * @memberof DeployedScenario
+     */
+    'schedule'?: Schedule;
 }
 
 export const DeployedScenarioStatusEnum = {
@@ -8651,6 +8800,12 @@ export interface DeployedScenarioDetail {
      * @memberof DeployedScenarioDetail
      */
     'classId'?: string | null;
+    /**
+     * 
+     * @type {Schedule}
+     * @memberof DeployedScenarioDetail
+     */
+    'schedule'?: Schedule;
 }
 
 export const DeployedScenarioDetailStatusEnum = {
@@ -15710,6 +15865,18 @@ export interface Range {
      * @memberof Range
      */
     'cmi5DeploymentAllowed'?: boolean;
+    /**
+     * 
+     * @type {RangeAllocations}
+     * @memberof Range
+     */
+    'allocations'?: RangeAllocations | null;
+    /**
+     * 
+     * @type {RangeConstraints}
+     * @memberof Range
+     */
+    'constraints'?: RangeConstraints | null;
 }
 
 export const RangeStatusEnum = {
@@ -15738,6 +15905,25 @@ export const RangeBootstrapTypeEnum = {
 
 export type RangeBootstrapTypeEnum = typeof RangeBootstrapTypeEnum[keyof typeof RangeBootstrapTypeEnum];
 
+/**
+ * 
+ * @export
+ * @interface RangeAllocations
+ */
+export interface RangeAllocations {
+    /**
+     * Total available CPUs
+     * @type {number}
+     * @memberof RangeAllocations
+     */
+    'cpu': number;
+    /**
+     * Total available memory in bytes
+     * @type {number}
+     * @memberof RangeAllocations
+     */
+    'memory': number;
+}
 /**
  * 
  * @export
@@ -17447,6 +17633,31 @@ export interface RangeConsolesList200Response {
     'data'?: Array<RangeConsole>;
 }
 /**
+ * 
+ * @export
+ * @interface RangeConstraints
+ */
+export interface RangeConstraints {
+    /**
+     * Optional CPU oversubscription factor
+     * @type {number}
+     * @memberof RangeConstraints
+     */
+    'cpuFactor'?: number | null;
+    /**
+     * Maximum number of range networks
+     * @type {number}
+     * @memberof RangeConstraints
+     */
+    'rangeNetworks': number;
+    /**
+     * Maximum number of all range resources, including range networks
+     * @type {number}
+     * @memberof RangeConstraints
+     */
+    'rangeResources': number;
+}
+/**
  * RangeOS Range Container
  * @export
  * @interface RangeContainer
@@ -17762,6 +17973,18 @@ export interface RangeCreate {
      * @memberof RangeCreate
      */
     'cmi5DeploymentAllowed'?: boolean;
+    /**
+     * 
+     * @type {RangeAllocations}
+     * @memberof RangeCreate
+     */
+    'allocations'?: RangeAllocations | null;
+    /**
+     * 
+     * @type {RangeConstraints}
+     * @memberof RangeCreate
+     */
+    'constraints'?: RangeConstraints | null;
 }
 
 export const RangeCreateBootstrapTypeEnum = {
@@ -20972,6 +21195,12 @@ export interface RangeSpecificationAws {
      */
     'registries'?: Registries | null;
     /**
+     * 
+     * @type {RangeConstraints}
+     * @memberof RangeSpecificationAws
+     */
+    'constraints'?: RangeConstraints | null;
+    /**
      * Cluster machine pools
      * @type {Array<AwsMachinePool>}
      * @memberof RangeSpecificationAws
@@ -21086,6 +21315,12 @@ export interface RangeSpecificationAwsCreate {
      */
     'registries'?: Registries | null;
     /**
+     * 
+     * @type {RangeConstraints}
+     * @memberof RangeSpecificationAwsCreate
+     */
+    'constraints'?: RangeConstraints | null;
+    /**
      * Cluster machine pools
      * @type {Array<AwsMachinePoolCreate>}
      * @memberof RangeSpecificationAwsCreate
@@ -21199,6 +21434,12 @@ export interface RangeSpecificationAwsUpdate {
      * @memberof RangeSpecificationAwsUpdate
      */
     'registries'?: Registries | null;
+    /**
+     * 
+     * @type {RangeConstraints}
+     * @memberof RangeSpecificationAwsUpdate
+     */
+    'constraints'?: RangeConstraints | null;
     /**
      * Cluster machine pools
      * @type {Array<AwsMachinePoolUpdate>}
@@ -21338,6 +21579,12 @@ export interface RangeSpecificationVsphere {
      */
     'registries'?: Registries | null;
     /**
+     * 
+     * @type {RangeConstraints}
+     * @memberof RangeSpecificationVsphere
+     */
+    'constraints'?: RangeConstraints | null;
+    /**
      * Cluster machine pools
      * @type {Array<VsphereMachinePool>}
      * @memberof RangeSpecificationVsphere
@@ -21446,6 +21693,12 @@ export interface RangeSpecificationVsphereCreate {
      */
     'registries'?: Registries | null;
     /**
+     * 
+     * @type {RangeConstraints}
+     * @memberof RangeSpecificationVsphereCreate
+     */
+    'constraints'?: RangeConstraints | null;
+    /**
      * Cluster machine pools
      * @type {Array<VsphereMachinePoolCreate>}
      * @memberof RangeSpecificationVsphereCreate
@@ -21553,6 +21806,12 @@ export interface RangeSpecificationVsphereUpdate {
      * @memberof RangeSpecificationVsphereUpdate
      */
     'registries'?: Registries | null;
+    /**
+     * 
+     * @type {RangeConstraints}
+     * @memberof RangeSpecificationVsphereUpdate
+     */
+    'constraints'?: RangeConstraints | null;
     /**
      * Cluster machine pools
      * @type {Array<VsphereMachinePoolUpdate>}
@@ -21923,6 +22182,18 @@ export interface RangeUpdate {
      * @memberof RangeUpdate
      */
     'cmi5DeploymentAllowed'?: boolean;
+    /**
+     * 
+     * @type {RangeAllocations}
+     * @memberof RangeUpdate
+     */
+    'allocations'?: RangeAllocations | null;
+    /**
+     * 
+     * @type {RangeConstraints}
+     * @memberof RangeUpdate
+     */
+    'constraints'?: RangeConstraints | null;
 }
 
 export const RangeUpdateBootstrapTypeEnum = {
@@ -22741,6 +23012,25 @@ export interface RegistryMirror {
 /**
  * 
  * @export
+ * @interface ResourceRequirements
+ */
+export interface ResourceRequirements {
+    /**
+     * Measured in cpu units. In Kubernetes, 1 CPU unit is equivalent to 1 physical CPU core, or 1 virtual core, depending on whether the node is a physical host or a virtual machine running inside a physical machine
+     * @type {string}
+     * @memberof ResourceRequirements
+     */
+    'cpu'?: string | null;
+    /**
+     * Measured in bytes. You can express memory as a plain integer or as a fixed-point number using one of these quantity suffixes: E, P, T, G, M, k. You can also use the power-of-two equivalents: Ei, Pi, Ti, Gi, Mi, Ki
+     * @type {string}
+     * @memberof ResourceRequirements
+     */
+    'memory'?: string | null;
+}
+/**
+ * 
+ * @export
  * @interface Scenario
  */
 export interface Scenario {
@@ -22884,6 +23174,157 @@ export const ScenarioGroup = {
 export type ScenarioGroup = typeof ScenarioGroup[keyof typeof ScenarioGroup];
 
 
+/**
+ * Overrides for resource types in a scenario
+ * @export
+ * @interface ScenarioOverrides
+ */
+export interface ScenarioOverrides {
+    /**
+     * Override container specifications by UUID
+     * @type {{ [key: string]: ContainerSpecification; }}
+     * @memberof ScenarioOverrides
+     */
+    'containerSpecifications'?: { [key: string]: ContainerSpecification; };
+    /**
+     * Override ghost agents by UUID
+     * @type {{ [key: string]: GhostAgent; }}
+     * @memberof ScenarioOverrides
+     */
+    'ghostAgents'?: { [key: string]: GhostAgent; };
+    /**
+     * Override ghost C2 servers by UUID
+     * @type {{ [key: string]: GhostC2Server; }}
+     * @memberof ScenarioOverrides
+     */
+    'ghostC2Servers'?: { [key: string]: GhostC2Server; };
+    /**
+     * Override ghost clients by UUID
+     * @type {{ [key: string]: GhostClient; }}
+     * @memberof ScenarioOverrides
+     */
+    'ghostClients'?: { [key: string]: GhostClient; };
+    /**
+     * Override ghost traffic profiles by UUID
+     * @type {{ [key: string]: GhostTrafficProfile; }}
+     * @memberof ScenarioOverrides
+     */
+    'ghostTrafficProfiles'?: { [key: string]: GhostTrafficProfile; };
+    /**
+     * Override internet gateways by UUID
+     * @type {{ [key: string]: InternetGateway; }}
+     * @memberof ScenarioOverrides
+     */
+    'internetGateways'?: { [key: string]: InternetGateway; };
+    /**
+     * Override range BGPs by UUID
+     * @type {{ [key: string]: RangeBGP; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangeBGPs'?: { [key: string]: RangeBGP; };
+    /**
+     * Override range BGP links by UUID
+     * @type {{ [key: string]: RangeBGPLink; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangeBGPLinks'?: { [key: string]: RangeBGPLink; };
+    /**
+     * Override range certs by UUID
+     * @type {{ [key: string]: RangeCert; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangeCerts'?: { [key: string]: RangeCert; };
+    /**
+     * Override range certs by UUID
+     * @type {{ [key: string]: RangePki; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangePkis'?: { [key: string]: RangePki; };
+    /**
+     * Override range consoles by UUID
+     * @type {{ [key: string]: RangeConsole; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangeConsoles'?: { [key: string]: RangeConsole; };
+    /**
+     * Override range DNS servers by UUID
+     * @type {{ [key: string]: RangeDNSServer; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangeDNSServers'?: { [key: string]: RangeDNSServer; };
+    /**
+     * Override range DNS zone by UUID
+     * @type {{ [key: string]: RangeDNSZone; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangeDNSZones'?: { [key: string]: RangeDNSZone; };
+    /**
+     * Override range DNS record by UUID
+     * @type {{ [key: string]: RangeDNSRecord; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangeDNSRecords'?: { [key: string]: RangeDNSRecord; };
+    /**
+     * Override range auto IPs by UUID
+     * @type {{ [key: string]: RangeAutoIP; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangeAutoIPs'?: { [key: string]: RangeAutoIP; };
+    /**
+     * Override range IPs by UUID
+     * @type {{ [key: string]: RangeIP; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangeIPs'?: { [key: string]: RangeIP; };
+    /**
+     * Override range auto L3 networks by UUID
+     * @type {{ [key: string]: RangeAutoL3Network; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangeAutoL3Networks'?: { [key: string]: RangeAutoL3Network; };
+    /**
+     * Override range L3 networks by UUID
+     * @type {{ [key: string]: RangeL3Network; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangeL3Networks'?: { [key: string]: RangeL3Network; };
+    /**
+     * Override range networks by UUID
+     * @type {{ [key: string]: RangeNetwork; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangeNetworks'?: { [key: string]: RangeNetwork; };
+    /**
+     * Override provisioning service composites by UUID
+     * @type {{ [key: string]: AnsiblePlaybook; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangeAnsiblePlaybooks'?: { [key: string]: AnsiblePlaybook; };
+    /**
+     * Override range routers by UUID
+     * @type {{ [key: string]: RangeRouter; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangeRouters'?: { [key: string]: RangeRouter; };
+    /**
+     * Override range tor nets by UUID
+     * @type {{ [key: string]: RangeTorNet; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangeTorNets'?: { [key: string]: RangeTorNet; };
+    /**
+     * Override range volumes by UUID
+     * @type {{ [key: string]: RangeVolume; }}
+     * @memberof ScenarioOverrides
+     */
+    'rangeVolumes'?: { [key: string]: RangeVolume; };
+    /**
+     * Override VM specifications by UUID
+     * @type {{ [key: string]: VMSpecification; }}
+     * @memberof ScenarioOverrides
+     */
+    'vmSpecifications'?: { [key: string]: VMSpecification; };
+}
 /**
  * Overrides for resource types in a scenario
  * @export
@@ -23133,6 +23574,18 @@ export interface ScenariosCreate1Request {
      * @type {string}
      * @memberof ScenariosCreate1Request
      */
+    'endDate'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ScenariosCreate1Request
+     */
+    'startDate'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ScenariosCreate1Request
+     */
     'classId'?: string;
 }
 /**
@@ -23147,6 +23600,18 @@ export interface ScenariosCreateByRangeIdRequest {
      * @memberof ScenariosCreateByRangeIdRequest
      */
     'scenarioId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ScenariosCreateByRangeIdRequest
+     */
+    'endDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ScenariosCreateByRangeIdRequest
+     */
+    'startDate'?: string;
     /**
      * 
      * @type {string}
@@ -23178,6 +23643,18 @@ export interface ScenariosDeployRequest {
      * @memberof ScenariosDeployRequest
      */
     'classId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ScenariosDeployRequest
+     */
+    'endDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ScenariosDeployRequest
+     */
+    'startDate'?: string;
     /**
      * 
      * @type {string}
@@ -23309,6 +23786,313 @@ export interface ScenariosValidateRequest {
      * @memberof ScenariosValidateRequest
      */
     'overrides'?: ScenarioOverridesOverride;
+}
+/**
+ * 
+ * @export
+ * @interface Schedule
+ */
+export interface Schedule {
+    /**
+     * Date when the scenario will start or null to start immediately.
+     * @type {string}
+     * @memberof Schedule
+     */
+    'startDate'?: string;
+    /**
+     * Date when the scenario will end.
+     * @type {string}
+     * @memberof Schedule
+     */
+    'endDate'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface ScheduleCreate
+ */
+export interface ScheduleCreate {
+    /**
+     * Date when the scenario will start or null to start immediately.
+     * @type {string}
+     * @memberof ScheduleCreate
+     */
+    'startDate'?: string;
+    /**
+     * Date when the scenario will end.
+     * @type {string}
+     * @memberof ScheduleCreate
+     */
+    'endDate': string;
+}
+/**
+ * 
+ * @export
+ * @interface ScheduleUpdate
+ */
+export interface ScheduleUpdate {
+    /**
+     * Date when the scenario will start or null to start immediately.
+     * @type {string}
+     * @memberof ScheduleUpdate
+     */
+    'startDate'?: string;
+    /**
+     * Date when the scenario will end.
+     * @type {string}
+     * @memberof ScheduleUpdate
+     */
+    'endDate': string;
+}
+/**
+ * 
+ * @export
+ * @interface ScheduledScenario
+ */
+export interface ScheduledScenario {
+    /**
+     * 
+     * @type {string}
+     * @memberof ScheduledScenario
+     */
+    'uuid'?: string;
+    /**
+     * Date when the object was created.
+     * @type {string}
+     * @memberof ScheduledScenario
+     */
+    'dateCreated'?: string;
+    /**
+     * Date when the object was last edited.
+     * @type {string}
+     * @memberof ScheduledScenario
+     */
+    'dateEdited'?: string;
+    /**
+     * A user provided human readable description.
+     * @type {string}
+     * @memberof ScheduledScenario
+     */
+    'description'?: string;
+    /**
+     * A user provided human readable name.
+     * @type {string}
+     * @memberof ScheduledScenario
+     */
+    'name'?: string;
+    /**
+     * The author of the package.
+     * @type {string}
+     * @memberof ScheduledScenario
+     */
+    'author'?: string;
+    /**
+     * User provided metadata
+     * @type {object}
+     * @memberof ScheduledScenario
+     */
+    'metadata'?: object;
+    /**
+     * 
+     * @type {Schedule}
+     * @memberof ScheduledScenario
+     */
+    'schedule'?: Schedule;
+    /**
+     * ReCAST event ID assigned when the scenario registers with ReCAST
+     * @type {string}
+     * @memberof ScheduledScenario
+     */
+    'recastEventId'?: string | null;
+    /**
+     * ReCAST Range Deployment ID assigned after the scenario is successfully scheduled and prior to deployment
+     * @type {string}
+     * @memberof ScheduledScenario
+     */
+    'recastRangeDeploymentId'?: string | null;
+    /**
+     * List of possible Range IDs to deploy the scenario to
+     * @type {Array<string>}
+     * @memberof ScheduledScenario
+     */
+    'rangeIds'?: Array<string>;
+    /**
+     * Range ID assigned after the scenario is successfully scheduled and prior to deployment
+     * @type {string}
+     * @memberof ScheduledScenario
+     */
+    'rangeId'?: string | null;
+    /**
+     * 
+     * @type {ScenarioOverrides}
+     * @memberof ScheduledScenario
+     */
+    'overrides'?: ScenarioOverrides | null;
+    /**
+     * 
+     * @type {object}
+     * @memberof ScheduledScenario
+     */
+    'labels'?: object | null;
+    /**
+     * 
+     * @type {object}
+     * @memberof ScheduledScenario
+     */
+    'annotations'?: object | null;
+    /**
+     * 
+     * @type {Cmi5Details}
+     * @memberof ScheduledScenario
+     */
+    'cmi5Details'?: Cmi5Details | null;
+    /**
+     * 
+     * @type {BackgroundJob}
+     * @memberof ScheduledScenario
+     */
+    'deployJob'?: BackgroundJob | null;
+    /**
+     * 
+     * @type {BackgroundJob}
+     * @memberof ScheduledScenario
+     */
+    'scheduleJob'?: BackgroundJob | null;
+    /**
+     * Scenario ID
+     * @type {string}
+     * @memberof ScheduledScenario
+     */
+    'scenario'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface ScheduledScenarioCreate
+ */
+export interface ScheduledScenarioCreate {
+    /**
+     * A user provided human readable description.
+     * @type {string}
+     * @memberof ScheduledScenarioCreate
+     */
+    'description'?: string;
+    /**
+     * A user provided human readable name.
+     * @type {string}
+     * @memberof ScheduledScenarioCreate
+     */
+    'name': string;
+    /**
+     * User provided metadata
+     * @type {object}
+     * @memberof ScheduledScenarioCreate
+     */
+    'metadata'?: object;
+    /**
+     * 
+     * @type {ScheduleCreate}
+     * @memberof ScheduledScenarioCreate
+     */
+    'schedule': ScheduleCreate;
+    /**
+     * List of possible Range IDs to deploy the scenario to
+     * @type {Array<string>}
+     * @memberof ScheduledScenarioCreate
+     */
+    'rangeIds': Array<string>;
+    /**
+     * 
+     * @type {ScenarioOverrides}
+     * @memberof ScheduledScenarioCreate
+     */
+    'overrides'?: ScenarioOverrides | null;
+    /**
+     * Scenario ID
+     * @type {string}
+     * @memberof ScheduledScenarioCreate
+     */
+    'scenario': string;
+}
+/**
+ * 
+ * @export
+ * @interface ScheduledScenarioUpdate
+ */
+export interface ScheduledScenarioUpdate {
+    /**
+     * A user provided human readable description.
+     * @type {string}
+     * @memberof ScheduledScenarioUpdate
+     */
+    'description'?: string;
+    /**
+     * A user provided human readable name.
+     * @type {string}
+     * @memberof ScheduledScenarioUpdate
+     */
+    'name'?: string;
+    /**
+     * User provided metadata
+     * @type {object}
+     * @memberof ScheduledScenarioUpdate
+     */
+    'metadata'?: object;
+    /**
+     * 
+     * @type {ScheduleUpdate}
+     * @memberof ScheduledScenarioUpdate
+     */
+    'schedule'?: ScheduleUpdate;
+    /**
+     * 
+     * @type {ScenarioOverrides}
+     * @memberof ScheduledScenarioUpdate
+     */
+    'overrides'?: ScenarioOverrides | null;
+    /**
+     * Scenario ID
+     * @type {string}
+     * @memberof ScheduledScenarioUpdate
+     */
+    'scenario'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface ScheduledScenariosList200Response
+ */
+export interface ScheduledScenariosList200Response {
+    /**
+     * 
+     * @type {number}
+     * @memberof ScheduledScenariosList200Response
+     */
+    'offset'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ScheduledScenariosList200Response
+     */
+    'limit'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ScheduledScenariosList200Response
+     */
+    'totalCount'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ScheduledScenariosList200Response
+     */
+    'totalPages'?: number;
+    /**
+     * 
+     * @type {Array<ScheduledScenario>}
+     * @memberof ScheduledScenariosList200Response
+     */
+    'data'?: Array<ScheduledScenario>;
 }
 /**
  * 
@@ -25003,18 +25787,6 @@ export interface VmSpecificationOverride {
      * @memberof VmSpecificationOverride
      */
     'cloudInit'?: CloudInit | null;
-    /**
-     * Number of CPU cores
-     * @type {number}
-     * @memberof VmSpecificationOverride
-     */
-    'cpuCores'?: number;
-    /**
-     * Quantity of requested memory to be allocated
-     * @type {string}
-     * @memberof VmSpecificationOverride
-     */
-    'memory'?: string;
     /**
      * Hostname of the VM
      * @type {string}
@@ -26881,16 +27653,19 @@ export const AssetsChartsApiAxiosParamCreator = function (configuration?: Config
          * @param {string} cpe Common Platform Enumeration - post provisioning actions
          * @param {File} file The file to upload
          * @param {ChartsCreateIconTypeEnum} iconType Changes the icon displayed in the UI
+         * @param {ResourceRequirements} requests 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        chartsCreate: async (cpe: string, file: File, iconType: ChartsCreateIconTypeEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        chartsCreate: async (cpe: string, file: File, iconType: ChartsCreateIconTypeEnum, requests: ResourceRequirements, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'cpe' is not null or undefined
             assertParamExists('chartsCreate', 'cpe', cpe)
             // verify required parameter 'file' is not null or undefined
             assertParamExists('chartsCreate', 'file', file)
             // verify required parameter 'iconType' is not null or undefined
             assertParamExists('chartsCreate', 'iconType', iconType)
+            // verify required parameter 'requests' is not null or undefined
+            assertParamExists('chartsCreate', 'requests', requests)
             const localVarPath = `/v1/content/assets/charts`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -26925,6 +27700,10 @@ export const AssetsChartsApiAxiosParamCreator = function (configuration?: Config
     
             if (iconType !== undefined) { 
                 localVarFormParams.append('iconType', iconType as any);
+            }
+    
+            if (requests !== undefined) { 
+                localVarFormParams.append('requests', new Blob([JSON.stringify(requests)], { type: "application/json", }));
             }
     
     
@@ -27244,11 +28023,12 @@ export const AssetsChartsApiFp = function(configuration?: Configuration) {
          * @param {string} cpe Common Platform Enumeration - post provisioning actions
          * @param {File} file The file to upload
          * @param {ChartsCreateIconTypeEnum} iconType Changes the icon displayed in the UI
+         * @param {ResourceRequirements} requests 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async chartsCreate(cpe: string, file: File, iconType: ChartsCreateIconTypeEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Chart>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.chartsCreate(cpe, file, iconType, options);
+        async chartsCreate(cpe: string, file: File, iconType: ChartsCreateIconTypeEnum, requests: ResourceRequirements, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Chart>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.chartsCreate(cpe, file, iconType, requests, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AssetsChartsApi.chartsCreate']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -27388,11 +28168,12 @@ export const AssetsChartsApiFactory = function (configuration?: Configuration, b
          * @param {string} cpe Common Platform Enumeration - post provisioning actions
          * @param {File} file The file to upload
          * @param {ChartsCreateIconTypeEnum} iconType Changes the icon displayed in the UI
+         * @param {ResourceRequirements} requests 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        chartsCreate(cpe: string, file: File, iconType: ChartsCreateIconTypeEnum, options?: RawAxiosRequestConfig): AxiosPromise<Chart> {
-            return localVarFp.chartsCreate(cpe, file, iconType, options).then((request) => request(axios, basePath));
+        chartsCreate(cpe: string, file: File, iconType: ChartsCreateIconTypeEnum, requests: ResourceRequirements, options?: RawAxiosRequestConfig): AxiosPromise<Chart> {
+            return localVarFp.chartsCreate(cpe, file, iconType, requests, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -27530,12 +28311,13 @@ export class AssetsChartsApi extends BaseAPI {
      * @param {string} cpe Common Platform Enumeration - post provisioning actions
      * @param {File} file The file to upload
      * @param {ChartsCreateIconTypeEnum} iconType Changes the icon displayed in the UI
+     * @param {ResourceRequirements} requests 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AssetsChartsApi
      */
-    public chartsCreate(cpe: string, file: File, iconType: ChartsCreateIconTypeEnum, options?: RawAxiosRequestConfig) {
-        return AssetsChartsApiFp(this.configuration).chartsCreate(cpe, file, iconType, options).then((request) => request(this.axios, this.basePath));
+    public chartsCreate(cpe: string, file: File, iconType: ChartsCreateIconTypeEnum, requests: ResourceRequirements, options?: RawAxiosRequestConfig) {
+        return AssetsChartsApiFp(this.configuration).chartsCreate(cpe, file, iconType, requests, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -30669,6 +31451,109 @@ export const Cmi5BuildApiAxiosParamCreator = function (configuration?: Configura
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Create a cmi5 zip package and return it
+         * @param {File} file 
+         * @param {boolean} createAuMappings Whether or not to create / update au mappings for a course
+         * @param {number} [duration] The amount of time the course will take
+         * @param {boolean} [selfEnrollable] If a user can self enroll in the course
+         * @param {number} [seats] The number of users which can be enrolled into this course
+         * @param {Array<string>} [workRoles] The list of work roles this task works towards
+         * @param {Array<string>} [topicTags] General topic tags that are related to the course
+         * @param {Array<string>} [platforms] The platforms which this course utilizes
+         * @param {Array<string>} [requirements] A list of user requirments for the course
+         * @param {Cmi5BuildBuildAndUploadCourseLevelEnum} [courseLevel] The difficulty level of the course
+         * @param {string} [projectName] Optional project name for the cmi5 course upload
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cmi5BuildBuildAndUpload: async (file: File, createAuMappings: boolean, duration?: number, selfEnrollable?: boolean, seats?: number, workRoles?: Array<string>, topicTags?: Array<string>, platforms?: Array<string>, requirements?: Array<string>, courseLevel?: Cmi5BuildBuildAndUploadCourseLevelEnum, projectName?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'file' is not null or undefined
+            assertParamExists('cmi5BuildBuildAndUpload', 'file', file)
+            // verify required parameter 'createAuMappings' is not null or undefined
+            assertParamExists('cmi5BuildBuildAndUpload', 'createAuMappings', createAuMappings)
+            const localVarPath = `/v1/cmi5/build/upload`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
+
+            // authentication openId required
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication basic required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+
+            if (duration !== undefined) { 
+                localVarFormParams.append('duration', duration as any);
+            }
+    
+            if (selfEnrollable !== undefined) { 
+                localVarFormParams.append('selfEnrollable', String(selfEnrollable) as any);
+            }
+    
+            if (seats !== undefined) { 
+                localVarFormParams.append('seats', seats as any);
+            }
+                if (workRoles) {
+                localVarFormParams.append('workRoles', workRoles.join(COLLECTION_FORMATS.csv));
+            }
+
+                if (topicTags) {
+                localVarFormParams.append('topicTags', topicTags.join(COLLECTION_FORMATS.csv));
+            }
+
+                if (platforms) {
+                localVarFormParams.append('platforms', platforms.join(COLLECTION_FORMATS.csv));
+            }
+
+                if (requirements) {
+                localVarFormParams.append('requirements', requirements.join(COLLECTION_FORMATS.csv));
+            }
+
+    
+            if (courseLevel !== undefined) { 
+                localVarFormParams.append('courseLevel', courseLevel as any);
+            }
+    
+            if (file !== undefined) { 
+                localVarFormParams.append('file', file as any);
+            }
+    
+            if (createAuMappings !== undefined) { 
+                localVarFormParams.append('createAuMappings', String(createAuMappings) as any);
+            }
+    
+            if (projectName !== undefined) { 
+                localVarFormParams.append('projectName', projectName as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams;
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -30694,6 +31579,29 @@ export const Cmi5BuildApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['Cmi5BuildApi.cmi5BuildBuild']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * 
+         * @summary Create a cmi5 zip package and return it
+         * @param {File} file 
+         * @param {boolean} createAuMappings Whether or not to create / update au mappings for a course
+         * @param {number} [duration] The amount of time the course will take
+         * @param {boolean} [selfEnrollable] If a user can self enroll in the course
+         * @param {number} [seats] The number of users which can be enrolled into this course
+         * @param {Array<string>} [workRoles] The list of work roles this task works towards
+         * @param {Array<string>} [topicTags] General topic tags that are related to the course
+         * @param {Array<string>} [platforms] The platforms which this course utilizes
+         * @param {Array<string>} [requirements] A list of user requirments for the course
+         * @param {Cmi5BuildBuildAndUploadCourseLevelEnum} [courseLevel] The difficulty level of the course
+         * @param {string} [projectName] Optional project name for the cmi5 course upload
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async cmi5BuildBuildAndUpload(file: File, createAuMappings: boolean, duration?: number, selfEnrollable?: boolean, seats?: number, workRoles?: Array<string>, topicTags?: Array<string>, platforms?: Array<string>, requirements?: Array<string>, courseLevel?: Cmi5BuildBuildAndUploadCourseLevelEnum, projectName?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.cmi5BuildBuildAndUpload(file, createAuMappings, duration, selfEnrollable, seats, workRoles, topicTags, platforms, requirements, courseLevel, projectName, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['Cmi5BuildApi.cmi5BuildBuildAndUpload']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -30715,6 +31623,26 @@ export const Cmi5BuildApiFactory = function (configuration?: Configuration, base
          */
         cmi5BuildBuild(file: File, project: string, createAuMappings: boolean, options?: RawAxiosRequestConfig): AxiosPromise<object> {
             return localVarFp.cmi5BuildBuild(file, project, createAuMappings, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Create a cmi5 zip package and return it
+         * @param {File} file 
+         * @param {boolean} createAuMappings Whether or not to create / update au mappings for a course
+         * @param {number} [duration] The amount of time the course will take
+         * @param {boolean} [selfEnrollable] If a user can self enroll in the course
+         * @param {number} [seats] The number of users which can be enrolled into this course
+         * @param {Array<string>} [workRoles] The list of work roles this task works towards
+         * @param {Array<string>} [topicTags] General topic tags that are related to the course
+         * @param {Array<string>} [platforms] The platforms which this course utilizes
+         * @param {Array<string>} [requirements] A list of user requirments for the course
+         * @param {Cmi5BuildBuildAndUploadCourseLevelEnum} [courseLevel] The difficulty level of the course
+         * @param {string} [projectName] Optional project name for the cmi5 course upload
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cmi5BuildBuildAndUpload(file: File, createAuMappings: boolean, duration?: number, selfEnrollable?: boolean, seats?: number, workRoles?: Array<string>, topicTags?: Array<string>, platforms?: Array<string>, requirements?: Array<string>, courseLevel?: Cmi5BuildBuildAndUploadCourseLevelEnum, projectName?: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.cmi5BuildBuildAndUpload(file, createAuMappings, duration, selfEnrollable, seats, workRoles, topicTags, platforms, requirements, courseLevel, projectName, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -30739,8 +31667,39 @@ export class Cmi5BuildApi extends BaseAPI {
     public cmi5BuildBuild(file: File, project: string, createAuMappings: boolean, options?: RawAxiosRequestConfig) {
         return Cmi5BuildApiFp(this.configuration).cmi5BuildBuild(file, project, createAuMappings, options).then((request) => request(this.axios, this.basePath));
     }
+
+    /**
+     * 
+     * @summary Create a cmi5 zip package and return it
+     * @param {File} file 
+     * @param {boolean} createAuMappings Whether or not to create / update au mappings for a course
+     * @param {number} [duration] The amount of time the course will take
+     * @param {boolean} [selfEnrollable] If a user can self enroll in the course
+     * @param {number} [seats] The number of users which can be enrolled into this course
+     * @param {Array<string>} [workRoles] The list of work roles this task works towards
+     * @param {Array<string>} [topicTags] General topic tags that are related to the course
+     * @param {Array<string>} [platforms] The platforms which this course utilizes
+     * @param {Array<string>} [requirements] A list of user requirments for the course
+     * @param {Cmi5BuildBuildAndUploadCourseLevelEnum} [courseLevel] The difficulty level of the course
+     * @param {string} [projectName] Optional project name for the cmi5 course upload
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof Cmi5BuildApi
+     */
+    public cmi5BuildBuildAndUpload(file: File, createAuMappings: boolean, duration?: number, selfEnrollable?: boolean, seats?: number, workRoles?: Array<string>, topicTags?: Array<string>, platforms?: Array<string>, requirements?: Array<string>, courseLevel?: Cmi5BuildBuildAndUploadCourseLevelEnum, projectName?: string, options?: RawAxiosRequestConfig) {
+        return Cmi5BuildApiFp(this.configuration).cmi5BuildBuildAndUpload(file, createAuMappings, duration, selfEnrollable, seats, workRoles, topicTags, platforms, requirements, courseLevel, projectName, options).then((request) => request(this.axios, this.basePath));
+    }
 }
 
+/**
+ * @export
+ */
+export const Cmi5BuildBuildAndUploadCourseLevelEnum = {
+    Beginner: 'beginner',
+    Intermediate: 'intermediate',
+    Advanced: 'advanced'
+} as const;
+export type Cmi5BuildBuildAndUploadCourseLevelEnum = typeof Cmi5BuildBuildAndUploadCourseLevelEnum[keyof typeof Cmi5BuildBuildAndUploadCourseLevelEnum];
 
 
 /**
@@ -31568,7 +32527,7 @@ export const Cmi5ScenariosApiAxiosParamCreator = function (configuration?: Confi
         /**
          * Assigns a scenario to the current user, or deploys a new one if none are available.
          * @summary Initialize Scenario
-         * @param {ScenariosCreate1Request} [scenariosCreate1Request] 
+         * @param {ScenariosCreate1Request} [scenariosCreate1Request] If not provided, the scenario will start immediately
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -31613,7 +32572,7 @@ export const Cmi5ScenariosApiAxiosParamCreator = function (configuration?: Confi
          * Deploy multiple scenarios for a given class
          * @summary Deploy scenarios for a class
          * @param {string} scenarioId 
-         * @param {ScenariosDeployRequest} scenariosDeployRequest 
+         * @param {ScenariosDeployRequest} scenariosDeployRequest If not provided, the scenario will start immediately
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -31837,7 +32796,7 @@ export const Cmi5ScenariosApiFp = function(configuration?: Configuration) {
         /**
          * Assigns a scenario to the current user, or deploys a new one if none are available.
          * @summary Initialize Scenario
-         * @param {ScenariosCreate1Request} [scenariosCreate1Request] 
+         * @param {ScenariosCreate1Request} [scenariosCreate1Request] If not provided, the scenario will start immediately
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -31851,7 +32810,7 @@ export const Cmi5ScenariosApiFp = function(configuration?: Configuration) {
          * Deploy multiple scenarios for a given class
          * @summary Deploy scenarios for a class
          * @param {string} scenarioId 
-         * @param {ScenariosDeployRequest} scenariosDeployRequest 
+         * @param {ScenariosDeployRequest} scenariosDeployRequest If not provided, the scenario will start immediately
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -31915,7 +32874,7 @@ export const Cmi5ScenariosApiFactory = function (configuration?: Configuration, 
         /**
          * Assigns a scenario to the current user, or deploys a new one if none are available.
          * @summary Initialize Scenario
-         * @param {ScenariosCreate1Request} [scenariosCreate1Request] 
+         * @param {ScenariosCreate1Request} [scenariosCreate1Request] If not provided, the scenario will start immediately
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -31926,7 +32885,7 @@ export const Cmi5ScenariosApiFactory = function (configuration?: Configuration, 
          * Deploy multiple scenarios for a given class
          * @summary Deploy scenarios for a class
          * @param {string} scenarioId 
-         * @param {ScenariosDeployRequest} scenariosDeployRequest 
+         * @param {ScenariosDeployRequest} scenariosDeployRequest If not provided, the scenario will start immediately
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -31981,7 +32940,7 @@ export class Cmi5ScenariosApi extends BaseAPI {
     /**
      * Assigns a scenario to the current user, or deploys a new one if none are available.
      * @summary Initialize Scenario
-     * @param {ScenariosCreate1Request} [scenariosCreate1Request] 
+     * @param {ScenariosCreate1Request} [scenariosCreate1Request] If not provided, the scenario will start immediately
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof Cmi5ScenariosApi
@@ -31994,7 +32953,7 @@ export class Cmi5ScenariosApi extends BaseAPI {
      * Deploy multiple scenarios for a given class
      * @summary Deploy scenarios for a class
      * @param {string} scenarioId 
-     * @param {ScenariosDeployRequest} scenariosDeployRequest 
+     * @param {ScenariosDeployRequest} scenariosDeployRequest If not provided, the scenario will start immediately
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof Cmi5ScenariosApi
@@ -55953,11 +56912,12 @@ export type ScenarioPermissionsRemoveUserGroupEnum = typeof ScenarioPermissionsR
 export const ManageRangeResourcesScenariosApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Deploys a scenario in an existing range
-         * @summary Creates a scenario
+         * DEPRECATED - use the scheduled scenario API instead
+         * @summary Schedules a scenario on a range
          * @param {string} rangeId 
-         * @param {ScenariosCreateByRangeIdRequest} scenariosCreateByRangeIdRequest Optional runtime scenario specific overrides
+         * @param {ScenariosCreateByRangeIdRequest} scenariosCreateByRangeIdRequest If not provided, the scenario will start immediately
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
         scenariosCreateByRangeId: async (rangeId: string, scenariosCreateByRangeIdRequest: ScenariosCreateByRangeIdRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
@@ -56486,14 +57446,15 @@ export const ManageRangeResourcesScenariosApiFp = function(configuration?: Confi
     const localVarAxiosParamCreator = ManageRangeResourcesScenariosApiAxiosParamCreator(configuration)
     return {
         /**
-         * Deploys a scenario in an existing range
-         * @summary Creates a scenario
+         * DEPRECATED - use the scheduled scenario API instead
+         * @summary Schedules a scenario on a range
          * @param {string} rangeId 
-         * @param {ScenariosCreateByRangeIdRequest} scenariosCreateByRangeIdRequest Optional runtime scenario specific overrides
+         * @param {ScenariosCreateByRangeIdRequest} scenariosCreateByRangeIdRequest If not provided, the scenario will start immediately
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
-        async scenariosCreateByRangeId(rangeId: string, scenariosCreateByRangeIdRequest: ScenariosCreateByRangeIdRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployedScenario>> {
+        async scenariosCreateByRangeId(rangeId: string, scenariosCreateByRangeIdRequest: ScenariosCreateByRangeIdRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScheduledScenario>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.scenariosCreateByRangeId(rangeId, scenariosCreateByRangeIdRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ManageRangeResourcesScenariosApi.scenariosCreateByRangeId']?.[localVarOperationServerIndex]?.url;
@@ -56639,14 +57600,15 @@ export const ManageRangeResourcesScenariosApiFactory = function (configuration?:
     const localVarFp = ManageRangeResourcesScenariosApiFp(configuration)
     return {
         /**
-         * Deploys a scenario in an existing range
-         * @summary Creates a scenario
+         * DEPRECATED - use the scheduled scenario API instead
+         * @summary Schedules a scenario on a range
          * @param {string} rangeId 
-         * @param {ScenariosCreateByRangeIdRequest} scenariosCreateByRangeIdRequest Optional runtime scenario specific overrides
+         * @param {ScenariosCreateByRangeIdRequest} scenariosCreateByRangeIdRequest If not provided, the scenario will start immediately
          * @param {*} [options] Override http request option.
+         * @deprecated
          * @throws {RequiredError}
          */
-        scenariosCreateByRangeId(rangeId: string, scenariosCreateByRangeIdRequest: ScenariosCreateByRangeIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<DeployedScenario> {
+        scenariosCreateByRangeId(rangeId: string, scenariosCreateByRangeIdRequest: ScenariosCreateByRangeIdRequest, options?: RawAxiosRequestConfig): AxiosPromise<ScheduledScenario> {
             return localVarFp.scenariosCreateByRangeId(rangeId, scenariosCreateByRangeIdRequest, options).then((request) => request(axios, basePath));
         },
         /**
@@ -56765,11 +57727,12 @@ export const ManageRangeResourcesScenariosApiFactory = function (configuration?:
  */
 export class ManageRangeResourcesScenariosApi extends BaseAPI {
     /**
-     * Deploys a scenario in an existing range
-     * @summary Creates a scenario
+     * DEPRECATED - use the scheduled scenario API instead
+     * @summary Schedules a scenario on a range
      * @param {string} rangeId 
-     * @param {ScenariosCreateByRangeIdRequest} scenariosCreateByRangeIdRequest Optional runtime scenario specific overrides
+     * @param {ScenariosCreateByRangeIdRequest} scenariosCreateByRangeIdRequest If not provided, the scenario will start immediately
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      * @memberof ManageRangeResourcesScenariosApi
      */
@@ -56936,6 +57899,555 @@ export const ScenariosRetrieveByRangeIdUuidIncludesEnum = {
     DetailPackages: 'detail.packages'
 } as const;
 export type ScenariosRetrieveByRangeIdUuidIncludesEnum = typeof ScenariosRetrieveByRangeIdUuidIncludesEnum[keyof typeof ScenariosRetrieveByRangeIdUuidIncludesEnum];
+
+
+/**
+ * ManageRangeResourcesScheduledScenariosApi - axios parameter creator
+ * @export
+ */
+export const ManageRangeResourcesScheduledScenariosApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Schedules a scenario to be deployed on one of the given ranges
+         * @summary Schedules a scenario
+         * @param {ScheduledScenarioCreate} [scheduledScenarioCreate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scheduledScenariosCreate: async (scheduledScenarioCreate?: ScheduledScenarioCreate, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v1/manage/scheduled`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication openId required
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication basic required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(scheduledScenarioCreate, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Deletes a scheduled scenario. If the scenario is currently deployed, it will be destroyed.
+         * @summary Deletes a scheduled scenario
+         * @param {string} uuid 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scheduledScenariosDelete: async (uuid: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uuid' is not null or undefined
+            assertParamExists('scheduledScenariosDelete', 'uuid', uuid)
+            const localVarPath = `/v1/manage/scheduled/{uuid}`
+                .replace(`{${"uuid"}}`, encodeURIComponent(String(uuid)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication openId required
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication basic required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * List all scheduled scenarios
+         * @summary List scheduled scenarios
+         * @param {string} [uuid] 
+         * @param {string} [name] 
+         * @param {string} [description] 
+         * @param {string} [author] 
+         * @param {{ [key: string]: any; }} [metadata] 
+         * @param {string} [assignedRangeId] 
+         * @param {string} [requestedRangeId] 
+         * @param {number} [offset] Number of objects to skip
+         * @param {number} [limit] Number of objects per page
+         * @param {string} [search] Search the list partially or fully
+         * @param {ScheduledScenariosListSortByEnum} [sortBy] Key used to sort the collection by
+         * @param {ScheduledScenariosListSortEnum} [sort] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scheduledScenariosList: async (uuid?: string, name?: string, description?: string, author?: string, metadata?: { [key: string]: any; }, assignedRangeId?: string, requestedRangeId?: string, offset?: number, limit?: number, search?: string, sortBy?: ScheduledScenariosListSortByEnum, sort?: ScheduledScenariosListSortEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/v1/manage/scheduled`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication openId required
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication basic required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+            if (uuid !== undefined) {
+                localVarQueryParameter['uuid'] = uuid;
+            }
+
+            if (name !== undefined) {
+                localVarQueryParameter['name'] = name;
+            }
+
+            if (description !== undefined) {
+                localVarQueryParameter['description'] = description;
+            }
+
+            if (author !== undefined) {
+                localVarQueryParameter['author'] = author;
+            }
+
+            if (metadata !== undefined) {
+                localVarQueryParameter['metadata'] = metadata;
+            }
+
+            if (assignedRangeId !== undefined) {
+                localVarQueryParameter['assignedRangeId'] = assignedRangeId;
+            }
+
+            if (requestedRangeId !== undefined) {
+                localVarQueryParameter['requestedRangeId'] = requestedRangeId;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (search !== undefined) {
+                localVarQueryParameter['search'] = search;
+            }
+
+            if (sortBy !== undefined) {
+                localVarQueryParameter['sortBy'] = sortBy;
+            }
+
+            if (sort !== undefined) {
+                localVarQueryParameter['sort'] = sort;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Retrieve an existing scheduled scenario
+         * @summary Retrieve a scheduled scenario
+         * @param {string} uuid 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scheduledScenariosRetrieve: async (uuid: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uuid' is not null or undefined
+            assertParamExists('scheduledScenariosRetrieve', 'uuid', uuid)
+            const localVarPath = `/v1/manage/scheduled/{uuid}`
+                .replace(`{${"uuid"}}`, encodeURIComponent(String(uuid)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication openId required
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication basic required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Update a scheduled scenario
+         * @param {string} uuid 
+         * @param {ScheduledScenarioUpdate} [scheduledScenarioUpdate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scheduledScenariosUpdate: async (uuid: string, scheduledScenarioUpdate?: ScheduledScenarioUpdate, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uuid' is not null or undefined
+            assertParamExists('scheduledScenariosUpdate', 'uuid', uuid)
+            const localVarPath = `/v1/manage/scheduled/{uuid}`
+                .replace(`{${"uuid"}}`, encodeURIComponent(String(uuid)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication openId required
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication basic required
+            // http basic authentication required
+            setBasicAuthToObject(localVarRequestOptions, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(scheduledScenarioUpdate, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * ManageRangeResourcesScheduledScenariosApi - functional programming interface
+ * @export
+ */
+export const ManageRangeResourcesScheduledScenariosApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ManageRangeResourcesScheduledScenariosApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Schedules a scenario to be deployed on one of the given ranges
+         * @summary Schedules a scenario
+         * @param {ScheduledScenarioCreate} [scheduledScenarioCreate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scheduledScenariosCreate(scheduledScenarioCreate?: ScheduledScenarioCreate, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScheduledScenario>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scheduledScenariosCreate(scheduledScenarioCreate, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ManageRangeResourcesScheduledScenariosApi.scheduledScenariosCreate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Deletes a scheduled scenario. If the scenario is currently deployed, it will be destroyed.
+         * @summary Deletes a scheduled scenario
+         * @param {string} uuid 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scheduledScenariosDelete(uuid: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scheduledScenariosDelete(uuid, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ManageRangeResourcesScheduledScenariosApi.scheduledScenariosDelete']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * List all scheduled scenarios
+         * @summary List scheduled scenarios
+         * @param {string} [uuid] 
+         * @param {string} [name] 
+         * @param {string} [description] 
+         * @param {string} [author] 
+         * @param {{ [key: string]: any; }} [metadata] 
+         * @param {string} [assignedRangeId] 
+         * @param {string} [requestedRangeId] 
+         * @param {number} [offset] Number of objects to skip
+         * @param {number} [limit] Number of objects per page
+         * @param {string} [search] Search the list partially or fully
+         * @param {ScheduledScenariosListSortByEnum} [sortBy] Key used to sort the collection by
+         * @param {ScheduledScenariosListSortEnum} [sort] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scheduledScenariosList(uuid?: string, name?: string, description?: string, author?: string, metadata?: { [key: string]: any; }, assignedRangeId?: string, requestedRangeId?: string, offset?: number, limit?: number, search?: string, sortBy?: ScheduledScenariosListSortByEnum, sort?: ScheduledScenariosListSortEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScheduledScenariosList200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scheduledScenariosList(uuid, name, description, author, metadata, assignedRangeId, requestedRangeId, offset, limit, search, sortBy, sort, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ManageRangeResourcesScheduledScenariosApi.scheduledScenariosList']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Retrieve an existing scheduled scenario
+         * @summary Retrieve a scheduled scenario
+         * @param {string} uuid 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scheduledScenariosRetrieve(uuid: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScheduledScenario>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scheduledScenariosRetrieve(uuid, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ManageRangeResourcesScheduledScenariosApi.scheduledScenariosRetrieve']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Update a scheduled scenario
+         * @param {string} uuid 
+         * @param {ScheduledScenarioUpdate} [scheduledScenarioUpdate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async scheduledScenariosUpdate(uuid: string, scheduledScenarioUpdate?: ScheduledScenarioUpdate, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ScheduledScenario>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scheduledScenariosUpdate(uuid, scheduledScenarioUpdate, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ManageRangeResourcesScheduledScenariosApi.scheduledScenariosUpdate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * ManageRangeResourcesScheduledScenariosApi - factory interface
+ * @export
+ */
+export const ManageRangeResourcesScheduledScenariosApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ManageRangeResourcesScheduledScenariosApiFp(configuration)
+    return {
+        /**
+         * Schedules a scenario to be deployed on one of the given ranges
+         * @summary Schedules a scenario
+         * @param {ScheduledScenarioCreate} [scheduledScenarioCreate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scheduledScenariosCreate(scheduledScenarioCreate?: ScheduledScenarioCreate, options?: RawAxiosRequestConfig): AxiosPromise<ScheduledScenario> {
+            return localVarFp.scheduledScenariosCreate(scheduledScenarioCreate, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Deletes a scheduled scenario. If the scenario is currently deployed, it will be destroyed.
+         * @summary Deletes a scheduled scenario
+         * @param {string} uuid 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scheduledScenariosDelete(uuid: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.scheduledScenariosDelete(uuid, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * List all scheduled scenarios
+         * @summary List scheduled scenarios
+         * @param {string} [uuid] 
+         * @param {string} [name] 
+         * @param {string} [description] 
+         * @param {string} [author] 
+         * @param {{ [key: string]: any; }} [metadata] 
+         * @param {string} [assignedRangeId] 
+         * @param {string} [requestedRangeId] 
+         * @param {number} [offset] Number of objects to skip
+         * @param {number} [limit] Number of objects per page
+         * @param {string} [search] Search the list partially or fully
+         * @param {ScheduledScenariosListSortByEnum} [sortBy] Key used to sort the collection by
+         * @param {ScheduledScenariosListSortEnum} [sort] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scheduledScenariosList(uuid?: string, name?: string, description?: string, author?: string, metadata?: { [key: string]: any; }, assignedRangeId?: string, requestedRangeId?: string, offset?: number, limit?: number, search?: string, sortBy?: ScheduledScenariosListSortByEnum, sort?: ScheduledScenariosListSortEnum, options?: RawAxiosRequestConfig): AxiosPromise<ScheduledScenariosList200Response> {
+            return localVarFp.scheduledScenariosList(uuid, name, description, author, metadata, assignedRangeId, requestedRangeId, offset, limit, search, sortBy, sort, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retrieve an existing scheduled scenario
+         * @summary Retrieve a scheduled scenario
+         * @param {string} uuid 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scheduledScenariosRetrieve(uuid: string, options?: RawAxiosRequestConfig): AxiosPromise<ScheduledScenario> {
+            return localVarFp.scheduledScenariosRetrieve(uuid, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update a scheduled scenario
+         * @param {string} uuid 
+         * @param {ScheduledScenarioUpdate} [scheduledScenarioUpdate] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        scheduledScenariosUpdate(uuid: string, scheduledScenarioUpdate?: ScheduledScenarioUpdate, options?: RawAxiosRequestConfig): AxiosPromise<ScheduledScenario> {
+            return localVarFp.scheduledScenariosUpdate(uuid, scheduledScenarioUpdate, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * ManageRangeResourcesScheduledScenariosApi - object-oriented interface
+ * @export
+ * @class ManageRangeResourcesScheduledScenariosApi
+ * @extends {BaseAPI}
+ */
+export class ManageRangeResourcesScheduledScenariosApi extends BaseAPI {
+    /**
+     * Schedules a scenario to be deployed on one of the given ranges
+     * @summary Schedules a scenario
+     * @param {ScheduledScenarioCreate} [scheduledScenarioCreate] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ManageRangeResourcesScheduledScenariosApi
+     */
+    public scheduledScenariosCreate(scheduledScenarioCreate?: ScheduledScenarioCreate, options?: RawAxiosRequestConfig) {
+        return ManageRangeResourcesScheduledScenariosApiFp(this.configuration).scheduledScenariosCreate(scheduledScenarioCreate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Deletes a scheduled scenario. If the scenario is currently deployed, it will be destroyed.
+     * @summary Deletes a scheduled scenario
+     * @param {string} uuid 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ManageRangeResourcesScheduledScenariosApi
+     */
+    public scheduledScenariosDelete(uuid: string, options?: RawAxiosRequestConfig) {
+        return ManageRangeResourcesScheduledScenariosApiFp(this.configuration).scheduledScenariosDelete(uuid, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * List all scheduled scenarios
+     * @summary List scheduled scenarios
+     * @param {string} [uuid] 
+     * @param {string} [name] 
+     * @param {string} [description] 
+     * @param {string} [author] 
+     * @param {{ [key: string]: any; }} [metadata] 
+     * @param {string} [assignedRangeId] 
+     * @param {string} [requestedRangeId] 
+     * @param {number} [offset] Number of objects to skip
+     * @param {number} [limit] Number of objects per page
+     * @param {string} [search] Search the list partially or fully
+     * @param {ScheduledScenariosListSortByEnum} [sortBy] Key used to sort the collection by
+     * @param {ScheduledScenariosListSortEnum} [sort] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ManageRangeResourcesScheduledScenariosApi
+     */
+    public scheduledScenariosList(uuid?: string, name?: string, description?: string, author?: string, metadata?: { [key: string]: any; }, assignedRangeId?: string, requestedRangeId?: string, offset?: number, limit?: number, search?: string, sortBy?: ScheduledScenariosListSortByEnum, sort?: ScheduledScenariosListSortEnum, options?: RawAxiosRequestConfig) {
+        return ManageRangeResourcesScheduledScenariosApiFp(this.configuration).scheduledScenariosList(uuid, name, description, author, metadata, assignedRangeId, requestedRangeId, offset, limit, search, sortBy, sort, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieve an existing scheduled scenario
+     * @summary Retrieve a scheduled scenario
+     * @param {string} uuid 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ManageRangeResourcesScheduledScenariosApi
+     */
+    public scheduledScenariosRetrieve(uuid: string, options?: RawAxiosRequestConfig) {
+        return ManageRangeResourcesScheduledScenariosApiFp(this.configuration).scheduledScenariosRetrieve(uuid, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update a scheduled scenario
+     * @param {string} uuid 
+     * @param {ScheduledScenarioUpdate} [scheduledScenarioUpdate] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ManageRangeResourcesScheduledScenariosApi
+     */
+    public scheduledScenariosUpdate(uuid: string, scheduledScenarioUpdate?: ScheduledScenarioUpdate, options?: RawAxiosRequestConfig) {
+        return ManageRangeResourcesScheduledScenariosApiFp(this.configuration).scheduledScenariosUpdate(uuid, scheduledScenarioUpdate, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+/**
+ * @export
+ */
+export const ScheduledScenariosListSortByEnum = {
+    Author: 'author',
+    Description: 'description',
+    DateCreated: 'dateCreated',
+    DateEdited: 'dateEdited',
+    Name: 'name'
+} as const;
+export type ScheduledScenariosListSortByEnum = typeof ScheduledScenariosListSortByEnum[keyof typeof ScheduledScenariosListSortByEnum];
+/**
+ * @export
+ */
+export const ScheduledScenariosListSortEnum = {
+    Asc: 'asc',
+    Desc: 'desc'
+} as const;
+export type ScheduledScenariosListSortEnum = typeof ScheduledScenariosListSortEnum[keyof typeof ScheduledScenariosListSortEnum];
 
 
 /**
