@@ -279,7 +279,8 @@
   "msw": {
     "workerDirectory": [
       "libs/ui/api/hooks/src",
-      "apps/rapid-cmi5-electron-frontend/src"
+      "apps/rapid-cmi5-electron-frontend/src",
+      "apps/cc-cmi5-player/src"
     ]
   }
 }

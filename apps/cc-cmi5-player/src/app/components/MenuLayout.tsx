@@ -14,21 +14,33 @@ import ReorderIcon from '@mui/icons-material/Reorder';
 /** Icons */
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import { Tooltip, Typography } from '@mui/material';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import { Box, Switch, Tooltip, Typography, useTheme } from '@mui/material';
 import { classIdSel, studentIdSel } from '../redux/auReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { cmi5Instance } from '../session/cmi5';
-
 
 import { classChangeModalId } from './CourseModals';
 import RC5Player from './player/RC5Player';
 
 import ScenarioWrapper from './scenario/ScenarioWrapper';
-import {
-  TeamScenarioContextProvider,
-} from './team-consoles/TeamScenarioContext';
+import { TeamScenarioContextProvider } from './team-consoles/TeamScenarioContext';
 import { useCMI5Session } from '../hooks/useCMI5Session';
-import { ButtonInfoField, ButtonInfoFormHeaderLayout, ButtonMainUi, config, dividerColor, setModal } from '@rapid-cmi5/ui';
+import {
+  ButtonInfoField,
+  ButtonInfoFormHeaderLayout,
+  ButtonMainUi,
+  config,
+  dividerColor,
+  setDividerColor,
+  setIconColor,
+  setModal,
+  setTheme,
+  themeColor,
+} from '@rapid-cmi5/ui';
+import { CustomTheme } from '../styles/createPalette';
 
 /**
  * The main slide content.
@@ -38,11 +50,14 @@ import { ButtonInfoField, ButtonInfoFormHeaderLayout, ButtonMainUi, config, divi
 export default function MenuLayout() {
   const [isMenuDrawerOpen, setIsMenuDrawerOpen] = useState(true);
   const [isSplitPanelShown, setIsSplitPanelShown] = useState(false);
-
+  const currentTheme: CustomTheme = useTheme();
   const dispatch = useDispatch();
   const classId = useSelector(classIdSel);
   const studentId = useSelector(studentIdSel);
   const themedDividerColor = useSelector(dividerColor);
+  const theColor = useSelector(themeColor);
+  const muiTheme = useTheme();
+  const { palette } = muiTheme;
 
   const [password, setPassword] = useState('');
   const [clearUserName, setCleanUserName] = useState('');
@@ -100,6 +115,15 @@ export default function MenuLayout() {
     }
   };
 
+  useEffect(() => {
+    if (currentTheme) {
+      const iconColor = currentTheme.button.iconColor;
+      const dividerColor = currentTheme.input.outlineColor;
+      dispatch(setIconColor(iconColor));
+      dispatch(setDividerColor(dividerColor || 'grey'));
+    }
+  }, [currentTheme]);
+
   return (
     <>
       <Drawer
@@ -107,6 +131,7 @@ export default function MenuLayout() {
           width: isMenuDrawerOpen ? DRAWER_WIDTH : 0,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
+            backgroundColor: 'background.default',
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
           },
@@ -122,9 +147,11 @@ export default function MenuLayout() {
 
       <PanelGroup direction="horizontal">
         <Panel defaultSize={45} minSize={5}>
-          <div
+          <Box
             ref={slideRef}
-            style={{
+            sx={{
+              //presentation background color
+              backgroundColor: palette.background.paper,
               height: '100%',
               width: '100%',
               overflow: 'auto',
@@ -134,7 +161,8 @@ export default function MenuLayout() {
               direction="row"
               sx={{
                 position: 'absolute',
-                backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                zIndex: (theme) => theme.zIndex.appBar + 1,
+                //backgroundColor: leave blank so it matches presentation background
               }}
             >
               <IconButton
@@ -187,7 +215,38 @@ export default function MenuLayout() {
               >
                 <ReorderIcon />
               </IconButton>
-
+              <Switch
+                checked={theColor === 'dark'}
+                icon={
+                  <LightModeIcon
+                    color="primary"
+                    fontSize="small"
+                    sx={{
+                      backgroundColor: 'background.default',
+                      borderRadius: '12px',
+                      borderStyle: 1,
+                    }}
+                  />
+                }
+                checkedIcon={
+                  <DarkModeIcon
+                    color="primary"
+                    fontSize="small"
+                    sx={{
+                      backgroundColor: 'background.default',
+                      borderRadius: '12px',
+                      borderStyle: 1,
+                    }}
+                  />
+                }
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  if (event.target.checked) {
+                    dispatch(setTheme('dark'));
+                    return;
+                  }
+                  dispatch(setTheme('light'));
+                }}
+              />
               {featureFlagChangeClassRoom && (
                 <ButtonInfoField
                   alertSxProps={{
@@ -262,7 +321,7 @@ export default function MenuLayout() {
                     arrow
                     enterDelay={500}
                     enterNextDelay={500}
-                    sx={{ maxWidth: '480px', backgroundColor: 'black' }}
+                    sx={{ maxWidth: '480px' }}
                     title={
                       <Stack
                         direction="column"
@@ -315,7 +374,7 @@ export default function MenuLayout() {
                 </TeamScenarioContextProvider>
               )}
             </>
-          </div>
+          </Box>
         </Panel>
         {isSplitPanelShown && (
           <>

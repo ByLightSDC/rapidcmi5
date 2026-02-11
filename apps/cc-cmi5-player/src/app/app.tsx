@@ -1,12 +1,19 @@
 /* Material */
-import { ThemeProvider } from '@mui/material';
-import { darkTheme } from './styles/muiThemeDark';
+import { ThemeProvider, useTheme } from '@mui/material';
 import { useEffect } from 'react';
 import { NotificationsProvider } from '@toolpad/core';
 import AppRoutes from './AppRoutes';
 import { debugLog } from './debug';
+import { useDispatch, useSelector } from 'react-redux';
+import { setDividerColor, setIconColor, themeColor } from '@rapid-cmi5/ui';
+import { lightTheme } from './styles/muiTheme';
+import { darkTheme } from './styles/muiThemeDark';
+import { CustomTheme } from './styles/createPalette';
 
 export function App() {
+  const theme = useSelector(themeColor);
+
+
   // Handle session termination when user leaves the page
   useEffect(() => {
     const handleBeforeUnload = async () => {
@@ -35,8 +42,10 @@ export function App() {
     };
   }, []);
 
+
+
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme === 'dark' ? darkTheme : lightTheme}>
       <NotificationsProvider
         slotProps={{
           snackbar: {

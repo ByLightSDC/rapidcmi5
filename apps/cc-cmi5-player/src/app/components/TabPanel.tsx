@@ -7,7 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { auJsonSel, auLogoSel, courseAUProgressSel } from '../redux/auReducer';
 import { activeTabSel, setActiveTab } from '../redux/navigationReducer';
 import ProgressBar from './ProgressBar';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography, useTheme } from '@mui/material';
+import { CustomTheme } from '../styles/createPalette';
 
 export default function TabPanel() {
   const auJson = useSelector(auJsonSel);
@@ -15,7 +16,7 @@ export default function TabPanel() {
   const dispatch = useDispatch();
   const activeTab = useSelector(activeTabSel);
   const courseAUProgress = useSelector(courseAUProgressSel);
-
+  const currentTheme: CustomTheme = useTheme();
   const tabClicked = (_: React.SyntheticEvent, newValue: number) => {
     dispatch(setActiveTab(newValue));
   };
@@ -121,13 +122,21 @@ export default function TabPanel() {
       sx={{
         maxWidth: '260px',
         width: '100%',
-        bgcolor: 'grey.900',
+        //left panel background
+        bgcolor: 'background.default',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
       }}
     >
-      <Box sx={{ zIndex: 50, pt: 3 }}>
+      <Box
+        sx={{
+          zIndex: 50,
+          pt: 0,
+          display: 'flex',
+          alignContent: 'center',
+        }}
+      >
         {auLogo && (
           <img
             alt="logo"
@@ -139,7 +148,6 @@ export default function TabPanel() {
       </Box>
 
       <ProgressBar />
-
       <Tabs
         orientation="vertical"
         variant="scrollable"
@@ -149,7 +157,8 @@ export default function TabPanel() {
         aria-label="Slides"
         sx={{
           width: '100%',
-          bgcolor: 'grey.800',
+          //TABS background color
+          bgcolor: 'background.default',
           color: 'white',
           '& .MuiTabs-indicator': {
             backgroundColor: getActiveTabIndicatorColor(),
@@ -162,9 +171,19 @@ export default function TabPanel() {
             fontSize: '14px',
             fontWeight: 'normal',
             lineHeight: '1.2',
+            backgroundColor: 'background.default',
+            borderStyle: 'solid',
+            borderColor: currentTheme.input.outlineColor,
+            borderRadius: 0,
+            borderWidth: 1,
           },
           '& .MuiTab-root.Mui-selected': {
             fontWeight: 'bold',
+            backgroundColor: '#3C59A266',
+            borderStyle: 'none',
+            borderColor: '#3C59A266',
+            borderRadius: 0,
+            borderWidth: 1,
           },
         }}
         textColor="inherit"
