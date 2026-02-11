@@ -13,6 +13,7 @@ export interface EditVideoToolbarProps {
   rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   width?: number;
   height?: number;
+  autoplay?: boolean;
 }
 
 export function EditVideoToolbar({
@@ -23,6 +24,7 @@ export function EditVideoToolbar({
   rest,
   width,
   height,
+  autoplay,
 }: EditVideoToolbarProps): JSX.Element {
   const openEditVideoDialog = usePublisher(openEditVideoDialog$);
 
@@ -52,6 +54,7 @@ export function EditVideoToolbar({
                 rest,
                 width,
                 height,
+                autoplay,
               },
             });
           }}

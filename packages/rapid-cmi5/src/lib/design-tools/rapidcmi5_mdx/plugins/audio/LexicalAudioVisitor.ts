@@ -25,6 +25,11 @@ export const LexicalAudioVisitor: LexicalExportVisitor<AudioNode, Mdast.Html> =
         audio.setAttribute('title', lexicalNode.getTitle()!);
       }
 
+      if (lexicalNode.getAutoplay()) {
+        audio.setAttribute('autoplay', 'true');
+        audio.setAttribute('muted', 'true');
+      }
+
       for (const attr of lexicalNode.getRest()) {
         if (attr.type === 'mdxJsxAttribute') {
           if (typeof attr.value === 'string') {

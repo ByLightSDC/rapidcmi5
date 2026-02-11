@@ -34,6 +34,11 @@ export const LexicalVideoVisitor: LexicalExportVisitor<VideoNode, Mdast.Html> =
         video.setAttribute('title', lexicalNode.getTitle()!);
       }
 
+      if (lexicalNode.getAutoplay()) {
+        video.setAttribute('autoplay', 'true');
+        video.setAttribute('muted', 'true');
+      }
+
       for (const attr of lexicalNode.getRest()) {
         if (attr.type === 'mdxJsxAttribute') {
           if (typeof attr.value === 'string') {
