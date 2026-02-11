@@ -12825,7 +12825,7 @@ export type GhostTrafficBrowserBrowserTypeEnum = typeof GhostTrafficBrowserBrows
  * @type GhostTrafficBrowserEventsInner
  * @export
  */
-export type GhostTrafficBrowserEventsInner = GhostBrowserEventBrowse | GhostBrowserEventClick | GhostBrowserEventCrawl | GhostBrowserEventExecuteScript | GhostBrowserEventRandom | GhostBrowserEventTypeKeys;
+export type GhostTrafficBrowserEventsInner = { type: 'browse' } & GhostBrowserEventBrowse | { type: 'click' } & GhostBrowserEventClick | { type: 'crawl' } & GhostBrowserEventCrawl | { type: 'executeScript' } & GhostBrowserEventExecuteScript | { type: 'random' } & GhostBrowserEventRandom | { type: 'typeKeys' } & GhostBrowserEventTypeKeys;
 
 /**
  * 
@@ -13186,7 +13186,7 @@ export type GhostTrafficOutlookHandlerEnum = typeof GhostTrafficOutlookHandlerEn
  * @type GhostTrafficOutlookEventsInner
  * @export
  */
-export type GhostTrafficOutlookEventsInner = GhostOutlookEventCreate | GhostOutlookEventReply;
+export type GhostTrafficOutlookEventsInner = { type: 'create' } & GhostOutlookEventCreate | { type: 'reply' } & GhostOutlookEventReply;
 
 /**
  * 
@@ -13416,7 +13416,7 @@ export type GhostTrafficSFTPHandlerEnum = typeof GhostTrafficSFTPHandlerEnum[key
  * Type of ghost traffic
  * @export
  */
-export type GhostTrafficType = GhostTrafficBrowser | GhostTrafficCommand | GhostTrafficCurl | GhostTrafficDNS | GhostTrafficICMP | GhostTrafficOutlook | GhostTrafficSFTP;
+export type GhostTrafficType = { handler: 'browser' } & GhostTrafficBrowser | { handler: 'command' } & GhostTrafficCommand | { handler: 'curl' } & GhostTrafficCurl | { handler: 'dns' } & GhostTrafficDNS | { handler: 'icmp' } & GhostTrafficICMP | { handler: 'outlook' } & GhostTrafficOutlook | { handler: 'sftp' } & GhostTrafficSFTP;
 
 /**
  * 
