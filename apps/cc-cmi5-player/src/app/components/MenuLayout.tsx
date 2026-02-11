@@ -215,24 +215,29 @@ export default function MenuLayout() {
                 <ReorderIcon />
               </IconButton>
               <Switch
-                icon=<LightModeIcon
+                checked={theColor === 'dark'}
+                icon={
+                  <LightModeIcon
                     color="primary"
-                  fontSize="small"
-                  sx={{
-                    backgroundColor: 'background.default',
-                    borderRadius: '12px',
-                    borderStyle: 1,
-                  }}
-                />
-                checkedIcon=<DarkModeIcon
-                  color="primary"
-                  fontSize="small"
-                  sx={{
-                    backgroundColor: 'background.default',
-                    borderRadius: '12px',
-                    borderStyle: 1,
-                  }}
-                />
+                    fontSize="small"
+                    sx={{
+                      backgroundColor: 'background.default',
+                      borderRadius: '12px',
+                      borderStyle: 1,
+                    }}
+                  />
+                }
+                checkedIcon={
+                  <DarkModeIcon
+                    color="primary"
+                    fontSize="small"
+                    sx={{
+                      backgroundColor: 'background.default',
+                      borderRadius: '12px',
+                      borderStyle: 1,
+                    }}
+                  />
+                }
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   if (event.target.checked) {
                     dispatch(setTheme('dark'));
