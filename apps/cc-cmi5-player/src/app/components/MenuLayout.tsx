@@ -161,6 +161,7 @@ export default function MenuLayout() {
               direction="row"
               sx={{
                 position: 'absolute',
+                zIndex: (theme) => theme.zIndex.appBar + 1,
                 //backgroundColor: leave blank so it matches presentation background
               }}
             >
