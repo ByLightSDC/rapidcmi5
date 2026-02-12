@@ -61,7 +61,7 @@ export function CloneLoadingOverlay({
     (loadingVariant === LoadingState.cloningRepo
       ? 'Cloning repository...'
       : loadingVariant === LoadingState.openingRepo
-        ? 'Opening repository...'
+        ? 'Opening existing repository...'
         : loadingVariant === LoadingState.creatingRepo
           ? 'Creating repository...'
           : 'Loading Repository...');
