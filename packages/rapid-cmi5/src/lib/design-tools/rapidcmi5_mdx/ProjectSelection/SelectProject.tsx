@@ -170,7 +170,7 @@ export default function WelcomePage({
         <CloneLoadingOverlay
           loadingVariant={loadingState}
           forceShow={isSandboxLaunching}
-          overrideMessage="Launching sandbox..."
+          overrideMessage={isSandboxLaunching ? 'Launching sandbox...' : undefined}
         />
 
         <DocumentationDialog
