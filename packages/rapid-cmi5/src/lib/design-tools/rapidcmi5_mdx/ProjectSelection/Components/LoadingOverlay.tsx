@@ -60,9 +60,16 @@ export function CloneLoadingOverlay({
     overrideMessage ||
     (loadingVariant === LoadingState.cloningRepo
       ? 'Cloning repository...'
-      : 'Loading Repository...');
+      : loadingVariant === LoadingState.openingRepo
+        ? 'Opening repository...'
+        : loadingVariant === LoadingState.creatingRepo
+          ? 'Creating repository...'
+          : 'Loading Repository...');
   const showHourglass =
-    forceShow || loadingVariant === LoadingState.loadingRepo;
+    forceShow ||
+    loadingVariant === LoadingState.loadingRepo ||
+    loadingVariant === LoadingState.openingRepo ||
+    loadingVariant === LoadingState.creatingRepo;
   return (
     <Box
       sx={{

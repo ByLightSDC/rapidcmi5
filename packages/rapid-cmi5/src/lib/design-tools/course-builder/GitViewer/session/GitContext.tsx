@@ -664,7 +664,7 @@ export const GitContextProvider = (props: tProviderProps) => {
   };
 
   const openLocalRepo = async (id?: string) => {
-    dispatch(setLoadingState(LoadingState.loadingRepo));
+    dispatch(setLoadingState(LoadingState.openingRepo));
     try {
       const dirName = await gitFs.openLocalRepo(id);
 
@@ -1065,7 +1065,7 @@ export const GitContextProvider = (props: tProviderProps) => {
   // instead this function expliciltly calls filesystem functions itself to get around having to wait for redux state
   const handleCreateLocalRepo = async (req: CreateLocalRepoType) => {
     const cleanedName = slugifyPath(req.repoDirName);
-    dispatch(setLoadingState(LoadingState.loadingRepo));
+    dispatch(setLoadingState(LoadingState.creatingRepo));
 
     try {
       const r: RepoAccessObject = {

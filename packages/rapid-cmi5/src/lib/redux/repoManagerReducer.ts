@@ -36,6 +36,8 @@ export enum LoadingState {
   loaded = 'Loaded',
   loadingRepo = 'Loading Repo',
   cloningRepo = 'Cloning Repo',
+  openingRepo = 'Opening Repo',
+  creatingRepo = 'Creating Repo',
 }
 
 // the file system path for the particular mount type
