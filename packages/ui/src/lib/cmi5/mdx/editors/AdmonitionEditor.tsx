@@ -38,7 +38,6 @@ import {
 
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { fromMarkdown, type Options } from 'mdast-util-from-markdown';
 import { toMarkdown } from 'mdast-util-to-markdown';
 
 import {
@@ -57,6 +56,7 @@ import { AdmonitionTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { SelectorMainUi } from '../../../inputs/selectors/selectors';
 import { debugLogError } from '../../../utility/logger';
 import { editorInPlayback$ } from '../state/vars';
+import { convertMarkdownToMdast } from '../util/conversion';
 
 export declare interface AdmonitionDirectiveEditorProps<
   T extends Directives = Directives,
@@ -359,10 +359,10 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
           >
             <NestedLexicalEditor<Paragraph>
               getContent={(node) => {
-                const theNode = fromMarkdown(getTitle(mdastNode.attributes), {
-                  extensions: syntaxExtensions,
-                  mdastExtensions: null,
-                });
+                const theNode = convertMarkdownToMdast(
+                  getTitle(mdastNode.attributes),
+                  syntaxExtensions,
+                );
                 return theNode.children;
               }}
               getUpdatedMdastNode={(

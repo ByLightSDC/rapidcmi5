@@ -8,7 +8,6 @@ import {
 import type { ContainerDirective } from 'mdast-util-directive';
 
 import { Paragraph } from 'mdast';
-import { fromMarkdown, type Options } from 'mdast-util-from-markdown';
 import { toMarkdown } from 'mdast-util-to-markdown';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -41,6 +40,7 @@ import { ButtonIcon } from '../../../../utility/buttons';
 import { debugLog } from '../../../../utility/logger';
 import { editorInPlayback$ } from '../../state/vars';
 import { dividerColor } from '@rapid-cmi5/ui';
+import { convertMarkdownToMdast } from '../../util/conversion';
 
 /**
  * Accordion Editor for accordion directives
@@ -285,10 +285,10 @@ export const ImageLabelEditor: React.FC<
                 <Box sx={{ padding: 2 }}>
                   <NestedLexicalEditor<Paragraph>
                     getContent={(node) => {
-                      const theNode = fromMarkdown(theTitle, {
-                        extensions: syntaxExtensions,
-                        mdastExtensions: null,
-                      });
+                      const theNode = convertMarkdownToMdast(
+                        theTitle,
+                        syntaxExtensions,
+                      );
                       return theNode.children;
                     }}
                     getUpdatedMdastNode={(
