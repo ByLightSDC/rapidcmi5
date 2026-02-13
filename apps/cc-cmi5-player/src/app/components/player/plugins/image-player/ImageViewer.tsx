@@ -12,8 +12,6 @@ import {
   imagePreviewHandler$,
 } from './index';
 import styles from './styles/image-plugin.module.css';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 
 const BROKEN_IMG_URI =
   'data:image/svg+xml;charset=utf-8,' +
@@ -91,6 +89,7 @@ function parseCssString(
       );
 
       // TODO: this is very simple parsing. Is something more robust needed?
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (style as any)[camelCasePropName] = propValue;
     }
   });
@@ -147,21 +146,21 @@ export function ImageViewer({
   href,
   id,
 }: ImageViewerProps): JSX.Element | null {
-  const [editor] = useLexicalComposerContext();
+ 
   const [ImagePlaceholderComponent, imagePreviewHandler] = useCellValues(
     imagePlaceholderComponent$,
     imagePreviewHandler$,
   );
   const labelsRef = React.useRef<null | HTMLImageElement>(null);
   const [imageSource, setImageSource] = React.useState<string | null>(null);
-  const [isSelected, setSelected, clearSelection] =
-    useLexicalNodeSelection(nodeKey);
+
   // determine styles
   let styleAttribute: MdxJsxAttribute | undefined;
   let style: React.CSSProperties = {};
   const wrapperStyle: React.CSSProperties = {};
   if (rest) {
     styleAttribute = rest.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (item: any): item is MdxJsxAttribute =>
         item.type === 'mdxJsxAttribute' && item.name === 'style',
     );
@@ -196,6 +195,7 @@ export function ImageViewer({
       return null;
     }
     const className = rest.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (attr: any) =>
         attr.type === 'mdxJsxAttribute' &&
         (attr.name === 'class' || attr.name === 'className'),

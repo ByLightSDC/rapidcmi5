@@ -48,13 +48,13 @@ import {
   debugLog,
   AnimationConfig,
   themeColor,
+  ImageTextDirectiveDescriptor,
 } from '@rapid-cmi5/ui';
 
 import { RC5PlayerToolbar } from './RC5PlayerToolbar';
 import { ActivityDirectiveDescriptor } from './editors/directives/ActivityDirectiveDescriptor';
 import { AuManagerContext } from '../../session/AuManager';
 import { kebabToCamel } from '../../utils/StringUtils';
-import { githubDark } from '@uiw/codemirror-theme-github';
 import { LayoutBoxDirectiveDescriptor } from './editors/directives/LayoutBoxDirectiveDescriptor';
 import { GridContainerDirectiveDescriptor } from './editors/directives/GridContainerDirectiveDescriptor';
 import { GridCellDirectiveDescriptor } from './editors/directives/GridCellDirectiveDescriptor';
@@ -109,6 +109,7 @@ function RC5Player() {
           TabsDirectiveDescriptor,
           TabContentDirectiveDescriptor,
           ImageLabelDirectiveDescriptor,
+          ImageTextDirectiveDescriptor
         ],
       }),
       codeMirrorPlugin({
@@ -313,7 +314,7 @@ function RC5Player() {
       </Box>
       {fullScreenImage && (
         <div
-          onClick={(e: any) => {
+          onClick={(e: React.MouseEvent<HTMLDivElement>) => {
             e.stopPropagation();
             setFullScreenImage('');
           }}

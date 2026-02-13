@@ -66,6 +66,7 @@ import {
   GridContainerDirectiveDescriptor,
   GridCellDirectiveDescriptor,
   appHeaderVisible,
+  ImageTextDirectiveDescriptor,
 } from '@rapid-cmi5/ui';
 
 import {
@@ -323,6 +324,7 @@ function RC5VisualEditor() {
           ActivityDirectiveDescriptor,
           FxDirectiveDescriptor,
           ImageLabelDirectiveDescriptor,
+          ImageTextDirectiveDescriptor,
           YoutubeDirectiveDescriptor,
           LayoutBoxDirectiveDescriptor,
           TabsDirectiveDescriptor,

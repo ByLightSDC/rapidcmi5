@@ -2,7 +2,7 @@
 import { DRAWER_WIDTH } from './ContentLayout';
 import TabPanel from './TabPanel';
 import Drawer from '@mui/material/Drawer';
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
@@ -16,7 +16,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
+
 import { Box, Switch, Tooltip, Typography, useTheme } from '@mui/material';
 import { classIdSel, studentIdSel } from '../redux/auReducer';
 import { useDispatch, useSelector } from 'react-redux';
@@ -68,7 +68,7 @@ export default function MenuLayout() {
 
   const featureFlagChangeClassRoom = false;
 
-  const { isAuthenticated, isTestMode } = useCMI5Session();
+  useCMI5Session();
 
   const getStrippedUserName = useCallback((inputName: string) => {
     const pcteCharindex = inputName.indexOf('@pcte.mil');
@@ -122,7 +122,7 @@ export default function MenuLayout() {
       dispatch(setIconColor(iconColor));
       dispatch(setDividerColor(dividerColor || 'grey'));
     }
-  }, [currentTheme]);
+  }, [currentTheme, dispatch]);
 
   return (
     <>
@@ -178,11 +178,7 @@ export default function MenuLayout() {
                   }
                 }}
               >
-                {isMenuDrawerOpen ? (
-                  <KeyboardArrowLeftIcon />
-                ) : (
-                  <KeyboardArrowRightIcon />
-                )}
+                {isMenuDrawerOpen ? <KeyboardArrowLeftIcon /> : <KeyboardArrowRightIcon />}
               </IconButton>
 
               <IconButton
@@ -252,12 +248,10 @@ export default function MenuLayout() {
                   alertSxProps={{
                     borderStyle: 'solid',
                     borderWidth: '1px',
-                    borderColor: (theme: any) => `${theme.input.outlineColor}`,
+                    borderColor: (theme: CustomTheme) => `${theme.input.outlineColor}`,
                     color: 'white',
                   }}
-                  infoIcon={
-                    <AccountCircleIcon fontSize="inherit" color="primary" />
-                  }
+                  infoIcon={<AccountCircleIcon fontSize="inherit" color="primary" />}
                   name="account-info-icon"
                   message={
                     <Stack
@@ -267,19 +261,9 @@ export default function MenuLayout() {
                         marginLeft: '8px',
                       }}
                     >
-                      {studentId && (
-                        <Typography variant="caption">
-                          Student Id: {studentId}
-                        </Typography>
-                      )}
-                      <Typography variant="caption">
-                        Registration Id: {regId}
-                      </Typography>
-                      {classId && (
-                        <Typography variant="caption">
-                          Class Id: {classId}
-                        </Typography>
-                      )}
+                      {studentId && <Typography variant="caption">Student Id: {studentId}</Typography>}
+                      <Typography variant="caption">Registration Id: {regId}</Typography>
+                      {classId && <Typography variant="caption">Class Id: {classId}</Typography>}
                       <Typography variant="caption">
                         User Name:
                         {clearUserName}
@@ -329,19 +313,9 @@ export default function MenuLayout() {
                           display: 'flex',
                         }}
                       >
-                        {studentId && (
-                          <Typography variant="caption">
-                            Student Id:{studentId}
-                          </Typography>
-                        )}
-                        <Typography variant="caption">
-                          Registration Id:{regId}
-                        </Typography>
-                        {classId && (
-                          <Typography variant="caption">
-                            Class Id:{classId}
-                          </Typography>
-                        )}
+                        {studentId && <Typography variant="caption">Student Id:{studentId}</Typography>}
+                        <Typography variant="caption">Registration Id:{regId}</Typography>
+                        {classId && <Typography variant="caption">Class Id:{classId}</Typography>}
                         <Typography variant="caption">
                           User Name:
                           {clearUserName}

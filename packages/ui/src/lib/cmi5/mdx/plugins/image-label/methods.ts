@@ -19,3 +19,4 @@ export const onCheckClickOutsideImageLabel = (imageId: string) => {
   }
   return false;
 };
+

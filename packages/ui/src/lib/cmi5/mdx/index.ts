@@ -72,5 +72,7 @@ export * from './plugins/image-label/constants';
 export * from './plugins/image-label/ImageLabelDirectiveDescriptor';
 export * from './plugins/image-label/methods';
 export * from './plugins/image-label/vars';
-
+export * from './plugins/image-text/ImageTextDirectiveDescriptor';
+export * from './plugins/image-text/vars';
+export * from './plugins/image-text/constants';
 export * from './util/validateYamlFrontmatter';
