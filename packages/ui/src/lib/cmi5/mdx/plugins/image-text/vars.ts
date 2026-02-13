@@ -18,13 +18,6 @@ export const imageTextKeys$ = signal<Record<string, string | null>>({});
  */
 export const isTextDropping$ = signal<boolean>(false);
 
-/**
- * Indicates whether a text is currently being dragged/dropped.
- *
- * Used to control UI state such as hover targets, drop indicators,
- * and preventing conflicting interactions while dropping.
- */
-export const isTextDragging$ = signal<boolean>(false);
 
 /**
  * Stores the last click position within the image

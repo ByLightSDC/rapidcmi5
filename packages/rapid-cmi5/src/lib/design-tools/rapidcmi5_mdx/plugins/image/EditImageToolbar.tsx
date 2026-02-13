@@ -82,7 +82,7 @@ export function EditImageToolbar({
    * set a flag when label is being dropped
    * @param e
    */
-  const handleDragLabelStart = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handlePlaceLabelStart = (e: React.MouseEvent<HTMLButtonElement>) => {
     window.removeEventListener('mousemove', handleMouseMove);
     window.addEventListener('mousemove', handleMouseMove);
     clickPosition$.value = [e?.clientX, e?.clientY];
@@ -96,7 +96,7 @@ export function EditImageToolbar({
    * set a flag when label is being dropped
    * @param e
    */
-  const handleDragTextStart = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handlePlaceTextStart = (e: React.MouseEvent<HTMLButtonElement>) => {
     window.removeEventListener('mousemove', handleMouseMove);
     window.addEventListener('mousemove', handleMouseMove);
     clickImageTextPosition$.value = [e?.clientX, e?.clientY];
@@ -168,7 +168,7 @@ export function EditImageToolbar({
         aria-label="Add Label"
         disabled={readOnly}
         onClick={(e) => {
-          handleDragLabelStart(e);
+          handlePlaceLabelStart(e);
         }}
       >
         <RoomIcon />
@@ -190,7 +190,7 @@ export function EditImageToolbar({
         aria-label="Add Text"
         disabled={readOnly}
         onClick={(e) => {
-          handleDragTextStart(e);
+          handlePlaceTextStart(e);
         }}
       >
         <TextFieldsIcon />

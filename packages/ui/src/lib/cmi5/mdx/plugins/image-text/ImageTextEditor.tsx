@@ -22,7 +22,6 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { ImageTextDirectiveNode } from './types';
 import { debugLog } from '../../../../utility/logger';
 import { editorInPlayback$ } from '../../state/vars';
-import { clickImageTextPosition$ } from './vars';
 
 /**
  * Accordion Editor for accordion directives
@@ -42,9 +41,10 @@ export const ImageTextEditor: React.FC<
   const isDraggingRef = useRef<boolean>(false);
   const currentOffset = useRef<number[]>([0, 0]);
   const imageBounds = useRef<DOMRect | null>(null);
-  const startTimeRef = useRef<number | null>(null);
   const [currentPosition, setCurrentPosition] = useState([0, 0]);
   const currentPositionRef = useRef<number[]>([0, 0]);
+  const currentDimensionsRef = useRef<number[]>([0, 0]);
+  const boxRef = useRef<HTMLDivElement | null>(null);
 
   /**
    * Safely retrieves the value of a specific attribute from a node's attributes object.
@@ -71,50 +71,51 @@ export const ImageTextEditor: React.FC<
   const imageId: string =
     getAttributeValue(mdastNode.attributes, 'imageId') || '';
 
-  //40
+    /**
+     * Background color context menu
+     */
   const bgColor =
     !readOnly && !isPlayback && isHovered
       ? muiTheme.palette.mode === 'dark'
-        ? '#282b30e6'
-        : '#EEEEEEe6'
+        ? '#282b30cc'
+        : '#EEEEEEcc'
       : undefined;
 
   /**
-   * Listen for mouse move
-   * Store mouse position when Label/Marker button is clicked
-   * clickPosition is used from ImageEditor to avoid dropping marker on the Add Marker button since the button is positioned inside the image area
-   * set a flag when label is being dropped
+   * Start listening for mouse move
+   * Store offset position bw mouse and move target
+   * Set flag
    * @param e
    */
-  const handleDragTextStart = useCallback(
-    (e: any) => {
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      // store image rect dimensions for the purpose of keeping text inside image area
       const imgEl = document.getElementById(imageId);
       if (imgEl) {
         imageBounds.current = imgEl.getBoundingClientRect();
-        console.log('imageBounds.current ', imageBounds.current);
       }
+
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+
       if (isDraggingRef.current) {
-        console.log('STOP MD');
+        //stop dragging will be processed by mouse up handler
       } else {
-        console.log('CHECK START MD');
-        if (startTimeRef.current) {
-          if (Date.now() - startTimeRef.current < 1000) {
-            return;
-          }
-        }
-        console.log('START MD');
+        // start listeners and set flag
         window.addEventListener('mousemove', handleMouseMove);
         window.addEventListener('mouseup', handleMouseUp);
         isDraggingRef.current = true;
-        const target = e.target as HTMLElement;
-        const rect = target.getBoundingClientRect();
-        console.log('rect', rect);
-        console.log('e.clientX', e.clientX);
-        console.log('e.clientX', e.clientX);
+
+        // store label dimensions for the purpose of keeping text inside image area
+        if (boxRef.current) {
+          const rect = boxRef.current.getBoundingClientRect();
+          currentDimensionsRef.current[0] = rect.width;
+          currentDimensionsRef.current[1] = rect.height;
+        }
+
+        // save offset and current position
         const xx = e.clientX - currentPosition[0];
         const yy = e.clientY - currentPosition[1];
-        console.log('offset', [xx, yy]);
         currentOffset.current = [xx, yy];
         currentPositionRef.current = [currentPosition[0], currentPosition[1]];
       }
@@ -123,47 +124,49 @@ export const ImageTextEditor: React.FC<
   );
 
   /**
-   * Set marker position to follow mouse
+   * Set text position to follow mouse
+   * Don't allow it outside of the box
    * @param e
    */
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      //console.log('handleMouseMove', e.clientX);
-      let nClientX = imageBounds.current
+      const newClientX = imageBounds.current
         ? Math.max(
             imageBounds.current.left,
-            Math.min(imageBounds.current.right, e.clientX),
+            Math.min(
+              imageBounds.current.right - currentDimensionsRef.current[0],
+              e.clientX,
+            ),
           )
         : e.clientX;
-      let nClientY = imageBounds.current
+      const newClientY = imageBounds.current
         ? Math.max(
             imageBounds.current.top,
-            Math.min(imageBounds.current.bottom, e.clientY),
+            Math.min(
+              imageBounds.current.bottom - currentDimensionsRef.current[1],
+              e.clientY,
+            ),
           )
         : e.clientX;
-      const xx = nClientX - currentOffset.current[0];
-      const yy = nClientY - currentOffset.current[1];
-      console.log('xx', xx);
+      const xx = newClientX - currentOffset.current[0];
+      const yy = newClientY - currentOffset.current[1];
       setCurrentPosition([xx, yy]);
       currentPositionRef.current = [xx, yy];
     },
     [setCurrentPosition, currentOffset],
   );
 
+  /**
+   * Stop drag listeners and update mdast node position
+   */
   const handleMouseUp = useCallback(
     (e: MouseEvent) => {
       e.stopPropagation();
       e.stopImmediatePropagation();
-      startTimeRef.current = Date.now();
-      console.log('STOP2');
+
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
 
-      console.log('updateMdastNode currentPosition', currentPosition);
-      console.log(
-        'clickImageTextPosition$.value',
-        clickImageTextPosition$.value,
-      );
       if (isDraggingRef.current) {
         isDraggingRef.current = false;
         updateMdastNode({
@@ -174,17 +177,16 @@ export const ImageTextEditor: React.FC<
             y: '' + currentPositionRef.current[1],
           },
         });
-        // updateTheThing();
       }
     },
     [currentPosition[0], currentPosition[1]],
   );
 
   /**
-   * Find container div in ImageEditor to portal labels into
-   * Retrieved with imageId
+   * UE parses starting position
    */
   useEffect(() => {
+    // get portal layer to draw text into
     const interval = setInterval(() => {
       const el = document.getElementById(`image-labels-${imageId}`);
       if (el) {
@@ -193,6 +195,7 @@ export const ImageTextEditor: React.FC<
       }
     }, 50);
 
+    // set default current position based on mdast attributes x & y
     const xyPos = [0, 0];
     try {
       if (typeof mdastNode.attributes.x !== 'undefined') {
@@ -217,6 +220,7 @@ export const ImageTextEditor: React.FC<
     return createPortal(
       <>
         <Stack
+          ref={boxRef}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           direction="row"
@@ -226,18 +230,19 @@ export const ImageTextEditor: React.FC<
             position: 'absolute',
             left: currentPosition[0],
             top: currentPosition[1],
+            display: 'flex',
+            alignItems: 'flex-start',
           }}
         >
           <Stack
             direction="row"
             sx={{
               minWidth: '32px',
-              display: 'flex',
-              justifyContent: 'center',
+              maxHeight: '32px',
             }}
           >
             {!readOnly && !isPlayback && isHovered && (
-              <IconButton onMouseDown={handleDragTextStart}>
+              <IconButton onMouseDown={handleMouseDown}>
                 <DragIndicatorIcon color="warning" />
               </IconButton>
             )}
@@ -255,6 +260,7 @@ export const ImageTextEditor: React.FC<
           />
           {!readOnly && !isPlayback && isHovered && (
             <IconButton
+              sx={{ maxHeight: '32px' }}
               aria-label="delete"
               onClick={(e) => {
                 e.preventDefault();

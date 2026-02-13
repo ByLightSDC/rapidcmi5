@@ -15,8 +15,6 @@ import { useCellValues } from '@mdxeditor/gurx';
 import classNames from 'classnames';
 import {
   $createLineBreakNode,
-  $createParagraphNode,
-  $createTextNode,
   $getNodeByKey,
   $getSelection,
   $isNodeSelection,
@@ -73,7 +71,6 @@ import {
   isTextDropping$,
   clickImageTextPosition$,
   DEFAULT_IMAGE_TEXT_CONTENT,
-  isTextDragging$,
 } from '@rapid-cmi5/ui';
 import { currentAuPath } from '@rapid-cmi5/react-editor';
 
@@ -731,8 +728,6 @@ export function ImageEditor({
       setIsUrlShowing(false);
     }
   }, [viewMode]);
-
-  // useEffect(() => {}, [isFocused]);
 
   return imageSource !== null ? (
     <React.Suspense
