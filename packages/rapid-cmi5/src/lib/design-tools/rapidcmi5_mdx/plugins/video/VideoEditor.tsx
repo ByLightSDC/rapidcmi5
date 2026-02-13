@@ -315,6 +315,7 @@ export interface VideoEditorProps {
   height: 'inherit' | number;
   rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   videoId: string;
+  autoplay: boolean;
 }
 
 export function VideoEditor({
@@ -325,6 +326,7 @@ export function VideoEditor({
   height,
   rest,
   videoId,
+  autoplay,
 }: VideoEditorProps): JSX.Element {
   const [videoFilePath] = useCellValues(videoFilePath$);
   const [Placeholder] = useCellValues(videoPlaceholder$);
@@ -369,6 +371,7 @@ export function VideoEditor({
             rest={rest}
             width={typeof width === 'number' ? width : undefined}
             height={typeof height === 'number' ? height : undefined}
+            autoplay={autoplay}
           />
         )}
       </div>

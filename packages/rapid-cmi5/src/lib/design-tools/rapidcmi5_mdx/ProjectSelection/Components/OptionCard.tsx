@@ -18,6 +18,7 @@ const OptionCard = ({
   handleShowDocs,
   subText,
   icon,
+  disabled = false,
   'data-testid': dataTestId, // Accept data-testid prop
 }: {
   title: string;
@@ -25,6 +26,7 @@ const OptionCard = ({
   handleShowDocs: () => void;
   subText: JSX.Element;
   icon: JSX.Element;
+  disabled?: boolean;
   'data-testid'?: string; // Add to type definition
 }) => {
   const theme = useTheme();
@@ -36,6 +38,7 @@ const OptionCard = ({
       <ListItemButton
         data-testid={dataTestId}
         onClick={handleSelect}
+        disabled={disabled}
         sx={{
           borderRadius: 2,
           p: 1.2,
@@ -83,6 +86,7 @@ const OptionCard = ({
               e.stopPropagation();
               handleShowDocs();
             }}
+            disabled={disabled}
             sx={{
               color: alpha(palette.primary.main, 0.8),
               transition: 'all 0.2s ease',

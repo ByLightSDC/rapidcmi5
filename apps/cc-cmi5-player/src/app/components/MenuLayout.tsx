@@ -2,7 +2,7 @@
 import { DRAWER_WIDTH } from './ContentLayout';
 import TabPanel from './TabPanel';
 import Drawer from '@mui/material/Drawer';
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
@@ -16,7 +16,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
+
 import { Box, Switch, Tooltip, Typography, useTheme } from '@mui/material';
 import { classIdSel, studentIdSel } from '../redux/auReducer';
 import { useDispatch, useSelector } from 'react-redux';
@@ -161,6 +161,7 @@ export default function MenuLayout() {
               direction="row"
               sx={{
                 position: 'absolute',
+                zIndex: (theme) => theme.zIndex.appBar + 1,
                 //backgroundColor: leave blank so it matches presentation background
               }}
             >
@@ -177,11 +178,7 @@ export default function MenuLayout() {
                   }
                 }}
               >
-                {isMenuDrawerOpen ? (
-                  <KeyboardArrowLeftIcon />
-                ) : (
-                  <KeyboardArrowRightIcon />
-                )}
+                {isMenuDrawerOpen ? <KeyboardArrowLeftIcon /> : <KeyboardArrowRightIcon />}
               </IconButton>
 
               <IconButton
@@ -215,24 +212,29 @@ export default function MenuLayout() {
                 <ReorderIcon />
               </IconButton>
               <Switch
-                icon=<LightModeIcon
+                checked={theColor === 'dark'}
+                icon={
+                  <LightModeIcon
                     color="primary"
-                  fontSize="small"
-                  sx={{
-                    backgroundColor: 'background.default',
-                    borderRadius: '12px',
-                    borderStyle: 1,
-                  }}
-                />
-                checkedIcon=<DarkModeIcon
-                  color="primary"
-                  fontSize="small"
-                  sx={{
-                    backgroundColor: 'background.default',
-                    borderRadius: '12px',
-                    borderStyle: 1,
-                  }}
-                />
+                    fontSize="small"
+                    sx={{
+                      backgroundColor: 'background.default',
+                      borderRadius: '12px',
+                      borderStyle: 1,
+                    }}
+                  />
+                }
+                checkedIcon={
+                  <DarkModeIcon
+                    color="primary"
+                    fontSize="small"
+                    sx={{
+                      backgroundColor: 'background.default',
+                      borderRadius: '12px',
+                      borderStyle: 1,
+                    }}
+                  />
+                }
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   if (event.target.checked) {
                     dispatch(setTheme('dark'));
@@ -249,9 +251,7 @@ export default function MenuLayout() {
                     borderColor: (theme: any) => `${theme.input.outlineColor}`,
                     color: 'white',
                   }}
-                  infoIcon={
-                    <AccountCircleIcon fontSize="inherit" color="primary" />
-                  }
+                  infoIcon={<AccountCircleIcon fontSize="inherit" color="primary" />}
                   name="account-info-icon"
                   message={
                     <Stack
@@ -261,19 +261,9 @@ export default function MenuLayout() {
                         marginLeft: '8px',
                       }}
                     >
-                      {studentId && (
-                        <Typography variant="caption">
-                          Student Id: {studentId}
-                        </Typography>
-                      )}
-                      <Typography variant="caption">
-                        Registration Id: {regId}
-                      </Typography>
-                      {classId && (
-                        <Typography variant="caption">
-                          Class Id: {classId}
-                        </Typography>
-                      )}
+                      {studentId && <Typography variant="caption">Student Id: {studentId}</Typography>}
+                      <Typography variant="caption">Registration Id: {regId}</Typography>
+                      {classId && <Typography variant="caption">Class Id: {classId}</Typography>}
                       <Typography variant="caption">
                         User Name:
                         {clearUserName}
@@ -323,19 +313,9 @@ export default function MenuLayout() {
                           display: 'flex',
                         }}
                       >
-                        {studentId && (
-                          <Typography variant="caption">
-                            Student Id:{studentId}
-                          </Typography>
-                        )}
-                        <Typography variant="caption">
-                          Registration Id:{regId}
-                        </Typography>
-                        {classId && (
-                          <Typography variant="caption">
-                            Class Id:{classId}
-                          </Typography>
-                        )}
+                        {studentId && <Typography variant="caption">Student Id:{studentId}</Typography>}
+                        <Typography variant="caption">Registration Id:{regId}</Typography>
+                        {classId && <Typography variant="caption">Class Id:{classId}</Typography>}
                         <Typography variant="caption">
                           User Name:
                           {clearUserName}

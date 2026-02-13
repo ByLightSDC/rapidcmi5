@@ -10,7 +10,14 @@ import {
 import { useCellValues, usePublisher } from '@mdxeditor/gurx';
 
 // MUI
-import { Box, Paper, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  FormControlLabel,
+  Paper,
+  Stack,
+  Switch,
+  Typography,
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 
@@ -48,6 +55,7 @@ export const AudioDialog: React.FC = () => {
   const [audioStyle, setAudioStyle] = useState<string>('');
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [fileOptions, setFileOptions] = useState<string[]>([]);
+  const [autoplay, setAutoplay] = useState<boolean>(false);
 
   const { isFsLoaded, handleGetFolderStructure } =
     useContext(GitContext);
@@ -66,6 +74,7 @@ export const AudioDialog: React.FC = () => {
       setTitle(state.initialValues.title ? state.initialValues.title : '');
 
       setAudioStyle('');
+      setAutoplay(state.initialValues.autoplay ?? false);
       if (state.initialValues.rest) {
         const styleAttribute = state.initialValues.rest.find(
           //@ts-ignore
@@ -80,6 +89,7 @@ export const AudioDialog: React.FC = () => {
       setSrc('');
       setTitle('');
       setAudioStyle('');
+      setAutoplay(false);
     }
 
     // clear the file regardless of the editing state
@@ -113,6 +123,7 @@ export const AudioDialog: React.FC = () => {
       src: src,
       title: title,
       rest: restParams,
+      autoplay: autoplay,
     };
 
     saveAudio(audioParams);
@@ -283,6 +294,18 @@ export const AudioDialog: React.FC = () => {
               value={audioStyle}
               onChange={(textValue: string) => setAudioStyle(textValue)}
               infoText="Inline styles Ex. border-radius:8px;"
+            />
+
+            {/* Autoplay section */}
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={autoplay}
+                  onChange={(e) => setAutoplay(e.target.checked)}
+                  name="audio-autoplay"
+                />
+              }
+              label="Autoplay"
             />
           </Stack>
         </>

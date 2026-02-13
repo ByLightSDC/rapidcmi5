@@ -21,6 +21,7 @@ import {
   gfmTaskListItemToMarkdown,
 } from 'mdast-util-gfm-task-list-item';
 import { gfmTableFromMarkdown, gfmTableToMarkdown } from 'mdast-util-gfm-table';
+import { gfmStrikethrough } from 'micromark-extension-gfm-strikethrough';
 import { Options, Value, fromMarkdown } from 'mdast-util-from-markdown';
 import { Extension } from 'micromark-util-types';
 
@@ -54,7 +55,8 @@ export const convertMarkdownToMdast = (
   syntaxExtensions: Extension[],
 ) => {
   const theChildMDast = fromMarkdown(theMarkDown, {
-    extensions: syntaxExtensions,
+    // Ensure ~~strikethrough~~ tokens are parsed as GFM delete nodes.
+    extensions: [...syntaxExtensions, gfmStrikethrough()],
     mdastExtensions: [
       mdxJsxFromMarkdown(),
       directiveFromMarkdown(),

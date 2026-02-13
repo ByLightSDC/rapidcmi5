@@ -20,6 +20,7 @@ export default function WebAppSelection({
   recentProjects,
   handleCloneRepo,
   handleShowDocumentation,
+  isSandboxLaunching = false,
 }: {
   openLocalFolderAndSet: () => Promise<void>;
   openLocalRecentProject: (id: string) => Promise<void>;
@@ -28,6 +29,7 @@ export default function WebAppSelection({
   recentProjects: DirMeta[];
   handleShowDocumentation: (doc: OptionDocumentation) => void;
   handleCloneRepo: () => void;
+  isSandboxLaunching?: boolean;
 }) {
   return (
     <>
@@ -51,13 +53,18 @@ export default function WebAppSelection({
             cloneRepo={handleCloneRepo}
             createRepo={handleCreateRepo}
             onShowDocumentation={handleShowDocumentation}
+            isDisabled={isSandboxLaunching}
           />
-          <SandBoxSelection openSandbox={handleOpenSandbox} />
+          <SandBoxSelection
+            openSandbox={handleOpenSandbox}
+            isLaunching={isSandboxLaunching}
+          />
         </Box>
 
         <RecentProjectSelection
           recentProjects={recentProjects}
           openRecentProject={openLocalRecentProject}
+          isDisabled={isSandboxLaunching}
         />
       </Box>
 
