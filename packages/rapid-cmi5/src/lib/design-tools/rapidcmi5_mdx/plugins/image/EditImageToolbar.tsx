@@ -10,7 +10,6 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 /** Icons */
-import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RoomIcon from '@mui/icons-material/Room';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 
@@ -184,7 +183,7 @@ export function EditImageToolbar({
             pointerEvents: 'none',
           }}
         >
-          <AddCircleIcon color="warning" />
+          <TextFieldsIcon color="warning" />
         </div>
       )}
       <IconButton
@@ -206,7 +205,7 @@ export function EditImageToolbar({
             pointerEvents: 'none',
           }}
         >
-          <AddCircleIcon color="warning" />
+          <TextFieldsIcon color="warning" />
         </div>
       )}
 

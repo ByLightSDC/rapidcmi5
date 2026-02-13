@@ -71,6 +71,7 @@ export const ImageTextEditor: React.FC<
   const imageId: string =
     getAttributeValue(mdastNode.attributes, 'imageId') || '';
 
+  //40
   const bgColor =
     !readOnly && !isPlayback && isHovered
       ? muiTheme.palette.mode === 'dark'
@@ -121,7 +122,6 @@ export const ImageTextEditor: React.FC<
     [currentPosition],
   );
 
-
   /**
    * Set marker position to follow mouse
    * @param e
@@ -170,8 +170,8 @@ export const ImageTextEditor: React.FC<
           ...mdastNode,
           attributes: {
             ...mdastNode.attributes,
-            x: '' + currentPositionRef.current,
-            y: '' + currentPositionRef.current,
+            x: '' + currentPositionRef.current[0],
+            y: '' + currentPositionRef.current[1],
           },
         });
         // updateTheThing();
@@ -222,15 +222,27 @@ export const ImageTextEditor: React.FC<
           direction="row"
           sx={{
             backgroundColor: bgColor,
-            borderRadius: 16,
+            borderRadius: 4,
             position: 'absolute',
             left: currentPosition[0],
             top: currentPosition[1],
           }}
         >
-          <IconButton onMouseDown={handleDragTextStart}>
-            <DragIndicatorIcon color="warning" />
-          </IconButton>
+          <Stack
+            direction="row"
+            sx={{
+              minWidth: '32px',
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            {!readOnly && !isPlayback && isHovered && (
+              <IconButton onMouseDown={handleDragTextStart}>
+                <DragIndicatorIcon color="warning" />
+              </IconButton>
+            )}
+          </Stack>
+
           <NestedLexicalEditor<ContainerDirective>
             block={true}
             getContent={(node) => {
