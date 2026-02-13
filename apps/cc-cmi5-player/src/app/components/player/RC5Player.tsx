@@ -47,6 +47,7 @@ import {
   debugLog,
   AnimationConfig,
   themeColor,
+  ImageTextDirectiveDescriptor,
 } from '@rapid-cmi5/ui';
 
 import { RC5PlayerToolbar } from './RC5PlayerToolbar';
@@ -107,6 +108,7 @@ function RC5Player() {
           TabsDirectiveDescriptor,
           TabContentDirectiveDescriptor,
           ImageLabelDirectiveDescriptor,
+          ImageTextDirectiveDescriptor
         ],
       }),
       codeMirrorPlugin({

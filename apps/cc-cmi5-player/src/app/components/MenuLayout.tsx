@@ -68,7 +68,7 @@ export default function MenuLayout() {
 
   const featureFlagChangeClassRoom = false;
 
-  const { isAuthenticated, isTestMode } = useCMI5Session();
+  useCMI5Session();
 
   const getStrippedUserName = useCallback((inputName: string) => {
     const pcteCharindex = inputName.indexOf('@pcte.mil');
@@ -122,7 +122,7 @@ export default function MenuLayout() {
       dispatch(setIconColor(iconColor));
       dispatch(setDividerColor(dividerColor || 'grey'));
     }
-  }, [currentTheme]);
+  }, [currentTheme, dispatch]);
 
   return (
     <>
@@ -248,7 +248,7 @@ export default function MenuLayout() {
                   alertSxProps={{
                     borderStyle: 'solid',
                     borderWidth: '1px',
-                    borderColor: (theme: any) => `${theme.input.outlineColor}`,
+                    borderColor: (theme: CustomTheme) => `${theme.input.outlineColor}`,
                     color: 'white',
                   }}
                   infoIcon={<AccountCircleIcon fontSize="inherit" color="primary" />}
