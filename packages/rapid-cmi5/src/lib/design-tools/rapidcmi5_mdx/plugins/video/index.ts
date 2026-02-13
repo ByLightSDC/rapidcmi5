@@ -92,6 +92,7 @@ export interface SrcVideoParameters extends BaseVideoParameters {
   rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   width?: number;
   height?: number;
+  autoplay?: boolean;
 }
 
 /**
@@ -108,6 +109,7 @@ export interface SaveVideoParameters extends BaseVideoParameters {
   rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   width?: number; // undefined means 'inherit'
   height?: number; // undefined means 'inherit'
+  autoplay?: boolean;
 }
 
 /**
@@ -150,6 +152,7 @@ const internalInsertVideo$ = Signal<SrcVideoParameters>((r) => {
           rest: values.rest ?? [],
           width: values.width,
           height: values.height,
+          autoplay: values.autoplay,
         });
         $insertNodes([videoNode]);
         if ($isRootOrShadowRoot(videoNode.getParentOrThrow())) {
@@ -247,6 +250,7 @@ export const videoDialogState$ = Cell<
                   values.width ?? 'inherit',
                   values.height ?? 'inherit',
                 );
+                videoNode.setAutoplay(values.autoplay ?? false);
               });
               r.pub(videoDialogState$, { type: 'inactive' });
             }

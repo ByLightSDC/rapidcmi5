@@ -10,7 +10,14 @@ import {
 import { useCellValues, usePublisher } from '@mdxeditor/gurx';
 
 // MUI
-import { Box, Paper, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  FormControlLabel,
+  Paper,
+  Stack,
+  Switch,
+  Typography,
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid2';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
@@ -51,6 +58,7 @@ export const VideoDialog: React.FC = () => {
   const [fileOptions, setFileOptions] = useState<string[]>([]);
   const [width, setWidth] = useState<string>('');
   const [height, setHeight] = useState<string>('');
+  const [autoplay, setAutoplay] = useState<boolean>(false);
   const { handleGetFolderStructure } = useContext(GitContext);
 
   // get the state from Gurx
@@ -69,6 +77,7 @@ export const VideoDialog: React.FC = () => {
       setVideoStyle('');
       setWidth(state.initialValues.width?.toString() ?? '');
       setHeight(state.initialValues.height?.toString() ?? '');
+      setAutoplay(state.initialValues.autoplay ?? false);
       if (state.initialValues.rest) {
         const styleAttribute = state.initialValues.rest.find(
           //@ts-ignore
@@ -85,6 +94,7 @@ export const VideoDialog: React.FC = () => {
       setVideoStyle('');
       setWidth('');
       setHeight('');
+      setAutoplay(false);
     }
 
     // clear the file regardless of the editing state
@@ -120,6 +130,7 @@ export const VideoDialog: React.FC = () => {
       rest: restParams,
       width: width ? parseInt(width, 10) : undefined,
       height: height ? parseInt(height, 10) : undefined,
+      autoplay: autoplay,
     };
 
     saveVideo(videoParams);
@@ -323,6 +334,18 @@ export const VideoDialog: React.FC = () => {
                 />
               </Grid>
             </Grid>
+
+            {/* Autoplay section */}
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={autoplay}
+                  onChange={(e) => setAutoplay(e.target.checked)}
+                  name="video-autoplay"
+                />
+              }
+              label="Autoplay"
+            />
           </Stack>
         </>
       </ModalDialog>

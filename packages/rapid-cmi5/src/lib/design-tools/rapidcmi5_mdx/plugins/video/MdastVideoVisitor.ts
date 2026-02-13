@@ -35,6 +35,7 @@ export const MdastHtmlVideoVisitor: MdastImportVisitor<Mdast.Html> = {
     const width = video.width;
     const height = video.height;
     const videoId = video.getAttribute('data-video-id') || undefined; // ✅ Extract videoId from HTML
+    const autoplay = video.hasAttribute('autoplay');
 
     const videoNode = $createVideoNode({
       src: src || '',
@@ -42,6 +43,7 @@ export const MdastHtmlVideoVisitor: MdastImportVisitor<Mdast.Html> = {
       width,
       height,
       videoId, // ✅ Pass videoId to preserve GUID
+      autoplay,
     });
 
     if (lexicalParent.getType() === 'root') {
@@ -74,6 +76,8 @@ export const MdastJsxVideoVisitor: MdastImportVisitor<
     const height = getAttributeValue(mdastNode, 'height');
     const width = getAttributeValue(mdastNode, 'width');
     const videoId = getAttributeValue(mdastNode, 'data-video-id'); // ✅ Extract videoId
+    const autoplayAttr = getAttributeValue(mdastNode, 'autoplay');
+    const autoplay = autoplayAttr !== undefined;
 
     const rest = mdastNode.attributes.filter((a) => {
       return (
@@ -85,6 +89,8 @@ export const MdastJsxVideoVisitor: MdastImportVisitor<
           'width',
           'controls',
           'data-video-id',
+          'autoplay',
+          'muted',
         ].includes(a.name)
       );
     });
@@ -96,6 +102,7 @@ export const MdastJsxVideoVisitor: MdastImportVisitor<
       height: height ? parseInt(height, 10) : undefined,
       rest,
       videoId, // ✅ Pass videoId to preserve GUID
+      autoplay,
     });
 
     if (lexicalParent.getType() === 'root') {

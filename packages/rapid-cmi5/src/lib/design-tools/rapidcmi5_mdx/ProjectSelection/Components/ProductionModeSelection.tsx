@@ -65,19 +65,23 @@ The application will verify the \`.git\` folder exists before opening`,
   },
 };
 
+export type ProductionModeSelectionProps = {
+  openLocalFolder: () => void;
+  cloneRepo: () => void;
+  onShowDocumentation?: (doc: OptionDocumentation) => void;
+  createRepo: () => void;
+  isElectron?: boolean;
+  isDisabled?: boolean;
+};
+
 export default function ProductionModeSelection({
   openLocalFolder,
   cloneRepo,
   onShowDocumentation,
   createRepo,
   isElectron = false,
-}: {
-  openLocalFolder: () => void;
-  cloneRepo: () => void;
-  onShowDocumentation?: (doc: OptionDocumentation) => void;
-  createRepo: () => void;
-  isElectron?: boolean;
-}) {
+  isDisabled = false,
+}: ProductionModeSelectionProps) {
   const handleShowDocs = (key: string) => {
     if (onShowDocumentation) {
       onShowDocumentation(documentation[key]);
@@ -98,6 +102,7 @@ export default function ProductionModeSelection({
           title={'Clone Git Repository'}
           handleSelect={cloneRepo}
           handleShowDocs={() => handleShowDocs('clone')}
+          disabled={isDisabled}
           icon={
             getSvgStyleIcon(StyleIconTypeEnum.GIT, {
               fontSize: 'inherit',
@@ -117,6 +122,7 @@ export default function ProductionModeSelection({
             title={'Open Existing Project'}
             handleSelect={() => openLocalFolder()}
             handleShowDocs={() => handleShowDocs('open')}
+            disabled={isDisabled}
             icon={<FolderOpen />}
             subText={
               <>Select existing git project on your desktop</>
@@ -129,6 +135,7 @@ export default function ProductionModeSelection({
           title={'Create New Project'}
           handleSelect={() => createRepo()}
           handleShowDocs={() => handleShowDocs('create')}
+          disabled={isDisabled}
           icon={<CreateNewFolder />}
           subText={
             <>Create new git project on your desktop</>

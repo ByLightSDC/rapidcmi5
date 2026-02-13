@@ -6,9 +6,8 @@ import {
   appendCodeBlockEditorDescriptor$,
   insertCodeBlock$,
 } from '@mdxeditor/editor';
-import { CodeMirrorEditor } from './CodeMirrorEditor';
-
-
+import {  CodeMirrorEditor } from './CodeMirrorEditor';
+import './code-mirror.css';
 /**
  * The codemirror code block languages.
  * @group CodeMirror

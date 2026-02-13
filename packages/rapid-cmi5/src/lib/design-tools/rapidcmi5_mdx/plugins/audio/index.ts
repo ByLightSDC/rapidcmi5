@@ -72,6 +72,7 @@ export interface FileAudioParameters extends BaseAudioParameters {
 export interface SrcAudioParameters extends BaseAudioParameters {
   src: string;
   rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
+  autoplay?: boolean;
 }
 
 /**
@@ -86,6 +87,7 @@ export interface SaveAudioParameters extends BaseAudioParameters {
   src?: string;
   file?: FileList;
   rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
+  autoplay?: boolean;
 }
 
 /**
@@ -123,6 +125,7 @@ const internalInsertAudio$ = Signal<SrcAudioParameters>((r) => {
           src: values.src,
           title: values.title ?? '',
           rest: values.rest ?? [],
+          autoplay: values.autoplay,
         });
         $insertNodes([audioNode]);
         if ($isRootOrShadowRoot(audioNode.getParentOrThrow())) {
@@ -204,6 +207,7 @@ export const audioDialogState$ = Cell<
                 audioNode.setTitle(values.title);
                 audioNode.setSrc(src);
                 audioNode.setRest(values.rest);
+                audioNode.setAutoplay(values.autoplay ?? false);
               });
               r.pub(audioDialogState$, { type: 'inactive' });
             }

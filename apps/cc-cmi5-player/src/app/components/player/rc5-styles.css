@@ -19,6 +19,13 @@
   background-color: transparent !important;
 }
 
+/* makes accordion nested content dark TODO -- remove?*/
+.light-editor {
+  --basePageBg: #f8f8f8;
+  --baseTextContrast: rgb(0, 0, 0);
+  --baseText: #323232d9;
+}
+
 .nested-editable-dark {
   --basePageBg: #212125;
   /* inline code block 
