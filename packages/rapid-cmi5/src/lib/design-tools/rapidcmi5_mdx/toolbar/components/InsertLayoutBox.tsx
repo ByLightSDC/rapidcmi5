@@ -34,9 +34,13 @@ import ViewComfyIcon from '@mui/icons-material/ViewComfy';
 
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { fromMarkdown } from 'mdast-util-from-markdown';
 import { Options as ToMarkdownOptions } from 'mdast-util-to-markdown';
-import { exportMarkdownFromLexical, defaultToMarkdownExtensions, placeCaretInsideDirective } from '@rapid-cmi5/ui';
+import {
+  convertMarkdownToMdast,
+  exportMarkdownFromLexical,
+  defaultToMarkdownExtensions,
+  placeCaretInsideDirective,
+} from '@rapid-cmi5/ui';
 
 const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
   listItemIndent: 'one',
@@ -121,10 +125,10 @@ export const InsertLayoutBox = () => {
         theMarkDown = 'Layout Box';
       }
 
-      const theChildMDast = fromMarkdown(theMarkDown, {
-        extensions: syntaxExtensions,
-        mdastExtensions: null,
-      });
+      const theChildMDast = convertMarkdownToMdast(
+        theMarkDown,
+        syntaxExtensions,
+      );
 
       const mdast: ContainerDirective = {
         type: 'containerDirective',
