@@ -229,6 +229,7 @@ export interface AudioEditorProps {
   nodeKey: NodeKey;
   rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   id: string;
+  autoplay: boolean;
 }
 
 export function AudioEditor({
@@ -237,6 +238,7 @@ export function AudioEditor({
   nodeKey,
   rest,
   id,
+  autoplay,
 }: AudioEditorProps): JSX.Element {
   const [audioFilePath] = useCellValues(audioFilePath$);
   const [Placeholder] = useCellValues(audioPlaceholder$);
@@ -285,6 +287,7 @@ export function AudioEditor({
             initialAudioPath={initialAudioPath}
             title={title || ''}
             rest={rest}
+            autoplay={autoplay}
           />
         )}
       </div>

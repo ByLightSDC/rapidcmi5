@@ -16,8 +16,8 @@ import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
 function convertVideoElement(domNode: Node): null | DOMConversionOutput {
   if (domNode instanceof HTMLVideoElement) {
-    const { src, title, width, height } = domNode;
-    const node = $createVideoNode({ src, title, width, height });
+    const { src, title, width, height, autoplay } = domNode;
+    const node = $createVideoNode({ src, title, width, height, autoplay });
     return { node };
   }
   return null;
@@ -35,6 +35,7 @@ export type SerializedVideoNode = Spread<
     src: string;
     rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
     videoId?: string; // Unique persistent ID for animation targeting
+    autoplay?: boolean;
     type: 'video';
     version: 1;
   },
@@ -56,6 +57,8 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
   __height: 'inherit' | number;
   /** @internal */
   __videoId: string; // Unique persistent ID for animation targeting
+  /** @internal */
+  __autoplay: boolean;
 
   /** @internal */
   __rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
@@ -74,6 +77,8 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
       node.__height,
       node.__rest,
       node.__key,
+      undefined,
+      node.__autoplay,
     );
     cloned.__videoId = node.__videoId; // Preserve videoId on clone
     return cloned;
@@ -81,7 +86,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
 
   /** @internal */
   static override importJSON(serializedNode: SerializedVideoNode): VideoNode {
-    const { title, src, width, rest, height, videoId } = serializedNode;
+    const { title, src, width, rest, height, videoId, autoplay } = serializedNode;
     const node = $createVideoNode({
       title,
       src,
@@ -89,6 +94,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
       width,
       rest,
       videoId, // Restore videoId from saved state
+      autoplay,
     });
     return node;
   }
@@ -106,6 +112,10 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
     }
     if (this.__height) {
       element.setAttribute('height', this.__height.toString());
+    }
+    if (this.__autoplay) {
+      element.setAttribute('autoplay', 'true');
+      element.setAttribute('muted', 'true');
     }
     return { element };
   }
@@ -132,6 +142,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
     rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[],
     key?: NodeKey,
     videoId?: string,
+    autoplay?: boolean,
   ) {
     super(key);
     this.__src = src;
@@ -141,6 +152,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
     this.__rest = rest ?? [];
     // Generate or restore unique videoId for animation targeting
     this.__videoId = videoId || this.generateVideoId();
+    this.__autoplay = autoplay ?? false;
   }
 
   /** @internal */
@@ -162,6 +174,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
       src: this.getSrc(),
       rest: this.__rest,
       videoId: this.__videoId, // Save videoId for persistence
+      autoplay: this.__autoplay,
       type: 'video',
       version: 1,
     };
@@ -219,6 +232,10 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
     return this.__videoId;
   }
 
+  getAutoplay(): boolean {
+    return this.__autoplay;
+  }
+
   setTitle(title: string | undefined): void {
     this.getWritable().__title = title;
   }
@@ -231,6 +248,10 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
     rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[] | undefined,
   ): void {
     this.getWritable().__rest = rest ?? [];
+  }
+
+  setAutoplay(autoplay: boolean): void {
+    this.getWritable().__autoplay = autoplay;
   }
 
   /** @internal */
@@ -252,6 +273,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
         height={this.__height}
         rest={this.__rest}
         videoId={this.__videoId}
+        autoplay={this.__autoplay}
       />
     );
   }
@@ -269,6 +291,7 @@ export interface CreateVideoNodeParameters {
   rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   src: string;
   videoId?: string;
+  autoplay?: boolean;
 }
 
 /**
@@ -277,8 +300,8 @@ export interface CreateVideoNodeParameters {
  * @group Video
  */
 export function $createVideoNode(params: CreateVideoNodeParameters): VideoNode {
-  const { title, src, key, width, height, rest, videoId } = params;
-  return new VideoNode(src, title, width, height, rest, key, videoId);
+  const { title, src, key, width, height, rest, videoId, autoplay } = params;
+  return new VideoNode(src, title, width, height, rest, key, videoId, autoplay);
 }
 
 /**

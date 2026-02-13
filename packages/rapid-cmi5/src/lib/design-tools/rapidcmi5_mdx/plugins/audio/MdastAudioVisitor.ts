@@ -33,11 +33,13 @@ export const MdastHtmlAudioVisitor: MdastImportVisitor<Mdast.Html> = {
     const src = audio.getAttribute('src') || audio.src;
     const title = audio.getAttribute('title') || audio.title;
     const id = audio.getAttribute('data-audio-id') || undefined; // ✅ Extract id from HTML
+    const autoplay = audio.hasAttribute('autoplay');
 
     const audioNode = $createAudioNode({
       src: src || '',
       title,
       id, // ✅ Pass id to preserve GUID
+      autoplay,
     });
 
     if (lexicalParent.getType() === 'root') {
@@ -68,11 +70,15 @@ export const MdastJsxAudioVisitor: MdastImportVisitor<
 
     const title = getAttributeValue(mdastNode, 'title');
     const id = getAttributeValue(mdastNode, 'data-audio-id'); // ✅ Extract id
+    const autoplayAttr = getAttributeValue(mdastNode, 'autoplay');
+    const autoplay = autoplayAttr !== undefined;
 
     const rest = mdastNode.attributes.filter((a) => {
       return (
         a.type === 'mdxJsxAttribute' &&
-        !['src', 'title', 'controls', 'data-audio-id'].includes(a.name) // ✅ Filter out data-audio-id
+        !['src', 'title', 'controls', 'data-audio-id', 'autoplay', 'muted'].includes(
+          a.name,
+        ) // ✅ Filter out data-audio-id, autoplay, and muted
       );
     });
 
@@ -81,6 +87,7 @@ export const MdastJsxAudioVisitor: MdastImportVisitor<
       title,
       rest,
       id, // ✅ Pass id to preserve GUID
+      autoplay,
     });
 
     if (lexicalParent.getType() === 'root') {

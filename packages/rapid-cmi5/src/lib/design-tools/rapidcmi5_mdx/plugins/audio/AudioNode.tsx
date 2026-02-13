@@ -16,8 +16,8 @@ import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
 function convertAudioElement(domNode: Node): null | DOMConversionOutput {
   if (domNode instanceof HTMLAudioElement) {
-    const { src, title } = domNode;
-    const node = $createAudioNode({ src, title });
+    const { src, title, autoplay } = domNode;
+    const node = $createAudioNode({ src, title, autoplay });
     return { node };
   }
   return null;
@@ -33,6 +33,7 @@ export type SerializedAudioNode = Spread<
     src: string;
     rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
     id?: string; // Unique persistent ID for animation targeting
+    autoplay?: boolean;
     type: 'audio';
     version: 1;
   },
@@ -50,6 +51,8 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
   __title: string | undefined;
   /** @internal */
   __id: string; // Unique persistent ID for animation targeting
+  /** @internal */
+  __autoplay: boolean;
 
   /** @internal */
   __rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
@@ -66,6 +69,8 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
       node.__title,
       node.__rest,
       node.__key,
+      undefined,
+      node.__autoplay,
     );
     cloned.__id = node.__id; // Preserve id on clone
     return cloned;
@@ -73,12 +78,13 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
 
   /** @internal */
   static override importJSON(serializedNode: SerializedAudioNode): AudioNode {
-    const { title, src, rest, id } = serializedNode;
+    const { title, src, rest, id, autoplay } = serializedNode;
     const node = $createAudioNode({
       title,
       src,
       rest,
       id, // Restore id from saved state
+      autoplay,
     });
     return node;
   }
@@ -90,6 +96,9 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
     element.setAttribute('controls', 'true');
     if (this.__title) {
       element.setAttribute('title', this.__title);
+    }
+    if (this.__autoplay) {
+      element.setAttribute('autoplay', 'true');
     }
     return { element };
   }
@@ -114,6 +123,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
     rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[],
     key?: NodeKey,
     id?: string,
+    autoplay?: boolean,
   ) {
     super(key);
     this.__src = src;
@@ -121,6 +131,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
     this.__rest = rest ?? [];
     // Generate or restore unique id for animation targeting
     this.__id = id || this.generateId();
+    this.__autoplay = autoplay ?? false;
   }
 
   /** @internal */
@@ -140,6 +151,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
       src: this.getSrc(),
       rest: this.__rest,
       id: this.__id, // Save id for persistence
+      autoplay: this.__autoplay,
       type: 'audio',
       version: 1,
     };
@@ -173,6 +185,10 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
     return this.__id;
   }
 
+  getAutoplay(): boolean {
+    return this.__autoplay;
+  }
+
   getRest(): (MdxJsxAttribute | MdxJsxExpressionAttribute)[] {
     return this.__rest;
   }
@@ -191,6 +207,10 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
     this.getWritable().__rest = rest ?? [];
   }
 
+  setAutoplay(autoplay: boolean): void {
+    this.getWritable().__autoplay = autoplay;
+  }
+
   /** @internal */
   shouldBeSerializedAsElement(): boolean {
     // ALWAYS serialize as HTML element to preserve id for animations!
@@ -206,6 +226,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
         nodeKey={this.getKey()}
         rest={this.__rest}
         id={this.__id}
+        autoplay={this.__autoplay}
       />
     );
   }
@@ -221,6 +242,7 @@ export interface CreateAudioNodeParameters {
   rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   src: string;
   id?: string;
+  autoplay?: boolean;
 }
 
 /**
@@ -229,8 +251,8 @@ export interface CreateAudioNodeParameters {
  * @group Audio
  */
 export function $createAudioNode(params: CreateAudioNodeParameters): AudioNode {
-  const { title, src, key, rest, id } = params;
-  return new AudioNode(src, title, rest, key, id);
+  const { title, src, key, rest, id, autoplay } = params;
+  return new AudioNode(src, title, rest, key, id, autoplay);
 }
 
 /**
