@@ -66,8 +66,7 @@
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "cc-cmi5-player:build",
-        "hmr": true,
-        "port": 4300
+        "hmr": true
       },
       "configurations": {
         "development": {
