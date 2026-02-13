@@ -10,8 +10,7 @@ import type { ContainerDirective } from 'mdast-util-directive';
 import { Paragraph } from 'mdast';
 import { fromMarkdown, type Options } from 'mdast-util-from-markdown';
 import { toMarkdown } from 'mdast-util-to-markdown';
-import { useEffect, useMemo, useState } from 'react';
-
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Popper, { PopperPlacementType } from '@mui/material/Popper';
 import { createPortal } from 'react-dom';

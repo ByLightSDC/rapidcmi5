@@ -58,9 +58,24 @@ import { GitContext } from '../../../course-builder/GitViewer/session/GitContext
 import { useSelector } from 'react-redux';
 
 import RC5LinkEditor from '../link/RC5LinkEditor';
-import { debugLogError, editorInPlayback$, useTimeStampUUID, onCheckClickOutsideImageLabel, debugLog, convertMarkdownToMdast, DEFAULT_IMAGE_LABEL_CONTENT, MARKER_HALF_WIDTH, MARKER_HALF_HEIGHT, isLabelDropping$, clickPosition$ } from '@rapid-cmi5/ui';
+import {
+  debugLogError,
+  editorInPlayback$,
+  useTimeStampUUID,
+  onCheckClickOutsideImageLabel,
+  debugLog,
+  convertMarkdownToMdast,
+  DEFAULT_IMAGE_LABEL_CONTENT,
+  MARKER_HALF_WIDTH,
+  MARKER_HALF_HEIGHT,
+  isLabelDropping$,
+  clickPosition$,
+  isTextDropping$,
+  clickImageTextPosition$,
+  DEFAULT_IMAGE_TEXT_CONTENT,
+  isTextDragging$,
+} from '@rapid-cmi5/ui';
 import { currentAuPath } from '@rapid-cmi5/react-editor';
-
 
 const BROKEN_IMG_URI =
   'data:image/svg+xml;charset=utf-8,' +
@@ -513,6 +528,54 @@ export function ImageEditor({
     });
   };
 
+  /**
+   * Insert Image Text Directive
+   * @param xPos X position relative to image top left corner
+   * @param yPos Y position relative to image top left corner
+   * @returns
+   */
+  const insertImageText = (xPos: string, yPos: string) => {
+    if (!editor) return;
+
+    editor.update(() => {
+      const targetNode = $getNodeByKey(nodeKey);
+
+      if (!targetNode) return;
+      let targetImageId = id;
+      if (!targetImageId) {
+        debugLog('set image id for text');
+        targetImageId = generateId();
+        (targetNode as ImageNode).setId(targetImageId);
+      }
+
+      // create children tabs content nodes
+      const theChildMDast = convertMarkdownToMdast(
+        DEFAULT_IMAGE_TEXT_CONTENT,
+        syntaxExtensions,
+      );
+
+      // create image label node
+      const mdastAccordion: ContainerDirective = {
+        type: 'containerDirective',
+        name: 'imageText',
+        attributes: {
+          imageId: targetImageId,
+          x: xPos,
+          y: yPos,
+        },
+        children: (theChildMDast?.children as BlockContent[]) || [],
+      };
+      //insert after image (ordering not important)
+      const textNode = $createDirectiveNode(mdastAccordion) as DirectiveNode;
+      const lineBreakNode = $createLineBreakNode();
+      targetNode.insertAfter(lineBreakNode);
+      lineBreakNode.insertAfter(textNode);
+
+      //turn off dropping flag
+      isTextDropping$.value = false;
+    });
+  };
+
   useEffect(() => {
     if (imagePreviewHandler) {
       const callPreviewHandler = async () => {
@@ -557,6 +620,7 @@ export function ImageEditor({
             event.target === labelsRef.current
           ) {
             if (id) {
+              //check click outside with label
               onCheckClickOutsideImageLabel(id);
             }
             if (event.shiftKey) {
@@ -566,6 +630,8 @@ export function ImageEditor({
               setSelected(true);
             }
 
+            //these checks are needed because the mouse up command propogates to the image first
+            //check label drop
             if (isLabelDropping$.value && event.currentTarget) {
               const target = event.target as HTMLElement;
               const rect = target.getBoundingClientRect();
@@ -573,11 +639,26 @@ export function ImageEditor({
               const yy = event.clientY - rect.top - MARKER_HALF_HEIGHT;
               insertImageLabel('' + xx, '' + yy);
             }
+            //check text drop
+            if (isTextDropping$.value && event.currentTarget) {
+              const target = event.target as HTMLElement;
+              const rect = target.getBoundingClientRect();
+              const xx = event.clientX - rect.left - MARKER_HALF_WIDTH;
+              const yy = event.clientY - rect.top - MARKER_HALF_HEIGHT;
+              insertImageText('' + xx, '' + yy);
+            }
+
             return true;
           } else {
+            //reset position after label dropped
             if (isLabelDropping$.value && event.target) {
               if (clickPosition$.value[0] !== event.clientX) {
                 isLabelDropping$.value = false;
+              }
+            }
+            if (isTextDropping$.value && event.target) {
+              if (clickImageTextPosition$.value[0] !== event.clientX) {
+                isTextDropping$.value = false;
               }
             }
           }
@@ -650,6 +731,8 @@ export function ImageEditor({
       setIsUrlShowing(false);
     }
   }, [viewMode]);
+
+  // useEffect(() => {}, [isFocused]);
 
   return imageSource !== null ? (
     <React.Suspense

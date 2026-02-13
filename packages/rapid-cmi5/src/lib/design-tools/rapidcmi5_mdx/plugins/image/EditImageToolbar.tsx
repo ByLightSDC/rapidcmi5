@@ -12,14 +12,19 @@ import SettingsIcon from '@mui/icons-material/Settings';
 /** Icons */
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RoomIcon from '@mui/icons-material/Room';
+import TextFieldsIcon from '@mui/icons-material/TextFields';
 
 import { openEditImageDialog$ } from './index';
-import {useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTheme } from '@mui/system';
 
-
 import { useSignalEffect } from '@preact/signals-react';
-import { clickPosition$, isLabelDropping$ } from '@rapid-cmi5/ui';
+import {
+  clickImageTextPosition$,
+  clickPosition$,
+  isLabelDropping$,
+  isTextDropping$,
+} from '@rapid-cmi5/ui';
 
 export interface EditImageToolbarProps {
   nodeKey: string;
@@ -54,18 +59,18 @@ export function EditImageToolbar({
   height,
   href,
 }: EditImageToolbarProps): JSX.Element {
-  const [readOnly] =
-    useCellValues(readOnly$);
+  const [readOnly] = useCellValues(readOnly$);
   const [editor] = useLexicalComposerContext();
   const openEditImageDialog = usePublisher(openEditImageDialog$);
   const [isMarking, setIsMarking] = useState(false);
+  const [isTextDropping, setIsTextDropping] = useState(false);
   const muiTheme = useTheme();
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
   /**
    * Set marker position to follow mouse
-   * @param e 
+   * @param e
    */
   const handleMouseMove = (e: MouseEvent) => {
     setPosition({ x: e.clientX, y: e.clientY });
@@ -76,13 +81,27 @@ export function EditImageToolbar({
    * Store mouse position when Label/Marker button is clicked
    * clickPosition is used from ImageEditor to avoid dropping marker on the Add Marker button since the button is positioned inside the image area
    * set a flag when label is being dropped
-   * @param e 
+   * @param e
    */
   const handleDragLabelStart = (e: React.MouseEvent<HTMLButtonElement>) => {
     window.removeEventListener('mousemove', handleMouseMove);
     window.addEventListener('mousemove', handleMouseMove);
     clickPosition$.value = [e?.clientX, e?.clientY];
     isLabelDropping$.value = true;
+  };
+
+  /**
+   * Listen for mouse move
+   * Store mouse position when Label/Marker button is clicked
+   * clickPosition is used from ImageEditor to avoid dropping marker on the Add Marker button since the button is positioned inside the image area
+   * set a flag when label is being dropped
+   * @param e
+   */
+  const handleDragTextStart = (e: React.MouseEvent<HTMLButtonElement>) => {
+    window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove);
+    clickImageTextPosition$.value = [e?.clientX, e?.clientY];
+    isTextDropping$.value = true;
   };
 
   /**
@@ -93,12 +112,22 @@ export function EditImageToolbar({
   }, []);
 
   /**
-   * Listen for flag and update internal React state
+   * Listen for label being dropped and update internal React state
    */
   useSignalEffect(() => {
     setIsMarking(isLabelDropping$.value);
     if (isLabelDropping$.value === false) {
       clickPosition$.value = [-1, -1];
+    }
+  });
+
+  /**
+   * Listen for text being dropped and update internal React state
+   */
+  useSignalEffect(() => {
+    setIsTextDropping(isTextDropping$.value);
+    if (isTextDropping$.value === false) {
+      clickImageTextPosition$.value = [-1, -1];
     }
   });
 
@@ -145,7 +174,6 @@ export function EditImageToolbar({
       >
         <RoomIcon />
       </IconButton>
-
       {isMarking && (
         <div
           style={{
@@ -156,9 +184,32 @@ export function EditImageToolbar({
             pointerEvents: 'none',
           }}
         >
-          <AddCircleIcon color='warning'/>
+          <AddCircleIcon color="warning" />
         </div>
       )}
+      <IconButton
+        aria-label="Add Text"
+        disabled={readOnly}
+        onClick={(e) => {
+          handleDragTextStart(e);
+        }}
+      >
+        <TextFieldsIcon />
+      </IconButton>
+      {isTextDropping && (
+        <div
+          style={{
+            position: 'fixed',
+            top: position.y,
+            left: position.x,
+            transform: 'translate(-50%, -50%)',
+            pointerEvents: 'none',
+          }}
+        >
+          <AddCircleIcon color="warning" />
+        </div>
+      )}
+
       <IconButton
         aria-label="delete"
         disabled={readOnly}
