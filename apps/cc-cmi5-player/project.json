@@ -25,7 +25,7 @@
             "output": "assets/rapid-cmi5"
           },
           {
-            "input": "cmi5-test-lessons/test-lesson/",
+            "input": "apps/cc-cmi5-player/src/test/",
             "glob": "**/*",
             "output": "."
           },
