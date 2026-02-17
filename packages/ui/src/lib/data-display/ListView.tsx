@@ -8,6 +8,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Typography from '@mui/material/Typography';
 import ListItemPerformant from './ListItemPerformant';
+import { equalsNoCase } from '../utility/string';
 
 /**
  * interface for list items
