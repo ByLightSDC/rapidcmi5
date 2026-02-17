@@ -29,5 +29,4 @@ vitest.config.*.timestamp*
 temp.package
 temp.project
 allpackages.json
-apps/rapid-cmi5-electron-frontend/assets/cmi5-player.zip
-apps/rapid-cmi5-electron-frontend/assets/cc-cmi5-player.zip
+apps/rapid-cmi5-electron-frontend/src/assets/cc-cmi5-player.zip
