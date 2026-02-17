@@ -9,7 +9,8 @@ import {
   generateCourseDist,
   generateCourseJson,
 } from '@rapid-cmi5/cmi5-build-common';
-import path, { join, relative } from 'path/posix';
+import { join as joinPosix, relative as relativePosix } from 'path/posix';
+import path from 'path';
 
 function getAssetPath(...segments: string[]) {
   if (!app.isPackaged) {
@@ -17,6 +18,32 @@ function getAssetPath(...segments: string[]) {
   }
   return path.join(process.resourcesPath, 'assets', ...segments);
 }
+
+const fsOps: FsOperations = {
+  readFile: async (path: string, encoding?: string) => {
+    const content = await fs.promises.readFile(path);
+    if (encoding === 'utf-8') {
+      return new TextDecoder().decode(content as Uint8Array);
+    }
+    return content;
+  },
+  writeFile: async (path: string, content: string | Uint8Array, encoding?: string) => {
+    await fs.promises.writeFile(path, content);
+  },
+  deleteFolder: async (path: string, options: { recursive: boolean; force: boolean }) => {
+    try {
+      await fs.promises.rm(path, options);
+    } catch (err) {
+      if (!options.force) throw err;
+    }
+  },
+  copy: async (src: string, dest: string, options: { recursive: boolean }) => {
+    await fs.promises.cp(src, dest, { recursive: true });
+  },
+  mkdir: async (path: string, options: { recursive: boolean }) => {
+    await fs.promises.mkdir(path, options);
+  },
+};
 
 export class cmi5Builder {
   public async buildZip(
@@ -26,6 +53,8 @@ export class cmi5Builder {
     courseFolder: string,
   ): Promise<string | null> {
     const buildPath = path.join(process.cwd(), '/cmi5/output', `${projectName}_${Date.now()}`);
+    const outPath = path.join(process.cwd(), 'build-output', projectName);
+
     // We always want to cleanup the folders, on any kind of failure
 
     try {
@@ -39,33 +68,7 @@ export class cmi5Builder {
         throw new Error('Course data was null');
       }
 
-      const fsOps: FsOperations = {
-        readFile: async (path: string, encoding?: string) => {
-          const content = await fs.promises.readFile(path);
-          if (encoding === 'utf-8') {
-            return new TextDecoder().decode(content as Uint8Array);
-          }
-          return content;
-        },
-        writeFile: async (path: string, content: string | Uint8Array, encoding?: string) => {
-          await fs.promises.writeFile(path, content);
-        },
-        deleteFolder: async (path: string, options: { recursive: boolean; force: boolean }) => {
-          try {
-            await fs.promises.rm(path, options);
-          } catch (err) {
-            if (!options.force) throw err;
-          }
-        },
-        copy: async (src: string, dest: string, options: { recursive: boolean }) => {
-          await fs.promises.cp(src, dest, { recursive: true });
-        },
-        mkdir: async (path: string, options: { recursive: boolean }) => {
-          await fs.promises.mkdir(path, options);
-        },
-      };
-
-      await generateCourseDist(coursePath, buildPath, courseData, fsOps, join, relative, courseFolder);
+      await generateCourseDist(coursePath, buildPath, courseData, fsOps, joinPosix, relativePosix, courseFolder);
 
       const cmi5Xml = generateCmi5Xml(courseData);
       const cmi5Path = path.join(buildPath, 'cmi5.xml');
@@ -75,7 +78,6 @@ export class cmi5Builder {
       try {
         const archive = archiver('zip', { zlib: { level: 9 } });
 
-        const outPath = path.join(process.cwd(), 'build-output', projectName);
         await fs.promises.mkdir(path.dirname(outPath), {
           recursive: true,
         });
