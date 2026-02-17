@@ -45,7 +45,7 @@ function getRapidBase(isTestMode: boolean) {
   );
 }
 
-function resolveSafe(userPath: string, isTestMode: boolean): string {
+export function resolveSafe(userPath: string, isTestMode: boolean): string {
   const base = getRapidBase(isTestMode);
 
   // Coerce to string

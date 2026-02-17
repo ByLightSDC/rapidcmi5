@@ -4,15 +4,16 @@ import { useEffect } from 'react';
 import { NotificationsProvider } from '@toolpad/core';
 import AppRoutes from './AppRoutes';
 import { debugLog } from './debug';
-import { useDispatch, useSelector } from 'react-redux';
-import { setDividerColor, setIconColor, themeColor } from '@rapid-cmi5/ui';
-import { lightTheme } from './styles/muiTheme';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { useSelector } from 'react-redux';
+import { themeColor } from '@rapid-cmi5/ui';
 import { darkTheme } from './styles/muiThemeDark';
+import { lightTheme } from './styles/muiTheme';
 import { CustomTheme } from './styles/createPalette';
 
 export function App() {
   const theme = useSelector(themeColor);
-
 
   // Handle session termination when user leaves the page
   useEffect(() => {
@@ -42,19 +43,19 @@ export function App() {
     };
   }, []);
 
-
-
   return (
     <ThemeProvider theme={theme === 'dark' ? darkTheme : lightTheme}>
-      <NotificationsProvider
-        slotProps={{
-          snackbar: {
-            anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
-          },
-        }}
-      >
-        <AppRoutes />
-      </NotificationsProvider>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <NotificationsProvider
+          slotProps={{
+            snackbar: {
+              anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
+            },
+          }}
+        >
+          <AppRoutes />
+        </NotificationsProvider>
+      </LocalizationProvider>
     </ThemeProvider>
   );
 }
