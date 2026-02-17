@@ -6,15 +6,14 @@ import AppRoutes from './AppRoutes';
 import { debugLog } from './debug';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { useDispatch, useSelector } from 'react-redux';
-import { setDividerColor, setIconColor, themeColor } from '@rapid-cmi5/ui';
-import { lightTheme } from './styles/muiTheme';
+import { useSelector } from 'react-redux';
+import { themeColor } from '@rapid-cmi5/ui';
 import { darkTheme } from './styles/muiThemeDark';
+import { lightTheme } from './styles/muiTheme';
 import { CustomTheme } from './styles/createPalette';
 
 export function App() {
   const theme = useSelector(themeColor);
-
 
   // Handle session termination when user leaves the page
   useEffect(() => {
@@ -44,10 +43,8 @@ export function App() {
     };
   }, []);
 
-
-
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme === 'dark' ? darkTheme : lightTheme}>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <NotificationsProvider
           slotProps={{

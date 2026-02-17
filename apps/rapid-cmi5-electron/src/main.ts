@@ -5,12 +5,12 @@ import App from './app/app';
 import * as nodePath from 'path'; // Renamed to avoid conflicts
 import { finished } from 'stream/promises';
 import { createWriteStream } from 'fs';
-import { ElectronFsHandler } from './app/api/fileSystem/fileSystem';
+import { ElectronFsHandler, resolveSafe } from './app/api/fileSystem/fileSystem';
 
 import { app } from 'electron';
 import { cmi5Builder } from './app/api/cmi5Builder/build';
-import JSZip from 'jszip';
-import { FolderStruct } from '@rapid-cmi5/cmi5-build-common';
+import fs from 'fs';
+
 
 const builder = new cmi5Builder();
 let fsHandler: ElectronFsHandler | null = null;
@@ -413,7 +413,7 @@ ipcMain.handle('fs:readdir', async (_e, dirPath: string) => {
 });
 
 // CMI5 Build Handler
-ipcMain.handle(
+ipcMain.handle( 
   'cmi5Build',
   async (
     _evt,
@@ -423,27 +423,17 @@ ipcMain.handle(
   ) => {
 
     try {
-      const zip = new JSZip();
-      const courseRoot = zip.folder(courseFolder);
-
-      if (!courseRoot) {
-        throw new Error('Failed to create course folder in zip');
-      }
 
       const coursePath = nodePath.join(projectPath, courseFolder);
-
       const folderStruct = await getFsHandler().getFolderStructure(
         coursePath,
-        projectPath,
+        coursePath,
         true,
         true,
       );
+      const coursePathAbsolute = resolveSafe(coursePath, false);
 
-      fillZip(folderStruct, courseRoot);
-
-      const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
-
-      const tempPath = await builder.buildZip(zipBuffer, projectName);
+      const tempPath = await builder.buildZip(coursePathAbsolute, folderStruct, projectName, courseFolder);
 
       if (tempPath == null) {
         throw new Error('Failed to build zip package');
@@ -459,8 +449,8 @@ ipcMain.handle(
         return { canceled: true };
       }
 
-      const fs = await import('fs');
       await fs.promises.mkdir(nodePath.dirname(filePath), { recursive: true });
+      
       await finished(
         fs.createReadStream(tempPath).pipe(createWriteStream(filePath)),
       );
@@ -494,20 +484,6 @@ export default class Main {
   }
 }
 
-export function fillZip(folderStruct: FolderStruct[], zip: JSZip) {
-  for (const item of folderStruct) {
-    if (item.isBranch) {
-      const subZip = zip.folder(item.name);
-      if (subZip && item.children) {
-        fillZip(item.children, subZip);
-      }
-    } else {
-      if (item.content) {
-        zip.file(item.name, item.content);
-      }
-    }
-  }
-}
 
 Main.initialize();
 Main.bootstrapApp();

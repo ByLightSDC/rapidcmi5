@@ -2,12 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter as RouterWrapper } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 
-import {
-  debugLogError,
-  setDividerColor,
-  setIconColor,
-  themeColor,
-} from '@rapid-cmi5/ui';
+import { debugLogError, setDividerColor, setIconColor, themeColor } from '@rapid-cmi5/ui';
 
 /* Shared */
 import AppHeader from './shared/AppHeader';
@@ -33,13 +28,7 @@ import { darkTheme } from './styles/muiThemeDark';
 import { lightTheme } from './styles/muiTheme';
 import { CourseAU, generateAuId } from '@rapid-cmi5/cmi5-build-common';
 
-function RapidCmi5WithAuth({
-  isAuthenticated,
-  token,
-}: {
-  isAuthenticated: boolean;
-  token: string | undefined;
-}) {
+function RapidCmi5WithAuth({ isAuthenticated, token }: { isAuthenticated: boolean; token: string | undefined }) {
   if (!token) return null;
   const currentAuth = useSelector(auth);
   const getAuScenarioUUID = async (au: CourseAU) => {
@@ -67,10 +56,7 @@ function RapidCmi5WithAuth({
         },
       );
 
-      if (
-        !matchingScenarios.data.data ||
-        matchingScenarios.data.totalCount === 0
-      ) {
+      if (!matchingScenarios.data.data || matchingScenarios.data.totalCount === 0) {
         debugLogError(`No matching scenario found for AU "${au.auName}"`);
         return null;
       }
@@ -81,6 +67,7 @@ function RapidCmi5WithAuth({
   };
   return (
     <RapidCmi5
+      showHomeButton={true}
       userAuth={{
         token,
         userEmail: currentAuth?.parsedUserToken?.email?.toLowerCase(),
@@ -98,14 +85,11 @@ function RapidCmi5WithAuth({
         const auId = generateAuId({ blockId, auName: au.auName });
         let cmi5CourseMapping;
         try {
-          cmi5CourseMapping = await DevopsApiClient.cmi5AuMappingRetrieve(
-            auId,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
+          cmi5CourseMapping = await DevopsApiClient.cmi5AuMappingRetrieve(auId, {
+            headers: {
+              Authorization: `Bearer ${token}`,
             },
-          );
+          });
         } catch (err: any) {
           if (err.status !== 404) {
             throw err;
@@ -187,14 +171,8 @@ export default function App({ authEnabled }: { authEnabled: boolean }) {
   const token = useSelector(authToken);
 
   useEffect(() => {
-    const iconColor =
-      theme === 'dark'
-        ? darkTheme.palette.primary.main
-        : lightTheme.palette.primary.main;
-    const dividerColor =
-      theme === 'dark'
-        ? darkTheme.palette.primary.main
-        : lightTheme.palette.primary.main;
+    const iconColor = theme === 'dark' ? darkTheme.palette.primary.main : lightTheme.palette.primary.main;
+    const dividerColor = theme === 'dark' ? darkTheme.palette.primary.main : lightTheme.palette.primary.main;
 
     dispatch(setIconColor(iconColor));
     dispatch(setDividerColor(dividerColor || 'grey'));
@@ -236,17 +214,12 @@ export default function App({ authEnabled }: { authEnabled: boolean }) {
                       }}
                     >
                       {authEnabled ? (
-                        <RapidCmi5WithAuth
-                          isAuthenticated={isAuthenticatedSel}
-                          token={token}
-                        />
+                        <RapidCmi5WithAuth isAuthenticated={isAuthenticatedSel} token={token} />
                       ) : (
                         <RapidCmi5
                           showHomeButton={true}
                           downloadCmi5Player={async () => {
-                            const response = await fetch(
-                              '/assets/cc-cmi5-player.zip',
-                            );
+                            const response = await fetch('/assets/cc-cmi5-player.zip');
                             return response;
                           }}
                         />
