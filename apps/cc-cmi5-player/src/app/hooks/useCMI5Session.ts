@@ -38,7 +38,7 @@ import { setModal } from '@rapid-cmi5/ui';
 import { classPromptModalId } from '../components/CourseModals';
 import { checkForDevMode } from '../utils/DevMode';
 import { setAuthToken } from '@rapid-cmi5/keycloak';
-import { queryHooksConfig } from 'libs/frontend/clients/hooks/src/lib/api/config';
+import { queryHooksConfig } from '@rangeos-nx/frontend/clients/hooks';
 
 type sessionState = {
   authToken: string;
@@ -486,18 +486,8 @@ export const useCMI5Session = () => {
    *
    */
   useEffect(() => {
-    debugLog('UE rangeData updated', rangeData);
-    if (rangeData) {
-      getConsoleCredentials(cmi5Instance, rangeData);
-    }
-  }, [rangeData, rangeData.deployedScenarios, getConsoleCredentials]);
-
-  /**
-   *
-   */
-  useEffect(() => {
-    debugLog('UE retry load rangeData');
     const retry = async () => {
+      debugLog('UE retry load rangeData');
       rangeDataAttempts.current = 0;
       await initializeScenarios();
       dispatch(setIsSessionInitialized(true));
@@ -508,13 +498,23 @@ export const useCMI5Session = () => {
   }, [savedRangeDataAttempts, dispatch, initializeScenarios]);
 
   /**
+   * 
+   */
+  useEffect(() => {
+    if (rangeData) {
+      debugLog('UE rangeData loaded, get console creds', rangeData);
+      getConsoleCredentials(cmi5Instance, rangeData);
+    }
+  }, [rangeData, rangeData.deployedScenarios, getConsoleCredentials]);
+
+  /**
    *
    */
   useEffect(() => {
-    debugLog('UE retry get console creds ');
     if (savedRangeConsoleDataAttempts === -1) {
       rangeConsoleDataAttempts.current = 0;
       if (rangeData) {
+        debugLog('UE retry get console creds ');
         getConsoleCredentials(cmi5Instance, rangeData);
       }
     }
