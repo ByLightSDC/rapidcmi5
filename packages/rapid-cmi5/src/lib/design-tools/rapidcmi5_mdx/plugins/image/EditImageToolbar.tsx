@@ -183,7 +183,7 @@ export function EditImageToolbar({
             pointerEvents: 'none',
           }}
         >
-          <TextFieldsIcon color="warning" />
+          <RoomIcon color="warning" />
         </div>
       )}
       <IconButton
