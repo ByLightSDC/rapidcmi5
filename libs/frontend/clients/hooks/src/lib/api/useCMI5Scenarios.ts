@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useQuery, useMutation } from 'react-query';
 
 import {
   defaultQueryConfig,
+  defaultSortByOptions,
   defaultSortOrder,
   queryHooksConfig,
 } from './config';
 import { getErrorMessage } from './errorMessages';
 
 import { DevopsApiClient, ScenariosCreate1Request, ScenariosDeployRequest } from '@rangeos-nx/frontend/clients/devops-api';
-
 export const queryKeyCMI5Scenarios = 'cmi5-scenarios';
 
 export const useGetCMI5Scenarios = (reqOptions?: any) => {
@@ -36,7 +36,7 @@ export const useGetCMI5Scenarios = (reqOptions?: any) => {
         reqOptions?.offset,
         reqOptions?.limit,
         reqOptions?.search,
-        reqOptions?.sortBy,
+        reqOptions?.sortBy || defaultSortByOptions,
         reqOptions?.sort || defaultSortOrder,
         undefined, // includes
         options,
@@ -65,6 +65,8 @@ export const usePostCMI5Scenarios = (formData: any) => {
     const scenarioDeployRequest: ScenariosDeployRequest = {
       classId: formData.classId,
       count: formData.count,
+      startDate: formData.startDate,
+      endDate: formData.endDate,
     };
     try {
       const response = await DevopsApiClient.scenariosDeploy(
@@ -85,6 +87,8 @@ export const usePostInitializeCMI5Scenarios = (formData: any) => {
   const postResult = async (formData: any) => {
     const req: ScenariosCreate1Request = {
       classId: formData.classId,
+      startDate: formData.startDate,
+      endDate: formData.endDate,
     };
     try {
       const response = await DevopsApiClient.scenariosCreate1(
@@ -92,7 +96,10 @@ export const usePostInitializeCMI5Scenarios = (formData: any) => {
         queryHooksConfig,
       );
 
-      if (response.data.deployedScenarios?.length === 0) {
+      if (
+        response.data.deployedScenarios?.length === 0 &&
+        response.data.scheduledScenarios?.length === 0
+      ) {
         throw new Error(
           `No deployed scenarios found for Class Id ${formData.classId}`,
         );

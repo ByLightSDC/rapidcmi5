@@ -1,16 +1,16 @@
-import path from 'path';
 import fs from 'fs';
-import extract from 'extract-zip';
 import archiver from 'archiver';
 import { app } from 'electron';
 
 import {
-  generateCourseDist,
+  FolderStruct,
+  FsOperations,
   generateCmi5Xml,
-  getFolderStructureBackend,
-} from '@rapid-cmi5/cmi5-build/backend';
-
-import { generateCourseJson } from '@rapid-cmi5/cmi5-build-common';
+  generateCourseDist,
+  generateCourseJson,
+} from '@rapid-cmi5/cmi5-build-common';
+import { join as joinPosix, relative as relativePosix } from 'path/posix';
+import path from 'path';
 
 function getAssetPath(...segments: string[]) {
   if (!app.isPackaged) {
@@ -19,41 +19,56 @@ function getAssetPath(...segments: string[]) {
   return path.join(process.resourcesPath, 'assets', ...segments);
 }
 
+const fsOps: FsOperations = {
+  readFile: async (path: string, encoding?: string) => {
+    const content = await fs.promises.readFile(path);
+    if (encoding === 'utf-8') {
+      return new TextDecoder().decode(content as Uint8Array);
+    }
+    return content;
+  },
+  writeFile: async (path: string, content: string | Uint8Array, encoding?: string) => {
+    await fs.promises.writeFile(path, content);
+  },
+  deleteFolder: async (path: string, options: { recursive: boolean; force: boolean }) => {
+    try {
+      await fs.promises.rm(path, options);
+    } catch (err) {
+      if (!options.force) throw err;
+    }
+  },
+  copy: async (src: string, dest: string, options: { recursive: boolean }) => {
+    await fs.promises.cp(src, dest, { recursive: true });
+  },
+  mkdir: async (path: string, options: { recursive: boolean }) => {
+    await fs.promises.mkdir(path, options);
+  },
+};
+
 export class cmi5Builder {
   public async buildZip(
-    buf: Buffer,
+    coursePath: string,
+    folderStructure: FolderStruct[],
     projectName: string,
+    courseFolder: string,
   ): Promise<string | null> {
+    const buildPath = path.join(process.cwd(), '/cmi5/output', `${projectName}_${Date.now()}`);
+    const outPath = path.join(process.cwd(), 'build-output', projectName);
 
-    await fs.promises.writeFile(path.join(process.cwd(), projectName), buf);
-
-    const file = {
-      path: path.join(process.cwd(), projectName),
-      originalname: projectName,
-    };
-
-    const extractedPath = await this.extractZip(file.path, file.originalname);
-    const buildPath = path.join(
-      process.cwd(),
-      '/cmi5/output',
-      `${projectName}_${Date.now()}`,
-    );
     // We always want to cleanup the folders, on any kind of failure
+
     try {
       const distPath = getAssetPath('cc-cmi5-player-dist');
 
       await fs.promises.cp(distPath, buildPath, { recursive: true });
 
-      const folderStructure = await getFolderStructureBackend(extractedPath);
-      const courseFolder = folderStructure[0].children;
-      if (!courseFolder) return null;
-      const courseData = generateCourseJson(courseFolder);
+      const courseData = generateCourseJson(folderStructure);
 
       if (!courseData) {
         throw new Error('Course data was null');
       }
 
-      await generateCourseDist(extractedPath, buildPath, courseData);
+      await generateCourseDist(coursePath, buildPath, courseData, fsOps, joinPosix, relativePosix, courseFolder);
 
       const cmi5Xml = generateCmi5Xml(courseData);
       const cmi5Path = path.join(buildPath, 'cmi5.xml');
@@ -63,7 +78,6 @@ export class cmi5Builder {
       try {
         const archive = archiver('zip', { zlib: { level: 9 } });
 
-        const outPath = path.join(process.cwd(), 'build-output', projectName);
         await fs.promises.mkdir(path.dirname(outPath), {
           recursive: true,
         });
@@ -94,29 +108,10 @@ export class cmi5Builder {
     } finally {
       // Cleanup the files
       try {
-        await fs.promises.unlink(file.path);
-      } catch (err) {
-        console.warn('Failed to delete uploaded file', err);
-      }
-      try {
-        await fs.promises.rm(extractedPath, { recursive: true, force: true });
-      } catch (err) {
-        console.warn('Failed to remove extracted path', err);
-      }
-      try {
         await fs.promises.rm(buildPath, { recursive: true, force: true });
       } catch (err) {
         console.warn('Failed to remove build path', err);
       }
     }
   }
-
-  async extractZip(filePath: string, fileName: string): Promise<string> {
-    const outputPath = `${process.cwd()}/uploads/${fileName}_${Date.now()}`;
-    fs.mkdirSync(outputPath, { recursive: true });
-    await extract(filePath, { dir: outputPath });
-    return outputPath;
-  }
-
-  validateZipFile() {}
 }
