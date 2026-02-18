@@ -58,9 +58,9 @@ export default function TabPanel() {
 
     let color;
     if (status.failed) {
-      color = '#f44336'; // Red indicator for failed active slide
+      color = currentTheme.palette.error.main;  // Red indicator for failed active slide
     } else if (status.passed && !status.failed) {
-      color = '#4caf50'; // Green indicator for passed active slide (MUI success color)
+      color = currentTheme.palette.success.main; // Green indicator for passed active slide (MUI success color)
     } else {
       color = '#007bff'; // Blue indicator for active slide with no status
     }
@@ -77,9 +77,9 @@ export default function TabPanel() {
     if (slideIndex === activeTab) {
       border = 'none'; // Let MUI indicator handle active slide
     } else if (status.failed) {
-      border = '4px solid #f44336'; // Red right border for failed slides
+      border = `4px solid ${currentTheme.palette.error.main}`; // Red right border for failed slides
     } else if (status.passed && !status.failed) {
-      border = '4px solid #4caf50'; // Green right border for passed slides (MUI success color)
+      border = `4px solid ${currentTheme.palette.success.main} `; // #4caf50 Green right border for passed slides (MUI success color)
     } else {
       border = 'none'; // No border for inactive, incomplete slides
     }
@@ -95,7 +95,7 @@ export default function TabPanel() {
       return (
         <CancelIcon
           sx={{
-            color: '#f44336',
+            color: currentTheme.palette.error.main,
             fontSize: '20px',
             height: '20px', // Fixed height
             width: '20px', // Fixed width
@@ -106,7 +106,7 @@ export default function TabPanel() {
       return (
         <CheckCircleIcon
           sx={{
-            color: '#4caf50',
+            color: currentTheme.palette.success.main,
             fontSize: '20px',
             height: '20px', // Fixed height
             width: '20px', // Fixed width
