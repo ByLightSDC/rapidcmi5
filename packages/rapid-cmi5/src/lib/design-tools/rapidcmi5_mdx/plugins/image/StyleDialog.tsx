@@ -31,7 +31,7 @@ interface StyleProps {
   isOpen: boolean;
   style: string;
   setImageStyle: React.Dispatch<React.SetStateAction<string>>;
-  setIsStyleDialogOpen: (open: boolean) => void; //Change for gurx MB
+  setIsStyleDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const BorderStyles: string[] = [
