@@ -1,3 +1,4 @@
+import { GitCredentials } from '@rapid-cmi5/cmi5-build-common';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 type tKeycloakUiState = {
@@ -14,6 +15,8 @@ type tKeycloakUiState = {
   isAuthenticated: boolean;
   isLoggingOut: boolean;
   isSSOEnabled: boolean;
+  devOpsApi: string | undefined;
+  gitCredentials: GitCredentials | undefined;
 };
 
 interface State {
@@ -29,6 +32,8 @@ export const initialState: tKeycloakUiState = {
   isAuthenticated: false,
   isLoggingOut: false,
   isSSOEnabled: true,
+  devOpsApi: undefined,
+  gitCredentials: undefined
 };
 
 export const keycloakUiSlice = createSlice({
@@ -80,6 +85,12 @@ export const keycloakUiSlice = createSlice({
     ) => {
       state.isSSOEnabled = action.payload;
     },
+    setDevopsApi: (state, action: PayloadAction<string>) => {
+      state.devOpsApi = action.payload;
+    },
+    setGitCredentials: (state, action: PayloadAction<GitCredentials>) => {
+      state.gitCredentials = action.payload;
+    },
   },
 });
 
@@ -93,6 +104,8 @@ export const {
   setIsAuthenticated,
   setIsLoggingOut,
   setIsSSOEnabled,
+  setDevopsApi,
+  setGitCredentials
 } = keycloakUiSlice.actions;
 
 //Selectors
@@ -114,5 +127,8 @@ export const isAuthenticated = (state: State) =>
 export const isLoggingOut = (state: State) => state.keycloakUi.isLoggingOut;
 
 export const isSSOEnabled = (state: State) => state.keycloakUi.isSSOEnabled;
+export const devopsApiUrl = (state: State) => state.keycloakUi.devOpsApi;
+export const gitCredentials = (state: State) => state.keycloakUi.gitCredentials;
+
 
 export const keycloakUiReducer = keycloakUiSlice.reducer;

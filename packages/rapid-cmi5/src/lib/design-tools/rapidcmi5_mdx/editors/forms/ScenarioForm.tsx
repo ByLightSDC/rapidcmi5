@@ -1,4 +1,6 @@
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { UseFormReturn } from 'react-hook-form';
 import {
   FormControlCheckboxField,
@@ -11,7 +13,7 @@ import {
   NAME_GROUP_OPT,
   UUID_GROUP,
 } from '@rapid-cmi5/ui';
-import { Alert, MenuItem, Typography } from '@mui/material';
+import { Alert, alpha, Box, MenuItem, Typography, useTheme } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import * as yup from 'yup';
@@ -30,7 +32,7 @@ export const ScenarioForm = ({
   crudType,
   defaultFormData,
   deleteButton,
-  onSave
+  onSave,
 }: {
   crudType: FormCrudType;
   defaultFormData: RC5ScenarioContent;
@@ -39,6 +41,7 @@ export const ScenarioForm = ({
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
   const { GetScenariosForm } = useContext(GitContext);
+  const theme = useTheme();
 
   const validationSchema = yup.object().shape({
     uuid: UUID_GROUP,
@@ -66,6 +69,9 @@ export const ScenarioForm = ({
     const { errors } = formState;
 
     const watchPromptClass = watch('promptClass');
+    const scenarioName = watch('name');
+    const scenarioUuid = watch('uuid');
+
     /**
      *
      * @param {string} topicId
@@ -107,7 +113,93 @@ export const ScenarioForm = ({
         </Grid>
         {GetScenariosForm ? (
           <Grid size={7.5}>
-            <GetScenariosForm submitForm={onApplyScenario} formType={crudType} errors={errors} formMethods={formMethods}/>
+            <GetScenariosForm
+              submitForm={onApplyScenario}
+              formType={crudType}
+              errors={errors}
+              formMethods={formMethods}
+            />
+
+            {/* Selected Scenario Display */}
+            {scenarioName ? (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.5,
+                  my: 1.5,
+                  p: 1,
+                  borderRadius: 2,
+                  border: `1px solid ${theme.palette.primary.main}`,
+                  bgcolor: alpha(theme.palette.primary.main, 0.08),
+                }}
+              >
+                <CheckCircleIcon
+                  sx={{
+                    fontSize: 20,
+                    color: theme.palette.primary.main,
+                    flexShrink: 0,
+                  }}
+                />
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography
+                    variant="body2"
+                    fontWeight={600}
+                    sx={{
+                      color: theme.palette.text.primary,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {scenarioName}
+                  </Typography>
+                  {scenarioUuid && (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: theme.palette.text.secondary,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: 'block',
+                      }}
+                    >
+                      {scenarioUuid}
+                    </Typography>
+                  )}
+                </Box>
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.5,
+                  my: 1,
+                  p:1,
+                  borderRadius: 2,
+                  border: `1px dashed ${theme.palette.divider}`,
+                  bgcolor: theme.palette.background.paper,
+                }}
+              >
+                <FolderOpenIcon
+                  sx={{
+                    fontSize: 20,
+                    color: alpha(theme.palette.text.secondary, 0.7),
+                    flexShrink: 0,
+                  }}
+                />
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: alpha(theme.palette.text.secondary, 0.7),
+                  }}
+                >
+                  No scenario selected
+                </Typography>
+              </Box>
+            )}
           </Grid>
         ) : (
           <>

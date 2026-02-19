@@ -1,3 +1,4 @@
+import { GitCredentials, SSOConfig } from '@rapid-cmi5/cmi5-build-common';
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electron', {
@@ -6,8 +7,19 @@ contextBridge.exposeInMainWorld('electron', {
 });
 
 export const ipc = {
-  cmi5Build: (projectPath: string, courseFolder: string, projectName: string) =>
-    ipcRenderer.invoke('cmi5Build', projectPath, courseFolder, projectName),
+  cmi5Build: (
+    projectPath: string,
+    courseFolder: string,
+    projectName: string,
+    createAuMappings: boolean,
+  ) =>
+    ipcRenderer.invoke(
+      'cmi5Build',
+      projectPath,
+      courseFolder,
+      projectName,
+      createAuMappings,
+    ),
 };
 
 contextBridge.exposeInMainWorld('ipc', ipc);
@@ -101,8 +113,25 @@ export const fsApi = {
   getStatus: (path: string) => ipcRenderer.invoke('fs:getStatus', path),
   getStashStatus: (path: string) =>
     ipcRenderer.invoke('fs:getStashStatus', path),
+  readPlayerConfig: () => ipcRenderer.invoke('fs:readPlayerConfig'),
+  writePlayerConfig: (content: string) =>
+    ipcRenderer.invoke('fs:writePlayerConfig', content),
 };
 contextBridge.exposeInMainWorld('fsApi', fsApi);
+
+export const userSettingsApi = {
+  setSSOConfig: (data: SSOConfig) =>
+    ipcRenderer.invoke('userSettingsApi:setSSOConfig', data),
+  getSSOConfig: () => ipcRenderer.invoke('userSettingsApi:getSSOConfig'),
+  loginSSO: (refresh?: boolean) =>
+    ipcRenderer.invoke('userSettingsApi:loginSSO', refresh),
+  getGitCredentials: () =>
+    ipcRenderer.invoke('userSettingsApi:getGitCredentials'),
+  setGitCredentials: (creds: GitCredentials) =>
+    ipcRenderer.invoke('userSettingsApi:setGitCredentials', creds),
+};
+
+contextBridge.exposeInMainWorld('userSettingsApi', userSettingsApi);
 
 async function normalizeData(data: any): Promise<string | Uint8Array> {
   if (typeof data === 'string') return data;

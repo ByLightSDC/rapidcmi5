@@ -58,7 +58,7 @@ export default function TabPanel() {
 
     let color;
     if (status.failed) {
-      color = currentTheme.palette.error.main;  // Red indicator for failed active slide
+      color = currentTheme.palette.error.main; // Red indicator for failed active slide
     } else if (status.passed && !status.failed) {
       color = currentTheme.palette.success.main; // Green indicator for passed active slide (MUI success color)
     } else {
@@ -123,7 +123,7 @@ export default function TabPanel() {
         maxWidth: '260px',
         width: '100%',
         //left panel background
-        bgcolor: 'background.default',
+          bgcolor: currentTheme.palette.mode === 'light' ? '#8a91ac' :'background.default',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -135,18 +135,22 @@ export default function TabPanel() {
           pt: 0,
           display: 'flex',
           alignContent: 'center',
+          borderRadius: 1,
         }}
       >
         {auLogo && (
           <img
             alt="logo"
             width="200px"
-            style={{ padding: '16px', paddingBottom: 0 }}
+            style={{
+              padding: '16px',
+              paddingBottom: 0,
+           
+            }}
             src={auLogo}
           />
         )}
       </Box>
-
       <ProgressBar />
       <Tabs
         orientation="vertical"

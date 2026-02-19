@@ -1,6 +1,6 @@
 import * as ReactDOM from 'react-dom/client';
 import AppWrapper from './app/AppWrapper';
-import { fsApi, ipc, store } from '@rapid-cmi5/react-editor';
+import { fsApi, ipc } from '@rapid-cmi5/react-editor';
 
 import './styles.css';
 import './assets/fonts/stylesheet.css';

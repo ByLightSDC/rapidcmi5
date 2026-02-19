@@ -1,4 +1,4 @@
-import { AppDispatch } from '@rapid-cmi5/react-editor';
+import { AppDispatch, useMDStyleIcons } from '@rapid-cmi5/react-editor';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import {
@@ -20,12 +20,33 @@ import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Box from '@mui/material/Box';
+import ListIcon from '@mui/icons-material/List';
 
 /* Icons */
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import Brightness6Icon from '@mui/icons-material/Brightness6';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import { useState } from 'react';
+import KeyIcon from '@mui/icons-material/Key';
+import { useEffect, useState } from 'react';
+import ConfigureSSOForm from './ssoModal';
+import { GitCredentials, SSOConfig } from '@rapid-cmi5/cmi5-build-common';
+
+import {
+  gitCredentials,
+  isSSOEnabled,
+  setAuth,
+  setAuthIdToken,
+  setAuthToken,
+  setDevopsApi,
+  setGitCredentials,
+  setIsAuthenticated,
+  setIsSSOEnabled,
+} from '@rapid-cmi5/keycloak';
+import ConfigureGitCredentialsForm, {
+  configureGitCredsModalId,
+  defaultGitCreds,
+} from './gitModal';
+import JsonFileEditorModal, { configureCmi5ConfigModalId } from './ConfigModal';
 
 /**
  * @typedef propTypes - User Info Box props
@@ -39,18 +60,39 @@ type propTypes = {
 };
 
 const clearStoragePromptModalId = 'reset-persistence';
+export const configureSSOPromptModalId = 'configure-sso';
+
+export function detectIsElectron(): boolean {
+  return typeof window !== 'undefined' && !!(window as any).fsApi;
+}
 
 export default function UserInfoBox({
   anchorEl,
   onClose,
   authEnabled,
 }: propTypes) {
+  const [ssoInfo, setSSOInfo] = useState<SSOConfig>({
+    devopsApiUrl: 'https://',
+    keycloakClientId: '',
+    keycloakRealm: '',
+    keycloakScope: '',
+    keycloakUrl: 'https://',
+    username: '',
+    password: '',
+  });
+
+  const selGitCredentials = useSelector(gitCredentials);
+
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
   const appThemeColor = useSelector(themeColor);
   const logOut = useLogOut();
   const modalObj = useSelector(modal);
-
+  const { gitIcon } = useMDStyleIcons();
+  const [
+    fileContentsStringOrParsedObject,
+    setFileContentsStringOrParsedObject,
+  ] = useState('');
   //#region About
   const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
 
@@ -58,6 +100,38 @@ export default function UserInfoBox({
     setAboutDialogOpen(false);
   };
 
+  const getSSOConfig = async () => {
+    if (detectIsElectron()) {
+      const settings = await window.userSettingsApi.getSSOConfig();
+      if (settings) {
+        dispatch(setDevopsApi(settings.devopsApiUrl));
+        setSSOInfo(settings);
+        // now lets try to login if its valid
+        const tokenResponse = await window.userSettingsApi.loginSSO();
+
+        dispatch(setAuthToken(tokenResponse.access_token));
+        dispatch(setIsAuthenticated(true));
+        dispatch(setIsSSOEnabled(true));
+      }
+    } else {
+      console.log('Web app');
+    }
+  };
+  const getGitCreds = async () => {
+    if (detectIsElectron()) {
+      const creds = await window.userSettingsApi.getGitCredentials();
+      dispatch(setGitCredentials(creds));
+    } else {
+      console.log('Web app');
+    }
+  };
+  useEffect(() => {
+    getGitCreds();
+  }, []);
+
+  useEffect(() => {
+    getSSOConfig();
+  }, []);
   //#endregion
 
   /**
@@ -78,6 +152,27 @@ export default function UserInfoBox({
     }
   };
 
+  const handlePlayerConfig = async () => {
+    if (detectIsElectron()) {
+      const config = await window.fsApi.readPlayerConfig();
+      setFileContentsStringOrParsedObject(config);
+      dispatch(
+        setModal({
+          type: configureCmi5ConfigModalId,
+          id: null,
+          name: null,
+          meta: {
+            title: 'Configure SSO',
+          },
+        }),
+      );
+      onClose();
+      console.log('config', config);
+    } else {
+      console.log('Web app');
+    }
+  };
+
   const handleThemeToggle = () => {
     const newTheme = appThemeColor === 'dark' ? 'light' : 'dark';
     console.log('setting theme', newTheme);
@@ -86,6 +181,54 @@ export default function UserInfoBox({
 
     dispatch(setTheme(newTheme));
     onClose();
+  };
+
+  const handleConfigureSSO = () => {
+    dispatch(
+      setModal({
+        type: configureSSOPromptModalId,
+        id: null,
+        name: null,
+        meta: {
+          title: 'Configure SSO',
+        },
+      }),
+    );
+    onClose();
+  };
+
+  const handleConfigureGit = () => {
+    dispatch(
+      setModal({
+        type: configureGitCredsModalId,
+        id: null,
+        name: null,
+        meta: {
+          title: 'Configure Git',
+        },
+      }),
+    );
+    onClose();
+  };
+
+  const handleSaveGitCreds = (data: GitCredentials) => {
+    if (detectIsElectron()) {
+      window.userSettingsApi.setGitCredentials(data);
+      dispatch(setGitCredentials(data));
+    } else {
+      console.log('Web app');
+    }
+  };
+
+  const handleSaveSSO = async (data: SSOConfig) => {
+    // Handle saving SSO config - implement as needed
+    if (detectIsElectron()) {
+      await window.userSettingsApi.setSSOConfig(data);
+      setSSOInfo(data);
+    } else {
+      console.log('Web app');
+    }
+    return;
   };
 
   const handleLogout = async () => {
@@ -107,7 +250,9 @@ export default function UserInfoBox({
     );
     onClose();
   };
-
+  const handleCloseModal = () => {
+    dispatch(setModal({ type: '', id: null, name: null }));
+  };
   return (
     <section aria-label="user info">
       {/* dont fetch until the menu opens (anchor defined) to ensure that the authToken is set in queryHooksConfig */}
@@ -127,6 +272,40 @@ export default function UserInfoBox({
             title="Clear Data"
             handleAction={handleClearStorage}
             maxWidth="xs"
+          />
+        )}
+
+        {modalObj.type === configureSSOPromptModalId && (
+          <ConfigureSSOForm
+            defaultData={ssoInfo}
+            modalObj={modalObj}
+            handleCloseModal={handleCloseModal}
+            handleModalAction={handleCloseModal}
+            handleSaveSSO={handleSaveSSO}
+          />
+        )}
+        {modalObj.type === configureGitCredsModalId && (
+          <ConfigureGitCredentialsForm
+            defaultData={selGitCredentials || defaultGitCreds}
+            modalObj={modalObj}
+            handleCloseModal={handleCloseModal}
+            handleModalAction={handleCloseModal}
+            handleSaveGitCreds={handleSaveGitCreds}
+          />
+        )}
+        {modalObj.type === configureCmi5ConfigModalId && (
+          <JsonFileEditorModal
+            modalId="configureCmi5ConfigModalId"
+            modalObj={modalObj}
+            title="CMI5 Player Config"
+            filename="cfg.json"
+            initialJson={fileContentsStringOrParsedObject}
+            handleCloseModal={handleCloseModal}
+            handleSaveJson={(parsed) => {
+              window.fsApi.writePlayerConfig(parsed);
+              // 1) write `raw` back to the file
+              // 2) optionally store `parsed` in state for runtime use
+            }}
           />
         )}
       </div>
@@ -159,6 +338,40 @@ export default function UserInfoBox({
             }}
           />
         </MenuItem>
+        <MenuItem onClick={handleConfigureSSO}>
+          <ListItemIcon>
+            <KeyIcon />
+          </ListItemIcon>
+          <ListItemText
+            primary={'SSO'}
+            primaryTypographyProps={{
+              color: 'secondary.contrastText',
+              variant: 'body2',
+            }}
+          />
+        </MenuItem>
+        <MenuItem onClick={handleConfigureGit}>
+          <ListItemIcon>{gitIcon}</ListItemIcon>
+          <ListItemText
+            primary={'Git Credentials'}
+            primaryTypographyProps={{
+              color: 'secondary.contrastText',
+              variant: 'body2',
+            }}
+          />
+        </MenuItem>
+        <MenuItem onClick={handlePlayerConfig}>
+          <ListItemIcon>
+            <ListIcon />
+          </ListItemIcon>
+          <ListItemText
+            primary={'Edit Player Config'}
+            primaryTypographyProps={{
+              color: 'secondary.contrastText',
+              variant: 'body2',
+            }}
+          />
+        </MenuItem>
         <MenuItem onClick={handlePromptClearStorage}>
           <ListItemIcon>
             <DeleteForeverIcon
@@ -175,6 +388,7 @@ export default function UserInfoBox({
             }}
           />
         </MenuItem>
+
         {authEnabled && (
           <MenuItem onClick={handleLogout}>
             <ListItemIcon>

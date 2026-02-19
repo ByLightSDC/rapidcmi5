@@ -85,16 +85,16 @@ export function DownloadCmi5ZipForm({
             readOnly={false}
           />
         </Grid>
-        {!isElectron && (
-          <Grid size={6} sx={{ marginTop: '12px' }}>
-            <FormControlCheckboxField
-              infoText={getInfoText('cmiAUMapping', 'auId')}
-              control={control}
-              name="createAuMappings"
-              label="Create AU Mappings?"
-            />
-          </Grid>
-        )}
+        {/* {!isElectron && ( */}
+        <Grid size={6} sx={{ marginTop: '12px' }}>
+          <FormControlCheckboxField
+            infoText={getInfoText('cmiAUMapping', 'auId')}
+            control={control}
+            name="createAuMappings"
+            label="Create AU Mappings?"
+          />
+        </Grid>
+        {/* )} */}
       </>
     );
   };

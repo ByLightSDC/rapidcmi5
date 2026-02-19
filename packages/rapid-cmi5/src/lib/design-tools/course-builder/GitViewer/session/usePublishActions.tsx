@@ -12,9 +12,13 @@ import {
 } from '../../../../redux/repoManagerReducer';
 import { RootState } from '../../../../redux/store';
 import { getRepoAccess } from './GitContext';
-import { GitFS } from '../utils/fileSystem';
+import { getRepoPath, GitFS } from '../utils/fileSystem';
 import { join } from 'path-browserify';
-import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
+import {
+  CourseAU,
+  generateBlockId,
+  generateCourseJson,
+} from '@rapid-cmi5/cmi5-build-common';
 
 export const usePublishActions = (
   fsInstance: GitFS,
@@ -34,11 +38,24 @@ export const usePublishActions = (
 
     try {
       let res = null;
+      const repoPath = getRepoPath(r);
+
+      const folderStructure = await fsInstance.getFolderStructure(
+        join(repoPath, currentCourse.basePath),
+        currentCourse.basePath,
+        true,
+      );
+
+      if (!folderStructure) throw new Error('Course folder was empty');
+
+      const courseData = generateCourseJson(folderStructure);
+
       if (fsInstance.isElectron) {
         await window.ipc.cmi5Build(
           join(r.fileSystemType, r.repoName),
           currentCourse.basePath,
           req.zipName,
+          req.createAuMappings,
         );
       } else {
         if (!downloadCmi5Zip) throw Error('Download cmi5 zip is not defined');
@@ -48,8 +65,23 @@ export const usePublishActions = (
           r,
           currentCourse.basePath,
           req.zipName,
-          req.createAuMappings ? processAu : undefined,
         );
+      }
+
+      if (processAu) {
+        if (!courseData) {
+          throw new Error('Course data was null');
+        }
+        for (const block of courseData.blocks) {
+          const blockId = generateBlockId({
+            courseId: courseData.courseId,
+            blockName: block.blockName,
+          });
+
+          for (const au of block.aus) {
+            await processAu(au, blockId);
+          }
+        }
       }
     } catch (err: any) {
       debugLog('Failed downloading cmi5 zip', currentCourse.basePath);

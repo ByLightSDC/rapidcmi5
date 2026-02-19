@@ -69,7 +69,6 @@ export function KeycloakUi(props: KeycloakUiProps) {
   // this handles both the initial token and the automatic refreshes
   const onKeycloakTokensUpdate = (tokens: any) => {
   
-    console.log("got tokens", tokens)
     if (typeof tokens?.idToken === 'undefined') {
       dispatch(
         setAuthRefreshError({

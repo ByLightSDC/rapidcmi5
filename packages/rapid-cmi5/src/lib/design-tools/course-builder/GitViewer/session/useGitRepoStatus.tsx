@@ -88,9 +88,6 @@ export function useGitRepoStatus(
         modifiedFilesAfter = [...modifiedFilesAfter, modifiedFile];
       }
     }
-    // if (!fsInstance.isElectron) {
-    //   await fsInstance.writeModifiedFiles(r, modifiedFilesAfter);
-    // }
     await resolveStashStatus(r, modifiedFilesAfter);
 
     setModifiedFiles(modifiedFilesAfter);
@@ -103,10 +100,6 @@ export function useGitRepoStatus(
     let status = [...modifiedFiles];
     status = status.filter((f) => !newFiles.includes(f.name));
     status = [...status, ...changedFiles];
-
-    // if (!fsInstance.isElectron) {
-    //   await fsInstance.writeModifiedFiles(r, status);
-    // }
 
     setModifiedFiles(status);
   };

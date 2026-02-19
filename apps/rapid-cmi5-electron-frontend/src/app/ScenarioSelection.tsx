@@ -1,21 +1,6 @@
 import { useForm, Controller } from 'react-hook-form';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
-import { config } from '@rapid-cmi5/ui';
-import type { ScenarioFormProps } from '@rapid-cmi5/react-editor';
-
-export interface Scenario {
-  uuid: string;
-  name: string;
-  author: string;
-  dateEdited: string;
-  description: string;
-  dateCreated: string;
-  packages?: string[];
-  drafts?: string[];
-  metadata_tags?: string[];
-}
-
 /* MUI */
 import {
   Button,
@@ -52,6 +37,23 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
 
+import { ButtonMinorUi } from '@rapid-cmi5/ui';
+import type { ScenarioFormProps } from '@rapid-cmi5/react-editor';
+
+export interface Scenario {
+  uuid: string;
+  name: string;
+  author: string;
+  dateEdited: string;
+  description: string;
+  dateCreated: string;
+  packages?: string[];
+  drafts?: string[];
+  metadata_tags?: string[];
+}
+
+
+
 interface ApiResponse {
   offset: number;
   limit: number;
@@ -67,7 +69,10 @@ interface ScenarioFormData {
 const ITEMS_PER_PAGE = 50;
 const SEARCH_DEBOUNCE_MS = 400;
 
-export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
+/** Shared height so the button and the status box always match. */
+const ROW_HEIGHT = 42;
+
+export function MyScenariosForm({ submitForm, token, url }: ScenarioFormProps) {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
@@ -77,6 +82,7 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -91,6 +97,20 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
   });
 
   const selectedScenarioId = watch('selectedScenarioId');
+
+  // Color palette derived from MUI theme
+  const colors = {
+    background: theme.palette.background.default,
+    surface: theme.palette.background.paper,
+    surfaceHover: alpha(theme.palette.action.hover, 0.5),
+    surfaceSelected: alpha(theme.palette.primary.main, 0.08),
+    border: theme.palette.divider,
+    borderHover: alpha(theme.palette.action.hover, 0.8),
+    borderSelected: theme.palette.primary.main,
+    textPrimary: theme.palette.text.primary,
+    textSecondary: theme.palette.text.secondary,
+    textTertiary: alpha(theme.palette.text.secondary, 0.7),
+  };
 
   // Server-side fetch with pagination and search
   const getScenarios = useCallback(
@@ -108,17 +128,16 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
           sort: 'desc',
         };
 
-        // Add search parameter if searching
         if (search.trim()) {
           params.search = search.trim();
         }
 
         const response = await axios.get<ApiResponse>(
-          `${config.DEVOPS_API_URL}/v1/content/range/scenarios`,
+          `${url}/v1/content/range/scenarios`,
           {
             headers: { Authorization: `Bearer ${token}` },
             params,
-          }
+          },
         );
 
         setScenarios(response.data?.data ?? []);
@@ -133,7 +152,7 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
         setIsLoading(false);
       }
     },
-    [token]
+    [token, url],
   );
 
   // Debounce search input
@@ -144,7 +163,7 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
 
     searchTimeoutRef.current = setTimeout(() => {
       setDebouncedSearch(searchQuery);
-      setCurrentPage(1); // Reset to first page on search
+      setCurrentPage(1);
     }, SEARCH_DEBOUNCE_MS);
 
     return () => {
@@ -180,12 +199,10 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
   }, [currentPage]);
 
   const onSubmit = async (data: ScenarioFormData) => {
-    const selectedScenario = scenarios.find(
-      (s) => s.uuid === data.selectedScenarioId
-    );
-    if (!selectedScenario) return;
-
-    submitForm(selectedScenario);
+    const found = scenarios.find((s) => s.uuid === data.selectedScenarioId);
+    if (!found) return;
+    console.log("Found , found0" , found)
+    submitForm(found);
     setOpen(false);
   };
 
@@ -216,60 +233,56 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
   const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
   const endItem = Math.min(currentPage * ITEMS_PER_PAGE, totalCount);
 
-  // Refined color palette
-  const colors = {
-    background: theme.palette.mode === 'dark' ? '#0a0a0a' : '#fafafa',
-    surface: theme.palette.mode === 'dark' ? '#141414' : '#ffffff',
-    surfaceHover: theme.palette.mode === 'dark' ? '#1a1a1a' : '#f5f5f5',
-    surfaceSelected:
-      theme.palette.mode === 'dark'
-        ? alpha(theme.palette.primary.main, 0.08)
-        : alpha(theme.palette.primary.main, 0.04),
-    border: theme.palette.mode === 'dark' ? '#262626' : '#e5e5e5',
-    borderHover: theme.palette.mode === 'dark' ? '#404040' : '#d4d4d4',
-    borderSelected: theme.palette.primary.main,
-    textPrimary: theme.palette.mode === 'dark' ? '#fafafa' : '#0a0a0a',
-    textSecondary: theme.palette.mode === 'dark' ? '#a3a3a3' : '#737373',
-    textTertiary: theme.palette.mode === 'dark' ? '#737373' : '#a3a3a3',
-  };
-
   return (
-    <>
-      <Button
-        variant="outlined"
-        onClick={() => setOpen(true)}
+    <Box sx={{ my: 1 }}>
+      {/* Row: button + status box — full width, matched height */}
+      <Box
         sx={{
-          borderRadius: 2,
-          textTransform: 'none',
-          fontWeight: 500,
-          px: 3,
-          py: 1.25,
-          borderColor: colors.border,
-          color: colors.textPrimary,
-          '&:hover': {
-            borderColor: colors.borderHover,
-            bgcolor: colors.surfaceHover,
-          },
+          display: 'flex',
+          alignItems: 'stretch',
+          gap: 1.5,
+          width: '100%',
         }}
       >
-        Select Scenario
-      </Button>
+        {/* Button — fixed width, shared height */}
+        <ButtonMinorUi
+          onClick={() => setOpen(true)}
+          sx={{
+            height: ROW_HEIGHT,
+            flexShrink: 0,
+            boxSizing: 'border-box',
+          }}
+        >
+          Select
+        </ButtonMinorUi>
+
+      
+
+      </Box>
 
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
         fullWidth
-        maxWidth="md"
+        maxWidth={false}
         TransitionComponent={Fade}
         transitionDuration={200}
         PaperProps={{
           sx: {
+            width: {
+              xs: '95vw',
+              sm: '80vw',
+              md: '700px',
+              lg: '800px',
+            },
             height: '85vh',
             maxHeight: '900px',
             borderRadius: 3,
             bgcolor: colors.background,
             backgroundImage: 'none',
             overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
       >
@@ -279,6 +292,7 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
             p: 0,
             borderBottom: `1px solid ${colors.border}`,
             bgcolor: colors.surface,
+            flexShrink: 0,
           }}
         >
           <Box
@@ -290,7 +304,7 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
               py: 2,
             }}
           >
-            <Box sx={{ width: 40 }} /> {/* Spacer for centering */}
+            <Box sx={{ width: 40 }} />
             <Typography
               variant="subtitle1"
               fontWeight={600}
@@ -367,6 +381,8 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
           sx={{
             p: 0,
             bgcolor: colors.background,
+            flex: 1,
+            overflow: 'auto',
             '&::-webkit-scrollbar': {
               width: 8,
             },
@@ -393,6 +409,7 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
                 py: 1.5,
                 borderBottom: `1px solid ${colors.border}`,
                 bgcolor: colors.surface,
+                flexShrink: 0,
               }}
             >
               <Typography
@@ -475,7 +492,6 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
               </Stack>
             </Box>
           ) : scenarios.length === 0 ? (
-            /* Empty State */
             <Box
               sx={{
                 display: 'flex',
@@ -519,7 +535,6 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
               </Typography>
             </Box>
           ) : (
-            /* Scenario List */
             <Box sx={{ p: 3 }}>
               <FormControl error={!!errors.selectedScenarioId} fullWidth>
                 <Controller
@@ -570,7 +585,6 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
                                 }}
                                 onClick={() => field.onChange(scenario.uuid)}
                               >
-                                {/* Selection indicator */}
                                 {isSelected && (
                                   <Box
                                     sx={{
@@ -588,17 +602,14 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
                                 <FormControlLabel
                                   value={scenario.uuid}
                                   control={
-                                    <Radio
-                                      sx={{
-                                        display: 'none',
-                                      }}
-                                    />
+                                    <Radio sx={{ display: 'none' }} />
                                   }
                                   sx={{ m: 0, width: '100%' }}
                                   label={
-                                    <Box sx={{ p: 2, pl: isSelected ? 2.5 : 2 }}>
+                                    <Box
+                                      sx={{ p: 2, pl: isSelected ? 2.5 : 2 }}
+                                    >
                                       <Stack spacing={1.25}>
-                                        {/* Title Row */}
                                         <Box
                                           sx={{
                                             display: 'flex',
@@ -630,7 +641,6 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
                                           )}
                                         </Box>
 
-                                        {/* Metadata Row */}
                                         <Stack
                                           direction="row"
                                           spacing={2}
@@ -680,7 +690,6 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
                                           </Stack>
                                         </Stack>
 
-                                        {/* Description */}
                                         {scenario.description && (
                                           <Typography
                                             variant="body2"
@@ -731,9 +740,9 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
             borderTop: `1px solid ${colors.border}`,
             bgcolor: colors.surface,
             justifyContent: 'space-between',
+            flexShrink: 0,
           }}
         >
-          {/* Pagination */}
           {totalPages > 1 ? (
             <Box
               sx={{
@@ -824,7 +833,6 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
             <Box />
           )}
 
-          {/* Action Buttons */}
           <Stack direction="row" spacing={1.5}>
             <Button
               onClick={() => setOpen(false)}
@@ -865,6 +873,6 @@ export function MyScenariosForm({ submitForm, token }: ScenarioFormProps) {
           </Stack>
         </DialogActions>
       </Dialog>
-    </>
+    </Box>
   );
 }

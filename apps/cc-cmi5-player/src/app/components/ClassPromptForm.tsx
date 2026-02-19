@@ -15,7 +15,6 @@ import Grid from '@mui/material/Grid2';
 /* API Topic */
 
 import { ClassEntry, defaultClassEntryData } from '../session/constants';
-import { useEffect } from 'react';
 import {
   FormCrudType,
   NAME_GROUP,
@@ -77,9 +76,9 @@ export default function ClassPromptForm(props: tFormProps) {
   ): JSX.Element => {
     const { control } = formMethods;
     const { errors } = formState;
-    const handleEndDateChange = (value: Date | null) => {
-      formMethods.setValue('endDate', value?.toISOString());
-    };
+    // const handleEndDateChange = (value: Date | null) => {
+    //   formMethods.setValue('endDate', value?.toISOString());
+    // };
     return (
       <>
         <Grid size={6}>
@@ -93,7 +92,7 @@ export default function ClassPromptForm(props: tFormProps) {
             readOnly={crudType === FormCrudType.view}
           />
         </Grid>
-        <Grid size={6}>
+        {/* <Grid size={6}>
           <DateTimePicker
             label="End Date"
             name="endDate"
@@ -102,7 +101,7 @@ export default function ClassPromptForm(props: tFormProps) {
             onChange={handleEndDateChange}
             readOnly={crudType === FormCrudType.view}
           />
-        </Grid>
+        </Grid> */}
       </>
     );
   };

@@ -6,7 +6,12 @@
       "config": {
         "DEVOPS_API_URL": "https://rangeos-api.develop-cp.rangeos.engineering",
         "DEVOPS_GQL_URL": "https://rangeos-graphql.develop-cp.rangeos.engineering/",
-        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.develop-cp.rangeos.engineering"
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.develop-cp.rangeos.engineering",
+        "SLIDE_LOGO": "./assets/bylight/RangeOS_Logo_White.png",
+        "KEYCLOAK_URL": "https://keycloak.global.cloudcents.bylight.com/auth/",
+        "KEYCLOAK_REALM": "cloudcents",
+        "KEYCLOAK_CLIENT_ID": "rangeos-dashboard",
+        "KEYCLOAK_SCOPE": "profile"
       }
     },
     {
@@ -311,6 +316,10 @@
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.develop-cp.rangeos.engineering",
         "SLIDE_BACKGROUND": "",
         "SLIDE_LOGO": "./assets/bylight/RangeOS_Logo_White.png",
+        "KEYCLOAK_URL": "https://keycloak.global.cloudcents.bylight.com/auth/",
+        "KEYCLOAK_REALM": "cloudcents",
+        "KEYCLOAK_CLIENT_ID": "rangeos-dashboard",
+        "KEYCLOAK_SCOPE": "profile",
         "LOGGING_ENABLED": true,
         "LOGGING_LEVEL": "DEBUG",
         "LOGGING_COMPONENTS": {

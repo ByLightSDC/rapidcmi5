@@ -10,7 +10,7 @@ export default function AppWrapper() {
 
   return (
     <Provider store={store}>
-      <Auth>
+      <Auth >
         <StrictMode>
           <QueryClientProvider client={queryClient}>
             <App />

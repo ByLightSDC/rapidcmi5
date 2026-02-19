@@ -9,7 +9,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 
 import { UseFormReturn } from 'react-hook-form';
 import { FormCrudType } from '@rapid-cmi5/ui';
-import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
+import { CourseAU, GitCredentials } from '@rapid-cmi5/cmi5-build-common';
 
 export interface buildCmi5ZipParams {
   zipBlob: File;
@@ -25,6 +25,7 @@ export type SubmitScenarioFormFn<T = any> = (item: T) => void;
 export interface ScenarioFormProps {
   submitForm: SubmitScenarioFormFn;
   token: string;
+  url?: string;
   formMethods: UseFormReturn;
   formType: FormCrudType;
   errors: any;
@@ -52,6 +53,7 @@ export type UserAuth = {
   token: string;
   userName: string;
   userEmail: string;
+  gitCredentials?: GitCredentials
 };
 
 export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {

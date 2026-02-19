@@ -2,11 +2,12 @@ import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   auConfigInitializedSel,
+  auJsonSel,
   setIsDisplayInitialized,
 } from './redux/auReducer';
 import { config, debugLog } from '@rapid-cmi5/ui';
 import { authToken, KeycloakUi } from '@rapid-cmi5/keycloak';
-import { queryHooksConfig } from 'libs/frontend/clients/hooks/src/lib/api/config';
+import { queryHooksConfig } from '@rangeos-nx/frontend/clients/hooks';
 
 /* eslint-disable-next-line */
 export interface AuthProps {
