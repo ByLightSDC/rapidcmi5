@@ -12,6 +12,8 @@ import SettingsIcon from '@mui/icons-material/Settings';
 /** Icons */
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RoomIcon from '@mui/icons-material/Room';
+import PaletteIcon from '@mui/icons-material/Palette'; //MB
+
 
 import { openEditImageDialog$ } from './index';
 import {useEffect, useState } from 'react';
@@ -20,6 +22,10 @@ import { useTheme } from '@mui/system';
 
 import { useSignalEffect } from '@preact/signals-react';
 import { clickPosition$, isLabelDropping$ } from '@rapid-cmi5/ui';
+
+
+//MB
+import { imageStyleDialogOpen$ } from './index';
 
 export interface EditImageToolbarProps {
   nodeKey: string;
@@ -58,6 +64,8 @@ export function EditImageToolbar({
     useCellValues(readOnly$);
   const [editor] = useLexicalComposerContext();
   const openEditImageDialog = usePublisher(openEditImageDialog$);
+  const openStyleDialog = usePublisher(imageStyleDialogOpen$); //MB
+
   const [isMarking, setIsMarking] = useState(false);
   const muiTheme = useTheme();
 
@@ -136,6 +144,16 @@ export function EditImageToolbar({
       >
         <SettingsIcon />
       </IconButton>
+
+      <IconButton
+        aria-label="edit styles"
+        disabled={readOnly}
+        onClick={() => openStyleDialog(true)}
+      >
+        {/* MB */}
+        <PaletteIcon /> 
+      </IconButton>
+ 
       <IconButton
         aria-label="Add Label"
         disabled={readOnly}

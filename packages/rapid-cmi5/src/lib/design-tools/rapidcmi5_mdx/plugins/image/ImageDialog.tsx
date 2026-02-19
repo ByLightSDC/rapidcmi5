@@ -5,9 +5,10 @@ import {
   saveImage$,
   imageDialogState$,
   imageFilePath$,
+  imageStyleDialogOpen$, //MB
 } from './index';
 
-import { useCellValues, usePublisher } from '@mdxeditor/gurx';
+import { Cell, useCellValue, useCellValues, usePublisher } from '@mdxeditor/gurx';
 import { StyleDialog } from './StyleDialog';
 
 // MUI
@@ -16,6 +17,7 @@ import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid2';
 import EditIcon from '@mui/icons-material/Edit';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
+
 
 import {
   ButtonIcon,
@@ -57,7 +59,13 @@ export const ImageDialog: React.FC = () => {
   const [title, setTitle] = useState<string>('');
   const [linkUrl, setLinkUrl] = useState<string>('');
   const [imageStyle, setImageStyle] = useState<string>('');
-  const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
+  // Replace the local state use and use gurx signals to handle. MB
+  //const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false); 
+  const isStyleDialogOpen = useCellValue(imageStyleDialogOpen$);
+  const setStyleDialogOpen = usePublisher(imageStyleDialogOpen$);
+
+
+
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [fileOptions, setFileOptions] = useState<string[]>([]);
   const [width, setWidth] = useState<string>('');
@@ -365,11 +373,12 @@ export const ImageDialog: React.FC = () => {
               <Grid size={0.8}>
                 <ButtonIcon
                   name="edit-style"
-                  props={{
-                    onClick: (event) => {
-                      setIsStyleDialogOpen(true);
-                    },
-                  }}
+                // Remove inline click MB
+                  //props={{
+                   // onClick: (event) => {
+                    //  setIsStyleDialogOpen(true);
+                   // },
+                  //}}
                 >
                   <Tooltip
                     arrow
@@ -391,9 +400,10 @@ export const ImageDialog: React.FC = () => {
                   fullWidth
                   value={imageStyle}
                   onChange={(textValue: string) => setImageStyle(textValue)}
-                  onClick={() => {
-                    setIsStyleDialogOpen(true);
-                  }}
+                // Remove click on
+                //  onClick={() => {
+                //    setIsStyleDialogOpen(true);
+                //  }}
                   infoText="Inline styles Ex. opacity:0.5;"
                   slotProps={{
                     input: {
@@ -407,12 +417,15 @@ export const ImageDialog: React.FC = () => {
           {/*</DialogContent>*/}
         </>
       </ModalDialog>
+      
+      {/* New image syle signal - MB */}
       <StyleDialog
         isOpen={isStyleDialogOpen}
         style={imageStyle}
         setImageStyle={setImageStyle}
-        setIsStyleDialogOpen={setIsStyleDialogOpen}
+        setIsStyleDialogOpen={setStyleDialogOpen}
       />
+
     </>
   );
 };

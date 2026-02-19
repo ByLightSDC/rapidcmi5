@@ -57,6 +57,7 @@ import {
   MdastJsxImageVisitor,
 } from './MdastImageVisitor';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
+import { useCellValue, useCellValues, usePublisher } from '@mdxeditor/gurx';
 
 export * from './ImageNode';
 
@@ -114,6 +115,12 @@ export interface SaveImageParameters extends BaseImageParameters {
   height?: number; // undefined means 'inherit'
   href?: string;
 }
+
+
+// New signals for moving style popup window -MB
+export const imageStyleDialogOpen$ = Cell(false);
+
+
 
 /**
  * The state of the image dialog when it is inactive.
