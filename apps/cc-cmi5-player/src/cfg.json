@@ -370,22 +370,22 @@
     },
     {
       "name": "leonardo",
-      "url": "https://cpt-player.cp.leonardo.rangeos.engineering",
+      "url": "https://cpt-player.cp.leonardo.rangeos",
       "config": {
-        "DEVOPS_API_URL": "https://rangeos-api.cp.leonardo.rangeos.engineering",
-        "DEVOPS_GQL_URL": "https://rangeos-graphql.cp.leonardo.rangeos.engineering/",
-        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.cp.leonardo.rangeos.engineering",
+        "DEVOPS_API_URL": "https://rangeos-api.cp.leonardo.rangeos",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.cp.leonardo.rangeos/",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.cp.leonardo.rangeos",
         "SLIDE_BACKGROUND": "",
         "SLIDE_LOGO": "./assets/bylight/RangeOS_Logo_White.png"
       }
     },
     {
       "name": "mci",
-      "url": "https://cpt-player.cp.mci.rangeos.engineering",
+      "url": "https://cpt-player.cp.mci.rangeos",
       "config": {
-        "DEVOPS_API_URL": "https://rangeos-api.cp.mci.rangeos.engineering",
-        "DEVOPS_GQL_URL": "https://rangeos-graphql.cp.mci.rangeos.engineering/",
-        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.cp.mci.rangeos.engineering",
+        "DEVOPS_API_URL": "https://rangeos-api.cp.mci.rangeos",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.cp.mci.rangeos/",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.cp.mci.rangeos",
         "SLIDE_BACKGROUND": "",
         "SLIDE_LOGO": "./assets/bylight/RangeOS_Logo_White.png"
       }
