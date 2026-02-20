@@ -2,20 +2,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import './lesson-tree.css';
-import TreeView, {
-  INode,
-  ITreeViewOnExpandProps,
-  NodeId,
-} from 'react-accessible-treeview';
+import TreeView, { INode, ITreeViewOnExpandProps, NodeId } from 'react-accessible-treeview';
 import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  addASlide,
-  currentAuPath,
-  deleteSlide,
-  navigateSlide,
-} from '../../../../redux/courseBuilderReducer';
+import { addASlide, currentAuPath, deleteSlide, navigateSlide } from '../../../../redux/courseBuilderReducer';
 import AddIcon from '@mui/icons-material/Add';
 
 import { AppDispatch } from '../../../../redux/store';
@@ -34,6 +25,7 @@ import {
   CourseData,
   defaultSlideContent,
   MoveOnCriteriaEnum,
+  LessonTheme,
   SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 
@@ -42,6 +34,7 @@ import { useRC5Prompts } from '../../modals/useRC5Prompts';
 import { Renamer } from './Renamer';
 import { MoveOnCriteriaForm } from './MoveOnCriteriaForm';
 import { DndProvider } from 'react-dnd';
+import { LessonSettingsForm } from './LessonSettingsForm';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
@@ -69,20 +62,9 @@ export enum LessonTreeNodeType {
   Slide,
 }
 
-function LessonTree({
-  courseData,
-  isReadOnly = false,
-  paddingBase = 12,
-  onCreateLesson,
-}: LessonTreeViewProps) {
-  const {
-    changeLesson,
-    currentAuIndex,
-    currentSlideIndex,
-    handleReorderSlide,
-    handleReorderLesson,
-  } = useCourseData();
-  const { changeLessonMoveOn, changeLessonName, changeSlideName, saveSlide } =
+function LessonTree({ courseData, isReadOnly = false, paddingBase = 12, onCreateLesson }: LessonTreeViewProps) {
+  const { changeLesson, currentAuIndex, currentSlideIndex, handleReorderSlide, handleReorderLesson } = useCourseData();
+  const { changeLessonMoveOn, changeLessonName, changeSlideName, saveSlide, changeLessonTheme } =
     useContext(RC5Context);
   const repoAccessObject = useSelector(currentRepoAccessObjectSel);
 
@@ -97,8 +79,8 @@ function LessonTree({
   const [menuNode, setMenuNode] = useState<ILessonNode | null>(null);
   const [menuAnchor, setMenuAnchor] = useState<any>(null);
   const [menuAnchorPos, setMenuAnchorPos] = useState<number[]>([0, 0]);
-  const [moveOnCriteriaForm, setMoveOnCriteriaForm] =
-    useState<ILessonNode | null>(null);
+  const [moveOnCriteriaForm, setMoveOnCriteriaForm] = useState<ILessonNode | null>(null);
+  const [lessonSettingsForm, setLessonSettingsForm] = useState<ILessonNode | null>(null);
 
   const handleMoveOn = (moveOn: MoveOnCriteriaEnum) => {
     if (moveOnCriteriaForm) {
@@ -110,6 +92,18 @@ function LessonTree({
       severity: 'success',
     });
   };
+
+  const handleLessonSettings = (theme: LessonTheme) => {
+    if (lessonSettingsForm) {
+      changeLessonTheme(theme, lessonSettingsForm);
+    }
+    setLessonSettingsForm(null);
+    displayToaster({
+      message: 'Lesson settings updated',
+      severity: 'success',
+    });
+  };
+
   const handleRename = (newName: string, element: ILessonNode) => {
     if (element.type === LessonTreeNodeType.Slide) {
       changeSlideName(newName, element);
@@ -123,11 +117,7 @@ function LessonTree({
    * @param element Node context menu action
    * @param whichAction
    */
-  const handleNodeAction = async (
-    event: any,
-    element: ILessonNode,
-    whichAction: number,
-  ) => {
+  const handleNodeAction = async (event: any, element: ILessonNode, whichAction: number) => {
     // debugLog('onAction', element);
     if (element.type === LessonTreeNodeType.Lesson) {
       switch (whichAction) {
@@ -148,17 +138,17 @@ function LessonTree({
               display: defaultSlideContent,
               slideTitle: slideTitle,
               type: SlideTypeEnum.Markdown,
-              filepath: await handleGetUniqueFilePath(
-                repoAccessObject,
-                slugifyPath(slideTitle),
-                currentAuDir || '',
-              ),
+              filepath: await handleGetUniqueFilePath(repoAccessObject, slugifyPath(slideTitle), currentAuDir || ''),
             }),
           );
 
           break;
         case LessonNodeActionEnum.Rename:
           setMenuAnchor(event.target);
+          break;
+
+        case LessonNodeActionEnum.LessonSettings:
+          setLessonSettingsForm(element);
           break;
 
         case LessonNodeActionEnum.SetMoveOnCriteria:
@@ -172,10 +162,7 @@ function LessonTree({
     if (element.type === LessonTreeNodeType.Slide) {
       switch (whichAction) {
         case SlideNodeActionEnum.Delete:
-          if (
-            (courseData?.blocks[0]?.aus[element.parent as number]?.slides
-              .length || 0) > 1
-          ) {
+          if ((courseData?.blocks[0]?.aus[element.parent as number]?.slides.length || 0) > 1) {
             if (element.slide !== undefined && element.lesson !== undefined) {
               dispatch(
                 deleteSlide({
@@ -208,11 +195,7 @@ function LessonTree({
    * Loads slide and lesson if applicable
    * @param param0
    */
-  const handleNodeSelect = ({
-    element,
-    isSelected,
-    isBranch,
-  }: ILessonNodeSelectProps) => {
+  const handleNodeSelect = ({ element, isSelected, isBranch }: ILessonNodeSelectProps) => {
     if (
       element.type === LessonTreeNodeType.Slide &&
       typeof element.block !== 'undefined' &&
@@ -220,8 +203,7 @@ function LessonTree({
     ) {
       if (currentAuIndex !== element.lesson) {
         const blockName = courseData?.blocks[element.block].blockName;
-        const lessonName =
-          courseData?.blocks[element.block]?.aus?.[element.lesson]?.auName;
+        const lessonName = courseData?.blocks[element.block]?.aus?.[element.lesson]?.auName;
         if (blockName && lessonName) {
           if (!currentExpandedNodes.current.includes(element.lesson)) {
             currentExpandedNodes.current.push(element.lesson);
@@ -365,10 +347,7 @@ function LessonTree({
 
   const moveNode = useCallback((drag: ILessonNode, hover: ILessonNode) => {
     // === Lesson Reordering ===
-    if (
-      drag.type === LessonTreeNodeType.Lesson &&
-      hover.type === LessonTreeNodeType.Lesson
-    ) {
+    if (drag.type === LessonTreeNodeType.Lesson && hover.type === LessonTreeNodeType.Lesson) {
       if (drag.id === undefined || hover.id === undefined) return;
       if (drag.id === hover.id) return;
       handleReorderLesson(drag.id as number, hover.id as number);
@@ -381,12 +360,7 @@ function LessonTree({
       hover.type === LessonTreeNodeType.Slide &&
       drag.lesson === hover.lesson
     ) {
-      if (
-        drag.lesson === undefined ||
-        drag.slide === undefined ||
-        hover.slide === undefined
-      )
-        return;
+      if (drag.lesson === undefined || drag.slide === undefined || hover.slide === undefined) return;
 
       if (drag.slide === hover.slide) return;
 
@@ -395,16 +369,8 @@ function LessonTree({
     }
 
     // === FUTURE Slide Move to Another Lesson ===
-    if (
-      drag.type === LessonTreeNodeType.Slide &&
-      hover.type === LessonTreeNodeType.Lesson
-    ) {
-      if (
-        drag.lesson === undefined ||
-        drag.slide === undefined ||
-        hover.id === undefined
-      )
-        return;
+    if (drag.type === LessonTreeNodeType.Slide && hover.type === LessonTreeNodeType.Lesson) {
+      if (drag.lesson === undefined || drag.slide === undefined || hover.id === undefined) return;
 
       if (hover.id === drag.lesson) {
         return;
@@ -443,13 +409,7 @@ function LessonTree({
                   defaultExpandedIds={currentExpandedNodes.current}
                   //expandedIds={currentExpandedNodes.current}
                   selectedIds={[]}
-                  nodeRenderer={({
-                    element,
-                    isBranch,
-                    isExpanded,
-                    getNodeProps,
-                    level,
-                  }) => (
+                  nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level }) => (
                     <div
                       {...getNodeProps()}
                       style={{
@@ -458,17 +418,8 @@ function LessonTree({
                       }}
                     >
                       <LessonTreeNode
-                        key={
-                          element.id.toString() +
-                          '/' +
-                          (element.parent || 0).toString()
-                        }
-                        data-testid={
-                          'slide-node-' +
-                          element.id.toString() +
-                          '/' +
-                          (element.parent || 0).toString()
-                        }
+                        key={element.id.toString() + '/' + (element.parent || 0).toString()}
+                        data-testid={'slide-node-' + element.id.toString() + '/' + (element.parent || 0).toString()}
                         isOpen={isExpanded}
                         element={element}
                         isReadOnly={isReadOnly}
@@ -496,11 +447,23 @@ function LessonTree({
                     }}
                     handleModalAction={handleMoveOn}
                     currentMoveOn={
-                      moveOnCriteriaForm.id !== undefined &&
-                      moveOnCriteriaForm.block !== undefined
-                        ? courseData?.blocks?.[moveOnCriteriaForm.block]?.aus?.[
-                            moveOnCriteriaForm.id as number
-                          ]?.moveOnCriteria
+                      moveOnCriteriaForm.id !== undefined && moveOnCriteriaForm.block !== undefined
+                        ? courseData?.blocks?.[moveOnCriteriaForm.block]?.aus?.[moveOnCriteriaForm.id as number]
+                            ?.moveOnCriteria
+                        : undefined
+                    }
+                  />
+                )}
+                {lessonSettingsForm && (
+                  <LessonSettingsForm
+                    handleCloseModal={() => {
+                      setLessonSettingsForm(null);
+                    }}
+                    handleModalAction={handleLessonSettings}
+                    currentTheme={
+                      lessonSettingsForm.id !== undefined && lessonSettingsForm.block !== undefined
+                        ? courseData?.blocks?.[lessonSettingsForm.block]?.aus?.[lessonSettingsForm.id as number]
+                            ?.lessonTheme
                         : undefined
                     }
                   />
