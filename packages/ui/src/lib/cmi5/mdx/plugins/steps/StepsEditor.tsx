@@ -216,7 +216,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
     //selection is not immediate
     await delay(50);
 
-    // Insert a brand new tab directive node with updated tabs using markdown
+    // Insert a brand new stepper directive node with updated tabs using markdown
     // using the insertMarkdown method ensures new node will have correct position information so nested content displays correctly
     // tried hard to find an alternate solution that would allow me to simply update existing mdastnode, but no solution found
     // since position data is generated from markdown and mdast utilities during parsing

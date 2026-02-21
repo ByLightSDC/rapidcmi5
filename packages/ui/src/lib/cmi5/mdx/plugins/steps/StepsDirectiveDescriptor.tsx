@@ -8,19 +8,19 @@ import { StepsEditor } from './StepsEditor';
  *  
 ::::steps
 
-:::stepContent{title="Tab 1"}
+:::stepContent{title="Step 1"}
 Hello World
 :::
 
-:::stepContent{title="Tab 2"}
+:::stepContent{title="Step 2"}
 1. Sed sagittis eleifend rutrum
 2. Donec vitae suscipit est
 3. Nulla tempor lobortis orci
 :::
 ::::
  * Uses the Directives plugin to import/export mdast
- * containerDirective because tabs can contain multiple children
- * NestedLexicalEditor ContainerDirective because tabs can contain multiple blocks 
+ * containerDirective because steps can contain multiple children
+ * NestedLexicalEditor ContainerDirective because steps can contain multiple blocks 
  */
 export const StepsDirectiveDescriptor: DirectiveDescriptor<StepDirectiveNode> = {
   name: 'steps',

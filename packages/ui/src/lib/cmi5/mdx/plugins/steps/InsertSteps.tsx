@@ -21,9 +21,9 @@ import { convertMarkdownToMdast } from '../../util/conversion';
 
 
 /**
- * A toolbar button component that inserts a tab structure into the editor.
+ * A toolbar button component that inserts a stepper structure into the editor.
  * @component
- * @returns A button with a tooltip labeled "Tabs" and a tab icon.
+ * @returns A button with a tooltip labeled "Insert Stepper" and a stepper icon.
  */
 export const InsertSteps = () => {
   const editor = useCellValue(activeEditor$);

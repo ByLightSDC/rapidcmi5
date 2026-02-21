@@ -3,7 +3,7 @@ import { StepContentDirectiveNode } from './types';
 import { StepContentEditor } from './StepContentEditor';
 
 /**
- * Tab Item Content Editor for the Tab plugin
+ * Stepper Item Content Editor for the Stepper plugin
  */
 export const StepContentDirectiveDescriptor: DirectiveDescriptor<StepContentDirectiveNode> =
   {

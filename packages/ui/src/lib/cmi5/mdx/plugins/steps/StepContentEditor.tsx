@@ -19,7 +19,7 @@ import {
 import { useFocusWithin } from '../shared/useFocusWithin';
 
 /**
- * Tab Content Editor for tabs plugin
+ * Stepper Content Editor for stepper plugin
  * @param props
  * @returns
  */
@@ -46,8 +46,8 @@ export const StepContentEditor: React.FC<
   );
 
   /**
-   * determine tab index for aria labels
-   * check current tab selection to see if content should be displayed or hidden
+   * determine stepper index for aria labels
+   * check current stepper selection to see if content should be displayed or hidden
    */
   useMemo(() => {
     parentEditor.update(() => {
@@ -67,7 +67,7 @@ export const StepContentEditor: React.FC<
   }, [lexicalNode, parentEditor, step]);
 
   useEffect(() => {
-    //REF console.log('visible');
+    //REF 
   }, [contentIsVisible]);
 
   const handleAlignmentChange = (value: 'left' | 'center' | 'right') => {

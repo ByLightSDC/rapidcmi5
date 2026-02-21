@@ -3,7 +3,7 @@ import { StepContentDirectiveNode, StepDirectiveNode } from './types';
 export const DEFAULT_STEP: StepContentDirectiveNode = {
   type: 'containerDirective',
   name: 'stepContent',
-  attributes: { title: 'New Tab' },
+  attributes: { title: 'New Step' },
   children: [
     {
       type: 'paragraph',
