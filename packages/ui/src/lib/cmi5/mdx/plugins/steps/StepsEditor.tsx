@@ -12,7 +12,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useEffect, useState } from 'react';
-
+import { toMarkdown } from 'mdast-util-to-markdown';
 import { $getRoot } from 'lexical';
 
 import {
@@ -28,32 +28,49 @@ import {
   Tab,
   Tabs,
   Tooltip,
+  Typography,
   TypographyOwnProps,
   useTheme,
 } from '@mui/material';
 
 /** Icons */
 import AddIcon from '@mui/icons-material/Add';
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
 import { StepsContext } from './StepsContext';
-import { StepContentDirectiveNode, StepDirectiveNode } from './types';
+import { StepContentDirectiveNode, StepDirectiveNode, StepType } from './types';
 
 import { $isElementNode } from 'lexical';
 import { DEFAULT_STEP } from './constants';
 import { darkTab } from './styles';
 import ModalDialog from '../../../../modals/ModalDialog';
-import { ButtonMinorUi, ButtonOptions } from '../../../../utility/buttons';
+import {
+  ButtonIcon,
+  ButtonMinorUi,
+  ButtonOptions,
+} from '../../../../utility/buttons';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
-import { convertMdastToMarkdown } from '../../util/conversion';
+import {
+  convertMarkdownToMdast,
+  convertMdastToMarkdown,
+} from '../../util/conversion';
+import { dividerColor } from 'packages/ui/src/lib/redux/commonAppReducer';
 
 /**
- * Tabs Editor for tabs directive
+ * Steps Editor for steps directive
  * @param param0
  * @returns
  */
@@ -64,17 +81,17 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
 }) => {
   const muiTheme = useTheme();
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+  const insertMarkdown = usePublisher(insertMarkdown$);
+  const [editor] = useLexicalComposerContext();
   const [step, setStep] = useState(0);
+  const [stepCount, setStepCount] = useState(0);
+  const [title, setTitle] = useState('');
 
   const [formData, setFormData] = useState<Array<StepContentDirectiveNode>>(
     structuredClone(mdastNode.children),
   );
-  const insertMarkdown = usePublisher(insertMarkdown$);
-  const [editor] = useLexicalComposerContext();
+
   const [isConfiguring, setIsConfiguring] = useState(false);
-  const [boxStyle, setBoxStyle] = useState<string | undefined>(
-    mdastNode?.attributes.style,
-  );
   const [sxProps, setSxProps] = useState<SxProps>({});
   const [isPlayback, readOnly, syntaxExtensions] = useCellValues(
     editorInPlayback$,
@@ -114,24 +131,24 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   };
 
   /**
-   * Inserts new tab before tab index
-   * @param index - Tab index.
+   * Inserts new step before tab index
+   * @param index - Step index.
    */
-  const handleAddTabBefore = useCallback(
+  const handleAddStepBefore = useCallback(
     (index: number) => {
-      const newTabContentNode = structuredClone(DEFAULT_STEP);
+      const newStepContentNode = structuredClone(DEFAULT_STEP);
       const children = [...formData];
-      children.splice(index, 0, newTabContentNode);
+      children.splice(index, 0, newStepContentNode);
       setFormData(children);
     },
     [formData],
   );
 
   /**
-   * Inserts new tab after tab index
-   * @param index - Tab index.
+   * Inserts new step after step index
+   * @param index - Step index.
    */
-  const handleAddTabAfter = useCallback(
+  const handleAddStepAfter = useCallback(
     (index: number) => {
       const newTabContentNode = structuredClone(DEFAULT_STEP);
       const children = [...formData];
@@ -149,7 +166,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   /**
    * Adds a tab to the end
    */
-  const handleAddTab = useCallback(() => {
+  const handleAddStep = useCallback(() => {
     const children = [...formData];
     const newTabContentNode = structuredClone(DEFAULT_STEP);
     children.push(newTabContentNode);
@@ -167,7 +184,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
    * Removes tab at tab index
    * @param index - Tab index.
    */
-  const handleRemoveTab = useCallback(
+  const handleRemoveStep = useCallback(
     (index: number) => {
       const children = [...formData];
       children.splice(index, 1);
@@ -222,7 +239,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
     parentEditor.update(() => {
       const mdast: ContainerDirective = {
         type: 'containerDirective',
-        name: 'tabs',
+        name: 'steps',
         attributes: {
           color: 'transparent',
         },
@@ -243,13 +260,41 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   }, [insertMarkdown, formData, lexicalNode, parentEditor]);
 
   /**
-   * Handle Change Tab
+   * Handle Next Step
    * @param event
-   * @param newValue
    */
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleNext = useCallback(
+    (event: React.SyntheticEvent) => {
+      setStep(step + 1);
+    },
+    [step],
+  );
+
+  /**
+   * Handle Previous Step
+   * @param event
+   */
+  const handlePrevious = useCallback(
+    (event: React.SyntheticEvent) => {
+      setStep(step - 1);
+    },
+    [step],
+  );
+
+  const handleReset = (event: React.SyntheticEvent) => {
+    setStep(0);
+  };
+
+  const handleStepChange = (newValue: number) => {
     setStep(newValue);
   };
+  //  * Handle Change Tab
+  //  * @param event
+  //  * @param newValue
+  //  */
+  // const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  //   setStep(newValue);
+  // };
 
   /**
    * Updates tab title text
@@ -294,93 +339,232 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
         // no styles applied
       }
     }
+    //if (mdastNode?.children[tab].attributes)
+
+    if (
+      Object.prototype.hasOwnProperty.call(
+        mdastNode.children[step].attributes,
+        'title',
+      )
+    ) {
+      setTitle(mdastNode.children[step].attributes['title'] || '');
+    } else {
+      setTitle('');
+    }
+
+    // setTitle
   }, [step, mdastNode]);
+
+  /**
+   * UE sets step count
+   */
+  useEffect(() => {
+    //console.log('mdastNode.children', mdastNode.children);
+    let maxSteps = 0;
+    for (let i = 0; i < mdastNode.children.length; i++) {
+      if (mdastNode.children[i].name === 'stepContent') {
+        if (
+          Object.prototype.hasOwnProperty.call(
+            mdastNode.children[i].attributes,
+            'stepType',
+          )
+        ) {
+          const stepType = mdastNode.children[i].attributes['stepType'];
+          if (stepType === StepType.PAGE) {
+            maxSteps++;
+          }
+        } else {
+          maxSteps++;
+        }
+      }
+    }
+    setStepCount(maxSteps);
+  }, [mdastNode?.children?.length]);
 
   /**
    * Render Tabs and Nested Content
    */
   return (
     <>
-      <Box sx={{ margin: 0, padding: 0, position: 'relative', ...sxProps }}>
-        <Stack direction="row" spacing={1}>
-          <Tabs
-            sx={{ minWidth: 'maxContent' }}
-            value={step}
-            onChange={handleTabChange}
-            aria-label="basic tabs example"
-            textColor="secondary"
-            indicatorColor="primary"
+      <Box
+        sx={{
+          margin: 0,
+          padding: 0,
+          position: 'relative',
+          ...sxProps,
+        }}
+      >
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <ButtonIcon
+            id="previous-step"
+            name="previous-step"
+            tooltip="Previous Step"
+            props={{
+              disabled: step <= 0,
+              onClick: handlePrevious,
+            }}
+            sxProps={{
+              width: '48px',
+              height: '48px',
+            }}
           >
-            {mdastNode.children.map((item, index) => {
-              if (
-                (item.type === 'containerDirective' ||
-                  item.type === 'leafDirective') &&
-                item.name === 'stepContent'
-              ) {
-                return (
-                  <Tab
-                    //force dark theme styling in RC5Player since CMI5 player does not support theme switching
-                    sx={
-                      readOnly
-                        ? { ...darkTab, borderRadius: 0 }
-                        : { borderRadius: 0 }
-                    }
-                    label={item.attributes?.title}
-                    {...a11yProps(index)}
-                    key={index}
-                  />
-                );
-              }
-
-              return null;
-            })}
-          </Tabs>
-          <div>
-            {!isPlayback && (
-              <Box
+            <div style={{ position: 'relative' }}>
+              <ArrowBackIosIcon
+                fontSize="large"
                 sx={{
-                  backgroundColor:
-                    muiTheme.palette.mode === 'dark'
-                      ? '#282b30e6'
-                      : '#EEEEEEe6',
                   position: 'absolute',
-                  display: 'flex',
+                  left: '-12px',
+                  top: '-18px',
+                }}
+              />
+            </div>
+          </ButtonIcon>
+          <Stack direction="column" sx={{ flexGrow: 1 }}>
+            <StepsContext.Provider value={{ step }}>
+              <div>
+                {!isPlayback && (
+                  <Box
+                    sx={{
+                      backgroundColor:
+                        muiTheme.palette.mode === 'dark'
+                          ? '#282b30e6'
+                          : '#EEEEEEe6',
+                      position: 'absolute',
+                      display: 'flex',
+                      right: -8,
+                    }}
+                  >
+                    <Tooltip title="Edit Steps Settings">
+                      <IconButton onClick={handleConfigure}>
+                        <SettingsIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <IconButton
+                      aria-label="delete"
+                      disabled={readOnly}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        editor.update(() => {
+                          lexicalNode?.remove();
+                        });
+                      }}
+                    >
+                      <DeleteForeverIcon />
+                    </IconButton>
+                  </Box>
+                )}
+              </div>
+              {/* title  */}
+              <Stack
+                direction="column"
+                sx={{
+                  padding: 2,
+                  boxShadow: 2,
+                  borderColor: (theme: any) => `${theme.palette.divider}`,
+                  borderStyle: 'solid',
+                  borderWidth: '1px',
                 }}
               >
-                <Tooltip title="Edit Steps Settings">
-                  <IconButton onClick={handleConfigure}>
-                    <SettingsIcon />
-                  </IconButton>
-                </Tooltip>
-                <IconButton
-                  aria-label="delete"
-                  disabled={readOnly}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    editor.update(() => {
-                      lexicalNode?.remove();
-                    });
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
                   }}
                 >
-                  <DeleteForeverIcon />
-                </IconButton>
-              </Box>
-            )}
-          </div>
-        </Stack>
+                  <Typography sx={{ padding: 2 }} variant="h2">
+                    {title}
+                  </Typography>
+                </Box>
 
-        <StepsContext.Provider value={{ step }}>
-          <NestedLexicalEditor<ContainerDirective>
-            block={true}
-            getContent={(node) => {
-              return node.children;
+                <NestedLexicalEditor<ContainerDirective>
+                  block={true}
+                  getContent={(node) => {
+                    return node.children;
+                  }}
+                  getUpdatedMdastNode={(node, children: any) => ({
+                    ...node,
+                    children,
+                  })}
+                />
+              </Stack>
+            </StepsContext.Provider>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignContent: 'center',
+                alignItems: 'center',
+                padding: 2,
+              }}
+            >
+              {Array.from({ length: stepCount }).map((_, index) => (
+                <ButtonIcon
+                  id={`step-${index + 1}`}
+                  name="reset-step"
+                  tooltip={`Step ${index + 1}`}
+                  props={{
+                    onClick: () => handleStepChange(index),
+                  }}
+                  sxProps={{ minWidth: '32px' }}
+                >
+                  <Typography
+                    sx={{
+                      textDecoration: index === step ? 'underline' : undefined,
+                    }}
+                  >
+                    {index + 1}
+                  </Typography>
+                </ButtonIcon>
+              ))}
+              <ButtonIcon
+                id="reset-step"
+                name="reset-step"
+                tooltip="Start Again"
+                props={{
+                  disabled: step === 0,
+                  onClick: handleReset,
+                }}
+              >
+                <RefreshIcon fontSize="medium" />
+              </ButtonIcon>
+            </Stack>
+          </Stack>
+          <ButtonIcon
+            id="next-step"
+            name="next-step"
+            tooltip="Next Step"
+            props={{
+              disabled: step >= stepCount - 1,
+              onClick: handleNext,
             }}
-            getUpdatedMdastNode={(node, children: any) => ({
-              ...node,
-              children,
-            })}
-          />
-        </StepsContext.Provider>
+            sxProps={{
+              width: '48px',
+              height: '48px',
+            }}
+          >
+            <div style={{ position: 'relative' }}>
+              <ArrowForwardIosIcon
+                fontSize="large"
+                sx={{
+                  position: 'absolute',
+                  left: '-12px',
+                  top: '-18px',
+                }}
+              />
+            </div>
+          </ButtonIcon>
+        </Stack>
       </Box>
       {isConfiguring && (
         <ModalDialog
@@ -413,8 +597,11 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                     width: '100%',
                   }}
                 >
-                  <ButtonMinorUi startIcon={<AddIcon />} onClick={handleAddTab}>
-                    Add Tab
+                  <ButtonMinorUi
+                    startIcon={<AddIcon />}
+                    onClick={handleAddStep}
+                  >
+                    Add Step
                   </ButtonMinorUi>
                 </div>
                 {formData.map(
@@ -483,7 +670,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                                   height: 30,
                                 }}
                                 onClick={(event) => {
-                                  handleAddTabBefore(index);
+                                  handleAddStepBefore(index);
                                 }}
                               >
                                 <ListItemIcon
@@ -497,7 +684,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                                   <AddIcon />
                                 </ListItemIcon>
                                 <ListItemText
-                                  primary="Insert Tab Before"
+                                  primary="Insert Step Before"
                                   slotProps={{ primary: listItemProps }}
                                 />
                               </ListItemButton>
@@ -506,7 +693,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                                   height: 30,
                                 }}
                                 onClick={(event) => {
-                                  handleAddTabAfter(index);
+                                  handleAddStepAfter(index);
                                 }}
                               >
                                 <ListItemIcon
@@ -520,7 +707,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                                   <AddIcon />
                                 </ListItemIcon>
                                 <ListItemText
-                                  primary="Insert Tab After"
+                                  primary="Insert Step After"
                                   slotProps={{ primary: listItemProps }}
                                 />
                               </ListItemButton>
@@ -529,7 +716,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                                   height: 30,
                                 }}
                                 onClick={(event) => {
-                                  handleRemoveTab(index);
+                                  handleRemoveStep(index);
                                 }}
                               >
                                 <ListItemIcon
@@ -556,49 +743,6 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                   },
                 )}
               </>
-              {/* Style section FUTURE */}
-              {/* <Grid2 container alignItems="center" sx={{ width: '100%' }}>
-                <Grid2 size={1}>
-                  <ButtonIcon
-                    name="edit-style"
-                    props={{
-                      onClick: (event) => {
-                        //setIsStyleDialogOpen(true);
-                      },
-                    }}
-                  >
-                    <Tooltip
-                      arrow
-                      enterDelay={500}
-                      enterNextDelay={500}
-                      title="Edit Tab Inline Styles"
-                    >
-                      <EditIcon />
-                    </Tooltip>
-                  </ButtonIcon>
-                </Grid2>
-                <Grid2 size={11}>
-                  <TextFieldMainUi
-                    autoFocus
-                    margin="dense"
-                    label="Styles"
-                    name="image-styles"
-                    type="text"
-                    fullWidth
-                    value={boxStyle}
-                    onChange={(textValue: string) => setBoxStyle(textValue)}
-                    onClick={() => {
-                      //setIsStyleDialogOpen(true);
-                    }}
-                    infoText="Inline styles Ex. opacity:0.5;"
-                    slotProps={{
-                      input: {
-                        readOnly: true,
-                      },
-                    }}
-                  />
-                </Grid2>
-              </Grid2> */}
             </Stack>
           </Paper>
         </ModalDialog>
