@@ -78,6 +78,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
   const insertMarkdown = usePublisher(insertMarkdown$);
   const [editor] = useLexicalComposerContext();
+
   const [formData, setFormData] = useState<Array<StepContentDirectiveNode>>(
     structuredClone(mdastNode.children),
   );
@@ -351,7 +352,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   useEffect(() => {
     let maxSteps = 0;
     for (let i = 0; i < mdastNode.children.length; i++) {
-      if (mdastNode.children[i].name !== 'stepContent') {
+      if (mdastNode.children[i].name === 'stepContent') {
         maxSteps++;
       }
     }
@@ -405,125 +406,120 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
               />
             </div>
           </ButtonIcon>
-          <nav aria-label="process">
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <StepsContext.Provider value={{ step }}>
-                <div>
-                  {!isPlayback && (
-                    <Box
-                      sx={{
-                        backgroundColor:
-                          muiTheme.palette.mode === 'dark'
-                            ? '#282b30e6'
-                            : '#EEEEEEe6',
-                        position: 'absolute',
-                        display: 'flex',
-                        right: -8,
-                      }}
-                    >
-                      <Tooltip title="Edit Steps Settings">
-                        <IconButton onClick={handleConfigure}>
-                          <SettingsIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <IconButton
-                        aria-label="delete"
-                        disabled={readOnly}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          editor.update(() => {
-                            lexicalNode?.remove();
-                          });
-                        }}
-                      >
-                        <DeleteForeverIcon />
-                      </IconButton>
-                    </Box>
-                  )}
-                </div>
-                {/* title  */}
-                <Stack
-                  direction="column"
-                  sx={{
-                    padding: 2,
-                    boxShadow: 2,
-                    borderColor: (theme: any) => `${theme.palette.divider}`,
-                    borderStyle: 'solid',
-                    borderWidth: '1px',
-                  }}
-                >
+
+          <Stack direction="column" sx={{ flexGrow: 1 }}>
+            <StepsContext.Provider value={{ step }}>
+              <div>
+                {!isPlayback && (
                   <Box
-                    id={`step-panel-${step}`}
-                    aria-labelledby={`step-${step}`}
-                    role="tabpanel"
                     sx={{
+                      backgroundColor:
+                        muiTheme.palette.mode === 'dark'
+                          ? '#282b30e6'
+                          : '#EEEEEEe6',
+                      position: 'absolute',
                       display: 'flex',
-                      justifyContent: 'center',
-                      role: 'tabpanel',
+                      right: -8,
                     }}
                   >
-                    <Typography sx={{ padding: 2 }} variant="h2">
-                      {title}
-                    </Typography>
+                    <Tooltip title="Edit Steps Settings">
+                      <IconButton onClick={handleConfigure}>
+                        <SettingsIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <IconButton
+                      aria-label="delete"
+                      disabled={readOnly}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        editor.update(() => {
+                          lexicalNode?.remove();
+                        });
+                      }}
+                    >
+                      <DeleteForeverIcon />
+                    </IconButton>
                   </Box>
-
-                  <NestedLexicalEditor<ContainerDirective>
-                    block={true}
-                    getContent={(node) => {
-                      return node.children;
-                    }}
-                    getUpdatedMdastNode={(node, children: any) => ({
-                      ...node,
-                      children,
-                    })}
-                  />
-                </Stack>
-              </StepsContext.Provider>
+                )}
+              </div>
+              {/* title  */}
               <Stack
-                direction="row"
-                spacing={1}
+                direction="column"
                 sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignContent: 'center',
-                  alignItems: 'center',
                   padding: 2,
+                  boxShadow: 2,
+                  borderColor: (theme: any) => `${theme.palette.divider}`,
+                  borderStyle: 'solid',
+                  borderWidth: '1px',
                 }}
               >
-                {Array.from({ length: stepCount }).map((_, index) => (
-                  <ButtonIcon
-                    {...a11yStepProps(index)}
-                    name="reset-step"
-                    tooltip={`Step ${index + 1}`}
-                    props={{
-                      onClick: () => handleStepChange(index),
-                    }}
-                    sxProps={{ minWidth: '32px' }}
-                  >
-                    <Typography
-                      sx={{
-                        textDecoration:
-                          index === step ? 'underline' : undefined,
-                      }}
-                    >
-                      {index + 1}
-                    </Typography>
-                  </ButtonIcon>
-                ))}
-                <ButtonIcon
-                  id="reset-step"
-                  name="reset-step"
-                  tooltip="Start Again"
-                  props={{
-                    disabled: step === 0,
-                    onClick: handleReset,
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
                   }}
                 >
-                  <RefreshIcon fontSize="medium" />
-                </ButtonIcon>
+                  <Typography sx={{ padding: 2 }} variant="h2">
+                    {title}
+                  </Typography>
+                </Box>
+
+                <NestedLexicalEditor<ContainerDirective>
+                  block={true}
+                  getContent={(node) => {
+                    return node.children;
+                  }}
+                  getUpdatedMdastNode={(node, children: any) => ({
+                    ...node,
+                    children,
+                  })}
+                />
               </Stack>
+            </StepsContext.Provider>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignContent: 'center',
+                alignItems: 'center',
+                padding: 2,
+              }}
+            >
+              {Array.from({ length: stepCount }).map((_, index) => (
+                <ButtonIcon
+                  {...a11yStepProps(index)}
+                  name="reset-step"
+                  tooltip={`Step ${index + 1}`}
+                  props={{
+                    onClick: () => handleStepChange(index),
+                  }}
+                  sxProps={{ minWidth: '32px' }}
+                >
+                  <Typography
+                    sx={{
+                      textDecoration: index === step ? 'underline' : undefined,
+                    }}
+                  >
+                    {index + 1}
+                  </Typography>
+                </ButtonIcon>
+              ))}
+              <ButtonIcon
+                id="reset-step"
+                name="reset-step"
+                tooltip="Start Again"
+                props={{
+                  disabled: step === 0,
+                  onClick: handleReset,
+                }}
+              >
+                <RefreshIcon fontSize="medium" />
+              </ButtonIcon>
             </Stack>
-          </nav>
+          </Stack>
+
           <ButtonIcon
             id="next-step"
             name="next-step"

@@ -71,7 +71,7 @@ export const InsertSteps = () => {
 
   return (
     <ButtonWithTooltip
-      title="Insert Steps"
+      title="Insert Stepper"
       aria-label="insert-steps"
       onClick={() => {
         insertAtSelection();
