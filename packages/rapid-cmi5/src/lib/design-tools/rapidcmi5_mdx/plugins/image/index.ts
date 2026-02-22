@@ -118,8 +118,33 @@ export interface SaveImageParameters extends BaseImageParameters {
 
 
 // New signals for moving style popup window -MB
-export const imageStyleDialogOpen$ = Cell(false);
+// oldexport const imageStyleDialogOpen$ = Cell(false);
+const StyleCell$ = Cell(
+  // initial value
+  false, //We want it hidden
+  // the r is the realm instance that starts the cell
+  (r) => {
+    r.sub(StyleCell$, (value) => {
+      console.log('StyleCell$ changed to', value)
+    })
+  },
+  // distinct flag, true by default
+  true
+)
 
+// Since signals have no initial value, you need to specify the type of data that will flow through them
+const StyleSignal$ = Signal<boolean>(
+  // the r is the realm instance that starts the cell
+  (r) => {
+    r.sub(StyleSignal$, (value) => {
+      console.log('StyleSignal$ changed to', value)
+    })
+    // publishing a value through a signal will publish it into $StyleCell as well
+    r.link(StyleSignal$, StyleCell$)
+  },
+  // distinct flag
+  true
+)
 
 
 /**

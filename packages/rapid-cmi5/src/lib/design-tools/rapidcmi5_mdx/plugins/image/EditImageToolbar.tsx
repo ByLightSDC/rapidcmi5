@@ -25,7 +25,8 @@ import { clickPosition$, isLabelDropping$ } from '@rapid-cmi5/ui';
 
 
 //MB
-import { imageStyleDialogOpen$ } from './index';
+//import { imageStyleDialogOpen$ } from './index';
+import { StyleDialog } from './StyleDialog';
 
 export interface EditImageToolbarProps {
   nodeKey: string;
@@ -64,12 +65,17 @@ export function EditImageToolbar({
     useCellValues(readOnly$);
   const [editor] = useLexicalComposerContext();
   const openEditImageDialog = usePublisher(openEditImageDialog$);
-  const openStyleDialog = usePublisher(imageStyleDialogOpen$); //MB
+  //const openStyleDialog = usePublisher(imageStyleDialogOpen$); //MB
 
   const [isMarking, setIsMarking] = useState(false);
   const muiTheme = useTheme();
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  //For letting style dialogue work outside imagedialog.
+const [imageStyle, setImageStyle] = useState<string>('');
+const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
+
 
   /**
    * Set marker position to follow mouse
@@ -110,7 +116,11 @@ export function EditImageToolbar({
     }
   });
 
+  
   return (
+    
+    // Wrap this in a fragment so styledialog can liv eOUTSIDE of imageDialogue without us having to rewire it compltely. 
+    <>
     <Stack
       direction="row"
       spacing={0}
@@ -148,9 +158,12 @@ export function EditImageToolbar({
       <IconButton
         aria-label="edit styles"
         disabled={readOnly}
-        onClick={() => openStyleDialog(true)}
+        onClick={() => {
+          setIsStyleDialogOpen(true)
+          console.log('Button was clicked!')}}
       >
         {/* MB */}
+              
         <PaletteIcon /> 
       </IconButton>
  
@@ -190,5 +203,14 @@ export function EditImageToolbar({
         <DeleteForeverIcon />
       </IconButton>
     </Stack>
+
+    {/* Dialog lives OUTSIDE the button, but inside the component */}
+    <StyleDialog
+      isOpen={isStyleDialogOpen}
+      style={imageStyle}
+      setImageStyle={setImageStyle}
+      setIsStyleDialogOpen={setIsStyleDialogOpen}
+    />
+  </>
   );
 }
