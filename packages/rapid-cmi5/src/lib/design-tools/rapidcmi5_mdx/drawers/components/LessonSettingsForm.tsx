@@ -1,33 +1,38 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { commitChangesModalId } from '../../modals/constants';
-import { FormControlUIProvider, FormStateType, MiniForm, ModalDialog, AlignmentToolbarControls } from '@rapid-cmi5/ui';
+import {
+  FormControlUIProvider,
+  FormStateType,
+  MiniForm,
+  ModalDialog,
+  AlignmentToolbarControls,
+} from '@rapid-cmi5/ui';
 import { UseFormReturn } from 'react-hook-form';
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
-import { Slider, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import {
+  Slider,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from '@mui/material';
 
 import * as yup from 'yup';
 import { useSelector } from 'react-redux';
 import { modal } from '@rapid-cmi5/ui';
 import React from 'react';
-import { BlockPaddingEnum, ContentWidthEnum, DefaultAlignmentEnum, LessonTheme } from '@rapid-cmi5/cmi5-build-common';
+import {
+  BlockPaddingEnum,
+  ContentWidthEnum,
+  DefaultAlignmentEnum,
+  LessonTheme,
+} from '@rapid-cmi5/cmi5-build-common';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-
-const contentWidthDescriptions = new Map<string, string>([
-  ['none', 'No width constraint (default)'],
-  ['small', 'Narrow content area (55% of available width)'],
-  ['medium', 'Standard content area (75% of available width)'],
-  ['large', 'Full width content area'],
-]);
-
-const blockPaddingDescriptions = new Map<string, string>([
-  ['none', 'No block spacing (default)'],
-  ['small', 'Compact spacing between blocks (8px)'],
-  ['medium', 'Standard spacing between blocks (32px)'],
-  ['large', 'Generous spacing between blocks (64px)'],
-  ['custom', 'Custom padding value'],
-]);
+import {
+  blockPaddingDescriptions,
+  contentWidthDescriptions,
+} from '../constants';
 
 export function LessonSettingsForm({
   handleCloseModal,
@@ -46,10 +51,13 @@ export function LessonSettingsForm({
   const [blockPadding, setBlockPadding] = React.useState<BlockPaddingEnum>(
     currentTheme?.blockPadding || BlockPaddingEnum.None,
   );
-  const [customPadding, setCustomPadding] = React.useState<number>(currentTheme?.blockPaddingCustomValue ?? 16);
-  const [defaultAlignment, setDefaultAlignment] = React.useState<DefaultAlignmentEnum>(
-    currentTheme?.defaultAlignment || DefaultAlignmentEnum.Left,
+  const [customPadding, setCustomPadding] = React.useState<number>(
+    currentTheme?.blockPaddingCustomValue ?? 16,
   );
+  const [defaultAlignment, setDefaultAlignment] =
+    React.useState<DefaultAlignmentEnum>(
+      currentTheme?.defaultAlignment || DefaultAlignmentEnum.Left,
+    );
 
   const validationSchema = yup.object().shape({});
 
@@ -70,7 +78,10 @@ export function LessonSettingsForm({
     }
   };
 
-  const getFormFields = (formMethods: UseFormReturn, formState: FormStateType): JSX.Element => {
+  const getFormFields = (
+    formMethods: UseFormReturn,
+    formState: FormStateType,
+  ): JSX.Element => {
     return (
       <>
         {/* Content Width */}
@@ -154,11 +165,13 @@ export function LessonSettingsForm({
           </Typography>
           <AlignmentToolbarControls
             currentAlignment={defaultAlignment}
-            onAlignmentChange={(val) => setDefaultAlignment(val as DefaultAlignmentEnum)}
+            onAlignmentChange={(val) =>
+              setDefaultAlignment(val as DefaultAlignmentEnum)
+            }
           />
           <Typography variant="body2" sx={{ mt: 0.5 }}>
-            Sets the default text alignment for all slides in this lesson. Per-component alignment overrides take
-            precedence.
+            Sets the default text alignment for all slides in this lesson.
+            Per-component alignment overrides take precedence.
           </Typography>
         </Grid>
       </>

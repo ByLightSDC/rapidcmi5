@@ -156,10 +156,16 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
   onAction,
   moveNode,
 }) => {
-  const [insertionDirection, setInsertionDirection] = React.useState<'above' | 'below' | null>(null);
+  const [insertionDirection, setInsertionDirection] = React.useState<
+    'above' | 'below' | null
+  >(null);
 
   const ref = useRef<HTMLDivElement>(null);
-  const [{ handlerId }, drop] = useDrop<ILessonNode, void, { handlerId: Identifier | null }>({
+  const [{ handlerId }, drop] = useDrop<
+    ILessonNode,
+    void,
+    { handlerId: Identifier | null }
+  >({
     accept: ItemTypes.slide,
     collect(monitor) {
       if (!monitor.isOver()) {
@@ -172,15 +178,20 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
     hover(item: ILessonNode, monitor) {
       if (!ref.current || item.id === element.id) return;
 
-      const isLesson = item.type === LessonTreeNodeType.Lesson && element.type === LessonTreeNodeType.Lesson;
-      const isSlide = item.type === LessonTreeNodeType.Slide && element.type === LessonTreeNodeType.Slide;
+      const isLesson =
+        item.type === LessonTreeNodeType.Lesson &&
+        element.type === LessonTreeNodeType.Lesson;
+      const isSlide =
+        item.type === LessonTreeNodeType.Slide &&
+        element.type === LessonTreeNodeType.Slide;
 
       if (!isLesson && !isSlide) return;
 
       if (isSlide && item.lesson !== element.lesson) return;
 
       const hoverBoundingRect = ref.current.getBoundingClientRect();
-      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
       const clientOffset = monitor.getClientOffset();
       const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
 
@@ -188,13 +199,18 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
 
       // Calculate drag & hover indexes
       const dragIndex = isLesson ? (item.id as number) : (item.slide as number);
-      const hoverIndex = isLesson ? (element.id as number) : (element.slide as number);
+      const hoverIndex = isLesson
+        ? (element.id as number)
+        : (element.slide as number);
 
       // Prevent premature reorder
       const isDraggingUp = dragIndex > hoverIndex;
       const isDraggingDown = dragIndex < hoverIndex;
 
-      if ((isDraggingDown && hoverClientY < hoverMiddleY) || (isDraggingUp && hoverClientY > hoverMiddleY)) {
+      if (
+        (isDraggingDown && hoverClientY < hoverMiddleY) ||
+        (isDraggingUp && hoverClientY > hoverMiddleY)
+      ) {
         return;
       }
     },
@@ -202,13 +218,17 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
       if (!ref.current || item.id === element.id) return;
 
       const hoverBoundingRect = ref.current.getBoundingClientRect();
-      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
       const clientOffset = monitor.getClientOffset();
       const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
       const insertAbove = hoverClientY < hoverMiddleY;
 
       // === Lesson Drop Logic ===
-      if (item.type === LessonTreeNodeType.Lesson && element.type === LessonTreeNodeType.Lesson) {
+      if (
+        item.type === LessonTreeNodeType.Lesson &&
+        element.type === LessonTreeNodeType.Lesson
+      ) {
         const dragLessonIndex = item.id as number;
         const hoverLessonIndex = element.id as number;
         if (dragLessonIndex === hoverLessonIndex) return;
@@ -226,7 +246,10 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
       }
 
       // === Slide Drop Logic ===
-      if (item.type === LessonTreeNodeType.Slide && element.type === LessonTreeNodeType.Slide) {
+      if (
+        item.type === LessonTreeNodeType.Slide &&
+        element.type === LessonTreeNodeType.Slide
+      ) {
         if (item.lesson !== element.lesson) return;
 
         const dragIndex = item.slide!;
@@ -256,7 +279,8 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
     }),
   });
 
-  const isCurrentLessonFolder = typeof currentLesson !== 'undefined' && currentLesson === element.id;
+  const isCurrentLessonFolder =
+    typeof currentLesson !== 'undefined' && currentLesson === element.id;
 
   const focusColor = 'primary.main';
 
@@ -332,7 +356,8 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                 `${element.isBranch ? theme.palette.text.hint : isCurrentSlide ? focusColor : theme.palette.text.hint}`,
             }}
           >
-            {element.type === LessonTreeNodeType.Slide && element.hasActivity === true ? (
+            {element.type === LessonTreeNodeType.Slide &&
+            element.hasActivity === true ? (
               <LocalActivity color="inherit" />
             ) : (
               <NewspaperOutlinedIcon color="inherit" />
@@ -424,7 +449,10 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                           >
                             {option.icon}
                           </ListItemIcon>
-                          <ListItemText primary={option.tooltip} slotProps={{ primary: listItemProps }} />
+                          <ListItemText
+                            primary={option.tooltip}
+                            slotProps={{ primary: listItemProps }}
+                          />
                         </ListItemButton>
                       </>
                     </React.Fragment>
@@ -476,7 +504,11 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
               {lessonNodeActions.map((option: RowAction, index: number) => {
                 if (option.hidden) return null;
                 // only allow add slide on current lesson
-                if (index === LessonNodeActionEnum.AddSlide && !isCurrentLessonFolder) return null;
+                if (
+                  index === LessonNodeActionEnum.AddSlide &&
+                  !isCurrentLessonFolder
+                )
+                  return null;
                 return (
                   <React.Fragment key={option.tooltip}>
                     {index > 0 && <Divider />}
@@ -498,7 +530,10 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                       >
                         {option.icon}
                       </ListItemIcon>
-                      <ListItemText primary={option.tooltip} slotProps={{ primary: listItemProps }} />
+                      <ListItemText
+                        primary={option.tooltip}
+                        slotProps={{ primary: listItemProps }}
+                      />
                     </ListItemButton>
                   </React.Fragment>
                 );

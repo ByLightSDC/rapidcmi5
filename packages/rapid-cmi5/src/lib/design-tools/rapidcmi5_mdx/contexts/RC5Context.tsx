@@ -1,7 +1,14 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { MDXEditorMethods } from '@mdxeditor/editor';
 
-import React, { createContext, RefObject, useCallback, useContext, useMemo, useRef } from 'react';
+import React, {
+  createContext,
+  RefObject,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+} from 'react';
 import { Message, MessageType } from '../../course-builder/CourseBuilderTypes';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -23,7 +30,12 @@ import {
   LessonTheme,
   CourseData,
 } from '@rapid-cmi5/cmi5-build-common';
-import { debugLog, debugLogError, setModal, validateYamlFrontmatter } from '@rapid-cmi5/ui';
+import {
+  debugLog,
+  debugLogError,
+  setModal,
+  validateYamlFrontmatter,
+} from '@rapid-cmi5/ui';
 import {
   currentCourse,
   currentSlideNum,
@@ -59,7 +71,10 @@ interface IRC5Context {
   addEditor: (ref: RefObject<MDXEditorMethods>) => void;
   removeEditor: () => void;
   changeCourseName: (newName: string) => void;
-  changeLessonMoveOn: (moveOn: MoveOnCriteriaEnum, element: ILessonNode) => void;
+  changeLessonMoveOn: (
+    moveOn: MoveOnCriteriaEnum,
+    element: ILessonNode,
+  ) => void;
   changeLessonName: (newName: string, element: ILessonNode) => void;
   changeSlideName: (newName: string, element: ILessonNode) => void;
   changeLessonTheme: (theme: LessonTheme, element: ILessonNode) => void;
@@ -100,7 +115,8 @@ export const RC5Context = createContext<IRC5Context>({
 export const RC5ContextProvider: any = (props: tProviderProps) => {
   const { children, isEnabled = true } = props;
   const dispatch = useDispatch();
-  const { handleLoadCourse, syncCurrentCourseWithGit, handleRenameCourse } = useContext(GitContext);
+  const { handleLoadCourse, syncCurrentCourseWithGit, handleRenameCourse } =
+    useContext(GitContext);
   const currentCourseName = useSelector(currentCourse);
   const currentSlideIndex = useSelector(currentSlideNum);
   const courseData = useSelector(courseDataCache);
@@ -111,8 +127,16 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
 
   const lessonSlides = useMemo(() => {
     //defensive
-    if (!courseData || !courseData.blocks || currentBlockIndex > courseData.blocks.length - 1) {
-      if (courseData && courseData.blocks && currentBlockIndex > courseData.blocks.length - 1) {
+    if (
+      !courseData ||
+      !courseData.blocks ||
+      currentBlockIndex > courseData.blocks.length - 1
+    ) {
+      if (
+        courseData &&
+        courseData.blocks &&
+        currentBlockIndex > courseData.blocks.length - 1
+      ) {
         dispatch(updateBlockIndex(0));
       }
       return [];
@@ -133,7 +157,10 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
         return [];
       }
 
-      const normSlideIndex = Math.min(currentAu.slides.length - 1, currentSlideIndex);
+      const normSlideIndex = Math.min(
+        currentAu.slides.length - 1,
+        currentSlideIndex,
+      );
       if (normSlideIndex !== currentSlideIndex) {
         dispatch(navigateSlide(normSlideIndex));
       }
@@ -149,7 +176,13 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
     }
 
     return [];
-  }, [courseData, currentAuIndex, currentBlockIndex, currentSlideIndex, dispatch]);
+  }, [
+    courseData,
+    currentAuIndex,
+    currentBlockIndex,
+    currentSlideIndex,
+    dispatch,
+  ]);
 
   const onAddEditor = (ref: RefObject<MDXEditorMethods>) => {
     editorRef.current = ref;
@@ -167,7 +200,11 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
     (lessonIndex: number) => {
       debugLog('onDeleteLesson', lessonIndex);
 
-      if (!courseData || !courseData.blocks || !courseData.blocks[currentBlockIndex]) {
+      if (
+        !courseData ||
+        !courseData.blocks ||
+        !courseData.blocks[currentBlockIndex]
+      ) {
         debugLogError('Course data not available for lesson deletion');
         return;
       }
@@ -213,7 +250,9 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
         }),
       );
 
-      const newLessonIndex = block.aus.findIndex((lesson) => lesson.dirPath === currentAu.dirPath);
+      const newLessonIndex = block.aus.findIndex(
+        (lesson) => lesson.dirPath === currentAu.dirPath,
+      );
 
       dispatch(updateAuIndex(newLessonIndex));
 
@@ -265,7 +304,9 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
           lessonIndex,
         }),
       );
-      dispatch(updateDirtyDisplay({ reason: 'change lesson move on criteria' }));
+      dispatch(
+        updateDirtyDisplay({ reason: 'change lesson move on criteria' }),
+      );
     },
     [courseData, currentBlockIndex, dispatch],
   );
@@ -342,14 +383,20 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
         !courseData.blocks[currentBlockIndex].aus ||
         !courseData.blocks[currentBlockIndex].aus[element.lesson] ||
         !courseData.blocks[currentBlockIndex].aus[element.lesson].slides ||
-        !courseData.blocks[currentBlockIndex].aus[element.lesson].slides[element.slide]
+        !courseData.blocks[currentBlockIndex].aus[element.lesson].slides[
+          element.slide
+        ]
       ) {
-        debugLogError('Course data or slide not available for slide name change');
+        debugLogError(
+          'Course data or slide not available for slide name change',
+        );
         return;
       }
 
       const slide = {
-        ...courseData.blocks[currentBlockIndex].aus[element.lesson].slides[element.slide],
+        ...courseData.blocks[currentBlockIndex].aus[element.lesson].slides[
+          element.slide
+        ],
         slideTitle: newName,
       };
 

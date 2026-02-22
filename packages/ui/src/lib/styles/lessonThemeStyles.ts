@@ -19,7 +19,10 @@ export const BLOCK_PADDING_MAP: Record<string, string | null> = {
   [BlockPaddingEnum.Large]: '64px',
 };
 
-export const ALIGNMENT_MAP: Record<DefaultAlignmentEnum, { textAlign: string; justifyContent: string }> = {
+export const ALIGNMENT_MAP: Record<
+  DefaultAlignmentEnum,
+  { textAlign: string; justifyContent: string }
+> = {
   [DefaultAlignmentEnum.Left]: {
     textAlign: 'start',
     justifyContent: 'flex-start',
@@ -54,12 +57,13 @@ export function resolveLessonThemeCSS(theme?: LessonTheme): {
 
   const width = theme.contentWidth || DEFAULT_LESSON_THEME.contentWidth;
   const padding = theme.blockPadding || DEFAULT_LESSON_THEME.blockPadding;
-  const alignment = theme.defaultAlignment || DEFAULT_LESSON_THEME.defaultAlignment;
+  const alignment =
+    theme.defaultAlignment || DEFAULT_LESSON_THEME.defaultAlignment;
 
   const resolvedPadding =
     padding === BlockPaddingEnum.Custom
       ? `${theme.blockPaddingCustomValue ?? 16}px`
-      : BLOCK_PADDING_MAP[padding] ?? null;
+      : (BLOCK_PADDING_MAP[padding] ?? null);
 
   return {
     maxWidth: CONTENT_WIDTH_MAP[width] ?? null,
@@ -79,16 +83,31 @@ export function resolveLessonThemeCSS(theme?: LessonTheme): {
  * Uses direct child combinator (>) so per-component alignment overrides
  * (Grid, Accordion, Tabs) naturally take precedence.
  */
-export function generateLessonThemeStyleTag(scopedClass: string, theme?: LessonTheme): string {
+export function generateLessonThemeStyleTag(
+  scopedClass: string,
+  theme?: LessonTheme,
+): string {
   const css = resolveLessonThemeCSS(theme);
   if (!css) return '';
 
-  const widthRule = css.maxWidth ? `
+  const widthRule = css.maxWidth
+    ? `
     .${scopedClass} .mdxeditor-root-contenteditable {
       max-width: ${css.maxWidth};
       margin-left: auto;
       margin-right: auto;
-    }` : '';
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] {
+      max-width: ${css.maxWidth};
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] [data-lexical-decorator] {
+      max-width: none;
+      margin-left: unset;
+      margin-right: unset;
+    }`
+    : '';
 
   const alignmentRule = `
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > p,
@@ -105,12 +124,14 @@ export function generateLessonThemeStyleTag(scopedClass: string, theme?: LessonT
       text-align: ${css.textAlign};
     }`;
 
-  const blockPaddingRule = css.blockPadding ? `
+  const blockPaddingRule = css.blockPadding
+    ? `
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] + [data-lexical-decorator],
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] + p,
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > p + [data-lexical-decorator] {
       margin-top: ${css.blockPadding};
-    }` : '';
+    }`
+    : '';
 
   return widthRule + alignmentRule + blockPaddingRule;
 }

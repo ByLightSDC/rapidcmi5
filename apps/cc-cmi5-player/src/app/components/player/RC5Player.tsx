@@ -13,7 +13,11 @@ import {
   quotePlugin,
 } from '@mdxeditor/editor';
 import { imagePlayerPlugin } from './plugins/image-player/';
-import { animationPlayerPlugin, parseFrontmatterAnimations, useAnimationPlayback } from './plugins/animation-player';
+import {
+  animationPlayerPlugin,
+  parseFrontmatterAnimations,
+  useAnimationPlayback,
+} from './plugins/animation-player';
 import '@mdxeditor/editor/style.css';
 import React, { useContext, useEffect, useMemo, useState, useRef } from 'react';
 
@@ -71,11 +75,15 @@ function RC5Player() {
   const [fullScreenImage, setFullScreenImage] = useState<string>('');
   const [fullScreenImageStyle, setFullScreenImageStyle] = useState({});
   const themeSel = useSelector(themeColor);
-  const [mdxTheme, setMdxTheme] = useState(`${themeSel}-theme ${themeSel}-editor nested-editable-${themeSel}`);
+  const [mdxTheme, setMdxTheme] = useState(
+    `${themeSel}-theme ${themeSel}-editor nested-editable-${themeSel}`,
+  );
   const [slideAnimations, setSlideAnimations] = useState<AnimationConfig[]>([]);
   const auJson = useSelector(auJsonSel);
   const currentLessonTheme = auJson?.lessonTheme;
-  const themeClass = useRef(`lesson-theme-${Math.random().toString(36).slice(2, 9)}`).current;
+  const themeClass = useRef(
+    `lesson-theme-${Math.random().toString(36).slice(2, 9)}`,
+  ).current;
 
   const pixelTop = '40px';
 
@@ -110,12 +118,11 @@ function RC5Player() {
           TabsDirectiveDescriptor,
           TabContentDirectiveDescriptor,
           ImageLabelDirectiveDescriptor,
-          ImageTextDirectiveDescriptor
+          ImageTextDirectiveDescriptor,
         ],
       }),
       codeMirrorPlugin({
         codeBlockLanguages: languageList,
-        codeMirrorExtensions: [githubDark],
       }),
       footnotePlugin({
         footnoteDefinitionEditorDescriptors: [FootnoteDefinitionDescriptor],
@@ -268,7 +275,11 @@ function RC5Player() {
   useEffect(() => {
     // Small delay to ensure DOM is fully rendered after MDX content loads
     const timeoutId = setTimeout(() => {
-      logger.debug(`Attaching media event listeners for slide ${activeTab}`, undefined, 'media');
+      logger.debug(
+        `Attaching media event listeners for slide ${activeTab}`,
+        undefined,
+        'media',
+      );
       mediaEventManager.attachMediaEventListeners();
     }, 100);
 
@@ -281,7 +292,9 @@ function RC5Player() {
    * UE sets mdx theme when MUI theme changes
    */
   useEffect(() => {
-    setMdxTheme(`${themeSel}-theme ${themeSel}-editor nested-editable-${themeSel}`);
+    setMdxTheme(
+      `${themeSel}-theme ${themeSel}-editor nested-editable-${themeSel}`,
+    );
   }, [themeSel]);
 
   // Use the animation playback hook with parsed animations
@@ -295,7 +308,11 @@ function RC5Player() {
         onClick={onClickSlide}
         ref={editorContainerRef}
       >
-        {currentLessonTheme && <style>{generateLessonThemeStyleTag(themeClass, currentLessonTheme)}</style>}
+        {currentLessonTheme && (
+          <style>
+            {generateLessonThemeStyleTag(themeClass, currentLessonTheme)}
+          </style>
+        )}
         {thePlugins && thePlugins.length > 0 && (
           <MDXEditor
             className={mdxTheme}
