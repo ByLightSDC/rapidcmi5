@@ -68,6 +68,8 @@ import {
   appHeaderVisible,
   ImageTextDirectiveDescriptor,
   generateLessonThemeStyleTag,
+  StepsDirectiveDescriptor,
+  StepContentDirectiveDescriptor,
 } from '@rapid-cmi5/ui';
 
 import {
@@ -341,6 +343,8 @@ function RC5VisualEditor() {
           ImageTextDirectiveDescriptor,
           YoutubeDirectiveDescriptor,
           LayoutBoxDirectiveDescriptor,
+          StepsDirectiveDescriptor,
+          StepContentDirectiveDescriptor,
           TabsDirectiveDescriptor,
           TabContentDirectiveDescriptor,
           AnimDirectiveDescriptor,

@@ -51,6 +51,8 @@ import {
   themeColor,
   ImageTextDirectiveDescriptor,
   generateLessonThemeStyleTag,
+  StepsDirectiveDescriptor,
+  StepContentDirectiveDescriptor,
 } from '@rapid-cmi5/ui';
 
 import { RC5PlayerToolbar } from './RC5PlayerToolbar';
@@ -115,6 +117,8 @@ function RC5Player() {
           LayoutBoxDirectiveDescriptor,
           GridContainerDirectiveDescriptor,
           GridCellDirectiveDescriptor,
+          StepsDirectiveDescriptor,
+          StepContentDirectiveDescriptor,
           TabsDirectiveDescriptor,
           TabContentDirectiveDescriptor,
           ImageLabelDirectiveDescriptor,
