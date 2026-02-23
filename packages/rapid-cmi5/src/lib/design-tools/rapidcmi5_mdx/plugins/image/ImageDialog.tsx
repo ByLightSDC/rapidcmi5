@@ -57,7 +57,7 @@ export const ImageDialog: React.FC = () => {
   const [title, setTitle] = useState<string>('');
   const [linkUrl, setLinkUrl] = useState<string>('');
   const [imageStyle, setImageStyle] = useState<string>('');
-  const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
+  //const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [fileOptions, setFileOptions] = useState<string[]>([]);
   const [width, setWidth] = useState<string>('');
@@ -367,7 +367,7 @@ export const ImageDialog: React.FC = () => {
                   name="edit-style"
                   props={{
                     onClick: (event) => {
-                      setIsStyleDialogOpen(true);
+                     // setIsStyleDialogOpen(true);
                     },
                   }}
                 >
@@ -392,7 +392,7 @@ export const ImageDialog: React.FC = () => {
                   value={imageStyle}
                   onChange={(textValue: string) => setImageStyle(textValue)}
                   onClick={() => {
-                    setIsStyleDialogOpen(true);
+                    //setIsStyleDialogOpen(true);
                   }}
                   infoText="Inline styles Ex. opacity:0.5;"
                   slotProps={{
@@ -407,12 +407,12 @@ export const ImageDialog: React.FC = () => {
           {/*</DialogContent>*/}
         </>
       </ModalDialog>
-      <StyleDialog
+      {/* MBStyleDialog
         isOpen={isStyleDialogOpen}
         style={imageStyle}
         setImageStyle={setImageStyle}
         setIsStyleDialogOpen={setIsStyleDialogOpen}
-      />
+      />*/}
     </>
   );
 };
