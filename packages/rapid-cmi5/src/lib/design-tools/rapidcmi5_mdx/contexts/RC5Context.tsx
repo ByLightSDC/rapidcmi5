@@ -51,6 +51,7 @@ import {
   updateDirtyDisplay,
   updateCourseData,
   updateCourseAuData,
+  setDefaultLessonTheme,
   updateCourseSlideData,
   resetCourseOperations,
   saveSlideContent,
@@ -330,6 +331,7 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
           lessonIndex,
         }),
       );
+      dispatch(setDefaultLessonTheme(lessonTheme));
       dispatch(updateDirtyDisplay({ reason: 'change lesson theme settings' }));
     },
     [courseData, currentBlockIndex, dispatch],

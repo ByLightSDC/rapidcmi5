@@ -7,6 +7,7 @@ import {
   CourseAU,
   CourseData,
   KSATElement,
+  LessonTheme,
   Operation,
   RC5ScenarioContent,
   SlideType,
@@ -525,6 +526,7 @@ export interface CreateLessonOptions extends FsContextOptions {
   blockIndex: number;
   auName: string;
   coursePath: string;
+  defaultLessonTheme?: LessonTheme;
 }
 
 export const createLesson = async ({
@@ -534,6 +536,7 @@ export const createLesson = async ({
   blockIndex,
   auName,
   coursePath,
+  defaultLessonTheme,
 }: CreateLessonOptions) => {
   if (blockIndex < 0 || blockIndex >= courseData.blocks.length) {
     throw new Error(`Invalid blockIndex ${blockIndex}`);
@@ -563,6 +566,7 @@ export const createLesson = async ({
         filepath,
       },
     ],
+    ...(defaultLessonTheme ? { lessonTheme: defaultLessonTheme } : {}),
   };
 
   // Get original block

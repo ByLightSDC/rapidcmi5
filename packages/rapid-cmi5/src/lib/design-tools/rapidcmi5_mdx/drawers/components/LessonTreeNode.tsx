@@ -30,7 +30,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import NewspaperOutlinedIcon from '@mui/icons-material/NewspaperOutlined';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import TuneIcon from '@mui/icons-material/Tune';
+import PaletteIcon from '@mui/icons-material/Palette';
 
 import React, { useRef } from 'react';
 import { ButtonOptions, RowAction } from '@rapid-cmi5/ui';
@@ -99,7 +99,7 @@ const lessonNodeActions = [
   },
   {
     tooltip: 'Lesson Settings',
-    icon: <TuneIcon color="inherit" />,
+    icon: <PaletteIcon color="inherit" />,
   },
   {
     tooltip: 'Delete Lesson',

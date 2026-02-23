@@ -8,6 +8,7 @@ import {
   JobeContent,
   Operation,
   CourseAU,
+  LessonTheme,
 } from '@rapid-cmi5/cmi5-build-common';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './store';
@@ -101,6 +102,8 @@ export type CourseBuilderState = {
   repoViewScrollTop: number;
   // The repo cache allows us to store current AU and slide per repo and course pair
   repoCache: RepoCache;
+  // Default formatting applied to newly created lessons
+  defaultLessonTheme?: LessonTheme;
 };
 
 // Saves the state for various repos so you may swap between them easily.
@@ -159,6 +162,7 @@ export const initialStateCourseBuilder: CourseBuilderState = {
   isVersionControlExpanded: false,
   repoFolderChange: false,
   repoViewScrollTop: 0,
+  defaultLessonTheme: undefined,
 };
 
 type tDirtyState = { reason?: string; counter?: number };
@@ -543,6 +547,12 @@ export const courseBuilderSlice = createSlice({
       const { blockIndex, lessonIndex, au } = action.payload;
       state.courseData.blocks[blockIndex].aus[lessonIndex] = au;
     },
+    setDefaultLessonTheme: (
+      state,
+      action: PayloadAction<LessonTheme>,
+    ) => {
+      state.defaultLessonTheme = action.payload;
+    },
     removeCourseAu: (
       state,
       action: PayloadAction<{
@@ -921,6 +931,7 @@ export const {
   updateCourseData,
   updateCourseSlideData,
   updateCourseAuData,
+  setDefaultLessonTheme,
   updateCurrentCourse,
   updateDisplayText,
   updateExpandedFileTreeNodes,
@@ -991,4 +1002,6 @@ export const repoFolderChange = (state: RootState) =>
   state.courseBuilder.repoFolderChange;
 export const repoViewScrollTop = (state: RootState) =>
   state.courseBuilder.repoViewScrollTop;
+export const defaultLessonThemeSel = (state: RootState) =>
+  state.courseBuilder.defaultLessonTheme;
 export default courseBuilderSlice.reducer;
