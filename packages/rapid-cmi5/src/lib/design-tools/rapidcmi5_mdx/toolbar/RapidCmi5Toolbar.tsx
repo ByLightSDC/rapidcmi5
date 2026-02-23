@@ -66,6 +66,7 @@ import {
   dividerColor,
   iconColor,
   InsertGrid,
+  InsertSteps,
 } from '@rapid-cmi5/ui';
 import { displayData } from '../../../redux/courseBuilderReducer';
 import { SlideMenu } from '../menu/SlideMenu';
@@ -221,6 +222,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                         <InsertAudio />
                         <InsertVideo />
                         <Separator />
+                        <InsertSteps />
                         <InsertTable />
                         <InsertTabs />
                         <InsertAccordion />
