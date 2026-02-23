@@ -87,7 +87,7 @@ export function LessonSettingsForm({
         {/* Content Width */}
         <Grid size={11.5}>
           <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
-            Content width
+            Content Width
           </Typography>
           <ToggleButtonGroup
             value={contentWidth}
@@ -111,7 +111,7 @@ export function LessonSettingsForm({
         {/* Block Padding */}
         <Grid size={11.5} sx={{ mt: 2.5 }}>
           <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
-            Block padding
+            Block Padding
           </Typography>
           <ToggleButtonGroup
             value={blockPadding}
@@ -161,17 +161,27 @@ export function LessonSettingsForm({
         {/* Default Alignment */}
         <Grid size={11.5} sx={{ mt: 2.5 }}>
           <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
-            Default alignment
+            Text Alignment
           </Typography>
-          <AlignmentToolbarControls
-            currentAlignment={defaultAlignment}
-            onAlignmentChange={(val) =>
-              setDefaultAlignment(val as DefaultAlignmentEnum)
-            }
-          />
+          <ToggleButtonGroup
+            value={defaultAlignment}
+            exclusive
+            onChange={(_, val) => {
+              setDefaultAlignment(val as DefaultAlignmentEnum);
+            }}
+            size="small"
+            fullWidth
+          >
+            <ToggleButton value={DefaultAlignmentEnum.Left}>Left</ToggleButton>
+            <ToggleButton value={DefaultAlignmentEnum.Center}>
+              Center
+            </ToggleButton>
+            <ToggleButton value={DefaultAlignmentEnum.Right}>
+              Right
+            </ToggleButton>
+          </ToggleButtonGroup>
           <Typography variant="body2" sx={{ mt: 0.5 }}>
-            Sets the default text alignment for all slides in this lesson.
-            Per-component alignment overrides take precedence.
+            Left align text, Center text, Right align text
           </Typography>
         </Grid>
       </>
