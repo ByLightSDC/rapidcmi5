@@ -22,7 +22,7 @@ import { useTheme } from '@mui/system';
 import { useSignalEffect } from '@preact/signals-react';
 import { clickPosition$, isLabelDropping$ } from '@rapid-cmi5/ui';
 import { StyleDialog } from './StyleDialog';
-
+import { Z_INDEX } from './index';
 
 /**
  *  This will allow Style Dialog to be called from the palette button. Effectively separated from ImageDialog. 
@@ -229,6 +229,7 @@ export function EditImageToolbar({
             left: position.x,
             transform: 'translate(-50%, -50%)',
             pointerEvents: 'none',
+            zIndex: Z_INDEX.toolbar,
           }}
         >
           <AddCircleIcon color='warning'/>

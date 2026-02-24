@@ -58,6 +58,16 @@ import {
 } from './MdastImageVisitor';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
+
+//Introduce defined layers for toolbar. Now that StyleDialog is there it competes with the labels for stacking context.
+export const Z_INDEX = {
+  image: 0,
+  label: 10,
+  toolbar: 20,
+  dialog: 100,
+  modal: 1000,
+} as const;
+
 export * from './ImageNode';
 
 export const CAN_USE_DOM: boolean =
