@@ -27,6 +27,7 @@ import {
   Operation,
   CourseAU,
   CourseBlock,
+  LessonTheme,
   CourseData,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
@@ -50,6 +51,7 @@ import {
   updateDirtyDisplay,
   updateCourseData,
   updateCourseAuData,
+  setDefaultLessonTheme,
   updateCourseSlideData,
   resetCourseOperations,
   saveSlideContent,
@@ -76,7 +78,7 @@ interface IRC5Context {
   ) => void;
   changeLessonName: (newName: string, element: ILessonNode) => void;
   changeSlideName: (newName: string, element: ILessonNode) => void;
-
+  changeLessonTheme: (theme: LessonTheme, element: ILessonNode) => void;
   deleteLesson: (lessonIndex: number) => void;
   discardLessonChanges: () => void;
   saveCourseFile: () => Promise<string[]>;
@@ -97,6 +99,7 @@ export const RC5Context = createContext<IRC5Context>({
   removeEditor: () => {},
   changeCourseName: (newName: string) => {},
   changeLessonMoveOn: (moveOn: MoveOnCriteriaEnum, element: ILessonNode) => {},
+  changeLessonTheme: (theme: LessonTheme, element: ILessonNode) => {},
   changeLessonName: (newName: string, element: ILessonNode) => {},
   changeSlideName: (newName: string, element: ILessonNode) => {},
   deleteLesson: (lessonIndex: number) => {},
@@ -309,6 +312,31 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
     [courseData, currentBlockIndex, dispatch],
   );
 
+  const onChangeLessonTheme = useCallback(
+    (lessonTheme: LessonTheme, element: ILessonNode) => {
+      if (element.id === undefined) {
+        return;
+      }
+      const lessonIndex = element.id as number;
+
+      const au: CourseAU = {
+        ...courseData.blocks[currentBlockIndex].aus[lessonIndex],
+        lessonTheme,
+      };
+
+      dispatch(
+        updateCourseAuData({
+          au,
+          blockIndex: currentBlockIndex,
+          lessonIndex,
+        }),
+      );
+      dispatch(setDefaultLessonTheme(lessonTheme));
+      dispatch(updateDirtyDisplay({ reason: 'change lesson theme settings' }));
+    },
+    [courseData, currentBlockIndex, dispatch],
+  );
+
   const onChangeLessonName = useCallback(
     (newName: string, element: ILessonNode) => {
       if (element.id === undefined) {
@@ -513,6 +541,7 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
         addEditor: onAddEditor,
         changeCourseName: onChangeCourseName,
         changeLessonMoveOn: onChangeLessonMoveOn,
+        changeLessonTheme: onChangeLessonTheme,
         changeLessonName: onChangeLessonName,
         changeSlideName: onChangeSlideName,
         deleteLesson: onDeleteLesson,

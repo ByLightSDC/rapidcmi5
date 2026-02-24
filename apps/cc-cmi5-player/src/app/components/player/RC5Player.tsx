@@ -19,7 +19,8 @@ import {
   useAnimationPlayback,
 } from './plugins/animation-player';
 import '@mdxeditor/editor/style.css';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState, useRef } from 'react';
+
 import { Box, Typography } from '@mui/material';
 import {
   AdmonitionDirectiveDescriptor,
@@ -49,6 +50,7 @@ import {
   AnimationConfig,
   themeColor,
   ImageTextDirectiveDescriptor,
+  generateLessonThemeStyleTag,
   StepsDirectiveDescriptor,
   StepContentDirectiveDescriptor,
 } from '@rapid-cmi5/ui';
@@ -63,6 +65,8 @@ import { GridCellDirectiveDescriptor } from './editors/directives/GridCellDirect
 import { mediaEventManager } from '../../utils/MediaEventManager';
 import { logger } from '../../debug';
 import { useSelector } from 'react-redux';
+import { auJsonSel } from '../../redux/auReducer';
+
 /**
  * Rapid CMI5 Visual Editor
  * @returns
@@ -77,6 +81,11 @@ function RC5Player() {
     `${themeSel}-theme ${themeSel}-editor nested-editable-${themeSel}`,
   );
   const [slideAnimations, setSlideAnimations] = useState<AnimationConfig[]>([]);
+  const auJson = useSelector(auJsonSel);
+  const currentLessonTheme = auJson?.lessonTheme;
+  const themeClass = useRef(
+    `lesson-theme-${Math.random().toString(36).slice(2, 9)}`,
+  ).current;
 
   const pixelTop = '40px';
 
@@ -298,13 +307,16 @@ function RC5Player() {
   return (
     <>
       <Box
-        sx={{
-          marginTop: pixelTop,
-          height: `calc(100vh - ${pixelTop})`,
-        }}
+        className={themeClass}
+        sx={{ marginTop: pixelTop, height: `calc(100vh - ${pixelTop})` }}
         onClick={onClickSlide}
         ref={editorContainerRef}
       >
+        {currentLessonTheme && (
+          <style>
+            {generateLessonThemeStyleTag(themeClass, currentLessonTheme)}
+          </style>
+        )}
         {thePlugins && thePlugins.length > 0 && (
           <MDXEditor
             className={mdxTheme}

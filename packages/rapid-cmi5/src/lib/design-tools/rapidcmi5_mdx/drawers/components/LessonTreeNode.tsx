@@ -30,6 +30,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import NewspaperOutlinedIcon from '@mui/icons-material/NewspaperOutlined';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import PaletteIcon from '@mui/icons-material/Palette';
 
 import React, { useRef } from 'react';
 import { ButtonOptions, RowAction } from '@rapid-cmi5/ui';
@@ -65,6 +66,7 @@ export enum LessonNodeActionEnum {
   AddSlide,
   Rename,
   SetMoveOnCriteria,
+  LessonSettings,
   Delete,
 }
 
@@ -94,6 +96,10 @@ const lessonNodeActions = [
   {
     tooltip: 'Move On Criteria',
     icon: <EmojiEventsIcon color="inherit" />,
+  },
+  {
+    tooltip: 'Lesson Settings',
+    icon: <PaletteIcon color="inherit" />,
   },
   {
     tooltip: 'Delete Lesson',
