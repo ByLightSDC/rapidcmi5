@@ -15,9 +15,8 @@ import RoomIcon from '@mui/icons-material/Room';
 import PaletteIcon from '@mui/icons-material/Palette';
 
 import { openEditImageDialog$ } from './index';
-import {useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTheme } from '@mui/system';
-
 
 import { useSignalEffect } from '@preact/signals-react';
 import { clickPosition$, isLabelDropping$ } from '@rapid-cmi5/ui';
@@ -25,13 +24,12 @@ import { StyleDialog } from './StyleDialog';
 import { Z_INDEX } from './index';
 
 /**
- *  This will allow Style Dialog to be called from the palette button. Effectively separated from ImageDialog. 
+ *  This will allow Style Dialog to be called from the palette button. Effectively separated from ImageDialog.
  * In the future we could move this to a 'hooks' file.
  * @param nodeKey - The image node to be edited.
  * @returns An object containing the current style string and a setter function.
  */
 function useImageStyle(nodeKey: string) {
-
   const [editor] = useLexicalComposerContext();
   const [imageStyle, setImageStyle] = useState<string>('');
 
@@ -52,7 +50,7 @@ function useImageStyle(nodeKey: string) {
       ) {
         //Get the current set attributes.
         const rest = node.getRest() ?? [];
-        
+
         // Update them with changes.
         const nextRest = [
           ...rest.filter((attr: any) => attr.name !== 'style'),
@@ -68,9 +66,8 @@ function useImageStyle(nodeKey: string) {
     });
   }, [imageStyle, editor, nodeKey]);
 
-  return { imageStyle, setImageStyle }; 
+  return { imageStyle, setImageStyle };
 }
-
 
 export interface EditImageToolbarProps {
   nodeKey: string;
@@ -105,8 +102,7 @@ export function EditImageToolbar({
   height,
   href,
 }: EditImageToolbarProps): JSX.Element {
-  const [readOnly] =
-    useCellValues(readOnly$);
+  const [readOnly] = useCellValues(readOnly$);
   const [editor] = useLexicalComposerContext();
   const openEditImageDialog = usePublisher(openEditImageDialog$);
 
@@ -119,10 +115,9 @@ export function EditImageToolbar({
   const { imageStyle, setImageStyle } = useImageStyle(nodeKey);
   const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
 
-
   /**
    * Set marker position to follow mouse
-   * @param e 
+   * @param e
    */
   const handleMouseMove = (e: MouseEvent) => {
     setPosition({ x: e.clientX, y: e.clientY });
@@ -133,7 +128,7 @@ export function EditImageToolbar({
    * Store mouse position when Label/Marker button is clicked
    * clickPosition is used from ImageEditor to avoid dropping marker on the Add Marker button since the button is positioned inside the image area
    * set a flag when label is being dropped
-   * @param e 
+   * @param e
    */
   const handleDragLabelStart = (e: React.MouseEvent<HTMLButtonElement>) => {
     window.removeEventListener('mousemove', handleMouseMove);
@@ -149,8 +144,6 @@ export function EditImageToolbar({
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-
-  
   /**
    * Listen for flag and update internal React state
    */
@@ -161,100 +154,98 @@ export function EditImageToolbar({
     }
   });
 
-  
   return (
-    
-    // Wrap this in a fragment so StyleDialog can live OUTSIDE of imageDialogue without us having to rewire it completely. 
+    // Wrap this in a fragment so StyleDialog can live OUTSIDE of imageDialogue without us having to rewire it completely.
     <>
-    <Stack
-      direction="row"
-      spacing={0}
-      sx={{
-        backgroundColor:
-          muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
-        position: 'absolute',
-        right: 0,
-        top: 0,
-        display: 'flex',
-        zIndex: 1,
-      }}
-    >
-      <IconButton
-        aria-label="edit"
-        disabled={readOnly}
-        onClick={(e) => {
-          openEditImageDialog({
-            nodeKey: nodeKey,
-            initialValues: {
-              src: !initialImagePath ? imageSource : initialImagePath,
-              title,
-              altText: alt,
-              rest: rest,
-              width, // undefined if 'inherit'
-              height, // undefined if 'inherit'
-              href,
-            },
-          });
+      <Stack
+        direction="row"
+        spacing={0}
+        sx={{
+          backgroundColor:
+            muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
+          position: 'absolute',
+          right: 0,
+          top: 0,
+          display: 'flex',
+          zIndex: 1,
         }}
       >
-        <SettingsIcon />
-      </IconButton>
-
-      <IconButton
-        aria-label="edit styles"
-        disabled={readOnly}
-        onClick={() => {
-          setIsStyleDialogOpen(true)
-        }}
-      >
-        <PaletteIcon /> 
-      </IconButton>
- 
-      <IconButton
-        aria-label="Add Label"
-        disabled={readOnly}
-        onClick={(e) => {
-          handleDragLabelStart(e);
-        }}
-      >
-        <RoomIcon />
-      </IconButton>
-
-      {isMarking && (
-        <div
-          style={{
-            position: 'fixed',
-            top: position.y,
-            left: position.x,
-            transform: 'translate(-50%, -50%)',
-            pointerEvents: 'none',
-            zIndex: Z_INDEX.toolbar,
+        <IconButton
+          aria-label="edit"
+          disabled={readOnly}
+          onClick={(e) => {
+            openEditImageDialog({
+              nodeKey: nodeKey,
+              initialValues: {
+                src: !initialImagePath ? imageSource : initialImagePath,
+                title,
+                altText: alt,
+                rest: rest,
+                width, // undefined if 'inherit'
+                height, // undefined if 'inherit'
+                href,
+              },
+            });
           }}
         >
-          <AddCircleIcon color='warning'/>
-        </div>
-      )}
-      <IconButton
-        aria-label="delete"
-        disabled={readOnly}
-        onClick={(e) => {
-          e.preventDefault();
-          editor.update(() => {
-            $getNodeByKey(nodeKey)?.remove();
-          });
-        }}
-      >
-        <DeleteForeverIcon />
-      </IconButton>
-    </Stack>
+          <SettingsIcon />
+        </IconButton>
 
-    {/* Style Dialog lives OUTSIDE the button, but inside the toolbar component */}
-    <StyleDialog
-      isOpen={isStyleDialogOpen}
-      style={imageStyle}
-      setImageStyle={setImageStyle}
-      setIsStyleDialogOpen={setIsStyleDialogOpen}
-    />
-  </>
+        <IconButton
+          aria-label="edit styles"
+          disabled={readOnly}
+          onClick={() => {
+            setIsStyleDialogOpen(true);
+          }}
+        >
+          <PaletteIcon />
+        </IconButton>
+
+        <IconButton
+          aria-label="Add Label"
+          disabled={readOnly}
+          onClick={(e) => {
+            handleDragLabelStart(e);
+          }}
+        >
+          <RoomIcon />
+        </IconButton>
+
+        {isMarking && (
+          <div
+            style={{
+              position: 'fixed',
+              top: position.y,
+              left: position.x,
+              transform: 'translate(-50%, -50%)',
+              pointerEvents: 'none',
+              zIndex: Z_INDEX.toolbar,
+            }}
+          >
+            <AddCircleIcon color="warning" />
+          </div>
+        )}
+        <IconButton
+          aria-label="delete"
+          disabled={readOnly}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.update(() => {
+              $getNodeByKey(nodeKey)?.remove();
+            });
+          }}
+        >
+          <DeleteForeverIcon />
+        </IconButton>
+      </Stack>
+
+      {/* Style Dialog lives OUTSIDE the button, but inside the toolbar component */}
+      <StyleDialog
+        isOpen={isStyleDialogOpen}
+        style={imageStyle}
+        setImageStyle={setImageStyle}
+        setIsStyleDialogOpen={setIsStyleDialogOpen}
+      />
+    </>
   );
 }

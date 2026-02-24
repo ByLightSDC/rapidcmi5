@@ -25,7 +25,6 @@ import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
 import BlockIcon from '@mui/icons-material/Block';
 import { ModalDialog, SelectorMainUi } from '@rapid-cmi5/ui';
 
-
 interface StyleProps {
   isOpen: boolean;
   style: string;
@@ -258,13 +257,13 @@ export const StyleDialog: React.FC<StyleProps> = ({
     }
 
     setImageStyle(styleString);
-    setIsStyleDialogOpen(false); 
-  //  onApply(styleString.trim());
+    setIsStyleDialogOpen(false);
+    //  onApply(styleString.trim());
   };
 
   const handleStyleCancel = () => {
     setIsStyleDialogOpen(false);
-   // onCancel();
+    // onCancel();
   };
 
   const handleAlignmentToggle = (
