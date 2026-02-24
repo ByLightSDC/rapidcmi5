@@ -1,4 +1,3 @@
-// components/CertificateManagerModal.tsx
 import { useCallback, useContext, useRef, useState } from 'react';
 import { CommonAppModalState, ModalDialog } from '@rapid-cmi5/ui';
 import {

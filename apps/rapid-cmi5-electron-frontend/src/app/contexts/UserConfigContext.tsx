@@ -11,6 +11,7 @@ import {
   GitUserConfig,
   SSOConfig,
 } from '@rapid-cmi5/cmi5-build-common';
+import { config } from '@rapid-cmi5/ui';
 
 export interface CertInfo {
   id: string;
@@ -18,7 +19,7 @@ export interface CertInfo {
   addedAt: string;
   subject?: string;
 }
-const SSO_CONFIG_KEY = 'rapid-cmi5:ssoConfig';
+
 interface UserConfigContextType {
   gitUser?: GitUserConfig;
   setGitUser: (config: GitUserConfig) => void;
@@ -41,6 +42,12 @@ const asyncNoop = async () => {
   return;
 };
 
+/* 
+  This context exists to have a global user configuration management point.
+  Currently this is focused mainly on the Electron side but should be expanded for the web application.
+  A user should be able to configure something once and have it track across all courses and repos in their application,
+  they should not be required to type in things such as urls or username and email over and over again.
+*/
 export const UserConfigContext = createContext<UserConfigContextType>({
   setGitUser: noop,
   setSSOConfig: noop,
@@ -55,6 +62,17 @@ interface UserConfigProps {
   children: ReactNode;
 }
 
+function getWebSSOConfig(): SSOConfig {
+  return {
+    keycloakClientId: config.KEYCLOAK_CLIENT_ID || '',
+    keycloakRealm: config.KEYCLOAK_REALM || '',
+    keycloakScope: config.KEYCLOAK_SCOPE || '',
+    keycloakUrl: config.KEYCLOAK_URL || '',
+    rangeRestApiUrl: config.DEVOPS_API_URL || '',
+    ssoEnabled: config.KEYCLOAK_URL ? true : false,
+  };
+}
+
 export default function UserConfig({ children }: UserConfigProps) {
   const isElectron = detectIsElectron();
 
@@ -65,47 +83,44 @@ export default function UserConfig({ children }: UserConfigProps) {
 
   const [gitCredentials, setGitCredentialsState] = useState<Credentials>();
 
-  const [ssoConfig, setSsoConfigState] = useState<SSOConfig>({
-    keycloakClientId: '',
-    keycloakRealm: '',
-    keycloakScope: '',
-    keycloakUrl: '',
-    rangeRestApiUrl: '',
-    ssoEnabled: false,
+  const [ssoConfig, setSsoConfigState] = useState<SSOConfig>(() => {
+    if (!isElectron) {
+      return getWebSSOConfig();
+    }
+    return {
+      keycloakClientId: '',
+      keycloakRealm: '',
+      keycloakScope: '',
+      keycloakUrl: '',
+      rangeRestApiUrl: '',
+      ssoEnabled: false,
+    };
   });
+
   const [certs, setCerts] = useState<CertInfo[]>([]);
 
-  // Load persisted values on mount
+  // Load persisted values on mount (Electron only)
   useEffect(() => {
+    if (!isElectron) return;
+
     let cancelled = false;
 
     async function load() {
-      if (isElectron) {
-        const [userConfig, gitCreds, ssoConfig, certList] = await Promise.all([
-          window.userSettingsApi.getGitUserConfig(),
-          window.userSettingsApi.getGitCredentials(),
+      const [userConfig, gitCreds, ssoConfig, certList] = await Promise.all([
+        window.userSettingsApi.getGitUserConfig(),
+        window.userSettingsApi.getGitCredentials(),
+        window.userSettingsApi.getSSOConfig(),
+        window.userSettingsApi.listCerts(),
+      ]);
 
-          window.userSettingsApi.getSSOConfig(),
-          window.userSettingsApi.listCerts(),
-        ]);
-
-        if (!cancelled) {
-          setGitUserState(userConfig);
-          setGitCredentialsState(gitCreds);
-          setSsoConfigState(ssoConfig);
-          setCerts(certList);
-        }
-      } else {
-        const stored = localStorage.getItem(SSO_CONFIG_KEY);
-        if (stored && !cancelled) {
-          try {
-            setSsoConfigState(JSON.parse(stored));
-          } catch {
-            // Corrupted data, ignore
-          }
-        }
+      if (!cancelled) {
+        setGitUserState(userConfig);
+        setGitCredentialsState(gitCreds);
+        setSsoConfigState(ssoConfig);
+        setCerts(certList);
       }
     }
+
     load();
     return () => {
       cancelled = true;
@@ -147,13 +162,11 @@ export default function UserConfig({ children }: UserConfigProps) {
   }, [isElectron]);
 
   const setSSOConfig = useCallback(
-    (config: SSOConfig) => {
+    (cfg: SSOConfig) => {
       if (isElectron) {
-        window.userSettingsApi.setSSOConfig(config);
-      } else {
-        localStorage.setItem(SSO_CONFIG_KEY, JSON.stringify(config));
+        window.userSettingsApi.setSSOConfig(cfg);
       }
-      setSsoConfigState(config);
+      setSsoConfigState(cfg);
     },
     [isElectron],
   );

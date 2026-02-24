@@ -1,8 +1,6 @@
-// app/api/userSettings/certManager.ts
 import fs from 'fs';
 import path from 'path';
 import { app } from 'electron';
-import https from 'https';
 import tls from 'tls';
 
 export interface CertInfo {
@@ -22,14 +20,16 @@ function ensureCertsDir() {
 
 /**
  * Load all custom certs and add them to the TLS trust chain.
- * Call this once at app startup.
+ * Call this once at app startup and after adding/removing certs.
  */
 export function applyCustomCerts(): void {
   ensureCertsDir();
 
-  const certFiles = fs.readdirSync(CERTS_DIR).filter(
-    (f) => f.endsWith('.pem') || f.endsWith('.crt') || f.endsWith('.cer'),
-  );
+  const certFiles = fs
+    .readdirSync(CERTS_DIR)
+    .filter(
+      (f) => f.endsWith('.pem') || f.endsWith('.crt') || f.endsWith('.cer'),
+    );
 
   if (certFiles.length === 0) return;
 
@@ -37,7 +37,6 @@ export function applyCustomCerts(): void {
     fs.readFileSync(path.join(CERTS_DIR, f), 'utf-8'),
   );
 
-  // Append custom certs to Node's default CA store
   const originalCreateSecureContext = tls.createSecureContext;
   tls.createSecureContext = function (options = {}) {
     const context = originalCreateSecureContext.call(tls, options);
@@ -60,9 +59,11 @@ export function applyCustomCerts(): void {
 export function listCerts(): CertInfo[] {
   ensureCertsDir();
 
-  const certFiles = fs.readdirSync(CERTS_DIR).filter(
-    (f) => f.endsWith('.pem') || f.endsWith('.crt') || f.endsWith('.cer'),
-  );
+  const certFiles = fs
+    .readdirSync(CERTS_DIR)
+    .filter(
+      (f) => f.endsWith('.pem') || f.endsWith('.crt') || f.endsWith('.cer'),
+    );
 
   return certFiles.map((filename) => {
     const fullPath = path.join(CERTS_DIR, filename);
@@ -71,7 +72,6 @@ export function listCerts(): CertInfo[] {
 
     let subject: string | undefined;
     try {
-      // Try to extract subject from PEM certificate
       const subjectMatch = content.match(/subject=(.+)/);
       if (subjectMatch) {
         subject = subjectMatch[1].trim();
@@ -95,12 +95,10 @@ export function listCerts(): CertInfo[] {
 export function addCert(filename: string, contents: string): CertInfo {
   ensureCertsDir();
 
-  // Validate it looks like a PEM cert
   if (!contents.includes('-----BEGIN CERTIFICATE-----')) {
     throw new Error('Invalid certificate format. Expected PEM format.');
   }
 
-  // Sanitize filename
   const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
   const destPath = path.join(CERTS_DIR, safeName);
 
@@ -109,6 +107,7 @@ export function addCert(filename: string, contents: string): CertInfo {
   }
 
   fs.writeFileSync(destPath, contents, 'utf-8');
+  applyCustomCerts();
 
   return {
     id: Buffer.from(safeName).toString('base64url'),
@@ -126,7 +125,6 @@ export function removeCert(id: string): void {
   const filename = Buffer.from(id, 'base64url').toString('utf-8');
   const fullPath = path.join(CERTS_DIR, filename);
 
-  // Prevent path traversal
   if (path.dirname(fullPath) !== CERTS_DIR) {
     throw new Error('Invalid certificate ID');
   }
@@ -136,4 +134,5 @@ export function removeCert(id: string): void {
   }
 
   fs.unlinkSync(fullPath);
+  applyCustomCerts();
 }

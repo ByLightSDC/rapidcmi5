@@ -32,18 +32,17 @@ import CertificateManagerModal, {
   configureCertsModalId,
 } from '../modals/CertificateManagerModal';
 import { detectIsElectron } from '../../utils/appType';
-import JsonFileEditorModal, {
-  configureCmi5ConfigModalId,
-} from '../modals/ConfigModal';
-import ConfigureSSOCredentialsForm, {
-  configureSSOCredsModalId,
-} from '../modals/ElectronLoginModal';
-import ConfigureGitCredentialsForm, {
-  configureGitCredsModalId,
-} from '../modals/GitModal';
-import ConfigureSSOForm from '../modals/SsoModal';
+import JsonFileEditorModal from '../modals/JsonFileEditorModal';
+import {
+  configureGlobalGitConfigModalId,
+  ConfigureGlobalGitConfigForm,
+} from '../modals/GitGlobalConfigModal';
+import ConfigureSSOForm, {
+  configureSSOPromptModalId,
+} from '../modals/SsoConfigModal';
 import { AuthContext } from '../../contexts/AuthContext';
 import { UserConfigContext } from '../../contexts/UserConfigContext';
+import { configureSSOCredsModalId } from '../modals/ElectronLoginModal';
 
 interface UserInfoBoxProps {
   anchorEl: HTMLElement | null;
@@ -51,7 +50,7 @@ interface UserInfoBoxProps {
 }
 
 const clearStoragePromptModalId = 'reset-persistence';
-export const configureSSOPromptModalId = 'configure-sso';
+const configureCmi5CFGModalId = 'configureCmi5CFGModalId';
 
 export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
   const isElectron = detectIsElectron();
@@ -60,7 +59,7 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
   const appThemeColor = useSelector(themeColor);
   const modalObj = useSelector(modal);
   const { gitIcon } = useMDStyleIcons();
-  const { logout, token, handleSaveSSOCreds } = useContext(AuthContext);
+  const { logout, token } = useContext(AuthContext);
   const {
     setGitUser,
     gitUser,
@@ -97,7 +96,7 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
     if (isElectron) {
       const config = await window.fsApi.readPlayerConfig();
       setPlayerConfigContents(config);
-      openModal(configureCmi5ConfigModalId, 'CMI5 Player Config');
+      openModal(configureCmi5CFGModalId, 'CMI5 Player Config');
     }
   };
 
@@ -139,14 +138,6 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
             maxWidth="xs"
           />
         )}
-        {modalObj.type === configureSSOCredsModalId && (
-          <ConfigureSSOCredentialsForm
-            modalObj={modalObj}
-            handleCloseModal={handleCloseModal}
-            handleModalAction={handleCloseModal}
-            handleSaveSSOCreds={handleSaveSSOCreds}
-          />
-        )}
 
         {modalObj.type === configureCertsModalId && (
           <CertificateManagerModal
@@ -173,8 +164,8 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
           />
         )}
 
-        {modalObj.type === configureGitCredsModalId && (
-          <ConfigureGitCredentialsForm
+        {modalObj.type === configureGlobalGitConfigModalId && (
+          <ConfigureGlobalGitConfigForm
             defaultData={{
               authorEmail: gitUser?.authorEmail ?? '',
               authorName: gitUser?.authorName ?? '',
@@ -189,16 +180,16 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
           />
         )}
 
-        {modalObj.type === configureCmi5ConfigModalId && (
+        {modalObj.type === configureCmi5CFGModalId && (
           <JsonFileEditorModal
-            modalId={configureCmi5ConfigModalId}
+            modalId={configureCmi5CFGModalId}
             modalObj={modalObj}
             title="CMI5 Player Config"
             filename="cfg.json"
             initialJson={playerConfigContents}
             handleCloseModal={handleCloseModal}
-            handleSaveJson={(parsed) => {
-              window.fsApi.writePlayerConfig(parsed);
+            handleSaveJson={(text) => {
+              window.fsApi.writePlayerConfig(text);
             }}
           />
         )}
@@ -224,47 +215,31 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
         </MenuItem>
 
         <MenuItem
-          onClick={() => openModal(configureSSOPromptModalId, 'Configure SSO')}
-        >
-          <ListItemIcon>
-            <KeyIcon />
-          </ListItemIcon>
-          <MenuItemText label="SSO" />
-        </MenuItem>
-
-        <MenuItem
-          onClick={() => openModal(configureGitCredsModalId, 'Configure Git')}
+          onClick={() =>
+            openModal(configureGlobalGitConfigModalId, 'Configure Git')
+          }
         >
           <ListItemIcon>{gitIcon}</ListItemIcon>
-          <MenuItemText label="Git Credentials" />
-        </MenuItem>
-
-        <MenuItem
-          onClick={() => {
-            dispatch(
-              setModal({
-                id: null,
-                meta: undefined,
-                name: null,
-                type: clearStoragePromptModalId,
-              }),
-            );
-            onClose();
-          }}
-        >
-          <ListItemIcon>
-            <DeleteForeverIcon sx={{ transform: 'scaleX(-1)' }} />
-          </ListItemIcon>
-          <MenuItemText label="Clear Data" />
+          <MenuItemText label="Git Config" />
         </MenuItem>
 
         {isElectron && (
           <>
+            <MenuItem
+              onClick={() =>
+                openModal(configureSSOPromptModalId, 'Configure SSO')
+              }
+            >
+              <ListItemIcon>
+                <KeyIcon />
+              </ListItemIcon>
+              <MenuItemText label="SSO Config" />
+            </MenuItem>
             <MenuItem onClick={handlePlayerConfig}>
               <ListItemIcon>
                 <ListIcon />
               </ListItemIcon>
-              <MenuItemText label="Edit Player Config" />
+              <MenuItemText label="Edit cfg.json" />
             </MenuItem>
             <MenuItem
               onClick={() =>
@@ -295,6 +270,24 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
               ))}
           </>
         )}
+        <MenuItem
+          onClick={() => {
+            dispatch(
+              setModal({
+                id: null,
+                meta: undefined,
+                name: null,
+                type: clearStoragePromptModalId,
+              }),
+            );
+            onClose();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteForeverIcon sx={{ transform: 'scaleX(-1)' }} />
+          </ListItemIcon>
+          <MenuItemText label="Clear Data" />
+        </MenuItem>
       </Menu>
     </section>
   );

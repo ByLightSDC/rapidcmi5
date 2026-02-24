@@ -72,7 +72,7 @@ const SEARCH_DEBOUNCE_MS = 400;
 /** Shared height so the button and the status box always match. */
 const ROW_HEIGHT = 42;
 
-export function MyScenariosForm({ submitForm, token, url }: ScenarioFormProps) {
+export function ScenarioSelectionForm({ submitForm, token, url }: ScenarioFormProps) {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);

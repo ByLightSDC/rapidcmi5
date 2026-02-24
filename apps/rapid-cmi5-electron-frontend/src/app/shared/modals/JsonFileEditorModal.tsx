@@ -18,9 +18,6 @@ export type JsonEditorFormData = {
   jsonText: string;
 };
 
-export const configureCmi5ConfigModalId = 'configureCmi5ConfigModalId';
-
-
 const jsonValidationSchema = yup.object().shape({
   jsonText: yup
     .string()
@@ -65,7 +62,7 @@ export function JsonFileEditorModal({
   handleModalAction?: (
     modalId: string,
     buttonAction: number,
-    data?: unknown
+    data?: unknown,
   ) => void;
 
   // called only when JSON is valid & user hits Save
@@ -110,9 +107,15 @@ export function JsonFileEditorModal({
       return (
         <>
           <Grid size={12}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
               <Typography variant="body2" color="text.secondary">
-                {filename ? `Editing: ${filename}` : 'Paste or edit JSON below.'}
+                {filename
+                  ? `Editing: ${filename}`
+                  : 'Paste or edit JSON below.'}
               </Typography>
 
               <Button size="small" variant="outlined" onClick={formatJson}>
@@ -139,7 +142,7 @@ export function JsonFileEditorModal({
         </>
       );
     },
-    []
+    [],
   );
 
   return (

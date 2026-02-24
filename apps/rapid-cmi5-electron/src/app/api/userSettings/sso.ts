@@ -1,10 +1,5 @@
-// main/store.ts
-
 import Store from 'electron-store';
-import https from 'https';
 import axios from 'axios';
-import fs from 'fs';
-import path from 'path';
 import { app, safeStorage } from 'electron';
 
 import {
@@ -27,46 +22,12 @@ export const store = new Store<StoreSchema>({
   },
 });
 
-function loadCustomCAs(): string[] {
-  const certsDir = path.join(app.getPath('userData'), 'custom-certs');
-
-  try {
-    if (!fs.existsSync(certsDir)) return [];
-
-    return fs
-      .readdirSync(certsDir)
-      .filter((f) => f.endsWith('.pem') || f.endsWith('.crt') || f.endsWith('.cer'))
-      .map((f) => fs.readFileSync(path.join(certsDir, f), 'utf-8'));
-  } catch {
-    return [];
-  }
-}
-
-function createHttpsAgent(): https.Agent {
-  const customCAs = loadCustomCAs();
-
-  if (customCAs.length > 0) {
-    return new https.Agent({ ca: customCAs });
-  }
-
-  // No custom certs — use default system CA trust store
-  return new https.Agent();
-}
-
+// No custom httpsAgent needed — applyCustomCerts() patches TLS globally
 const http = axios.create({
-  httpsAgent: createHttpsAgent(),
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded',
   },
 });
-
-/**
- * Rebuild the https agent with the latest custom certs.
- * Call after adding or removing certificates.
- */
-export function refreshHttpsAgent(): void {
-  http.defaults.httpsAgent = createHttpsAgent();
-}
 
 export function encryptCredentials(credentials: Credentials): string {
   if (!safeStorage.isEncryptionAvailable()) {

@@ -12,9 +12,10 @@ import {
 import { useCallback, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import * as yup from 'yup';
-import { configureSSOPromptModalId } from '../navbar/UserInfoBox';
 import { SSOConfig } from '@rapid-cmi5/cmi5-build-common';
 import { Alert, Collapse } from '@mui/material';
+
+export const configureSSOPromptModalId = 'configure-sso';
 
 const validationSchema = yup.object().shape({
   keycloakUrl: yup

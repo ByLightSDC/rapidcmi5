@@ -22,6 +22,7 @@ export type SubmitScenarioFormFn<T = any> = (item: T) => void;
 // This will exist in app in order to pass the token too
 // this prevents needing to pass the token into the package part of the application
 // we only need to pass the function for on click
+
 export interface ScenarioFormProps {
   submitForm: SubmitScenarioFormFn;
   token: string;

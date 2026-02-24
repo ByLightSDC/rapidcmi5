@@ -13,14 +13,14 @@ import { useCallback, useMemo } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import * as yup from 'yup';
 
-export const configureGitCredsModalId = 'configureGitCredsModalId';
+export const configureGlobalGitConfigModalId = 'configureGlobalGitConfigModalId';
 
 interface GitCredentialsFormData extends GitUserConfig {
   username?: string;
   password?: string;
 }
 
-interface ConfigureGitCredentialsFormProps {
+interface ConfigureGlobalGitConfigFormProps {
   defaultData?: GitCredentialsFormData;
   modalObj: CommonAppModalState;
   handleCloseModal: () => void;
@@ -33,14 +33,14 @@ interface ConfigureGitCredentialsFormProps {
   handleSaveGitCredentials?: (credentials: Credentials) => void;
 }
 
-export function ConfigureGitCredentialsForm({
+export function ConfigureGlobalGitConfigForm({
   defaultData,
   modalObj,
   handleCloseModal,
   handleModalAction,
   handleSaveGitConfig,
   handleSaveGitCredentials,
-}: ConfigureGitCredentialsFormProps) {
+}: ConfigureGlobalGitConfigFormProps) {
   const showCredentials = Boolean(handleSaveGitCredentials);
 
   const validationSchema = useMemo(() => {
@@ -156,10 +156,10 @@ export function ConfigureGitCredentialsForm({
 
   return (
     <ModalDialog
-      testId={configureGitCredsModalId}
+      testId={configureGlobalGitConfigModalId}
       buttons={[]}
       dialogProps={{
-        open: modalObj.type === configureGitCredsModalId,
+        open: modalObj.type === configureGlobalGitConfigModalId,
       }}
       maxWidth="sm"
     >
@@ -186,4 +186,4 @@ export function ConfigureGitCredentialsForm({
   );
 }
 
-export default ConfigureGitCredentialsForm;
+export default ConfigureGlobalGitConfigForm;

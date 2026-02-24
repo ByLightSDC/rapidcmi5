@@ -1,5 +1,5 @@
 /* Material */
-import { ThemeProvider, useTheme } from '@mui/material';
+import { ThemeProvider } from '@mui/material';
 import { useEffect } from 'react';
 import { NotificationsProvider } from '@toolpad/core';
 import AppRoutes from './AppRoutes';
@@ -10,7 +10,6 @@ import { useSelector } from 'react-redux';
 import { themeColor } from '@rapid-cmi5/ui';
 import { darkTheme } from './styles/muiThemeDark';
 import { lightTheme } from './styles/muiTheme';
-import { CustomTheme } from './styles/createPalette';
 
 export function App() {
   const theme = useSelector(themeColor);

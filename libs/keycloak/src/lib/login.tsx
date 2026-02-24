@@ -18,7 +18,6 @@ import {
 export interface LoginProps {
   scope: string;
   clientId: string;
-
   children: ReactNode;
 }
 
@@ -54,7 +53,7 @@ export function Login(props: LoginProps) {
             parsedUserToken: keycloak.tokenParsed,
           }),
         );
-     
+
         dispatch(setAuthToken(keycloak.token));
         dispatch(setAuthIdToken(keycloak.idToken));
       } else {

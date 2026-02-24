@@ -171,7 +171,6 @@ export default function RC5Modals() {
       //console.log('setSuperDataCache', data);
       setSuperDataCache(data);
     }
-    console.log('cache meta?', modalObj.meta);
     handleCloseModal();
     if (modalObj.meta.notify) {
       sendMessage({
@@ -232,7 +231,6 @@ export default function RC5Modals() {
           {/* prompt apply changes before course settings or something that   */}
           <SaveCourseForm
             defaultData={{
-              
               ...defaultSaveData,
             }}
             modalId={saveCourseFileBeforeModalId}

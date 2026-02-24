@@ -23,6 +23,7 @@ const defaultSSOCreds: Credentials = {
   username: '',
   password: '',
 };
+
 export function ConfigureSSOCredentialsForm({
   defaultData = defaultSSOCreds,
 
