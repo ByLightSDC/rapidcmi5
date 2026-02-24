@@ -23,6 +23,40 @@ export type Cmi5Scenario = {
  * @property {string} [dirPath] Directory Path
  */
 
+// --- Lesson Theme Defaults ---
+
+export enum ContentWidthEnum {
+  None = 'none',
+  Small = 'small',
+  Medium = 'medium',
+  Large = 'large',
+}
+
+export enum BlockPaddingEnum {
+  None = 'none',
+  Small = 'small',
+  Medium = 'medium',
+  Large = 'large',
+  Custom = 'custom',
+}
+
+export enum DefaultAlignmentEnum {
+  Left = 'left',
+  Center = 'center',
+  Right = 'right',
+}
+
+export type LessonTheme = {
+  contentWidth?: ContentWidthEnum;
+  blockPadding?: BlockPaddingEnum;
+  blockPaddingCustomValue?: number;
+  defaultAlignment?: DefaultAlignmentEnum;
+};
+
+export const contentWidthOptions = Object.values(ContentWidthEnum);
+export const blockPaddingOptions = Object.values(BlockPaddingEnum);
+export const defaultAlignmentOptions = Object.values(DefaultAlignmentEnum);
+
 export type CourseAU = {
   auName: string;
   assetsPath?: string;
@@ -47,6 +81,7 @@ export type CourseAU = {
   dirPath: string;
   ksats?: KSATElement[];
   moveOnCriteria?: MoveOnCriteriaEnum;
+  lessonTheme?: LessonTheme;
 };
 
 export enum Operation {

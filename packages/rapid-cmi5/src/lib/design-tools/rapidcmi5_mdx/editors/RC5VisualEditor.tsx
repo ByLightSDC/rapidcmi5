@@ -67,6 +67,7 @@ import {
   GridCellDirectiveDescriptor,
   appHeaderVisible,
   ImageTextDirectiveDescriptor,
+  generateLessonThemeStyleTag,
   StepsDirectiveDescriptor,
   StepContentDirectiveDescriptor,
 } from '@rapid-cmi5/ui';
@@ -89,6 +90,9 @@ import {
   displayData,
   updateDirtyDisplay,
   updateTeamScenario,
+  courseDataCache,
+  currentAu,
+  currentBlock,
 } from '../../../redux/courseBuilderReducer';
 import { ActivityDirectiveDescriptor } from './directives/ActivityDirectiveDescriptor';
 
@@ -122,10 +126,20 @@ function RC5VisualEditor() {
   const currentRepoAccessObject = useSelector(currentRepoAccessObjectSel);
   const { handleBlobImageFile, isFsLoaded, currentCourse } =
     useContext(GitContext);
-
+  const courseData = useSelector(courseDataCache);
+  const currentAuIndex = useSelector(currentAu);
+  const currentBlockIndex = useSelector(currentBlock);
   const isEditing = true;
   const pixelTop = (isAppHeaderShowing ? 40 : 0) + (isEditing ? 87 : 0);
 
+  const currentLessonTheme = useMemo(() => {
+    return courseData?.blocks?.[currentBlockIndex]?.aus?.[currentAuIndex]
+      ?.lessonTheme;
+  }, [courseData, currentBlockIndex, currentAuIndex]);
+
+  const themeClass = useRef(
+    `lesson-theme-${Math.random().toString(36).slice(2, 9)}`,
+  ).current;
   //pixelTop = 0;
   //WARNING NOT SURE WHY THIS WORKS-------------------------------------------------------
 
@@ -692,8 +706,14 @@ function RC5VisualEditor() {
     <>
       {thePlugins && thePlugins.length > 0 && currentCourse ? (
         <Box
-          sx={{ height: `calc(100vh - ${pixelTop}px)`, position: 'relative' }}
+          className={themeClass}
+          sx={{ height: `calc(100vh - ${pixelTop}px)` }}
         >
+          {currentLessonTheme && (
+            <style>
+              {generateLessonThemeStyleTag(themeClass, currentLessonTheme)}
+            </style>
+          )}
           <MDXEditor
             className={mdxTheme}
             onChange={onChange}

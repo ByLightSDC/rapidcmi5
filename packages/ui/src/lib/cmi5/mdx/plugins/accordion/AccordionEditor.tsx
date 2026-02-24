@@ -281,17 +281,19 @@ export const AccordionEditor: React.FC<
           ...sxProps,
         }}
       >
-        <Stack direction="row" spacing={1}>
-          <NestedLexicalEditor<ContainerDirective>
-            block={true}
-            getContent={(node) => {
-              return node.children;
-            }}
-            getUpdatedMdastNode={(node, children: any) => ({
-              ...node,
-              children,
-            })}
-          />
+        <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <NestedLexicalEditor<ContainerDirective>
+              block={true}
+              getContent={(node) => {
+                return node.children;
+              }}
+              getUpdatedMdastNode={(node, children: any) => ({
+                ...node,
+                children,
+              })}
+            />
+          </Box>
           <div>
             {!isPlayback && (
               <Box
