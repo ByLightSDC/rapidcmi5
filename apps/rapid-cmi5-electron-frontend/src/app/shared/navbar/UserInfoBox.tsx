@@ -235,6 +235,11 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
               </ListItemIcon>
               <MenuItemText label="SSO Config" />
             </MenuItem>
+            {/* 
+              Used to quickly change the cmi5 player cfg.json file.
+              This is important for airgap installs so that we can more easily fix issues with URLs
+              where it may be difficult to get a new version of the application to.
+            */}
             <MenuItem onClick={handlePlayerConfig}>
               <ListItemIcon>
                 <ListIcon />

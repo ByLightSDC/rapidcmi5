@@ -58,14 +58,12 @@ export function JsonFileEditorModal({
 
   handleCloseModal: () => void;
 
-  // keep your existing modal action pattern if you want
   handleModalAction?: (
     modalId: string,
     buttonAction: number,
     data?: unknown,
   ) => void;
 
-  // called only when JSON is valid & user hits Save
   handleSaveJson: (rawText: string) => void;
 }) {
   const defaultData: JsonEditorFormData = {
@@ -82,7 +80,6 @@ export function JsonFileEditorModal({
     const parsed = JSON.parse(data.jsonText);
     handleSaveJson(data.jsonText);
 
-    // optional hook to reuse your existing modal action wiring
     handleModalAction?.(modalId, 1, parsed);
   };
 
@@ -132,7 +129,6 @@ export function JsonFileEditorModal({
               required
               multiline
               minRows={16}
-              // if your FormControlTextField supports sx / inputProps, keep it simple
               placeholder={'{\n  "example": true\n}\n'}
               error={Boolean(errors?.jsonText)}
               helperText={errors?.jsonText?.message}
@@ -142,7 +138,7 @@ export function JsonFileEditorModal({
         </>
       );
     },
-    [],
+    [filename],
   );
 
   return (
@@ -157,7 +153,7 @@ export function JsonFileEditorModal({
       <FormControlUIProvider>
         <MiniForm
           dataCache={defaultData}
-          doAction={handleSaveJson} // MiniForm expects a doAction; we handle in onResponse
+          doAction={handleSaveJson}
           formTitle={title}
           instructions="Edit the JSON file contents. Save will validate JSON and return the parsed object."
           submitButtonText="Save"

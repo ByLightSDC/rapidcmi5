@@ -52,8 +52,6 @@ export interface Scenario {
   metadata_tags?: string[];
 }
 
-
-
 interface ApiResponse {
   offset: number;
   limit: number;
@@ -72,7 +70,11 @@ const SEARCH_DEBOUNCE_MS = 400;
 /** Shared height so the button and the status box always match. */
 const ROW_HEIGHT = 42;
 
-export function ScenarioSelectionForm({ submitForm, token, url }: ScenarioFormProps) {
+export function ScenarioSelectionForm({
+  submitForm,
+  token,
+  url,
+}: ScenarioFormProps) {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
@@ -102,10 +104,10 @@ export function ScenarioSelectionForm({ submitForm, token, url }: ScenarioFormPr
   const colors = {
     background: theme.palette.background.default,
     surface: theme.palette.background.paper,
-    surfaceHover: alpha(theme.palette.action.hover, 0.5),
+    surfaceHover: alpha(theme.palette.action.hover, 0.01),
     surfaceSelected: alpha(theme.palette.primary.main, 0.08),
     border: theme.palette.divider,
-    borderHover: alpha(theme.palette.action.hover, 0.8),
+    borderHover: alpha(theme.palette.action.hover, 0.4),
     borderSelected: theme.palette.primary.main,
     textPrimary: theme.palette.text.primary,
     textSecondary: theme.palette.text.secondary,
@@ -253,9 +255,6 @@ export function ScenarioSelectionForm({ submitForm, token, url }: ScenarioFormPr
         >
           Select
         </ButtonMinorUi>
-
-      
-
       </Box>
 
       <Dialog
@@ -583,25 +582,9 @@ export function ScenarioSelectionForm({ submitForm, token, url }: ScenarioFormPr
                                 }}
                                 onClick={() => field.onChange(scenario.uuid)}
                               >
-                                {isSelected && (
-                                  <Box
-                                    sx={{
-                                      position: 'absolute',
-                                      left: 0,
-                                      top: 0,
-                                      bottom: 0,
-                                      width: 3,
-                                      bgcolor: theme.palette.primary.main,
-                                      borderRadius: '3px 0 0 3px',
-                                    }}
-                                  />
-                                )}
-
                                 <FormControlLabel
                                   value={scenario.uuid}
-                                  control={
-                                    <Radio sx={{ display: 'none' }} />
-                                  }
+                                  control={<Radio sx={{ display: 'none' }} />}
                                   sx={{ m: 0, width: '100%' }}
                                   label={
                                     <Box
