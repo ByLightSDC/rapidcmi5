@@ -49,6 +49,8 @@ import {
   AnimationConfig,
   themeColor,
   ImageTextDirectiveDescriptor,
+  StepsDirectiveDescriptor,
+  StepContentDirectiveDescriptor,
 } from '@rapid-cmi5/ui';
 
 import { RC5PlayerToolbar } from './RC5PlayerToolbar';
@@ -106,10 +108,12 @@ function RC5Player() {
           LayoutBoxDirectiveDescriptor,
           GridContainerDirectiveDescriptor,
           GridCellDirectiveDescriptor,
+          StepsDirectiveDescriptor,
+          StepContentDirectiveDescriptor,
           TabsDirectiveDescriptor,
           TabContentDirectiveDescriptor,
           ImageLabelDirectiveDescriptor,
-          ImageTextDirectiveDescriptor
+          ImageTextDirectiveDescriptor,
         ],
       }),
       codeMirrorPlugin({
@@ -287,7 +291,7 @@ function RC5Player() {
       `${themeSel}-theme ${themeSel}-editor nested-editable-${themeSel}`,
     );
   }, [themeSel]);
-  
+
   // Use the animation playback hook with parsed animations
   useAnimationPlayback(slideAnimations, activeTab, true);
 
