@@ -32,6 +32,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import {
   blockPaddingDescriptions,
   contentWidthDescriptions,
+  defaultAlignmentLabels,
 } from '../constants';
 
 export function LessonSettingsForm({
@@ -181,7 +182,7 @@ export function LessonSettingsForm({
             </ToggleButton>
           </ToggleButtonGroup>
           <Typography variant="body2" sx={{ mt: 0.5 }}>
-            Left align text, Center text, Right align text
+            {defaultAlignmentLabels.get(defaultAlignment) ?? 'Left'} align text
           </Typography>
         </Grid>
       </>

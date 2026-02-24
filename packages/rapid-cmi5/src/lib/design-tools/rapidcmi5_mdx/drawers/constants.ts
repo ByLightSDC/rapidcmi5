@@ -1,6 +1,7 @@
 import {
   BlockPaddingEnum,
   ContentWidthEnum,
+  DefaultAlignmentEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 
 export const contentWidthDescriptions = new Map<ContentWidthEnum, string>([
@@ -16,4 +17,10 @@ export const blockPaddingDescriptions = new Map<BlockPaddingEnum, string>([
   [BlockPaddingEnum.Medium, 'Standard spacing between blocks (32px)'],
   [BlockPaddingEnum.Large, 'Generous spacing between blocks (64px)'],
   [BlockPaddingEnum.Custom, 'Custom padding value'],
+]);
+
+export const defaultAlignmentLabels = new Map<DefaultAlignmentEnum, string>([
+  [DefaultAlignmentEnum.Left, 'Left'],
+  [DefaultAlignmentEnum.Center, 'Center'],
+  [DefaultAlignmentEnum.Right, 'Right'],
 ]);
