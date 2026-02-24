@@ -410,7 +410,7 @@ export const ImageDialog: React.FC = () => {
       {/* MBStyleDialog
         isOpen={isStyleDialogOpen}
         style={imageStyle}
-        setImageStyle={setImageStyle}
+        setImageStyle={}
         setIsStyleDialogOpen={setIsStyleDialogOpen}
       />*/}
     </>

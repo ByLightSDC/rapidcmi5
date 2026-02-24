@@ -34,6 +34,14 @@ interface StyleProps {
   setIsStyleDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+/*//LEt's try this new interface MB
+interface StyleProps {
+  isOpen: boolean;
+  style: string;
+  onApply: (style: string) => void;
+  onCancel: () => void;
+}
+*/
 export const BorderStyles: string[] = [
   'solid',
   'dotted',
@@ -259,11 +267,13 @@ export const StyleDialog: React.FC<StyleProps> = ({
     }
 
     setImageStyle(styleString);
-    setIsStyleDialogOpen(false);
+    setIsStyleDialogOpen(false); 
+  //  onApply(styleString.trim());
   };
 
   const handleStyleCancel = () => {
     setIsStyleDialogOpen(false);
+   // onCancel();
   };
 
   const handleAlignmentToggle = (

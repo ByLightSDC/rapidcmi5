@@ -73,7 +73,8 @@ export function EditImageToolbar({
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
   //For letting style dialogue work outside imagedialog.
-const [imageStyle, setImageStyle] = useState<string>('');
+//const [imageStyle, setImageStyle] = useState<string>('');
+const { imageStyle, setImageStyle } = useImageStyle(nodeKey);
 const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
 
 
@@ -106,6 +107,44 @@ const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  //debug
+    //debug
+function useImageStyle(nodeKey: string) {
+  const [editor] = useLexicalComposerContext();
+  const [imageStyle, setImageStyle] = useState<string>('');
+
+  useEffect(() => {
+    if (!imageStyle) return;
+
+    editor.update(() => {
+      const node = $getNodeByKey(nodeKey);
+      if (!node) return;
+
+      if (
+        'getRest' in node &&
+        'setRest' in node &&
+        typeof node.getRest === 'function' &&
+        typeof node.setRest === 'function'
+      ) {
+        const rest = node.getRest() ?? [];
+
+        const nextRest = [
+          ...rest.filter((attr: any) => attr.name !== 'style'),
+          {
+            type: 'mdxJsxAttribute',
+            name: 'style',
+            value: imageStyle,
+          },
+        ];
+
+        node.setRest(nextRest);
+      }
+    });
+  }, [imageStyle, editor, nodeKey]);
+
+  return { imageStyle, setImageStyle };
+}
+  
   /**
    * Listen for flag and update internal React state
    */
@@ -204,6 +243,7 @@ const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
       </IconButton>
     </Stack>
 
+    {/* Dialog lives OUTSIDE the button, but inside the component */}
     {/* Dialog lives OUTSIDE the button, but inside the component */}
     <StyleDialog
       isOpen={isStyleDialogOpen}
