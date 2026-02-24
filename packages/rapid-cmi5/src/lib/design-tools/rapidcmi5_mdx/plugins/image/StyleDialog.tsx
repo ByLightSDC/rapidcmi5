@@ -258,12 +258,10 @@ export const StyleDialog: React.FC<StyleProps> = ({
 
     setImageStyle(styleString);
     setIsStyleDialogOpen(false);
-    //  onApply(styleString.trim());
   };
 
   const handleStyleCancel = () => {
     setIsStyleDialogOpen(false);
-    // onCancel();
   };
 
   const handleAlignmentToggle = (

@@ -17,7 +17,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 
 import {
-  ButtonIcon,
   ButtonModalMainUi,
   ComboBoxSelectorUi,
   ModalDialog,
@@ -56,7 +55,6 @@ export const ImageDialog: React.FC = () => {
   const [title, setTitle] = useState<string>('');
   const [linkUrl, setLinkUrl] = useState<string>('');
   const [imageStyle, setImageStyle] = useState<string>('');
-  //const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [fileOptions, setFileOptions] = useState<string[]>([]);
   const [width, setWidth] = useState<string>('');
@@ -277,7 +275,6 @@ export const ImageDialog: React.FC = () => {
               id="image"
               options={fileOptions}
               defaultValue={src.replace(IMAGE_DIR, '')}
-              // value={src}
               showAllOptions={true}
               autocompleteProps={{
                 freeSolo: true,
