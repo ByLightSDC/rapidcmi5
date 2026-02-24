@@ -109,14 +109,13 @@ export function EditImageToolbar({
     useCellValues(readOnly$);
   const [editor] = useLexicalComposerContext();
   const openEditImageDialog = usePublisher(openEditImageDialog$);
-  //const openStyleDialog = usePublisher(imageStyleDialogOpen$); //MB
 
   const [isMarking, setIsMarking] = useState(false);
   const muiTheme = useTheme();
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  //For letting style dialogue work outside of image dialog.
+  // For letting style dialogue work outside of image dialog.
   const { imageStyle, setImageStyle } = useImageStyle(nodeKey);
   const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
 
