@@ -3,12 +3,10 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 // import { useAppBreadCrumbs } from '../hooks/useAppBreadCrumbs';
-
 import { appHeaderVisible, themeColor } from '@rapid-cmi5/ui';
-import { useLogOut } from '../hooks/useLogOut';
 
 /* Branded */
-import { AppLogo, AppHeaderDashboardMenu } from '@rapid-cmi5/ui';
+import { AppLogo } from '@rapid-cmi5/ui';
 
 /* MUI */
 import Box from '@mui/material/Box';
@@ -36,8 +34,7 @@ const appsKey = 0;
 const settingsKey = 1;
 const logoutKey = 2;
 
-export default function AppHeader({ authEnabled }: { authEnabled: boolean }) {
-  const logOut = useLogOut();
+export default function AppHeader() {
   const showAppHeader = useSelector(appHeaderVisible);
   const appThemeColor = useSelector(themeColor);
   const [settingsMenuAnchor, setSettingsMenuAnchor] =
@@ -55,8 +52,6 @@ export default function AppHeader({ authEnabled }: { authEnabled: boolean }) {
         );
         setSettingsMenuAnchor(menuButtonRef);
         break;
-      case logoutKey:
-        logOut();
         break;
       default:
         break;
@@ -142,7 +137,6 @@ export default function AppHeader({ authEnabled }: { authEnabled: boolean }) {
             <UserInfoBox
               anchorEl={settingsMenuAnchor}
               onClose={() => setSettingsMenuAnchor(null)}
-              authEnabled={authEnabled}
             />
           </Box>
         </Box>

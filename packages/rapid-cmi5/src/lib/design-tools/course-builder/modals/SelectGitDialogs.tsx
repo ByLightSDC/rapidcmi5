@@ -50,7 +50,6 @@ import { TextField, Alert } from '@mui/material';
 import { RC5Context } from '../../rapidcmi5_mdx/contexts/RC5Context';
 import CreateLocalRepoForm from './CreateLocalRepoForm';
 import { detectIsElectron } from '../GitViewer/utils/gitFsInstance';
-import { GitCredentials } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Select Repo, Course, AU

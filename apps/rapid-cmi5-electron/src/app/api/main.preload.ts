@@ -1,4 +1,8 @@
-import { GitCredentials, SSOConfig } from '@rapid-cmi5/cmi5-build-common';
+import {
+  Credentials,
+  GitUserConfig,
+  SSOConfig,
+} from '@rapid-cmi5/cmi5-build-common';
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electron', {
@@ -123,12 +127,24 @@ export const userSettingsApi = {
   setSSOConfig: (data: SSOConfig) =>
     ipcRenderer.invoke('userSettingsApi:setSSOConfig', data),
   getSSOConfig: () => ipcRenderer.invoke('userSettingsApi:getSSOConfig'),
+  setGitUserConfig: (data: GitUserConfig) =>
+    ipcRenderer.invoke('userSettingsApi:setGitUserConfig', data),
+  getGitUserConfig: () =>
+    ipcRenderer.invoke('userSettingsApi:getGitUserConfig'),
   loginSSO: (refresh?: boolean) =>
     ipcRenderer.invoke('userSettingsApi:loginSSO', refresh),
+  logoutSSO: () => ipcRenderer.invoke('userSettingsApi:logoutSSO'),
   getGitCredentials: () =>
     ipcRenderer.invoke('userSettingsApi:getGitCredentials'),
-  setGitCredentials: (creds: GitCredentials) =>
+  setGitCredentials: (creds: Credentials) =>
     ipcRenderer.invoke('userSettingsApi:setGitCredentials', creds),
+  setSSOCredentials: (creds: Credentials) =>
+    ipcRenderer.invoke('userSettingsApi:setSSOCredentials', creds),
+  listCerts: () => ipcRenderer.invoke('userSettingsApi:listCerts'),
+  addCert: (filename: string, contents: string) =>
+    ipcRenderer.invoke('userSettingsApi:addCert', filename, contents),
+  removeCert: (id: string) =>
+    ipcRenderer.invoke('userSettingsApi:removeCert', id),
 };
 
 contextBridge.exposeInMainWorld('userSettingsApi', userSettingsApi);

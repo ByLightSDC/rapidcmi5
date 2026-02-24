@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import { BrowserRouter as RouterWrapper } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -7,6 +7,7 @@ import {
   setDividerColor,
   setIconColor,
   themeColor,
+  useToaster,
 } from '@rapid-cmi5/ui';
 
 /* Shared */
@@ -29,58 +30,42 @@ import { ThemeProvider } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
+import { GetScenarioFormProps, RapidCmi5 } from '@rapid-cmi5/react-editor';
+import { MyScenariosForm } from './shared/modals/ScenarioSelection';
 import {
-  AppDispatch,
-  GetScenarioFormProps,
-  RapidCmi5,
-} from '@rapid-cmi5/react-editor';
-import { MyScenariosForm } from './ScenarioSelection';
-import {
-  auth,
+  authError,
+  authRefreshError,
   authToken,
-  devopsApiUrl,
-  gitCredentials,
   isAuthenticated,
-  setAuthToken,
-  setIsAuthenticated,
-  setIsSSOEnabled,
 } from '@rapid-cmi5/keycloak';
 import { darkTheme } from './styles/muiThemeDark';
 import { lightTheme } from './styles/muiTheme';
 import { CourseAU, generateAuId } from '@rapid-cmi5/cmi5-build-common';
+import UserConfig, { UserConfigContext } from './contexts/UserConfigContext';
+import Auth, { AuthContext } from './contexts/AuthContext';
 
-function RapidCmi5WithAuth({
-  isAuthenticated,
-  token,
-}: {
-  isAuthenticated: boolean;
-  token: string | undefined;
-}) {
-  const currentAuth = useSelector(auth);
-  const selDevopsApiUrl = useSelector(devopsApiUrl);
-  const selGitCredentials = useSelector(gitCredentials);
+function RapidCmi5Wrapper() {
+  const { token } = useContext(AuthContext);
+  const { gitUser, gitCredentials, ssoConfig } = useContext(UserConfigContext);
 
-  overrideDevOpsApiClient(selDevopsApiUrl);
-  const dispatch: AppDispatch = useDispatch();
+  console.log('git', gitUser, gitCredentials);
+  overrideDevOpsApiClient(ssoConfig?.rangeRestApiUrl);
+  const authRefreshErrorSel = useSelector(authRefreshError);
+  const authErrorSel = useSelector(authError);
+  const toaster = useToaster();
 
-  async function loginSSO() {
-    const tokenResponse = await window.userSettingsApi.loginSSO();
-    dispatch(setAuthToken(tokenResponse.access_token));
-    dispatch(setIsAuthenticated(true));
-    dispatch(setIsSSOEnabled(true));
-  }
+  const hasError = !!(authErrorSel.error || authRefreshErrorSel.error);
+  const errorMessage = authErrorSel.error || authRefreshErrorSel.error;
 
   useEffect(() => {
-    if (!token) return;
+    console.log('Has error toaster', errorMessage);
 
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const expiresInMs = payload.exp * 1000 - Date.now();
-    console.log('expires in ', expiresInMs)
-    // refresh 60 seconds before expiry
-    const timeout = setTimeout(loginSSO, expiresInMs - 60000);
-
-    return () => clearTimeout(timeout);
-  }, [token]);
+    toaster({
+      message: `SSO Configuration Error: ${errorMessage}`,
+      severity: 'error',
+      autoHideDuration: 15
+    });
+  }, [hasError, errorMessage]);
 
   const getAuScenarioUUID = async (au: CourseAU) => {
     let scenarioUUID = null;
@@ -121,22 +106,18 @@ function RapidCmi5WithAuth({
   };
 
   return (
+    <>
+ <h2>my token : {token}</h2>
+ <h2>errors : {errorMessage}</h2>
+
     <RapidCmi5
       showHomeButton={true}
-      userAuth={
-        token
-          ? {
-              token,
-              userEmail:
-                selGitCredentials?.authorEmail ||
-                currentAuth?.parsedUserToken?.email?.toLowerCase(),
-              userName:
-                selGitCredentials?.authorName ||
-                currentAuth?.parsedUserToken?.name,
-              gitCredentials: selGitCredentials,
-            }
-          : undefined
-      }
+      userAuth={{
+        token,
+        userEmail: gitUser?.authorEmail || '',
+        userName: gitUser?.authorName || '',
+        gitCredentials,
+      }}
       downloadCmi5Player={async () => {
         const response = await fetch('/assets/cc-cmi5-player.zip');
         return response;
@@ -212,21 +193,19 @@ function RapidCmi5WithAuth({
                 formType={props.formType}
                 errors={props.errors}
                 formMethods={props.formMethods}
-                url={selDevopsApiUrl}
+                url={ssoConfig?.rangeRestApiUrl}
               />
             )
           : undefined
       }
     />
+        </>
   );
 }
 
-export default function App({ authEnabled }: { authEnabled: boolean }) {
+export default function App() {
   const dispatch = useDispatch();
   const theme = useSelector(themeColor);
-
-  const isAuthenticatedSel = useSelector(isAuthenticated);
-  const token = useSelector(authToken);
 
   useEffect(() => {
     const iconColor =
@@ -240,7 +219,7 @@ export default function App({ authEnabled }: { authEnabled: boolean }) {
 
     dispatch(setIconColor(iconColor));
     dispatch(setDividerColor(dividerColor || 'grey'));
-  }, [theme]);
+  }, [dispatch, theme]);
 
   return (
     <ThemeProvider theme={theme === 'dark' ? darkTheme : lightTheme}>
@@ -266,7 +245,7 @@ export default function App({ authEnabled }: { authEnabled: boolean }) {
               >
                 <SizingContextProvider>
                   <TimePickerProvider>
-                    <AppHeader authEnabled={authEnabled} />
+                    <AppHeader />
 
                     <main
                       id="app-routes"
@@ -277,22 +256,7 @@ export default function App({ authEnabled }: { authEnabled: boolean }) {
                         overflow: 'hidden',
                       }}
                     >
-                      {/* {authEnabled ? ( */}
-                      <RapidCmi5WithAuth
-                        isAuthenticated={isAuthenticatedSel}
-                        token={token}
-                      />
-                      {/* ) : (
-                        <RapidCmi5
-                          showHomeButton={true}
-                          downloadCmi5Player={async () => {
-                            const response = await fetch(
-                              '/assets/cc-cmi5-player.zip',
-                            );
-                            return response;
-                          }}
-                        />
-                      )} */}
+                      <RapidCmi5Wrapper />
                     </main>
                   </TimePickerProvider>
                 </SizingContextProvider>

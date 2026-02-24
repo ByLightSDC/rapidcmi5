@@ -1,8 +1,10 @@
 import {
   FolderStruct,
-  GitCredentials,
+  Credentials,
+  GitUserConfig,
   SSOConfig,
   TokenResponse,
+  CertInfo,
 } from '@rapid-cmi5/cmi5-build-common';
 import { ModifiedFile } from './design-tools/course-builder/GitViewer/Components/GitActions/GitFileStatus';
 import { DirEntry } from './design-tools/course-builder/GitViewer/utils/ElectronFsApi';
@@ -17,12 +19,20 @@ export interface ipc {
   ) => Promise<string>;
 }
 
-export interface userSettingsApi {
+export interface UserSettingsApi {
   setSSOConfig: (data: SSOConfig) => Promise<void>;
   getSSOConfig: () => Promise<SSOConfig>;
+  setSSOCredentials: (creds: Credentials) => void;
   loginSSO: (refresh?: boolean) => Promise<TokenResponse>;
-  getGitCredentials: () => Promise<GitCredentials>;
-  setGitCredentials: (creds: GitCredentials) => void;
+  logoutSSO: () => Promise<void>;
+  getGitCredentials: () => Promise<Credentials>;
+  setGitCredentials: (creds: Credentials) => void;
+  getGitUserConfig: () => Promise<GitUserConfig>;
+  setGitUserConfig: (config: GitUserConfig) => void;
+  clearGitCredentials: () => void;
+  listCerts: () => Promise<CertInfo[]>;
+  addCert: (filename: string, contents: string) => Promise<CertInfo>;
+  removeCert: (id: string) => Promise<void>;
 }
 
 export interface fsApi {
@@ -138,6 +148,6 @@ declare global {
   interface Window {
     ipc: ipc;
     fsApi: fsApi;
-    userSettingsApi: userSettingsApi;
+    userSettingsApi: UserSettingsApi;
   }
 }

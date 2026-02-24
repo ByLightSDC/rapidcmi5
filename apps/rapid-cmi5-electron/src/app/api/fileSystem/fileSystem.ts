@@ -13,7 +13,6 @@ const AuthenticationErrorMessage =
   'The credentials provided are invalid; authentication has failed.';
 const AuthorizationErrorMessage =
   'The credentials provided do not have proper access; authorization has failed. Please give the personal access token proper repository access.';
-
 const fsp = fs.promises;
 
 function toPosix(p: string) {
@@ -180,7 +179,7 @@ export class ElectronFsHandler {
     return true;
   }
 
-  async mkdir(p: string, recursive: boolean = false) {
+  async mkdir(p: string, recursive = false) {
     const full = await this.getFullPath(p);
     await fsp.mkdir(full, { recursive });
     return true;

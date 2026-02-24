@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
 import { useDispatch, useSelector } from 'react-redux';
-import { config, ModalDialog } from '@rapid-cmi5/ui';
+import { ModalDialog } from '@rapid-cmi5/ui';
 
 import Box from '@mui/material/Box';
 import {
@@ -17,6 +17,8 @@ import {
 
 export interface LoginProps {
   scope: string;
+  clientId: string;
+
   children: ReactNode;
 }
 
@@ -34,9 +36,9 @@ export function Login(props: LoginProps) {
         let roles: string[] = [];
         if (
           keycloak.resourceAccess &&
-          keycloak.resourceAccess.hasOwnProperty(config.KEYCLOAK_CLIENT_ID)
+          keycloak.resourceAccess.hasOwnProperty(props.clientId)
         ) {
-          roles = keycloak.resourceAccess[config.KEYCLOAK_CLIENT_ID].roles;
+          roles = keycloak.resourceAccess[props.clientId].roles;
         }
 
         dispatch(

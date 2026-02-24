@@ -11,7 +11,7 @@ import {
 } from './reducer';
 
 import { Login } from './login';
-import { ReactNode } from 'react';
+import { ReactNode, useMemo } from 'react';
 
 /* eslint-disable-next-line */
 export interface KeycloakUiProps {
@@ -28,10 +28,8 @@ export function KeycloakUi(props: KeycloakUiProps) {
   const { children = <></> } = props;
 
   const onKeycloakEvent = (event: unknown, error: unknown) => {
-
-
     if (error) {
-      console.error("keycloak error", error);
+      console.error('keycloak error', error);
       const errorDetailDecoded = decodeURIComponent(
         (error as AuthClientError).error_description?.replace(/\+/g, '%20'),
       );
@@ -43,7 +41,7 @@ export function KeycloakUi(props: KeycloakUiProps) {
         }),
       );
     } else {
-      console.error("keycloak event", event);
+      console.error('keycloak event', event);
 
       switch (event) {
         case 'onAuthSuccess':
@@ -68,7 +66,6 @@ export function KeycloakUi(props: KeycloakUiProps) {
 
   // this handles both the initial token and the automatic refreshes
   const onKeycloakTokensUpdate = (tokens: any) => {
-  
     if (typeof tokens?.idToken === 'undefined') {
       dispatch(
         setAuthRefreshError({
@@ -78,7 +75,7 @@ export function KeycloakUi(props: KeycloakUiProps) {
     } else {
       if (tokens) {
         //REF axios.defaults.headers.common['Authorization'] = `Bearer ${tokens.token}`;
-      
+
         dispatch(setAuthToken(tokens.token));
         dispatch(setAuthIdToken(tokens.idToken));
       }
@@ -91,10 +88,20 @@ export function KeycloakUi(props: KeycloakUiProps) {
     realm: props.realm,
     clientId: props.clientId,
   };
+  // Because of UserConfig context, this will get rerendered
+  // const keycloak = useMemo(
+  //   () =>
+  //     new Keycloak({
+  //       url: props.url,
+  //       realm: props.realm,
+  //       clientId: props.clientId,
+  //     }),
+  //   [props.url, props.realm, props.clientId],
+
+  // );
   const keycloak = new Keycloak(config);
 
   (window as any).keycloak = keycloak;
-
 
   return (
     <ReactKeycloakProvider
@@ -104,7 +111,9 @@ export function KeycloakUi(props: KeycloakUiProps) {
       //required to avoid issue where firefox loops
       initOptions={{ checkLoginIframe: false }}
     >
-      <Login scope={props.scope}>{children}</Login>
+      <Login scope={props.scope} clientId={props.clientId}>
+        {children}
+      </Login>
     </ReactKeycloakProvider>
   );
 }

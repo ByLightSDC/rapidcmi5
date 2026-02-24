@@ -9,7 +9,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 
 import { UseFormReturn } from 'react-hook-form';
 import { FormCrudType } from '@rapid-cmi5/ui';
-import { CourseAU, GitCredentials } from '@rapid-cmi5/cmi5-build-common';
+import { CourseAU, Credentials } from '@rapid-cmi5/cmi5-build-common';
 
 export interface buildCmi5ZipParams {
   zipBlob: File;
@@ -50,10 +50,10 @@ export interface RapidCmi5Opts {
 }
 
 export type UserAuth = {
-  token: string;
+  token?: string;
   userName: string;
   userEmail: string;
-  gitCredentials?: GitCredentials
+  gitCredentials?: Credentials
 };
 
 export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {

@@ -12,14 +12,20 @@ import {
 import { app } from 'electron';
 import { cmi5Builder } from './app/api/cmi5Builder/build';
 import fs from 'fs';
-import { GitCredentials, SSOConfig } from '@rapid-cmi5/cmi5-build-common';
 import {
-  decryptGitCredentials,
-  encryptGitCredentials,
+  Credentials,
+  GitUserConfig,
+  SSOConfig,
+} from '@rapid-cmi5/cmi5-build-common';
+import {
+  decryptCredentials,
+  encryptCredentials,
   loginSSO,
   loginWithRefreshOrPassword,
+  logoutSSO,
   store,
 } from './app/api/userSettings/sso';
+import { applyCustomCerts, listCerts, addCert, removeCert } from './app/api/userSettings/certManager';
 
 const builder = new cmi5Builder();
 let fsHandler: ElectronFsHandler | null = null;
@@ -471,22 +477,92 @@ ipcMain.handle('userSettingsApi:loginSSO', async (_e, refresh = true) => {
   }
 });
 
+ipcMain.handle('userSettingsApi:logoutSSO', async () => {
+  // @ts-ignore
+  const refreshToken = store.get('refreshToken') ?? null;
+
+  if (refreshToken) {
+    try {
+      await logoutSSO(refreshToken);
+    } catch (err) {
+      console.error('SSO logout failed:', err);
+    }
+  }
+
+  // Clean up stored tokens regardless of whether the server logout succeeded
+  // @ts-ignore
+  store.delete('refreshToken');
+  // @ts-ignore
+  store.delete('ssoCredsEnc');
+});
+
 ipcMain.handle(
   'userSettingsApi:setGitCredentials',
-  async (_e, creds: GitCredentials) => {
-    const enc = encryptGitCredentials(creds);
+  async (_e, creds: Credentials) => {
+    const enc = encryptCredentials(creds);
     // @ts-ignore
-
     store.set('gitCredsEnc', enc);
   },
 );
 
-ipcMain.handle('userSettingsApi:getGitCredentials', (_e, config: SSOConfig) => {
+ipcMain.handle('userSettingsApi:getGitCredentials', (_e) => {
   // @ts-ignore
   const enc = store.get('gitCredsEnc');
   if (!enc) return null;
-  return decryptGitCredentials(enc) ?? null;
+  return decryptCredentials(enc) ?? null;
 });
+
+ipcMain.handle(
+  'userSettingsApi:setSSOCredentials',
+  async (_e, creds: Credentials) => {
+    const enc = encryptCredentials(creds);
+    // @ts-ignore
+    store.set('ssoCredsEnc', enc);
+  },
+);
+
+ipcMain.handle(
+  'userSettingsApi:setGitUserConfig',
+  (_e, config: GitUserConfig) => {
+    // @ts-ignore
+    store.set('gitUserConfig', config);
+    return true;
+  },
+);
+
+ipcMain.handle('userSettingsApi:getGitUserConfig', () => {
+  // @ts-ignore
+  return store.get('gitUserConfig') ?? null;
+});
+
+ipcMain.handle('userSettingsApi:clearGitCredentials', () => {
+  // @ts-ignore
+  store.delete('gitCredsEnc');
+  return true;
+});
+
+// Cert Manager
+applyCustomCerts();
+
+ipcMain.handle('userSettingsApi:listCerts', () => {
+  return listCerts();
+});
+
+ipcMain.handle(
+  'userSettingsApi:addCert',
+  (_e, filename: string, contents: string) => {
+    const cert = addCert(filename, contents);
+    // Re-apply so the new cert is trusted immediately
+    applyCustomCerts();
+    return cert;
+  },
+);
+
+ipcMain.handle('userSettingsApi:removeCert', (_e, id: string) => {
+  removeCert(id);
+  applyCustomCerts();
+});
+
 
 // CMI5 Build Handler
 ipcMain.handle(

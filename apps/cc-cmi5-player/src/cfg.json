@@ -389,6 +389,17 @@
         "SLIDE_BACKGROUND": "",
         "SLIDE_LOGO": "./assets/bylight/RangeOS_Logo_White.png"
       }
+    },
+    {
+      "name": "ccri",
+      "url": "https://cpt-player.cp.ccri.rangeos",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.cp.ccri.rangeos",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.cp.ccri.rangeos/",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.cp.ccri.rangeos",
+        "SLIDE_BACKGROUND": "",
+        "SLIDE_LOGO": "./assets/bylight/RangeOS_Logo_White.png"
+      }
     }
   ]
 }

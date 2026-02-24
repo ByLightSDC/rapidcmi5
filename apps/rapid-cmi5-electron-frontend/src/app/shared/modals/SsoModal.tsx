@@ -1,8 +1,8 @@
 /* eslint-disable react/jsx-no-useless-fragment */
-import { Grid, Stack } from '@mui/system';
+import { Grid } from '@mui/system';
 import {
   CommonAppModalState,
-  FormControlPassword,
+  FormControlCheckboxField,
   FormControlTextField,
   FormControlUIProvider,
   FormStateType,
@@ -12,22 +12,9 @@ import {
 import { useCallback, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import * as yup from 'yup';
-import { configureSSOPromptModalId } from './UserInfoBox';
+import { configureSSOPromptModalId } from '../navbar/UserInfoBox';
 import { SSOConfig } from '@rapid-cmi5/cmi5-build-common';
-import {
-  Alert,
-  Button,
-  CircularProgress,
-  Collapse,
-  Divider,
-  Typography,
-} from '@mui/material';
-import {
-  setAuthToken,
-  setIsAuthenticated,
-  setIsSSOEnabled,
-} from '@rapid-cmi5/keycloak';
-import { useDispatch } from 'react-redux';
+import { Alert, Collapse } from '@mui/material';
 
 const validationSchema = yup.object().shape({
   keycloakUrl: yup
@@ -37,7 +24,7 @@ const validationSchema = yup.object().shape({
   keycloakRealm: yup.string().required('Realm is required'),
   keycloakClientId: yup.string().required('Client ID is required'),
   keycloakScope: yup.string().required('Scope is required'),
-  devopsApiUrl: yup
+  rangeRestApiUrl: yup
     .string()
     .url('Must be a valid URL')
     .required('DevOps API URL is required'),
@@ -48,9 +35,8 @@ const defaultSSOConfig: SSOConfig = {
   keycloakRealm: '',
   keycloakClientId: '',
   keycloakScope: 'profile',
-  devopsApiUrl: '',
-  username: '',
-  password: '',
+  rangeRestApiUrl: '',
+  ssoEnabled: false,
 };
 
 interface FormStatus {
@@ -73,11 +59,9 @@ export function ConfigureSSOForm({
     buttonAction: number,
     data?: SSOConfig,
   ) => void;
-  handleSaveSSO: (data: SSOConfig) => Promise<void>;
+  handleSaveSSO: (data: SSOConfig) => void;
 }) {
   const [status, setStatus] = useState<FormStatus | null>(null);
-  const [isTesting, setIsTesting] = useState(false);
-
   const onCancel = () => {
     setStatus(null);
     handleCloseModal();
@@ -94,65 +78,10 @@ export function ConfigureSSOForm({
     }
   };
 
-  const dispatch = useDispatch();
-
   const getFormFields = useCallback(
     (formMethods: UseFormReturn, formState: FormStateType): JSX.Element => {
-      const { control, getValues, trigger } = formMethods;
+      const { control } = formMethods;
       const { errors } = formState;
-
-      const testLogin = async () => {
-        setStatus(null);
-        setIsTesting(true);
-
-        const ok = await trigger();
-        if (!ok) {
-          setIsTesting(false);
-          setStatus({
-            type: 'error',
-            message: 'Please fix the validation errors above before testing.',
-          });
-          return;
-        }
-
-        const values = getValues();
-        await handleSaveSSO(values as any);
-
-        try {
-          const tokenResponse = await window.userSettingsApi.loginSSO(false);
-          dispatch(setAuthToken(tokenResponse.access_token));
-          dispatch(setIsAuthenticated(true));
-          dispatch(setIsSSOEnabled(true));
-          setStatus({
-            type: 'success',
-            message: 'Login successful — SSO connection verified.',
-          });
-        } catch (e: any) {
-          console.error('SSO login test failed', e);
-          dispatch(setIsAuthenticated(false));
-
-          let message = 'An unknown error occurred.';
-          if (e?.response?.status === 401 || e?.error === 'invalid_grant') {
-            message = 'Authentication failed — invalid username or password.';
-          } else if (e?.response?.status === 403) {
-            message =
-              'Authorization failed — this account does not have the required permissions.';
-          } else if (
-            e?.code === 'ECONNREFUSED' ||
-            e?.code === 'ENOTFOUND' ||
-            e?.message?.includes('fetch')
-          ) {
-            message =
-              'Could not reach the Keycloak server. Please verify the URL and your network connection.';
-          } else if (e?.message) {
-            message = e.message;
-          }
-
-          setStatus({ type: 'error', message });
-        } finally {
-          setIsTesting(false);
-        }
-      };
 
       return (
         <>
@@ -170,6 +99,13 @@ export function ConfigureSSOForm({
             </Grid>
           )}
 
+          <Grid size={6}>
+            <FormControlCheckboxField
+              control={control}
+              name="ssoEnabled"
+              label="Enable SSO?"
+            />
+          </Grid>
           <Grid size={12}>
             <FormControlTextField
               control={control}
@@ -185,11 +121,11 @@ export function ConfigureSSOForm({
           <Grid size={{ xs: 12 }}>
             <FormControlTextField
               control={control}
-              error={Boolean(errors?.devopsApiUrl)}
-              helperText={errors?.devopsApiUrl?.message}
-              name="devopsApiUrl"
+              error={Boolean(errors?.rangeRestApiUrl)}
+              helperText={errors?.rangeRestApiUrl?.message}
+              name="rangeRestApiUrl"
               required
-              label="DevOps API URL"
+              label="Range REST API URL"
               placeholder="https://rangeos-api.example.com"
               readOnly={false}
             />
@@ -233,57 +169,10 @@ export function ConfigureSSOForm({
               readOnly={false}
             />
           </Grid>
-          <Grid size={12}>
-            <Divider sx={{ my: 1 }}>
-              <Typography variant="caption" color="text.secondary">
-                Credentials
-              </Typography>
-            </Divider>
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <FormControlTextField
-              control={control}
-              error={Boolean(errors?.username)}
-              helperText={errors?.username?.message}
-              name="username"
-              required
-              label="Username"
-              placeholder="john.doe"
-              readOnly={false}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <FormControlPassword
-              control={control}
-              error={Boolean(errors?.password)}
-              helperText={errors?.password?.message}
-              name="password"
-              required
-              label="Password"
-              placeholder="••••••••"
-              readOnly={false}
-            />
-          </Grid>
-          <Grid size={12}>
-            <Stack direction="row" spacing={1} justifyContent="flex-end">
-              <Button
-                variant="outlined"
-                onClick={testLogin}
-                disabled={isTesting}
-                startIcon={
-                  isTesting ? <CircularProgress size={16} /> : undefined
-                }
-              >
-                {isTesting ? 'Attempting Login' : 'Login'}
-              </Button>
-            </Stack>
-          </Grid>
         </>
       );
     },
-    [status, isTesting, dispatch, handleSaveSSO],
+    [status],
   );
 
   return (

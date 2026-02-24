@@ -100,7 +100,7 @@ If you want to contribute code or test local changes, you can build the Electron
 3. Build the Electron Application
 
 Run the following commands in order:
-
+- `npx nx reset`
 - `npx nx run rapid-cmi5-electron-frontend:build`
 - `npx nx run cc-cmi5-player:build`
 - `cp -r dist/apps/cc-cmi5-player apps/rapid-cmi5-electron/src/assets/cc-cmi5-player-dist`
