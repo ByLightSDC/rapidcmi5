@@ -23,7 +23,6 @@ import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
 import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
 import BlockIcon from '@mui/icons-material/Block';
-import ImageIcon from '@mui/icons-material/Image';
 import { ModalDialog, SelectorMainUi } from '@rapid-cmi5/ui';
 
 
@@ -34,14 +33,6 @@ interface StyleProps {
   setIsStyleDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-/*//LEt's try this new interface MB
-interface StyleProps {
-  isOpen: boolean;
-  style: string;
-  onApply: (style: string) => void;
-  onCancel: () => void;
-}
-*/
 export const BorderStyles: string[] = [
   'solid',
   'dotted',

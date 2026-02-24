@@ -363,23 +363,6 @@ export const ImageDialog: React.FC = () => {
             {/* Style section */}
             <Grid container alignItems="center" sx={{ width: '100%' }}>
               <Grid size={0.8}>
-                <ButtonIcon
-                  name="edit-style"
-                  props={{
-                    onClick: (event) => {
-                     // setIsStyleDialogOpen(true);
-                    },
-                  }}
-                >
-                  <Tooltip
-                    arrow
-                    enterDelay={500}
-                    enterNextDelay={500}
-                    title="Edit Image Styles"
-                  >
-                    <EditIcon />
-                  </Tooltip>
-                </ButtonIcon>
               </Grid>
               <Grid size={11.2}>
                 <TextFieldMainUi
@@ -391,9 +374,6 @@ export const ImageDialog: React.FC = () => {
                   fullWidth
                   value={imageStyle}
                   onChange={(textValue: string) => setImageStyle(textValue)}
-                  onClick={() => {
-                    //setIsStyleDialogOpen(true);
-                  }}
                   infoText="Inline styles Ex. opacity:0.5;"
                   slotProps={{
                     input: {
@@ -404,15 +384,8 @@ export const ImageDialog: React.FC = () => {
               </Grid>
             </Grid>
           </Stack>
-          {/*</DialogContent>*/}
         </>
       </ModalDialog>
-      {/* MBStyleDialog
-        isOpen={isStyleDialogOpen}
-        style={imageStyle}
-        setImageStyle={}
-        setIsStyleDialogOpen={setIsStyleDialogOpen}
-      />*/}
     </>
   );
 };

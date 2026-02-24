@@ -12,8 +12,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 /** Icons */
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RoomIcon from '@mui/icons-material/Room';
-import PaletteIcon from '@mui/icons-material/Palette'; //MB
-
+import PaletteIcon from '@mui/icons-material/Palette';
 
 import { openEditImageDialog$ } from './index';
 import {useEffect, useState } from 'react';
@@ -22,11 +21,56 @@ import { useTheme } from '@mui/system';
 
 import { useSignalEffect } from '@preact/signals-react';
 import { clickPosition$, isLabelDropping$ } from '@rapid-cmi5/ui';
-
-
-//MB
-//import { imageStyleDialogOpen$ } from './index';
 import { StyleDialog } from './StyleDialog';
+
+
+/**
+ *  This will allow Style Dialog to be called from the palette button. Effectively separated from ImageDialog. 
+ * In the future we could move this to a 'hooks' file.
+ * @param nodeKey - The image node to be edited.
+ * @returns An object containing the current style string and a setter function.
+ */
+function useImageStyle(nodeKey: string) {
+
+  const [editor] = useLexicalComposerContext();
+  const [imageStyle, setImageStyle] = useState<string>('');
+
+  useEffect(() => {
+    if (!imageStyle) return;
+
+    // Otherwise, update.
+    editor.update(() => {
+      const node = $getNodeByKey(nodeKey);
+      if (!node) return;
+
+      // Attributes such as style and width exist in'rest'.
+      if (
+        'getRest' in node &&
+        'setRest' in node &&
+        typeof node.getRest === 'function' &&
+        typeof node.setRest === 'function'
+      ) {
+        //Get the current set attributes.
+        const rest = node.getRest() ?? [];
+        
+        // Update them with changes.
+        const nextRest = [
+          ...rest.filter((attr: any) => attr.name !== 'style'),
+          {
+            type: 'mdxJsxAttribute',
+            name: 'style',
+            value: imageStyle,
+          },
+        ];
+        // Set and render update.
+        node.setRest(nextRest);
+      }
+    });
+  }, [imageStyle, editor, nodeKey]);
+
+  return { imageStyle, setImageStyle }; 
+}
+
 
 export interface EditImageToolbarProps {
   nodeKey: string;
@@ -72,10 +116,9 @@ export function EditImageToolbar({
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  //For letting style dialogue work outside imagedialog.
-//const [imageStyle, setImageStyle] = useState<string>('');
-const { imageStyle, setImageStyle } = useImageStyle(nodeKey);
-const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
+  //For letting style dialogue work outside of image dialog.
+  const { imageStyle, setImageStyle } = useImageStyle(nodeKey);
+  const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
 
 
   /**
@@ -107,43 +150,7 @@ const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  //debug
-    //debug
-function useImageStyle(nodeKey: string) {
-  const [editor] = useLexicalComposerContext();
-  const [imageStyle, setImageStyle] = useState<string>('');
 
-  useEffect(() => {
-    if (!imageStyle) return;
-
-    editor.update(() => {
-      const node = $getNodeByKey(nodeKey);
-      if (!node) return;
-
-      if (
-        'getRest' in node &&
-        'setRest' in node &&
-        typeof node.getRest === 'function' &&
-        typeof node.setRest === 'function'
-      ) {
-        const rest = node.getRest() ?? [];
-
-        const nextRest = [
-          ...rest.filter((attr: any) => attr.name !== 'style'),
-          {
-            type: 'mdxJsxAttribute',
-            name: 'style',
-            value: imageStyle,
-          },
-        ];
-
-        node.setRest(nextRest);
-      }
-    });
-  }, [imageStyle, editor, nodeKey]);
-
-  return { imageStyle, setImageStyle };
-}
   
   /**
    * Listen for flag and update internal React state
@@ -158,7 +165,7 @@ function useImageStyle(nodeKey: string) {
   
   return (
     
-    // Wrap this in a fragment so styledialog can liv eOUTSIDE of imageDialogue without us having to rewire it compltely. 
+    // Wrap this in a fragment so StyleDialog can live OUTSIDE of imageDialogue without us having to rewire it completely. 
     <>
     <Stack
       direction="row"
@@ -199,10 +206,8 @@ function useImageStyle(nodeKey: string) {
         disabled={readOnly}
         onClick={() => {
           setIsStyleDialogOpen(true)
-          console.log('Button was clicked!')}}
+        }}
       >
-        {/* MB */}
-              
         <PaletteIcon /> 
       </IconButton>
  
@@ -243,8 +248,7 @@ function useImageStyle(nodeKey: string) {
       </IconButton>
     </Stack>
 
-    {/* Dialog lives OUTSIDE the button, but inside the component */}
-    {/* Dialog lives OUTSIDE the button, but inside the component */}
+    {/* Style Dialog lives OUTSIDE the button, but inside the toolbar component */}
     <StyleDialog
       isOpen={isStyleDialogOpen}
       style={imageStyle}
