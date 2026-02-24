@@ -1,14 +1,19 @@
-import { CourseAU, CourseData } from '@rapid-cmi5/cmi5-build-common';
+import {
+  CourseAU,
+  CourseData,
+  createAuMappingName,
+  generateAuId,
+  generateBlockId,
+} from '@rapid-cmi5/cmi5-build-common';
 import { AxiosRequestConfig, isAxiosError } from 'axios';
 
-import { createAuMappingName } from '../commands/generateAuMappings';
-import { generateAuId, generateBlockId } from '@rapid-cmi5/cmi5-build/backend';
 import {
+  overrideDevOpsApiClient,
+  DevopsApiClient,
   Cmi5AUMapping,
-  Cmi5AUMappingApiFactory,
   Cmi5AuMappingUpdate,
-  RangeContentScenariosApiFactory,
-} from '../../../../libs/frontend/clients/devops-api/src/lib';
+} from '@rangeos-nx/frontend/clients/devops-api';
+
 import path from 'path';
 
 type Scenario = { scenarioName?: string; scenarioUUID?: string };
@@ -38,13 +43,10 @@ export function constructOpendashAuID(
 }
 
 export class AuMappingService {
-  private cmi5Client;
-  private scenarioClient;
   private options;
 
   constructor({ baseUrl, jwt }: AuMappingServiceDeps) {
-    this.cmi5Client = Cmi5AUMappingApiFactory(undefined, baseUrl);
-    this.scenarioClient = RangeContentScenariosApiFactory(undefined, baseUrl);
+    overrideDevOpsApiClient(baseUrl);
 
     this.options = {
       headers: {
@@ -118,7 +120,7 @@ export class AuMappingService {
     }
     if (scenario.scenarioUUID) {
       try {
-        const res = await this.scenarioClient.scenariosRetrieve(
+        const res = await DevopsApiClient.scenariosRetrieve(
           scenario.scenarioUUID,
           this.options,
         );
@@ -137,7 +139,7 @@ export class AuMappingService {
 
     if (scenario.scenarioName) {
       try {
-        const res = await this.scenarioClient.scenariosList(
+        const res = await DevopsApiClient.scenariosList(
           undefined,
           scenario.scenarioName,
           undefined,
@@ -177,7 +179,7 @@ export class AuMappingService {
     let existingMapping: Cmi5AUMapping | undefined;
 
     try {
-      const res = await this.cmi5Client.cmi5AuMappingRetrieve(
+      const res = await DevopsApiClient.cmi5AuMappingRetrieve(
         auId,
         this.options,
       );
@@ -202,7 +204,7 @@ export class AuMappingService {
         };
         console.log('\tExisting mapping, updated');
 
-        await this.cmi5Client.cmi5AuMappingUpdate(
+        await DevopsApiClient.cmi5AuMappingUpdate(
           auId,
           cmi5update,
           this.options,
@@ -218,7 +220,7 @@ export class AuMappingService {
       // for (const mapping of oldMappings) {
       //   await this.cmi5Client.cmi5AuMappingDelete(mapping.auId);
       // }
-      const res = await this.cmi5Client.cmi5AuMappingCreate(
+      const res = await DevopsApiClient.cmi5AuMappingCreate(
         {
           auId,
           name: mappingName,

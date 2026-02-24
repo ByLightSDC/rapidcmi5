@@ -2,10 +2,14 @@ import {
   overrideDevOpsApiClient,
   DevopsApiClient,
 } from '@rangeos-nx/frontend/clients/devops-api';
-import { CourseAU, generateAuId } from '@rapid-cmi5/cmi5-build-common';
+import {
+  CourseAU,
+  createAuMappingNameWithAuId,
+  generateAuId,
+} from '@rapid-cmi5/cmi5-build-common';
 import { RapidCmi5, GetScenarioFormProps } from '@rapid-cmi5/react-editor';
 import { debugLogError } from '@rapid-cmi5/ui';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { ScenarioSelectionForm } from './shared/modals/ScenarioSelectionModal';
 import { UserConfigContext } from './contexts/UserConfigContext';
 import { AuthContext } from './contexts/AuthContext';
@@ -13,7 +17,10 @@ import { AuthContext } from './contexts/AuthContext';
 export function RapidCmi5Wrapper() {
   const { token, parsedUserToken } = useContext(AuthContext);
   const { gitUser, gitCredentials, ssoConfig } = useContext(UserConfigContext);
-  overrideDevOpsApiClient(ssoConfig?.rangeRestApiUrl);
+
+  useEffect(() => {
+    overrideDevOpsApiClient(ssoConfig?.rangeRestApiUrl);
+  }, [ssoConfig?.rangeRestApiUrl]);
 
   // Git global config overrides the keycloak name and email
   const userFullName =
@@ -120,7 +127,7 @@ export function RapidCmi5Wrapper() {
               {
                 auId,
                 scenarios: [scenarioUUID],
-                name: 'test',
+                name: createAuMappingNameWithAuId(auId),
               },
               {
                 headers: {

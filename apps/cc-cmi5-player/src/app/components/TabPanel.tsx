@@ -123,7 +123,10 @@ export default function TabPanel() {
         maxWidth: '260px',
         width: '100%',
         //left panel background
-          bgcolor: currentTheme.palette.mode === 'light' ? '#8a91ac' :'background.default',
+        bgcolor:
+          currentTheme.palette.mode === 'light'
+            ? '#8a91ac'
+            : 'background.default',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -145,7 +148,6 @@ export default function TabPanel() {
             style={{
               padding: '16px',
               paddingBottom: 0,
-           
             }}
             src={auLogo}
           />

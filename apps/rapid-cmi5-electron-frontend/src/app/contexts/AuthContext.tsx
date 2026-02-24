@@ -97,12 +97,14 @@ export default function Auth(props: AuthProps) {
   const [electronUsername, setElectronUsername] = useState<string>();
   const [electronRoles, setElectronRoles] = useState<string[]>([]);
   const [electronIsAuthenticated, setElectronIsAuthenticated] = useState(false);
+  const [electronParsedUserToken, setElectronParsedUserToken] = useState<any>();
 
   // Web auth state (from Redux/Keycloak)
   const webAppToken = useSelector(authToken);
   const webAppIdToken = useSelector(authIdToken);
   const webAppAuthError = useSelector(authError);
   const webAppAuth = useSelector(auth);
+
   const webAppIsAuthenticated = useSelector(isAuthenticated);
 
   // Unified values
@@ -115,6 +117,10 @@ export default function Auth(props: AuthProps) {
     ? electronIsAuthenticated
     : webAppIsAuthenticated;
 
+  const parsedUserToken = isElectron
+    ? electronParsedUserToken
+    : webAppAuth.parsedUserToken;
+
   const processTokenResponse = useCallback(
     (tokenResponse: { access_token: string; id_token?: string }) => {
       const accessToken = tokenResponse.access_token;
@@ -126,6 +132,8 @@ export default function Auth(props: AuthProps) {
       setElectronIsAuthenticated(true);
 
       const parsed = parseJwtPayload(accessToken);
+      setElectronParsedUserToken(parsed);
+
       if (parsed) {
         setElectronUsername(
           parsed['name'] || parsed['preferred_username'] || 'Unknown',
@@ -140,26 +148,9 @@ export default function Auth(props: AuthProps) {
         } else {
           setElectronRoles([]);
         }
-
-        // Also dispatch to Redux so other parts of the app can access auth state
-        dispatch(
-          setAuth({
-            username:
-              parsed['name'] || parsed['preferred_username'] || 'Unknown',
-            role: 'Infrastructure',
-            roles:
-              clientId && parsed['resource_access']?.[clientId]?.roles
-                ? parsed['resource_access'][clientId].roles
-                : parsed['realm_access']?.roles || [],
-            parsedUserToken: parsed,
-          }),
-        );
-        dispatch(setAuthToken(accessToken));
-        dispatch(setAuthIdToken(idToken));
-        dispatch(setIsAuthenticated(true));
       }
     },
-    [dispatch, ssoConfig?.keycloakClientId],
+    [ssoConfig?.keycloakClientId],
   );
 
   const clearElectronAuth = useCallback(() => {
@@ -169,12 +160,7 @@ export default function Auth(props: AuthProps) {
     setElectronUsername(undefined);
     setElectronRoles([]);
     setElectronIsAuthenticated(false);
-
-    dispatch(setAuth({ username: '', role: 'Infrastructure' }));
-    dispatch(setAuthToken(undefined));
-    dispatch(setAuthIdToken(undefined));
-    dispatch(setIsAuthenticated(false));
-  }, [dispatch]);
+  }, []);
 
   // Login for the web app is taken care of through another library
   const loginElectron = useCallback(async () => {
@@ -185,13 +171,12 @@ export default function Auth(props: AuthProps) {
       } catch (err: any) {
         setElectronError({ error: err?.message ?? String(err), id: '0' });
         setElectronIsAuthenticated(false);
-        dispatch(setIsAuthenticated(false));
         throw Error(`SSO Login Failed ${err}`);
       }
     } else {
       throw Error('loginElectron called in non-Electron environment');
     }
-  }, [isElectron, processTokenResponse, dispatch]);
+  }, [isElectron, processTokenResponse]);
 
   const logout = useCallback(() => {
     if (isElectron) {
@@ -212,11 +197,10 @@ export default function Auth(props: AuthProps) {
       } catch (err: any) {
         setElectronError({ error: err?.message ?? String(err), id: '0' });
         setElectronIsAuthenticated(false);
-        dispatch(setIsAuthenticated(false));
         throw err;
       }
     },
-    [processTokenResponse, dispatch],
+    [processTokenResponse],
   );
 
   const handleCloseModal = () => {
@@ -305,6 +289,7 @@ export default function Auth(props: AuthProps) {
         roles,
         isAuthenticated: authenticated,
         handleSaveSSOCredsElectron,
+        parsedUserToken,
       }}
     >
       {!isElectron ? (

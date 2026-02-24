@@ -201,7 +201,6 @@ export function ScenarioSelectionForm({ submitForm, token, url }: ScenarioFormPr
   const onSubmit = async (data: ScenarioFormData) => {
     const found = scenarios.find((s) => s.uuid === data.selectedScenarioId);
     if (!found) return;
-    console.log("Found , found0" , found)
     submitForm(found);
     setOpen(false);
   };
@@ -229,7 +228,6 @@ export function ScenarioSelectionForm({ submitForm, token, url }: ScenarioFormPr
       setCurrentPage(newPage);
     }
   };
-
   const startItem = (currentPage - 1) * ITEMS_PER_PAGE + 1;
   const endItem = Math.min(currentPage * ITEMS_PER_PAGE, totalCount);
 

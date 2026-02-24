@@ -1,5 +1,4 @@
-import { CourseData } from '@rapid-cmi5/cmi5-build-common';
-import { generateAuId, generateBlockId } from '@rapid-cmi5/cmi5-build/backend';
+import { CourseData, createAuMappingName, generateAuId, generateBlockId } from '@rapid-cmi5/cmi5-build-common';
 
 type TfDict = {
   resource: {
@@ -9,22 +8,6 @@ type TfDict = {
     rangeos_scenario: Record<string, any>;
   };
 };
-
-export function sanitizeName(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-') // replace non-alphanumerics with dash
-    .replace(/^-+|-+$/g, '') // trim leading/trailing dashes
-    .substring(0, 50); // optional: cap length
-}
-
-export function createAuMappingName(
-  courseTitle: string,
-  blockName: string,
-  auName: string,
-): string {
-  return `${sanitizeName(courseTitle)}-${sanitizeName(blockName)}-${sanitizeName(auName)}`.substring(0,99);
-}
 
 export function generateAllAuMappings(coursesData: CourseData[]) {
   const tfDict: TfDict = {

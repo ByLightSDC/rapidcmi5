@@ -1,24 +1,29 @@
 import Store from 'electron-store';
 import axios from 'axios';
-import { app, safeStorage } from 'electron';
+import { safeStorage } from 'electron';
 
 import {
   Credentials,
+  GitUserConfig,
   SSOConfig,
   TokenResponse,
 } from '@rapid-cmi5/cmi5-build-common';
 
 interface StoreSchema {
   ssoConfig: SSOConfig | null;
+  gitUserConfig: GitUserConfig | null;
   ssoCredentials: string | null;
+  gitCredentials: string | null;
   refreshToken: string | null;
 }
 
 export const store = new Store<StoreSchema>({
   defaults: {
     ssoConfig: null,
+    gitUserConfig: null,
     refreshToken: null,
-    gitCreds: null,
+    ssoCredentials: null,
+    gitCredentials: null,
   },
 });
 
@@ -51,6 +56,26 @@ export function decryptCredentials(encrypted: string): Credentials | null {
   }
 }
 
+export function encryptToken(token: string): string {
+  if (!safeStorage.isEncryptionAvailable()) {
+    throw new Error('Encryption not available on this system');
+  }
+  const encrypted = safeStorage.encryptString(token);
+  return encrypted.toString('base64');
+}
+
+export function decryptToken(encrypted: string): string | null {
+  if (!safeStorage.isEncryptionAvailable()) {
+    throw new Error('Encryption not available on this system');
+  }
+  try {
+    const buffer = Buffer.from(encrypted, 'base64');
+    return safeStorage.decryptString(buffer);
+  } catch {
+    return null;
+  }
+}
+
 export async function loginWithRefreshOrPassword(
   currentRefreshToken?: string | null,
 ): Promise<TokenResponse> {
@@ -70,10 +95,8 @@ export async function loginWithRefreshOrPassword(
 }
 
 export async function loginSSO(): Promise<TokenResponse> {
-  // @ts-ignore
   const config: SSOConfig | null = store.get('ssoConfig') as SSOConfig | null;
-  // @ts-ignore
-  const credsEnc: string | null = store.get('ssoCredsEnc') as string | null;
+  const credsEnc: string | null = store.get('ssoCredentials') as string | null;
 
   if (!credsEnc) {
     throw new Error('Encrypted credentials not found');
@@ -107,7 +130,6 @@ export async function loginSSO(): Promise<TokenResponse> {
 export async function refreshToken(
   refreshToken: string,
 ): Promise<TokenResponse> {
-  // @ts-ignore
   const config: SSOConfig | null = store.get('ssoConfig') as SSOConfig | null;
 
   if (!config) {
@@ -130,7 +152,6 @@ export async function refreshToken(
 }
 
 export async function logoutSSO(refreshToken: string): Promise<void> {
-  // @ts-ignore
   const config: SSOConfig | null = store.get('ssoConfig') as SSOConfig | null;
 
   if (!config) {
@@ -148,6 +169,5 @@ export async function logoutSSO(refreshToken: string): Promise<void> {
   });
 
   await http.post(logoutUrl, params.toString());
-  // @ts-ignore
-  store.delete('ssoCredsEnc');
+  store.delete('ssoCredentials');
 }

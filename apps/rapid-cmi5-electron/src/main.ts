@@ -20,12 +20,19 @@ import {
 import {
   decryptCredentials,
   encryptCredentials,
+  decryptToken,
+  encryptToken,
   loginSSO,
   loginWithRefreshOrPassword,
   logoutSSO,
   store,
 } from './app/api/userSettings/sso';
-import { applyCustomCerts, listCerts, addCert, removeCert } from './app/api/userSettings/certManager';
+import {
+  applyCustomCerts,
+  listCerts,
+  addCert,
+  removeCert,
+} from './app/api/userSettings/certManager';
 
 const builder = new cmi5Builder();
 let fsHandler: ElectronFsHandler | null = null;
@@ -450,36 +457,30 @@ ipcMain.handle('fs:writePlayerConfig', async (_e, content) => {
 });
 
 ipcMain.handle('userSettingsApi:getSSOConfig', () => {
-  // @ts-ignore
   return store.get('ssoConfig');
 });
 
 ipcMain.handle('userSettingsApi:setSSOConfig', (_e, config: SSOConfig) => {
-  // @ts-ignore
   store.set('ssoConfig', config);
   return true;
 });
 
 ipcMain.handle('userSettingsApi:loginSSO', async (_e, refresh = true) => {
   if (refresh) {
-    // @ts-ignore
-
-    const storedRefreshToken = store.get('refreshToken') ?? null;
+    const enc = store.get('refreshToken');
+    const storedRefreshToken = enc ? decryptToken(enc) : null;
     const tokens = await loginWithRefreshOrPassword(storedRefreshToken);
-
-    // @ts-ignore
-    store.set('refreshToken', tokens.refresh_token);
+    store.set('refreshToken', encryptToken(tokens.refresh_token));
     return tokens;
   } else {
     const tokens = await loginSSO();
-
     return tokens;
   }
 });
 
 ipcMain.handle('userSettingsApi:logoutSSO', async () => {
-  // @ts-ignore
-  const refreshToken = store.get('refreshToken') ?? null;
+  const enc = store.get('refreshToken');
+  const refreshToken = enc ? decryptToken(enc) : null;
 
   if (refreshToken) {
     try {
@@ -490,24 +491,20 @@ ipcMain.handle('userSettingsApi:logoutSSO', async () => {
   }
 
   // Clean up stored tokens regardless of whether the server logout succeeded
-  // @ts-ignore
   store.delete('refreshToken');
-  // @ts-ignore
-  store.delete('ssoCredsEnc');
+  store.delete('ssoCredentials');
 });
 
 ipcMain.handle(
   'userSettingsApi:setGitCredentials',
   async (_e, creds: Credentials) => {
     const enc = encryptCredentials(creds);
-    // @ts-ignore
-    store.set('gitCredsEnc', enc);
+    store.set('gitCredentials', enc);
   },
 );
 
 ipcMain.handle('userSettingsApi:getGitCredentials', (_e) => {
-  // @ts-ignore
-  const enc = store.get('gitCredsEnc');
+  const enc = store.get('gitCredentials');
   if (!enc) return null;
   return decryptCredentials(enc) ?? null;
 });
@@ -516,28 +513,24 @@ ipcMain.handle(
   'userSettingsApi:setSSOCredentials',
   async (_e, creds: Credentials) => {
     const enc = encryptCredentials(creds);
-    // @ts-ignore
-    store.set('ssoCredsEnc', enc);
+    store.set('ssoCredentials', enc);
   },
 );
 
 ipcMain.handle(
   'userSettingsApi:setGitUserConfig',
   (_e, config: GitUserConfig) => {
-    // @ts-ignore
     store.set('gitUserConfig', config);
     return true;
   },
 );
 
 ipcMain.handle('userSettingsApi:getGitUserConfig', () => {
-  // @ts-ignore
   return store.get('gitUserConfig') ?? null;
 });
 
 ipcMain.handle('userSettingsApi:clearGitCredentials', () => {
-  // @ts-ignore
-  store.delete('gitCredsEnc');
+  store.delete('gitCredentials');
   return true;
 });
 
@@ -562,7 +555,6 @@ ipcMain.handle('userSettingsApi:removeCert', (_e, id: string) => {
   removeCert(id);
   applyCustomCerts();
 });
-
 
 // CMI5 Build Handler
 ipcMain.handle(
