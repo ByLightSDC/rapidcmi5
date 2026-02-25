@@ -40,8 +40,8 @@ import { ButtonOptions, ButtonMinorUi } from '@rapid-cmi5/ui';
 enum RepoActionEnum {
   // TriggerRename,
   // Rename,
-  Delete,
   Config,
+  Delete,
 }
 
 /**
@@ -58,12 +58,12 @@ const repoActions = [
   //   icon: <EditIcon color="inherit" />,
   // },
   {
-    tooltip: 'Delete Project',
-    icon: <DeleteForeverIcon color="inherit" />,
-  },
-  {
     tooltip: 'Configure Git',
     icon: <SettingsIcon color="inherit" />,
+  },
+  {
+    tooltip: 'Delete Project',
+    icon: <DeleteForeverIcon color="inherit" />,
   },
 ];
 
