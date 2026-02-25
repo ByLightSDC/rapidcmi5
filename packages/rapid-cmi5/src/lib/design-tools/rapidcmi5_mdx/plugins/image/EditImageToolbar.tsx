@@ -13,13 +13,20 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RoomIcon from '@mui/icons-material/Room';
 import PaletteIcon from '@mui/icons-material/Palette';
+import TextFieldsIcon from '@mui/icons-material/TextFields';
 
 import { openEditImageDialog$ } from './index';
 import { useEffect, useState } from 'react';
 import { useTheme } from '@mui/system';
 
 import { useSignalEffect } from '@preact/signals-react';
-import { clickPosition$, isLabelDropping$ } from '@rapid-cmi5/ui';
+import {
+  clickImageTextPosition$,
+  clickPosition$,
+  isLabelDropping$,
+  isTextDropping$,
+} from '@rapid-cmi5/ui';
+
 import { StyleDialog } from './StyleDialog';
 import { Z_INDEX } from './index';
 
@@ -108,7 +115,7 @@ export function EditImageToolbar({
 
   const [isMarking, setIsMarking] = useState(false);
   const muiTheme = useTheme();
-
+  const [isTextDropping, setIsTextDropping] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
   // For letting style dialogue work outside of image dialog.
@@ -151,6 +158,29 @@ export function EditImageToolbar({
     setIsMarking(isLabelDropping$.value);
     if (isLabelDropping$.value === false) {
       clickPosition$.value = [-1, -1];
+    }
+  });
+
+  /**
+   * Listen for mouse move
+   * Store mouse position when text button is clicked
+   * clickPosition is used from ImageEditor to avoid dropping marker on the Add Marker button since the button is positioned inside the image area
+   * set a flag when label is being dropped
+   * @param e
+   */
+  const handlePlaceTextStart = (e: React.MouseEvent<HTMLButtonElement>) => {
+    window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove);
+    clickImageTextPosition$.value = [e?.clientX, e?.clientY];
+    isTextDropping$.value = true;
+  };
+  /**
+   * Listen for text being dropped and update internal React state
+   */
+  useSignalEffect(() => {
+    setIsTextDropping(isTextDropping$.value);
+    if (isTextDropping$.value === false) {
+      clickImageTextPosition$.value = [-1, -1];
     }
   });
 
@@ -210,6 +240,28 @@ export function EditImageToolbar({
         >
           <RoomIcon />
         </IconButton>
+        <IconButton
+          aria-label="Add Text"
+          disabled={readOnly}
+          onClick={(e) => {
+            handlePlaceTextStart(e);
+          }}
+        >
+          <TextFieldsIcon />
+        </IconButton>
+        {isTextDropping && (
+          <div
+            style={{
+              position: 'fixed',
+              top: position.y,
+              left: position.x,
+              transform: 'translate(-50%, -50%)',
+              pointerEvents: 'none',
+            }}
+          >
+            <TextFieldsIcon color="warning" />
+          </div>
+        )}
 
         {isMarking && (
           <div
