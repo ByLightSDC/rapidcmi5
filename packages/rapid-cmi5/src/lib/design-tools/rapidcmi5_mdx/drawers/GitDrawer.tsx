@@ -48,8 +48,6 @@ export const GitDrawer = () => {
       }}
       spacing={0}
     >
-      {/*REF {!isRepoConnectedToRemote && } */}
-
       <Typography
         variant="caption"
         sx={{

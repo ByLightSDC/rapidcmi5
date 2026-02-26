@@ -103,6 +103,9 @@ export function CloneRepoForm({
         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [watchRepoUrl, errors['repoRemoteUrl']]);
 
+      /**
+       * Whether form has git configuration errors
+       */
       const hasRequiredErrors = useMemo(() => {
         if (
           errors?.repoUsername ||

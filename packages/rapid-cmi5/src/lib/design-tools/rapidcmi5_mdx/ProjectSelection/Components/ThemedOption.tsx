@@ -17,7 +17,7 @@ const ThemedOptionCard = ({ children }: { children: React.ReactNode }) => {
           '&:hover': {
             background: alpha(palette.primary.main, 0.17),
             borderColor: alpha(palette.primary.main, 0.3),
-            //transform: 'translateY(-2px)',
+            transform: 'translateY(-2px)',
             boxShadow: alpha(palette.primary.main, 0.3),
           },
         }}
