@@ -44,16 +44,11 @@ import { GitContext } from '../course-builder/GitViewer/session/GitContext';
 /**
  * Icons
  */
-import AddIcon from '@mui/icons-material/Add';
+
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import EditIcon from '@mui/icons-material/Edit';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import FolderZipIcon from '@mui/icons-material/FolderZip';
-import ImportExportIcon from '@mui/icons-material/ImportExport';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useRC5Prompts } from './modals/useRC5Prompts';
 import { listItemProps } from './drawers/components/LessonTreeNode';
-import { useMDStyleIcons } from './styles/useMDStyleIcons';
 import { getSvgStyleIcon, StyleIconTypeEnum } from './styles/styleSvgConstants';
 
 enum RepoActionEnum {
@@ -144,7 +139,7 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
             <NavViewMenu showHomeButton={showHomeButton} />
             <Divider orientation="vertical" />
             <PanelGroup direction="horizontal">
-              <Panel defaultSize={24} minSize={10}>
+              <Panel defaultSize={26} minSize={10}>
                 <Stack
                   direction="row"
                   sx={{
