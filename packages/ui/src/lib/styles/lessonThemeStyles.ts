@@ -1,9 +1,10 @@
+
 import {
   BlockPaddingEnum,
   ContentWidthEnum,
   DefaultAlignmentEnum,
   LessonTheme,
-} from '../../../../common/src/lib/types/course';
+} from '@rapid-cmi5/cmi5-build-common';
 
 export const CONTENT_WIDTH_MAP: Record<ContentWidthEnum, string | null> = {
   [ContentWidthEnum.None]: null,

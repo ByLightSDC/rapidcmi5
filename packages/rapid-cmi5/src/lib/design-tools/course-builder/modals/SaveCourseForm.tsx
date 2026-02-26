@@ -8,16 +8,11 @@ import {
   FormControlPassword,
   CommonAppModalState,
   NAME_GROUP_OPT,
-  ButtonMinorUi,
   useToaster,
 } from '@rapid-cmi5/ui';
 import Grid from '@mui/material/Grid2';
 
 import { Alert, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
-
-import AddIcon from '@mui/icons-material/Add';
-
 import * as yup from 'yup';
 
 import { UseFormReturn } from 'react-hook-form';

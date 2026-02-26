@@ -1,6 +1,7 @@
+import { Credentials } from '@rapid-cmi5/cmi5-build-common';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-type tKeycloakUiState = {
+export type tKeycloakUiState = {
   auth: {
     username?: string;
     role?: string;

@@ -15,7 +15,6 @@ import Grid from '@mui/material/Grid2';
 /* API Topic */
 
 import { ClassEntry, defaultClassEntryData } from '../session/constants';
-import { useEffect } from 'react';
 import {
   FormCrudType,
   NAME_GROUP,
@@ -27,7 +26,6 @@ import {
   Topic,
   usePostInitializeCMI5Scenarios,
 } from '@rangeos-nx/frontend/clients/hooks';
-import { DateTimePicker } from '@mui/x-date-pickers';
 
 /**
  * @typedef {Object} tFormProps
@@ -77,33 +75,19 @@ export default function ClassPromptForm(props: tFormProps) {
   ): JSX.Element => {
     const { control } = formMethods;
     const { errors } = formState;
-    const handleEndDateChange = (value: Date | null) => {
-      formMethods.setValue('endDate', value?.toISOString());
-    };
+
     return (
-      <>
-        <Grid size={6}>
-          <FormControlTextField
-            control={control}
-            error={Boolean(errors?.name)}
-            helperText={errors?.name?.message}
-            name="classId"
-            required
-            label="Class Id"
-            readOnly={crudType === FormCrudType.view}
-          />
-        </Grid>
-        <Grid size={6}>
-          <DateTimePicker
-            label="End Date"
-            name="endDate"
-            disablePast
-            slotProps={{ textField: { required: true, fullWidth: true } }}
-            onChange={handleEndDateChange}
-            readOnly={crudType === FormCrudType.view}
-          />
-        </Grid>
-      </>
+      <Grid size={6}>
+        <FormControlTextField
+          control={control}
+          error={Boolean(errors?.name)}
+          helperText={errors?.name?.message}
+          name="classId"
+          required
+          label="Class Id"
+          readOnly={crudType === FormCrudType.view}
+        />
+      </Grid>
     );
   };
 

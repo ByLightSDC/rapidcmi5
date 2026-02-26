@@ -49,6 +49,7 @@ import ImportRepoZipForm from './ImportRepoZipForm';
 import { TextField, Alert } from '@mui/material';
 import { RC5Context } from '../../rapidcmi5_mdx/contexts/RC5Context';
 import CreateLocalRepoForm from './CreateLocalRepoForm';
+import { detectIsElectron } from '../GitViewer/utils/gitFsInstance';
 
 /**
  * Select Repo, Course, AU
@@ -77,6 +78,7 @@ export function SelectGitDialogs() {
     isElectron,
     currentAuth,
   } = useContext(GitContext);
+
   const { sendMessage } = useContext(RC5Context);
 
   const getInstructions = () => {
@@ -118,29 +120,6 @@ export function SelectGitDialogs() {
         meta: {
           title: 'Create Course',
         },
-      }),
-    );
-  };
-
-  const promptCloneRepo = () => {
-    dispatch(
-      setModal({
-        type: cloneRepoModalId,
-        id: null,
-        name: null,
-        meta: {
-          title: 'Clone Repo',
-        },
-      }),
-    );
-  };
-
-  const promptSelectRepo = () => {
-    dispatch(
-      setModal({
-        type: selectRepoModalId,
-        id: null,
-        name: null,
       }),
     );
   };
@@ -265,6 +244,8 @@ export function SelectGitDialogs() {
         <CloneRepoForm
           defaultData={{
             ...defaultCloneRepoData,
+            repoUsername: currentAuth?.gitCredentials?.username || '',
+            repoPassword: currentAuth?.gitCredentials?.password || '',
             authorEmail: currentAuth?.userEmail?.toLowerCase() || '',
             authorName: currentAuth?.userName || '',
             shallowClone: false,
@@ -406,8 +387,8 @@ export function SelectGitDialogs() {
       {modalObj.type === gitPullModalId && (
         <PullForm
           defaultData={{
-            repoUsername: '',
-            repoPassword: '',
+            repoUsername: currentAuth?.gitCredentials?.username || '',
+            repoPassword: currentAuth?.gitCredentials?.password || '',
             branch: currentBranch || '',
             allowConflicts: false,
           }}
@@ -446,8 +427,8 @@ export function SelectGitDialogs() {
       {modalObj.type === gitPushModalId && (
         <PushForm
           defaultData={{
-            repoUsername: '',
-            repoPassword: '',
+            repoUsername: currentAuth?.gitCredentials?.username || '',
+            repoPassword: currentAuth?.gitCredentials?.password || '',
             branch: currentBranch || '',
             force: false,
           }}

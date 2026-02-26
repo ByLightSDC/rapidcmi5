@@ -26,7 +26,7 @@ export default function RC5Modals() {
   const modalObj = useSelector(modal);
   const dispatch = useDispatch();
   const { deleteLesson, sendMessage } = useContext(RC5Context);
-  const { currentGitConfig, handleDeleteCourse, handleDeleteCurrentRepo } =
+  const { currentGitConfig, handleDeleteCourse, handleDeleteCurrentRepo, currentAuth } =
     useContext(GitContext);
 
   const { currentBranch }: RepoState = useSelector(
@@ -171,7 +171,6 @@ export default function RC5Modals() {
       //console.log('setSuperDataCache', data);
       setSuperDataCache(data);
     }
-    console.log('cache meta?', modalObj.meta);
     handleCloseModal();
     if (modalObj.meta.notify) {
       sendMessage({
@@ -183,7 +182,7 @@ export default function RC5Modals() {
   };
 
   const defaultSaveData = useMemo(() => {
-    const theDefaultData = {
+    const theDefaultData : SuperSaveFormType = {
       commit: {
         ...defaultCommitData,
         authorEmail: currentGitConfig?.authorEmail?.toLowerCase(),
@@ -192,8 +191,8 @@ export default function RC5Modals() {
         commitMessage: '',
       },
       push: {
-        repoUsername: superSaveDataCache?.push.repoUsername || '',
-        repoPassword: superSaveDataCache?.push.repoPassword || '',
+        repoUsername: currentAuth?.gitCredentials?.username || '',
+        repoPassword: currentAuth?.gitCredentials?.password || '',
         branch: currentBranch || 'main',
         force: false,
       },
@@ -231,7 +230,9 @@ export default function RC5Modals() {
 
           {/* prompt apply changes before course settings or something that   */}
           <SaveCourseForm
-            defaultData={defaultSaveData}
+            defaultData={{
+              ...defaultSaveData,
+            }}
             modalId={saveCourseFileBeforeModalId}
             modalObj={modalObj}
             handleCloseModal={handleCloseModal}
