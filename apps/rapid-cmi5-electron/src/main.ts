@@ -3,9 +3,11 @@ import ElectronEvents from './app/events/electron.events';
 import { BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import App from './app/app';
 import * as nodePath from 'path'; // Renamed to avoid conflicts
-import { finished, pipeline } from 'stream/promises';
-import { createWriteStream } from 'fs';
-import { ElectronFsHandler, resolveSafe } from './app/api/fileSystem/fileSystem';
+import { pipeline } from 'stream/promises';
+import {
+  ElectronFsHandler,
+  resolveSafe,
+} from './app/api/fileSystem/fileSystem';
 
 import { app } from 'electron';
 import { cmi5Builder } from './app/api/cmi5Builder/build';
@@ -72,7 +74,14 @@ ipcMain.handle(
     password: string,
   ) => {
     try {
-      return await getFsHandler().cloneRepo(repoPath, url, branch, shallowClone, username, password);
+      return await getFsHandler().cloneRepo(
+        repoPath,
+        url,
+        branch,
+        shallowClone,
+        username,
+        password,
+      );
     } catch (error) {
       console.error('Error cloning repository:', error);
       throw error;
@@ -80,32 +89,94 @@ ipcMain.handle(
   },
 );
 
-ipcMain.handle('fs:pullRepo', async (_e, repoPath: string, branch: string, username: string, password: string) => {
+ipcMain.handle(
+  'fs:pullRepo',
+  async (
+    _e,
+    repoPath: string,
+    branch: string,
+    username: string,
+    password: string,
+  ) => {
+    try {
+      return await getFsHandler().pullRepo(
+        repoPath,
+        branch,
+        username,
+        password,
+      );
+    } catch (error) {
+      console.error('Error pulling repository:', error);
+      throw error;
+    }
+  },
+);
+
+ipcMain.handle(
+  'fs:pushRepo',
+  async (_e, repoPath: string, username: string, password: string) => {
+    try {
+      return await getFsHandler().pushRepo(repoPath, username, password);
+    } catch (error) {
+      console.error('Error pushing repository:', error);
+      throw error;
+    }
+  },
+);
+
+ipcMain.handle('fs:chooseProject', async (_e) => {
   try {
-    return await getFsHandler().pullRepo(repoPath, branch, username, password);
+    return await getFsHandler().chooseProject();
   } catch (error) {
-    console.error('Error pulling repository:', error);
+    console.error('Error choosing project:', error);
     throw error;
   }
 });
 
-ipcMain.handle('fs:pushRepo', async (_e, repoPath: string, username: string, password: string) => {
+ipcMain.handle('fs:getRecentProjects', () => {
   try {
-    return await getFsHandler().pushRepo(repoPath, username, password);
+    return getFsHandler().getRecentProjects();
   } catch (error) {
-    console.error('Error pushing repository:', error);
+    console.error('Error getting recent projects:', error);
     throw error;
   }
 });
 
-ipcMain.handle('fs:gitCommit', async (_e, repoPath: string, message: string, name: string, email: string) => {
+ipcMain.handle('fs:removeRecentProject', (_e, id: string) => {
   try {
-    return await getFsHandler().gitCommit(repoPath, message, name, email);
+    return getFsHandler().removeRecentProject(id);
   } catch (error) {
-    console.error('Error committing changes:', error);
+    console.error('Error removing recent project:', error);
     throw error;
   }
 });
+
+ipcMain.handle('fs:addRecentProject', (_e, id: string) => {
+  try {
+    return getFsHandler().addRecentProject(id);
+  } catch (error) {
+    console.error('Error adding recent project:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle(
+  'fs:gitCommit',
+  async (
+    _e,
+    repoPath: string,
+    message: string,
+    name: string,
+    email: string,
+  ) => {
+    try {
+      return await getFsHandler().gitCommit(repoPath, message, name, email);
+    } catch (error) {
+      console.error('Error committing changes:', error);
+      throw error;
+    }
+  },
+);
 
 ipcMain.handle('fs:getStashStatus', async (_e, repoPath: string) => {
   try {
@@ -125,14 +196,17 @@ ipcMain.handle('fs:getStatus', async (_e, repoPath: string) => {
   }
 });
 
-ipcMain.handle('fs:gitInitRepo', async (_e, repoPath: string, defaultBranch: string) => {
-  try {
-    return await getFsHandler().gitInitRepo(repoPath, defaultBranch);
-  } catch (error) {
-    console.error('Error initializing repository:', error);
-    throw error;
-  }
-});
+ipcMain.handle(
+  'fs:gitInitRepo',
+  async (_e, repoPath: string, defaultBranch: string) => {
+    try {
+      return await getFsHandler().gitInitRepo(repoPath, defaultBranch);
+    } catch (error) {
+      console.error('Error initializing repository:', error);
+      throw error;
+    }
+  },
+);
 
 ipcMain.handle('fs:listRepoRemotes', async (_e, repoPath: string) => {
   try {
@@ -161,41 +235,53 @@ ipcMain.handle('fs:getAllGitBranches', async (_e, repoPath: string) => {
   }
 });
 
-ipcMain.handle('fs:getGitConfig', async (_e, repoPath: string, configPath: string) => {
-  try {
-    return await getFsHandler().getGitConfig(repoPath, configPath);
-  } catch (error) {
-    console.error('Error getting git config:', error);
-    throw error;
-  }
-});
+ipcMain.handle(
+  'fs:getGitConfig',
+  async (_e, repoPath: string, configPath: string) => {
+    try {
+      return await getFsHandler().getGitConfig(repoPath, configPath);
+    } catch (error) {
+      console.error('Error getting git config:', error);
+      throw error;
+    }
+  },
+);
 
-ipcMain.handle('fs:setGitConfig', async (_e, repoPath: string, configPath: string, value: string) => {
-  try {
-    return await getFsHandler().setGitConfig(repoPath, configPath, value);
-  } catch (error) {
-    console.error('Error setting git config:', error);
-    throw error;
-  }
-});
+ipcMain.handle(
+  'fs:setGitConfig',
+  async (_e, repoPath: string, configPath: string, value: string) => {
+    try {
+      return await getFsHandler().setGitConfig(repoPath, configPath, value);
+    } catch (error) {
+      console.error('Error setting git config:', error);
+      throw error;
+    }
+  },
+);
 
-ipcMain.handle('fs:gitCheckout', async (_e, repoPath: string, branch: string) => {
-  try {
-    return await getFsHandler().gitCheckout(repoPath, branch);
-  } catch (error) {
-    console.error('Error checking out branch:', error);
-    throw error;
-  }
-});
+ipcMain.handle(
+  'fs:gitCheckout',
+  async (_e, repoPath: string, branch: string) => {
+    try {
+      return await getFsHandler().gitCheckout(repoPath, branch);
+    } catch (error) {
+      console.error('Error checking out branch:', error);
+      throw error;
+    }
+  },
+);
 
-ipcMain.handle('fs:gitAddRemote', async (_e, repoPath: string, remoteUrl: string) => {
-  try {
-    return await getFsHandler().gitAddRemote(repoPath, remoteUrl);
-  } catch (error) {
-    console.error('Error adding remote:', error);
-    throw error;
-  }
-});
+ipcMain.handle(
+  'fs:gitAddRemote',
+  async (_e, repoPath: string, remoteUrl: string) => {
+    try {
+      return await getFsHandler().gitAddRemote(repoPath, remoteUrl);
+    } catch (error) {
+      console.error('Error adding remote:', error);
+      throw error;
+    }
+  },
+);
 
 ipcMain.handle('fs:gitAdd', async (_e, repoPath: string, filePath: string) => {
   try {
@@ -206,38 +292,58 @@ ipcMain.handle('fs:gitAdd', async (_e, repoPath: string, filePath: string) => {
   }
 });
 
-ipcMain.handle('fs:gitRemove', async (_e, repoPath: string, filePath: string) => {
-  try {
-    return await getFsHandler().gitRemove(repoPath, filePath);
-  } catch (error) {
-    console.error('Error removing file from git:', error);
-    throw error;
-  }
-});
+ipcMain.handle(
+  'fs:gitRemove',
+  async (_e, repoPath: string, filePath: string) => {
+    try {
+      return await getFsHandler().gitRemove(repoPath, filePath);
+    } catch (error) {
+      console.error('Error removing file from git:', error);
+      throw error;
+    }
+  },
+);
 
-ipcMain.handle('fs:gitWriteRef', async (_e, repoPath: string, branch: string, commitHash: string) => {
-  try {
-    return await getFsHandler().gitWriteRef(repoPath, branch, commitHash);
-  } catch (error) {
-    console.error('Error writing git ref:', error);
-    throw error;
-  }
-});
+ipcMain.handle(
+  'fs:gitWriteRef',
+  async (_e, repoPath: string, branch: string, commitHash: string) => {
+    try {
+      return await getFsHandler().gitWriteRef(repoPath, branch, commitHash);
+    } catch (error) {
+      console.error('Error writing git ref:', error);
+      throw error;
+    }
+  },
+);
 
-ipcMain.handle('fs:revertFileToHEAD', async (_e, repoPath: string, filePath: string) => {
-  try {
-    return await getFsHandler().revertFileToHEAD(repoPath, filePath);
-  } catch (error) {
-    console.error('Error reverting file:', error);
-    throw error;
-  }
-});
+ipcMain.handle(
+  'fs:revertFileToHEAD',
+  async (_e, repoPath: string, filePath: string) => {
+    try {
+      return await getFsHandler().revertFileToHEAD(repoPath, filePath);
+    } catch (error) {
+      console.error('Error reverting file:', error);
+      throw error;
+    }
+  },
+);
 
 ipcMain.handle(
   'fs:getFolderStructure',
-  async (_e, dir: string, repoPath: string, getContents: boolean, includeGitIgnored?: boolean) => {
+  async (
+    _e,
+    dir: string,
+    repoPath: string,
+    getContents: boolean,
+    includeGitIgnored?: boolean,
+  ) => {
     try {
-      return await getFsHandler().getFolderStructure(dir, repoPath, getContents, includeGitIgnored);
+      return await getFsHandler().getFolderStructure(
+        dir,
+        repoPath,
+        getContents,
+        includeGitIgnored,
+      );
     } catch (error) {
       console.error('Error getting folder structure:', error);
       throw error;
@@ -254,41 +360,53 @@ ipcMain.handle('fs:gitLog', async (_e, repoPath: string) => {
   }
 });
 
-ipcMain.handle('fs:gitResetIndex', async (_e, repoPath: string, relFilePath: string) => {
-  try {
-    return await getFsHandler().gitResetIndex(repoPath, relFilePath);
-  } catch (error) {
-    console.error('Error resetting index:', error);
-    throw error;
-  }
-});
+ipcMain.handle(
+  'fs:gitResetIndex',
+  async (_e, repoPath: string, relFilePath: string) => {
+    try {
+      return await getFsHandler().gitResetIndex(repoPath, relFilePath);
+    } catch (error) {
+      console.error('Error resetting index:', error);
+      throw error;
+    }
+  },
+);
 
-ipcMain.handle('fs:gitResolveFile', async (_e, repoPath: string, relFilePath: string) => {
-  try {
-    return await getFsHandler().gitResolveFile(repoPath, relFilePath);
-  } catch (error) {
-    console.error('Error resolving file:', error);
-    throw error;
-  }
-});
+ipcMain.handle(
+  'fs:gitResolveFile',
+  async (_e, repoPath: string, relFilePath: string) => {
+    try {
+      return await getFsHandler().gitResolveFile(repoPath, relFilePath);
+    } catch (error) {
+      console.error('Error resolving file:', error);
+      throw error;
+    }
+  },
+);
 
-ipcMain.handle('fs:gitStash', async (_e, repoPath: string, op: 'list' | 'pop' | 'push') => {
-  try {
-    return await getFsHandler().gitStash(repoPath, op);
-  } catch (error) {
-    console.error('Error with git stash:', error);
-    throw error;
-  }
-});
+ipcMain.handle(
+  'fs:gitStash',
+  async (_e, repoPath: string, op: 'list' | 'pop' | 'push') => {
+    try {
+      return await getFsHandler().gitStash(repoPath, op);
+    } catch (error) {
+      console.error('Error with git stash:', error);
+      throw error;
+    }
+  },
+);
 
-ipcMain.handle('fs:gitResolveRef', async (_e, repoPath: string, branch: string) => {
-  try {
-    return await getFsHandler().gitResolveRef(repoPath, branch);
-  } catch (error) {
-    console.error('Error resolving ref:', error);
-    throw error;
-  }
-});
+ipcMain.handle(
+  'fs:gitResolveRef',
+  async (_e, repoPath: string, branch: string) => {
+    try {
+      return await getFsHandler().gitResolveRef(repoPath, branch);
+    } catch (error) {
+      console.error('Error resolving ref:', error);
+      throw error;
+    }
+  },
+);
 
 // File System Operations (continued)
 ipcMain.handle('fs:copyFile', async (_e, src: string, dest: string) => {
@@ -337,36 +455,57 @@ ipcMain.handle('fs:readdir', async (_e, dirPath: string) => {
 });
 
 // CMI5 Build Handler
-ipcMain.handle('cmi5Build', async (_evt, projectPath: string, courseFolder: string, projectName: string) => {
-  const coursePath = nodePath.join(projectPath, courseFolder);
-  const folderStruct = await getFsHandler().getFolderStructure(coursePath, coursePath, true, true);
-  const coursePathAbsolute = resolveSafe(coursePath, false);
+ipcMain.handle(
+  'cmi5Build',
+  async (
+    _evt,
+    projectPath: string,
+    courseFolder: string,
+    projectName: string,
+  ) => {
+    const coursePath = nodePath.join(projectPath, courseFolder);
+    const folderStruct = await getFsHandler().getFolderStructure(
+      coursePath,
+      coursePath,
+      true,
+      true,
+    );
+    const coursePathAbsolute = resolveSafe(coursePath, false);
 
-  const tempPath = await builder.buildZip(coursePathAbsolute, folderStruct, projectName, courseFolder);
-  if (tempPath === null) return { success: false, canceled: false };
+    const tempPath = await builder.buildZip(
+      coursePathAbsolute,
+      folderStruct,
+      projectName,
+      courseFolder,
+    );
+    if (tempPath === null) return { success: false, canceled: false };
 
-  try {
-    const { filePath, canceled } = await dialog.showSaveDialog({
-      title: 'Save CMI5 package',
-      defaultPath: nodePath.join(app.getPath('downloads'), `${projectName}`),
-      filters: [{ name: 'ZIP Archive', extensions: ['zip'] }],
-    });
+    try {
+      const { filePath, canceled } = await dialog.showSaveDialog({
+        title: 'Save CMI5 package',
+        defaultPath: nodePath.join(app.getPath('downloads'), `${projectName}`),
+        filters: [{ name: 'ZIP Archive', extensions: ['zip'] }],
+      });
 
-    if (canceled || !filePath) {
-      return { success: false, canceled: true };
+      if (canceled || !filePath) {
+        return { success: false, canceled: true };
+      }
+
+      await fs.promises.mkdir(nodePath.dirname(filePath), { recursive: true });
+      await pipeline(
+        fs.createReadStream(tempPath),
+        fs.createWriteStream(filePath),
+      );
+      shell.showItemInFolder(filePath);
+
+      return { success: true, canceled: false, filePath };
+    } finally {
+      await fs.promises.rm(tempPath, { force: true }).catch((err) => {
+        console.warn('Failed to remove temp build file:', err);
+      });
     }
-
-    await fs.promises.mkdir(nodePath.dirname(filePath), { recursive: true });
-    await pipeline(fs.createReadStream(tempPath), fs.createWriteStream(filePath));
-    shell.showItemInFolder(filePath);
-
-    return { success: true, canceled: false, filePath };
-  } finally {
-    await fs.promises.rm(tempPath, { force: true }).catch((err) => {
-      console.warn('Failed to remove temp build file:', err);
-    });
-  }
-});
+  },
+);
 
 export default class Main {
   static initialize() {

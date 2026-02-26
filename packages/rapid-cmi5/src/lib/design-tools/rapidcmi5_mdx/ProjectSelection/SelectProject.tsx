@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from 'react';
 import { alpha, Box, Container, useTheme } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
-import { DirMeta } from '../../course-builder/GitViewer/utils/fileSystem';
 import DocumentationDialog from './Dialogs/DocumentationDialog';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
 import { RepoState } from '../../../redux/repoManagerReducer';
@@ -11,6 +10,7 @@ import WebAppSelection from './Components/WebAppSelection';
 import ElectronAppSelection from './Components/ElectronSelection';
 import CloneLoadingOverlay from './Components/LoadingOverlay';
 import { useToaster } from '@rapid-cmi5/ui';
+import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
 
 interface OptionDocumentation {
   title: string;
@@ -26,10 +26,15 @@ export default function WelcomePage({
   const { palette } = theme;
   const toast = useToaster();
 
-  const { getLocalFolders, openSandbox, openLocalRepo, isElectron } =
-    useContext(GitContext);
+  const {
+    getLocalFolders,
+    openSandbox,
+    openLocalRepo,
+    isElectron,
+    deleteRecentProject,
+  } = useContext(GitContext);
+
   const { promptCloneRepo, promptCreateLocalRepo } = useRC5Prompts();
-  const [recentProjects, setRecentProjects] = useState<DirMeta[]>([]);
   const [isSandboxLaunching, setIsSandboxLaunching] = useState(false);
 
   const { loadingState }: RepoState = useSelector(
@@ -74,9 +79,7 @@ export default function WelcomePage({
     transparent 60%
   )
 `;
-  const populateFolders = async () => {
-    setRecentProjects(await getLocalFolders());
-  };
+  const [recentProjects, setRecentProjects] = useState<DirMeta[]>([]);
 
   const [docDialogOpen, setDocDialogOpen] = useState(false);
   const handleShowDocumentation = (doc: OptionDocumentation) => {
@@ -92,13 +95,30 @@ export default function WelcomePage({
     null,
   );
 
+  const populateFolders = async () => {
+    setRecentProjects(await getLocalFolders());
+  };
+
   useEffect(() => {
     populateFolders();
   }, []);
 
-  const openLocalFolderAndSet = async () => {
-    await openLocalRepo();
-    setRepoSelected();
+  const handleRemoveRecentProject = async (ids: string[]) => {
+    if (!ids?.length) return;
+
+    for (const id of ids) {
+      await deleteRecentProject(id);
+    }
+
+    toast({
+      message:
+        ids.length === 1
+          ? `Removed project ${ids[0]} from your recents`
+          : `Removed ${ids.length} projects from your recents`,
+      severity: 'success',
+    });
+
+    populateFolders();
   };
 
   const openLocalRecentProject = async (id: string) => {
@@ -153,6 +173,7 @@ export default function WelcomePage({
               handleCreateRepo={promptCreateLocalRepo}
               openLocalFolderAndSet={openLocalFolderWithToast}
               openLocalRecentProject={openLocalRecentProject}
+              removeLocalRecentProject={handleRemoveRecentProject}
             />
           ) : (
             <WebAppSelection
@@ -164,13 +185,16 @@ export default function WelcomePage({
               handleCreateRepo={promptCreateLocalRepo}
               openLocalFolderAndSet={openLocalFolderWithToast}
               openLocalRecentProject={openLocalRecentProject}
+              removeLocalRecentProject={handleRemoveRecentProject}
             />
           )}
         </Container>
         <CloneLoadingOverlay
           loadingVariant={loadingState}
           forceShow={isSandboxLaunching}
-          overrideMessage={isSandboxLaunching ? 'Launching sandbox...' : undefined}
+          overrideMessage={
+            isSandboxLaunching ? 'Launching sandbox...' : undefined
+          }
         />
 
         <DocumentationDialog

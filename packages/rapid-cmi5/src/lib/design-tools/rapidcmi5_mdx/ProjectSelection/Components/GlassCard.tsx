@@ -5,11 +5,13 @@ import { CreateNewFolder } from '@mui/icons-material';
 export interface GlassCardProps extends PaperProps {
   title: string;
   icon: ReactNode;
+  headerAction?: ReactNode;
 }
 export function GlassCard({
   children,
   title,
   icon,
+  headerAction,
   sx,
   ...props
 }: GlassCardProps) {
@@ -68,6 +70,9 @@ export function GlassCard({
         >
           {title}
         </Typography>
+        {headerAction && (
+          <Box sx={{ ml: 'auto' }}>{headerAction}</Box>
+        )}
       </Box>
       {children}
     </Paper>

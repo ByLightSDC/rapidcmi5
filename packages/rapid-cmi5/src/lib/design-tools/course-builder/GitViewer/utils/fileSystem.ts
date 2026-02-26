@@ -9,6 +9,7 @@ import {
   generateCmi5Xml,
   generateBlockId,
   CourseAU,
+  DirMeta,
 } from '@rapid-cmi5/cmi5-build-common';
 import JSZip from 'jszip';
 import path, { basename, dirname, join, relative } from 'path-browserify';
@@ -16,7 +17,7 @@ import YAML from 'yaml';
 import { configure, fs as zenFs } from '@zenfs/core';
 import { IndexedDB, WebAccess } from '@zenfs/dom';
 import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
-import { set, get, keys, getMany } from 'idb-keyval';
+import { set, get, keys, getMany, del } from 'idb-keyval';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import { electronFs } from './ElectronFsApi';
 import { IFs } from 'memfs';
@@ -38,17 +39,6 @@ export const cmi5BuildOutput = `/gitfs/outPut`;
 export type FolderStructWithMtime = FolderStruct & {
   mtime?: number; // milliseconds since epoch
   mtimeDate?: string; // ISO string
-};
-
-export type DirMeta = {
-  // not needed for electron
-  dirHandle?: FileSystemDirectoryHandle;
-  id: string;
-  createdAt: string;
-  name: string;
-  isValid: boolean;
-  lastAccessed: string;
-  remoteUrl?: string;
 };
 
 export class GitFS {
@@ -339,18 +329,6 @@ export class GitFS {
     }
   };
 
-  // Helper to count files
-  private countFiles(folders: FolderStruct[]): number {
-    let count = 0;
-    for (const item of folders) {
-      if (!item.isBranch) {
-        count++;
-      } else if (item.children) {
-        count += this.countFiles(item.children);
-      }
-    }
-    return count;
-  }
   // this is browser specific
   openLocalDirectory = async (
     dirHandle: FileSystemDirectoryHandle,
@@ -376,11 +354,17 @@ export class GitFS {
 
   async openLocalRepo(id?: string) {
     if (this.isElectron) {
-      if (!id) throw Error('No directory ID given');
-      if (!(await this.dirExists('/' + fsType.localFileSystem + '/' + id)))
-        throw Error('Could not find dir');
-      const dirName = basename(id);
-      return dirName;
+      // if (!id) throw Error('No directory ID given');
+      if (id) {
+        if (!(await this.dirExists('/' + fsType.localFileSystem + '/' + id)))
+          throw Error('Could not find dir');
+        const dirName = basename(id);
+        return dirName;
+      } else {
+        const dirname = await window.fsApi.chooseProject();
+        if (!dirname) throw new Error('No project selected');
+        return dirname;
+      }
     } else {
       let dirHandle: FileSystemDirectoryHandle | undefined;
 
@@ -404,6 +388,15 @@ export class GitFS {
 
       await this.openLocalDirectory(dirHandle);
       return dirHandle.name;
+    }
+  }
+
+  // This will just remove a recent local project
+  async removeRecentProject(id: string) {
+    if (this.isElectron) {
+      await window.fsApi.removeRecentProject(id);
+    } else {
+      await del('courses/' + id);
     }
   }
 
@@ -492,7 +485,6 @@ export class GitFS {
     const id = crypto.randomUUID();
 
     const dirMeta: DirMeta = {
-      createdAt: new Date().toISOString(),
       lastAccessed: new Date().toISOString(),
       dirHandle,
       id,
@@ -504,26 +496,12 @@ export class GitFS {
     await set('courses/' + id || 'rootdir', dirMeta);
   };
 
-  getLocalDirs = async () => {
+  getRecentProjects = async () => {
     const newMetas: DirMeta[] = [];
 
     if (this.isElectron) {
       try {
-        const dirs = await this.fs.promises.readdir(fsType.localFileSystem);
-
-        for (const dir of dirs) {
-          const stats = await this.fs.promises.stat(
-            fsType.localFileSystem + '/' + dir.toString(),
-          );
-          newMetas.push({
-            createdAt: new Date(stats.ctimeMs as number).toISOString(),
-            lastAccessed: new Date(stats.mtimeMs as number).toISOString(),
-            id: dir.toString(),
-            isValid: true,
-            name: dir.toString(),
-            remoteUrl: await this.getGitRemoteUrlElectron(dir.toString()),
-          });
-        }
+        return await window.fsApi.getRecentProjects();
       } catch {
         return [];
       }
@@ -580,6 +558,7 @@ export class GitFS {
 
     return saved?.dirHandle;
   };
+
   /**
    * Deletes a local repository directory by name.
    *

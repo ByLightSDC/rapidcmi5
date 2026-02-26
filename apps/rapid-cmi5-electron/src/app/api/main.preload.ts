@@ -101,6 +101,11 @@ export const fsApi = {
   getStatus: (path: string) => ipcRenderer.invoke('fs:getStatus', path),
   getStashStatus: (path: string) =>
     ipcRenderer.invoke('fs:getStashStatus', path),
+  chooseProject: () => ipcRenderer.invoke('fs:chooseProject'),
+  getRecentProjects: () => ipcRenderer.invoke('fs:getRecentProjects'),
+  removeRecentProject: (id: string) => ipcRenderer.invoke('fs:removeRecentProject', id),
+  addRecentProject: (id: string) => ipcRenderer.invoke('fs:addRecentProject', id),
+
 };
 contextBridge.exposeInMainWorld('fsApi', fsApi);
 

@@ -1,5 +1,5 @@
 import { CreateNewFolder, FolderOpen } from '@mui/icons-material';
-import {  List, alpha, useTheme } from '@mui/material';
+import { List, alpha, useTheme } from '@mui/material';
 import {
   getSvgStyleIcon,
   StyleIconTypeEnum,
@@ -109,11 +109,7 @@ export default function ProductionModeSelection({
               color: alpha(palette.primary.main, 0.9),
             }) || <></>
           }
-          subText={
-            <>
-             Clone remote git repository to your desktop
-            </>
-          }
+          subText={<>Clone remote git repository to your desktop</>}
         />
         {/* Open Existing Repository */}
         {!isElectron && (
@@ -124,9 +120,19 @@ export default function ProductionModeSelection({
             handleShowDocs={() => handleShowDocs('open')}
             disabled={isDisabled}
             icon={<FolderOpen />}
-            subText={
-              <>Select existing git project on your desktop</>
-            }
+            subText={<>Select existing git project on your desktop</>}
+          />
+        )}
+        {/* Open Existing Repository */}
+        {isElectron && (
+          <OptionCard
+            data-testid="open-repo-button"
+            title={'Open Existing Project'}
+            handleSelect={() => openLocalFolder()}
+            handleShowDocs={() => handleShowDocs('open')}
+            disabled={isDisabled}
+            icon={<FolderOpen />}
+            subText={<>Select existing git project on your desktop</>}
           />
         )}
         {/* Create New Repository */}
@@ -137,9 +143,7 @@ export default function ProductionModeSelection({
           handleShowDocs={() => handleShowDocs('create')}
           disabled={isDisabled}
           icon={<CreateNewFolder />}
-          subText={
-            <>Create new git project on your desktop</>
-          }
+          subText={<>Create new git project on your desktop</>}
         />
       </List>
     </GlassCard>

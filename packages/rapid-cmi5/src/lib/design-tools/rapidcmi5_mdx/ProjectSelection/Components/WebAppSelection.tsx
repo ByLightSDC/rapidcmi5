@@ -1,11 +1,9 @@
-import { Box, Container } from '@mui/material';
-import { DirMeta } from '../../../course-builder/GitViewer/utils/fileSystem';
-import CloneLoadingOverlay from './LoadingOverlay';
+import { Box } from '@mui/material';
 import ProductionModeSelection from './ProductionModeSelection';
 import RecentProjectSelection from './RecentProjectSelection';
 import SandBoxSelection from './SandBoxSelection';
-import { LoadingState } from 'packages/rapid-cmi5/src/lib/redux/repoManagerReducer';
-import DesktopDownload from './DesktopDownloader';
+import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
+
 
 interface OptionDocumentation {
   title: string;
@@ -21,12 +19,15 @@ export default function WebAppSelection({
   handleCloneRepo,
   handleShowDocumentation,
   isSandboxLaunching = false,
+  removeLocalRecentProject,
 }: {
   openLocalFolderAndSet: () => Promise<void>;
   openLocalRecentProject: (id: string) => Promise<void>;
+  removeLocalRecentProject: (ids: string[]) => Promise<void>;
   handleCreateRepo: () => void;
   handleOpenSandbox: () => Promise<void>;
   recentProjects: DirMeta[];
+
   handleShowDocumentation: (doc: OptionDocumentation) => void;
   handleCloneRepo: () => void;
   isSandboxLaunching?: boolean;
@@ -64,6 +65,7 @@ export default function WebAppSelection({
         <RecentProjectSelection
           recentProjects={recentProjects}
           openRecentProject={openLocalRecentProject}
+          removeRecentProject={removeLocalRecentProject}
           isDisabled={isSandboxLaunching}
         />
       </Box>

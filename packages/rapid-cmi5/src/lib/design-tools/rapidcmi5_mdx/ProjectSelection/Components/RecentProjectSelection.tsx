@@ -7,14 +7,20 @@ import {
   InputAdornment,
   Alert,
   AlertTitle,
+  Tooltip,
+  Checkbox,
+  Button,
+  Switch,
 } from '@mui/material';
 import { alpha, Box, Stack, useTheme } from '@mui/system';
-import { History, Search, Clear } from '@mui/icons-material';
-import { useState, useMemo } from 'react';
-import { DirMeta } from '../../../course-builder/GitViewer/utils/fileSystem';
+import { History, Search, Clear, Info } from '@mui/icons-material';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import CancelIcon from '@mui/icons-material/Cancel';
 import { GlassCard } from './GlassCard';
+
 import ThemedOptionCard from './ThemedOption';
-import { ButtonMinorUi } from '@rapid-cmi5/ui';
+import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
+import { useState, useMemo } from 'react';
 
 const formatRelativeTime = (isoDate: string): string => {
   const now = new Date();
@@ -38,22 +44,25 @@ const formatRelativeTime = (isoDate: string): string => {
 export type RecentProjectSelectionProps = {
   recentProjects: DirMeta[];
   openRecentProject: (path: string) => void;
+  removeRecentProject: (path: string[]) => Promise<void>;
   isDisabled?: boolean;
 };
 
 export default function RecentProjectSelection({
   recentProjects,
   openRecentProject,
+  removeRecentProject,
   isDisabled = false,
 }: RecentProjectSelectionProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isRemoving, setIsRemoving] = useState(false);
   const theme = useTheme();
   const { palette } = theme;
 
-  // Filter projects based on search query
   const filteredProjects = useMemo(() => {
     if (!searchQuery.trim()) return recentProjects;
-
     const query = searchQuery.toLowerCase();
     return recentProjects.filter(
       (project) =>
@@ -70,11 +79,63 @@ export default function RecentProjectSelection({
     setSearchQuery('');
   };
 
+  const handleEnterEditMode = () => {
+    setIsEditMode(true);
+    setSelectedIds(new Set());
+  };
+
+  const handleCancelEditMode = () => {
+    setIsEditMode(false);
+    setSelectedIds(new Set());
+  };
+
+  const handleToggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const handleRemoveSelected = async () => {
+    setIsRemoving(true);
+    removeRecentProject([...selectedIds])
+    setIsRemoving(false);
+    setIsEditMode(false);
+    setSelectedIds(new Set());
+  };
+
+  const editButton =
+    recentProjects.length > 0 ? (
+      <Tooltip
+        title={isEditMode ? 'Exit edit mode' : 'Select projects to remove'}
+        placement="left"
+        arrow
+      >
+        <Switch
+          checked={isEditMode}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            if (event.target.checked) {
+              handleEnterEditMode();
+            } else {
+              handleCancelEditMode();
+            }
+          }}
+          disabled={isDisabled}
+        />
+      </Tooltip>
+    ) : null;
+
   return (
     <GlassCard
       sx={{ height: 'clamp(650px, 80vh, 700px)' }}
       title="Recent Projects"
       icon={<History sx={{ color: 'white' }} />}
+      headerAction={editButton}
     >
       <Box
         data-testid="recent-projects-card"
@@ -85,6 +146,38 @@ export default function RecentProjectSelection({
           minHeight: 0,
         }}
       >
+        {/* Edit mode info banner */}
+        {isEditMode && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 1,
+              mb: 2,
+              p: 1.5,
+              borderRadius: 1.5,
+              backgroundColor: alpha(palette.info.main, 0.08),
+              border: `1px solid ${alpha(palette.info.main, 0.2)}`,
+              flexShrink: 0,
+            }}
+          >
+            <Info
+              sx={{ fontSize: 16, color: 'info.main', mt: 0.15, flexShrink: 0 }}
+            />
+            <Typography
+              variant="caption"
+              sx={{
+                fontFamily: '"IBM Plex Sans", sans-serif',
+                color: 'text.secondary',
+                lineHeight: 1.5,
+              }}
+            >
+              Select projects to remove from this list. Projects won't be
+              deleted — they'll reappear here if opened again.
+            </Typography>
+          </Box>
+        )}
+
         {/* Search Bar */}
         {recentProjects.length > 0 && (
           <TextField
@@ -127,9 +220,7 @@ export default function RecentProjectSelection({
                     sx={{
                       width: 24,
                       height: 24,
-                      '&:hover': {
-                        color: 'primary.main',
-                      },
+                      '&:hover': { color: 'primary.main' },
                     }}
                   >
                     <Clear sx={{ fontSize: 16 }} />
@@ -148,9 +239,7 @@ export default function RecentProjectSelection({
             minHeight: 0,
             pr: 1,
             mr: -1,
-            '&::-webkit-scrollbar': {
-              width: '8px',
-            },
+            '&::-webkit-scrollbar': { width: '8px' },
             '&::-webkit-scrollbar-track': {
               background: alpha(palette.background.paper, 0.3),
               borderRadius: '4px',
@@ -158,114 +247,116 @@ export default function RecentProjectSelection({
             '&::-webkit-scrollbar-thumb': {
               background: alpha(palette.primary.main, 0.3),
               borderRadius: '4px',
-              '&:hover': {
-                background: alpha(palette.primary.main, 0.5),
-              },
+              '&:hover': { background: alpha(palette.primary.main, 0.5) },
             },
           }}
         >
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: '1fr',
-              gap: 2,
-            }}
-          >
+          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 2 }}>
             {filteredProjects.map((project) => (
-              <ThemedOptionCard key={project.id}>
-                <ListItemButton
-                  onClick={() => openRecentProject(project.id)}
-                  disabled={isDisabled}
-                  sx={{
-                    borderRadius: 2,
-                    p: 1.2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    gap: 0.5,
-                    transition: 'none',
-                    '&:hover': {
-                      background: 'transparent',
-                    },
-                  }}
-                >
-                  <Box sx={{ mb: 1 }}>
-                    <ListItemText
-                      primary={project.name}
-                      sx={{
-                        margin: 0,
-                        flex: 1,
-                        fontFamily: '"IBM Plex Sans", sans-serif',
-                        fontWeight: 500,
-                        fontSize: '14px',
-                        letterSpacing: '0.01em',
-                      }}
-                    />
-
-                    {/* {!project.isValid && (
-                      <Box
+              <Box
+                key={project.id}
+                sx={{
+                  position: 'relative',
+                  ...(!isEditMode && { '&:hover .remove-btn': { opacity: 1 } }),
+                }}
+              >
+                <ThemedOptionCard>
+                  <ListItemButton
+                    onClick={() => {
+                      if (isEditMode) {
+                        handleToggleSelect(project.id);
+                      } else {
+                        openRecentProject(project.id);
+                      }
+                    }}
+                    disabled={isDisabled}
+                    sx={{
+                      borderRadius: 2,
+                      p: 1.2,
+                      pr: isEditMode ? 1.2 : 4.5,
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 1,
+                      transition: 'none',
+                      '&:hover': { background: 'transparent' },
+                    }}
+                  >
+                    {isEditMode && (
+                      <Checkbox
+                        checked={selectedIds.has(project.id)}
+                        size="small"
+                        disableRipple
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={() => handleToggleSelect(project.id)}
                         sx={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                          px: 1,
-                          py: 0.25,
-                          borderRadius: 1,
-                          background: alpha(palette.warning.light, 0.1),
-                          border: `1px solid ${alpha(palette.warning.main, 0.5)}`,
+                          p: 0,
+                          flexShrink: 0,
+                          color: alpha(palette.error.main, 0.5),
+                          '&.Mui-checked': { color: 'error.main' },
                         }}
-                      >
+                      />
+                    )}
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Box sx={{ mb: 0.5 }}>
+                        <ListItemText
+                          primary={project.name}
+                          sx={{
+                            margin: 0,
+                            fontFamily: '"IBM Plex Sans", sans-serif',
+                            fontWeight: 500,
+                            fontSize: '14px',
+                            letterSpacing: '0.01em',
+                          }}
+                        />
+                      </Box>
+                      <Stack spacing={0.5}>
                         <Typography
                           variant="caption"
                           sx={{
-                            fontFamily: '"Space Mono", monospace',
-                            fontSize: '0.7rem',
-                            color: palette.warning.main,
+                            fontFamily: '"IBM Plex Sans", sans-serif',
+                            fontSize: '0.75rem',
+                            color: alpha(palette.text.primary, 0.7),
                           }}
                         >
-                          ⚠ Needs permission
+                          Last Accessed:{' '}
+                          {formatRelativeTime(project.lastAccessed)}
                         </Typography>
-                      </Box>
-                    )} */}
-                  </Box>
-                  <Stack spacing={0.5}>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        fontFamily: '"IBM Plex Sans", sans-serif',
-                        fontSize: '0.75rem',
-                        color: alpha(palette.text.primary, 0.7),
-                      }}
-                    >
-                      {formatRelativeTime(project.lastAccessed)}
-                    </Typography>
-
-                    {project.remoteUrl && (
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          fontFamily: '"Space Mono", monospace',
-                          fontSize: '0.7rem',
-                          color: alpha(palette.text.primary, 0.5),
-                        }}
-                      >
-                        {project.remoteUrl}
-                      </Typography>
-                    )}
-                  </Stack>
-                </ListItemButton>
-              </ThemedOptionCard>
+                        {project.createdAt && (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontFamily: '"IBM Plex Sans", sans-serif',
+                              fontSize: '0.75rem',
+                              color: alpha(palette.text.primary, 0.7),
+                            }}
+                          >
+                            Created: {formatRelativeTime(project.createdAt)}
+                          </Typography>
+                        )}
+                        {project.remoteUrl && (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontFamily: '"Space Mono", monospace',
+                              fontSize: '0.7rem',
+                              color: alpha(palette.text.primary, 0.5),
+                            }}
+                          >
+                            {project.remoteUrl}
+                          </Typography>
+                        )}
+                      </Stack>
+                    </Box>
+                  </ListItemButton>
+                </ThemedOptionCard>
+              </Box>
             ))}
           </Box>
         </Box>
 
         {filteredProjects.length === 0 && recentProjects.length > 0 && (
-          <Box
-            sx={{
-              py: 6,
-              textAlign: 'center',
-            }}
-          >
+          <Box sx={{ py: 6, textAlign: 'center' }}>
             <Typography
               variant="body1"
               sx={{
@@ -279,22 +370,16 @@ export default function RecentProjectSelection({
         )}
 
         {recentProjects.length === 0 && (
-          <Box
-            sx={{
-              py: 6,
-              textAlign: 'center',
-            }}
-          >
+          <Box sx={{ py: 6, textAlign: 'center' }}>
             <Typography
               variant="body1"
-              sx={{
-                fontFamily: '"IBM Plex Sans", sans-serif',
-              }}
+              sx={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
             >
               No recent projects yet
             </Typography>
           </Box>
         )}
+
         {filteredProjects.some((project) => project.isValid === false) && (
           <Alert severity="warning" sx={{ lineHeight: 1, mt: 2 }}>
             <AlertTitle sx={{ lineHeight: 1, fontWeight: 'bold' }}>
@@ -304,6 +389,33 @@ export default function RecentProjectSelection({
               You must click allow access when the browser prompts you.
             </Stack>
           </Alert>
+        )}
+
+        {/* Edit mode action bar */}
+        {isEditMode && (
+          <Stack direction="row" spacing={1} sx={{ mt: 2, flexShrink: 0 }}>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleCancelEditMode}
+              disabled={isRemoving}
+              sx={{ fontFamily: '"IBM Plex Sans", sans-serif', flex: 1 }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              size="small"
+              onClick={handleRemoveSelected}
+              disabled={selectedIds.size === 0 || isRemoving}
+              sx={{ fontFamily: '"IBM Plex Sans", sans-serif', flex: 1 }}
+            >
+              {isRemoving
+                ? 'Removing…'
+                : `Remove Selected${selectedIds.size > 0 ? ` (${selectedIds.size})` : ''}`}
+            </Button>
+          </Stack>
         )}
       </Box>
     </GlassCard>
