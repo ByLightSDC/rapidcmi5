@@ -38,6 +38,8 @@ export function GitConfigForm({
   ) => void;
 }) {
   const { handleGitSetConfig } = useContext(GitContext);
+  const { isRepoConnectedToRemote, handleChangeRepoName, currentRepo } =
+    useContext(GitContext);
 
   const validationSchema = yup.object().shape({
     username: NAME_GROUP_OPT,
@@ -99,7 +101,7 @@ export function GitConfigForm({
             error={Boolean(errors?.username)}
             helperText={errors?.username?.message}
             name="username"
-            label="Git Username"
+            label="User Name"
             placeholder="user.name"
             readOnly={false}
           />
@@ -121,13 +123,15 @@ export function GitConfigForm({
             error={Boolean(errors?.remoteRepoUrl)}
             helperText={errors?.remoteRepoUrl?.message}
             name="remoteRepoUrl"
-            label="Remote URL"
+            label="Remote Repository URL"
             placeholder="https://mycourserepo.git"
             readOnly={false}
             multiline
           />
         </Grid>
-        {/* <Alert severity="info">{errors.zipFile.message}</Alert> */}
+        {!isRepoConnectedToRemote && (
+          <Alert severity="info">Remote Repository MUST be blank. Ensure there is no README file.</Alert>
+        )}
       </>
     );
   };
@@ -145,7 +149,7 @@ export function GitConfigForm({
         <MiniForm
           dataCache={defaultData}
           doAction={handleGitSetConfig}
-          formTitle="Configure Git Credentials (Project)"
+          formTitle="Project Settings"
           getFormFields={getFormFields}
           instructions=""
           successToasterMessage="Set Git Config Successfully"
