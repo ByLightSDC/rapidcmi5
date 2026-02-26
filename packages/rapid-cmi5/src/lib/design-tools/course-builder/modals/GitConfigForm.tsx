@@ -20,7 +20,7 @@ import { NAME_GROUP_OPT } from '@rapid-cmi5/ui';
 import { GitConfigType } from '../CourseBuilderApiTypes';
 import { useContext } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';
-import { Alert } from '@mui/material';
+import { Alert, Typography } from '@mui/material';
 
 export function GitConfigForm({
   defaultData,
@@ -73,6 +73,9 @@ export function GitConfigForm({
     const { errors, isValid } = formState;
     return (
       <>
+        <Grid size={12}>
+          <Typography variant="caption">Commit Settings</Typography>
+        </Grid>
         <Grid size={6}>
           <FormControlTextField
             control={control}
@@ -94,6 +97,9 @@ export function GitConfigForm({
             placeholder="FirstName LastName"
             readOnly={false}
           />
+        </Grid>
+        <Grid size={12}>
+          <Typography variant="caption">Remote Repository</Typography>
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <FormControlTextField
@@ -117,6 +123,7 @@ export function GitConfigForm({
             readOnly={false}
           />
         </Grid>
+
         <Grid size={12}>
           <FormControlTextField
             control={control}
@@ -130,7 +137,10 @@ export function GitConfigForm({
           />
         </Grid>
         {!isRepoConnectedToRemote && (
-          <Alert severity="info">Remote Repository MUST be blank. Ensure there is no README file.</Alert>
+          <Alert severity="warning">
+            The remote Repository MUST be blank. Please ensure there is no
+            README file before you add the remote.
+          </Alert>
         )}
       </>
     );

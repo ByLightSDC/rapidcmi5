@@ -1,6 +1,5 @@
 import { setModal } from '@rapid-cmi5/ui';
 import {
-  attachRemoteRepoModalId,
   cloneRepoModalId,
   commitChangesModalId,
   createLocalRepoModalId,
@@ -34,19 +33,7 @@ export const useRC5Prompts = () => {
   const hasFilesToSave = useSelector(isDisplayDirty);
   const { sendMessage } = useContext(RC5Context);
 
-  const promptAttachRemoteRepo = (e: any, meta?: any) => {
-    dispatch(
-      setModal({
-        type: attachRemoteRepoModalId,
-        id: null,
-        name: null,
-        meta: {
-          ...meta,
-          title: 'Attach Remote Repo',
-        },
-      }),
-    );
-  };
+
 
   const promptDeleteAllSlides = () => {
     dispatch(
@@ -250,12 +237,11 @@ export const useRC5Prompts = () => {
         id: null,
         name: repoName,
         meta: {
-          title: 'Delete Local Repository',
+          title: 'Delete Project',
           confirmNameOnDelete: true,
-          message:
-            'Are you sure you want to delete the local git repository named ',
+          message: 'Are you sure you want to delete the project named ',
           permanentWarning:
-            'This will only effect your local files. The remote repository will remain intact. Be sure to commit any pending changes!',
+            'This will only effect your local files. The remote repository will remain intact. Be sure to commit & push any pending changes before you delete!',
         },
       }),
     );
@@ -342,7 +328,6 @@ export const useRC5Prompts = () => {
   };
 
   return {
-    promptAttachRemoteRepo,
     promptChangeCourse,
     promptCloneRepo,
     promptCreateLocalRepo,

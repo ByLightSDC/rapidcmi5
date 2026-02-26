@@ -60,7 +60,6 @@ export function SaveCourseForm({
   } = useContext(GitContext);
   const { discardLessonChanges, saveCourseFile, sendMessage } =
     useContext(RC5Context);
-  const { promptAttachRemoteRepo } = useRC5Prompts();
 
   const displayToaster = useToaster();
   const dispatch = useDispatch();
@@ -72,13 +71,6 @@ export function SaveCourseForm({
   const [saveError, setSaveErrorMessage] = useState<string | null>(null);
   const [saveProgressMessage, setSaveProgressMessage] = useState('');
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
-
-  const handleAddRemoteBeforeSave = () => {
-    promptAttachRemoteRepo(undefined, {
-      notify: MessageType.saveCourse,
-      cacheMeta: modalObj.meta,
-    });
-  };
 
   const handleFormChanges = (data: any) => {
     setSuperData(data);
