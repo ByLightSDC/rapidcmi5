@@ -75,3 +75,8 @@
   left: -6px;
   cursor: nw-resize;
 }
+
+.imageWrapper img {
+  max-width: 100%;
+  max-height: 100%;
+}
