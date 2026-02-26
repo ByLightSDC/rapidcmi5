@@ -5,7 +5,9 @@ import {
 import {
   CourseAU,
   createAuMappingNameWithAuId,
+  Credentials,
   generateAuId,
+  GitUserConfig,
 } from '@rapid-cmi5/cmi5-build-common';
 import { RapidCmi5, GetScenarioFormProps } from '@rapid-cmi5/react-editor';
 import { debugLogError } from '@rapid-cmi5/ui';
@@ -16,7 +18,20 @@ import { AuthContext } from './contexts/AuthContext';
 
 export function RapidCmi5Wrapper() {
   const { token, parsedUserToken } = useContext(AuthContext);
-  const { gitUser, gitCredentials, ssoConfig } = useContext(UserConfigContext);
+  const { gitUser, gitCredentials, ssoConfig, setGitCredentials, setGitUser } =
+    useContext(UserConfigContext);
+
+  const handleOverrideGlobalGitConfig = (
+    config?: GitUserConfig,
+    creds?: Credentials,
+  ) => {
+    if (config) {
+      setGitUser(config);
+    }
+    if (setGitCredentials && creds) {
+      setGitCredentials(creds);
+    }
+  };
 
   useEffect(() => {
     overrideDevOpsApiClient(ssoConfig?.rangeRestApiUrl);
@@ -68,6 +83,7 @@ export function RapidCmi5Wrapper() {
 
   return (
     <RapidCmi5
+      handleOverrideGlobalGitConfig={handleOverrideGlobalGitConfig}
       showHomeButton={true}
       userAuth={{
         token,

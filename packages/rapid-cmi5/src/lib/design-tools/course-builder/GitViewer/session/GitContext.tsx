@@ -12,7 +12,11 @@ import {
 import { Buffer } from 'buffer';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { CourseData } from '@rapid-cmi5/cmi5-build-common';
+import {
+  CourseData,
+  Credentials,
+  GitUserConfig,
+} from '@rapid-cmi5/cmi5-build-common';
 import {
   CreateCloneType,
   CreateCommitType,
@@ -557,6 +561,29 @@ export const GitContextProvider = (props: tProviderProps) => {
     await loadCourse(coursePath, r);
   };
 
+  const attemptGlobalGitConfigOverride = (
+    authorEmail: string,
+    authorName: string,
+    repoUsername?: string,
+    repoPassword?: string,
+  ) => {
+    if (rapidCmi5Opts.handleOverrideGlobalGitConfig) {
+      const gitUserConfig: GitUserConfig = {
+        authorEmail: authorEmail,
+        authorName: authorName,
+      };
+
+      const creds: Credentials | undefined =
+        repoUsername && repoPassword
+          ? {
+              username: repoUsername,
+              password: repoPassword,
+            }
+          : undefined;
+      rapidCmi5Opts.handleOverrideGlobalGitConfig(gitUserConfig, creds);
+    }
+  };
+
   const handleCloneRepo = async (req: CreateCloneType) => {
     const cleanedName = slugifyPath(req.repoDirName);
     dispatch(setLoadingState(LoadingState.cloningRepo));
@@ -565,6 +592,7 @@ export const GitContextProvider = (props: tProviderProps) => {
       fileSystemType: fsType.localFileSystem,
       repoName: req.repoDirName,
     };
+
     try {
       await gitFs.createRepoInDir(
         req.repoDirName,
@@ -589,6 +617,12 @@ export const GitContextProvider = (props: tProviderProps) => {
       setLocalFileSystemLoaded(true);
       setBrowserFileSystemLoaded(true);
       await resolveCurrentRepo(r);
+      attemptGlobalGitConfigOverride(
+        req.authorEmail,
+        req.authorName,
+        req.repoUsername,
+        req.repoPassword,
+      );
     } finally {
       dispatch(setLoadingState(LoadingState.loaded));
     }
@@ -1103,6 +1137,7 @@ export const GitContextProvider = (props: tProviderProps) => {
         fileSystemType: fsType.localFileSystem,
         repoName: cleanedName,
       });
+      attemptGlobalGitConfigOverride(req.authorEmail, req.authorName, req.repoUsername, req.repoPassword);
     } finally {
       dispatch(setLoadingState(LoadingState.loaded));
     }

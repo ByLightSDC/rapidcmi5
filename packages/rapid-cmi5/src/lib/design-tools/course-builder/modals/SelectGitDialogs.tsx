@@ -260,6 +260,8 @@ export function SelectGitDialogs() {
             repoRemoteUrl: '',
             authorEmail: currentAuth?.userEmail?.toLowerCase() || '',
             authorName: currentAuth?.userName || '',
+            repoUsername: currentAuth?.gitCredentials?.username || '',
+            repoPassword: currentAuth?.gitCredentials?.password || '',
             shallowClone: false,
           }}
           modalObj={modalObj}
