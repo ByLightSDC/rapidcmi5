@@ -37,7 +37,7 @@ import { GitDrawer } from './drawers/GitDrawer';
 import { SlideMenu } from './menu/ArchiveSlideMenu';
 import { dividerColor } from '@rapid-cmi5/ui';
 import WelcomePage from './ProjectSelection/SelectProject';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import OptionCard from './ProjectSelection/Components/OptionCard';
 import { GitContext } from '../course-builder/GitViewer/session/GitContext';
 
@@ -54,6 +54,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { useRC5Prompts } from './modals/useRC5Prompts';
 import { listItemProps } from './drawers/components/LessonTreeNode';
 import { useMDStyleIcons } from './styles/useMDStyleIcons';
+import { getSvgStyleIcon, StyleIconTypeEnum } from './styles/styleSvgConstants';
 
 enum RepoActionEnum {
   Config,
@@ -69,16 +70,22 @@ enum RepoActionEnum {
 export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
   const viewMode = useSelector(currentViewMode);
   const themedDividerColor = useSelector(dividerColor);
-  const { gitIcon } = useMDStyleIcons();
+
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(changeViewMode(ViewModeEnum.RepoSelector));
   }, []);
-  const { currentRepo } =
-    useContext(GitContext);
+  const { currentRepo } = useContext(GitContext);
   const { promptDeleteRepo, promptGitConfig } = useRC5Prompts();
 
   const theme = useTheme();
+
+  const gitIcon = useMemo(() => {
+    return getSvgStyleIcon(StyleIconTypeEnum.GIT, {
+      color: theme.palette.primary.main,
+      fontSize: 'inherit',
+    });
+  }, [theme.palette.primary.main]);
 
   /**
    * context menu for course
@@ -86,7 +93,7 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
   const repoActions = [
     {
       tooltip: 'Project Settings',
-      icon: <Box color="primary.main"> {gitIcon}</Box>,
+      icon: <Box sx={{ marginTop: 1 }}> {gitIcon}</Box>,
     },
     {
       tooltip: 'Delete Project',
@@ -118,7 +125,14 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
           }}
         />
       ) : (
-        <Stack direction="column">
+        <Stack
+          direction="column"
+          sx={{
+            width: '100%',
+            height: '100%',
+            minHeight: 0,
+          }}
+        >
           <Stack
             direction="row"
             sx={{
@@ -241,9 +255,7 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
                 }}
               />
               <Panel>
-                {viewMode === ViewModeEnum.Designer && (
-                    <RC5VisualEditor />
-                )}
+                {viewMode === ViewModeEnum.Designer && <RC5VisualEditor />}
                 {viewMode === ViewModeEnum.CodeEditor && <RC5FileEditor />}
                 {viewMode === ViewModeEnum.GitEditor && <RC5GitEditor />}
               </Panel>
