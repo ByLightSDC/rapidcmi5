@@ -32,4 +32,5 @@ export * from './lib/types/quiz';
 export * from './lib/types/slide';
 export * from './lib/types/teamConsoles';
 export * from './lib/types/projects';
+export * from './lib/types/user';
 

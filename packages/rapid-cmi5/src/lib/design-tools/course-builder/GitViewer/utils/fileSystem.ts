@@ -112,7 +112,6 @@ export class GitFS {
     r: RepoAccessObject,
     coursePath: string,
     zipName: string,
-    processAu?: (au: CourseAU, blockId: string) => Promise<void>,
   ) => {
     const repoPath = getRepoPath(r);
 
@@ -179,19 +178,6 @@ export class GitFS {
       const cmi5Path = path.join(cmi5BuildCache, 'cmi5.xml');
 
       await this.fs.promises.writeFile(cmi5Path, cmi5Xml.trim());
-
-      if (processAu) {
-        for (const block of courseData.blocks) {
-          const blockId = generateBlockId({
-            courseId: courseData.courseId,
-            blockName: block.blockName,
-          });
-
-          for (const au of block.aus) {
-            await processAu(au, blockId);
-          }
-        }
-      }
 
       const builtZip = await this.generateZip(cmi5BuildCache, '');
 

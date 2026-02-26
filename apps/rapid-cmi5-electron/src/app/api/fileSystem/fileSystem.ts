@@ -51,12 +51,12 @@ const store = new Store<StoreSchema>({
 import path, { basename, join } from 'path';
 import git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
+import { getAssetPath } from '../cmi5Builder/build';
 
 const AuthenticationErrorMessage =
   'The credentials provided are invalid; authentication has failed.';
 const AuthorizationErrorMessage =
   'The credentials provided do not have proper access; authorization has failed. Please give the personal access token proper repository access.';
-
 const fsp = fs.promises;
 
 function toPosix(p: string) {
@@ -131,7 +131,29 @@ export class ElectronFsHandler {
       clearDirectory(base);
     }
 
-    this.baseReady = fsp.mkdir(base, { recursive: true }).then(() => {});
+    this.baseReady = fsp.mkdir(base, { recursive: true }).then(() => {
+      return;
+    });
+  }
+
+  async readPlayerConfig(): Promise<Record<string, any>> {
+    const distPath = getAssetPath('cc-cmi5-player-dist');
+
+    const configPath = path.join(distPath, 'cfg.json');
+    const data = await fsp.readFile(configPath);
+    const dataArray = new Uint8Array(data);
+    const text = new TextDecoder().decode(dataArray);
+    return JSON.parse(text);
+  }
+
+  async writePlayerConfig(config: Record<string, any>) {
+    const distPath = getAssetPath('cc-cmi5-player-dist');
+    const configPath = path.join(distPath, 'cfg.json');
+    const obj = typeof config === 'string' ? JSON.parse(config) : config;
+
+    const pretty = JSON.stringify(obj, null, 2) + '\n';
+
+    await fsp.writeFile(configPath, pretty, { encoding: 'utf8' });
   }
 
   private async getFullPath(p: string): Promise<string> {
@@ -208,7 +230,7 @@ export class ElectronFsHandler {
     return true;
   }
 
-  async mkdir(p: string, recursive: boolean = false) {
+  async mkdir(p: string, recursive = false) {
     const full = await this.getFullPath(p);
     await fsp.mkdir(full, { recursive });
     return true;

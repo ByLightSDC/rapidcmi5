@@ -12,6 +12,27 @@ import {
 import { app } from 'electron';
 import { cmi5Builder } from './app/api/cmi5Builder/build';
 import fs from 'fs';
+import {
+  Credentials,
+  GitUserConfig,
+  SSOConfig,
+} from '@rapid-cmi5/cmi5-build-common';
+import {
+  decryptCredentials,
+  encryptCredentials,
+  decryptToken,
+  encryptToken,
+  loginSSO,
+  loginWithRefreshOrPassword,
+  logoutSSO,
+  store,
+} from './app/api/userSettings/sso';
+import {
+  applyCustomCerts,
+  listCerts,
+  addCert,
+  removeCert,
+} from './app/api/userSettings/certManager';
 
 const builder = new cmi5Builder();
 let fsHandler: ElectronFsHandler | null = null;
@@ -150,6 +171,36 @@ ipcMain.handle('fs:removeRecentProject', (_e, id: string) => {
     throw error;
   }
 });
+
+ipcMain.handle(
+  'fs:pushRepo',
+  async (_e, repoPath: string, username: string, password: string) => {
+    try {
+      return await getFsHandler().pushRepo(repoPath, username, password);
+    } catch (error) {
+      console.error('Error pushing repository:', error);
+      throw error;
+    }
+  },
+);
+
+ipcMain.handle(
+  'fs:gitCommit',
+  async (
+    _e,
+    repoPath: string,
+    message: string,
+    name: string,
+    email: string,
+  ) => {
+    try {
+      return await getFsHandler().gitCommit(repoPath, message, name, email);
+    } catch (error) {
+      console.error('Error committing changes:', error);
+      throw error;
+    }
+  },
+);
 
 ipcMain.handle('fs:addRecentProject', (_e, id: string) => {
   try {
@@ -452,6 +503,123 @@ ipcMain.handle('fs:readdir', async (_e, dirPath: string) => {
     console.error('Error reading directory:', error);
     throw error;
   }
+});
+
+ipcMain.handle('fs:readPlayerConfig', async (_e) => {
+  try {
+    return await getFsHandler().readPlayerConfig();
+  } catch (error) {
+    console.error('Error reading directory:', error);
+    throw error;
+  }
+});
+ipcMain.handle('fs:writePlayerConfig', async (_e, content) => {
+  try {
+    return await getFsHandler().writePlayerConfig(content);
+  } catch (error) {
+    console.error('Error reading directory:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('userSettingsApi:getSSOConfig', () => {
+  return store.get('ssoConfig');
+});
+
+ipcMain.handle('userSettingsApi:setSSOConfig', (_e, config: SSOConfig) => {
+  store.set('ssoConfig', config);
+  return true;
+});
+
+ipcMain.handle('userSettingsApi:loginSSO', async (_e, refresh = true) => {
+  if (refresh) {
+    const enc = store.get('refreshToken');
+    const storedRefreshToken = enc ? decryptToken(enc) : null;
+    const tokens = await loginWithRefreshOrPassword(storedRefreshToken);
+    store.set('refreshToken', encryptToken(tokens.refresh_token));
+    return tokens;
+  } else {
+    const tokens = await loginSSO();
+    return tokens;
+  }
+});
+
+ipcMain.handle('userSettingsApi:logoutSSO', async () => {
+  const enc = store.get('refreshToken');
+  const refreshToken = enc ? decryptToken(enc) : null;
+
+  if (refreshToken) {
+    try {
+      await logoutSSO(refreshToken);
+    } catch (err) {
+      console.error('SSO logout failed:', err);
+    }
+  }
+
+  // Clean up stored tokens regardless of whether the server logout succeeded
+  store.delete('refreshToken');
+  store.delete('ssoCredentials');
+});
+
+ipcMain.handle(
+  'userSettingsApi:setGitCredentials',
+  async (_e, creds: Credentials) => {
+    const enc = encryptCredentials(creds);
+    store.set('gitCredentials', enc);
+  },
+);
+
+ipcMain.handle('userSettingsApi:getGitCredentials', (_e) => {
+  const enc = store.get('gitCredentials');
+  if (!enc) return null;
+  return decryptCredentials(enc) ?? null;
+});
+
+ipcMain.handle(
+  'userSettingsApi:setSSOCredentials',
+  async (_e, creds: Credentials) => {
+    const enc = encryptCredentials(creds);
+    store.set('ssoCredentials', enc);
+  },
+);
+
+ipcMain.handle(
+  'userSettingsApi:setGitUserConfig',
+  (_e, config: GitUserConfig) => {
+    store.set('gitUserConfig', config);
+    return true;
+  },
+);
+
+ipcMain.handle('userSettingsApi:getGitUserConfig', () => {
+  return store.get('gitUserConfig') ?? null;
+});
+
+ipcMain.handle('userSettingsApi:clearGitCredentials', () => {
+  store.delete('gitCredentials');
+  return true;
+});
+
+// Cert Manager
+applyCustomCerts();
+
+ipcMain.handle('userSettingsApi:listCerts', () => {
+  return listCerts();
+});
+
+ipcMain.handle(
+  'userSettingsApi:addCert',
+  (_e, filename: string, contents: string) => {
+    const cert = addCert(filename, contents);
+    // Re-apply so the new cert is trusted immediately
+    applyCustomCerts();
+    return cert;
+  },
+);
+
+ipcMain.handle('userSettingsApi:removeCert', (_e, id: string) => {
+  removeCert(id);
+  applyCustomCerts();
 });
 
 // CMI5 Build Handler

@@ -17,7 +17,7 @@ import Grid from '@mui/material/Grid2';
 import { UseFormReturn } from 'react-hook-form';
 
 import { NAME_GROUP_OPT } from '@rapid-cmi5/ui';
-import { DownloadCmi5Type, PullType } from '../CourseBuilderApiTypes';
+import { DownloadCmi5Type } from '../CourseBuilderApiTypes';
 import { useContext } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';
 import { downloadCmi5ZipModalId } from '../../rapidcmi5_mdx/modals/constants';
@@ -85,16 +85,14 @@ export function DownloadCmi5ZipForm({
             readOnly={false}
           />
         </Grid>
-        {!isElectron && (
-          <Grid size={6} sx={{ marginTop: '12px' }}>
-            <FormControlCheckboxField
-              infoText={getInfoText('cmiAUMapping', 'auId')}
-              control={control}
-              name="createAuMappings"
-              label="Create AU Mappings?"
-            />
-          </Grid>
-        )}
+        <Grid size={6} sx={{ marginTop: '12px' }}>
+          <FormControlCheckboxField
+            infoText={getInfoText('cmiAUMapping', 'auId')}
+            control={control}
+            name="createAuMappings"
+            label="Create AU Mappings?"
+          />
+        </Grid>
       </>
     );
   };

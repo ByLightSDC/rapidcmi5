@@ -1,18 +1,15 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 // import { useAppBreadCrumbs } from '../hooks/useAppBreadCrumbs';
-
 import { appHeaderVisible, themeColor } from '@rapid-cmi5/ui';
-import { useLogOut } from '../hooks/useLogOut';
 
 /* Branded */
-import { AppLogo, AppHeaderDashboardMenu } from '@rapid-cmi5/ui';
+import { AppLogo } from '@rapid-cmi5/ui';
 
 /* MUI */
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 
@@ -22,22 +19,11 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import UserInfoBox from './navbar/UserInfoBox';
 import { Typography } from '@mui/material';
 
-/* Layout Notes
-height is determined by the toggle icon size in the Navbar , currently medium
-*/
-
-const loadingHeight = 6;
-const pageMargin = 12;
-const pageMarginTop = pageMargin - loadingHeight;
-const pageMarginBottom = 0;
-
 /* app menu icon keys */
 const appsKey = 0;
 const settingsKey = 1;
-const logoutKey = 2;
 
-export default function AppHeader({ authEnabled }: { authEnabled: boolean }) {
-  const logOut = useLogOut();
+export default function AppHeader() {
   const showAppHeader = useSelector(appHeaderVisible);
   const appThemeColor = useSelector(themeColor);
   const [settingsMenuAnchor, setSettingsMenuAnchor] =
@@ -55,22 +41,10 @@ export default function AppHeader({ authEnabled }: { authEnabled: boolean }) {
         );
         setSettingsMenuAnchor(menuButtonRef);
         break;
-      case logoutKey:
-        logOut();
         break;
       default:
         break;
     }
-  };
-
-  // THEME upper right button style
-  const appIconStyle = {
-    marginLeft: '8px',
-    color: (theme: any) => `${theme.header.buttonColor}`,
-    '&:hover': {
-      backgroundColor: 'primary.dark',
-      color: (theme: any) => `${theme.header.hoverColor}`,
-    },
   };
 
   return (
@@ -142,23 +116,10 @@ export default function AppHeader({ authEnabled }: { authEnabled: boolean }) {
             <UserInfoBox
               anchorEl={settingsMenuAnchor}
               onClose={() => setSettingsMenuAnchor(null)}
-              authEnabled={authEnabled}
             />
           </Box>
         </Box>
       )}
-      {/* <Box sx={{ height: 'auto', backgroundColor: 'background.paper' }}>
-        <Divider
-          orientation="horizontal"
-          variant="fullWidth"
-          sx={{
-            boxShadow: 0,
-            borderBottomWidth: '1.5px',
-            backgroundColor: (theme: any) => `${theme.input.outlineColor}`,
-            color: (theme: any) => `${theme.header.default}`,
-          }}
-        />
-      </Box> */}
     </>
   );
 }
