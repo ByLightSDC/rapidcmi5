@@ -343,8 +343,8 @@ export const NavViewMenu = ({
       {showHomeButton && (
         <Box sx={{ mt: 'auto', mb: 2 }}>
           <IconButton
-            aria-label="repo-selection-button"
-            data-testid="repo-selection-button"
+            aria-label="repo-selection"
+            data-testid="repo-selection"
             color="inherit"
             size={iconButtonSize}
             style={menuIconStyle}
