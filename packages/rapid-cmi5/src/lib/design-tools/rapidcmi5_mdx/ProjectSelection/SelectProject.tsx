@@ -25,7 +25,7 @@ export default function SelectProjectHomePage({}: {}) {
   const theme = useTheme();
   const { palette } = theme;
 
-  const toast = useToaster();
+  const displayToaster = useToaster();
 
   const {
     getLocalFolders,
@@ -45,17 +45,19 @@ export default function SelectProjectHomePage({}: {}) {
     try {
       await openLocalRepo(id);
 
-      toast({
+      displayToaster({
         message: 'Repository opened successfully.',
         severity: 'success',
+        autoHideDuration: 3000,
       });
     } catch (e: any) {
       const msg =
         e?.message || e?.name || 'Failed to open repository. Please try again.';
 
-      toast({
+      displayToaster({
         message: `Open repository failed: ${msg}`,
         severity: 'error',
+        autoHideDuration: 8000,
       });
     }
   };
@@ -108,12 +110,13 @@ export default function SelectProjectHomePage({}: {}) {
       await deleteRecentProject(id);
     }
 
-    toast({
+    displayToaster({
       message:
         ids.length === 1
           ? `Removed project from your recents`
           : `Removed ${ids.length} projects from your recents`,
       severity: 'success',
+      autoHideDuration: 3000,
     });
 
     populateRecentProjects();
@@ -123,9 +126,10 @@ export default function SelectProjectHomePage({}: {}) {
     try {
       await openLocalRepo(id);
 
-      toast({
+      displayToaster({
         message: 'Repository opened successfully.',
         severity: 'success',
+        autoHideDuration: 3000,
       });
     } catch (e: any) {
       const msg =
@@ -135,9 +139,10 @@ export default function SelectProjectHomePage({}: {}) {
 
       await deleteRecentProject(id);
       await populateRecentProjects();
-      toast({
+      displayToaster({
         message: `Project folder has been moved or deleted: ${msg}`,
         severity: 'error',
+        autoHideDuration: 8000,
       });
     }
   };
