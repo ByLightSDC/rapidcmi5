@@ -12,7 +12,7 @@ import {
 import { join as joinPosix, relative as relativePosix } from 'path/posix';
 import path from 'path';
 
-function getAssetPath(...segments: string[]) {
+export function getAssetPath(...segments: string[]) {
   if (!app.isPackaged) {
     return path.join(__dirname, 'assets', ...segments);
   }

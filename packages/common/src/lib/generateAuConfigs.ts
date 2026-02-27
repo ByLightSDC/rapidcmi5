@@ -1,4 +1,4 @@
-import { generateAuId, generateBlockId, sanitizeName } from './generateCmi5Xml';
+import { generateAuId, generateBlockId } from './generateCmi5Xml';
 import { CourseData } from './types/course';
 
 // Utility to localize NX build pathing in index.html
@@ -14,11 +14,44 @@ function localizeCfg(content: string, relativePath: string): string {
   return content.replaceAll('./', relativePath + '/');
 }
 
+export function sanitizeName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-') // replace non-alphanumerics with dash
+    .replace(/^-+|-+$/g, '') // trim leading/trailing dashes
+    .substring(0, 50); // optional: cap length
+}
+
+export function createAuMappingName(
+  courseTitle: string,
+  blockName: string,
+  auName: string,
+): string {
+  return `${sanitizeName(courseTitle)}-${sanitizeName(blockName)}-${sanitizeName(auName)}`.substring(
+    0,
+    99,
+  );
+}
+export function createAuMappingNameWithAuId(auId: string): string {
+  return `${sanitizeName(auId)}`.substring(0, 99);
+}
+
 export interface FsOperations {
   readFile: (path: string, encoding?: string) => Promise<string | Uint8Array>;
-  writeFile: (path: string, content: string | Uint8Array, encoding?: string) => Promise<void>;
-  deleteFolder: (path: string, options: { recursive: boolean; force: boolean }) => Promise<void>;
-  copy: (src: string, dest: string, options: { recursive: boolean }) => Promise<void>;
+  writeFile: (
+    path: string,
+    content: string | Uint8Array,
+    encoding?: string,
+  ) => Promise<void>;
+  deleteFolder: (
+    path: string,
+    options: { recursive: boolean; force: boolean },
+  ) => Promise<void>;
+  copy: (
+    src: string,
+    dest: string,
+    options: { recursive: boolean },
+  ) => Promise<void>;
   mkdir: (path: string, options: { recursive: boolean }) => Promise<void>;
 }
 
@@ -31,7 +64,7 @@ async function copyIndexFile(
   pathRelative: (from: string, to: string) => string,
 ): Promise<void> {
   const indexPath = pathJoin(distPath, 'index.html');
-  const indexHtml = await fs.readFile(indexPath, 'utf-8') as string;
+  const indexHtml = (await fs.readFile(indexPath, 'utf-8')) as string;
   const relativePath = pathRelative(outputPath, distPath);
   const modifiedContent = localizeNxBuildPathing(indexHtml, relativePath);
 
@@ -42,7 +75,7 @@ async function copyIndexFile(
   );
 
   const cfgPath = pathJoin(distPath, 'cfg.json');
-  const cfgJson = await fs.readFile(cfgPath, 'utf-8') as string;
+  const cfgJson = (await fs.readFile(cfgPath, 'utf-8')) as string;
   const modifiedCfg = localizeCfg(cfgJson, relativePath);
 
   await fs.writeFile(pathJoin(outputPath, 'cfg.json'), modifiedCfg, 'utf-8');
@@ -62,10 +95,10 @@ export async function generateCourseDist(
   outputBaseFolder?: string,
 ): Promise<void> {
   const outputPath = pathJoin(distPath, 'compiled_course', 'blocks');
-  
+
   // Clean the previous output if any
   await fs.deleteFolder(outputPath, { recursive: true, force: true });
-  
+
   const finalOutputPath = outputBaseFolder
     ? pathJoin(outputPath, outputBaseFolder)
     : outputPath;

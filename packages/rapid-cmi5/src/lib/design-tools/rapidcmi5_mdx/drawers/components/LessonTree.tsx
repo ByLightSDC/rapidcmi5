@@ -34,6 +34,7 @@ import {
   CourseData,
   defaultSlideContent,
   MoveOnCriteriaEnum,
+  LessonTheme,
   SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 
@@ -42,6 +43,7 @@ import { useRC5Prompts } from '../../modals/useRC5Prompts';
 import { Renamer } from './Renamer';
 import { MoveOnCriteriaForm } from './MoveOnCriteriaForm';
 import { DndProvider } from 'react-dnd';
+import { LessonSettingsForm } from './LessonSettingsForm';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
@@ -82,8 +84,13 @@ function LessonTree({
     handleReorderSlide,
     handleReorderLesson,
   } = useCourseData();
-  const { changeLessonMoveOn, changeLessonName, changeSlideName, saveSlide } =
-    useContext(RC5Context);
+  const {
+    changeLessonMoveOn,
+    changeLessonName,
+    changeSlideName,
+    saveSlide,
+    changeLessonTheme,
+  } = useContext(RC5Context);
   const repoAccessObject = useSelector(currentRepoAccessObjectSel);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -99,6 +106,8 @@ function LessonTree({
   const [menuAnchorPos, setMenuAnchorPos] = useState<number[]>([0, 0]);
   const [moveOnCriteriaForm, setMoveOnCriteriaForm] =
     useState<ILessonNode | null>(null);
+  const [lessonSettingsForm, setLessonSettingsForm] =
+    useState<ILessonNode | null>(null);
 
   const handleMoveOn = (moveOn: MoveOnCriteriaEnum) => {
     if (moveOnCriteriaForm) {
@@ -110,6 +119,18 @@ function LessonTree({
       severity: 'success',
     });
   };
+
+  const handleLessonSettings = (theme: LessonTheme) => {
+    if (lessonSettingsForm) {
+      changeLessonTheme(theme, lessonSettingsForm);
+    }
+    setLessonSettingsForm(null);
+    displayToaster({
+      message: 'Lesson settings updated',
+      severity: 'success',
+    });
+  };
+
   const handleRename = (newName: string, element: ILessonNode) => {
     if (element.type === LessonTreeNodeType.Slide) {
       changeSlideName(newName, element);
@@ -159,6 +180,10 @@ function LessonTree({
           break;
         case LessonNodeActionEnum.Rename:
           setMenuAnchor(event.target);
+          break;
+
+        case LessonNodeActionEnum.LessonSettings:
+          setLessonSettingsForm(element);
           break;
 
         case LessonNodeActionEnum.SetMoveOnCriteria:
@@ -501,6 +526,22 @@ function LessonTree({
                         ? courseData?.blocks?.[moveOnCriteriaForm.block]?.aus?.[
                             moveOnCriteriaForm.id as number
                           ]?.moveOnCriteria
+                        : undefined
+                    }
+                  />
+                )}
+                {lessonSettingsForm && (
+                  <LessonSettingsForm
+                    handleCloseModal={() => {
+                      setLessonSettingsForm(null);
+                    }}
+                    handleModalAction={handleLessonSettings}
+                    currentTheme={
+                      lessonSettingsForm.id !== undefined &&
+                      lessonSettingsForm.block !== undefined
+                        ? courseData?.blocks?.[lessonSettingsForm.block]?.aus?.[
+                            lessonSettingsForm.id as number
+                          ]?.lessonTheme
                         : undefined
                     }
                   />

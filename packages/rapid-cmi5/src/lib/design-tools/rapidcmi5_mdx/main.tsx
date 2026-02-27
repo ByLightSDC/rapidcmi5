@@ -9,7 +9,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 
 import { UseFormReturn } from 'react-hook-form';
 import { FormCrudType } from '@rapid-cmi5/ui';
-import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
+import { CourseAU, Credentials } from '@rapid-cmi5/cmi5-build-common';
 
 export interface buildCmi5ZipParams {
   zipBlob: File;
@@ -22,9 +22,11 @@ export type SubmitScenarioFormFn<T = any> = (item: T) => void;
 // This will exist in app in order to pass the token too
 // this prevents needing to pass the token into the package part of the application
 // we only need to pass the function for on click
+
 export interface ScenarioFormProps {
   submitForm: SubmitScenarioFormFn;
   token: string;
+  url?: string;
   formMethods: UseFormReturn;
   formType: FormCrudType;
   errors: any;
@@ -49,9 +51,10 @@ export interface RapidCmi5Opts {
 }
 
 export type UserAuth = {
-  token: string;
+  token?: string;
   userName: string;
   userEmail: string;
+  gitCredentials?: Credentials
 };
 
 export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {

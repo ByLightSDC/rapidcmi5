@@ -8,6 +8,7 @@ import {
   currentAu,
   currentBlock,
   currentSlideNum,
+  defaultLessonThemeSel,
   handleCacheChange,
   isLessonMounted,
   reorderLesson,
@@ -44,6 +45,7 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
   const currentBlockIndex = useSelector(currentBlock);
   const currentSlideIndex = useSelector(currentSlideNum);
   const isLessonMountedSel = useSelector(isLessonMounted);
+  const defaultLessonTheme = useSelector(defaultLessonThemeSel);
 
   const { currentCourse, syncCurrentCourseWithGit } = useContext(GitContext);
 
@@ -98,6 +100,7 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
       coursePath: req.coursePath,
       fsInstance: fsInstance,
       r: repoAccessObject,
+      defaultLessonTheme,
     });
 
     if (!newCourseData) {

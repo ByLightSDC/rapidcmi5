@@ -1,4 +1,11 @@
-import { FolderStruct } from '@rapid-cmi5/cmi5-build-common';
+import {
+  FolderStruct,
+  Credentials,
+  GitUserConfig,
+  SSOConfig,
+  TokenResponse,
+  CertInfo,
+} from '@rapid-cmi5/cmi5-build-common';
 import { ModifiedFile } from './design-tools/course-builder/GitViewer/Components/GitActions/GitFileStatus';
 import { DirEntry } from './design-tools/course-builder/GitViewer/utils/ElectronFsApi';
 import { ReadCommitResult, StatusRow } from 'isomorphic-git';
@@ -8,7 +15,24 @@ export interface ipc {
     projectPath: string,
     courseFolder: string,
     projectName: string,
+    createAuMappings: boolean,
   ) => Promise<string>;
+}
+
+export interface UserSettingsApi {
+  setSSOConfig: (data: SSOConfig) => Promise<void>;
+  getSSOConfig: () => Promise<SSOConfig>;
+  setSSOCredentials: (creds: Credentials) => void;
+  loginSSO: (refresh?: boolean) => Promise<TokenResponse>;
+  logoutSSO: () => Promise<void>;
+  getGitCredentials: () => Promise<Credentials>;
+  setGitCredentials: (creds: Credentials) => void;
+  getGitUserConfig: () => Promise<GitUserConfig>;
+  setGitUserConfig: (config: GitUserConfig) => void;
+  clearGitCredentials: () => void;
+  listCerts: () => Promise<CertInfo[]>;
+  addCert: (filename: string, contents: string) => Promise<CertInfo>;
+  removeCert: (id: string) => Promise<void>;
 }
 
 export interface fsApi {
@@ -116,11 +140,14 @@ export interface fsApi {
   ) => Promise<void>;
 
   pushRepo: (dir: string, username: string, password: string) => Promise<void>;
+  readPlayerConfig: () => Promise<any>;
+  writePlayerConfig: (content: string) => void;
 }
 
 declare global {
   interface Window {
     ipc: ipc;
     fsApi: fsApi;
+    userSettingsApi: UserSettingsApi;
   }
 }

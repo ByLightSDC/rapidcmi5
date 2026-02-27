@@ -304,7 +304,8 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
       <Box sx={{ margin: 0, padding: 0, position: 'relative', ...sxProps }}>
         <Stack direction="row" spacing={1}>
           <Tabs
-            sx={{ minWidth: 'maxContent' }}
+            variant="fullWidth"
+            sx={{ width: '100%' }}
             value={tab}
             onChange={handleTabChange}
             aria-label="basic tabs example"
