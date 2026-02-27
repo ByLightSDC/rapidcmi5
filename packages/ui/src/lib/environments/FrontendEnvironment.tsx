@@ -28,7 +28,7 @@ function isMessageForMe({
   messageEvent: MessageEvent<Message>;
   uuid: string | null;
 }) {
-2
+
   // Check actually got a UUID
   if (uuid === null) {
     return false;

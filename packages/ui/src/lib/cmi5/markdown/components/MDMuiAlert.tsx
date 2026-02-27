@@ -67,7 +67,7 @@ export default function MDMuiAlert({
       setAdType(adType);
       setAdColor(getAdmonitionColor(adType));
       setAdHexColor(getAdmonitionHexColor(adType));
-    } catch (e) {}
+    } catch (e) { /* empty */ }
   }, []);
 
   /**

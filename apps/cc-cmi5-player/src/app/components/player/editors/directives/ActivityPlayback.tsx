@@ -9,9 +9,10 @@ import { useSelector } from 'react-redux';
 import { activeTabSel } from '../../../../redux/navigationReducer';
 import { useCMI5Session } from '../../../../hooks/useCMI5Session';
 import { Box } from '@mui/material';
+
 import { AuContextProps, RC5ScenarioContent, ScenarioContent, QuizContent, CTFContent, JobeContent, TeamConsolesContent, DownloadFileData } from '@rapid-cmi5/cmi5-build-common';
 import { setProgress$, submitScore$, getActivityCache$, setActivityCache$, debugLogError, AuQuiz, AuCTF, JobeInTheBox, FileDownloadLink } from '@rapid-cmi5/ui';
-import { SlideActivityType } from 'apps/cc-cmi5-player/src/app/types/SlideActivityStatusState';
+import { SlideActivityType } from '../../../../types/SlideActivityStatusState';
 
 /**
  * Non editable Activity View

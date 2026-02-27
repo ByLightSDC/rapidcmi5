@@ -14,7 +14,7 @@ export const useClearCacheSelection = () => {
   const dispatch = useDispatch();
 
   const clearSelectionCaches = (keys: string[]) => {
-    let newArr = [...selectionArr];
+    const newArr = [...selectionArr];
 
     for (let i = 0; i < keys.length; i++) {
       const selIndex = newArr.findIndex(
@@ -43,7 +43,7 @@ export const useSetCacheSelection = () => {
     meta?: any,
     modalMeta?: any,
   ) => {
-    let newArr = [...selectionArr];
+    const newArr = [...selectionArr];
     const selIndex = newArr.findIndex(
       (obj: CommonAppSelectionState) => obj.key == key,
     );
@@ -76,7 +76,7 @@ export const useSetCacheSelections = () => {
   const dispatch = useDispatch();
 
   const setSelectionCaches = (cacheList: any) => {
-    let newArr = [...selectionArr];
+    const newArr = [...selectionArr];
 
     cacheList.map((sel: any) => {
       const key = sel.key;
@@ -140,7 +140,7 @@ export const useSetCacheMultipleSelection = () => {
     key: any,
     selections: CommonAppSelectionState[], //#REF any[]
   ) => {
-    let newArr = [...selectionArr];
+    const newArr = [...selectionArr];
     const selIndex = newArr.findIndex(
       (obj: CommonAppMultipleSelectionState) => obj.key == key,
     );

@@ -80,7 +80,7 @@ export const paginationSlice = createSlice({
       state.pageFilters[action.payload.property] = action.payload.value;
     },
     setPageSettings: (state, action: PayloadAction<tSettingPropVal>) => {
-      if (state.pageSettings.hasOwnProperty(action.payload.property)) {
+      if (Object.prototype.hasOwnProperty.call(state.pageSettings, action.payload.property)) {
         state.pageSettings[action.payload.topic][action.payload.property] =
           action.payload.value;
       } else {

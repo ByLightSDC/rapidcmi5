@@ -37,7 +37,7 @@ export function getMenuOptions({
   displayByKey = true,
   ignoreNull = true,
 }: MenuOptionsProps) {
-  let menuOptions = [];
+  const menuOptions = [];
 
   // minHeight is so that the "default" - empty value has same height as other(s)
   const itemStyle = allowNoneOption ? { minHeight: '24px' } : {};

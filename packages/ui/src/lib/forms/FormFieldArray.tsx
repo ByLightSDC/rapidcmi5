@@ -276,7 +276,7 @@ export function FormFieldArray({
   const expandedSel = useSelector(expanded);
 
   const defaultExpandOverride = expandId
-    ? expandedSel.hasOwnProperty(expandId)
+    ? Object.prototype.hasOwnProperty.call(expandedSel, expandId)
       ? expandedSel[expandId]
       : defaultIsExpanded
     : defaultIsExpanded;
@@ -312,7 +312,7 @@ export function FormFieldArray({
     arrayFieldName.lastIndexOf('.') + 1,
   );
   const arrayErrors =
-    errors && errors.hasOwnProperty(arrayErrorName)
+    errors && Object.prototype.hasOwnProperty.call(errors, arrayErrorName)
       ? errors[arrayErrorName]
       : null;
 

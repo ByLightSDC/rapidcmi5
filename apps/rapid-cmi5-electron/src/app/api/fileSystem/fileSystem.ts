@@ -1,11 +1,13 @@
-import { FolderStruct } from '@rapid-cmi5/cmi5-build-common';
+import {
+  FolderStruct,
+} from '@rapid-cmi5/cmi5-build-common';
 
 import fs, { constants } from 'fs';
 
 import { app } from 'electron';
 
-import path, { join } from 'path';
-import git from 'isomorphic-git';
+import path, { basename, join } from 'path';
+import git, { ReadCommitResult, StatusRow } from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
 import { getAssetPath } from '../cmi5Builder/build';
 
@@ -86,7 +88,7 @@ export class ElectronFsHandler {
       clearDirectory(base);
     }
 
-    this.baseReady = fsp.mkdir(base, { recursive: true }).then(() => {});
+    this.baseReady = fsp.mkdir(base, { recursive: true }).then(() => {return});
   }
 
   async readPlayerConfig(): Promise<Record<string, any>> {
@@ -443,7 +445,7 @@ export class ElectronFsHandler {
     }
   }
 
-  async getStatus(p: string): Promise<any[]> {
+  async getStatus(p: string): Promise<Array<StatusRow>> {
     const fullPath = await this.getFullPath(p);
 
     return await git.statusMatrix({
@@ -468,7 +470,7 @@ export class ElectronFsHandler {
     });
   }
 
-  async gitLog(p: string): Promise<any[]> {
+  async gitLog(p: string): Promise<Array<ReadCommitResult>> {
     const fullPath = await this.getFullPath(p);
 
     return await git.log({

@@ -142,7 +142,7 @@ export default function MDTextEffects(props: any) {
         }}
       >
         <RoughNotation
-          getAnnotationObject={(annotation) => {}}
+          getAnnotationObject={(annotation) => {return}}
           show={isShow}
           {...rest}
         >

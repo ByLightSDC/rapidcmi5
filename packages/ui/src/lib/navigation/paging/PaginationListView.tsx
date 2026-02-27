@@ -231,7 +231,7 @@ export function PaginationListView({
     if (data) {
       let newPageData: any[];
       let newTotalCount = 0;
-      if (data.hasOwnProperty('data')) {
+      if (Object.prototype.hasOwnProperty.call(data, 'data')) {
         newPageData = data?.data;
         newTotalCount = data?.totalCount;
       } else {

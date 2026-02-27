@@ -62,7 +62,7 @@ ${indentedTestLogic}`;
     }
   };
 
-  const resetGrader = () => {};
+  const resetGrader = () => {return};
 
   return { resetGrader, submitCode };
 }

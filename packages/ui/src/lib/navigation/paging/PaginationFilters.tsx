@@ -76,7 +76,7 @@ export function PaginationFilters(props: PaginationFilterProps) {
     defaultVal?: string | string[],
     multipleSelect = false,
   ) => {
-    if (filterValues.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(filterValues, key)) {
       return filterValues[key];
     }
     return defaultVal || multipleSelect ? [defaultUndefinedOptionLabel] : '';

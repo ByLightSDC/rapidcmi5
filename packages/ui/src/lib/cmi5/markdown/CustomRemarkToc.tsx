@@ -38,7 +38,8 @@ export const customRemarkToc: Plugin = () => {
 
     // Insert TOC as a normal Markdown AST node (div with children)
     if (tocEntries.length > 0) {
-      //@ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-expect-error
       tree.children.unshift({
         type: 'paragraph',
         children: [

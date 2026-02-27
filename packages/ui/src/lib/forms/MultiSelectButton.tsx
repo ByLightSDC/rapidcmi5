@@ -86,14 +86,14 @@ export function MultiSelectButton({
 
         if (cache) {
           if (isKeyValue) {
-            let pairs: { [name: string]: string } = {};
+            const pairs: { [name: string]: string } = {};
             // first clear the array field before adding selected one(s)
             if (arrayMethods.replace && arrayMethods.append) {
               arrayMethods.replace([]);
               const newArr: any[] = [];
               cache.map((item: any, index: number) => {
                 const itemName = item.meta?.name || item.id;
-                if (pairs.hasOwnProperty(itemName)) {
+                if (Object.prototype.hasOwnProperty.call(pairs, itemName)) {
                   //properties have to be unique, but BE might not force unique names across records
                   //so we have to handle here to avoid script error
                   pairs[itemName + index] = item.id;
@@ -110,7 +110,7 @@ export function MultiSelectButton({
               setValue(fieldName, []);
               cache.map((item: any, index: number) => {
                 const itemName = item.meta?.name || item.id;
-                if (pairs.hasOwnProperty(itemName)) {
+                if (Object.prototype.hasOwnProperty.call(pairs, itemName)) {
                   //properties have to be unique, but BE might not force unique names across records
                   //so we have to handle here to avoid script error
                   pairs[itemName + index] = item.id;
@@ -167,10 +167,10 @@ export function MultiSelectButton({
   const openMultiSelection = () => {
     //get values from form
     //create a new array and inject modal id
-    let arr: any[] = [];
+    const arr: any[] = [];
     if (formMethods?.getValues) {
       formMethods.getValues(fieldName).map((item: any, index: number) => {
-        let shouldAdd = isKeyValue ? item.value : item;
+        const shouldAdd = isKeyValue ? item.value : item;
         //ensure blank entries don't appear in selection
 
         if (shouldAdd) {

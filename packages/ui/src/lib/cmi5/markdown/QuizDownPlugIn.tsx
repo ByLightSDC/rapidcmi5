@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import { Plugin } from 'unified';
 
@@ -71,9 +72,8 @@ export const remarkQuizDown: Plugin = () => {
           const depth = node.depth;
 
           const extracted = extractTextFromNode(node);
-          let value;
 
-          value = '\n' + '#'.repeat(depth) + ' ' + extracted + '\n';
+          const value = '\n' + '#'.repeat(depth) + ' ' + extracted + '\n';
 
           buffer.push(value);
         }

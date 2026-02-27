@@ -14,11 +14,6 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TouchAppIcon from '@mui/icons-material/TouchApp';
-
-/*Constants */
-const minLoadingButtonWidth = '94px'; // so button wont change size when "Loading"
-const minButtonHeight = '32px';
-const maxButtonHeight = '30px';
 import {
   Alert,
   AlertProps,
@@ -32,6 +27,9 @@ import { useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { copyTextToClipboard } from './copy';
+/*Constants */
+const minButtonHeight = '32px';
+const maxButtonHeight = '30px';
 
 const zOrderAboveDialog = 9999;
 const defaultInfoIcon = <div />;

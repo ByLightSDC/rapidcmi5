@@ -289,11 +289,11 @@ export function SharedFormWithProvider<
     if (!theErrors) {
       return undefined;
     }
-    let result: string[] = [];
-    let field: string = '';
+    const result: string[] = [];
+    let field = '';
 
     function traverse(obj: any) {
-      for (let key in obj) {
+      for (const key in obj) {
         if (key === 'message') {
           //result.push({ key, value: obj[key] });
           result.push(`${field} ${obj[key]}`);
@@ -1080,8 +1080,7 @@ export function SharedFormWithProvider<
                         </ButtonLoadingUi>
                       </>
                     ) : (
-                      <>
-                        <ButtonModalMainUi
+                      <ButtonModalMainUi
                           id="close-button"
                           startIcon={null}
                           type="button"
@@ -1093,7 +1092,6 @@ export function SharedFormWithProvider<
                         >
                           Close
                         </ButtonModalMainUi>
-                      </>
                     )}
                   </>
                 )}

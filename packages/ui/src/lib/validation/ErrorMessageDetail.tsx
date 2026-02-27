@@ -1,7 +1,7 @@
 export function ErrorMessageDetail(
   displayError: any,
   defaultMessage: string | undefined | null = '',
-  shouldShowDetail: boolean = false,
+  shouldShowDetail = false,
 ) {
   const optDetailStr =
     shouldShowDetail && displayError?.message

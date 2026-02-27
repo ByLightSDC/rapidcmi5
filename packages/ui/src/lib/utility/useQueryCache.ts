@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import { Query, useQueryClient } from 'react-query';
 
 interface LooseObject {
@@ -144,7 +145,7 @@ export const useCache = () => {
     // }
 
     //if not found above, check in "pagination" cache
-    let pagedResults: Array<string> = [];
+    const pagedResults: Array<string> = [];
     // The queries are stored in cache as a map by queryKey and reqOptions
     const entries = queryClient
       .getQueryCache()
@@ -155,13 +156,14 @@ export const useCache = () => {
     while (!result.done) {
       let records: any = (result.value as Query)?.state?.data;
       // check if this is "paged data"
+      // eslint-disable-next-line no-prototype-builtins
       if (records?.hasOwnProperty('data')) {
         records = records.data;
       }
       if (records && records.length > 0) {
         let localPageResults: Array<string> = [];
         localPageResults = records.reduce((acc: string[], obj: any) => {
-          if (obj.hasOwnProperty(propName)) {
+          if (Object.prototype.hasOwnProperty.call(obj, propName)) {
             if (obj[propName].startsWith(propValue)) {
               // to prevent duplicates
               const foundPageIndex = localPageResults.indexOf(obj[propName]);

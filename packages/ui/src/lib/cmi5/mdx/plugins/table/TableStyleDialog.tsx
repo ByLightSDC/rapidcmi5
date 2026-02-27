@@ -1,5 +1,4 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
-// @ts-ignore - inline-style-parser has type declaration issues
 import parse from 'inline-style-parser';
 
 /* MUI */

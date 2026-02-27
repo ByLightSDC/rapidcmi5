@@ -1,8 +1,8 @@
-const { BrowserWindow, shell, screen } = require('electron');
-const { rendererAppName, rendererAppPort } = require('./constants');
-const { environment } = require('../environments/environment');
-const { join } = require('path');
-const { format } = require('url');
+import { BrowserWindow, shell, screen } from 'electron';
+import { rendererAppName, rendererAppPort } from './constants';
+import { environment } from '../environments/environment';
+import { join } from 'path';
+import { format } from 'url';
 
 export default class App {
   // Keep a global reference of the window object, if you don't, the window will
@@ -37,7 +37,8 @@ export default class App {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     App.mainWindow = null;
   }
 

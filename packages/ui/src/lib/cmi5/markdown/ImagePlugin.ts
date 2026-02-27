@@ -105,7 +105,7 @@ export const parseAttributeList = (attributesStr: string) => {
 
   //console.log('parseAttributeList', attributesStr);
   const matches = [...attributesStr.matchAll(attributeListRegEx)];
-  let theProps: { [key: string]: any } = {};
+  const theProps: { [key: string]: any } = {};
 
   if (matches && matches.length > 0) {
     for (const match of matches) {

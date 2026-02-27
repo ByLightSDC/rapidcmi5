@@ -26,11 +26,11 @@ export function ReadOnlyTextField({
   sxProps?: any;
   sxInputProps?: any;
 }) {
-  const isDisabled = props.hasOwnProperty('disabled')
+  const isDisabled = Object.prototype.hasOwnProperty.call(props, 'disabled')
     ? props['disabled']
     : true;
-  const error = props.hasOwnProperty('error') ? props['error'] : false;
-  const helperText = props.hasOwnProperty('helperText')
+  const error = Object.prototype.hasOwnProperty.call(props, 'error') ? props['error'] : false;
+  const helperText = Object.prototype.hasOwnProperty.call(props, 'helperText')
     ? props['helperText']
     : '';
 

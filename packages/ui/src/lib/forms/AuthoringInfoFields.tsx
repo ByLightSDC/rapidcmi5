@@ -28,7 +28,7 @@ export function AuthoringInfoFields({
     <>
       {includeVersioning && (
         <>
-          {includeProperties.hasOwnProperty('branch') && (
+          {Object.prototype.hasOwnProperty.call(includeProperties, 'branch') && (
             <Grid size={5}>
               <FormControlTextField
                 control={control}
@@ -40,7 +40,7 @@ export function AuthoringInfoFields({
               />
             </Grid>
           )}
-          {includeProperties.hasOwnProperty('tag') && (
+          {Object.prototype.hasOwnProperty.call(includeProperties, 'tag') && (
             <Grid size={5}>
               <FormControlTextField
                 control={control}
@@ -75,8 +75,7 @@ export function AuthoringInfoFields({
         </>
       ) : null}
       {crudType === FormCrudType.design ? (
-        <>
-          <Grid size={12}>
+        <Grid size={12}>
             <FormControlTextField
               control={control}
               name="uuid"
@@ -85,7 +84,6 @@ export function AuthoringInfoFields({
               disabled={true}
             />
           </Grid>
-        </>
       ) : null}
     </>
   );

@@ -180,7 +180,7 @@ export function DynamicSelectorFieldGroup(
     fieldError = indexedErrors?.name;
     if (!fieldError) {
       fieldError =
-        indexedErrors && indexedErrors.hasOwnProperty(propertyKey)
+        indexedErrors && Object.prototype.hasOwnProperty.call(indexedErrors, propertyKey)
           ? indexedErrors[propertyKey]
           : null;
     }
@@ -411,8 +411,7 @@ export function DynamicSelectorFieldGroup(
       ref={divRef}
       style={{ marginTop: marginTop, gap: '4px' }} //negative margin to undo extra div vertical
     >
-      <>
-        {!readOnly && (
+      {!readOnly && (
           <ButtonSelectUi
             aria-label={`select-${itemName}`}
             id={selectButtonFocusId}
@@ -431,7 +430,6 @@ export function DynamicSelectorFieldGroup(
           </ButtonSelectUi>
         )}
         {uuidMemo}
-      </>
     </div>
   );
 }

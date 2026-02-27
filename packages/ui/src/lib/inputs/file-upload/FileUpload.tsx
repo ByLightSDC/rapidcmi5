@@ -45,7 +45,7 @@ export function FileUpload({
   onFileSelected,
   onFolderSelected,
 }: tFileUploadProps) {
-  const [fileNames, setFileNames] = useState<String[]>([noFileSelectedMessage]);
+  const [fileNames, setFileNames] = useState<string[]>([noFileSelectedMessage]);
   const [selectedFile, setSelectedFile] = useState<File | File[] | null>(null);
 
   useEffect(() => {

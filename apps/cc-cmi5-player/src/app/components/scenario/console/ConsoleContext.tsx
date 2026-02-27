@@ -241,6 +241,7 @@ export function ConsoleProvider(props: tProviderProps) {
   function screenToViewport(position: any) {
     // Note: the snapToGrid flag is a new feature of react flow that doesn't yet exist in it's typescript defs.
     // Setting this flag to false prevents the position conversion from snapping to a whole x and y number.
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return reactFlowInstanceRef.current?.screenToFlowPosition(position, {
       snapToGrid: false,
@@ -248,6 +249,7 @@ export function ConsoleProvider(props: tProviderProps) {
   }
 
   function viewportToScreen(position: any) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return reactFlowInstanceRef.current?.flowToScreenPosition(position, {
       snapToGrid: false,

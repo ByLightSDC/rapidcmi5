@@ -47,7 +47,7 @@ type tFieldProps = {
   required?: boolean;
   sxProps?: any;
   onChange?: (value: any) => void;
-  setValue: (name: string, value: unknown, config?: Object) => void;
+  setValue: (name: string, value: unknown, config?: NonNullable<unknown>) => void;
   trigger: (name?: string | string[]) => Promise<boolean>;
   watch: (names?: string | string[]) => unknown;
 };

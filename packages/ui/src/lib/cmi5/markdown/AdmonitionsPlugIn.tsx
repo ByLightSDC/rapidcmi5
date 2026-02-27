@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 import { Plugin } from 'unified';
 import { visit, SKIP } from 'unist-util-visit';

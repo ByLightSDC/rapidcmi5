@@ -22,10 +22,10 @@ export default function EmbeddedQuiz({
     Array.isArray(children) ? children[0] : children,
   );
 
-  let passingScore = 0;
-  let slideNumber = (auProps?.activeTab || 0 + 1).toString();
-  let cmi5QuizId = `slide-${slideNumber}/quiz-${quizNumber}`;
-  let quizTitle = `Quiz ${quizNumber}`;
+  const passingScore = 0;
+  const slideNumber = (auProps?.activeTab || 0 + 1).toString();
+  const cmi5QuizId = `slide-${slideNumber}/quiz-${quizNumber}`;
+  const quizTitle = `Quiz ${quizNumber}`;
 
   const quizContent: QuizContent = {
     title: quizTitle,
@@ -39,7 +39,7 @@ export default function EmbeddedQuiz({
 
   const quizProps: AuContextProps = { ...auProps };
   // This embedded quiz should not change progress of au
-  quizProps.setProgress = () => {};
+  quizProps.setProgress = () => {return};
 
   return <AuQuiz auProps={quizProps} content={quizContent} />;
 }

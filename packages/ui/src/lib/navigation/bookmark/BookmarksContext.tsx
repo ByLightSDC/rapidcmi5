@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 
 
 
@@ -292,10 +293,10 @@ export const BookmarksContextProvider: any = (props: tProviderProps) => {
    */
   const getMetaDataFromBookmark = (metaProperty: string) => {
     if (bookmarkData?.length > 0) {
-      if (bookmarkData[bookmarkData.length - 1].hasOwnProperty('meta')) {
+      if (Object.prototype.hasOwnProperty.call(bookmarkData[bookmarkData.length - 1], 'meta')) {
         if (
           bookmarkData[bookmarkData.length - 1].meta &&
-          bookmarkData[bookmarkData.length - 1].meta.hasOwnProperty(
+          Object.prototype.hasOwnProperty.call(bookmarkData[bookmarkData.length - 1].meta, 
             metaProperty,
           )
         ) {

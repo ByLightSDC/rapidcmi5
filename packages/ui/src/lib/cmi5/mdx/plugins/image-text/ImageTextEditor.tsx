@@ -218,8 +218,7 @@ export const ImageTextEditor: React.FC<
   // Get the target DOM node
   if (portalTarget) {
     return createPortal(
-      <>
-        <Stack
+      <Stack
           ref={boxRef}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
@@ -272,8 +271,7 @@ export const ImageTextEditor: React.FC<
               <DeleteForeverIcon />
             </IconButton>
           )}
-        </Stack>
-      </>,
+        </Stack>,
       portalTarget, // Render the children into the portalTarget DOM node
     );
   }

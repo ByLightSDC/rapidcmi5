@@ -32,7 +32,7 @@ export function DataCacheOrFetcher({
   errorMessage?: string;
   showIndicator?: boolean;
   shouldSuppressToaster?: boolean;
-  onDataLoad?: (data: Object) => void;
+  onDataLoad?: (data: object) => void;
   onError?: (error: string) => void;
 }) {
   const [shouldFetch, setShouldFetch] = useState(false);

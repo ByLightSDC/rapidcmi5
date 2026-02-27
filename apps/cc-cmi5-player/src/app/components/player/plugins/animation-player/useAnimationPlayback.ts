@@ -8,7 +8,7 @@ import { useEffect, useRef } from 'react';
 export function useAnimationPlayback(
   animations: AnimationConfig[],
   slideIndex: number,
-  enabled: boolean = true,
+  enabled = true,
 ) {
   const engineRef = useRef<AnimationEngine | null>(null);
 

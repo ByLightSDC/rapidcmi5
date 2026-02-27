@@ -426,8 +426,8 @@ export function MultipleSelectWrapper(props: tMultipleSelectWrapperProps) {
 
             const resolveName =
               pageData[selIndex].name || pageData[selIndex][dataIdField];
-            let newMeta = { ...selection.current[i].meta, name: resolveName };
-            let newObj = {
+            const newMeta = { ...selection.current[i].meta, name: resolveName };
+            const newObj = {
               ...selection.current[i],
               meta: newMeta,
               name: resolveName,
@@ -445,11 +445,11 @@ export function MultipleSelectWrapper(props: tMultipleSelectWrapperProps) {
               if (cacheData) {
                 numToResolve--;
                 const resolveNameFromQueryCache = cacheData?.name;
-                let newMeta = {
+                const newMeta = {
                   ...selection.current[i].meta,
                   name: resolveNameFromQueryCache,
                 };
-                let newObj = {
+                const newObj = {
                   ...selection.current[i],
                   meta: newMeta,
                   name: resolveNameFromQueryCache,

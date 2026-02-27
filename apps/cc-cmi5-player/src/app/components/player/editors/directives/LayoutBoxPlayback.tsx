@@ -37,9 +37,11 @@ export const LayoutBoxPlayback: React.FC<
     backgroundColor: 'inherit',
   };
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   if (mdastNode.attributes?.width)
     editorStyles.width = mdastNode.attributes?.width;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   if (mdastNode.attributes?.height)
     editorStyles.height = mdastNode.attributes?.height;

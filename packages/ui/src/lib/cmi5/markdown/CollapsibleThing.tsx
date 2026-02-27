@@ -88,7 +88,9 @@ export default function CollapsibleThing({
       setAdType(adType);
       setAdColor(getAdmonitionColor(adType));
       setAdHexColor(getAdmonitionHexColor(adType));
-    } catch (e) {}
+    } catch (e) {
+      return;
+    }
 
     return () => {
       lookupState.current.accordions = 0;

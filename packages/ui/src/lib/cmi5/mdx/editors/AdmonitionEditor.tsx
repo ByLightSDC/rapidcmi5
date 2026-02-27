@@ -352,7 +352,8 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
           {getAdmonitionIcon(adType)}
           <div
             style={{
-              // @ts-ignore
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-expect-error
               '--basePageBg': 'transparent',
               //backgroundColor: 'adSeverityHexColor || adHexColor || adColor',
             }}

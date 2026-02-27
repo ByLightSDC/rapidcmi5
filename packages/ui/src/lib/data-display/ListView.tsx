@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 //TODO upgrading from MUI 5 to 6 broke List with component property
 /* eslint-disable @typescript-eslint/no-explicit-any */

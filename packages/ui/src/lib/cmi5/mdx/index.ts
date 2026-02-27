@@ -1,3 +1,4 @@
+import './animation/styles/animations.css';
 export * from './constants/defaultData';
 export * from './constants/colors';
 
@@ -47,7 +48,6 @@ export * from './util/mergeStyleAttributes';
 export * from './util/mergeStyleAttributes';
 export * from './animation/engine/AnimationEngine';
 export * from './animation/types/Animation.types';
-import './animation/styles/animations.css';
 
 export * from './util/mergeStyleAttributes';
 

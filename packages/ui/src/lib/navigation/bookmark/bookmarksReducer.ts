@@ -62,7 +62,7 @@ export const bookmarksSlice = createSlice({
       if (state.cue?.length > 0) {
         if (
           state.cue[state.cue?.length - 1].meta &&
-          state.cue[state.cue?.length - 1].meta.hasOwnProperty(action.payload)
+          Object.prototype.hasOwnProperty.call(state.cue[state.cue?.length - 1].meta, action.payload)
         ) {
           delete state.cue[state.cue?.length - 1]['meta'][action.payload];
         }
@@ -72,13 +72,13 @@ export const bookmarksSlice = createSlice({
       state.formData = {};
     },
     clearFormData: (state, action: PayloadAction<string>) => {
-      if (state.formData && state.formData.hasOwnProperty(action.payload)) {
+      if (state.formData && Object.prototype.hasOwnProperty.call(state.formData, action.payload)) {
         delete state.formData[action.payload];
       }
     },
     popToBookmark: (state, action: PayloadAction<number>) => {
       if (state.cue?.length > 0) {
-        let newArr: tBookmark[] = [];
+        const newArr: tBookmark[] = [];
         for (let i = 0; i < state.cue?.length; i++) {
           if (i <= action.payload) {
             newArr.push(state.cue[i]);
@@ -111,7 +111,7 @@ export const bookmarksSlice = createSlice({
     ) => {
       if (state.cue?.length > 0) {
         let metaObj = null;
-        if (state.cue[state.cue?.length - 1].hasOwnProperty('meta')) {
+        if (Object.prototype.hasOwnProperty.call(state.cue[state.cue?.length - 1], 'meta')) {
           metaObj = state.cue[state.cue?.length - 1].meta;
         }
         if (!metaObj) {

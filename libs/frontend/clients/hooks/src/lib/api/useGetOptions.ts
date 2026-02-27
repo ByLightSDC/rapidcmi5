@@ -34,7 +34,7 @@ export const useGetOptions = (
   useEffect(() => {
     if (listQuery.isSuccess) {
       setDisplayList(
-        listQuery.data.hasOwnProperty('data')
+        Object.prototype.hasOwnProperty.call(listQuery.data, 'data')
           ? listQuery.data.data
           : listQuery.data,
       );
@@ -44,7 +44,7 @@ export const useGetOptions = (
   useEffect(() => {
     if (listQuery.isSuccess) {
       setDisplayList(
-        listQuery.data.hasOwnProperty('data')
+        Object.prototype.hasOwnProperty.call(listQuery.data, 'data')
           ? listQuery.data.data
           : listQuery.data,
       );

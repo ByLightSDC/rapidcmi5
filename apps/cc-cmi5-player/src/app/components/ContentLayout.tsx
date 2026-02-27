@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { styled } from '@mui/system';
 
 export const DRAWER_WIDTH = 240;

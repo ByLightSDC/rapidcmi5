@@ -21,7 +21,7 @@ export const defaultQueryConfig: any = {
   refetchIntervalInBackground: false,
 };
 
-export let queryHooksConfig: any = {
+export const queryHooksConfig: any = {
   headers: { Authorization: `Bearer <put the token here>` },
 };
 
@@ -47,7 +47,7 @@ export function getMetadataFilterParam(reqOptions: any) {
   const metadataParam: { [key: string]: any } = {};
   if (reqOptions?.metadataTags) {
     metadataParam['rangeOsUI'] = {};
-    let tagValues: { [key: string]: number } = {};
+    const tagValues: { [key: string]: number } = {};
     const tags = reqOptions.metadataTags.split(/,\s*/); // in case there's a space after comma
     tags.forEach((tag: string) => {
       tagValues[`${tag}`] = 0;

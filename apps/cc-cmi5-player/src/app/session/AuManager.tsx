@@ -61,10 +61,16 @@ export const AuManagerContext = createContext<AuContextProps>({
   viewedSlides: [],
   scenario: undefined, //TODO scenario, //from redux, may be more up to date than course data
   slides: [],
-  setActiveTab: (tab: number) => {},
-  setProgress: (makeProgress: boolean) => {},
+  setActiveTab: (tab: number) => {
+    return;
+  },
+  setProgress: (makeProgress: boolean) => {
+    return;
+  },
   slideData: 'Loading...',
-  submitScore: () => {},
+  submitScore: () => {
+    return;
+  },
   getActivityCache: null,
   setActivityCache: null,
   isAuthenticated: false,
