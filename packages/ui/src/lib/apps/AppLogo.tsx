@@ -21,7 +21,7 @@ export function AppLogo({
   isOverrideOpen?: boolean;
   assetId?: string;
 }) {
-  const logoContainerHeight = '20px'; //REF '102px';
+  const logoContainerHeight = '36px'; //REF '102px';
 
   return (
     <header aria-label="app logo">
@@ -29,7 +29,6 @@ export function AppLogo({
         height={logoContainerHeight}
         style={{
           background: bgColor ? bgColor : 'inherit',
-          marginLeft: '8px',
         }}
         src={
           appThemeColor === 'light'

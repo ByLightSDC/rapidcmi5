@@ -1,4 +1,4 @@
-export const attachRemoteRepoModalId = 'attachRemoteRepoModalId';
+
 export const cacheWarning = 'Content will be saved locally.';
 export const cloneRepoModalId = 'cloneRepoModalId';
 export const createLocalRepoModalId = 'createLocalRepoModalId';

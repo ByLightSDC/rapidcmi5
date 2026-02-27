@@ -16,7 +16,7 @@ import {
   deleteSlide,
   navigateSlide,
 } from '../../../../redux/courseBuilderReducer';
-import AddIcon from '@mui/icons-material/Add';
+
 
 import { AppDispatch } from '../../../../redux/store';
 
@@ -210,8 +210,6 @@ function LessonTree({
               );
             }
           }
-
-          // deleteASlide(element.name);
           break;
         case SlideNodeActionEnum.TriggerRename:
           setMenuAnchorPos([event.clientX - 60, event.clientY + 20]);
@@ -220,11 +218,6 @@ function LessonTree({
         case SlideNodeActionEnum.Rename:
           setMenuAnchor(event.target);
           break;
-        //REF maybe future?
-        // case SlideNodeActionEnum.SetMoveOnCriteria:
-        //   console.log('setMoveOnCriteria');
-        //   setMoveOnCriteriaForm(element);
-        //   break;
       }
     }
   };
@@ -312,9 +305,6 @@ function LessonTree({
       };
 
       currentExpandedNodes.current = [currentAuIndex];
-      // if (!currentExpandedNodes.current.includes(currentAuIndex)) {
-      //   currentExpandedNodes.current.push(currentAuIndex);
-      // }
 
       let theSlidesChildren: string[] = [];
       theTreeData.push(theCourse);
@@ -435,7 +425,6 @@ function LessonTree({
         return;
       }
 
-      // handleReorderSlide(drag.lesson, hover.id as number, drag.slide, 0); // Drop at top for now (you can enhance)
       return;
     }
   }, []);
@@ -466,7 +455,6 @@ function LessonTree({
                   onNodeSelect={handleNodeSelect}
                   onExpand={handleNodeExpand}
                   defaultExpandedIds={currentExpandedNodes.current}
-                  //expandedIds={currentExpandedNodes.current}
                   selectedIds={[]}
                   nodeRenderer={({
                     element,
@@ -549,34 +537,6 @@ function LessonTree({
               </div>
             )}
           </Box>
-          {onCreateLesson && (
-            <>
-              <Divider sx={{ mt: 'auto' }} />
-              <Box
-                sx={{
-                  mt: 'auto',
-                  borderTop: 1,
-                  borderColor: 'divider',
-                  p: 1.5,
-                }}
-              >
-                <ButtonMinorUi
-                  startIcon={<AddIcon />}
-                  sxProps={{
-                    width: '100%',
-                    justifyContent: 'center',
-                    px: 1,
-                    fontWeight: 700,
-                    minWidth: 200,
-                  }}
-                  onClick={onCreateLesson}
-                  data-testid="create-lesson-button"
-                >
-                  Create Lesson
-                </ButtonMinorUi>
-              </Box>
-            </>
-          )}
         </Box>
       </DndProvider>
     </>

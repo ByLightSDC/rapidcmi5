@@ -1,4 +1,5 @@
 import {
+  alpha,
   Box,
   Divider,
   IconButton,
@@ -10,6 +11,8 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+
+import Grid from '@mui/material/Grid2';
 import React, { useCallback, useContext, useState } from 'react';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
@@ -31,6 +34,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FolderZipIcon from '@mui/icons-material/FolderZip';
 import ImportExportIcon from '@mui/icons-material/ImportExport';
+import IosShareIcon from '@mui/icons-material/IosShare';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 
 //import SettingsIcon from '@mui/icons-material/Settings';
 import { debugLogError, RowAction } from '@rapid-cmi5/ui';
@@ -53,10 +58,6 @@ export enum CourseActionEnum {
  * context menu for course
  */
 const courseActions = [
-  // {
-  //   tooltip: 'Course Settings',
-  //   icon: <SettingsIcon color="inherit" />,
-  // },
   {
     tooltip: 'Rename Course',
     icon: <EditIcon color="inherit" />,
@@ -66,6 +67,7 @@ const courseActions = [
     tooltip: 'Create Course',
     icon: <AddIcon color="inherit" />,
   },
+
   {
     tooltip: 'Rename Course',
     icon: <EditIcon color="inherit" />,
@@ -74,7 +76,7 @@ const courseActions = [
     tooltip: 'Publish Course',
     icon: (
       <Stack direction="row">
-        <ImportExportIcon />
+        <IosShareIcon />
         <FolderZipIcon color="inherit" />
       </Stack>
     ),
@@ -167,6 +169,7 @@ export const LessonDrawer = () => {
 
   return (
     <Stack
+      spacing={1}
       sx={{
         backgroundColor: 'background.default',
         height: '100%',
@@ -174,44 +177,40 @@ export const LessonDrawer = () => {
         overflowY: 'auto',
       }}
     >
-      <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
+      <Typography
+        variant="caption"
+        sx={{
+          fontFamily: '"IBM Plex Sans", sans-serif',
+          fontWeight: 'bold',
+          marginTop: 0.5,
+        }}
+      >
         VISUAL DESIGNER
       </Typography>
 
-      <Stack
-        direction="column"
-        spacing={1}
-        sx={{
-          mb: 1,
-          p: 1,
-          borderRadius: 1,
-        }}
-      >
-        <Box
+  
+      <Grid container wrap="wrap">
+        <Grid
+          size={{ xs: 12, sm: 8, md: 8 }}
           sx={{
-            display: 'grid',
-            gridTemplateColumns: '1fr auto auto',
-            gap: 1,
-            alignItems: 'center',
-            width: '100%',
-            minWidth: 0,
+            display: 'flex',
+            justifyContent: 'flex-start',
+
+            minWidth: '100px',
+            marginTop: '4px',
+            gap: .5,
           }}
         >
-          {/* Col 1 */}
-          <Box>
-            <CourseSelector
-              currentCoursePath={currentCourse?.basePath || undefined}
-              currentRepo={currentRepo || undefined}
-              availableCourses={availableCourses}
-              disabled={!availableCourses || availableCourses?.length === 0}
-              onSelect={(coursePath: string) => {
-                saveSlide();
-                promptChangeCourse(coursePath);
-              }}
-            />
-          </Box>
-
-          {/* Col 2 */}
+          <CourseSelector
+            currentCoursePath={currentCourse?.basePath || undefined}
+            currentRepo={currentRepo || undefined}
+            availableCourses={availableCourses}
+            disabled={!availableCourses || availableCourses?.length === 0}
+            onSelect={(coursePath: string) => {
+              saveSlide();
+              promptChangeCourse(coursePath);
+            }}
+          />
           <Tooltip
             title={
               currentRepo ? 'Create course' : 'Select a repo to create a course'
@@ -226,13 +225,16 @@ export const LessonDrawer = () => {
                 onClick={promptCreateCourse}
                 size="small"
                 sx={(theme) => ({
-                  borderRadius: 1,
-                  border: `1px solid ${theme.palette.divider}`,
+                  backgroundColor: 'primary.main',
+                  color: 'common.white',
+                  borderRadius: 6,
+                  border: `1px solid ${theme.palette.primary.light}`,
                   transition:
                     'transform 120ms ease, background-color 120ms ease',
                   '&:hover': {
-                    bgcolor: theme.palette.action.selected,
+                    bgcolor: alpha(theme.palette.primary.main, 0.15),
                     transform: 'translateY(-1px)',
+                    color: 'primary.main',
                   },
                   '&.Mui-disabled': { opacity: 0.45 },
                 })}
@@ -241,8 +243,76 @@ export const LessonDrawer = () => {
               </IconButton>
             </span>
           </Tooltip>
+        </Grid>
+        <Grid
+          size={{ xs: 12, sm: 4, md: 4 }}
+          sx={{
+            display: 'flex',
+            gap: .5,
+            justifyContent: 'flex-end',
+            minWidth: '112px', 
+            marginTop: '4px',
+          }}
+        >
+          <Tooltip title="Create Lesson">
+            <span>
+              <IconButton
+                aria-label="create new lesson"
+                id="create-lesson"
+                data-testid="create-lesson"
+                disabled={!currentRepo}
+                onClick={onCreateLesson}
+                size="small"
+                sx={(theme) => ({
+                  borderRadius: 6,
+                  border: `1px solid ${theme.palette.primary.light}`,
+                  transition:
+                    'transform 120ms ease, background-color 120ms ease',
+                  '&:hover': {
+                    bgcolor: alpha(theme.palette.primary.main, 0.15),
+                    transform: 'translateY(-1px)',
+                  },
+                  '&.Mui-disabled': { opacity: 0.45 },
+                })}
+              >
+                <AddIcon fontSize="small" />
+                <MenuBookIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
 
-          {/* Col 3 */}
+          <Tooltip
+            title={
+              currentRepo
+                ? 'Publish course'
+                : 'Publish Not Available. Create a Course.'
+            }
+          >
+            <span>
+              <IconButton
+                aria-label="publish course"
+                id="publish-course"
+                data-testid="publish-course"
+                disabled={!currentRepo}
+                onClick={publishCourse}
+                size="small"
+                sx={(theme) => ({
+                  borderRadius: 1,
+                  border: `1px solid ${theme.palette.primary.light}`,
+                  transition:
+                    'transform 120ms ease, background-color 120ms ease',
+                  '&:hover': {
+                    bgcolor: alpha(theme.palette.primary.main, 0.15),
+                    transform: 'translateY(-1px)',
+                  },
+                  '&.Mui-disabled': { opacity: 0.45 },
+                })}
+              >
+                <IosShareIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+
           <ButtonOptions
             optionButton={(handleClick: any) => (
               <Tooltip title="More Options">
@@ -255,8 +325,10 @@ export const LessonDrawer = () => {
                     onClick={handleClick}
                     sx={(theme) => ({
                       borderRadius: 1,
-                      border: `1px solid ${theme.palette.divider}`,
-                      '&:hover': { bgcolor: theme.palette.action.selected },
+                      border: `1px solid ${theme.palette.primary.light}`,
+                      '&:hover': {
+                        bgcolor: alpha(theme.palette.primary.main, 0.15),
+                      },
                       '&.Mui-disabled': { opacity: 0.45 },
                     })}
                   >
@@ -315,25 +387,8 @@ export const LessonDrawer = () => {
               ))}
             </List>
           </ButtonOptions>
-
-          {/* Row 2: Publish spans ALL columns */}
-          <Box sx={{ gridColumn: '1 / -1' }}>
-            <ButtonMinorUi
-              id="publish-course-button"
-              startIcon={<ImportExportIcon />}
-              disabled={!currentRepo}
-              onClick={publishCourse}
-              fullWidth
-              sx={(theme) => ({
-                borderRadius: 1,
-                fontWeight: 700,
-              })}
-            >
-              Publish Course
-            </ButtonMinorUi>
-          </Box>
-        </Box>
-      </Stack>
+        </Grid>
+      </Grid>
 
       {menuAnchor && (
         <Renamer
@@ -351,14 +406,7 @@ export const LessonDrawer = () => {
       )}
       {courseData?.courseTitle ? (
         <>
-          <Typography
-            sx={{ color: 'text.hint', width: 'auto', marginBottom: '4px' }}
-            variant="caption"
-          >
-            Lessons
-          </Typography>
           <LessonTree courseData={courseData} onCreateLesson={onCreateLesson} />
-          
         </>
       ) : (
         <Typography

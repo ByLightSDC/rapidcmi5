@@ -422,7 +422,7 @@ export class GitFS {
         await this.openLocalDirectory(repoDir);
       } catch {
         throw Error(
-          'The clone operation failed to save files to your local computer.',
+          'The create project operation failed to save files to your local computer.',
         );
       }
     }

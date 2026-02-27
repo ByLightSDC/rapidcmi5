@@ -19,7 +19,6 @@ import CourseSelector from '../selectors/CourseSelector';
 import { Box, Stack } from '@mui/system';
 
 import {
-  attachRemoteRepoModalId,
   cloneRepoModalId,
   commitChangesModalId,
   createCourseModalId,
@@ -43,7 +42,6 @@ import PullForm from './PullForm';
 import PushForm from './PushForm';
 import GitConfigForm from './GitConfigForm';
 import DownloadCmi5ZipForm from './DownloadCmi5ZipForm';
-import AttachRemoteRepoForm from './AttachRemoteRepoForm';
 import { useCourseData } from '../../rapidcmi5_mdx/data-hooks/useCourseData';
 import ImportRepoZipForm from './ImportRepoZipForm';
 import { TextField, Alert } from '@mui/material';
@@ -262,6 +260,8 @@ export function SelectGitDialogs() {
             repoRemoteUrl: '',
             authorEmail: currentAuth?.userEmail?.toLowerCase() || '',
             authorName: currentAuth?.userName || '',
+            repoUsername: currentAuth?.gitCredentials?.username || '',
+            repoPassword: currentAuth?.gitCredentials?.password || '',
             shallowClone: false,
           }}
           modalObj={modalObj}
@@ -281,19 +281,7 @@ export function SelectGitDialogs() {
           handleModalAction={handleModalResponse}
         />
       )}
-      {/* prompt attach remote repo */}
-      {modalObj.type === attachRemoteRepoModalId && (
-        <AttachRemoteRepoForm
-          defaultData={{
-            ...defaultGitConfigData,
-            authorEmail: currentAuth?.userEmail?.toLowerCase() || '',
-            authorName: currentAuth?.userName || '',
-          }}
-          modalObj={modalObj}
-          handleCloseModal={handleCloseModal}
-          handleModalAction={handleModalResponse}
-        />
-      )}
+
       {/* prompt commit */}
       {modalObj.type === commitChangesModalId && (
         <CommitForm

@@ -7,21 +7,26 @@ import {
   FormStateType,
   MiniForm,
   ModalDialog,
+  ViewExpander,
 } from '@rapid-cmi5/ui';
 import * as yup from 'yup';
 
 import { cloneRepoModalId } from '../../rapidcmi5_mdx/modals/constants';
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
-import { Typography, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import { UseFormReturn } from 'react-hook-form';
 
 import { GIT_URL_GROUP, NAME_GROUP } from '@rapid-cmi5/ui';
 import { CreateCloneType } from '../CourseBuilderApiTypes';
-import { useCallback, useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect, useMemo } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';
+
+import CheckIcon from '@mui/icons-material/Check';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
 
 const validationSchema = yup.object().shape({
   repoDirName: NAME_GROUP,
@@ -98,9 +103,29 @@ export function CloneRepoForm({
         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [watchRepoUrl, errors['repoRemoteUrl']]);
 
+      /**
+       * Whether form has git configuration errors
+       */
+      const hasRequiredErrors = useMemo(() => {
+        if (
+          errors?.repoUsername ||
+          errors?.repoPassword ||
+          errors?.authorName ||
+          errors?.authorEmail
+        ) {
+          return true;
+        }
+        return false;
+      }, [
+        errors?.repoUsername,
+        errors?.repoPassword,
+        errors?.authorName,
+        errors?.authorEmail,
+      ]);
+
       return (
         <>
-          <Grid size={12}>
+          <Grid size={8}>
             <FormControlTextField
               control={control}
               error={Boolean(errors?.repoRemoteUrl)}
@@ -112,95 +137,103 @@ export function CloneRepoForm({
               readOnly={false}
             />
           </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <FormControlTextField
-              control={control}
-              error={Boolean(errors?.repoDirName)}
-              helperText={errors?.repoDirName?.message}
-              name="repoDirName"
-              required
-              label="Repository Name"
-              readOnly={false}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid size={4}>
             <FormControlTextField
               control={control}
               error={Boolean(errors?.repoBranch)}
               helperText={errors?.repoBranch?.message}
               name="repoBranch"
               required
-              label="Branch"
-              readOnly={false}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <FormControlTextField
-              control={control}
-              error={Boolean(errors?.repoUsername)}
-              helperText={errors?.repoUsername?.message}
-              name="repoUsername"
-              required
-              label="User Name"
-              readOnly={false}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <FormControlPassword
-              control={control}
-              error={Boolean(errors?.repoPassword)}
-              helperText={errors?.repoPassword?.message}
-              name="repoPassword"
-              required
-              label="Password"
-              readOnly={false}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <FormControlTextField
-              control={control}
-              error={Boolean(errors?.authorName)}
-              helperText={errors?.authorName?.message}
-              name="authorName"
-              required
-              label="Author Name"
-              readOnly={false}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <FormControlTextField
-              control={control}
-              error={Boolean(errors?.authorEmail)}
-              helperText={errors?.authorEmail?.message}
-              name="authorEmail"
-              required
-              label="Email"
+              label="Remote Branch"
               readOnly={false}
             />
           </Grid>
 
           <Grid size={12}>
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <FormControlCheckboxField
-                control={control}
-                name="shallowClone"
-                label="Shallow Clone"
-              />
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ ml: 2 }}
-              >
-                This improves performance for very large repos
-              </Typography>
-            </Box>
+            <FormControlTextField
+              control={control}
+              error={Boolean(errors?.repoDirName)}
+              helperText={errors?.repoDirName?.message}
+              name="repoDirName"
+              required
+              label="New Project Name"
+              readOnly={false}
+            />
           </Grid>
+
+          <ViewExpander
+            rightMenuChildren={
+              hasRequiredErrors ? (
+                <ReportProblemIcon color="error" fontSize="medium" />
+              ) : (
+                <CheckIcon color="success" fontSize="medium" />
+              )
+            }
+            title="Git Credentials"
+            defaultIsExpanded={false}
+          >
+            <>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <FormControlTextField
+                  control={control}
+                  error={Boolean(errors?.repoUsername)}
+                  helperText={errors?.repoUsername?.message}
+                  name="repoUsername"
+                  required
+                  label="User Name"
+                  placeholder="user.name"
+                  readOnly={false}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <FormControlPassword
+                  control={control}
+                  error={Boolean(errors?.repoPassword)}
+                  helperText={errors?.repoPassword?.message}
+                  name="repoPassword"
+                  required
+                  label="Password"
+                  placeholder="personal access token"
+                  readOnly={false}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <FormControlTextField
+                  control={control}
+                  error={Boolean(errors?.authorName)}
+                  helperText={errors?.authorName?.message}
+                  name="authorName"
+                  required
+                  label="Author Name"
+                  placeholder="FirstName LastName"
+                  readOnly={false}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <FormControlTextField
+                  control={control}
+                  error={Boolean(errors?.authorEmail)}
+                  helperText={errors?.authorEmail?.message}
+                  name="authorEmail"
+                  required
+                  label="Email"
+                  placeholder="user@gmail.com"
+                  readOnly={false}
+                />
+              </Grid>
+              <Grid size={12}>
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                  <FormControlCheckboxField
+                    control={control}
+                    name="shallowClone"
+                    label="Shallow Clone"
+                    infoText="This improves performance for large repos by cloning only
+                    the most recent history"
+                  />
+                </Box>
+              </Grid>
+            </>
+          </ViewExpander>
         </>
       );
     },
@@ -222,7 +255,7 @@ export function CloneRepoForm({
           doAction={handleCloneRepo}
           formTitle="Clone Repository"
           getFormFields={getFormFields}
-          instructions="Select a remote git repository to clone"
+          instructions=""
           submitButtonText="Clone"
           successToasterMessage="Repository Cloned Successfully"
           onClose={onClose}

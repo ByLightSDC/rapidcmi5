@@ -48,7 +48,7 @@ export const FileDrawer = () => {
   return (
     <Stack
       data-testid="file-drawer"
-      spacing={2.5}
+      spacing={0}
       sx={{
         backgroundColor: 'background.default',
         height: '100%',
@@ -58,10 +58,17 @@ export const FileDrawer = () => {
       <Stack spacing={1}>
         <Stack
           direction="row"
-          justifyContent="space-between"
+          justifyContent="flex-start"
           alignItems="center"
+          spacing={2}
         >
-          <Typography variant="h6" fontWeight="bold" sx={{ ml: 1 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              fontFamily: '"IBM Plex Sans", sans-serif',
+              fontWeight: 'bold',
+            }}
+          >
             PROJECT FILES
           </Typography>
 
