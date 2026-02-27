@@ -21,6 +21,10 @@ import {
   useCellValue,
   useRealm,
   UndoRedo,
+  ButtonWithTooltip,
+  iconComponentFor$,
+  useCellValues,
+  useTranslation,
 } from '@mdxeditor/editor';
 import { CLEAR_HISTORY_COMMAND } from 'lexical';
 import { InsertActivity } from './components/InsertActivity';
@@ -32,8 +36,9 @@ import { InsertLayoutBox } from './components/InsertLayoutBox';
 
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
+import WidgetsIcon from '@mui/icons-material/Widgets';
 
-import { Box, IconButton, Tooltip } from '@mui/material';
+import { Box, IconButton, Stack, Tooltip } from '@mui/material';
 
 import { InsertAdmonition } from './components/InsertAdmonition';
 import {
@@ -70,6 +75,10 @@ import {
 } from '@rapid-cmi5/ui';
 import { displayData } from '../../../redux/courseBuilderReducer';
 import { SlideMenu } from '../menu/SlideMenu';
+import { InsertBlockMenu } from './components/InsertBlockMenu';
+import { ModePreviewButton } from './components/ModePreviewButton';
+import { SaveSlideButton } from './components/SaveSlideButton';
+import { BlockLibraryDrawer } from './components/BlockLibraryDrawer';
 
 //Admonition
 export type RapidAdmonitionKind =
@@ -115,19 +124,17 @@ export const RapidCmi5Toolbar: React.FC = () => {
   const realm = useRealm();
   const [isToolGroup1Visible, setIsToolGroup1Visible] = useState(true);
   const isPlayback = useCellValue(editorInPlayback$);
+  const viewmode = useCellValue(viewMode$);
   const themeIconColor = useSelector(iconColor);
   const themedDividerColor = useSelector(dividerColor);
   const content = useSelector(displayData);
   const [editor] = useLexicalComposerContext();
 
-  const toggleGroup = useCallback(
-    (whichGroup: number) => {
-      if (whichGroup) {
-        setIsToolGroup1Visible(!isToolGroup1Visible);
-      }
-    },
-    [isToolGroup1Visible],
+  const [viewMode, iconComponentFor] = useCellValues(
+    viewMode$,
+    iconComponentFor$,
   );
+  const t = useTranslation();
 
   /**
    * UE sets view to Rich Text Editor on mount
@@ -144,11 +151,16 @@ export const RapidCmi5Toolbar: React.FC = () => {
     }
   }, [content]);
 
+  useEffect(() => {
+    console.log('viewmode', viewmode);
+  }, [viewmode]);
+
   return (
     <Box
       sx={{
         backgroundColor: 'background.default',
         width: '100vw',
+        minHeight: '40px',
         borderBottom: `1px solid ${themedDividerColor}`,
         position: 'sticky',
         top: 0,
@@ -164,120 +176,113 @@ export const RapidCmi5Toolbar: React.FC = () => {
           WebkitOverflowScrolling: 'touch',
         }}
       >
-        {/* Centerer */}
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            px: 1,
-          }}
-        >
-          {/* Actual toolbar row (shrink-to-fit) */}
-          <Box
-            sx={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              width: 'max-content',
-              p: 1,
-              gap: 1,
-              overflowX: 'hidden',
-            }}
+        <Stack direction="column" spacing={1} sx={{ padding: 1 }}>
+          {viewmode === 'rich-text' && (
+            <Stack direction="row" spacing={1}>
+              <Stack direction="row" spacing={1} sx={{ flexGrow: 1 }}>
+                <BoldItalicUnderlineToggles />
+                {/* <StrikeThroughSupSubToggles /> */}
+                <ColorTextSplitButton />
+                <HighlightSplitButton />
+                <TextFxButton />
+                <Separator />
+                <CodeToggle />
+                <ListsToggle />
+                <CreateLink />
+                <Separator />
+                <BlockTypeSelect />
+                <Separator />
+                <InsertImage />
+                <InsertAudio />
+                <InsertVideo />
+                <InsertCodeBlock />
+                <InsertLayoutBox />
+                <InsertTable />
+                <Separator />
+                <InsertAnimation />
+                <InsertBlockMenu />
+                <BlockLibraryDrawer />
+              </Stack>
+              {/* <Stack direction="row" spacing={1}>
+                <InsertAnimation />
+                <InsertBlockMenu />
+              </Stack> */}
+            </Stack>
+          )}
+          {viewmode !== 'rich-text' && <Box sx={{ minHeight: '32px' }}></Box>}
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{ display: 'flex', alignItems: 'flex-end' }}
           >
-            <DiffSourceToggleWrapper options={['rich-text', 'source']}>
-              <ConditionalContents
-                options={[
-                  {
-                    when: (editor) => editor?.editorType === 'sandpack',
-                    contents: () => <ShowSandpackInfo />,
-                  },
-                  {
-                    fallback: () => (
-                      <>
-                        <UndoRedo />
-                        <Separator />
-                        <BoldItalicUnderlineToggles />
-                        <StrikeThroughSupSubToggles />
-                        <ColorTextSplitButton />
-                        <HighlightSplitButton />
-                        <TextFxButton />
-                        <Separator />
-                        <CodeToggle />
-                        <ListsToggle />
-                        <Separator />
-
-                        <ConditionalContents
-                          options={[
-                            { when: whenInAdmonition, contents: () => <></> },
-                            { when: whenInActivity, contents: () => <></> },
-                            { fallback: () => <BlockTypeSelect /> },
-                          ]}
-                        />
-
-                        <InsertAdmonition />
-                        <InsertActivity />
-                        <Separator />
-
-                        <CreateLink />
-                        <InsertImage />
-                        <InsertAudio />
-                        <InsertVideo />
-                        <Separator />
-                        <InsertSteps />
-                        <InsertTable />
-                        <InsertTabs />
-                        <InsertAccordion />
-                        <InsertGrid />
-                        <InsertThematicBreak />
-                        <Separator />
-                        <InsertCodeBlock />
-                        <InsertLayoutBox />
-                        <InsertAnimation />
-                        <Separator />
-                      </>
-                    ),
-                  },
-                ]}
-              />
-            </DiffSourceToggleWrapper>
-          </Box>
-        </Box>
-      </Box>
-      {/* SlideMenu row: if you want it centered relative to the same width, keep it inside the same centered area */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          width: '100%',
-          my: 0.5,
-        }}
-      >
-        <SlideMenu
-          extraOptions={[
-            <IconButton
-              aria-label="toggle-playback"
-              size={iconButtonSize}
-              style={iconButtonStyle}
-              onClick={() => realm.pub(editorInPlayback$, !isPlayback)}
+            <Stack
+              id="save-menu"
+              direction="row"
+              spacing={1}
+              sx={{
+                flexGrow: 1,
+                display: 'flex',
+                alignItems: 'center',
+                maxHeight: '32px',
+              }}
             >
-              <Box
-                sx={{
-                  color: themeIconColor,
-                  display: 'flex',
+              <UndoRedo />
+              <SaveSlideButton />
+            </Stack>
+            <Stack
+              id="slide-menu"
+              direction="row"
+              spacing={1}
+              sx={{
+                backgroundColor: 'background.default',
+                borderColor: 'divider',
+                borderRadius: '24px',
+                borderStyle: 'solid',
+                //backgroundColor: 'orange',
+                display: 'flex',
+                justifyContent: 'center',
+                //flexGrow: 1,
+              }}
+            >
+              <SlideMenu />
+            </Stack>
+            <Stack
+              id="mode-menu"
+              direction="row"
+              spacing={1}
+              sx={{
+                //backgroundColor: 'green',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                flexGrow: 1,
+                maxHeight: '32px',
+              }}
+            >
+              <ButtonWithTooltip
+                title={t('toolbar.richText', 'rich_text')}
+                onClick={() => {
+                  changeViewMode('rich-text');
                 }}
+                disabled={false}
               >
-                {isPlayback ? (
-                  <Tooltip title="Toggle Preview OFF" {...tooltipStyle}>
-                    <StopScreenShareIcon color="inherit" />
-                  </Tooltip>
-                ) : (
-                  <Tooltip title="Toggle Preview ON" {...tooltipStyle}>
-                    <ScreenShareIcon color="inherit" />
-                  </Tooltip>
-                )}
-              </Box>
-            </IconButton>,
-          ]}
-        />
+                {iconComponentFor('rich_text')}
+              </ButtonWithTooltip>
+              <ButtonWithTooltip
+                title="Markdown"
+                onClick={() => {
+                  changeViewMode('source');
+                }}
+                disabled={false}
+              >
+                {iconComponentFor('markdown')}
+              </ButtonWithTooltip>
+              <ModePreviewButton />
+            </Stack>
+          </Stack>
+        </Stack>
+
+        {viewmode === 'source' && <></>}
       </Box>
     </Box>
   );
