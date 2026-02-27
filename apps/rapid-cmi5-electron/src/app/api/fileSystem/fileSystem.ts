@@ -1,4 +1,4 @@
-import { DirMeta, FolderStruct } from '@rapid-cmi5/cmi5-build-common';
+import { DirMeta, FolderStruct, sortProjectMetas } from '@rapid-cmi5/cmi5-build-common';
 
 import fs, { constants } from 'fs';
 
@@ -700,11 +700,7 @@ export class ElectronFsHandler {
       }
     }
 
-    return metas.sort((a, b) => {
-      const aTime = new Date(a.lastAccessed ?? a.createdAt).getTime();
-      const bTime = new Date(b.lastAccessed ?? b.createdAt).getTime();
-      return bTime - aTime;
-    });
+    return sortProjectMetas(metas);
   }
 
   async getGitRemoteUrlElectron(path: string): Promise<string | undefined> {

@@ -8,6 +8,7 @@ import {
   FsOperations,
   generateCmi5Xml,
   DirMeta,
+  sortProjectMetas,
 } from '@rapid-cmi5/cmi5-build-common';
 import JSZip from 'jszip';
 import path, { basename, dirname, join, relative } from 'path-browserify';
@@ -523,11 +524,7 @@ export class GitFS {
         await set('courses/' + meta.id, meta);
       }
     }
-    return newMetas.sort((a, b) => {
-      const aTime = new Date(a.lastAccessed ?? a.createdAt).getTime();
-      const bTime = new Date(b.lastAccessed ?? b.createdAt).getTime();
-      return bTime - aTime;
-    });
+    return sortProjectMetas(newMetas)
   };
 
   getDirHandle = async (id: string) => {

@@ -17,9 +17,8 @@ import { History, Search, Clear, Info } from '@mui/icons-material';
 import { GlassCard } from './GlassCard';
 
 import ThemedOptionCard from './ThemedOption';
-import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
+import { DirMeta, formatRelativeTime } from '@rapid-cmi5/cmi5-build-common';
 import { useState, useMemo } from 'react';
-import { formatRelativeTime } from '../../../../utils/dateAndTime';
 
 export type RecentProjectSelectionProps = {
   recentProjects: DirMeta[];

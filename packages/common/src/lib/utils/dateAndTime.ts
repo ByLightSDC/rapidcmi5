@@ -1,3 +1,5 @@
+import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
+
 export const formatRelativeTime = (isoDate: string): string => {
   const now = new Date();
   const date = new Date(isoDate);
@@ -15,4 +17,12 @@ export const formatRelativeTime = (isoDate: string): string => {
     return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
   if (diffDays === 1) return 'Yesterday';
   return `${diffDays} days ago`;
+};
+
+export const sortProjectMetas = (projectMetas: DirMeta[]) => {
+  return projectMetas.sort((a, b) => {
+    const aTime = new Date(a.lastAccessed ?? a.createdAt).getTime();
+    const bTime = new Date(b.lastAccessed ?? b.createdAt).getTime();
+    return bTime - aTime;
+  });
 };
