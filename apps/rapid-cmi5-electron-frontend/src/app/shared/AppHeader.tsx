@@ -41,7 +41,6 @@ export default function AppHeader() {
         );
         setSettingsMenuAnchor(menuButtonRef);
         break;
-        break;
       default:
         break;
     }
@@ -52,17 +51,25 @@ export default function AppHeader() {
       {showAppHeader && (
         <Box
           sx={{
-            height: '35px',
+            height: '40px',
             backgroundColor: (theme: any) => `${theme.header.default}`,
             borderBottom: '1px solid',
             borderBottomColor: 'divider',
             display: 'flex',
             alignItems: 'center',
-            px: 1,
+            //px: 1,
           }}
         >
           {/* Left section - Logo and Dashboard Menu */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              marginLeft: '8px',
+              marginTop: '6px', //this offsets loading bar that appears under the app header box
+            }}
+          >
             <AppLogo
               assetId="rapid-cmi5"
               isNavOpen={false}

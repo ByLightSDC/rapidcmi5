@@ -1,3 +1,4 @@
+import { Alert } from '@mui/material';
 import { Grid } from '@mui/system';
 import { Credentials, GitUserConfig } from '@rapid-cmi5/cmi5-build-common';
 import {
@@ -13,7 +14,8 @@ import { useCallback, useMemo } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import * as yup from 'yup';
 
-export const configureGlobalGitConfigModalId = 'configureGlobalGitConfigModalId';
+export const configureGlobalGitConfigModalId =
+  'configureGlobalGitConfigModalId';
 
 interface GitCredentialsFormData extends GitUserConfig {
   username?: string;
@@ -115,8 +117,8 @@ export function ConfigureGlobalGitConfigForm({
                   helperText={errors?.password?.message}
                   name="password"
                   required
-                  label="Personal Access Token"
-                  placeholder="ghp_********"
+                  label="Password"
+                  placeholder="personal access token"
                   readOnly={false}
                 />
               </Grid>
@@ -130,7 +132,7 @@ export function ConfigureGlobalGitConfigForm({
               helperText={errors?.authorName?.message}
               name="authorName"
               required
-              label="Git Author Name"
+              label="Author Name"
               placeholder="FirstName LastName"
               readOnly={false}
             />
@@ -143,11 +145,17 @@ export function ConfigureGlobalGitConfigForm({
               helperText={errors?.authorEmail?.message}
               name="authorEmail"
               required
-              label="Git Author Email"
+              label="Author Email"
               placeholder="user@gmail.com"
               readOnly={false}
             />
           </Grid>
+          <Alert severity="info">
+            Author name and email are required in order to make local commits.
+            User name and password are required when pushing changes to a remote
+            repository. Password can only be persisted in the desktop version of
+            RapidCMI5.
+          </Alert>
         </>
       );
     },
@@ -169,11 +177,7 @@ export function ConfigureGlobalGitConfigForm({
           doAction={doAction}
           formTitle="Configure Git Credentials"
           getFormFields={getFormFields}
-          instructions={
-            showCredentials
-              ? 'Enter your Git username and Personal Access Token (PAT).'
-              : 'Enter your Git author information for commits.'
-          }
+          instructions=""
           submitButtonText="Save"
           successToasterMessage="Git credentials saved"
           onClose={onClose}

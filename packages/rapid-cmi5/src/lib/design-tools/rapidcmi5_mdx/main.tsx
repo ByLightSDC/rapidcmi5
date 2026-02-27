@@ -2,20 +2,17 @@ import { GitContextProvider } from '../course-builder/GitViewer/session/GitConte
 import { RC5ContextProvider } from './contexts/RC5Context';
 import RC5Modals from './modals/RC5Modals';
 import Landing from './Landing';
-import { AxiosResponse } from 'axios';
 import { Provider } from 'react-redux';
 import { persistor, store } from '../../redux/store';
 import { PersistGate } from 'redux-persist/integration/react';
 
 import { UseFormReturn } from 'react-hook-form';
 import { FormCrudType } from '@rapid-cmi5/ui';
-import { CourseAU, Credentials } from '@rapid-cmi5/cmi5-build-common';
-
-export interface buildCmi5ZipParams {
-  zipBlob: File;
-  zipName: string;
-  createAuMappings: boolean;
-}
+import {
+  CourseAU,
+  Credentials,
+  GitUserConfig,
+} from '@rapid-cmi5/cmi5-build-common';
 
 export type SubmitScenarioFormFn<T = any> = (item: T) => void;
 
@@ -40,21 +37,24 @@ export interface GetScenarioFormProps {
 }
 
 export interface RapidCmi5Opts {
-  userAuth?: UserAuth,
-  // buildCmi5Zip?: (params: buildCmi5ZipParams) => Promise<AxiosResponse<object>>;
+  userAuth?: UserAuth;
   downloadCmi5Player?: () => Promise<any>;
-  processAu?:(au: CourseAU, blockId: string) => Promise<void>;
+  processAu?: (au: CourseAU, blockId: string) => Promise<void>;
   GetScenariosForm?: React.ComponentType<GetScenarioFormProps>;
   clearData?: () => void;
   showHomeButton?: boolean;
   clearCache?: () => void;
+  handleOverrideGlobalGitConfig?: (
+    config?: GitUserConfig,
+    creds?: Credentials,
+  ) => void;
 }
 
 export type UserAuth = {
   token?: string;
   userName: string;
   userEmail: string;
-  gitCredentials?: Credentials
+  gitCredentials?: Credentials;
 };
 
 export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {

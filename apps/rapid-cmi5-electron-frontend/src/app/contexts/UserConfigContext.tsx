@@ -99,13 +99,26 @@ export default function UserConfig({ children }: UserConfigProps) {
 
   const [certs, setCerts] = useState<CertInfo[]>([]);
 
-  // Load persisted values on mount (Electron only)
+  const GIT_USER_STORAGE_KEY = 'rapidcmi5.gitUser';
+
+  // Load persisted values on mount
   useEffect(() => {
-    if (!isElectron) return;
+    if (!isElectron) {
+      const stored = localStorage.getItem(GIT_USER_STORAGE_KEY);
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored) as GitUserConfig;
+          setGitUserState(parsed);
+        } catch {
+          // ignore malformed data
+        }
+      }
+      return;
+    }
 
     let cancelled = false;
 
-    async function load() {
+    const load = async () => {
       const [userConfig, gitCreds, ssoConfig, certList] = await Promise.all([
         window.userSettingsApi.getGitUserConfig(),
         window.userSettingsApi.getGitCredentials(),
@@ -119,7 +132,7 @@ export default function UserConfig({ children }: UserConfigProps) {
         setSsoConfigState(ssoConfig);
         setCerts(certList);
       }
-    }
+    };
 
     load();
     return () => {
@@ -131,6 +144,14 @@ export default function UserConfig({ children }: UserConfigProps) {
     (config: GitUserConfig) => {
       if (isElectron) {
         window.userSettingsApi.setGitUserConfig(config);
+      } else {
+        localStorage.setItem(
+          GIT_USER_STORAGE_KEY,
+          JSON.stringify({
+            authorName: config.authorName,
+            authorEmail: config.authorEmail,
+          }),
+        );
       }
       setGitUserState(config);
     },
@@ -142,8 +163,8 @@ export default function UserConfig({ children }: UserConfigProps) {
       try {
         if (isElectron) {
           window.userSettingsApi.setGitCredentials(creds);
-          setGitCredentialsState(creds);
         }
+        setGitCredentialsState(creds);
       } catch (error) {
         console.error('Failed to set git credentials:', error);
       }
@@ -203,7 +224,7 @@ export default function UserConfig({ children }: UserConfigProps) {
       value={{
         gitUser,
         setGitUser,
-        setGitCredentials: isElectron ? setGitCredentials : undefined,
+        setGitCredentials,
         gitCredentials,
         clearGitCredentials,
         setSSOConfig,

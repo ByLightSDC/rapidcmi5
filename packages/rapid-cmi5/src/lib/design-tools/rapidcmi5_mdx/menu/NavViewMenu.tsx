@@ -222,8 +222,40 @@ export const NavViewMenu = ({
       }}
       spacing={0}
     >
+      {showHomeButton && (
+        <IconButton
+          aria-label="repo-selection-button"
+          data-testid="repo-selection-button"
+          color="inherit"
+          size={iconButtonSize}
+          style={menuIconStyle}
+          onClick={() => {
+            if (viewMode === ViewModeEnum.Designer) {
+              saveSlide();
+              promptNavAway(ViewModeEnum.RepoSelector);
+            } else {
+              dispatch(changeViewMode(ViewModeEnum.RepoSelector));
+            }
+          }}
+          sx={{ backgroundColor: 'inherit' }}
+        >
+          <Tooltip arrow placement="right" title="Project Selection">
+            {viewMode === ViewModeEnum.RepoSelector ? (
+              <div
+                style={{
+                  color: disabledIconColor,
+                }}
+              >
+                <ArrowBackIcon color="inherit" sx={navIconStyle} />
+              </div>
+            ) : (
+              <ArrowBackIcon color="primary" sx={navIconStyle} />
+            )}
+          </Tooltip>
+        </IconButton>
+      )}
       <IconButton
-        aria-label="select-git"
+        aria-label="select-design"
         color="inherit"
         size={iconButtonSize}
         style={
@@ -309,7 +341,7 @@ export const NavViewMenu = ({
           title={
             isRepoConnectedToRemote
               ? 'Version Control'
-              : 'Connect to a Remote Repository'
+              : 'No remote repository configured. Click the settings ⚙️ icon to add a remote.'
           }
         >
           <Stack direction="row">
@@ -340,40 +372,6 @@ export const NavViewMenu = ({
           </Stack>
         </Tooltip>
       </IconButton>
-      {showHomeButton && (
-        <Box sx={{ mt: 'auto', mb: 2 }}>
-          <IconButton
-            aria-label="repo-selection-button"
-            data-testid="repo-selection-button"
-            color="inherit"
-            size={iconButtonSize}
-            style={menuIconStyle}
-            onClick={() => {
-              if (viewMode === ViewModeEnum.Designer) {
-                saveSlide();
-                promptNavAway(ViewModeEnum.RepoSelector);
-              } else {
-                dispatch(changeViewMode(ViewModeEnum.RepoSelector));
-              }
-            }}
-            sx={{ backgroundColor: 'inherit' }}
-          >
-            <Tooltip arrow placement="right" title="Project Selection">
-              {viewMode === ViewModeEnum.RepoSelector ? (
-                <div
-                  style={{
-                    color: disabledIconColor,
-                  }}
-                >
-                  <ArrowBackIcon color="inherit" sx={navIconStyle} />
-                </div>
-              ) : (
-                <ArrowBackIcon color="primary" sx={navIconStyle} />
-              )}
-            </Tooltip>
-          </IconButton>
-        </Box>
-      )}
     </Stack>
   );
 };

@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 import {
+  FormControlPassword,
   FormControlTextField,
   FormControlUIProvider,
   FormStateType,
@@ -19,6 +20,7 @@ import { NAME_GROUP_OPT } from '@rapid-cmi5/ui';
 import { GitConfigType } from '../CourseBuilderApiTypes';
 import { useContext } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';
+import { Alert, Typography } from '@mui/material';
 
 export function GitConfigForm({
   defaultData,
@@ -36,6 +38,8 @@ export function GitConfigForm({
   ) => void;
 }) {
   const { handleGitSetConfig } = useContext(GitContext);
+  const { isRepoConnectedToRemote, handleChangeRepoName, currentRepo } =
+    useContext(GitContext);
 
   const validationSchema = yup.object().shape({
     username: NAME_GROUP_OPT,
@@ -69,15 +73,8 @@ export function GitConfigForm({
     const { errors, isValid } = formState;
     return (
       <>
-        <Grid size={9}>
-          <FormControlTextField
-            control={control}
-            error={Boolean(errors?.authorEmail)}
-            helperText={errors?.authorEmail?.message}
-            name="authorEmail"
-            label="Email"
-            readOnly={false}
-          />
+        <Grid size={12}>
+          <Typography variant="caption">Commit Settings</Typography>
         </Grid>
         <Grid size={6}>
           <FormControlTextField
@@ -86,20 +83,65 @@ export function GitConfigForm({
             helperText={errors?.authorName?.message}
             name="authorName"
             label="Author Name"
+            placeholder="FirstName LastName"
             readOnly={false}
           />
         </Grid>
+        <Grid size={6}>
+          <FormControlTextField
+            control={control}
+            error={Boolean(errors?.authorEmail)}
+            helperText={errors?.authorEmail?.message}
+            name="authorEmail"
+            label="Email"
+            placeholder="FirstName LastName"
+            readOnly={false}
+          />
+        </Grid>
+        <Grid size={12}>
+          <Typography variant="caption">Remote Repository</Typography>
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <FormControlTextField
+            control={control}
+            error={Boolean(errors?.username)}
+            helperText={errors?.username?.message}
+            name="username"
+            label="User Name"
+            placeholder="user.name"
+            readOnly={false}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <FormControlPassword
+            control={control}
+            error={Boolean(errors?.password)}
+            helperText={errors?.password?.message}
+            name="password"
+            label="Password"
+            placeholder="personal access token"
+            readOnly={false}
+          />
+        </Grid>
+
         <Grid size={12}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.remoteRepoUrl)}
             helperText={errors?.remoteRepoUrl?.message}
             name="remoteRepoUrl"
-            label="Remote URL"
+            label="Remote Repository URL"
+            placeholder="https://mycourserepo.git"
             readOnly={false}
             multiline
           />
         </Grid>
+        {!isRepoConnectedToRemote && (
+          <Alert severity="warning">
+            The remote Repository MUST be blank. Please ensure there is no
+            README file before you add the remote.
+          </Alert>
+        )}
       </>
     );
   };
@@ -117,7 +159,7 @@ export function GitConfigForm({
         <MiniForm
           dataCache={defaultData}
           doAction={handleGitSetConfig}
-          formTitle="Repository Settings"
+          formTitle="Project Settings"
           getFormFields={getFormFields}
           instructions=""
           successToasterMessage="Set Git Config Successfully"

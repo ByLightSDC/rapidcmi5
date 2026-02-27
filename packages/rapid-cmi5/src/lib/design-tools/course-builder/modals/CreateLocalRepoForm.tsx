@@ -1,10 +1,12 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 import {
+  FormControlPassword,
   FormControlTextField,
   FormControlUIProvider,
   FormStateType,
   MiniForm,
   ModalDialog,
+  ViewExpander,
 } from '@rapid-cmi5/ui';
 import * as yup from 'yup';
 
@@ -17,8 +19,13 @@ import { UseFormReturn } from 'react-hook-form';
 
 import { GIT_URL_GROUP, NAME_GROUP } from '@rapid-cmi5/ui';
 import { CreateCloneType } from '../CourseBuilderApiTypes';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';
+import { Alert, Typography } from '@mui/material';
+
+import CheckIcon from '@mui/icons-material/Check';
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
 
 export function CreateLocalRepoForm({
   defaultData,
@@ -98,6 +105,23 @@ export function CreateLocalRepoForm({
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [watchRepoUrl, errors['repoRemoteUrl']]);
 
+    const hasRequiredErrors = useMemo(() => {
+      if (
+        errors?.repoUsername ||
+        errors?.repoPassword ||
+        errors?.authorName ||
+        errors?.authorEmail
+      ) {
+        return true;
+      }
+      return false;
+    }, [
+      errors?.repoUsername,
+      errors?.repoPassword,
+      errors?.authorName,
+      errors?.authorEmail,
+    ]);
+
     return (
       <>
         <Grid size={6}>
@@ -107,7 +131,7 @@ export function CreateLocalRepoForm({
             helperText={errors?.repoDirName?.message}
             name="repoDirName"
             required
-            label="Repository Name"
+            label="New Project Name"
             readOnly={false}
           />
         </Grid>
@@ -118,44 +142,96 @@ export function CreateLocalRepoForm({
             helperText={errors?.repoBranch?.message}
             name="repoBranch"
             required
-            label="Branch"
+            label="Remote Branch"
             readOnly={false}
           />
         </Grid>
-        <Grid size={6}>
-          <FormControlTextField
-            control={control}
-            error={Boolean(errors?.authorName)}
-            helperText={errors?.authorName?.message}
-            name="authorName"
-            required
-            label="Author Name"
-            readOnly={false}
-          />
-        </Grid>
-        <Grid size={6}>
-          <FormControlTextField
-            control={control}
-            error={Boolean(errors?.authorEmail)}
-            helperText={errors?.authorEmail?.message}
-            name="authorEmail"
-            required
-            label="Email"
-            readOnly={false}
-          />
-        </Grid>
-        <Grid size={12}>
-          <FormControlTextField
-            control={control}
-            error={Boolean(errors?.repoRemoteUrl)}
-            helperText={errors?.repoRemoteUrl?.message}
-            name="repoRemoteUrl"
-            label="Remote Repository URL"
-            multiline={true}
-            readOnly={false}
-            data-testid=""
-          />
-        </Grid>
+        <ViewExpander
+          rightMenuChildren={
+            hasRequiredErrors ? (
+              <ReportProblemIcon color="error" fontSize="medium" />
+            ) : (
+              <CheckIcon color="success" fontSize="medium" />
+            )
+          }
+          title="Git Credentials"
+          defaultIsExpanded={false}
+        >
+          <>
+            <Grid size={12}>
+              <Typography variant="caption">
+                Git Configuration for Tracking Changes
+              </Typography>
+            </Grid>
+
+            <Grid size={6}>
+              <FormControlTextField
+                control={control}
+                error={Boolean(errors?.authorName)}
+                helperText={errors?.authorName?.message}
+                name="authorName"
+                required
+                label="Author Name"
+                placeholder="FirstName LastName"
+                readOnly={false}
+              />
+            </Grid>
+            <Grid size={6}>
+              <FormControlTextField
+                control={control}
+                error={Boolean(errors?.authorEmail)}
+                helperText={errors?.authorEmail?.message}
+                name="authorEmail"
+                required
+                label="Email"
+                placeholder="user@gmail.com"
+                readOnly={false}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <FormControlTextField
+                control={control}
+                error={Boolean(errors?.repoUsername)}
+                helperText={errors?.repoUsername?.message}
+                name="repoUsername"
+                label="User Name"
+                placeholder="user.name"
+                readOnly={false}
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <FormControlPassword
+                control={control}
+                error={Boolean(errors?.repoPassword)}
+                helperText={errors?.repoPassword?.message}
+                name="repoPassword"
+                label="Password"
+                placeholder="Personal Access Token"
+                readOnly={false}
+              />
+            </Grid>
+            <Grid size={12}>
+              <FormControlTextField
+                control={control}
+                error={Boolean(errors?.repoRemoteUrl)}
+                helperText={errors?.repoRemoteUrl?.message}
+                name="repoRemoteUrl"
+                label="Remote Repository URL"
+                multiline={true}
+                placeholder="https://mycourserepo.git"
+                readOnly={false}
+                data-testid=""
+              />
+            </Grid>
+            <Alert severity="info">
+              Author name and email are required to commit changes locally.
+              <br />
+              User Name, Password, and Remote Repository URL are required in
+              order to push changes remotely. You can change these later.
+            </Alert>
+          </>
+        </ViewExpander>
       </>
     );
   };
@@ -175,7 +251,7 @@ export function CreateLocalRepoForm({
           doAction={handleCreateLocalRepo}
           formTitle="Create Project"
           getFormFields={getFormFields}
-          instructions="Fill out the form to create a new project"
+          instructions=""
           submitButtonText="Create"
           failToasterMessage="Project Creation Failed"
           successToasterMessage="Project Created Successfully"
