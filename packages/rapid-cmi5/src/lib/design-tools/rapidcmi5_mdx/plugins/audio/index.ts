@@ -41,7 +41,6 @@ import {
 } from './MdastAudioVisitor';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
-export * from './AudioNode';
 
 /**
  * @group Audio

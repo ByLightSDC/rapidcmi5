@@ -58,6 +58,7 @@ export * from './editors/AnimationDirectiveRegistry';
 export * from './editors/AdmonitionDirectiveDescriptor';
 export * from './editors/FxDirectiveDescriptor';
 export * from './editors/YouTubeDirectiveDescriptor';
+
 export * from './plugins/steps/InsertSteps';
 export * from './plugins/steps/StepContentDirectiveDescriptor';
 export * from './plugins/steps/StepsDirectiveDescriptor';
