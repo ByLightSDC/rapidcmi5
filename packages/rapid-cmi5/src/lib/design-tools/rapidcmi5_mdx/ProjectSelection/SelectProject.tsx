@@ -111,7 +111,7 @@ export default function SelectProjectHomePage({}: {}) {
     toast({
       message:
         ids.length === 1
-          ? `Removed project ${ids[0]} from your recents`
+          ? `Removed project from your recents`
           : `Removed ${ids.length} projects from your recents`,
       severity: 'success',
     });

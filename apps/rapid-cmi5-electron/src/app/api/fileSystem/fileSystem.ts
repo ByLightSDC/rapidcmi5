@@ -3,33 +3,11 @@ import { DirMeta, FolderStruct } from '@rapid-cmi5/cmi5-build-common';
 import fs, { constants } from 'fs';
 
 import { app, dialog } from 'electron';
-import Store from 'electron-store';
-
-interface RecentProjectEntry {
-  id: string;
-  lastAccessed: string;
-}
-
-interface StoreSchema {
-  recentProjects: RecentProjectEntry[];
-}
-
-const store = new Store<StoreSchema>({
-  schema: {
-    recentProjects: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          id: { type: 'string' },
-          lastAccessed: { type: 'string' },
-        },
-        required: ['id', 'lastAccessed'],
-      },
-      default: [],
-    },
-  },
-});
+import {
+  recentProjectsStore,
+  addRecentProject,
+  removeRecentProject,
+} from '../userSettings/recentProjects';
 
 import path, { basename, join } from 'path';
 import git from 'isomorphic-git';
@@ -490,7 +468,7 @@ export class ElectronFsHandler {
     const fullPath = await this.getFullPath(p);
 
     await git.init({ fs, dir: fullPath, defaultBranch });
-    this.addRecentProject(basename(p));
+    addRecentProject(basename(p));
   }
 
   async gitResolveRef(p: string, branch: string) {
@@ -531,7 +509,7 @@ export class ElectronFsHandler {
       singleBranch: true,
       onAuth: () => ({ username, password }),
     });
-    this.addRecentProject(basename(p));
+    addRecentProject(basename(p));
   }
 
   async gitCommit(
@@ -697,7 +675,7 @@ export class ElectronFsHandler {
   }
 
   async getRecentProjects(): Promise<DirMeta[]> {
-    const recentProjects = store.get('recentProjects');
+    const recentProjects = recentProjectsStore.get('recentProjects');
 
     const metas: DirMeta[] = [];
     for (const project of recentProjects) {
@@ -717,7 +695,7 @@ export class ElectronFsHandler {
         });
       } catch (error: any) {
         console.error('could not get stats for project', error);
-        this.removeRecentProject(project.id);
+        removeRecentProject(project.id);
         continue;
       }
     }
@@ -746,25 +724,6 @@ export class ElectronFsHandler {
     }
   }
 
-  removeRecentProject(id: string): void {
-    const updated = store.get('recentProjects').filter((p) => p.id !== id);
-    store.set('recentProjects', updated);
-  }
-
-  addRecentProject(id: string): void {
-    const projects = store.get('recentProjects');
-    const entry: RecentProjectEntry = {
-      id,
-      lastAccessed: new Date().toISOString(),
-    };
-    const existingIndex = projects.findIndex((p) => p.id === id);
-    const updated =
-      existingIndex >= 0
-        ? projects.map((p, i) => (i === existingIndex ? entry : p))
-        : [...projects, entry];
-    store.set('recentProjects', updated);
-  }
-
   async chooseProject(): Promise<string | null> {
     await this.baseReady;
     const base = getRapidBase(this.isTestMode);
@@ -788,7 +747,7 @@ export class ElectronFsHandler {
       throw new Error('Selected path is outside the RapidCMI5 sandbox');
     }
     const projectName = basename(chosen);
-    this.addRecentProject(projectName);
+    addRecentProject(projectName);
 
     return projectName;
   }
