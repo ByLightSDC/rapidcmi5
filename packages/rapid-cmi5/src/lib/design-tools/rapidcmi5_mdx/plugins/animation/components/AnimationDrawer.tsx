@@ -85,10 +85,9 @@ export function AnimationDrawer() {
     }
   }, [moveDown, selectedAnimationId]);
 
-  // Avoid rendering heavy drawer contents when closed
+ 
   if (!isOpen) {
     highlightAnimatedElement(null);
-    return null;
   }
 
   return (
@@ -125,7 +124,7 @@ export function AnimationDrawer() {
             <CloseIcon />
           </IconButton>
           <Typography variant="h6" sx={{ flex: 1, marginLeft: 1 }}>
-            Animation
+            Animation Library
           </Typography>
         </Stack>
 
