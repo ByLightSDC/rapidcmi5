@@ -11,22 +11,25 @@ import * as Mdast from 'mdast';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import { $getRoot } from 'lexical';
 
 import {
   Box,
   IconButton,
+  InputAdornment,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Paper,
+  Popover,
   Stack,
   SxProps,
   Tab,
   Tabs,
+  TextField,
   Tooltip,
   TypographyOwnProps,
   useTheme,
@@ -37,6 +40,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import PaletteIcon from '@mui/icons-material/Palette';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
@@ -51,6 +55,8 @@ import { ButtonMinorUi, ButtonOptions } from '../../../../utility/buttons';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
+import { LessonThemeContext } from '../../contexts/LessonThemeContext';
+import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
 
 /**
  * Tabs Editor for tabs directive
@@ -63,6 +69,9 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   parentEditor,
 }) => {
   const muiTheme = useTheme();
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  const blockPadding = resolvedThemeCSS?.blockPadding ?? '16px';
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
   const [tab, setTab] = useState(0);
 
@@ -76,6 +85,17 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     mdastNode?.attributes.style,
   );
   const [sxProps, setSxProps] = useState<SxProps>({});
+  const [backgroundColor, setBackgroundColor] = useState<string>(
+    mdastNode?.attributes.backgroundColor ?? '',
+  );
+  const [colorPickerAnchor, setColorPickerAnchor] =
+    useState<HTMLButtonElement | null>(null);
+  const [pendingColor, setPendingColor] = useState<string>(
+    mdastNode?.attributes.backgroundColor ?? '',
+  );
+  const colorPickerOpen = Boolean(colorPickerAnchor);
+  const paletteButtonRef = useRef<HTMLButtonElement>(null);
+
   const [isPlayback, readOnly, syntaxExtensions] = useCellValues(
     editorInPlayback$,
     readOnly$,
@@ -96,12 +116,6 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
 
   /**
    * Safely retrieves the value of a specific attribute from a node's attributes object.
-   *
-   * @param nodeAttributes - An object representing attribute key-value pairs,
-   *                         where each value can be a string, null, or undefined.
-   * @param attributeName - The name of the attribute to retrieve.
-   *
-   * @returns The value of the attribute if it exists (even if null), or `undefined` if the key is not present.
    */
   const getAttributeValue = (
     nodeAttributes: Record<string, string | null | undefined>,
@@ -115,7 +129,6 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
 
   /**
    * Inserts new tab before tab index
-   * @param index - Tab index.
    */
   const handleAddTabBefore = useCallback(
     (index: number) => {
@@ -129,7 +142,6 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
 
   /**
    * Inserts new tab after tab index
-   * @param index - Tab index.
    */
   const handleAddTabAfter = useCallback(
     (index: number) => {
@@ -165,7 +177,6 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
 
   /**
    * Removes tab at tab index
-   * @param index - Tab index.
    */
   const handleRemoveTab = useCallback(
     (index: number) => {
@@ -177,75 +188,98 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   );
 
   /**
-   * Saves changes
-   * inserts new node with updated content
-   * removes the original
-   * this flow is work around for not being able to create custom directive node without cloning the directives plugin
-   * the tabContent directives dont appear in the lexical tree, probably because the lexical DirectiveNode extends DecoratorNode which does not support children
-   * the hasChildren property specifies that a directive can have children, but this does not add implementing append, getChildren, etc to the lexical node
+   * Core rebuild: inserts a new tabs node with given data then removes old node.
+   * Used by both handleSubmit (tab management) and handleApplyColor.
    */
-  const handleSubmit = useCallback(async () => {
-    setIsConfiguring(false);
-    if (!parentEditor) return;
+  const rebuildNode = useCallback(
+    async (
+      children: TabContentDirectiveNode[],
+      bgColor: string,
+    ) => {
+      if (!parentEditor) return;
 
-    // first select AFTER the current tab
-    parentEditor.update(() => {
-      const nextSibling = lexicalNode.getNextSibling();
-      if (nextSibling) {
-        nextSibling.selectStart();
-      } else {
-        const root = $getRoot();
-        const lastChild = root.getChildren().at(-1);
-        if (lastChild) {
-          // If it's a text container (like paragraph), move cursor to end
-          if ($isElementNode(lastChild)) {
-            const lastText = lastChild.getLastDescendant();
-            if (lastText) {
-              lastText.selectEnd();
+      // select AFTER the current tab first
+      parentEditor.update(() => {
+        const nextSibling = lexicalNode.getNextSibling();
+        if (nextSibling) {
+          nextSibling.selectStart();
+        } else {
+          const root = $getRoot();
+          const lastChild = root.getChildren().at(-1);
+          if (lastChild) {
+            if ($isElementNode(lastChild)) {
+              const lastText = lastChild.getLastDescendant();
+              if (lastText) {
+                lastText.selectEnd();
+              } else {
+                lastChild.selectEnd();
+              }
             } else {
               lastChild.selectEnd();
             }
-          } else {
-            // If it's just a text node
-            lastChild.selectEnd();
           }
         }
-      }
-    });
-    //selection is not immediate
-    await delay(50);
+      });
 
-    // Insert a brand new tab directive node with updated tabs using markdown
-    // using the insertMarkdown method ensures new node will have correct position information so nested content displays correctly
-    // tried hard to find an alternate solution that would allow me to simply update existing mdastnode, but no solution found
-    // since position data is generated from markdown and mdast utilities during parsing
-    parentEditor.update(() => {
-      const mdast: ContainerDirective = {
-        type: 'containerDirective',
-        name: 'tabs',
-        attributes: {
-          color: 'transparent',
-        },
-        children: [...formData],
-      };
+      await delay(50);
 
-      const childMarkdown = convertMdastToMarkdown(mdast as Mdast.RootContent);
+      parentEditor.update(() => {
+        const attributes: Record<string, string> = {};
+        if (bgColor) {
+          attributes.backgroundColor = bgColor;
+        }
 
-      insertMarkdown(childMarkdown);
-    });
-    //selection is not immediate
-    await delay(50);
+        const mdast: ContainerDirective = {
+          type: 'containerDirective',
+          name: 'tabs',
+          attributes,
+          children: [...children],
+        };
 
-    //remove original node
-    parentEditor.update(() => {
-      lexicalNode.remove();
-    });
-  }, [insertMarkdown, formData, lexicalNode, parentEditor]);
+        const childMarkdown = convertMdastToMarkdown(
+          mdast as Mdast.RootContent,
+        );
+        insertMarkdown(childMarkdown);
+      });
+
+      await delay(50);
+
+      parentEditor.update(() => {
+        lexicalNode.remove();
+      });
+    },
+    [insertMarkdown, lexicalNode, parentEditor],
+  );
+
+  /**
+   * Saves tab structure changes (from configure modal)
+   */
+  const handleSubmit = useCallback(async () => {
+    setIsConfiguring(false);
+    await rebuildNode(formData, backgroundColor);
+  }, [rebuildNode, formData, backgroundColor]);
+
+  /**
+   * Applies the pending background color immediately
+   */
+  const handleApplyColor = useCallback(async () => {
+    setColorPickerAnchor(null);
+    setBackgroundColor(pendingColor);
+    await rebuildNode(formData, pendingColor);
+  }, [rebuildNode, formData, pendingColor]);
+
+  /**
+   * Clears the background color
+   */
+  const handleClearColor = useCallback(async () => {
+    setColorPickerAnchor(null);
+    setPendingColor('');
+    setBackgroundColor('');
+    await rebuildNode(formData, '');
+  }, [rebuildNode, formData]);
 
   /**
    * Handle Change Tab
-   * @param event
-   * @param newValue
    */
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
@@ -253,7 +287,6 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
 
   /**
    * Updates tab title text
-   * @param index - Tab index.
    */
   const handleUpdateTabText = useCallback(
     (index: number, text: string) => {
@@ -276,14 +309,13 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
 
   /**
    * Turns editing on
-   * Triggers Modal
    */
   const handleConfigure = useCallback(() => {
     setIsConfiguring(!isConfiguring);
   }, [isConfiguring]);
 
   /**
-   * Sets position offset of selected tab item
+   * Syncs style and backgroundColor from mdastNode on change
    */
   useEffect(() => {
     if (mdastNode.attributes.style) {
@@ -294,14 +326,50 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
         // no styles applied
       }
     }
+    const bgColor = mdastNode.attributes.backgroundColor ?? '';
+    setBackgroundColor(bgColor);
+    setPendingColor(bgColor);
   }, [tab, mdastNode]);
+
+  /**
+   * Full-width background color applied via box-shadow + clip-path.
+   * This technique extends the background across the full viewport width
+   * without requiring width/transform changes that break inside overflow:hidden
+   * ancestor containers. Content width is preserved — only the color spreads.
+   */
+  const dropShadow = muiTheme.palette.mode === 'dark'
+    ? '0 2px 6px rgba(0,0,0,0.5)'
+    : '0 2px 4px rgba(0,0,0,0.2)';
+
+  const fullWidthBackgroundSx: SxProps = backgroundColor
+    ? {
+        // box-shadow spreads the background color full-width via the clip-path technique.
+        // Drop shadow is omitted here: clip-path clips all box-shadow paint, so a
+        // combined drop shadow would be invisible regardless of inset values.
+        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+        clipPath: 'inset(0 -100vmax)',
+        backgroundColor,
+        paddingTop: blockPadding,
+        paddingBottom: blockPadding,
+      }
+    : {
+        boxShadow: dropShadow,
+      };
 
   /**
    * Render Tabs and Nested Content
    */
   return (
     <>
-      <Box sx={{ margin: 0, padding: 0, position: 'relative', ...sxProps }}>
+      <Box
+        sx={{
+          margin: 0,
+          padding: 0,
+          position: 'relative',
+          ...fullWidthBackgroundSx,
+          ...sxProps,
+        }}
+      >
         <Stack direction="row" spacing={1}>
           <Tabs
             variant="fullWidth"
@@ -348,6 +416,20 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
                   display: 'flex',
                 }}
               >
+                {/* Background Color Picker Button */}
+                <Tooltip title="Background Color">
+                  <IconButton
+                    ref={paletteButtonRef}
+                    onClick={(e) => {
+                      setPendingColor(backgroundColor);
+                      setColorPickerAnchor(e.currentTarget);
+                    }}
+                    size="small"
+                  >
+                    <PaletteIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+
                 <Tooltip title="Edit Tabs Settings">
                   <IconButton onClick={handleConfigure}>
                     <SettingsIcon />
@@ -383,6 +465,61 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
           />
         </TabsContext.Provider>
       </Box>
+
+      {/* Background Color Popover */}
+      <Popover
+        open={colorPickerOpen}
+        anchorEl={colorPickerAnchor}
+        onClose={() => setColorPickerAnchor(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+      >
+        <Paper sx={{ p: 2, minWidth: 220 }}>
+          <Stack spacing={1.5}>
+            <TextField
+              label="Background Color"
+              size="small"
+              value={pendingColor}
+              onChange={(e) => setPendingColor(e.target.value)}
+              placeholder="#ffffff"
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <input
+                        type="color"
+                        value={pendingColor || '#ffffff'}
+                        onChange={(e) => setPendingColor(e.target.value)}
+                        style={{
+                          width: 24,
+                          height: 24,
+                          border: 'none',
+                          padding: 0,
+                          cursor: 'pointer',
+                          background: 'none',
+                        }}
+                      />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+            <Stack direction="row" spacing={1} justifyContent="flex-end">
+              <ButtonMinorUi size="small" onClick={handleClearColor}>
+                Clear
+              </ButtonMinorUi>
+              <ButtonMinorUi
+                size="small"
+                variant="contained"
+                onClick={handleApplyColor}
+              >
+                Apply
+              </ButtonMinorUi>
+            </Stack>
+          </Stack>
+        </Paper>
+      </Popover>
+
       {isConfiguring && (
         <ModalDialog
           maxWidth="md"
@@ -434,7 +571,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
                       );
 
                       return (
-                        <Stack direction="row">
+                        <Stack direction="row" key={index}>
                           <TextFieldMainUi
                             value={theTitle}
                             onChange={(textValue: string) => {
@@ -557,49 +694,6 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
                   },
                 )}
               </>
-              {/* Style section FUTURE */}
-              {/* <Grid2 container alignItems="center" sx={{ width: '100%' }}>
-                <Grid2 size={1}>
-                  <ButtonIcon
-                    name="edit-style"
-                    props={{
-                      onClick: (event) => {
-                        //setIsStyleDialogOpen(true);
-                      },
-                    }}
-                  >
-                    <Tooltip
-                      arrow
-                      enterDelay={500}
-                      enterNextDelay={500}
-                      title="Edit Tab Inline Styles"
-                    >
-                      <EditIcon />
-                    </Tooltip>
-                  </ButtonIcon>
-                </Grid2>
-                <Grid2 size={11}>
-                  <TextFieldMainUi
-                    autoFocus
-                    margin="dense"
-                    label="Styles"
-                    name="image-styles"
-                    type="text"
-                    fullWidth
-                    value={boxStyle}
-                    onChange={(textValue: string) => setBoxStyle(textValue)}
-                    onClick={() => {
-                      //setIsStyleDialogOpen(true);
-                    }}
-                    infoText="Inline styles Ex. opacity:0.5;"
-                    slotProps={{
-                      input: {
-                        readOnly: true,
-                      },
-                    }}
-                  />
-                </Grid2>
-              </Grid2> */}
             </Stack>
           </Paper>
         </ModalDialog>

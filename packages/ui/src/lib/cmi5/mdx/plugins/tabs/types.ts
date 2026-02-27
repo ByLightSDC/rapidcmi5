@@ -18,6 +18,7 @@ export interface TabDirectiveNode extends ContainerDirective {
    */
   attributes: {
     style?: string;
+    backgroundColor?: string;
   };
 
   children: TabContentDirectiveNode[];

@@ -103,6 +103,7 @@ import { RC5LinkDialog } from '../plugins/link/RC5LinkDialog';
 import { directiveLinter } from './code/codeMirrorUtils';
 import { LayoutBoxDirectiveDescriptor } from './directives/layout-box/LayoutBoxDirectiveDescriptor';
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
+import { LessonThemeContext } from '@rapid-cmi5/ui';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -714,15 +715,17 @@ function RC5VisualEditor() {
               {generateLessonThemeStyleTag(themeClass, currentLessonTheme)}
             </style>
           )}
-          <MDXEditor
-            className={mdxTheme}
-            onChange={onChange}
-            ref={ref}
-            markdown={''}
-            plugins={thePlugins}
-            readOnly={!isEditing}
-            onError={onErrorHelper}
-          />
+          <LessonThemeContext.Provider value={{ lessonTheme: currentLessonTheme }}>
+            <MDXEditor
+              className={mdxTheme}
+              onChange={onChange}
+              ref={ref}
+              markdown={''}
+              plugins={thePlugins}
+              readOnly={!isEditing}
+              onError={onErrorHelper}
+            />
+          </LessonThemeContext.Provider>
         </Box>
       ) : (
         <Box

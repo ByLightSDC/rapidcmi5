@@ -94,6 +94,7 @@ export * from './lib/utility/logger';
 export * from './lib/styles/muiTheme';
 export * from './lib/styles/muiThemeDark';
 export * from './lib/styles/lessonThemeStyles';
+export * from './lib/cmi5/mdx/contexts/LessonThemeContext';
 export * from './lib/utility/useQueryCache';
 export * from './lib/utility/useQueryDetails';
 export * from './lib/cmi5/mdx/util/conversion';
