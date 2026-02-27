@@ -173,18 +173,6 @@ ipcMain.handle('fs:removeRecentProject', (_e, id: string) => {
 });
 
 ipcMain.handle(
-  'fs:pushRepo',
-  async (_e, repoPath: string, username: string, password: string) => {
-    try {
-      return await getFsHandler().pushRepo(repoPath, username, password);
-    } catch (error) {
-      console.error('Error pushing repository:', error);
-      throw error;
-    }
-  },
-);
-
-ipcMain.handle(
   'fs:gitCommit',
   async (
     _e,
@@ -210,24 +198,6 @@ ipcMain.handle('fs:addRecentProject', (_e, id: string) => {
     throw error;
   }
 });
-
-ipcMain.handle(
-  'fs:gitCommit',
-  async (
-    _e,
-    repoPath: string,
-    message: string,
-    name: string,
-    email: string,
-  ) => {
-    try {
-      return await getFsHandler().gitCommit(repoPath, message, name, email);
-    } catch (error) {
-      console.error('Error committing changes:', error);
-      throw error;
-    }
-  },
-);
 
 ipcMain.handle('fs:getStashStatus', async (_e, repoPath: string) => {
   try {

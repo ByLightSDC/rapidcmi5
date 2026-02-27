@@ -19,9 +19,8 @@ import RC5FileEditor from './editors/RC5FileEditor';
 import RC5VisualEditor from './editors/RC5VisualEditor';
 import RC5GitEditor from './editors/RC5GitEditor';
 import { GitDrawer } from './drawers/GitDrawer';
-import { SlideMenu } from './menu/ArchiveSlideMenu';
 import { dividerColor } from '@rapid-cmi5/ui';
-import WelcomePage from './ProjectSelection/SelectProject';
+import SelectProjectHomePage from './ProjectSelection/SelectProject';
 import { useEffect } from 'react';
 
 /**
@@ -41,11 +40,7 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
   return (
     <>
       {viewMode === ViewModeEnum.RepoSelector ? (
-        <WelcomePage
-          setRepoSelected={() => {
-            dispatch(changeViewMode(ViewModeEnum.Designer));
-          }}
-        />
+        <SelectProjectHomePage />
       ) : (
         <Stack
           direction="row"

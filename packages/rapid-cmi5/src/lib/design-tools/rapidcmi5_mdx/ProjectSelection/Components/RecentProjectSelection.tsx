@@ -19,7 +19,7 @@ import { GlassCard } from './GlassCard';
 import ThemedOptionCard from './ThemedOption';
 import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
 import { useState, useMemo } from 'react';
-import { formatRelativeTime } from 'packages/rapid-cmi5/src/lib/utils/dateAndTime';
+import { formatRelativeTime } from '../../../../utils/dateAndTime';
 
 export type RecentProjectSelectionProps = {
   recentProjects: DirMeta[];
@@ -83,7 +83,7 @@ export default function RecentProjectSelection({
 
   const handleRemoveSelected = async () => {
     setIsRemoving(true);
-    onRemoveRecentProject([...selectedIds])
+    await onRemoveRecentProject([...selectedIds])
     setIsRemoving(false);
     setIsEditMode(false);
     setSelectedIds(new Set());
@@ -98,13 +98,7 @@ export default function RecentProjectSelection({
       >
         <Switch
           checked={isEditMode}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            if (event.target.checked) {
-              handleEnterEditMode();
-            } else {
-              handleCancelEditMode();
-            }
-          }}
+          onChange={(e) => e.target.checked ? handleEnterEditMode() : handleCancelEditMode()}
           disabled={isDisabled}
         />
       </Tooltip>
@@ -233,64 +227,68 @@ export default function RecentProjectSelection({
         >
           <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 2 }}>
             {filteredProjects.map((project) => (
-              <Box
-                key={project.id}
-                sx={{
-                  position: 'relative',
-                  ...(!isEditMode && { '&:hover .remove-btn': { opacity: 1 } }),
-                }}
-              >
-                <ThemedOptionCard>
-                  <ListItemButton
-                    onClick={() => {
-                      if (isEditMode) {
-                        handleToggleSelect(project.id);
-                      } else {
-                        onOpenRecentProject(project.id);
-                      }
-                    }}
-                    disabled={isDisabled}
-                    sx={{
-                      borderRadius: 2,
-                      p: 1.2,
-                      pr: isEditMode ? 1.2 : 4.5,
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 1,
-                      transition: 'none',
-                      '&:hover': { background: 'transparent' },
-                    }}
-                  >
-                    {isEditMode && (
-                      <Checkbox
-                        checked={selectedIds.has(project.id)}
-                        size="small"
-                        disableRipple
-                        onClick={(e) => e.stopPropagation()}
-                        onChange={() => handleToggleSelect(project.id)}
+              <ThemedOptionCard key={project.id}>
+                <ListItemButton
+                  onClick={() => {
+                    if (isEditMode) {
+                      handleToggleSelect(project.id);
+                    } else {
+                      onOpenRecentProject(project.id);
+                    }
+                  }}
+                  disabled={isDisabled}
+                  sx={{
+                    borderRadius: 2,
+                    p: 1.2,
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 1,
+                    transition: 'none',
+                    '&:hover': { background: 'transparent' },
+                  }}
+                >
+                  {isEditMode && (
+                    <Checkbox
+                      checked={selectedIds.has(project.id)}
+                      size="small"
+                      disableRipple
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={() => handleToggleSelect(project.id)}
+                      sx={{
+                        p: 0,
+                        flexShrink: 0,
+                        color: alpha(palette.error.main, 0.5),
+                        '&.Mui-checked': { color: 'error.main' },
+                      }}
+                    />
+                  )}
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Box sx={{ mb: 0.5 }}>
+                      <ListItemText
+                        primary={project.name}
                         sx={{
-                          p: 0,
-                          flexShrink: 0,
-                          color: alpha(palette.error.main, 0.5),
-                          '&.Mui-checked': { color: 'error.main' },
+                          margin: 0,
+                          fontFamily: '"IBM Plex Sans", sans-serif',
+                          fontWeight: 500,
+                          fontSize: '14px',
+                          letterSpacing: '0.01em',
                         }}
                       />
-                    )}
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Box sx={{ mb: 0.5 }}>
-                        <ListItemText
-                          primary={project.name}
-                          sx={{
-                            margin: 0,
-                            fontFamily: '"IBM Plex Sans", sans-serif',
-                            fontWeight: 500,
-                            fontSize: '14px',
-                            letterSpacing: '0.01em',
-                          }}
-                        />
-                      </Box>
-                      <Stack spacing={0.5}>
+                    </Box>
+                    <Stack spacing={0.5}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontFamily: '"IBM Plex Sans", sans-serif',
+                          fontSize: '0.75rem',
+                          color: alpha(palette.text.primary, 0.7),
+                        }}
+                      >
+                        Last Accessed:{' '}
+                        {formatRelativeTime(project.lastAccessed)}
+                      </Typography>
+                      {project.createdAt && (
                         <Typography
                           variant="caption"
                           sx={{
@@ -299,38 +297,25 @@ export default function RecentProjectSelection({
                             color: alpha(palette.text.primary, 0.7),
                           }}
                         >
-                          Last Accessed:{' '}
-                          {formatRelativeTime(project.lastAccessed)}
+                          Created: {formatRelativeTime(project.createdAt)}
                         </Typography>
-                        {project.createdAt && (
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              fontFamily: '"IBM Plex Sans", sans-serif',
-                              fontSize: '0.75rem',
-                              color: alpha(palette.text.primary, 0.7),
-                            }}
-                          >
-                            Created: {formatRelativeTime(project.createdAt)}
-                          </Typography>
-                        )}
-                        {project.remoteUrl && (
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              fontFamily: '"Space Mono", monospace',
-                              fontSize: '0.7rem',
-                              color: alpha(palette.text.primary, 0.5),
-                            }}
-                          >
-                            {project.remoteUrl}
-                          </Typography>
-                        )}
-                      </Stack>
-                    </Box>
-                  </ListItemButton>
-                </ThemedOptionCard>
-              </Box>
+                      )}
+                      {project.remoteUrl && (
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontFamily: '"Space Mono", monospace',
+                            fontSize: '0.7rem',
+                            color: alpha(palette.text.primary, 0.5),
+                          }}
+                        >
+                          {project.remoteUrl}
+                        </Typography>
+                      )}
+                    </Stack>
+                  </Box>
+                </ListItemButton>
+              </ThemedOptionCard>
             ))}
           </Box>
         </Box>
@@ -360,7 +345,7 @@ export default function RecentProjectSelection({
           </Box>
         )}
 
-        {filteredProjects.some((project) => project.isValid === false) && (
+        {filteredProjects.some((project) => !project.isValid) && (
           <Alert severity="warning" sx={{ lineHeight: 1, mt: 2 }}>
             <AlertTitle sx={{ lineHeight: 1, fontWeight: 'bold' }}>
               Browser Requires Permission to Access Desktop Files

@@ -15,37 +15,20 @@ interface StoreSchema {
 }
 
 const store = new Store<StoreSchema>({
-  // schema: {
-  //   recentProjects: {
-  //     type: 'array',
-  //     items: {
-  //       type: 'object',
-  //       properties: {
-  //         id: { type: 'string' },
-  //         lastAccessed: { type: 'string' },
-  //       },
-  //       required: ['id', 'lastAccessed'],
-  //     },
-  //     default: [],
-  //   },
-  // },
-  // migrations: {
-  //   '1.0.0': (s) => {
-  //     const existing = s.get('recentProjects') as unknown;
-  //     if (
-  //       Array.isArray(existing) &&
-  //       existing.every((item: unknown) => typeof item === 'string')
-  //     ) {
-  //       s.set(
-  //         'recentProjects',
-  //         existing.map((id: string) => ({
-  //           id,
-  //           lastAccessed: new Date().toISOString(),
-  //         })),
-  //       );
-  //     }
-  //   },
-  // },
+  schema: {
+    recentProjects: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          lastAccessed: { type: 'string' },
+        },
+        required: ['id', 'lastAccessed'],
+      },
+      default: [],
+    },
+  },
 });
 
 import path, { basename, join } from 'path';
@@ -733,7 +716,8 @@ export class ElectronFsHandler {
           ),
         });
       } catch (error: any) {
-        console.error('could not get stats', error);
+        console.error('could not get stats for project', error);
+        this.removeRecentProject(project.id);
         continue;
       }
     }
@@ -774,12 +758,11 @@ export class ElectronFsHandler {
       lastAccessed: new Date().toISOString(),
     };
     const existingIndex = projects.findIndex((p) => p.id === id);
-    if (existingIndex >= 0) {
-      projects[existingIndex] = entry;
-    } else {
-      projects.push(entry);
-    }
-    store.set('recentProjects', projects);
+    const updated =
+      existingIndex >= 0
+        ? projects.map((p, i) => (i === existingIndex ? entry : p))
+        : [...projects, entry];
+    store.set('recentProjects', updated);
   }
 
   async chooseProject(): Promise<string | null> {
@@ -804,8 +787,9 @@ export class ElectronFsHandler {
     if (rel.startsWith('..') || path.isAbsolute(rel)) {
       throw new Error('Selected path is outside the RapidCMI5 sandbox');
     }
-    this.addRecentProject(basename(chosen));
+    const projectName = basename(chosen);
+    this.addRecentProject(projectName);
 
-    return path.basename(chosen);
+    return projectName;
   }
 }

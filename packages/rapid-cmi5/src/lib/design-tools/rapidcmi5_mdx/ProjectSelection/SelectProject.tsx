@@ -17,13 +17,14 @@ interface OptionDocumentation {
   content: string;
 }
 
-export default function WelcomePage({
-  setRepoSelected,
-}: {
-  setRepoSelected: () => void;
-}) {
+export default function SelectProjectHomePage({}: {}) {
+  const [recentProjects, setRecentProjects] = useState<DirMeta[]>([]);
+  const [isSandboxLaunching, setIsSandboxLaunching] = useState(false);
+  const [docDialogOpen, setDocDialogOpen] = useState(false);
+
   const theme = useTheme();
   const { palette } = theme;
+
   const toast = useToaster();
 
   const {
@@ -35,7 +36,6 @@ export default function WelcomePage({
   } = useContext(GitContext);
 
   const { promptCloneRepo, promptCreateLocalRepo } = useRC5Prompts();
-  const [isSandboxLaunching, setIsSandboxLaunching] = useState(false);
 
   const { loadingState }: RepoState = useSelector(
     (state: RootState) => state.repoManager,
@@ -79,9 +79,6 @@ export default function WelcomePage({
     transparent 60%
   )
 `;
-  const [recentProjects, setRecentProjects] = useState<DirMeta[]>([]);
-
-  const [docDialogOpen, setDocDialogOpen] = useState(false);
 
   const handleShowDocumentation = (doc: OptionDocumentation) => {
     setCurrentDoc(doc);
@@ -130,8 +127,6 @@ export default function WelcomePage({
         message: 'Repository opened successfully.',
         severity: 'success',
       });
-      setRepoSelected();
-
     } catch (e: any) {
       const msg =
         e?.message ||
@@ -152,7 +147,6 @@ export default function WelcomePage({
     setIsSandboxLaunching(true);
     try {
       await openSandbox();
-      setRepoSelected();
     } finally {
       setIsSandboxLaunching(false);
     }
