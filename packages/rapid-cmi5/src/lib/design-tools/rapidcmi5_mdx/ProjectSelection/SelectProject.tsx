@@ -41,7 +41,7 @@ export default function WelcomePage({
     (state: RootState) => state.repoManager,
   );
 
-  const openLocalFolderWithToast = async (id?: string) => {
+  const handleOpenLocalFolder = async (id?: string) => {
     try {
       await openLocalRepo(id);
 
@@ -82,6 +82,7 @@ export default function WelcomePage({
   const [recentProjects, setRecentProjects] = useState<DirMeta[]>([]);
 
   const [docDialogOpen, setDocDialogOpen] = useState(false);
+
   const handleShowDocumentation = (doc: OptionDocumentation) => {
     setCurrentDoc(doc);
     setDocDialogOpen(true);
@@ -95,15 +96,15 @@ export default function WelcomePage({
     null,
   );
 
-  const populateFolders = async () => {
+  const populateRecentProjects = async () => {
     setRecentProjects(await getLocalFolders());
   };
 
   useEffect(() => {
-    populateFolders();
+    populateRecentProjects();
   }, []);
 
-  const handleRemoveRecentProject = async (ids: string[]) => {
+  const removeRecentProjects = async (ids: string[]) => {
     if (!ids?.length) return;
 
     for (const id of ids) {
@@ -118,12 +119,32 @@ export default function WelcomePage({
       severity: 'success',
     });
 
-    populateFolders();
+    populateRecentProjects();
   };
 
-  const openLocalRecentProject = async (id: string) => {
-    await openLocalRepo(id);
-    setRepoSelected();
+  const handleOpenRecentProject = async (id: string) => {
+    try {
+      await openLocalRepo(id);
+
+      toast({
+        message: 'Repository opened successfully.',
+        severity: 'success',
+      });
+      setRepoSelected();
+
+    } catch (e: any) {
+      const msg =
+        e?.message ||
+        e?.name ||
+        'Failed to open repository. Removing from recents.';
+
+      await deleteRecentProject(id);
+      await populateRecentProjects();
+      toast({
+        message: `Project folder has been moved or deleted: ${msg}`,
+        severity: 'error',
+      });
+    }
   };
 
   const handleOpenSandbox = async () => {
@@ -168,24 +189,24 @@ export default function WelcomePage({
           {isElectron ? (
             <ElectronAppSelection
               recentProjects={recentProjects}
-              handleShowDocumentation={handleShowDocumentation}
-              handleCloneRepo={promptCloneRepo}
-              handleCreateRepo={promptCreateLocalRepo}
-              openLocalFolderAndSet={openLocalFolderWithToast}
-              openLocalRecentProject={openLocalRecentProject}
-              removeLocalRecentProject={handleRemoveRecentProject}
+              onShowDocumentation={handleShowDocumentation}
+              onCloneRepo={promptCloneRepo}
+              onCreateRepo={promptCreateLocalRepo}
+              onOpenLocalFolder={handleOpenLocalFolder}
+              onOpenRecentProject={handleOpenRecentProject}
+              onRemoveRecentProject={removeRecentProjects}
             />
           ) : (
             <WebAppSelection
-              handleOpenSandbox={handleOpenSandbox}
+              onOpenSandbox={handleOpenSandbox}
               isSandboxLaunching={isSandboxLaunching}
               recentProjects={recentProjects}
-              handleShowDocumentation={handleShowDocumentation}
-              handleCloneRepo={promptCloneRepo}
-              handleCreateRepo={promptCreateLocalRepo}
-              openLocalFolderAndSet={openLocalFolderWithToast}
-              openLocalRecentProject={openLocalRecentProject}
-              removeLocalRecentProject={handleRemoveRecentProject}
+              onShowDocumentation={handleShowDocumentation}
+              onCloneRepo={promptCloneRepo}
+              onCreateRepo={promptCreateLocalRepo}
+              onOpenLocalFolder={handleOpenLocalFolder}
+              onOpenRecentProject={handleOpenRecentProject}
+              onRemoveRecentProject={removeRecentProjects}
             />
           )}
         </Container>
@@ -206,9 +227,7 @@ export default function WelcomePage({
 
         {/* Global Styles for Animations */}
         <style>
-          {`
-          @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
-          
+          {`          
           @keyframes fadeInUp {
             from {
               opacity: 0;

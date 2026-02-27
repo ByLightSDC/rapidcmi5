@@ -7,8 +7,6 @@ import {
   generateCourseDist,
   FsOperations,
   generateCmi5Xml,
-  generateBlockId,
-  CourseAU,
   DirMeta,
 } from '@rapid-cmi5/cmi5-build-common';
 import JSZip from 'jszip';
@@ -22,7 +20,6 @@ import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import { electronFs } from './ElectronFsApi';
 import { IFs } from 'memfs';
 import saveAs from 'file-saver';
-import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 
 export const getRepoPath = (r: RepoAccessObject) =>
   `/${r.fileSystemType}/${r.repoName}`;
@@ -40,6 +37,9 @@ export type FolderStructWithMtime = FolderStruct & {
   mtime?: number; // milliseconds since epoch
   mtimeDate?: string; // ISO string
 };
+
+const noGitInProjectError =
+  'The selected directory does not contain a .git folder. Please choose a valid rapid cmi5 project';
 
 export class GitFS {
   public fs: FileSystemObject;
@@ -363,14 +363,22 @@ export class GitFS {
           mode: 'readwrite',
           startIn: 'documents',
         });
-        if (!dirHandle) throw Error('Could not get the dir handle');
 
-        await this.setDirHandle(dirHandle);
+        if (!dirHandle)
+          throw Error(
+            'There was an error when selecting the project directory, please try again',
+          );
+
+        // We do not want to add to recent projects if this is not a git project
+        try {
+          const gitFolder = await dirHandle.getDirectoryHandle('.git');
+          if (!gitFolder) throw Error(noGitInProjectError);
+
+          await this.setDirHandle(dirHandle);
+        } catch (error: any) {
+          throw Error(noGitInProjectError);
+        }
       }
-
-      // ensure the file has a .git folder
-      const gitFolder = await dirHandle.getDirectoryHandle('.git');
-      if (!gitFolder) throw Error('No git folder');
 
       await this.openLocalDirectory(dirHandle);
       return dirHandle.name;

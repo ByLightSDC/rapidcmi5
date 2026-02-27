@@ -14,44 +14,24 @@ import {
 } from '@mui/material';
 import { alpha, Box, Stack, useTheme } from '@mui/system';
 import { History, Search, Clear, Info } from '@mui/icons-material';
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import CancelIcon from '@mui/icons-material/Cancel';
 import { GlassCard } from './GlassCard';
 
 import ThemedOptionCard from './ThemedOption';
 import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
 import { useState, useMemo } from 'react';
-
-const formatRelativeTime = (isoDate: string): string => {
-  const now = new Date();
-  const date = new Date(isoDate);
-
-  const diffMs = now.getTime() - date.getTime();
-
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60)
-    return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
-  if (diffHours < 24)
-    return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
-  if (diffDays === 1) return 'Yesterday';
-  return `${diffDays} days ago`;
-};
+import { formatRelativeTime } from 'packages/rapid-cmi5/src/lib/utils/dateAndTime';
 
 export type RecentProjectSelectionProps = {
   recentProjects: DirMeta[];
-  openRecentProject: (path: string) => void;
-  removeRecentProject: (path: string[]) => Promise<void>;
+  onOpenRecentProject: (path: string) => void;
+  onRemoveRecentProject: (path: string[]) => Promise<void>;
   isDisabled?: boolean;
 };
 
 export default function RecentProjectSelection({
   recentProjects,
-  openRecentProject,
-  removeRecentProject,
+  onOpenRecentProject,
+  onRemoveRecentProject,
   isDisabled = false,
 }: RecentProjectSelectionProps) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -103,7 +83,7 @@ export default function RecentProjectSelection({
 
   const handleRemoveSelected = async () => {
     setIsRemoving(true);
-    removeRecentProject([...selectedIds])
+    onRemoveRecentProject([...selectedIds])
     setIsRemoving(false);
     setIsEditMode(false);
     setSelectedIds(new Set());
@@ -266,7 +246,7 @@ export default function RecentProjectSelection({
                       if (isEditMode) {
                         handleToggleSelect(project.id);
                       } else {
-                        openRecentProject(project.id);
+                        onOpenRecentProject(project.id);
                       }
                     }}
                     disabled={isDisabled}

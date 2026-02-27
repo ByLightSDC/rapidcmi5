@@ -11,25 +11,24 @@ interface OptionDocumentation {
 }
 
 export default function WebAppSelection({
-  openLocalFolderAndSet,
-  openLocalRecentProject,
-  handleCreateRepo,
-  handleOpenSandbox,
+  onOpenLocalFolder,
+  onOpenRecentProject,
+  onCreateRepo,
+  onOpenSandbox,
   recentProjects,
-  handleCloneRepo,
-  handleShowDocumentation,
+  onCloneRepo,
+  onShowDocumentation,
   isSandboxLaunching = false,
-  removeLocalRecentProject,
+  onRemoveRecentProject,
 }: {
-  openLocalFolderAndSet: () => Promise<void>;
-  openLocalRecentProject: (id: string) => Promise<void>;
-  removeLocalRecentProject: (ids: string[]) => Promise<void>;
-  handleCreateRepo: () => void;
-  handleOpenSandbox: () => Promise<void>;
+  onOpenLocalFolder: () => Promise<void>;
+  onOpenRecentProject: (id: string) => Promise<void>;
+  onRemoveRecentProject: (ids: string[]) => Promise<void>;
+  onCreateRepo: () => void;
+  onOpenSandbox: () => Promise<void>;
   recentProjects: DirMeta[];
-
-  handleShowDocumentation: (doc: OptionDocumentation) => void;
-  handleCloneRepo: () => void;
+  onShowDocumentation: (doc: OptionDocumentation) => void;
+  onCloneRepo: () => void;
   isSandboxLaunching?: boolean;
 }) {
   return (
@@ -50,22 +49,22 @@ export default function WebAppSelection({
           }}
         >
           <ProductionModeSelection
-            openLocalFolder={openLocalFolderAndSet}
-            cloneRepo={handleCloneRepo}
-            createRepo={handleCreateRepo}
-            onShowDocumentation={handleShowDocumentation}
+            openLocalFolder={onOpenLocalFolder}
+            cloneRepo={onCloneRepo}
+            createRepo={onCreateRepo}
+            onShowDocumentation={onShowDocumentation}
             isDisabled={isSandboxLaunching}
           />
           <SandBoxSelection
-            openSandbox={handleOpenSandbox}
+            openSandbox={onOpenSandbox}
             isLaunching={isSandboxLaunching}
           />
         </Box>
 
         <RecentProjectSelection
           recentProjects={recentProjects}
-          openRecentProject={openLocalRecentProject}
-          removeRecentProject={removeLocalRecentProject}
+          onOpenRecentProject={onOpenRecentProject}
+          onRemoveRecentProject={onRemoveRecentProject}
           isDisabled={isSandboxLaunching}
         />
       </Box>

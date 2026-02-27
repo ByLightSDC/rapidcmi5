@@ -9,21 +9,21 @@ interface OptionDocumentation {
 }
 
 export default function ElectronAppSelection({
-  openLocalFolderAndSet,
-  openLocalRecentProject,
-  removeLocalRecentProject,
-  handleCreateRepo,
+  onOpenLocalFolder,
+  onOpenRecentProject,
+  onRemoveRecentProject,
+  onCreateRepo,
   recentProjects,
-  handleCloneRepo,
-  handleShowDocumentation,
+  onCloneRepo,
+  onShowDocumentation,
 }: {
-  openLocalFolderAndSet: () => Promise<void>;
-  openLocalRecentProject: (id: string) => Promise<void>;
-  removeLocalRecentProject: (id: string[]) => Promise<void>;
-  handleCreateRepo: () => void;
+  onOpenLocalFolder: () => Promise<void>;
+  onOpenRecentProject: (id: string) => Promise<void>;
+  onRemoveRecentProject: (id: string[]) => Promise<void>;
+  onCreateRepo: () => void;
   recentProjects: DirMeta[];
-  handleShowDocumentation: (doc: OptionDocumentation) => void;
-  handleCloneRepo: () => void;
+  onShowDocumentation: (doc: OptionDocumentation) => void;
+  onCloneRepo: () => void;
 }) {
   return (
     <Box
@@ -36,17 +36,17 @@ export default function ElectronAppSelection({
       }}
     >
       <ProductionModeSelection
-        openLocalFolder={openLocalFolderAndSet}
-        cloneRepo={handleCloneRepo}
-        createRepo={handleCreateRepo}
-        onShowDocumentation={handleShowDocumentation}
+        openLocalFolder={onOpenLocalFolder}
+        cloneRepo={onCloneRepo}
+        createRepo={onCreateRepo}
+        onShowDocumentation={onShowDocumentation}
         isElectron={true}
       />
 
       <RecentProjectSelection
         recentProjects={recentProjects}
-        openRecentProject={openLocalRecentProject}
-        removeRecentProject={removeLocalRecentProject}
+        onOpenRecentProject={onOpenRecentProject}
+        onRemoveRecentProject={onRemoveRecentProject}
       />
     </Box>
   );
