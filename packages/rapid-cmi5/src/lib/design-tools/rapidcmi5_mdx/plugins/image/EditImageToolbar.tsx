@@ -28,7 +28,6 @@ import {
 } from '@rapid-cmi5/ui';
 
 import { StyleDialog } from './StyleDialog';
-import { Z_INDEX } from './index';
 import { useImageStyle } from './ImageHooks';
 
 export interface EditImageToolbarProps {
@@ -226,7 +225,7 @@ export function EditImageToolbar({
               left: position.x,
               transform: 'translate(-50%, -50%)',
               pointerEvents: 'none',
-              zIndex: Z_INDEX.toolbar,
+              zIndex: 1,
             }}
           >
             <AddCircleIcon color="warning" />
