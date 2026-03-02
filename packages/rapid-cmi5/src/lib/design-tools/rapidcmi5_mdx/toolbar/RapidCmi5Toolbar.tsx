@@ -1,4 +1,11 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import ReactDOM from 'react-dom';
 
@@ -27,13 +34,14 @@ import {
   useTranslation,
 } from '@mdxeditor/editor';
 import { CLEAR_HISTORY_COMMAND } from 'lexical';
-import { InsertActivity } from './components/InsertActivity';
+//import { InsertActivity } from './components/InsertActivity';
 import { InsertImage } from './components/InsertImage';
 import { InsertVideo } from './components/InsertVideo';
 import { InsertLayoutBox } from './components/InsertLayoutBox';
 
 /** Icons */
-
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import PaletteIcon from '@mui/icons-material/Palette';
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
 import WidgetsIcon from '@mui/icons-material/Widgets';
@@ -79,38 +87,8 @@ import { InsertBlockMenu } from './components/InsertBlockMenu';
 import { ModePreviewButton } from './components/ModePreviewButton';
 import { SaveSlideButton } from './components/SaveSlideButton';
 import { BlockLibraryDrawer } from './components/BlockLibraryDrawer';
-
-//Admonition
-export type RapidAdmonitionKind =
-  | 'note'
-  | 'tip'
-  | 'danger'
-  | 'info'
-  | 'caution';
-
-function whenInAdmonition(editorInFocus: EditorInFocus | null) {
-  const node = editorInFocus?.rootNode;
-  if (!node || node.getType() !== 'directive') {
-    return false;
-  }
-  const theKey = (node as DirectiveNode).getMdastNode()
-    .name as AdmonitionTypeEnum;
-  return AdmonitionTypes.includes(
-    (node as DirectiveNode).getMdastNode().name as AdmonitionTypeEnum,
-  );
-}
-
-//Activity
-function whenInActivity(editorInFocus: EditorInFocus | null) {
-  const node = editorInFocus?.rootNode;
-  if (!node || node.getType() !== 'directive') {
-    return false;
-  }
-
-  return ActivityType.includes(
-    (node as DirectiveNode).getMdastNode().name as RC5ActivityTypeEnum,
-  );
-}
+import { LessonStyleButton } from './components/LessonStyleButton';
+import { InsertFile } from './components/InsertFile';
 
 /**
  * A toolbar component that includes all toolbar components.
@@ -129,6 +107,8 @@ export const RapidCmi5Toolbar: React.FC = () => {
   const themedDividerColor = useSelector(dividerColor);
   const content = useSelector(displayData);
   const [editor] = useLexicalComposerContext();
+  const toolbarRef = useRef<HTMLDivElement>(null);
+  const [leftToolbarPos, setLeftToolbarPos] = useState<number | 0>(0);
 
   const [viewMode, iconComponentFor] = useCellValues(
     viewMode$,
@@ -155,11 +135,39 @@ export const RapidCmi5Toolbar: React.FC = () => {
     console.log('viewmode', viewmode);
   }, [viewmode]);
 
+  /**
+   * Prevent mode buttons from positioning off screen
+   * Mode button parent div has a width that is calculated by screen width minus toolbar left adjusted to create a right margin
+   * Observer ensures it gets updated when the lesson drawer is resized byt he user
+   */
+  useLayoutEffect(() => {
+    if (!toolbarRef.current) return;
+
+    const measure = () => {
+      if (toolbarRef.current) {
+        // Get the position relative to the viewport
+        const rect = toolbarRef.current.getBoundingClientRect();
+        // Calculate the absolute position relative to the document
+        const left = rect.left + window.scrollX;
+        //tool bar left plus margin
+        setLeftToolbarPos(left + 12);
+      }
+    };
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(toolbarRef.current);
+
+    return () => observer.disconnect();
+
+    // Ensure the ref is attached to a DOM element and that element exists
+  }, []);
+
   return (
     <Box
+      ref={toolbarRef}
       sx={{
         backgroundColor: 'background.default',
-        width: '100vw',
+        width: '100%',
         minHeight: '40px',
         borderBottom: `1px solid ${themedDividerColor}`,
         position: 'sticky',
@@ -195,25 +203,27 @@ export const RapidCmi5Toolbar: React.FC = () => {
                 <InsertImage />
                 <InsertAudio />
                 <InsertVideo />
+                <InsertFile />
                 <InsertCodeBlock />
-                <InsertLayoutBox />
-                <InsertTable />
+                {/* <InsertLayoutBox /> */}
+                <InsertGrid />
                 <Separator />
+                <LessonStyleButton />
                 <InsertAnimation />
                 <InsertBlockMenu />
                 <BlockLibraryDrawer />
               </Stack>
-              {/* <Stack direction="row" spacing={1}>
-                <InsertAnimation />
-                <InsertBlockMenu />
-              </Stack> */}
             </Stack>
           )}
           {viewmode !== 'rich-text' && <Box sx={{ minHeight: '32px' }}></Box>}
           <Stack
             direction="row"
             spacing={1}
-            sx={{ display: 'flex', alignItems: 'flex-end' }}
+            sx={{
+              display: 'flex',
+              alignItems: 'flex-end',
+              width: `calc(100vw - ${leftToolbarPos}px)`,
+            }}
           >
             <Stack
               id="save-menu"

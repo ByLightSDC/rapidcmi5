@@ -198,6 +198,7 @@ export const LessonDrawer = () => {
 
             minWidth: '100px',
             marginTop: '4px',
+            marginBottom:1,
             gap: .5,
           }}
         >

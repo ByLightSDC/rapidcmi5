@@ -120,7 +120,7 @@ export function AnimationDrawer() {
             borderColor: 'divider',
           }}
         >
-          <IconButton onClick={handleClose} aria-label="Close animation drawer">
+          <IconButton onClick={handleClose} aria-label="Close Animation Library">
             <CloseIcon />
           </IconButton>
           <Typography variant="h6" sx={{ flex: 1, marginLeft: 1 }}>

@@ -16,12 +16,12 @@ export type BaseActivity = {
 };
 
 export enum RC5ActivityTypeEnum {
-  scenario = 'Individual Training Scenario',
+  scenario = 'Scenario (Individual)',
   quiz = 'Quiz',
   ctf = 'Capture The Flag',
   download = 'Download File',
   jobe = 'Jobe In The Box',
-  consoles = 'Team Exercise Scenario',
+  consoles = 'Team Exercise',
 }
 
 export const ActivityType: string[] = Object.keys(RC5ActivityTypeEnum);
