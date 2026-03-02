@@ -152,7 +152,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
         // Calculate the absolute position relative to the document
         const left = rect.left + window.scrollX;
         //tool bar left plus 24 px right margin
-        setLeftToolbarPos(left+24);
+        setLeftToolbarPos(left + 24);
       }
     };
 
@@ -191,6 +191,10 @@ export const RapidCmi5Toolbar: React.FC = () => {
             <Stack direction="row" spacing={1}>
               <Stack direction="row" spacing={1} sx={{ flexGrow: 1 }}>
                 <BoldItalicUnderlineToggles />
+
+                <ColorTextSplitButton />
+                <HighlightSplitButton />
+                <TextFxButton />
                 <Stack
                   direction="row"
                   sx={{
@@ -217,15 +221,17 @@ export const RapidCmi5Toolbar: React.FC = () => {
                       <UnfoldMoreIcon fontSize="medium" />
                     )}
                   </ButtonWithTooltip>
-                  {isMoreTextTools && <StrikeThroughSupSubToggles />}
+                  {isMoreTextTools && (
+                    <Box sx={{ marginLeft: -1 }}>
+                      <StrikeThroughSupSubToggles />
+                    </Box>
+                  )}
                 </Stack>
-                <ColorTextSplitButton />
-                <HighlightSplitButton />
-                <TextFxButton />
                 <Separator />
-                <CodeToggle />
+
                 <ListsToggle />
                 <CreateLink />
+                <CodeToggle />
                 <Separator />
                 <BlockTypeSelect />
                 <Separator />

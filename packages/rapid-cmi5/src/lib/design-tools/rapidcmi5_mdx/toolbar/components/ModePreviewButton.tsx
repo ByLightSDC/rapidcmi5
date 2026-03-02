@@ -24,7 +24,7 @@ export const ModePreviewButton = () => {
 
   return (
     <ButtonWithTooltip
-      title={isPlayback ? 'Preview ON' : 'Preview OFF'}
+      title={isPlayback ? 'Preview OFF' : 'Preview ON'}
       onClick={() => realm.pub(editorInPlayback$, !isPlayback)}
     >
       {isPlayback ? (
