@@ -426,7 +426,8 @@ export class GitFS {
         await this.setDirHandle(repoDir);
 
         await this.openLocalDirectory(repoDir);
-      } catch {
+      } catch (error: any) {
+        console.error(error);
         this.currentProjectRecentsId = undefined;
         throw Error(
           'The create project operation failed to save files to your local computer.',
@@ -462,6 +463,32 @@ export class GitFS {
 
   // save the local file access directory handle so we dont have to ask for it each time
   setDirHandle = async (dirHandle: FileSystemDirectoryHandle) => {
+    // Check if this directory is already in recents using isSameEntry
+    const allKeys = await keys();
+    const matchingKeys = allKeys.filter(
+      (key): key is string =>
+        typeof key === 'string' && key.startsWith('courses/'),
+    );
+    const dirMetas = await getMany<DirMeta>(matchingKeys);
+
+    for (const meta of dirMetas) {
+      if (!meta?.dirHandle) continue;
+      try {
+        const isSame = await meta.dirHandle.isSameEntry(dirHandle);
+        if (isSame) {
+          const updatedMeta: DirMeta = {
+            ...meta,
+            lastAccessed: new Date().toISOString(),
+            dirHandle,
+          };
+          this.currentProjectRecentsId = meta.id;
+          await set('courses/' + meta.id, updatedMeta);
+          return;
+        }
+      } catch {}
+    }
+
+    // No existing entry found — create a new one
     const id = crypto.randomUUID();
 
     const dirMeta: DirMeta = {
