@@ -18,18 +18,15 @@ import { $getRoot } from 'lexical';
 import {
   Box,
   IconButton,
-  InputAdornment,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Paper,
-  Popover,
   Stack,
   SxProps,
   Tab,
   Tabs,
-  TextField,
   Tooltip,
   TypographyOwnProps,
   useTheme,
@@ -57,6 +54,8 @@ import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
+import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 
 /**
  * Tabs Editor for tabs directive
@@ -93,9 +92,11 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   const [pendingColor, setPendingColor] = useState<string>(
     mdastNode?.attributes.backgroundColor ?? '',
   );
+  // Ref so onClose always sees the latest pendingColor regardless of closure staleness.
+  const pendingColorRef = useRef(pendingColor);
+  // Set to true when handleClearColor already rebuilt, so onClose skips its rebuild.
+  const skipNextCloseRebuildRef = useRef(false);
   const colorPickerOpen = Boolean(colorPickerAnchor);
-  const paletteButtonRef = useRef<HTMLButtonElement>(null);
-
   const [isPlayback, readOnly, syntaxExtensions] = useCellValues(
     editorInPlayback$,
     readOnly$,
@@ -257,19 +258,12 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   }, [rebuildNode, formData, backgroundColor]);
 
   /**
-   * Applies the pending background color immediately
-   */
-  const handleApplyColor = useCallback(async () => {
-    setColorPickerAnchor(null);
-    setBackgroundColor(pendingColor);
-    await rebuildNode(formData, pendingColor);
-  }, [rebuildNode, formData, pendingColor]);
-
-  /**
    * Clears the background color
    */
   const handleClearColor = useCallback(async () => {
     setColorPickerAnchor(null);
+    pendingColorRef.current = '';
+    skipNextCloseRebuildRef.current = true;
     setPendingColor('');
     setBackgroundColor('');
     await rebuildNode(formData, '');
@@ -325,6 +319,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     }
     const bgColor = mdastNode.attributes.backgroundColor ?? '';
     setBackgroundColor(bgColor);
+    pendingColorRef.current = bgColor;
     setPendingColor(bgColor);
   }, [tab, mdastNode]);
 
@@ -414,7 +409,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
               backgroundColor:
                 muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
               position: 'absolute',
-              top: 0,
+              top: backgroundColor ? blockPadding : 0,
               right: 0,
               display: 'flex',
             }}
@@ -422,8 +417,8 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
             {/* Background Color Picker Button */}
             <Tooltip title="Background Color">
               <IconButton
-                ref={paletteButtonRef}
                 onClick={(e) => {
+                  pendingColorRef.current = backgroundColor;
                   setPendingColor(backgroundColor);
                   setColorPickerAnchor(e.currentTarget);
                 }}
@@ -468,58 +463,35 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
       </Box>
 
       {/* Background Color Popover */}
-      <Popover
-        open={colorPickerOpen}
+      <ColorSelectionPopover
         anchorEl={colorPickerAnchor}
-        onClose={() => setColorPickerAnchor(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-      >
-        <Paper sx={{ p: 2, minWidth: 220 }}>
-          <Stack spacing={1.5}>
-            <TextField
-              label="Background Color"
-              size="small"
-              value={pendingColor}
-              onChange={(e) => setPendingColor(e.target.value)}
-              placeholder="#ffffff"
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <input
-                        type="color"
-                        value={pendingColor || '#ffffff'}
-                        onChange={(e) => setPendingColor(e.target.value)}
-                        style={{
-                          width: 24,
-                          height: 24,
-                          border: 'none',
-                          padding: 0,
-                          cursor: 'pointer',
-                          background: 'none',
-                        }}
-                      />
-                    </InputAdornment>
-                  ),
-                },
-              }}
-            />
-            <Stack direction="row" spacing={1} justifyContent="flex-end">
-              <ButtonMinorUi size="small" onClick={handleClearColor}>
-                Clear
-              </ButtonMinorUi>
-              <ButtonMinorUi
-                size="small"
-                variant="contained"
-                onClick={handleApplyColor}
-              >
-                Apply
-              </ButtonMinorUi>
-            </Stack>
-          </Stack>
-        </Paper>
-      </Popover>
+        onClose={() => {
+          // onClose fires on both swatch selection and backdrop dismiss.
+          // Use the ref (not state) so we always see the latest value even
+          // when setPendingColor and onClose fire in the same React batch.
+          // Skip if handleClearColor already rebuilt (None swatch path).
+          setColorPickerAnchor(null);
+          if (skipNextCloseRebuildRef.current) {
+            skipNextCloseRebuildRef.current = false;
+            return;
+          }
+          const latest = pendingColorRef.current;
+          if (latest !== backgroundColor) {
+            setBackgroundColor(latest);
+            rebuildNode(formData, latest);
+          }
+        }}
+        lastColor={pendingColor}
+        palette={SHAPE_PRESET_COLORS}
+        onPickColor={(color) => {
+          // Track locally; rebuild happens in onClose (once) to avoid repeated
+          // lexical node removal when MuiColorInput fires on every keystroke.
+          pendingColorRef.current = color;
+          setPendingColor(color);
+        }}
+        onClear={handleClearColor}
+        noneLabel="No background"
+      />
 
       {isConfiguring && (
         <ModalDialog
