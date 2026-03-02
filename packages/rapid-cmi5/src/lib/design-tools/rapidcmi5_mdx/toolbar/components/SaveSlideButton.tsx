@@ -44,7 +44,7 @@ export const SaveSlideButton = () => {
           disabled={!isDirty}
           color="inherit"
           size={iconButtonSize}
-          style={{
+          sx={{
             ...iconButtonStyle,
             boxShadow: isDirty
               ? '0 0 0 3px rgba(234, 147, 16, .50)'

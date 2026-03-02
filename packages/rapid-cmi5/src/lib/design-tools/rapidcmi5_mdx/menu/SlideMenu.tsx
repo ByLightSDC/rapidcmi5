@@ -115,32 +115,31 @@ export const SlideMenu = () => {
       <Stack
         direction="row"
         sx={{
-          backgroundColor: 'transparent', 
+          backgroundColor: 'transparent',
           borderRadius: '6px',
           justifyContent: 'center',
           alignItems: 'center',
           padding: 0.25,
         }}
       >
-        <IconButton
-          aria-label="delete-slide"
-          color="secondary"
-          size={iconButtonSize}
-          style={iconButtonStyle}
-          disabled={lessonSlides.length <= 1}
-          onClick={() => {
-            onDeleteSlide();
-          }}
-        >
-          <Tooltip arrow title={`Delete Current Slide`} {...tooltipStyle}>
+        <Tooltip arrow title={`Delete Current Slide`} {...tooltipStyle}>
+          <IconButton
+            aria-label="delete-slide"
+            color="secondary"
+            size={iconButtonSize}
+            sx={iconButtonStyle}
+            disabled={lessonSlides.length <= 1}
+            onClick={() => {
+              onDeleteSlide();
+            }}
+          >
             <DeleteForeverIcon color="inherit" />
-          </Tooltip>
-        </IconButton>
+          </IconButton>
+        </Tooltip>
         <IconButton
           aria-label="prev-slide"
-          color="inherit"
           disabled={currentSlideIndex <= 0}
-          style={iconButtonStyle}
+          sx={iconButtonStyle}
           onClick={onPrevSlide}
         >
           <ArrowBackIcon color="inherit" />
@@ -156,7 +155,7 @@ export const SlideMenu = () => {
         <IconButton
           aria-label="next-slide"
           disabled={currentSlideIndex >= lessonSlides.length - 1}
-          style={iconButtonStyle}
+          sx={iconButtonStyle}
           color="inherit"
           onClick={onNextSlide}
         >

@@ -13,6 +13,9 @@ export const iconButtonStyle = {
   marginRight: '4px',
   height: '32px',
   width: '32px',
+  '&.Mui-disabled .MuiSvgIcon-root': {
+    color: 'divider',
+  },
 };
 
 export const tooltipStyle: Partial<TooltipProps> = {
