@@ -235,9 +235,9 @@ export function LessonStyleDrawer() {
             variant="h6"
             sx={{ color: 'primary.main', flex: 1, marginLeft: 1 }}
           >
-            Style Settings
+            Lesson Appearance
           </Typography>
-          <IconButton onClick={handleClose} aria-label="Close Style Settings">
+          <IconButton onClick={handleClose} aria-label="Close Lesson Appearance">
             <CloseIcon />
           </IconButton>
         </Stack>

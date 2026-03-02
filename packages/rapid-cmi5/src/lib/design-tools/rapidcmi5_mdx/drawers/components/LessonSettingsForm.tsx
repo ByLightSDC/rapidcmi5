@@ -201,11 +201,11 @@ export function LessonSettingsForm({
       <FormControlUIProvider>
         <MiniForm
           dataCache={{}}
-          formTitle="Lesson Settings"
+          formTitle="Lesson Appearance"
           getFormFields={getFormFields}
           instructions=""
           submitButtonText="Save"
-          failToasterMessage="Lesson Settings update failed"
+          failToasterMessage="Lesson Appearance update failed"
           onClose={onClose}
           onCancel={onCancel}
           onResponse={onResponse}

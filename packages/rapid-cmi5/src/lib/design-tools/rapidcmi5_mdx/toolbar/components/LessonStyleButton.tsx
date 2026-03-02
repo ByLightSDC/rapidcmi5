@@ -18,9 +18,9 @@ export const LessonStyleButton = () => {
 
   return (
     <ButtonWithTooltip
-      title="Style Settings"
+      title="Lesson Appearance"
       onClick={handleClick}
-      aria-label="Style Settings"
+      aria-label="Lesson Appearance"
     >
       <PaletteIcon fontSize="medium" />
     </ButtonWithTooltip>

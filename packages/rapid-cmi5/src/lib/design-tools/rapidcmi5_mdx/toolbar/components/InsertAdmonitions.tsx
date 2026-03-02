@@ -83,10 +83,6 @@ export const InsertAdmonitions = () => {
     };
   }, []);
 
-  useEffect(() => {
-    //console.log('directiveDescriptors', directiveDescriptors);
-  }, [directiveDescriptors]);
-
   return (
     <Stack direction="column">
       <>
