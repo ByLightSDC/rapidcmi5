@@ -7,6 +7,8 @@ import {
   Typography,
   Alert,
   Divider,
+  useTheme,
+  alpha,
 } from '@mui/material';
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -45,6 +47,7 @@ export function AnimationDrawer() {
   const toggleDrawer = usePublisher(toggleAnimationDrawer$);
   const moveUp = usePublisher(moveAnimationUp$);
   const moveDown = usePublisher(moveAnimationDown$);
+  const theme = useTheme();
 
   // Hook into Lexical selection
   const { selectedInfo, isAnimatable } = useLexicalSelection();
@@ -112,19 +115,20 @@ export function AnimationDrawer() {
         },
       }}
     >
-      <Stack direction="column" sx={{ height: '100%' }}>
+      <Stack id="animation-library" direction="column" sx={{ height: '100%' }}>
         {/* Header */}
         <Stack
           direction="row"
           sx={{
             alignItems: 'center',
             padding: 2,
+             background: alpha(theme.palette.primary.main, 0.15),
             borderBottom: 1,
             borderColor: 'divider',
           }}
         >
-          <MotionPhotosAutoIcon />
-          <Typography variant="h6" sx={{ flex: 1, marginLeft: 1 }}>
+          <MotionPhotosAutoIcon color="primary"/>
+          <Typography variant="h6" sx={{ color:'primary.main', flex: 1, marginLeft: 1 }}>
             Animation Library
           </Typography>
           <IconButton

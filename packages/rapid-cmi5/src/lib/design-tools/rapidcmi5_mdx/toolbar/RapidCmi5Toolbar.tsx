@@ -211,7 +211,6 @@ export const RapidCmi5Toolbar: React.FC = () => {
                 <LessonStyleButton />
                 <InsertAnimation />
                 <InsertBlockMenu />
-                <BlockLibraryDrawer />
               </Stack>
             </Stack>
           )}

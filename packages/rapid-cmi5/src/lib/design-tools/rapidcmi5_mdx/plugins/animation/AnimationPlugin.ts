@@ -15,6 +15,8 @@ import { getMarkdownFn$, setMarkdownFn$ } from './state/animationCells';
 import { areAnimationsEqual } from './utils/animationComparison';
 import { highlightAnimatedElement } from './utils/updateAnimationIndicators';
 import { debugLog, onAnimDirectiveClick$ } from '@rapid-cmi5/ui';
+import { BlockLibraryDrawer } from '../../toolbar/components/BlockLibraryDrawer';
+import { LessonStyleDrawer } from '../../toolbar/components/LessonStyleDrawer';
 
 export interface AnimationPluginParams {
   initialAnimations?: AnimationConfig[];
@@ -53,7 +55,7 @@ export const animationPlugin = realmPlugin<AnimationPluginParams>({
 
     // Add components first
     realm.pubIn({
-      [addComposerChild$]: [AnimationDrawer, AnimationResolver],
+      [addComposerChild$]: [AnimationDrawer, AnimationResolver, BlockLibraryDrawer, LessonStyleDrawer],
       [getMarkdownFn$]: params?.getMarkdown ?? null,
       [setMarkdownFn$]: params?.setMarkdown ?? null,
       [currentSlideIndex$]: slideIndex,

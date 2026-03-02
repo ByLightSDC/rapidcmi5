@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { Drawer, IconButton, Stack, Typography } from '@mui/material';
+import { alpha, Drawer, IconButton, Stack, Typography, useTheme } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -17,7 +17,6 @@ import {
 
 import { InsertActivities } from './InsertActivities';
 import { InsertAdmonitions } from './InsertAdmonitions';
-import { useSelector } from 'react-redux';
 
 import { InsertTable } from './InsertTable';
 import { InsertVideo } from './InsertVideo';
@@ -42,6 +41,7 @@ export function BlockLibraryDrawer() {
   useLexicalComposerContext(); // Ensures we are inside a Lexical editor context
   const drawerMode = useCellValue(drawerMode$);
   const changeViewMode = usePublisher(drawerMode$);
+  const theme = useTheme();
 
   const isOpen = useMemo(() => {
     return drawerMode === DRAWER_TYPE.BLOCK;
@@ -85,12 +85,13 @@ export function BlockLibraryDrawer() {
           sx={{
             alignItems: 'center',
             padding: 2,
+            background: alpha(theme.palette.primary.main, 0.15),
             borderBottom: 1,
             borderColor: 'divider',
           }}
         >
-          <WidgetsIcon />
-          <Typography variant="h6" sx={{ flex: 1, marginLeft: 1 }}>
+          <WidgetsIcon color="primary"/>
+          <Typography variant="h6" sx={{ color:'primary.main', flex: 1, marginLeft: 1 }}>
             Block Library
           </Typography>
           <IconButton onClick={handleClose} aria-label="Close Block Library">
