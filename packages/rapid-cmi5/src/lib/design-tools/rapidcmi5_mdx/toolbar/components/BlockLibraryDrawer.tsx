@@ -136,11 +136,11 @@ export function BlockLibraryDrawer() {
             headerSxProps={headerSxProps}
           >
             <Stack direction="column">
+              <InsertAccordion isDrawer={true} />
+              <InsertGrid isDrawer={true} />
               <InsertSteps isDrawer={true} />
               <InsertTable isDrawer={true} />
               <InsertTabs isDrawer={true} />
-              <InsertAccordion isDrawer={true} />
-              <InsertGrid isDrawer={true} />
               <InsertThematicBreak isDrawer={true} />
             </Stack>
           </ViewExpander>
@@ -150,11 +150,11 @@ export function BlockLibraryDrawer() {
             headerSxProps={headerSxProps}
           >
             <Stack direction="column">
-              <InsertImage isDrawer={true} />
-              <InsertVideo isDrawer={true} />
               <InsertAudio isDrawer={true} />
               <InsertCodeBlock isDrawer={true} />
               <InsertFile isDrawer={true} />
+              <InsertImage isDrawer={true} />
+              <InsertVideo isDrawer={true} />
             </Stack>
           </ViewExpander>
         </Stack>

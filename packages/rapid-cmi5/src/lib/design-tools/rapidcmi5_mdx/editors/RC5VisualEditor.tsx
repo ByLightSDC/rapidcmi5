@@ -106,7 +106,6 @@ import { LayoutBoxDirectiveDescriptor } from './directives/layout-box/LayoutBoxD
 import { RC5Context } from '../contexts/RC5Context';
 import { RapidCmi5Toolbar } from '../toolbar/RapidCmi5Toolbar';
 import { ErrorBoundary } from './ErrorBoundary';
-import { BlockLibraryDrawer } from '../toolbar/components/BlockLibraryDrawer';
 
 /**
  * Rapid CMI5 Visual Editor

@@ -79,8 +79,8 @@ export const InsertTabs = ({ isDrawer }: { isDrawer?: boolean }) => {
     <>
       {isDrawer ? (
         <ButtonMinorUi
-          title="Insert Steps"
-          aria-label="insert-steps"
+          title="Insert Tabs"
+          aria-label="insert-tabs"
           startIcon={
             <>
               <AddIcon
