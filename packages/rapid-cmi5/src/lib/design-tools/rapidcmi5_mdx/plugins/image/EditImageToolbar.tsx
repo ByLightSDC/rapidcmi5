@@ -28,7 +28,7 @@ import {
 } from '@rapid-cmi5/ui';
 
 import { StyleDialog } from './StyleDialog';
-import { useImageStyle } from './ImageHooks';
+import { useImageStyle } from './useImageStyle';
 
 export interface EditImageToolbarProps {
   nodeKey: string;
