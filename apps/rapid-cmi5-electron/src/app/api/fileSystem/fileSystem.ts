@@ -1,4 +1,8 @@
-import { DirMeta, FolderStruct, sortProjectMetas } from '@rapid-cmi5/cmi5-build-common';
+import {
+  DirMeta,
+  FolderStruct,
+  sortProjectMetas,
+} from '@rapid-cmi5/cmi5-build-common';
 
 import fs, { constants } from 'fs';
 
@@ -87,14 +91,14 @@ export class ElectronFsHandler {
     this.isTestMode = isTestMode;
 
     const base = getRapidBase(isTestMode);
-    // reset before each test run
-    if (isTestMode) {
-      clearDirectory(base);
-    }
 
-    this.baseReady = fsp.mkdir(base, { recursive: true }).then(() => {
-      return;
-    });
+    this.baseReady = (async () => {
+      if (isTestMode) {
+        await clearDirectory(base);
+      }
+
+      await fsp.mkdir(base, { recursive: true });
+    })();
   }
 
   async readPlayerConfig(): Promise<Record<string, any>> {

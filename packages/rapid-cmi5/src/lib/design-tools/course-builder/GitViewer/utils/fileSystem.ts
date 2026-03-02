@@ -417,6 +417,13 @@ export class GitFS {
       if (!dirHandle) throw Error('No directory selected for clone');
 
       await this.openLocalDirectory(dirHandle, true);
+
+      // Unmount any stale sub-mount for this repo name so initGitRepo writes
+      // to the new parent directory, not a leftover WebAccess handle.
+      try {
+        zenFs.umount('/localFileSystem/' + parentDir);
+      } catch {}
+
       await createFunction();
 
       // verify repo dir actually exits
@@ -594,6 +601,17 @@ export class GitFS {
     try {
       await this.fs.promises.rmdir(`${repoPath}/.git`);
     } catch {}
+
+    // For local filesystem repos in the browser, the root WebAccess mount point
+    // cannot be deleted via removeEntry (browser throws "Name is not allowed").
+    // Instead, unmount the zenFs path so the name can be reused immediately.
+    if (!this.isElectron && r.fileSystemType === fsType.localFileSystem) {
+      try {
+        zenFs.umount(repoPath);
+      } catch {}
+      return;
+    }
+
     await this.fs.promises.rmdir(repoPath);
   };
 
