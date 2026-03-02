@@ -270,7 +270,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
               }}
             >
               <ButtonWithTooltip
-                title={t('toolbar.richText', 'rich_text')}
+                title={t('toolbar.richText', 'Edit Rich Text')}
                 onClick={() => {
                   changeViewMode('rich-text');
                 }}
@@ -279,7 +279,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                 {iconComponentFor('rich_text')}
               </ButtonWithTooltip>
               <ButtonWithTooltip
-                title="Markdown"
+                title="Edit Markdown"
                 onClick={() => {
                   changeViewMode('source');
                 }}

@@ -2,11 +2,18 @@ import React from 'react';
 
 import { ButtonWithTooltip, readOnly$ } from '@mdxeditor/editor';
 import { useCellValues, usePublisher } from '@mdxeditor/gurx';
-import AttachFileIcon from '@mui/icons-material/AttachFile';
+
 import { insertActivityDirective$ } from '../../plugins/Activity';
 import { ContainerDirective } from 'mdast-util-directive';
-import { getDefaultData } from '@rapid-cmi5/ui';
+import { ButtonMinorUi, getDefaultData } from '@rapid-cmi5/ui';
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+
+/**
+ * Icons
+ */
+import AddIcon from '@mui/icons-material/Add';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import { useTheme } from '@mui/material';
 
 /**
  * This toolbar button allows the user to attach a file that can be downloaded
@@ -14,35 +21,69 @@ import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
  * MDXEditor.
  * @group Toolbar Components
  */
-export const InsertFile = React.forwardRef<
-  HTMLButtonElement,
-  Record<string, never>
->((_, forwardedRef) => {
-  //const openNewVideoDialog = usePublisher(openNewVideoDialog$);
+export const InsertFile = ({ isDrawer }: { isDrawer?: boolean }) => {
   const [readOnly] = useCellValues(readOnly$);
   const insertActivity = usePublisher(insertActivityDirective$);
+  const theme = useTheme();
 
+  const handleInsert = () => {
+    insertActivity({
+      type: 'containerDirective',
+      attributes: {},
+      name: 'download',
+      children: [
+        {
+          type: 'code',
+          lang: 'json',
+          value: getDefaultData(RC5ActivityTypeEnum.download),
+        },
+      ],
+    } as ContainerDirective);
+  };
   return (
-    <ButtonWithTooltip
-      title={'Insert File'}
-      aria-label="insert-file"
-      disabled={readOnly}
-      onClick={() => {
-        insertActivity({
-          type: 'containerDirective',
-          attributes: {},
-          name: 'download',
-          children: [
-            {
-              type: 'code',
-              lang: 'json',
-              value: getDefaultData(RC5ActivityTypeEnum.download),
-            },
-          ],
-        } as ContainerDirective);
-      }}
-    >
-      <AttachFileIcon />
-    </ButtonWithTooltip>
+    <>
+      {isDrawer ? (
+        <ButtonMinorUi
+          title="File"
+          aria-label="insert-file"
+          startIcon={
+            <>
+              <AddIcon
+                fontSize="large"
+                sx={{
+                  color: theme.palette.primary.main,
+                  fill: theme.palette.primary.main,
+                }}
+              />
+              <AttachFileIcon
+                fontSize="small"
+                sx={{ fill: theme.palette.primary.main, marginRight: 1 }}
+              />
+            </>
+          }
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            padding: 1,
+          }}
+          onClick={() => {
+            handleInsert();
+          }}
+        >
+          File
+        </ButtonMinorUi>
+      ) : (
+        <ButtonWithTooltip
+          title="Insert File"
+          aria-label="insert-file"
+          onClick={() => {
+            handleInsert();
+          }}
+        >
+          <AttachFileIcon fontSize="small" />
+        </ButtonWithTooltip>
+      )}
+    </>
   );
-});
+};

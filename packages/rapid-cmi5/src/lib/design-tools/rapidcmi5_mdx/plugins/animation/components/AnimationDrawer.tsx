@@ -8,10 +8,7 @@ import {
   Alert,
   Divider,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 import {
@@ -28,6 +25,13 @@ import { WrapWithAnimDirective } from './WrapWithAnimDirective';
 import { useLexicalSelection } from '../hooks/useLexicalSelection';
 import { highlightAnimatedElement } from '../utils/updateAnimationIndicators';
 import { ButtonMinorUi } from '@rapid-cmi5/ui';
+
+/** Icons */
+import CloseIcon from '@mui/icons-material/Close';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import MotionPhotosAutoIcon from '@mui/icons-material/MotionPhotosAuto';
 
 /**
  * Main animation drawer component
@@ -85,7 +89,6 @@ export function AnimationDrawer() {
     }
   }, [moveDown, selectedAnimationId]);
 
- 
   if (!isOpen) {
     highlightAnimatedElement(null);
   }
@@ -120,12 +123,16 @@ export function AnimationDrawer() {
             borderColor: 'divider',
           }}
         >
-          <IconButton onClick={handleClose} aria-label="Close Animation Library">
-            <CloseIcon />
-          </IconButton>
+          <MotionPhotosAutoIcon />
           <Typography variant="h6" sx={{ flex: 1, marginLeft: 1 }}>
             Animation Library
           </Typography>
+          <IconButton
+            onClick={handleClose}
+            aria-label="Close Animation Library"
+          >
+            <CloseIcon />
+          </IconButton>
         </Stack>
 
         {/* Selected Element Info */}

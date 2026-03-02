@@ -1,10 +1,5 @@
-import  { useCallback, useMemo } from 'react';
-import {
-  Drawer,
-  IconButton,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { useCallback, useMemo } from 'react';
+import { Drawer, IconButton, Stack, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -30,6 +25,9 @@ import { InsertAudio } from './InsertAudio';
 import { InsertImage } from './InsertImage';
 import { InsertCodeBlock } from './InsertCodeBlock';
 import { InsertThematicBreak } from './InsertThematicBreak';
+import { InsertFile } from './InsertFile';
+
+import WidgetsIcon from '@mui/icons-material/Widgets';
 
 const headerSxProps = {
   cursor: 'pointer',
@@ -76,7 +74,7 @@ export function BlockLibraryDrawer() {
       }}
     >
       <Stack
-        id="mico"
+        id="block-library"
         direction="column"
         sx={{ height: '100%', zIndex: 200 }}
         spacing={0}
@@ -91,12 +89,13 @@ export function BlockLibraryDrawer() {
             borderColor: 'divider',
           }}
         >
-          <IconButton onClick={handleClose} aria-label="Close Block Library">
-            <CloseIcon />
-          </IconButton>
+          <WidgetsIcon />
           <Typography variant="h6" sx={{ flex: 1, marginLeft: 1 }}>
             Block Library
           </Typography>
+          <IconButton onClick={handleClose} aria-label="Close Block Library">
+            <CloseIcon />
+          </IconButton>
         </Stack>
         <Stack direction="column" spacing={2} sx={{ mt: 1 }}>
           <ViewExpander
@@ -114,7 +113,7 @@ export function BlockLibraryDrawer() {
             <InsertAdmonitions />
           </ViewExpander>
           <ViewExpander
-            title="Layouts"
+            title="Layout"
             defaultIsExpanded={false}
             headerSxProps={headerSxProps}
           >
@@ -124,7 +123,7 @@ export function BlockLibraryDrawer() {
               <InsertTabs isDrawer={true} />
               <InsertAccordion isDrawer={true} />
               <InsertGrid isDrawer={true} />
-              <InsertThematicBreak isDrawer={true}/> 
+              <InsertThematicBreak isDrawer={true} />
             </Stack>
           </ViewExpander>
           <ViewExpander
@@ -137,6 +136,7 @@ export function BlockLibraryDrawer() {
               <InsertVideo isDrawer={true} />
               <InsertAudio isDrawer={true} />
               <InsertCodeBlock isDrawer={true} />
+              <InsertFile isDrawer={true} />
             </Stack>
           </ViewExpander>
         </Stack>
