@@ -151,8 +151,8 @@ export const RapidCmi5Toolbar: React.FC = () => {
         const rect = toolbarRef.current.getBoundingClientRect();
         // Calculate the absolute position relative to the document
         const left = rect.left + window.scrollX;
-        //tool bar left plus margin
-        setLeftToolbarPos(left + 12);
+        //tool bar left plus 24 px right margin
+        setLeftToolbarPos(left+24);
       }
     };
 
