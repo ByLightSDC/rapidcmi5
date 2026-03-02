@@ -367,91 +367,91 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
           margin: 0,
           padding: 0,
           position: 'relative',
+          // Reserve space on the right for the gutter button group so the
+          // tab bar never extends under them, even at full content width.
+          paddingRight: isPlayback ? 0 : '100px',
           ...fullWidthBackgroundSx,
           ...sxProps,
         }}
       >
-        <Stack direction="row" spacing={1}>
-          <Tabs
-            variant="fullWidth"
-            sx={{ width: '100%' }}
-            value={tab}
-            onChange={handleTabChange}
-            aria-label="basic tabs example"
-            textColor="secondary"
-            indicatorColor="primary"
+        <Tabs
+          variant="fullWidth"
+          sx={{ width: '100%' }}
+          value={tab}
+          onChange={handleTabChange}
+          aria-label="basic tabs example"
+          textColor="secondary"
+          indicatorColor="primary"
+        >
+          {mdastNode.children.map((item, index) => {
+            if (
+              (item.type === 'containerDirective' ||
+                item.type === 'leafDirective') &&
+              item.name === 'tabContent'
+            ) {
+              return (
+                <Tab
+                  //force dark theme styling in RC5Player since CMI5 player does not support theme switching
+                  sx={
+                    readOnly
+                      ? { ...darkTab, borderRadius: 0 }
+                      : { borderRadius: 0 }
+                  }
+                  label={item.attributes?.title}
+                  {...a11yProps(index)}
+                  key={index}
+                />
+              );
+            }
+
+            return null;
+          })}
+        </Tabs>
+
+        {!isPlayback && (
+          <Box
+            sx={{
+              backgroundColor:
+                muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              display: 'flex',
+            }}
           >
-            {mdastNode.children.map((item, index) => {
-              if (
-                (item.type === 'containerDirective' ||
-                  item.type === 'leafDirective') &&
-                item.name === 'tabContent'
-              ) {
-                return (
-                  <Tab
-                    //force dark theme styling in RC5Player since CMI5 player does not support theme switching
-                    sx={
-                      readOnly
-                        ? { ...darkTab, borderRadius: 0 }
-                        : { borderRadius: 0 }
-                    }
-                    label={item.attributes?.title}
-                    {...a11yProps(index)}
-                    key={index}
-                  />
-                );
-              }
-
-              return null;
-            })}
-          </Tabs>
-          <div>
-            {!isPlayback && (
-              <Box
-                sx={{
-                  backgroundColor:
-                    muiTheme.palette.mode === 'dark'
-                      ? '#282b30e6'
-                      : '#EEEEEEe6',
-                  position: 'absolute',
-                  display: 'flex',
+            {/* Background Color Picker Button */}
+            <Tooltip title="Background Color">
+              <IconButton
+                ref={paletteButtonRef}
+                onClick={(e) => {
+                  setPendingColor(backgroundColor);
+                  setColorPickerAnchor(e.currentTarget);
                 }}
+                size="small"
               >
-                {/* Background Color Picker Button */}
-                <Tooltip title="Background Color">
-                  <IconButton
-                    ref={paletteButtonRef}
-                    onClick={(e) => {
-                      setPendingColor(backgroundColor);
-                      setColorPickerAnchor(e.currentTarget);
-                    }}
-                    size="small"
-                  >
-                    <PaletteIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
+                <PaletteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
 
-                <Tooltip title="Edit Tabs Settings">
-                  <IconButton onClick={handleConfigure}>
-                    <SettingsIcon />
-                  </IconButton>
-                </Tooltip>
-                <IconButton
-                  aria-label="delete"
-                  disabled={readOnly}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    editor.update(() => {
-                      lexicalNode?.remove();
-                    });
-                  }}
-                >
-                  <DeleteForeverIcon />
-                </IconButton>
-              </Box>
-            )}
-          </div>
-        </Stack>
+            <Tooltip title="Edit Tabs Settings">
+              <IconButton onClick={handleConfigure}>
+                <SettingsIcon />
+              </IconButton>
+            </Tooltip>
+            <IconButton
+              aria-label="delete"
+              disabled={readOnly}
+              onClick={(e) => {
+                e.preventDefault();
+                editor.update(() => {
+                  lexicalNode?.remove();
+                });
+              }}
+            >
+              <DeleteForeverIcon />
+            </IconButton>
+          </Box>
+        )}
 
         <TabsContext.Provider value={{ tab }}>
           <NestedLexicalEditor<ContainerDirective>
