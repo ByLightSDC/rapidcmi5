@@ -93,8 +93,8 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
     <>
       {isDrawer ? (
         <ButtonMinorUi
-          title="Insert Steps"
-          aria-label="insert-steps"
+          title="Insert Accordion"
+          aria-label="insert-accordion"
           startIcon={
             <>
               <AddIcon

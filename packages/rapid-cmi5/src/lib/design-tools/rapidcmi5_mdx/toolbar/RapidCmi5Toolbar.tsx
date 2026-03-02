@@ -32,6 +32,10 @@ import {
   iconComponentFor$,
   useCellValues,
   useTranslation,
+  IS_STRIKETHROUGH,
+  IS_BOLD,
+  IS_ITALIC,
+  IS_UNDERLINE,
 } from '@mdxeditor/editor';
 import { CLEAR_HISTORY_COMMAND } from 'lexical';
 //import { InsertActivity } from './components/InsertActivity';
@@ -44,6 +48,8 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import PaletteIcon from '@mui/icons-material/Palette';
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
+import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
+import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import WidgetsIcon from '@mui/icons-material/Widgets';
 
 import { Box, IconButton, Stack, Tooltip } from '@mui/material';
@@ -86,9 +92,10 @@ import { SlideMenu } from '../menu/SlideMenu';
 import { InsertBlockMenu } from './components/InsertBlockMenu';
 import { ModePreviewButton } from './components/ModePreviewButton';
 import { SaveSlideButton } from './components/SaveSlideButton';
-import { BlockLibraryDrawer } from './components/BlockLibraryDrawer';
 import { LessonStyleButton } from './components/LessonStyleButton';
 import { InsertFile } from './components/InsertFile';
+import { FormatButton } from './components/FormatButton';
+import styles from './styles/toolbar.module.css';
 
 /**
  * A toolbar component that includes all toolbar components.
@@ -100,16 +107,13 @@ export const RapidCmi5Toolbar: React.FC = () => {
   const changeViewMode = usePublisher(viewMode$);
   const { getMarkdownData } = useContext(RC5Context);
   const realm = useRealm();
-  const [isToolGroup1Visible, setIsToolGroup1Visible] = useState(true);
-  const isPlayback = useCellValue(editorInPlayback$);
   const viewmode = useCellValue(viewMode$);
-  const themeIconColor = useSelector(iconColor);
   const themedDividerColor = useSelector(dividerColor);
   const content = useSelector(displayData);
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef<HTMLDivElement>(null);
   const [leftToolbarPos, setLeftToolbarPos] = useState<number | 0>(0);
-
+  const [isMoreTextTools, setIsMoreTextTools] = useState(false);
   const [viewMode, iconComponentFor] = useCellValues(
     viewMode$,
     iconComponentFor$,
@@ -189,7 +193,34 @@ export const RapidCmi5Toolbar: React.FC = () => {
             <Stack direction="row" spacing={1}>
               <Stack direction="row" spacing={1} sx={{ flexGrow: 1 }}>
                 <BoldItalicUnderlineToggles />
-                {/* <StrikeThroughSupSubToggles /> */}
+                <Stack
+                  direction="row"
+                  sx={{
+                    borderColor: isMoreTextTools ? 'divider' : 'transparent',
+                    borderRadius: 1,
+                    borderStyle: 'solid',
+                    borderWidth: 1,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <ButtonWithTooltip
+                    title={
+                      isMoreTextTools
+                        ? 'Less Text Tools...'
+                        : 'More Text Tools...'
+                    }
+                    onClick={() => setIsMoreTextTools(!isMoreTextTools)}
+                  >
+                    {isMoreTextTools ? (
+                      <UnfoldLessIcon fontSize="medium" />
+                    ) : (
+                      <UnfoldMoreIcon fontSize="medium" />
+                    )}
+                  </ButtonWithTooltip>
+                  {isMoreTextTools && <StrikeThroughSupSubToggles />}
+                </Stack>
                 <ColorTextSplitButton />
                 <HighlightSplitButton />
                 <TextFxButton />
@@ -205,7 +236,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                 <InsertVideo />
                 <InsertFile />
                 <InsertCodeBlock />
-                {/* <InsertLayoutBox /> */}
+                {/*REF <InsertLayoutBox /> */}
                 <InsertGrid />
                 <Separator />
                 <LessonStyleButton />
@@ -247,10 +278,8 @@ export const RapidCmi5Toolbar: React.FC = () => {
                 borderColor: 'divider',
                 borderRadius: '24px',
                 borderStyle: 'solid',
-                //backgroundColor: 'orange',
                 display: 'flex',
                 justifyContent: 'center',
-                //flexGrow: 1,
               }}
             >
               <SlideMenu />

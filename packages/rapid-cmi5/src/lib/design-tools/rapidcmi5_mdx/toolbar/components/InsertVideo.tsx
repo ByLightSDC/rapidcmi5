@@ -27,8 +27,8 @@ export const InsertVideo = ({ isDrawer }: { isDrawer?: boolean }) => {
     <>
       {isDrawer ? (
         <ButtonMinorUi
-          title="Insert Steps"
-          aria-label="insert-steps"
+          title="Insert Video"
+          aria-label="insert-video"
           startIcon={
             <>
               <AddIcon
@@ -58,8 +58,8 @@ export const InsertVideo = ({ isDrawer }: { isDrawer?: boolean }) => {
         </ButtonMinorUi>
       ) : (
         <ButtonWithTooltip
-          title="Insert Steps"
-          aria-label="insert-steps"
+          title="Insert Video"
+          aria-label="insert-video"
           onClick={() => {
             openNewVideoDialog();
           }}
