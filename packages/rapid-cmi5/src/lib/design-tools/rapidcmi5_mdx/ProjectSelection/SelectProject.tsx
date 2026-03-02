@@ -223,8 +223,6 @@ export default function SelectProjectHomePage({}: {}) {
           title={currentDoc?.title || ''}
           content={currentDoc?.content || ''}
         />
-
-        {/* Global Styles for Animations */}
         <style>
           {`          
           @keyframes fadeInUp {
