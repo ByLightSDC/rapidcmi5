@@ -50,6 +50,9 @@ export class GitFS {
   public isMountStarted: boolean = false;
   public isElectron: boolean = false;
   public cache = {};
+  // This allows us to remove a recent project from the recents list
+  // If we delete it in the UI
+  public currentProjectRecentsId?: string = undefined;
 
   constructor(isElectron: boolean = false) {
     if (isElectron) {
@@ -326,11 +329,9 @@ export class GitFS {
     try {
       if (forClone) {
         zenFs.umount('/localFileSystem');
-
         zenFs.mount('/localFileSystem', webacess);
       } else {
         zenFs.umount('/localFileSystem/' + dirHandle.name);
-
         zenFs.mount('/localFileSystem/' + dirHandle.name, webacess);
       }
       this.isBrowserFsLoaded = true;
@@ -341,7 +342,6 @@ export class GitFS {
 
   async openLocalRepo(id?: string) {
     if (this.isElectron) {
-      // if (!id) throw Error('No directory ID given');
       if (id) {
         if (!(await this.dirExists('/' + fsType.localFileSystem + '/' + id)))
           throw Error('Could not find dir');
@@ -357,6 +357,7 @@ export class GitFS {
 
       if (id) {
         dirHandle = await this.getDirHandle(id);
+        this.currentProjectRecentsId = id;
       }
       if (!dirHandle) {
         // @ts-ignore
@@ -373,10 +374,14 @@ export class GitFS {
         // We do not want to add to recent projects if this is not a git project
         try {
           const gitFolder = await dirHandle.getDirectoryHandle('.git');
-          if (!gitFolder) throw Error(noGitInProjectError);
+          if (!gitFolder) {
+            this.currentProjectRecentsId = undefined;
+            throw Error(noGitInProjectError);
+          }
 
           await this.setDirHandle(dirHandle);
         } catch (error: any) {
+          this.currentProjectRecentsId = undefined;
           throw Error(noGitInProjectError);
         }
       }
@@ -401,6 +406,7 @@ export class GitFS {
   ) {
     if (this.isElectron) {
       await createFunction();
+      // We don't need to take care of recents here, thats an electron backend job
     } else {
       // @ts-ignore
       let dirHandle = (await window.showDirectoryPicker({
@@ -421,6 +427,7 @@ export class GitFS {
 
         await this.openLocalDirectory(repoDir);
       } catch {
+        this.currentProjectRecentsId = undefined;
         throw Error(
           'The create project operation failed to save files to your local computer.',
         );
@@ -453,28 +460,6 @@ export class GitFS {
     }
   }
 
-  async getGitRemoteUrlElectron(path: string): Promise<string | undefined> {
-    try {
-      const r: RepoAccessObject = {
-        fileSystemType: fsType.localFileSystem,
-        repoName: path,
-      };
-
-      const file = await this.getFileContent(r, '.git/config');
-
-      if (!file) return undefined;
-
-      const text = file.content.toString();
-      // Match: [remote "origin"] ... url = xxx
-      const match = text.match(/\[remote\s+"origin"\][\s\S]*?url\s*=\s*(.+)/);
-
-      return match?.[1]?.trim();
-    } catch (err) {
-      // Not a git repo or no access
-      return undefined;
-    }
-  }
-
   // save the local file access directory handle so we dont have to ask for it each time
   setDirHandle = async (dirHandle: FileSystemDirectoryHandle) => {
     const id = crypto.randomUUID();
@@ -487,8 +472,9 @@ export class GitFS {
       isValid: true,
       remoteUrl: await this.getGitRemoteUrl(dirHandle),
     };
+    this.currentProjectRecentsId = id;
 
-    await set('courses/' + id || 'rootdir', dirMeta);
+    await set('courses/' + id, dirMeta);
   };
 
   getRecentProjects = async () => {
@@ -524,7 +510,7 @@ export class GitFS {
         await set('courses/' + meta.id, meta);
       }
     }
-    return sortProjectMetas(newMetas)
+    return sortProjectMetas(newMetas);
   };
 
   getDirHandle = async (id: string) => {
@@ -576,6 +562,11 @@ export class GitFS {
     }
 
     await this.clearDirectory(repoPath);
+    // .git is blocked from enumeration by the browser's File System Access API,
+    // so clearDirectory won't see it. Delete it explicitly by name.
+    try {
+      await this.fs.promises.rmdir(`${repoPath}/.git`);
+    } catch {}
     await this.fs.promises.rmdir(repoPath);
   };
 

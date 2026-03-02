@@ -5,7 +5,6 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 
@@ -502,6 +501,13 @@ export const GitContextProvider = (props: tProviderProps) => {
 
     setIsGitLoaded(false);
     await deleteRepo(r);
+    const recentProjectIOd = gitFs.currentProjectRecentsId;
+    // Electron will remove its own recent projects in the backend
+    if (!isElectron && recentProjectIOd) {
+      gitFs.currentProjectRecentsId = undefined;
+      gitFs.removeRecentProject(recentProjectIOd);
+    }
+
     await resetRepoStatus();
     dispatch(changeViewMode(ViewModeEnum.RepoSelector));
   };
@@ -532,7 +538,7 @@ export const GitContextProvider = (props: tProviderProps) => {
   const handleUnstageAll = async () => {
     const r = getRepoAccess(repoAccessObject);
 
-    const chagnedFiles = await unstageFiles(modifiedFiles);
+    await unstageFiles(modifiedFiles);
     await resolveGitRepoStatus(r);
     setCanCommit(false);
   };
@@ -1145,7 +1151,12 @@ export const GitContextProvider = (props: tProviderProps) => {
         fileSystemType: fsType.localFileSystem,
         repoName: cleanedName,
       });
-      attemptGlobalGitConfigOverride(req.authorEmail, req.authorName, req.repoUsername, req.repoPassword);
+      attemptGlobalGitConfigOverride(
+        req.authorEmail,
+        req.authorName,
+        req.repoUsername,
+        req.repoPassword,
+      );
     } finally {
       dispatch(setLoadingState(LoadingState.loaded));
     }
