@@ -137,8 +137,6 @@ export const LessonDrawer = () => {
   };
   const onCourseContextAction = (event: any, whichAction: number) => {
     switch (whichAction) {
-      // case CourseActionEnum.Configure:
-      //   break;
       case CourseActionEnum.TriggerRename:
         setMenuAnchorPos([event.clientX - 60, event.clientY + 20]);
         break;
@@ -188,18 +186,17 @@ export const LessonDrawer = () => {
         VISUAL DESIGNER
       </Typography>
 
-  
       <Grid container wrap="wrap">
         <Grid
           size={{ xs: 12, sm: 8, md: 8 }}
           sx={{
             display: 'flex',
             justifyContent: 'flex-start',
-
             minWidth: '100px',
             marginTop: '4px',
-            marginBottom:1,
-            gap: .5,
+            marginBottom: 0,
+            gap: 0.5,
+            fontSize: '28px',
           }}
         >
           <CourseSelector
@@ -217,7 +214,7 @@ export const LessonDrawer = () => {
               currentRepo ? 'Create course' : 'Select a repo to create a course'
             }
           >
-            <span>
+            <div style={{ marginTop: -8 }}>
               <IconButton
                 aria-label="create new course"
                 id="create-course-button"
@@ -228,7 +225,6 @@ export const LessonDrawer = () => {
                 sx={(theme) => ({
                   backgroundColor: 'primary.main',
                   color: 'common.white',
-                  borderRadius: 6,
                   border: `1px solid ${theme.palette.primary.light}`,
                   transition:
                     'transform 120ms ease, background-color 120ms ease',
@@ -240,18 +236,18 @@ export const LessonDrawer = () => {
                   '&.Mui-disabled': { opacity: 0.45 },
                 })}
               >
-                <AddIcon fontSize="small" />
+                <AddIcon />
               </IconButton>
-            </span>
+            </div>
           </Tooltip>
         </Grid>
         <Grid
           size={{ xs: 12, sm: 4, md: 4 }}
           sx={{
             display: 'flex',
-            gap: .5,
+            gap: 0.5,
             justifyContent: 'flex-end',
-            minWidth: '112px', 
+            minWidth: '112px',
             marginTop: '4px',
           }}
         >
