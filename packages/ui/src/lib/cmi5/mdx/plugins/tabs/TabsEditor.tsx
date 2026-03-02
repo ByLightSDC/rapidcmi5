@@ -192,10 +192,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
    * Used by both handleSubmit (tab management) and handleApplyColor.
    */
   const rebuildNode = useCallback(
-    async (
-      children: TabContentDirectiveNode[],
-      bgColor: string,
-    ) => {
+    async (children: TabContentDirectiveNode[], bgColor: string) => {
       if (!parentEditor) return;
 
       // select AFTER the current tab first
@@ -337,9 +334,10 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
    * without requiring width/transform changes that break inside overflow:hidden
    * ancestor containers. Content width is preserved — only the color spreads.
    */
-  const dropShadow = muiTheme.palette.mode === 'dark'
-    ? '0 2px 6px rgba(0,0,0,0.5)'
-    : '0 2px 4px rgba(0,0,0,0.2)';
+  const dropShadow =
+    muiTheme.palette.mode === 'dark'
+      ? '0 2px 6px rgba(0,0,0,0.5)'
+      : '0 2px 4px rgba(0,0,0,0.2)';
 
   const fullWidthBackgroundSx: SxProps = backgroundColor
     ? {
@@ -347,7 +345,10 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
         // Drop shadow is omitted here: clip-path clips all box-shadow paint, so a
         // combined drop shadow would be invisible regardless of inset values.
         boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: 'inset(0 -100vmax)',
+        // Negative top inset extends the clip region upward by blockPadding,
+        // so the box-shadow color fills the margin-top gap that the lesson
+        // theme CSS adds to [data-lexical-decorator] adjacent siblings.
+        clipPath: `inset(-${blockPadding} -100vmax 0)`,
         backgroundColor,
         paddingTop: blockPadding,
         paddingBottom: blockPadding,
