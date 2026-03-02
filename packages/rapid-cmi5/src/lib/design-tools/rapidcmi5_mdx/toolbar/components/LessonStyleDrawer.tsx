@@ -241,7 +241,9 @@ export function LessonStyleDrawer() {
             <CloseIcon />
           </IconButton>
         </Stack>
-
+        <Alert severity="info" sx={{ margin: 2 }}>
+          Settings are applied to the current lesson
+        </Alert>
         <Grid container sx={{ margin: 2 }}>
           {/* Content Width */}
           <Grid size={11.5}>
@@ -351,9 +353,6 @@ export function LessonStyleDrawer() {
             </Typography>
           </Grid>
         </Grid>
-        <Alert severity="info" sx={{ margin: 2 }}>
-          These settings are applied to the current lesson.
-        </Alert>
       </Stack>
     </Drawer>
   );

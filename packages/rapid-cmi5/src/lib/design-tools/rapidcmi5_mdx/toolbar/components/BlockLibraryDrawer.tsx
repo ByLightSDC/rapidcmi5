@@ -1,5 +1,14 @@
 import { useCallback, useMemo } from 'react';
-import { alpha, Drawer, IconButton, Stack, Typography, useTheme } from '@mui/material';
+import {
+  Alert,
+  alpha,
+  Box,
+  Drawer,
+  IconButton,
+  Stack,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -90,8 +99,11 @@ export function BlockLibraryDrawer() {
             borderColor: 'divider',
           }}
         >
-          <WidgetsIcon color="primary"/>
-          <Typography variant="h6" sx={{ color:'primary.main', flex: 1, marginLeft: 1 }}>
+          <WidgetsIcon color="primary" />
+          <Typography
+            variant="h6"
+            sx={{ color: 'primary.main', flex: 1, marginLeft: 1 }}
+          >
             Block Library
           </Typography>
           <IconButton onClick={handleClose} aria-label="Close Block Library">
@@ -99,6 +111,11 @@ export function BlockLibraryDrawer() {
           </IconButton>
         </Stack>
         <Stack direction="column" spacing={2} sx={{ mt: 1 }}>
+          <Box>
+            <Alert severity="info" sx={{ margin: 2 }}>
+              Expand a topic and click item to add it to the current slide.
+            </Alert>
+          </Box>
           <ViewExpander
             title="Activities"
             defaultIsExpanded={false}

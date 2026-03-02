@@ -94,8 +94,6 @@ import { ModePreviewButton } from './components/ModePreviewButton';
 import { SaveSlideButton } from './components/SaveSlideButton';
 import { LessonStyleButton } from './components/LessonStyleButton';
 import { InsertFile } from './components/InsertFile';
-import { FormatButton } from './components/FormatButton';
-import styles from './styles/toolbar.module.css';
 
 /**
  * A toolbar component that includes all toolbar components.
