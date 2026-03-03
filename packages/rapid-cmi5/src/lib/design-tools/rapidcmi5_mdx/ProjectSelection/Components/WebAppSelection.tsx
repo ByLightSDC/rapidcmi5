@@ -1,11 +1,9 @@
-import { Box, Container } from '@mui/material';
-import { DirMeta } from '../../../course-builder/GitViewer/utils/fileSystem';
-import CloneLoadingOverlay from './LoadingOverlay';
+import { Box } from '@mui/material';
 import ProductionModeSelection from './ProductionModeSelection';
 import RecentProjectSelection from './RecentProjectSelection';
 import SandBoxSelection from './SandBoxSelection';
-import { LoadingState } from 'packages/rapid-cmi5/src/lib/redux/repoManagerReducer';
-import DesktopDownload from './DesktopDownloader';
+import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
+
 
 interface OptionDocumentation {
   title: string;
@@ -13,22 +11,22 @@ interface OptionDocumentation {
 }
 
 export default function WebAppSelection({
-  openLocalFolderAndSet,
-  openLocalRecentProject,
-  handleCreateRepo,
-  handleOpenSandbox,
+  onOpenLocalFolder,
+  onOpenRecentProject,
+  onCreateRepo,
+  onOpenSandbox,
   recentProjects,
-  handleCloneRepo,
-  handleShowDocumentation,
+  onCloneRepo,
+  onShowDocumentation,
   isSandboxLaunching = false,
 }: {
-  openLocalFolderAndSet: () => Promise<void>;
-  openLocalRecentProject: (id: string) => Promise<void>;
-  handleCreateRepo: () => void;
-  handleOpenSandbox: () => Promise<void>;
+  onOpenLocalFolder: () => Promise<void>;
+  onOpenRecentProject: (id: string) => Promise<void>;
+  onCreateRepo: () => void;
+  onOpenSandbox: () => Promise<void>;
   recentProjects: DirMeta[];
-  handleShowDocumentation: (doc: OptionDocumentation) => void;
-  handleCloneRepo: () => void;
+  onShowDocumentation: (doc: OptionDocumentation) => void;
+  onCloneRepo: () => void;
   isSandboxLaunching?: boolean;
 }) {
   return (
@@ -49,21 +47,21 @@ export default function WebAppSelection({
           }}
         >
           <ProductionModeSelection
-            openLocalFolder={openLocalFolderAndSet}
-            cloneRepo={handleCloneRepo}
-            createRepo={handleCreateRepo}
-            onShowDocumentation={handleShowDocumentation}
+            openLocalFolder={onOpenLocalFolder}
+            cloneRepo={onCloneRepo}
+            createRepo={onCreateRepo}
+            onShowDocumentation={onShowDocumentation}
             isDisabled={isSandboxLaunching}
           />
           <SandBoxSelection
-            openSandbox={handleOpenSandbox}
+            openSandbox={onOpenSandbox}
             isLaunching={isSandboxLaunching}
           />
         </Box>
 
         <RecentProjectSelection
           recentProjects={recentProjects}
-          openRecentProject={openLocalRecentProject}
+          onOpenRecentProject={onOpenRecentProject}
           isDisabled={isSandboxLaunching}
         />
       </Box>

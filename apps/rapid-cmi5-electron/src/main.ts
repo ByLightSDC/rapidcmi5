@@ -33,6 +33,10 @@ import {
   addCert,
   removeCert,
 } from './app/api/userSettings/certManager';
+import {
+  addRecentProject,
+  removeRecentProject,
+} from './app/api/userSettings/recentProjects';
 
 const builder = new cmi5Builder();
 let fsHandler: ElectronFsHandler | null = null;
@@ -145,6 +149,33 @@ ipcMain.handle(
   },
 );
 
+ipcMain.handle('fs:chooseProject', async (_e) => {
+  try {
+    return await getFsHandler().chooseProject();
+  } catch (error) {
+    console.error('Error choosing project:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('fs:getRecentProjects', () => {
+  try {
+    return getFsHandler().getRecentProjects();
+  } catch (error) {
+    console.error('Error getting recent projects:', error);
+    throw error;
+  }
+});
+
+ipcMain.handle('fs:removeRecentProject', (_e, id: string) => {
+  try {
+    return removeRecentProject(id);
+  } catch (error) {
+    console.error('Error removing recent project:', error);
+    throw error;
+  }
+});
+
 ipcMain.handle(
   'fs:gitCommit',
   async (
@@ -162,6 +193,15 @@ ipcMain.handle(
     }
   },
 );
+
+ipcMain.handle('fs:addRecentProject', (_e, id: string) => {
+  try {
+    return addRecentProject(id);
+  } catch (error) {
+    console.error('Error adding recent project:', error);
+    throw error;
+  }
+});
 
 ipcMain.handle('fs:getStashStatus', async (_e, repoPath: string) => {
   try {

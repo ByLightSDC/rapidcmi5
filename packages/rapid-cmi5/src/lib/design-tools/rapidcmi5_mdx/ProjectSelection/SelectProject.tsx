@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from 'react';
 import { alpha, Box, Container, useTheme } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
-import { DirMeta } from '../../course-builder/GitViewer/utils/fileSystem';
 import DocumentationDialog from './Dialogs/DocumentationDialog';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
 import { RepoState } from '../../../redux/repoManagerReducer';
@@ -11,46 +10,54 @@ import WebAppSelection from './Components/WebAppSelection';
 import ElectronAppSelection from './Components/ElectronSelection';
 import CloneLoadingOverlay from './Components/LoadingOverlay';
 import { useToaster } from '@rapid-cmi5/ui';
+import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
 
 interface OptionDocumentation {
   title: string;
   content: string;
 }
 
-export default function WelcomePage({
-  setRepoSelected,
-}: {
-  setRepoSelected: () => void;
-}) {
-  const theme = useTheme();
-  const { palette } = theme;
-  const toast = useToaster();
-
-  const { getLocalFolders, openSandbox, openLocalRepo, isElectron } =
-    useContext(GitContext);
-  const { promptCloneRepo, promptCreateLocalRepo } = useRC5Prompts();
+export default function SelectProjectHomePage({}: {}) {
   const [recentProjects, setRecentProjects] = useState<DirMeta[]>([]);
   const [isSandboxLaunching, setIsSandboxLaunching] = useState(false);
+  const [docDialogOpen, setDocDialogOpen] = useState(false);
+
+  const theme = useTheme();
+  const { palette } = theme;
+
+  const displayToaster = useToaster();
+
+  const {
+    getLocalFolders,
+    openSandbox,
+    openLocalRepo,
+    isElectron,
+    deleteRecentProject,
+  } = useContext(GitContext);
+
+  const { promptCloneRepo, promptCreateLocalRepo } = useRC5Prompts();
 
   const { loadingState }: RepoState = useSelector(
     (state: RootState) => state.repoManager,
   );
 
-  const openLocalFolderWithToast = async (id?: string) => {
+  const handleOpenLocalFolder = async (id?: string) => {
     try {
       await openLocalRepo(id);
 
-      toast({
+      displayToaster({
         message: 'Repository opened successfully.',
         severity: 'success',
+        autoHideDuration: 3000,
       });
     } catch (e: any) {
       const msg =
         e?.message || e?.name || 'Failed to open repository. Please try again.';
 
-      toast({
+      displayToaster({
         message: `Open repository failed: ${msg}`,
         severity: 'error',
+        autoHideDuration: 8000,
       });
     }
   };
@@ -74,11 +81,7 @@ export default function WelcomePage({
     transparent 60%
   )
 `;
-  const populateFolders = async () => {
-    setRecentProjects(await getLocalFolders());
-  };
 
-  const [docDialogOpen, setDocDialogOpen] = useState(false);
   const handleShowDocumentation = (doc: OptionDocumentation) => {
     setCurrentDoc(doc);
     setDocDialogOpen(true);
@@ -92,18 +95,37 @@ export default function WelcomePage({
     null,
   );
 
-  useEffect(() => {
-    populateFolders();
-  }, []);
-
-  const openLocalFolderAndSet = async () => {
-    await openLocalRepo();
-    setRepoSelected();
+  const populateRecentProjects = async () => {
+    setRecentProjects(await getLocalFolders());
   };
 
-  const openLocalRecentProject = async (id: string) => {
-    await openLocalRepo(id);
-    setRepoSelected();
+  useEffect(() => {
+    populateRecentProjects();
+  }, []);
+
+  const handleOpenRecentProject = async (id: string) => {
+    try {
+      await openLocalRepo(id);
+
+      displayToaster({
+        message: 'Repository opened successfully.',
+        severity: 'success',
+        autoHideDuration: 3000,
+      });
+    } catch (e: any) {
+      const msg =
+        e?.message ||
+        e?.name ||
+        'Failed to open repository. Removing from recents.';
+
+      await deleteRecentProject(id);
+      await populateRecentProjects();
+      displayToaster({
+        message: `Project folder has been moved or deleted: ${msg}`,
+        severity: 'error',
+        autoHideDuration: 8000,
+      });
+    }
   };
 
   const handleOpenSandbox = async () => {
@@ -111,7 +133,6 @@ export default function WelcomePage({
     setIsSandboxLaunching(true);
     try {
       await openSandbox();
-      setRepoSelected();
     } finally {
       setIsSandboxLaunching(false);
     }
@@ -148,29 +169,31 @@ export default function WelcomePage({
           {isElectron ? (
             <ElectronAppSelection
               recentProjects={recentProjects}
-              handleShowDocumentation={handleShowDocumentation}
-              handleCloneRepo={promptCloneRepo}
-              handleCreateRepo={promptCreateLocalRepo}
-              openLocalFolderAndSet={openLocalFolderWithToast}
-              openLocalRecentProject={openLocalRecentProject}
+              onShowDocumentation={handleShowDocumentation}
+              onCloneRepo={promptCloneRepo}
+              onCreateRepo={promptCreateLocalRepo}
+              onOpenLocalFolder={handleOpenLocalFolder}
+              onOpenRecentProject={handleOpenRecentProject}
             />
           ) : (
             <WebAppSelection
-              handleOpenSandbox={handleOpenSandbox}
+              onOpenSandbox={handleOpenSandbox}
               isSandboxLaunching={isSandboxLaunching}
               recentProjects={recentProjects}
-              handleShowDocumentation={handleShowDocumentation}
-              handleCloneRepo={promptCloneRepo}
-              handleCreateRepo={promptCreateLocalRepo}
-              openLocalFolderAndSet={openLocalFolderWithToast}
-              openLocalRecentProject={openLocalRecentProject}
+              onShowDocumentation={handleShowDocumentation}
+              onCloneRepo={promptCloneRepo}
+              onCreateRepo={promptCreateLocalRepo}
+              onOpenLocalFolder={handleOpenLocalFolder}
+              onOpenRecentProject={handleOpenRecentProject}
             />
           )}
         </Container>
         <CloneLoadingOverlay
           loadingVariant={loadingState}
           forceShow={isSandboxLaunching}
-          overrideMessage={isSandboxLaunching ? 'Launching sandbox...' : undefined}
+          overrideMessage={
+            isSandboxLaunching ? 'Launching sandbox...' : undefined
+          }
         />
 
         <DocumentationDialog
@@ -179,12 +202,8 @@ export default function WelcomePage({
           title={currentDoc?.title || ''}
           content={currentDoc?.content || ''}
         />
-
-        {/* Global Styles for Animations */}
         <style>
-          {`
-          @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
-          
+          {`          
           @keyframes fadeInUp {
             from {
               opacity: 0;
