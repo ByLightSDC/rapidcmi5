@@ -58,7 +58,6 @@ import {
 } from './MdastImageVisitor';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
-export * from './ImageNode';
 
 export const CAN_USE_DOM: boolean =
   typeof window !== 'undefined' &&

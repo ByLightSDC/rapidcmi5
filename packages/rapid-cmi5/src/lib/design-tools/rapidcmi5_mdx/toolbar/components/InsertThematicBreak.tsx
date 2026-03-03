@@ -1,28 +1,34 @@
-import { usePublisher } from '@mdxeditor/gurx';
-import AudioFileIcon from '@mui/icons-material/AudioFile';
-import { openNewAudioDialog$ } from '../../plugins/audio';
-import { ButtonWithTooltip } from '@mdxeditor/editor';
+import { useCellValue, usePublisher } from '@mdxeditor/gurx';
+import {
+  ButtonWithTooltip,
+  iconComponentFor$,
+  insertThematicBreak$,
+  useTranslation,
+} from '@mdxeditor/editor';
+
 /**
  * Icons
  */
 import AddIcon from '@mui/icons-material/Add';
+import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import { useTheme } from '@mui/material';
 import { ButtonMinorUi } from '@rapid-cmi5/ui';
+
 /**
- * A toolbar button that allows the user to insert audio.
- * For this button to work, you must include `audioPlugin`.
+ * A toolbar button that allows the user to insert a thematic break (rendered as an HR HTML element).
+ * For this button to work, you need to have the `thematicBreakPlugin` plugin enabled.
  * @group Toolbar Components
  */
-export const InsertAudio = ({ isDrawer }: { isDrawer?: boolean }) => {
-  const openNewAudioDialog = usePublisher(openNewAudioDialog$);
-  const theme = useTheme();
+export const InsertThematicBreak = ({ isDrawer }: { isDrawer?: boolean }) => {
+  const insertThematicBreak = usePublisher(insertThematicBreak$);
+  const theme: any = useTheme();
 
   return (
     <>
       {isDrawer ? (
         <ButtonMinorUi
-          title="Insert Audio"
-          aria-label="insert-audio"
+          title="Insert Thematic Break"
+          aria-label="insert-thematic-break"
           startIcon={
             <>
               <AddIcon
@@ -32,7 +38,7 @@ export const InsertAudio = ({ isDrawer }: { isDrawer?: boolean }) => {
                   fill: theme.palette.primary.main,
                 }}
               />
-              <AudioFileIcon
+              <HorizontalRuleIcon
                 fontSize="small"
                 sx={{ fill: theme.palette.primary.main, marginRight: 1 }}
               />
@@ -42,23 +48,24 @@ export const InsertAudio = ({ isDrawer }: { isDrawer?: boolean }) => {
             display: 'flex',
             justifyContent: 'flex-start',
             alignItems: 'center',
+             margin: 1,
             padding: 1,
           }}
           onClick={() => {
-            openNewAudioDialog();
+            insertThematicBreak();
           }}
         >
-          Audio
+          Thematic Break
         </ButtonMinorUi>
       ) : (
         <ButtonWithTooltip
-          title="Insert Audio"
-          aria-label="insert-audio"
+          title="Insert Thematic Break"
+          aria-label="insert-thematic-break"
           onClick={() => {
-            openNewAudioDialog();
+            insertThematicBreak();
           }}
         >
-          <AudioFileIcon fontSize="small" />
+          <HorizontalRuleIcon fontSize="small" />
         </ButtonWithTooltip>
       )}
     </>

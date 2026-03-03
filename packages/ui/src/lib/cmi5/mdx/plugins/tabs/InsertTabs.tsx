@@ -17,18 +17,24 @@ import { ContainerDirective } from 'mdast-util-directive';
 import { DEFAULT_TABS } from './constants';
 import { placeCaretInsideDirective } from '../../util/caret';
 import { convertMarkdownToMdast } from '../../util/conversion';
+import { ButtonMinorUi } from 'packages/ui/src/lib/utility/buttons';
 
-
+/**
+ * Icons
+ */
+import AddIcon from '@mui/icons-material/Add';
+import { useTheme } from '@emotion/react';
 
 /**
  * A toolbar button component that inserts a tab structure into the editor.
  * @component
  * @returns A button with a tooltip labeled "Tabs" and a tab icon.
  */
-export const InsertTabs = () => {
+export const InsertTabs = ({ isDrawer }: { isDrawer?: boolean }) => {
   const editor = useCellValue(activeEditor$);
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
-
+  const theme: any = useTheme();
+  
   /**
    * Inserts default Tabs at the current selection
    * If it is NOT empty, nothing is inserted
@@ -46,7 +52,7 @@ export const InsertTabs = () => {
         return; //no applying tab to selection
       }
 
-      // create children tabs content nodes 
+      // create children tabs content nodes
       const theChildMDast = convertMarkdownToMdast(
         DEFAULT_TABS,
         syntaxExtensions,
@@ -57,7 +63,7 @@ export const InsertTabs = () => {
         type: 'containerDirective',
         name: 'tabs',
         attributes: {
-          style: "margin: 4px;",
+          style: 'margin: 4px;',
         },
         children: (theChildMDast?.children as BlockContent[]) || [],
       };
@@ -70,14 +76,51 @@ export const InsertTabs = () => {
   };
 
   return (
-    <ButtonWithTooltip
-      title="Insert Tabs"
-      aria-label="insert-tabs"
-      onClick={() => {
-        insertAtSelection();
-      }}
-    >
-      <TabIcon fontSize="small" />
-    </ButtonWithTooltip>
+    <>
+      {isDrawer ? (
+        <ButtonMinorUi
+          title="Insert Tabs"
+          aria-label="insert-tabs"
+          startIcon={
+            <>
+              <AddIcon
+                fontSize="large"
+                sx={{
+                  color: theme.palette.primary.main,
+                  fill: theme.palette.primary.main,
+                }}
+              />
+
+              <TabIcon
+                fontSize="small"
+                sx={{ fill: theme.palette.primary.main, marginRight: 1 }}
+              />
+            </>
+          }
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            margin: 1,
+            padding: 1,
+          }}
+          onClick={() => {
+            insertAtSelection();
+          }}
+        >
+          Tabs
+        </ButtonMinorUi>
+      ) : (
+        <ButtonWithTooltip
+          title="Insert Tabs"
+          aria-label="insert-tabs"
+          onClick={() => {
+            insertAtSelection();
+          }}
+        >
+          <TabIcon fontSize="small" />
+        </ButtonWithTooltip>
+      )}
+    </>
   );
 };

@@ -1,28 +1,36 @@
+
 import { usePublisher } from '@mdxeditor/gurx';
-import AudioFileIcon from '@mui/icons-material/AudioFile';
-import { openNewAudioDialog$ } from '../../plugins/audio';
-import { ButtonWithTooltip } from '@mdxeditor/editor';
+
+import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions';
+import { useTheme } from '@mui/material';
+import { ButtonMinorUi } from '@rapid-cmi5/ui';
+
 /**
  * Icons
  */
 import AddIcon from '@mui/icons-material/Add';
-import { useTheme } from '@mui/material';
-import { ButtonMinorUi } from '@rapid-cmi5/ui';
+import {
+  ButtonWithTooltip,
+  insertCodeBlock$,
+} from '@mdxeditor/editor';
+
 /**
- * A toolbar button that allows the user to insert audio.
- * For this button to work, you must include `audioPlugin`.
+ * A toolbar button that allows the user to insert a fenced code block.
+ * Once the code block is focused, you can construct a special code block toolbar for it, using the {@link ConditionalContents} primitive.
+ * See the {@link ConditionalContents} documentation for an example.
+ *
  * @group Toolbar Components
  */
-export const InsertAudio = ({ isDrawer }: { isDrawer?: boolean }) => {
-  const openNewAudioDialog = usePublisher(openNewAudioDialog$);
+export const InsertCodeBlock = ({ isDrawer }: { isDrawer?: boolean }) => {
+  const insertCodeBlock = usePublisher(insertCodeBlock$);
   const theme = useTheme();
 
   return (
     <>
       {isDrawer ? (
         <ButtonMinorUi
-          title="Insert Audio"
-          aria-label="insert-audio"
+          title="Insert Code Block"
+          aria-label="insert-code-block"
           startIcon={
             <>
               <AddIcon
@@ -32,7 +40,7 @@ export const InsertAudio = ({ isDrawer }: { isDrawer?: boolean }) => {
                   fill: theme.palette.primary.main,
                 }}
               />
-              <AudioFileIcon
+              <IntegrationInstructionsIcon
                 fontSize="small"
                 sx={{ fill: theme.palette.primary.main, marginRight: 1 }}
               />
@@ -45,20 +53,20 @@ export const InsertAudio = ({ isDrawer }: { isDrawer?: boolean }) => {
             padding: 1,
           }}
           onClick={() => {
-            openNewAudioDialog();
+            insertCodeBlock({});
           }}
         >
-          Audio
+          Code Block
         </ButtonMinorUi>
       ) : (
         <ButtonWithTooltip
-          title="Insert Audio"
-          aria-label="insert-audio"
+          title="Insert Code Block"
+          aria-label="insert-code-block"
           onClick={() => {
-            openNewAudioDialog();
+            insertCodeBlock({});
           }}
         >
-          <AudioFileIcon fontSize="small" />
+          <IntegrationInstructionsIcon fontSize="small" />
         </ButtonWithTooltip>
       )}
     </>

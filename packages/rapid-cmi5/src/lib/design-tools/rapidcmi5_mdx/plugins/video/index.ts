@@ -55,7 +55,6 @@ import {
 } from './MdastVideoVisitor';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
-export * from './VideoNode';
 
 export const CAN_USE_DOM: boolean =
   typeof window !== 'undefined' &&

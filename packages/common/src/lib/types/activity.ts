@@ -16,17 +16,19 @@ export type BaseActivity = {
 };
 
 export enum RC5ActivityTypeEnum {
-  scenario = 'Individual Training Scenario',
-  quiz = 'Quiz',
+  consoles = 'Team Exercise',
   ctf = 'Capture The Flag',
   download = 'Download File',
   jobe = 'Jobe In The Box',
-  consoles = 'Team Exercise Scenario',
+  quiz = 'Quiz',
+  scenario = 'Scenario',
 }
 
 export const ActivityType: string[] = Object.keys(RC5ActivityTypeEnum);
 
-export const activityLabels = Object.values(RC5ActivityTypeEnum);
+export const activityLabels = Object.values(RC5ActivityTypeEnum).sort((a, b) =>
+  a.localeCompare(b),
+);
 
 export const getDisplayNameFromSlideType = (activity: RC5ActivityTypeEnum) => {
   const lookUpKey =

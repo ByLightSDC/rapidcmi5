@@ -432,9 +432,14 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                       disabled={readOnly}
                       onClick={(e) => {
                         e.preventDefault();
-                        editor.update(() => {
-                          lexicalNode?.remove();
-                        });
+                        console.log('-------HEY NOW------');
+                        try {
+                          editor.update(() => {
+                            lexicalNode?.remove();
+                          });
+                        } catch (e) {
+                          console.log(e);
+                        }
                       }}
                     >
                       <DeleteForeverIcon />

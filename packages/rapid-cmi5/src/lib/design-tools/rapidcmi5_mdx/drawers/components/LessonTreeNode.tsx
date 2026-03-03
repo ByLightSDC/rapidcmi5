@@ -98,7 +98,7 @@ const lessonNodeActions = [
     icon: <EmojiEventsIcon color="inherit" />,
   },
   {
-    tooltip: 'Lesson Settings',
+    tooltip: 'Lesson Appearance',
     icon: <PaletteIcon color="inherit" />,
   },
   {

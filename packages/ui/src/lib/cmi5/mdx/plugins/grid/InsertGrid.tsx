@@ -18,6 +18,13 @@ import { placeCaretInsideDirective } from '../../util/caret';
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { DEFAULT_GRID } from './constants';
+import { ButtonMinorUi } from 'packages/ui/src/lib/utility/buttons';
+
+/**
+ * Icons
+ */
+import AddIcon from '@mui/icons-material/Add';
+import { useTheme } from '@mui/material';
 
 /**
  * Checks if the current selection is inside a grid container or grid cell.
@@ -62,9 +69,10 @@ const isInsideGrid = (editor: any): boolean => {
  * @component
  * @returns A button with a tooltip labeled "Insert Layout Grid" and a grid icon.
  */
-export const InsertGrid = () => {
+export const InsertGrid = ({ isDrawer }: { isDrawer?: boolean }) => {
   const editor = useCellValue(activeEditor$);
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
+  const theme = useTheme();
 
   /**
    * Inserts default Grid at the current selection.
@@ -113,14 +121,51 @@ export const InsertGrid = () => {
   };
 
   return (
-    <ButtonWithTooltip
-      title="Insert Layout Grid"
-      aria-label="insert-layout-grid"
-      onClick={() => {
-        insertAtSelection();
-      }}
-    >
-      <GridViewIcon fontSize="small" />
-    </ButtonWithTooltip>
+    <>
+      {isDrawer ? (
+        <ButtonMinorUi
+          title="Insert Layout Grid"
+          aria-label="insert-layout"
+          startIcon={
+            <>
+              <AddIcon
+                fontSize="large"
+                sx={{
+                  color: theme.palette.primary.main,
+                  fill: theme.palette.primary.main,
+                }}
+              />
+
+              <GridViewIcon
+                fontSize="small"
+                sx={{ fill: theme.palette.primary.main, marginRight: 1 }}
+              />
+            </>
+          }
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            margin: 1,
+            padding: 1,
+          }}
+          onClick={() => {
+            insertAtSelection();
+          }}
+        >
+          Layout Grid
+        </ButtonMinorUi>
+      ) : (
+        <ButtonWithTooltip
+          title="Insert Layout Grid"
+          aria-label="insert-layout-grid"
+          onClick={() => {
+            insertAtSelection();
+          }}
+        >
+          <GridViewIcon fontSize="small" />
+        </ButtonWithTooltip>
+      )}
+    </>
   );
 };

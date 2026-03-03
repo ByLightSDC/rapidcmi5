@@ -37,7 +37,7 @@ import ImportExportIcon from '@mui/icons-material/ImportExport';
 import IosShareIcon from '@mui/icons-material/IosShare';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 
-//import SettingsIcon from '@mui/icons-material/Settings';
+
 import { debugLogError, RowAction } from '@rapid-cmi5/ui';
 import { listItemProps } from './components/LessonTreeNode';
 import { useSelector } from 'react-redux';
@@ -145,8 +145,6 @@ export const LessonDrawer = () => {
   };
   const onCourseContextAction = (event: any, whichAction: number) => {
     switch (whichAction) {
-      // case CourseActionEnum.Configure:
-      //   break;
       case CourseActionEnum.TriggerRename:
         setMenuAnchorPos([event.clientX - 60, event.clientY + 20]);
         break;
@@ -205,6 +203,7 @@ export const LessonDrawer = () => {
 
             minWidth: '100px',
             marginTop: '4px',
+            marginBottom: 1,
             gap: 0.5,
           }}
         >
@@ -246,7 +245,7 @@ export const LessonDrawer = () => {
                   '&.Mui-disabled': { opacity: 0.45 },
                 })}
               >
-                <AddIcon fontSize="small" />
+                <AddIcon fontSize="inherit" />
               </IconButton>
             </span>
           </Tooltip>

@@ -7,11 +7,10 @@ import {
   Typography,
   Alert,
   Divider,
+  useTheme,
+  alpha,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 import {
@@ -29,6 +28,13 @@ import { useLexicalSelection } from '../hooks/useLexicalSelection';
 import { highlightAnimatedElement } from '../utils/updateAnimationIndicators';
 import { ButtonMinorUi } from '@rapid-cmi5/ui';
 
+/** Icons */
+import CloseIcon from '@mui/icons-material/Close';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import MotionPhotosAutoIcon from '@mui/icons-material/MotionPhotosAuto';
+
 /**
  * Main animation drawer component
  * Displays animation timeline and configuration
@@ -41,6 +47,7 @@ export function AnimationDrawer() {
   const toggleDrawer = usePublisher(toggleAnimationDrawer$);
   const moveUp = usePublisher(moveAnimationUp$);
   const moveDown = usePublisher(moveAnimationDown$);
+  const theme = useTheme();
 
   // Hook into Lexical selection
   const { selectedInfo, isAnimatable } = useLexicalSelection();
@@ -85,10 +92,8 @@ export function AnimationDrawer() {
     }
   }, [moveDown, selectedAnimationId]);
 
-  // Avoid rendering heavy drawer contents when closed
   if (!isOpen) {
     highlightAnimatedElement(null);
-    return null;
   }
 
   return (
@@ -110,23 +115,28 @@ export function AnimationDrawer() {
         },
       }}
     >
-      <Stack direction="column" sx={{ height: '100%' }}>
+      <Stack id="animation-library" direction="column" sx={{ height: '100%' }}>
         {/* Header */}
         <Stack
           direction="row"
           sx={{
             alignItems: 'center',
             padding: 2,
+             background: alpha(theme.palette.primary.main, 0.15),
             borderBottom: 1,
             borderColor: 'divider',
           }}
         >
-          <IconButton onClick={handleClose} aria-label="Close animation drawer">
+          <MotionPhotosAutoIcon color="primary"/>
+          <Typography variant="h6" sx={{ color:'primary.main', flex: 1, marginLeft: 1 }}>
+            Animation Library
+          </Typography>
+          <IconButton
+            onClick={handleClose}
+            aria-label="Close Animation Library"
+          >
             <CloseIcon />
           </IconButton>
-          <Typography variant="h6" sx={{ flex: 1, marginLeft: 1 }}>
-            Animation
-          </Typography>
         </Stack>
 
         {/* Selected Element Info */}

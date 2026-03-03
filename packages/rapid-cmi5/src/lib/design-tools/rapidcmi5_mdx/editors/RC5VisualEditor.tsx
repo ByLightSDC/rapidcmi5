@@ -20,7 +20,6 @@ import { history } from '@codemirror/commands';
 import { autocompletion } from '@codemirror/autocomplete';
 
 import '@mdxeditor/editor/style.css';
-import { RapidCmi5Toolbar } from '../toolbar/RapidCmi5Toolbar';
 
 import React, {
   RefObject,
@@ -33,9 +32,8 @@ import React, {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-// import SharedFormModals from '../../../shared-modals/SharedFormModals';
 import { Box, Typography, useTheme } from '@mui/material';
-import { RC5Context } from '../contexts/RC5Context';
+
 import {
   AdmonitionDirectiveDescriptor,
   debugLogError,
@@ -83,6 +81,7 @@ import {
 import { imagePlugin } from '../plugins/image';
 import { videoPlugin } from '../plugins/video';
 import { audioPlugin } from '../plugins/audio';
+import { RC5LinkDialog } from '../plugins/link/RC5LinkDialog';
 
 import {
   currentSlideNum,
@@ -94,15 +93,19 @@ import {
   currentAu,
   currentBlock,
 } from '../../../redux/courseBuilderReducer';
-import { ActivityDirectiveDescriptor } from './directives/ActivityDirectiveDescriptor';
+import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
 
 import { useImageFile } from '../data-hooks/useImageFile';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
-import { RC5LinkDialog } from '../plugins/link/RC5LinkDialog';
 
 import { directiveLinter } from './code/codeMirrorUtils';
+
+import { ActivityDirectiveDescriptor } from './directives/ActivityDirectiveDescriptor';
 import { LayoutBoxDirectiveDescriptor } from './directives/layout-box/LayoutBoxDirectiveDescriptor';
-import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
+
+import { RC5Context } from '../contexts/RC5Context';
+import { RapidCmi5Toolbar } from '../toolbar/RapidCmi5Toolbar';
+import { ErrorBoundary } from './ErrorBoundary';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -352,6 +355,7 @@ function RC5VisualEditor() {
           GridContainerDirectiveDescriptor,
           GridCellDirectiveDescriptor,
         ],
+        escapeUnknownTextDirectives: true,
       }),
       codeMirrorPlugin({
         codeBlockLanguages: languageList,
@@ -714,15 +718,17 @@ function RC5VisualEditor() {
               {generateLessonThemeStyleTag(themeClass, currentLessonTheme)}
             </style>
           )}
-          <MDXEditor
-            className={mdxTheme}
-            onChange={onChange}
-            ref={ref}
-            markdown={''}
-            plugins={thePlugins}
-            readOnly={!isEditing}
-            onError={onErrorHelper}
-          />
+          <ErrorBoundary>
+            <MDXEditor
+              className={mdxTheme}
+              onChange={onChange}
+              ref={ref}
+              markdown={''}
+              plugins={thePlugins}
+              readOnly={!isEditing}
+              onError={onErrorHelper}
+            />
+          </ErrorBoundary>
         </Box>
       ) : (
         <Box

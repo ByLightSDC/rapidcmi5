@@ -38,7 +38,6 @@ import type { BlockContent } from 'mdast';
 import {
   disableImageResize$,
   editImageToolbarComponent$,
-  ImageNode,
   imagePlaceholder$ as imagePlaceholderComponent$,
   imagePreviewHandler$,
 } from './index';
@@ -50,7 +49,7 @@ import {
   viewMode$,
   DirectiveNode,
 } from '@mdxeditor/editor';
-import { $isImageNode } from './ImageNode';
+import { $isImageNode,   ImageNode, } from './ImageNode';
 import ImageResizer from './ImageResizer';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 import { useSelector } from 'react-redux';

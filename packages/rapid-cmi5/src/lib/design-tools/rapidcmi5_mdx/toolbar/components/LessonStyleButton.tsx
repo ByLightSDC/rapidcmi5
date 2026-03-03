@@ -3,24 +3,26 @@ import { ButtonWithTooltip } from '@mdxeditor/editor';
 import { usePublisher } from '@mdxeditor/gurx';
 import MotionPhotosAutoIcon from '@mui/icons-material/MotionPhotosAuto';
 import { toggleAnimationDrawer$ } from '../../plugins/animation';
+import PaletteIcon from '@mui/icons-material/Palette';
+import { DRAWER_TYPE, drawerMode$ } from './drawers';
 
 /**
- * Toolbar button to toggle animation drawer
+ * Toolbar button to toggle Lesson Style Drawer
  */
-export const InsertAnimation = () => {
-  const toggle = usePublisher(toggleAnimationDrawer$);
+export const LessonStyleButton = () => {
+  const changeViewMode = usePublisher(drawerMode$);
 
   const handleClick = useCallback(() => {
-    toggle();
-  }, [toggle]);
+    changeViewMode(DRAWER_TYPE.STYLES);
+  }, [changeViewMode]);
 
   return (
     <ButtonWithTooltip
-      title="Animation Library"
+      title="Lesson Appearance"
       onClick={handleClick}
-      aria-label="Toggle Animation Library"
+      aria-label="Lesson Appearance"
     >
-      <MotionPhotosAutoIcon fontSize="medium" />
+      <PaletteIcon fontSize="medium" />
     </ButtonWithTooltip>
   );
 };

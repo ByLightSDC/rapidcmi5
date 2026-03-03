@@ -1,34 +1,51 @@
 import React from 'react';
 
-import { openNewVideoDialog$ } from '../../plugins/video';
 import { ButtonWithTooltip, readOnly$ } from '@mdxeditor/editor';
 import { useCellValues, usePublisher } from '@mdxeditor/gurx';
-import VideocamIcon from '@mui/icons-material/Videocam';
+
+import { insertActivityDirective$ } from '../../plugins/Activity';
+import { ContainerDirective } from 'mdast-util-directive';
+import { ButtonMinorUi, getDefaultData } from '@rapid-cmi5/ui';
+import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+
 /**
  * Icons
  */
 import AddIcon from '@mui/icons-material/Add';
-import { ButtonMinorUi } from '@rapid-cmi5/ui';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 import { useTheme } from '@mui/material';
+
 /**
- * This toolbar button allows the user to insert a video from either a URL
- * or a file.
- *
- * For the button to work, the 'videoPlugin' must be enabled in the
+ * This toolbar button allows the user to attach a file that can be downloaded
+ * follows the Activity pattern which is a directive that contains json
  * MDXEditor.
  * @group Toolbar Components
  */
-export const InsertVideo = ({ isDrawer }: { isDrawer?: boolean }) => {
-  const openNewVideoDialog = usePublisher(openNewVideoDialog$);
+export const InsertFile = ({ isDrawer }: { isDrawer?: boolean }) => {
   const [readOnly] = useCellValues(readOnly$);
+  const insertActivity = usePublisher(insertActivityDirective$);
   const theme = useTheme();
 
+  const handleInsert = () => {
+    insertActivity({
+      type: 'containerDirective',
+      attributes: {},
+      name: 'download',
+      children: [
+        {
+          type: 'code',
+          lang: 'json',
+          value: getDefaultData(RC5ActivityTypeEnum.download),
+        },
+      ],
+    } as ContainerDirective);
+  };
   return (
     <>
       {isDrawer ? (
         <ButtonMinorUi
-          title="Insert Video"
-          aria-label="insert-video"
+          title="File"
+          aria-label="insert-file"
           startIcon={
             <>
               <AddIcon
@@ -38,7 +55,7 @@ export const InsertVideo = ({ isDrawer }: { isDrawer?: boolean }) => {
                   fill: theme.palette.primary.main,
                 }}
               />
-              <VideocamIcon
+              <AttachFileIcon
                 fontSize="small"
                 sx={{ fill: theme.palette.primary.main, marginRight: 1 }}
               />
@@ -51,32 +68,22 @@ export const InsertVideo = ({ isDrawer }: { isDrawer?: boolean }) => {
             padding: 1,
           }}
           onClick={() => {
-            openNewVideoDialog();
+            handleInsert();
           }}
         >
-          Video
+          File
         </ButtonMinorUi>
       ) : (
         <ButtonWithTooltip
-          title="Insert Video"
-          aria-label="insert-video"
+          title="Insert File"
+          aria-label="insert-file"
           onClick={() => {
-            openNewVideoDialog();
+            handleInsert();
           }}
         >
-          <VideocamIcon fontSize="small" />
+          <AttachFileIcon fontSize="small" />
         </ButtonWithTooltip>
       )}
     </>
-    // <ButtonWithTooltip
-    //   title={'Insert video'}
-    //   aria-label="insert-video"
-    //   disabled={readOnly}
-    //   onClick={() => {
-    //     openNewVideoDialog();
-    //   }}
-    // >
-    //   <VideocamIcon />
-    // </ButtonWithTooltip>
   );
 };

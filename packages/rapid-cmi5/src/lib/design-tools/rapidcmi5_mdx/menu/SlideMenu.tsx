@@ -1,5 +1,4 @@
 import {
-  CircularProgress,
   IconButton,
   Stack,
   Tooltip,
@@ -10,7 +9,6 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
-import SaveIcon from '@mui/icons-material/Save';
 
 import {
   iconButtonSize,
@@ -30,7 +28,7 @@ import {
   defaultSlideContent,
   SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
-import { MessageType } from '../../course-builder/CourseBuilderTypes';
+
 import { useRC5Prompts } from '../modals/useRC5Prompts';
 import { RC5Context } from '../contexts/RC5Context';
 import { useContext, useMemo } from 'react';
@@ -48,19 +46,12 @@ import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
  * @param param0
  * @returns
  */
-export const SlideMenu = ({
-  extraOptions,
-}: {
-  extraOptions?: JSX.Element[];
-}) => {
+export const SlideMenu = () => {
   const dispatch = useDispatch();
   const currentSlideIndex = useSelector(currentSlideNum);
   const currentAuDir = useSelector(currentAuPath);
-  const isAppHeaderVisible = useSelector(appHeaderVisible);
   const { currentRepo, isGitLoaded, handleGetUniqueFilePath } =
     useContext(GitContext);
-  const isDirty = useSelector(isDisplayDirty);
-  const { promptDownloadCourseCMI5Zip, promptSaveCourseFile } = useRC5Prompts();
   const { lessonSlides, saveSlide } = useContext(RC5Context);
   const repoAccessObject = useSelector(currentRepoAccessObjectSel);
 
@@ -109,9 +100,6 @@ export const SlideMenu = ({
     dispatch(navigateSlide(currentSlideIndex - 1));
   };
 
-  const topOffset = useMemo(() => {
-    return isAppHeaderVisible ? 88 : 48;
-  }, [isAppHeaderVisible]);
   const theme = useTheme();
   const { palette } = theme;
   return (
@@ -127,34 +115,31 @@ export const SlideMenu = ({
       <Stack
         direction="row"
         sx={{
-          backgroundColor: 'transparent', //'#2222260D', //'background.paper' with 10% transparent,
+          backgroundColor: 'transparent',
           borderRadius: '6px',
           justifyContent: 'center',
           alignItems: 'center',
-          // background: palette.primary.main,
           padding: 0.25,
         }}
       >
-        {/* <Divider orientation="vertical" flexItem /> */}
-        <IconButton
-          aria-label="delete-slide"
-          color="secondary"
-          size={iconButtonSize}
-          style={iconButtonStyle}
-          disabled={lessonSlides.length <= 1}
-          onClick={() => {
-            onDeleteSlide();
-          }}
-        >
-          <Tooltip arrow title={`Delete Current Slide`} {...tooltipStyle}>
+        <Tooltip arrow title={`Delete Current Slide`} {...tooltipStyle}>
+          <IconButton
+            aria-label="delete-slide"
+            color="secondary"
+            size={iconButtonSize}
+            sx={iconButtonStyle}
+            disabled={lessonSlides.length <= 1}
+            onClick={() => {
+              onDeleteSlide();
+            }}
+          >
             <DeleteForeverIcon color="inherit" />
-          </Tooltip>
-        </IconButton>
+          </IconButton>
+        </Tooltip>
         <IconButton
           aria-label="prev-slide"
-          color="inherit"
           disabled={currentSlideIndex <= 0}
-          style={iconButtonStyle}
+          sx={iconButtonStyle}
           onClick={onPrevSlide}
         >
           <ArrowBackIcon color="inherit" />
@@ -170,7 +155,7 @@ export const SlideMenu = ({
         <IconButton
           aria-label="next-slide"
           disabled={currentSlideIndex >= lessonSlides.length - 1}
-          style={iconButtonStyle}
+          sx={iconButtonStyle}
           color="inherit"
           onClick={onNextSlide}
         >
@@ -189,54 +174,6 @@ export const SlideMenu = ({
             <NoteAddIcon color="primary" />
           </Tooltip>
         </IconButton>
-        {isGitLoaded ? (
-          <IconButton
-            className={isDirty ? 'blink-animation' : undefined}
-            aria-label="save-files"
-            data-testid="save-files-button"
-            disabled={!isDirty}
-            color="inherit"
-            size={iconButtonSize}
-            style={{
-              ...iconButtonStyle,
-              boxShadow: isDirty
-                ? '0 0 0 3px rgba(234, 147, 16, .50)'
-                : undefined,
-            }}
-            onClick={() => {
-              saveSlide();
-              promptSaveCourseFile(undefined, undefined, {
-                notify: MessageType.remountLesson,
-              });
-            }}
-          >
-            <Tooltip arrow title={`Save Files`} {...tooltipStyle}>
-              <SaveIcon color="inherit" />
-            </Tooltip>
-          </IconButton>
-        ) : (
-          <Tooltip title="Initializing Git repository - save functionality will be enabled soon.">
-            <CircularProgress size="1.5rem" />
-          </Tooltip>
-        )}
-        {extraOptions}
-        {/* <IconButton
-          aria-label="download-cmi5-zip"
-          color="inherit"
-          disabled={lessonSlides.length <= 0}
-          style={iconButtonStyle}
-          onClick={() => {
-            saveSlide();
-            promptDownloadCourseCMI5Zip();
-          }}
-        >
-          <Tooltip title="Publish Course" {...tooltipStyle}>
-            <Stack direction="row">
-              <ImportExportIcon />
-              <FolderZipIcon color="inherit" />
-            </Stack>
-          </Tooltip>
-        </IconButton> */}
       </Stack>
     </Stack>
   );
