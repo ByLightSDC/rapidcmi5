@@ -70,10 +70,15 @@ export const useCMI5Session = () => {
   const isCmi5RangeConnectionComplete = useSelector(auSessionInitializedSel);
 
   /**
-   * Gets Credentials for Console
-   * @param cmi5Instance
-   * @param rangeData
-   * @returns
+   * Fetches Guacamole console credentials from the DevOps API for a deployed scenario.
+   *
+   * Skips early if no scenarios are deployed. On success, dispatches credentials to Redux.
+   * If the response is empty or missing a password, retries up to {@link numRetries} times
+   * with a {@link retryDelay}ms delay between attempts. Both network errors and empty
+   * responses share the same retry/error-dispatch logic.
+   *
+   * @param cmi5Instance - The active CMI5 instance, used for registration ID and auth token.
+   * @param rangeData - Current range data; provides the deployed scenarios list.
    */
   const getConsoleCredentials = useCallback(
     async (cmi5Instance: Cmi5, rangeData: rangeDataType) => {
@@ -145,10 +150,14 @@ export const useCMI5Session = () => {
   );
 
   /**
-   * Posts a CMI5 users hashed authentication token to the LRS as a xAPI statment.
-   * DevopsAPI can then verify that the user on a particular AU ID is coming
-   * from a registered LRS that RangeOS trusts.
-   * @returns
+   * Sends the RangeOS auth xAPI statement to the LRS.
+   *
+   * Posts a hashed authentication token as an xAPI statement, which allows the DevOps API
+   * to verify that a request for a given AU ID originates from a trusted RangeOS LRS.
+   * This must succeed before any scenario or console initialization can proceed.
+   *
+   * @throws Re-throws any error from {@link sendRangeosAuthVerb} so the caller can handle it.
+   * @returns `true` on success.
    */
   const postAuAuth = async () => {
     try {
@@ -161,9 +170,19 @@ export const useCMI5Session = () => {
   };
 
   /**
-   * Initialize Session
-   * This function is responsible for setting up the cmi5 connection and sending the init verb to the LRS.
-   * It also saves the data in session storage so that you may refresh the page and continue using the course.
+   * Establishes the CMI5 session with the LRS.
+   *
+   * Handles the full CMI5 handshake, including page-refresh resumption via sessionStorage:
+   * 1. Short-circuits to test mode if `fetch === 'test'`.
+   * 2. Looks up an existing session in sessionStorage keyed by `registration + activityId`.
+   *    If the stored `fetchUrl` doesn't match the current launch params, the cache is discarded.
+   * 3. Attempts `cmi5Instance.initialize(cachedSession)`. If that fails, falls back to a
+   *    fresh `cmi5Instance.initialize()`. A failure on both is fatal — sets `cmi5ErrorMessage`
+   *    and returns early.
+   * 4. Sends the `Initialized` xAPI verb to the LRS (non-fatal if this fails).
+   * 5. Stores the auth token (unless SSO is enabled) and persists session data to sessionStorage
+   *    so subsequent page loads can skip the fetch step.
+   * 6. Sets `isInitSessionCmi5Complete` to `true` to signal downstream state machines.
    */
   const initializeSessionCmi5 = async () => {
     setIsInitSessionCmi5Complete(false);
@@ -340,7 +359,15 @@ export const useCMI5Session = () => {
   };
 
   /**
-   * Kick off scenario
+   * Requests scenario deployment from the DevOps API.
+   *
+   * POSTs to `/scenarios` with the current `classId` to trigger a RangeOS scenario deployment
+   * for this registration. Retries up to {@link numRetries} times with a {@link retryDelay}ms
+   * delay if the response contains no deployed scenarios.
+   *
+   * On success: persists the assigned `classId` to localStorage, dispatches it to Redux,
+   * clears any existing errors, and shows a success toast.
+   * On failure: dispatches the error message to Redux and retries if attempts remain.
    */
   const initializeScenarios = useCallback(async () => {
     debugLog('Calling init scenarios', classId);
@@ -427,10 +454,21 @@ export const useCMI5Session = () => {
   }, [classId, dispatch, displayToaster]);
 
   /**
-   * main loop
-   * We will use this function to set up the connection between the Range and the cmi5 course.
-   * A hashed token will be sent to the LRS which will then be picked up by the Range Engine allowing
-   * for a scenario to be deployed and console credentials to be provided.
+   * Connects the authenticated CMI5 session to RangeOS.
+   *
+   * Called after `initializeSessionCmi5` completes. Orchestrates the RangeOS side of setup:
+   * 1. Calls `postAuAuth` to register the hashed token with the LRS, enabling the Range Engine
+   *    to trust subsequent requests from this AU.
+   * 2. Resets scenario and console retry counters.
+   * 3. If the AU has a scenario:
+   *    - If `shouldPromptClassId` is true and no classId is cached, opens the class prompt modal.
+   *    - Otherwise calls `initializeScenarios` directly and marks the session initialized.
+   * 4. If the AU has no scenario, marks the session initialized immediately.
+   *
+   * On error, sets `cmi5ErrorMessage` and reloads the page with test query params as a fallback.
+   *
+   * @param shouldPromptClassId - Whether this AU requires a class ID before initializing scenarios.
+   * @param auHasScenario - Whether this AU has an associated RangeOS scenario.
    */
   const initializeCmi5WithRange = async (
     shouldPromptClassId: boolean,

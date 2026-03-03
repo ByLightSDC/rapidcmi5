@@ -90,7 +90,7 @@ function AuManager() {
     testCmi5,
     isCmi5RangeConnectionComplete,
     cmi5ErrorMessage,
-    isInitSessionCmi5Complete
+    isInitSessionCmi5Complete,
   } = useCMI5Session();
 
   const {
@@ -200,7 +200,7 @@ function AuManager() {
         auJsonExists: !!auJson,
         auJsonSlidesLength: auJson?.slides?.length || 0,
         auJsonSlides:
-          auJson?.slides?.map((slide: SlideType, index: number) => ({
+          auJson?.slides?.map((slide, index) => ({
             index,
             filepath: slide.filepath,
             title: slide.slideTitle,
@@ -267,12 +267,13 @@ function AuManager() {
     return null;
   }, [auManagerState, loadingMessage]);
 
-  const shouldRequireClassId = !!auJson.promptClassId;
-  const auHasScenario = !!(
-    auJson.rangeosScenarioUUID || auJson.rangeosScenarioName
-  );
-  const auHasTeamScenario = !!auJson.teamSSOEnabled;
+  const shouldRequireClassId = auJson.promptClassId
+    ? auJson.promptClassId
+    : false;
 
+  const auHasScenario =
+    auJson.rangeosScenarioUUID || auJson.rangeosScenarioName ? true : false;
+  const auHasTeamScenario = auJson.teamSSOEnabled ? true : false;
   /**
    * UE Manages Session State
    */
