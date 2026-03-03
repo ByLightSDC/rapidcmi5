@@ -1,5 +1,5 @@
 /*MUI */
-import { styled } from '@mui/material';
+import { alpha, styled, useTheme } from '@mui/material';
 
 import Button, { ButtonProps } from '@mui/material/Button';
 import Chip, { ChipProps } from '@mui/material/Chip';
@@ -28,7 +28,7 @@ import {
   IconButtonProps,
   Popper,
 } from '@mui/material';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { copyTextToClipboard } from './copy';
@@ -44,7 +44,12 @@ export function ButtonInfoField({
   alertProps = { icon: defaultInfoIcon, severity: 'info' },
   alertSxProps = {},
   boxProps = {},
-  infoIcon = <QuestionMarkIcon fontSize="small" />,
+  infoIcon = (
+    <QuestionMarkIcon
+      fontSize="small"
+      //sx={{ backgroundColor: 'info.light', borderRadius: 18 }}
+    />
+  ),
   name = '',
   props = {},
   message = 'More Information',
@@ -79,6 +84,11 @@ export function ButtonInfoField({
   const [anchorEl, setAnchorEl] = useState(null);
   const [isAlert, setIsAlert] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
+  const theme = useTheme();
+
+  const bgColor = useMemo(() => {
+    return alpha(theme.palette.info.light, 0.15);
+  }, [theme.palette.info.light]);
 
   const handleClick = (event: any) => {
     event.stopPropagation();
@@ -134,6 +144,7 @@ export function ButtonInfoField({
           id={name || 'button-info'}
           name={name || 'button-info'}
           props={{ ...props }}
+          sxProps={{ backgroundColor: bgColor }}
         >
           {infoIcon}
         </ButtonIcon>

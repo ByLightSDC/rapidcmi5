@@ -26,6 +26,7 @@ import {
   iconComponentFor$,
   useCellValues,
   useTranslation,
+  InsertTable,
 } from '@mdxeditor/editor';
 import { CLEAR_HISTORY_COMMAND } from 'lexical';
 import { InsertImage } from './components/InsertImage';
@@ -51,6 +52,9 @@ import {
   CONTENT_UPDATED_COMMAND,
   dividerColor,
   InsertGrid,
+  InsertAccordion,
+  InsertSteps,
+  InsertTabs,
 } from '@rapid-cmi5/ui';
 import { displayData } from '../../../redux/courseBuilderReducer';
 import { SlideMenu } from '../menu/SlideMenu';
@@ -59,6 +63,17 @@ import { ModePreviewButton } from './components/ModePreviewButton';
 import { SaveSlideButton } from './components/SaveSlideButton';
 import { LessonStyleButton } from './components/LessonStyleButton';
 import { InsertFile } from './components/InsertFile';
+import { InsertLayoutBox } from './components/InsertLayoutBox';
+import { InsertThematicBreak } from './components/InsertThematicBreak';
+
+/**
+ * Layout Constants
+ *
+ */
+const leftToolWidthContainer = 609;
+const rightToolWidthContainer = 96;
+const toolIconWidth = 29.0;
+const rightToolbarMargin = 24;
 
 /**
  * A toolbar component that includes all toolbar components.
@@ -76,6 +91,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef<HTMLDivElement>(null);
   const [leftToolbarPos, setLeftToolbarPos] = useState<number | 0>(0);
+  const [maxExtraToolsWidth, setMaxExtraToolsWidth] = useState(0);
   const [isMoreTextTools, setIsMoreTextTools] = useState(false);
   const [viewMode, iconComponentFor] = useCellValues(
     viewMode$,
@@ -116,8 +132,18 @@ export const RapidCmi5Toolbar: React.FC = () => {
         const rect = toolbarRef.current.getBoundingClientRect();
         // Calculate the absolute position relative to the document
         const left = rect.left + window.scrollX;
+
+        // calculate extra width where additional tools can be injected
+        const extraWidth =
+          window.innerWidth -
+          (left + leftToolWidthContainer + rightToolWidthContainer);
+        const fitCount = Math.floor(extraWidth / toolIconWidth);
+        
+        // avoid partial display
+        setMaxExtraToolsWidth(fitCount * toolIconWidth);
+
         //tool bar left plus 24 px right margin
-        setLeftToolbarPos(left + 24);
+        setLeftToolbarPos(left + rightToolbarMargin);
       }
     };
 
@@ -154,7 +180,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
         <Stack direction="column" spacing={1} sx={{ padding: 1 }}>
           {viewmode === 'rich-text' && (
             <Stack direction="row" spacing={1}>
-              <Stack direction="row" spacing={1} sx={{ flexGrow: 1 }}>
+              <Stack direction="row" spacing={0} sx={{ flexGrow: 1 }}>
                 <BoldItalicUnderlineToggles />
 
                 <ColorTextSplitButton />
@@ -199,17 +225,51 @@ export const RapidCmi5Toolbar: React.FC = () => {
                 <Separator />
                 <BlockTypeSelect />
                 <Separator />
-                <InsertImage />
-                <InsertAudio />
-                <InsertVideo />
-                <InsertFile />
-                <InsertCodeBlock />
-                {/*REF <InsertLayoutBox /> */}
-                <InsertGrid />
-                <Separator />
-                <LessonStyleButton />
-                <InsertAnimation />
-                <InsertBlockMenu />
+                {maxExtraToolsWidth > 0 && (
+                  <Stack
+                    direction="row"
+                    sx={{
+                      flexGrow: 1,
+                      display: 'flex',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      sx={{
+                        width: `${maxExtraToolsWidth}px`,
+                        flexWrap: 'nowrap',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      <InsertImage />
+                      <InsertVideo />
+                      <InsertAudio />
+                      <InsertFile />
+                      <InsertCodeBlock />
+                      <InsertGrid />
+                      <InsertLayoutBox />
+                      <Separator />
+                      <InsertAccordion />
+                      <InsertSteps />
+                      <InsertTable />
+                      <InsertTabs />
+                      <InsertThematicBreak />
+                    </Stack>
+                    <Separator />
+                  </Stack>
+                )}
+                <Stack
+                  direction="row"
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                  }}
+                >
+                  <LessonStyleButton />
+                  <InsertAnimation />
+                  <InsertBlockMenu />
+                </Stack>
               </Stack>
             </Stack>
           )}
