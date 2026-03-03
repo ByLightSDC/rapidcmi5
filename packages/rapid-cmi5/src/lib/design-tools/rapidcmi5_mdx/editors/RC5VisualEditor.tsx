@@ -720,28 +720,21 @@ function RC5VisualEditor() {
               {generateLessonThemeStyleTag(themeClass, currentLessonTheme)}
             </style>
           )}
-          <MDXEditor
-            className={mdxTheme}
-            onChange={onChange}
-            ref={ref}
-            markdown={''}
-            plugins={thePlugins}
-            readOnly={!isEditing}
-            onError={onErrorHelper}
-          />
-          
+
           <ErrorBoundary>
-		  <LessonThemeContext.Provider value={{ lessonTheme: currentLessonTheme }}>
-            <MDXEditor
-              className={mdxTheme}
-              onChange={onChange}
-              ref={ref}
-              markdown={''}
-              plugins={thePlugins}
-              readOnly={!isEditing}
-              onError={onErrorHelper}
-            />
-          </LessonThemeContext.Provider>
+            <LessonThemeContext.Provider
+              value={{ lessonTheme: currentLessonTheme }}
+            >
+              <MDXEditor
+                className={mdxTheme}
+                onChange={onChange}
+                ref={ref}
+                markdown={''}
+                plugins={thePlugins}
+                readOnly={!isEditing}
+                onError={onErrorHelper}
+              />
+            </LessonThemeContext.Provider>
           </ErrorBoundary>
         </Box>
       ) : (
