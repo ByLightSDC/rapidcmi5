@@ -74,7 +74,6 @@ export const TOCComponent = ({
   return (
     <Accordion
       expanded={isExpanded}
-      //onChange={toggleExpanded}
       key="TOC"
       variant="outlined"
       sx={{
