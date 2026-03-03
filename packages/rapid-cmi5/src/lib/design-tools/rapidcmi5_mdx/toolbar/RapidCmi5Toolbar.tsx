@@ -26,7 +26,6 @@ import {
   iconComponentFor$,
   useCellValues,
   useTranslation,
-  InsertTable,
 } from '@mdxeditor/editor';
 import { CLEAR_HISTORY_COMMAND } from 'lexical';
 import { InsertImage } from './components/InsertImage';
@@ -65,6 +64,7 @@ import { LessonStyleButton } from './components/LessonStyleButton';
 import { InsertFile } from './components/InsertFile';
 import { InsertLayoutBox } from './components/InsertLayoutBox';
 import { InsertThematicBreak } from './components/InsertThematicBreak';
+import { InsertTable } from './components/InsertTable';
 
 /**
  * Layout Constants
