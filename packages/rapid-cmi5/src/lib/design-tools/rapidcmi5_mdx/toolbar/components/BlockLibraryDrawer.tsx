@@ -79,6 +79,7 @@ export function BlockLibraryDrawer() {
           width: 360,
           maxWidth: '90vw',
           zIndex: 1400, // Ensure paper also has high z-index
+          overflowY: 'hidden',
         },
       }}
     >
@@ -110,75 +111,102 @@ export function BlockLibraryDrawer() {
             <CloseIcon />
           </IconButton>
         </Stack>
-        <Stack direction="column" spacing={2} sx={{ mt: 1 }}>
+        <Stack
+          direction="column"
+          sx={{
+            mt: 1,
+            height: '100%',
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
           <Box>
             <Alert severity="info" sx={{ margin: 2 }}>
               Expand a topic and click item to add it to the current slide.
             </Alert>
           </Box>
-          <ViewExpander
-            title="Activities"
-            defaultIsExpanded={false}
-            headerSxProps={headerSxProps}
-            rightMenuChildren={
-              <ButtonInfoField
-                alertSxProps={{
-                  maxWidth: '640px',
+          <Stack direction="column" spacing={2}>
+            <ViewExpander
+              title="Activities"
+              defaultIsExpanded={false}
+              headerSxProps={headerSxProps}
+              rightMenuChildren={
+                <ButtonInfoField
+                  alertSxProps={{
+                    maxWidth: '640px',
+                  }}
+                  popperPlacement="auto-end"
+                  message={
+                    <Markdown
+                      remarkPlugins={[remarkGfm]}
+                      rehypePlugins={[rehypeRaw, rehypeKatex]}
+                    >
+                      {activitiesTable}
+                    </Markdown>
+                  }
+                  triggerOnClick={true}
+                />
+              }
+              shouldStartWithDivider={true}
+              shouldEndWithDivider={true}
+            >
+              <Box sx={{ paddingLeft: 1, paddingRight: 1 }}>
+                <InsertActivities />
+              </Box>
+            </ViewExpander>
+            <ViewExpander
+              title="Admonitions"
+              defaultIsExpanded={false}
+              headerSxProps={headerSxProps}
+              shouldEndWithDivider={true}
+            >
+              <Box sx={{ paddingLeft: 1, paddingRight: 1 }}>
+                <InsertAdmonitions />
+              </Box>
+            </ViewExpander>
+            <ViewExpander
+              title="Layout"
+              defaultIsExpanded={false}
+              headerSxProps={headerSxProps}
+              shouldEndWithDivider={true}
+            >
+              <Stack
+                direction="column"
+                sx={{
+                  paddingLeft: 1,
+                  paddingRight: 1,
+                  display: 'flex',
+                  justifyContent: 'flex-start',
+                  alignContent: 'flex-start',
+                  alignItems: 'flex-start',
                 }}
-                popperPlacement="auto-end"
-                message={
-                  <Markdown
-                    remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[rehypeRaw, rehypeKatex]}
-                  >
-                    {activitiesTable}
-                  </Markdown>
-                }
-                triggerOnClick={true}
-              />
-            }
-            shouldStartWithDivider={true}
-            shouldEndWithDivider={true}
-          >
-            <InsertActivities />
-          </ViewExpander>
-          <ViewExpander
-            title="Admonitions"
-            defaultIsExpanded={false}
-            headerSxProps={headerSxProps}
-            shouldEndWithDivider={true}
-          >
-            <InsertAdmonitions />
-          </ViewExpander>
-          <ViewExpander
-            title="Layout"
-            defaultIsExpanded={false}
-            headerSxProps={headerSxProps}
-            shouldEndWithDivider={true}
-          >
-            <Stack direction="column">
-              <InsertAccordion isDrawer={true} />
-              <InsertGrid isDrawer={true} />
-              <InsertSteps isDrawer={true} />
-              <InsertTable isDrawer={true} />
-              <InsertTabs isDrawer={true} />
-              <InsertThematicBreak isDrawer={true} />
-            </Stack>
-          </ViewExpander>
-          <ViewExpander
-            title="Media"
-            defaultIsExpanded={false}
-            headerSxProps={headerSxProps}
-            shouldEndWithDivider={true}
-          >
-            <Stack direction="column">
-              <InsertAudio isDrawer={true} />
-              <InsertCodeBlock isDrawer={true} />
-              <InsertFile isDrawer={true} />
-              <InsertImage isDrawer={true} />
-              <InsertVideo isDrawer={true} />
-            </Stack>
-          </ViewExpander>
+              >
+                <InsertAccordion isDrawer={true} />
+                <InsertGrid isDrawer={true} />
+                <InsertSteps isDrawer={true} />
+                <InsertTable isDrawer={true} />
+                <InsertTabs isDrawer={true} />
+                <InsertThematicBreak isDrawer={true} />
+              </Stack>
+            </ViewExpander>
+            <ViewExpander
+              title="Media"
+              defaultIsExpanded={false}
+              headerSxProps={headerSxProps}
+              shouldEndWithDivider={true}
+            >
+              <Stack
+                direction="column"
+                sx={{ paddingLeft: 1, paddingRight: 1 }}
+              >
+                <InsertAudio isDrawer={true} />
+                <InsertCodeBlock isDrawer={true} />
+                <InsertFile isDrawer={true} />
+                <InsertImage isDrawer={true} />
+                <InsertVideo isDrawer={true} />
+              </Stack>
+            </ViewExpander>
+          </Stack>
         </Stack>
       </Stack>
     </Drawer>

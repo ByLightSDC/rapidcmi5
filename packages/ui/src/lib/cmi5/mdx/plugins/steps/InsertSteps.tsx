@@ -97,6 +97,7 @@ export const InsertSteps = ({ isDrawer }: { isDrawer?: boolean }) => {
             display: 'flex',
             justifyContent: 'flex-start',
             alignItems: 'center',
+            margin: 1,
             padding: 1,
           }}
           onClick={() => {
