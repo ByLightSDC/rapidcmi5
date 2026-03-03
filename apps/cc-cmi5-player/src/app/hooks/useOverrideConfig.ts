@@ -57,24 +57,12 @@ export const useOverrideConfigs = () => {
         'auManager',
       );
 
+      // If there is no launch data returned something is wrong
       if (!launchData) {
-        for (let attempt = 1; attempt <= 5; attempt++) {
-          logger.debug(
-            `Launch params not yet loaded, retrying (${attempt}/5)`,
-            'auManager',
-          );
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          launchData = cmi5Instance.launchData;
-          if (launchData) break;
-        }
-      }
-
-      if (!launchData) {
-        logger.debug(
-          'Launch params failed to load after 5 retries',
-          'auManager',
+        console.error('CMI5 workflow has failed to set launch data.');
+        throw Error(
+          'Launch data is null, there was an error in the cmi5 launch work flow',
         );
-        return;
       }
     }
 
@@ -200,9 +188,9 @@ export const useOverrideConfigs = () => {
 
       // Apply whitelisted launch params on top of cfg.json (launch params win)
       if (inProductionMode && launchData?.launchParameters) {
-        const launchParams = launchData.launchParameters
+        const launchParams = launchData.launchParameters;
         try {
-          console.log("launch params", launchParams)
+          console.log('launch params', launchParams);
           const parsedLaunchParams: { [key: string]: string | boolean } =
             JSON.parse(launchParams);
           const lpKeys = Object.keys(parsedLaunchParams);

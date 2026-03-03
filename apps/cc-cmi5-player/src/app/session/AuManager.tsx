@@ -85,12 +85,12 @@ function AuManager() {
   const {
     isAuthenticated,
     isTestMode,
-    initializeCmi5,
-    initializeSession,
+    initializeCmi5WithRange,
+    initializeSessionCmi5,
     testCmi5,
-    isSessionInitialized,
+    isCmi5RangeConnectionComplete,
     cmi5ErrorMessage,
-    isInitSessionComplete,
+    isInitSessionCmi5Complete
   } = useCMI5Session();
 
   const {
@@ -328,7 +328,7 @@ function AuManager() {
             dispatch(setIsConfigInitialized(true));
           }
         } else {
-          initializeSession();
+          initializeSessionCmi5();
           setAuManagerState(AuManagerState.authenticating);
         }
       }
@@ -338,7 +338,7 @@ function AuManager() {
       }
       return;
     } else if (auManagerState === AuManagerState.authenticating) {
-      if (isInitSessionComplete) {
+      if (isInitSessionCmi5Complete) {
         setAuManagerState(AuManagerState.loadingOverrides);
       }
       return;
@@ -353,7 +353,7 @@ function AuManager() {
       }
       return;
     } else if (auManagerState === AuManagerState.loadingScenario) {
-      if (isSessionInitialized) {
+      if (isCmi5RangeConnectionComplete) {
         // Add additional check for CMI5 readiness before calling resumeAU
         if (cmi5Instance.xapi !== null && cmi5Instance.xapi !== undefined) {
           logger.debug(
@@ -361,18 +361,12 @@ function AuManager() {
             undefined,
             'auManager',
           );
-          const doResume = async () => {
-            try {
-              await resumeAU(dispatch, isInitializedProgressData, auJson);
-            } catch (error) {
-              logger.error('[AU] resumeAU failed', { error }, 'auManager');
-            } finally {
-              setAuManagerState(AuManagerState.ready);
-              dispatch(setIsConfigInitialized(true));
-              setCmi5ReadyAttempts(0);
-            }
-          };
-          doResume();
+          resumeAU(dispatch, isInitializedProgressData, auJson); // gets cmi5 progress and sets active tab
+          setAuManagerState(AuManagerState.ready);
+          dispatch(setIsConfigInitialized(true));
+
+          // Reset CMI5 ready attempts on success
+          setCmi5ReadyAttempts(0);
         } else {
           // Wait a bit more for CMI5 to be ready, with retry limit
           const maxCmi5ReadyAttempts = 50; // 5 seconds max (50 * 100ms)
@@ -392,26 +386,15 @@ function AuManager() {
               undefined,
               'auManager',
             );
-            const doResumeFallback = async () => {
-              try {
-                await resumeAU(dispatch, isInitializedProgressData, auJson);
-              } catch (error) {
-                logger.error(
-                  '[AU] resumeAU fallback failed',
-                  { error },
-                  'auManager',
-                );
-              } finally {
-                setAuManagerState(AuManagerState.ready);
-                dispatch(setIsConfigInitialized(true));
-                setCmi5ReadyAttempts(0);
-              }
-            };
-            doResumeFallback();
+            resumeAU(dispatch, isInitializedProgressData, auJson);
+            setAuManagerState(AuManagerState.ready);
+            dispatch(setIsConfigInitialized(true));
+
+            setCmi5ReadyAttempts(0);
           }
         }
       } else {
-        initializeCmi5(shouldRequireClassId, auHasScenario);
+        initializeCmi5WithRange(shouldRequireClassId, auHasScenario);
       }
       return;
     } else if (auManagerState === AuManagerState.error) {
@@ -451,7 +434,7 @@ function AuManager() {
         isContentLoaded &&
         isOverridesLoaded &&
         isAuthenticated &&
-        isSessionInitialized
+        isCmi5RangeConnectionComplete
       ) {
         // Only call progressAU if:
         // 1. We haven initialized progress data yet, OR
@@ -473,14 +456,14 @@ function AuManager() {
     isContentLoaded,
     isOverridesLoaded,
     isAuthenticated,
-    isSessionInitialized,
+    isCmi5RangeConnectionComplete,
     contentErrorMessage,
     cmi5ErrorMessage,
     auManagerState,
     auJson,
     activeTab, // Re-added to trigger progress updates on slide navigation
     cmi5ReadyAttempts, // Added to trigger CMI5 readiness checks
-    isInitSessionComplete,
+    isInitSessionCmi5Complete,
   ]);
 
   /**

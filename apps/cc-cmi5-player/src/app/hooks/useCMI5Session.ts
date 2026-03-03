@@ -63,13 +63,11 @@ export const useCMI5Session = () => {
   );
   const rangeDataAttempts = useRef<number>(0);
   const rangeConsoleDataAttempts = useRef<number>(0);
-
-  //const [isSessionInitialized, setIsSessioninitialized] = useState(false);
+  
   const [isTestMode, setIsTestMode] = useState(checkForDevMode());
   const [cmi5ErrorMessage, setCMI5ErrorMessage] = useState('');
-  const [initSessionError, setInitSessionError] = useState<string | null>(null);
-  const [isInitSessionComplete, setIsInitSessionComplete] = useState(false);
-  const isSessionInitialized = useSelector(auSessionInitializedSel);
+  const [isInitSessionCmi5Complete, setIsInitSessionCmi5Complete] = useState(false);
+  const isCmi5RangeConnectionComplete = useSelector(auSessionInitializedSel);
 
   /**
    * Gets Credentials for Console
@@ -164,11 +162,11 @@ export const useCMI5Session = () => {
 
   /**
    * Initialize Session
-   * @returns
+   * This function is responsible for setting up the cmi5 connection and sending the init verb to the LRS.
+   * It also saves the data in session storage so that you may refresh the page and continue using the course.
    */
-  const initializeSession = async () => {
-    setInitSessionError(null);
-    setIsInitSessionComplete(false);
+  const initializeSessionCmi5 = async () => {
+    setIsInitSessionCmi5Complete(false);
     const launchParams = cmi5Instance.getLaunchParameters();
     console.log('🚀 CMI5 Player Launch Parameters:', {
       fetch: launchParams.fetch,
@@ -181,7 +179,7 @@ export const useCMI5Session = () => {
     if (cmi5Instance.getLaunchParameters().fetch === 'test') {
       debugLog('Cmi5 is in test mode');
       setIsTestMode(true);
-      setIsInitSessionComplete(true);
+      setIsInitSessionCmi5Complete(true);
       return;
     }
 
@@ -281,14 +279,12 @@ export const useCMI5Session = () => {
         );
         const errorMsg = 'Error initializing CMI5 with new session';
         setCMI5ErrorMessage(errorMsg);
-        setInitSessionError(errorMsg);
         return;
       }
     }
 
-    console.info('Successful CMI5 Session initialization', initializeData);
+    debugLog('Successful CMI5 Session initialization', initializeData);
     setCMI5ErrorMessage('');
-    setInitSessionError(null);
 
     // CRITICAL LOGGING: Track xAPI instance status
     console.log('🔍 xAPI Instance Status After Initialization:', {
@@ -301,9 +297,7 @@ export const useCMI5Session = () => {
 
     // Send Initialized verb to LRS after successful CMI5 initialization
     try {
-      sendInitializedVerb().catch((error) => {
-        debugLog('error sending initialized verb ', error);
-      });
+      await sendInitializedVerb();
     } catch (error) {
       debugLog('Error sending Initialized verb to LRS:', error);
       console.log('Error sending Initialized verb to LRS');
@@ -330,7 +324,7 @@ export const useCMI5Session = () => {
     });
     sessionStorage.setItem(sessionStorageId, JSON.stringify(sessionData));
 
-    setIsInitSessionComplete(true);
+    setIsInitSessionCmi5Complete(true);
   };
 
   /**
@@ -434,8 +428,11 @@ export const useCMI5Session = () => {
 
   /**
    * main loop
+   * We will use this function to set up the connection between the Range and the cmi5 course.
+   * A hashed token will be sent to the LRS which will then be picked up by the Range Engine allowing
+   * for a scenario to be deployed and console credentials to be provided.
    */
-  const initializeCmi5 = async (
+  const initializeCmi5WithRange = async (
     shouldPromptClassId: boolean,
     auHasScenario: boolean,
   ) => {
@@ -475,7 +472,6 @@ export const useCMI5Session = () => {
       // reload without query params
       document.location.search =
         'endpoint=test&fetch=test&actor=test&activityId=test&registration=test';
-      // console.log('Cmi5 params not working, assuming test, ', error);
     }
   };
 
@@ -522,13 +518,13 @@ export const useCMI5Session = () => {
   }, [savedRangeConsoleDataAttempts, getConsoleCredentials, rangeData]);
 
   return {
-    initializeCmi5,
-    initializeSession,
+    initializeCmi5WithRange,
+    initializeSessionCmi5,
     initializeScenarios,
     isAuthenticated: cmi5Instance?.isAuthenticated,
-    isSessionInitialized,
-    isInitSessionComplete,
-    initSessionError,
+    isCmi5RangeConnectionComplete,
+    setIsInitSessionCmi5Complete,
+    isInitSessionCmi5Complete,
     isTestMode,
     testCmi5,
     cmi5ErrorMessage,
