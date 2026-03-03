@@ -10,10 +10,12 @@ import {
   Stack,
   IconButton,
   alpha,
+  Box,
 } from '@mui/material';
 import TocIcon from '@mui/icons-material/Toc';
 import { TableOfContentsEntry } from './TocPlugin';
 import CloseIcon from '@mui/icons-material/Close';
+
 /**
  * TOCComponent (Table of Contents Component)
  *
@@ -102,7 +104,22 @@ export const TOCComponent = ({
         expandIcon={
           isExpanded ? null : (
             <Tooltip title="Table of Contents: Click to expand, then click on a heading to jump to its location in the slide.">
-              <span style={{ fontSize: '28px' }}>
+              <Box
+                sx={{
+                  backgroundColor: 'primary.main',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: '2px',
+                  borderRadius: 8,
+                  '&:hover': {
+                    bgcolor: alpha(theme.palette.primary.main, 0.3),
+                  },
+                  fontSize: '24px',
+                  width: '32px',
+                  height: '32px',
+                }}
+              >
                 <TocIcon
                   onClick={() => {
                     setIsExpanded(true);
@@ -110,18 +127,10 @@ export const TOCComponent = ({
                   color="action"
                   fontSize="inherit"
                   sx={{
-                    backgroundColor: 'primary.main',
                     color: 'white',
-                    margin: '1px',
-                    marginBottom: 0,
-                    padding: '2px',
-                    borderRadius: 8,
-                    '&:hover': {
-                      bgcolor: alpha(theme.palette.primary.main, 0.3),
-                    },
                   }}
                 />
-              </span>
+              </Box>
             </Tooltip>
           )
         }

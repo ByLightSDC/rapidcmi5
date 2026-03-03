@@ -3,7 +3,6 @@
  *   All rights reserved.
  */
 import Button, { ButtonProps } from '@mui/material/Button';
-//import styled from '@emotion/styled';
 
 /* Material UI */
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';

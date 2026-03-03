@@ -2,16 +2,6 @@
  * Constants for displaying help information 
  */
 
-export const ctfInfoText =
-  'Participants solve independent challenges across several categories to “capture flags';
-export const jobeInfoText =
-  'Hands-on coding and execution environment that allows participants to write and run code inside an isolated sandbox without requiring local setup.';
-export const quizInfoText =
-  'Structured assessment tool used to measure learner understanding of course material.';
-export const scenarioInfoText =
-  'A RangeOS Scenario is a fully interactive cybersecurity simulation delivered through a live cyber range environment. It provides structured training content alongside direct console access to systems within the range, allowing learners to perform real-world tasks in a controlled setting.';
-export const teamExerciseInfoText =
-  'A shared interactive cybersecurity simulation where multiple participants share access to deployed resources.';
 
 export const activitiesInfoText = `| Activity Type      | Description |
 |--------------------|-------------|

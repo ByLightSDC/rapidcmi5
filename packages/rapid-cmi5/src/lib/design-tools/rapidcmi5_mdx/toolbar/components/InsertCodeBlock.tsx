@@ -1,8 +1,6 @@
-import React from 'react';
-//import { ButtonWithTooltip } from '.././primitives/toolbar'
-//import { insertCodeBlock$ } from '../../codeblock/'
-import { useCellValue, usePublisher } from '@mdxeditor/gurx';
-//import { iconComponentFor$, useTranslation } from '../../core'
+
+import { usePublisher } from '@mdxeditor/gurx';
+
 import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions';
 import { useTheme } from '@mui/material';
 import { ButtonMinorUi } from '@rapid-cmi5/ui';
@@ -13,9 +11,7 @@ import { ButtonMinorUi } from '@rapid-cmi5/ui';
 import AddIcon from '@mui/icons-material/Add';
 import {
   ButtonWithTooltip,
-  iconComponentFor$,
   insertCodeBlock$,
-  useTranslation,
 } from '@mdxeditor/editor';
 
 /**
