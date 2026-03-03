@@ -225,7 +225,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
       parentEditor.update(() => {
         const attributes: Record<string, string> = {};
         if (bgColor) {
-          attributes.backgroundColor = bgColor;
+          attributes['backgroundColor'] = bgColor;
         }
 
         const mdast: ContainerDirective = {
