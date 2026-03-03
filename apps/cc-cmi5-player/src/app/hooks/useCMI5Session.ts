@@ -154,9 +154,7 @@ export const useCMI5Session = () => {
    */
   const postAuAuth = async () => {
     try {
-      sendRangeosAuthVerb().catch((error) => {
-        debugLog('error sending hash token statement ', error);
-      });
+      await sendRangeosAuthVerb();
       return true;
     } catch (error) {
       debugLog('error sending hash token statement ', error);
@@ -312,28 +310,26 @@ export const useCMI5Session = () => {
       // Don't throw error - initialization should continue even if LRS statement fails
     }
 
-    if (sessionStorageId === undefined) return;
     const authToken = cmi5Instance.getAuthToken();
     if (!config.CMI5_SSO_ENABLED) {
       storeAuthToken(authToken);
     }
     const initializedDate = cmi5Instance.getInitializedDate();
     // Store this in session storage since fetch can only be done once and we need the token on page refresh
-    if (sessionStorageId) {
-      const sessionData = {
-        authToken,
-        initializedDate: initializedDate.getTime(),
-        activityId: cmi5Instance.getLaunchParameters().activityId, // Store the activity ID for comparison
-        fetchUrl: launchParams.fetch,
-      };
-      console.log('💾 Storing CMI5 session data:', {
-        sessionStorageId,
-        authToken: authToken ? `${authToken.substring(0, 20)}...` : 'null',
-        initializedDate: initializedDate.toISOString(),
-        activityId: sessionData.activityId,
-      });
-      sessionStorage.setItem(sessionStorageId, JSON.stringify(sessionData));
-    }
+    const sessionData = {
+      authToken,
+      initializedDate: initializedDate.getTime(),
+      activityId: cmi5Instance.getLaunchParameters().activityId, // Store the activity ID for comparison
+      fetchUrl: launchParams.fetch,
+    };
+    console.log('💾 Storing CMI5 session data:', {
+      sessionStorageId,
+      authToken: authToken ? `${authToken.substring(0, 20)}...` : 'null',
+      initializedDate: initializedDate.toISOString(),
+      activityId: sessionData.activityId,
+    });
+    sessionStorage.setItem(sessionStorageId, JSON.stringify(sessionData));
+
     setIsInitSessionComplete(true);
   };
 
@@ -372,7 +368,11 @@ export const useCMI5Session = () => {
           rangeDataAttempts.current = rangeDataAttempts.current + 1;
           console.log('rangeDataAttempts.current', rangeDataAttempts.current);
           errorMessage =
-            errorMessage + '. Retrying...' + rangeDataAttempts.current + '/5';
+            errorMessage +
+            '. Retrying...' +
+            rangeDataAttempts.current +
+            '/' +
+            numRetries;
           setTimeout(() => {
             initializeScenarios();
           }, retryDelay);
@@ -506,7 +506,7 @@ export const useCMI5Session = () => {
       debugLog('UE rangeData loaded, get console creds', rangeData);
       getConsoleCredentials(cmi5Instance, rangeData);
     }
-  }, [rangeData, rangeData.deployedScenarios, getConsoleCredentials]);
+  }, [rangeData, getConsoleCredentials]);
 
   /**
    *
