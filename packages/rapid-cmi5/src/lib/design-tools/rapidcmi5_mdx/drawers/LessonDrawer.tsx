@@ -37,7 +37,7 @@ import ImportExportIcon from '@mui/icons-material/ImportExport';
 import IosShareIcon from '@mui/icons-material/IosShare';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 
-//import SettingsIcon from '@mui/icons-material/Settings';
+
 import { debugLogError, RowAction } from '@rapid-cmi5/ui';
 import { listItemProps } from './components/LessonTreeNode';
 import { useSelector } from 'react-redux';
