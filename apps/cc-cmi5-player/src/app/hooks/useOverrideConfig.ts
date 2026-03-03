@@ -23,7 +23,6 @@ export type DeploymentLocation = {
  */
 export const useOverrideConfigs = () => {
   const [isOverridesLoaded, setIsOverridesLoaded] = useState(false);
-  useState(false);
 
   const dispatch = useDispatch();
 
@@ -59,9 +58,8 @@ export const useOverrideConfigs = () => {
 
       // If there is no launch data returned something is wrong
       if (!launchData) {
-        console.error('CMI5 workflow has failed to set launch data.');
-        throw Error(
-          'Launch data is null, there was an error in the cmi5 launch work flow',
+        console.error(
+          'CMI5 workflow has failed to set launch data, will not be able to use Launch Params',
         );
       }
     }
