@@ -23,9 +23,7 @@ import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
 import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
 import BlockIcon from '@mui/icons-material/Block';
-import ImageIcon from '@mui/icons-material/Image';
 import { ModalDialog, SelectorMainUi } from '@rapid-cmi5/ui';
-
 
 interface StyleProps {
   isOpen: boolean;
