@@ -8,7 +8,6 @@ import {
 } from './index';
 
 import { useCellValues, usePublisher } from '@mdxeditor/gurx';
-import { StyleDialog } from './StyleDialog';
 
 // MUI
 import { Box, Paper, Stack, Tooltip, Typography } from '@mui/material';
@@ -18,7 +17,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 
 import {
-  ButtonIcon,
   ButtonModalMainUi,
   ComboBoxSelectorUi,
   ModalDialog,
@@ -57,7 +55,6 @@ export const ImageDialog: React.FC = () => {
   const [title, setTitle] = useState<string>('');
   const [linkUrl, setLinkUrl] = useState<string>('');
   const [imageStyle, setImageStyle] = useState<string>('');
-  const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [fileOptions, setFileOptions] = useState<string[]>([]);
   const [width, setWidth] = useState<string>('');
@@ -278,7 +275,6 @@ export const ImageDialog: React.FC = () => {
               id="image"
               options={fileOptions}
               defaultValue={src.replace(IMAGE_DIR, '')}
-              // value={src}
               showAllOptions={true}
               autocompleteProps={{
                 freeSolo: true,
@@ -359,60 +355,9 @@ export const ImageDialog: React.FC = () => {
                 />
               </Grid>
             </Grid>
-
-            {/* Style section */}
-            <Grid container alignItems="center" sx={{ width: '100%' }}>
-              <Grid size={0.8}>
-                <ButtonIcon
-                  name="edit-style"
-                  props={{
-                    onClick: (event) => {
-                      setIsStyleDialogOpen(true);
-                    },
-                  }}
-                >
-                  <Tooltip
-                    arrow
-                    enterDelay={500}
-                    enterNextDelay={500}
-                    title="Edit Image Styles"
-                  >
-                    <EditIcon />
-                  </Tooltip>
-                </ButtonIcon>
-              </Grid>
-              <Grid size={11.2}>
-                <TextFieldMainUi
-                  autoFocus
-                  margin="dense"
-                  label="Styles"
-                  name="image-styles"
-                  type="text"
-                  fullWidth
-                  value={imageStyle}
-                  onChange={(textValue: string) => setImageStyle(textValue)}
-                  onClick={() => {
-                    setIsStyleDialogOpen(true);
-                  }}
-                  infoText="Inline styles Ex. opacity:0.5;"
-                  slotProps={{
-                    input: {
-                      readOnly: true,
-                    },
-                  }}
-                />
-              </Grid>
-            </Grid>
           </Stack>
-          {/*</DialogContent>*/}
         </>
       </ModalDialog>
-      <StyleDialog
-        isOpen={isStyleDialogOpen}
-        style={imageStyle}
-        setImageStyle={setImageStyle}
-        setIsStyleDialogOpen={setIsStyleDialogOpen}
-      />
     </>
   );
 };
