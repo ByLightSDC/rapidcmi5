@@ -54,6 +54,7 @@ import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { getDirectiveBlockShadow } from '../../../../styles/directiveStyles';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 
@@ -329,10 +330,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
    * without requiring width/transform changes that break inside overflow:hidden
    * ancestor containers. Content width is preserved — only the color spreads.
    */
-  const dropShadow =
-    muiTheme.palette.mode === 'dark'
-      ? '0 2px 6px rgba(0,0,0,0.5)'
-      : '0 2px 4px rgba(0,0,0,0.2)';
+  const dropShadow = getDirectiveBlockShadow(muiTheme);
 
   const fullWidthBackgroundSx: SxProps = backgroundColor
     ? {
