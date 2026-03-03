@@ -1,8 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import axios, { AxiosError } from 'axios';
-import { v4 as uuidv4 } from 'uuid';
-import sha256 from 'crypto-js/sha256';
-import { Statement } from '@xapi/xapi';
 import Cmi5 from '@xapi/cmi5';
 import { debugLog } from '../debug';
 
@@ -66,17 +63,22 @@ export const useCMI5Session = () => {
   );
   const rangeDataAttempts = useRef<number>(0);
   const rangeConsoleDataAttempts = useRef<number>(0);
-
-  //const [isSessionInitialized, setIsSessioninitialized] = useState(false);
+  
   const [isTestMode, setIsTestMode] = useState(checkForDevMode());
   const [cmi5ErrorMessage, setCMI5ErrorMessage] = useState('');
-  const isSessionInitialized = useSelector(auSessionInitializedSel);
+  const [isInitSessionCmi5Complete, setIsInitSessionCmi5Complete] = useState(false);
+  const isCmi5RangeConnectionComplete = useSelector(auSessionInitializedSel);
 
   /**
-   * Gets Credentials for Console
-   * @param cmi5Instance
-   * @param rangeData
-   * @returns
+   * Fetches Guacamole console credentials from the DevOps API for a deployed scenario.
+   *
+   * Skips early if no scenarios are deployed. On success, dispatches credentials to Redux.
+   * If the response is empty or missing a password, retries up to {@link numRetries} times
+   * with a {@link retryDelay}ms delay between attempts. Both network errors and empty
+   * responses share the same retry/error-dispatch logic.
+   *
+   * @param cmi5Instance - The active CMI5 instance, used for registration ID and auth token.
+   * @param rangeData - Current range data; provides the deployed scenarios list.
    */
   const getConsoleCredentials = useCallback(
     async (cmi5Instance: Cmi5, rangeData: rangeDataType) => {
@@ -148,16 +150,18 @@ export const useCMI5Session = () => {
   );
 
   /**
-   * Posts a CMI5 users hashed authentication token to the LRS as a xAPI statment.
-   * DevopsAPI can then verify that the user on a particular AU ID is coming
-   * from a registered LRS that RangeOS trusts.
-   * @returns
+   * Sends the RangeOS auth xAPI statement to the LRS.
+   *
+   * Posts a hashed authentication token as an xAPI statement, which allows the DevOps API
+   * to verify that a request for a given AU ID originates from a trusted RangeOS LRS.
+   * This must succeed before any scenario or console initialization can proceed.
+   *
+   * @throws Re-throws any error from {@link sendRangeosAuthVerb} so the caller can handle it.
+   * @returns `true` on success.
    */
   const postAuAuth = async () => {
     try {
-      sendRangeosAuthVerb().catch((error) => {
-        debugLog('error sending hash token statement ', error);
-      });
+      await sendRangeosAuthVerb();
       return true;
     } catch (error) {
       debugLog('error sending hash token statement ', error);
@@ -166,10 +170,22 @@ export const useCMI5Session = () => {
   };
 
   /**
-   * Initialize Session
-   * @returns
+   * Establishes the CMI5 session with the LRS.
+   *
+   * Handles the full CMI5 handshake, including page-refresh resumption via sessionStorage:
+   * 1. Short-circuits to test mode if `fetch === 'test'`.
+   * 2. Looks up an existing session in sessionStorage keyed by `registration + activityId`.
+   *    If the stored `fetchUrl` doesn't match the current launch params, the cache is discarded.
+   * 3. Attempts `cmi5Instance.initialize(cachedSession)`. If that fails, falls back to a
+   *    fresh `cmi5Instance.initialize()`. A failure on both is fatal — sets `cmi5ErrorMessage`
+   *    and returns early.
+   * 4. Sends the `Initialized` xAPI verb to the LRS (non-fatal if this fails).
+   * 5. Stores the auth token (unless SSO is enabled) and persists session data to sessionStorage
+   *    so subsequent page loads can skip the fetch step.
+   * 6. Sets `isInitSessionCmi5Complete` to `true` to signal downstream state machines.
    */
-  const initializeSession = async () => {
+  const initializeSessionCmi5 = async () => {
+    setIsInitSessionCmi5Complete(false);
     const launchParams = cmi5Instance.getLaunchParameters();
     console.log('🚀 CMI5 Player Launch Parameters:', {
       fetch: launchParams.fetch,
@@ -182,6 +198,7 @@ export const useCMI5Session = () => {
     if (cmi5Instance.getLaunchParameters().fetch === 'test') {
       debugLog('Cmi5 is in test mode');
       setIsTestMode(true);
+      setIsInitSessionCmi5Complete(true);
       return;
     }
 
@@ -279,12 +296,13 @@ export const useCMI5Session = () => {
           '💥 FATAL: Error initializing CMI5 with new session, this is a fatal error',
           error,
         );
-        //throw new Error('Error initializing CMI5 with new session');
-        setCMI5ErrorMessage('Error initializing CMI5 with new session');
+        const errorMsg = 'Error initializing CMI5 with new session';
+        setCMI5ErrorMessage(errorMsg);
+        return;
       }
     }
 
-    console.info('Successful CMI5 Session initialization', initializeData);
+    debugLog('Successful CMI5 Session initialization', initializeData);
     setCMI5ErrorMessage('');
 
     // CRITICAL LOGGING: Track xAPI instance status
@@ -298,16 +316,34 @@ export const useCMI5Session = () => {
 
     // Send Initialized verb to LRS after successful CMI5 initialization
     try {
-      sendInitializedVerb().catch((error) => {
-        debugLog('error sending initialized verb ', error);
-      });
+      await sendInitializedVerb();
     } catch (error) {
       debugLog('Error sending Initialized verb to LRS:', error);
       console.log('Error sending Initialized verb to LRS');
       // Don't throw error - initialization should continue even if LRS statement fails
     }
 
-    return { sessionStorageId, fetchUrl: launchParams.fetch };
+    const authToken = cmi5Instance.getAuthToken();
+    if (!config.CMI5_SSO_ENABLED) {
+      storeAuthToken(authToken);
+    }
+    const initializedDate = cmi5Instance.getInitializedDate();
+    // Store this in session storage since fetch can only be done once and we need the token on page refresh
+    const sessionData = {
+      authToken,
+      initializedDate: initializedDate.getTime(),
+      activityId: cmi5Instance.getLaunchParameters().activityId, // Store the activity ID for comparison
+      fetchUrl: launchParams.fetch,
+    };
+    console.log('💾 Storing CMI5 session data:', {
+      sessionStorageId,
+      authToken: authToken ? `${authToken.substring(0, 20)}...` : 'null',
+      initializedDate: initializedDate.toISOString(),
+      activityId: sessionData.activityId,
+    });
+    sessionStorage.setItem(sessionStorageId, JSON.stringify(sessionData));
+
+    setIsInitSessionCmi5Complete(true);
   };
 
   /**
@@ -323,7 +359,15 @@ export const useCMI5Session = () => {
   };
 
   /**
-   * Kick off scenario
+   * Requests scenario deployment from the DevOps API.
+   *
+   * POSTs to `/scenarios` with the current `classId` to trigger a RangeOS scenario deployment
+   * for this registration. Retries up to {@link numRetries} times with a {@link retryDelay}ms
+   * delay if the response contains no deployed scenarios.
+   *
+   * On success: persists the assigned `classId` to localStorage, dispatches it to Redux,
+   * clears any existing errors, and shows a success toast.
+   * On failure: dispatches the error message to Redux and retries if attempts remain.
    */
   const initializeScenarios = useCallback(async () => {
     debugLog('Calling init scenarios', classId);
@@ -345,7 +389,11 @@ export const useCMI5Session = () => {
           rangeDataAttempts.current = rangeDataAttempts.current + 1;
           console.log('rangeDataAttempts.current', rangeDataAttempts.current);
           errorMessage =
-            errorMessage + '. Retrying...' + rangeDataAttempts.current + '/5';
+            errorMessage +
+            '. Retrying...' +
+            rangeDataAttempts.current +
+            '/' +
+            numRetries;
           setTimeout(() => {
             initializeScenarios();
           }, retryDelay);
@@ -406,40 +454,28 @@ export const useCMI5Session = () => {
   }, [classId, dispatch, displayToaster]);
 
   /**
-   * main loop
+   * Connects the authenticated CMI5 session to RangeOS.
+   *
+   * Called after `initializeSessionCmi5` completes. Orchestrates the RangeOS side of setup:
+   * 1. Calls `postAuAuth` to register the hashed token with the LRS, enabling the Range Engine
+   *    to trust subsequent requests from this AU.
+   * 2. Resets scenario and console retry counters.
+   * 3. If the AU has a scenario:
+   *    - If `shouldPromptClassId` is true and no classId is cached, opens the class prompt modal.
+   *    - Otherwise calls `initializeScenarios` directly and marks the session initialized.
+   * 4. If the AU has no scenario, marks the session initialized immediately.
+   *
+   * On error, sets `cmi5ErrorMessage` and reloads the page with test query params as a fallback.
+   *
+   * @param shouldPromptClassId - Whether this AU requires a class ID before initializing scenarios.
+   * @param auHasScenario - Whether this AU has an associated RangeOS scenario.
    */
-  const initializeCmi5 = async (
+  const initializeCmi5WithRange = async (
     shouldPromptClassId: boolean,
     auHasScenario: boolean,
   ) => {
     debugLog('initialize CMI5 session', shouldPromptClassId);
     try {
-      const res = await initializeSession();
-      const sessionStorageId = res?.sessionStorageId;
-      const fetchUrl = res?.fetchUrl;
-
-      if (sessionStorageId === undefined) return;
-      const authToken = cmi5Instance.getAuthToken();
-      if (!config.CMI5_SSO_ENABLED) {
-        storeAuthToken(authToken);
-      }
-      const initializedDate = cmi5Instance.getInitializedDate();
-      // Store this in session storage since fetch can only be done once and we need the token on page refresh
-      if (sessionStorageId) {
-        const sessionData = {
-          authToken,
-          initializedDate: initializedDate.getTime(),
-          activityId: cmi5Instance.getLaunchParameters().activityId, // Store the activity ID for comparison
-          fetchUrl: fetchUrl,
-        };
-        console.log('💾 Storing CMI5 session data:', {
-          sessionStorageId,
-          authToken: authToken ? `${authToken.substring(0, 20)}...` : 'null',
-          initializedDate: initializedDate.toISOString(),
-          activityId: sessionData.activityId,
-        });
-        sessionStorage.setItem(sessionStorageId, JSON.stringify(sessionData));
-      }
       await postAuAuth();
       debugLog('has scenario', auHasScenario);
       rangeDataAttempts.current = 0;
@@ -474,7 +510,6 @@ export const useCMI5Session = () => {
       // reload without query params
       document.location.search =
         'endpoint=test&fetch=test&actor=test&activityId=test&registration=test';
-      // console.log('Cmi5 params not working, assuming test, ', error);
     }
   };
 
@@ -498,14 +533,14 @@ export const useCMI5Session = () => {
   }, [savedRangeDataAttempts, dispatch, initializeScenarios]);
 
   /**
-   * 
+   *
    */
   useEffect(() => {
     if (rangeData) {
       debugLog('UE rangeData loaded, get console creds', rangeData);
       getConsoleCredentials(cmi5Instance, rangeData);
     }
-  }, [rangeData, rangeData.deployedScenarios, getConsoleCredentials]);
+  }, [rangeData, getConsoleCredentials]);
 
   /**
    *
@@ -521,10 +556,13 @@ export const useCMI5Session = () => {
   }, [savedRangeConsoleDataAttempts, getConsoleCredentials, rangeData]);
 
   return {
-    initializeCmi5,
+    initializeCmi5WithRange,
+    initializeSessionCmi5,
     initializeScenarios,
     isAuthenticated: cmi5Instance?.isAuthenticated,
-    isSessionInitialized,
+    isCmi5RangeConnectionComplete,
+    setIsInitSessionCmi5Complete,
+    isInitSessionCmi5Complete,
     isTestMode,
     testCmi5,
     cmi5ErrorMessage,

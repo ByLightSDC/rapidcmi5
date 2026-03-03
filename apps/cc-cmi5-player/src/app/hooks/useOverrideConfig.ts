@@ -1,9 +1,10 @@
 import { config } from '@rapid-cmi5/ui';
-import { logger, debugLog } from '../debug';
+import { logger } from '../debug';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setAuLogo } from '../redux/auReducer';
 import { overrideDevOpsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
+import { cmi5Instance } from '../session/cmi5';
 
 /**
  * Processes a template.
@@ -21,7 +22,8 @@ export type DeploymentLocation = {
  * @returns
  */
 export const useOverrideConfigs = () => {
-  const [isOverridesLoaded, setIsLoaded] = useState(false);
+  const [isOverridesLoaded, setIsOverridesLoaded] = useState(false);
+
   const dispatch = useDispatch();
 
   // env that can be overriden
@@ -44,7 +46,24 @@ export const useOverrideConfigs = () => {
 
   const themeWhiteList: string[] = ['SLIDE_BACKGROUND', 'SLIDE_LOGO'];
 
-  const loadOverrides = async (path: string) => {
+  const loadOverrides = async (path: string, inProductionMode = true) => {
+    let launchData;
+    if (inProductionMode) {
+      launchData = cmi5Instance.launchData;
+      logger.debug(
+        'Loading override launch params',
+        { launchData },
+        'auManager',
+      );
+
+      // If there is no launch data returned something is wrong
+      if (!launchData) {
+        console.error(
+          'CMI5 workflow has failed to set launch data, will not be able to use Launch Params',
+        );
+      }
+    }
+
     logger.debug('Loading override configs', { path }, 'auManager');
 
     try {
@@ -154,24 +173,6 @@ export const useOverrideConfigs = () => {
             }
           }
         }
-
-        logger.debug(
-          'Config after overrides',
-          {
-            DEVOPS_API_URL: config.DEVOPS_API_URL,
-            SLIDE_LOGO: config.THEME.SLIDE_LOGO,
-          },
-          'auManager',
-        );
-
-        overrideDevOpsApiClient(config.DEVOPS_API_URL);
-        logger.debug(
-          'DevOps API client overridden',
-          {
-            url: config.DEVOPS_API_URL,
-          },
-          'auManager',
-        );
       } else {
         logger.warn(
           'Failed to fetch override config',
@@ -183,8 +184,63 @@ export const useOverrideConfigs = () => {
         );
       }
 
+      // Apply whitelisted launch params on top of cfg.json (launch params win)
+      if (inProductionMode && launchData?.launchParameters) {
+        const launchParams = launchData.launchParameters;
+        try {
+          console.log('launch params', launchParams);
+          const parsedLaunchParams: { [key: string]: string | boolean } =
+            JSON.parse(launchParams);
+          const lpKeys = Object.keys(parsedLaunchParams);
+          for (let i = 0; i < lpKeys.length; i++) {
+            const prop = lpKeys[i];
+            if (whiteList.includes(prop)) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (config as any)[prop] = parsedLaunchParams[prop];
+              logger.debug(
+                'Overrode config from launch params',
+                { property: prop, value: parsedLaunchParams[prop] },
+                'auManager',
+              );
+            } else if (themeWhiteList.includes(prop)) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (config.THEME as any)[prop] = parsedLaunchParams[prop];
+              logger.debug(
+                'Overrode theme from launch params',
+                { property: prop, value: parsedLaunchParams[prop] },
+                'auManager',
+              );
+            }
+          }
+        } catch (e) {
+          logger.warn(
+            'Failed to parse launchParameters as JSON',
+            { launchParameters: launchParams },
+            'auManager',
+          );
+        }
+      }
+
+      logger.debug(
+        'Config after overrides',
+        {
+          DEVOPS_API_URL: config.DEVOPS_API_URL,
+          SLIDE_LOGO: config.THEME.SLIDE_LOGO,
+        },
+        'auManager',
+      );
+
+      overrideDevOpsApiClient(config.DEVOPS_API_URL);
+      logger.debug(
+        'DevOps API client overridden',
+        {
+          url: config.DEVOPS_API_URL,
+        },
+        'auManager',
+      );
+
       dispatch(setAuLogo(config.THEME.SLIDE_LOGO));
-      setIsLoaded(true);
+      setIsOverridesLoaded(true);
 
       // CRITICAL FIX: Refresh logging config after overrides are loaded
       try {
@@ -212,7 +268,7 @@ export const useOverrideConfigs = () => {
         'auManager',
       );
       dispatch(setAuLogo(config.THEME.SLIDE_LOGO));
-      setIsLoaded(true);
+      setIsOverridesLoaded(true);
     }
   };
 

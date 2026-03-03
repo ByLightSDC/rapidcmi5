@@ -1,17 +1,9 @@
-import {
-  createContext,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { createContext, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   auDisplayInitializedSel,
   auJsonSel,
   auViewedSlidesSel,
-  courseAUProgressSel,
   setIsConfigInitialized,
   setIsDisplayInitialized,
 } from '../redux/auReducer';
@@ -34,10 +26,9 @@ import {
   AuManagerState,
   QuizState,
   RC5ActivityTypeEnum,
-  SlideTypeEnum,
+  SlideType,
 } from '@rapid-cmi5/cmi5-build-common';
 import MenuLayout from '../components/MenuLayout';
-import { getAutoGradersProgress } from '../utils/Cmi5Helpers';
 
 import { modal, setModal } from '@rapid-cmi5/ui';
 import {
@@ -61,10 +52,16 @@ export const AuManagerContext = createContext<AuContextProps>({
   viewedSlides: [],
   scenario: undefined, //TODO scenario, //from redux, may be more up to date than course data
   slides: [],
-  setActiveTab: (tab: number) => {},
-  setProgress: (makeProgress: boolean) => {},
+  setActiveTab: (tab: number) => {
+    return;
+  },
+  setProgress: (makeProgress: boolean) => {
+    return;
+  },
   slideData: 'Loading...',
-  submitScore: () => {},
+  submitScore: () => {
+    return;
+  },
   getActivityCache: null,
   setActivityCache: null,
   isAuthenticated: false,
@@ -78,22 +75,22 @@ function AuManager() {
   const viewedSlides = useSelector(auViewedSlidesSel);
   const isDisplayInitialized = useSelector(auDisplayInitializedSel);
   const dispatch = useDispatch();
-  const courseAUProgress = useSelector(courseAUProgressSel);
 
   const isInitializedProgressData = useRef(false);
   const [auManagerState, setAuManagerState] = useState(AuManagerState.waiting);
 
   const [loadingMessage, setLoadingMessage] = useState('');
-  const [initializationAttempt, setInitializationAttempt] = useState(0);
   const [cmi5ReadyAttempts, setCmi5ReadyAttempts] = useState(0);
 
   const {
     isAuthenticated,
     isTestMode,
-    initializeCmi5,
+    initializeCmi5WithRange,
+    initializeSessionCmi5,
     testCmi5,
-    isSessionInitialized,
+    isCmi5RangeConnectionComplete,
     cmi5ErrorMessage,
+    isInitSessionCmi5Complete,
   } = useCMI5Session();
 
   const {
@@ -177,17 +174,21 @@ function AuManager() {
     );
   };
 
-  const slideData = useMemo(() => {
-    if (auJson?.slides && auJson?.slides.length > 0 && activeTab >= 0) {
-      if (activeTab >= auJson?.slides.length) {
-        debugLogError(`Slide Index ${activeTab}  does not exist`);
-        setActiveTab(0); //reset
-        return 'There was a problem loading this slide.';
+  const [slideData, setSlideData] = useState<string>('Loading...');
+
+  useEffect(() => {
+    if (auJson?.slides && auJson.slides.length > 0 && activeTab >= 0) {
+      if (activeTab >= auJson.slides.length) {
+        debugLogError(`Slide Index ${activeTab} does not exist`);
+        dispatch(setActiveTab(0));
+        setSlideData('There was a problem loading this slide.');
+      } else {
+        setSlideData(auJson.slides[activeTab].content as string);
       }
-      return auJson?.slides[activeTab].content as string;
+    } else {
+      setSlideData('Loading...');
     }
-    return 'Loading...';
-  }, [activeTab, auJson?.slides]);
+  }, [activeTab, auJson?.slides, dispatch]);
 
   const submitScore = (data: ActivityScore) => {
     logger.debug('Context Submit Score', { data }, 'auManager');
@@ -199,10 +200,10 @@ function AuManager() {
         auJsonExists: !!auJson,
         auJsonSlidesLength: auJson?.slides?.length || 0,
         auJsonSlides:
-          auJson?.slides?.map((slide: any, index: number) => ({
+          auJson?.slides?.map((slide, index) => ({
             index,
             filepath: slide.filepath,
-            title: slide.title,
+            title: slide.slideTitle,
             content: slide.content
               ? `${slide.content.substring(0, 100)}...`
               : 'No content',
@@ -225,10 +226,6 @@ function AuManager() {
     );
   };
 
-  const getAutoGraderProgress = () => {
-    logger.debug('Context Get AutoGrader', undefined, 'auManager');
-    return getAutoGradersProgress();
-  };
   //#endregion
 
   const getReadyDisplay = useCallback(() => {
@@ -277,7 +274,6 @@ function AuManager() {
   const auHasScenario =
     auJson.rangeosScenarioUUID || auJson.rangeosScenarioName ? true : false;
   const auHasTeamScenario = auJson.teamSSOEnabled ? true : false;
-
   /**
    * UE Manages Session State
    */
@@ -290,18 +286,9 @@ function AuManager() {
       setLoadingMessage(cmi5ErrorMessage);
       setAuManagerState(AuManagerState.error);
     }
-
     if (auManagerState === AuManagerState.waiting) {
-      loadOverrides('./cfg.json');
-      setAuManagerState(AuManagerState.loadingOverrides);
-      return;
-    } else if (auManagerState === AuManagerState.loadingOverrides) {
-      if (isOverridesLoaded) {
-        // Refresh logging configuration after overrides are applied
-        refreshLoggingConfig();
-        loadContent('./config.json');
-        setAuManagerState(AuManagerState.loadingContent);
-      }
+      loadContent('./config.json');
+      setAuManagerState(AuManagerState.loadingContent);
       return;
     } else if (auManagerState === AuManagerState.loadingContent) {
       if (isContentLoaded) {
@@ -327,6 +314,8 @@ function AuManager() {
 
         if (checkForDevMode()) {
           logger.debug('[AU] test mode', undefined, 'auManager');
+          loadOverrides('./cfg.json', false);
+
           testCmi5(true);
           logger.debug(
             '[AU] state >',
@@ -340,7 +329,7 @@ function AuManager() {
             dispatch(setIsConfigInitialized(true));
           }
         } else {
-          initializeCmi5(shouldRequireClassId, auHasScenario);
+          initializeSessionCmi5();
           setAuManagerState(AuManagerState.authenticating);
         }
       }
@@ -350,16 +339,22 @@ function AuManager() {
       }
       return;
     } else if (auManagerState === AuManagerState.authenticating) {
-      if (!isAuthenticated) {
-        setTimeout(() => {
-          setInitializationAttempt(initializationAttempt + 1);
-        }, 1000);
-      } else {
+      if (isInitSessionCmi5Complete) {
+        setAuManagerState(AuManagerState.loadingOverrides);
+      }
+      return;
+    } else if (auManagerState === AuManagerState.loadingOverrides) {
+      if (isOverridesLoaded) {
+        // Refresh logging configuration after overrides are applied
+        refreshLoggingConfig();
         setAuManagerState(AuManagerState.loadingScenario);
+        console.log('config loaded after overrides', config);
+      } else {
+        loadOverrides('./cfg.json');
       }
       return;
     } else if (auManagerState === AuManagerState.loadingScenario) {
-      if (isSessionInitialized) {
+      if (isCmi5RangeConnectionComplete) {
         // Add additional check for CMI5 readiness before calling resumeAU
         if (cmi5Instance.xapi !== null && cmi5Instance.xapi !== undefined) {
           logger.debug(
@@ -399,6 +394,8 @@ function AuManager() {
             setCmi5ReadyAttempts(0);
           }
         }
+      } else {
+        initializeCmi5WithRange(shouldRequireClassId, auHasScenario);
       }
       return;
     } else if (auManagerState === AuManagerState.error) {
@@ -416,7 +413,7 @@ function AuManager() {
     logger.debug('[AU] activeSlide', { activeTab }, 'auManager');
 
     if (auJson?.slides) {
-      // this prevents completion of an activity slide until the desired actvities are completed
+      // this prevents completion of an activity slide until the desired activities are completed
       let makeProgress = true;
 
       if (auJson.slides[activeTab]) {
@@ -438,7 +435,7 @@ function AuManager() {
         isContentLoaded &&
         isOverridesLoaded &&
         isAuthenticated &&
-        isSessionInitialized
+        isCmi5RangeConnectionComplete
       ) {
         // Only call progressAU if:
         // 1. We haven initialized progress data yet, OR
@@ -454,32 +451,20 @@ function AuManager() {
           );
         }
       }
-      /*
-      // Call progressAU for slide navigation to update slide status and progress
-      progressAU(
-        activeTab, // slideIdx - the slide index to process
-        makeProgress,
-        auJson,
-        viewedSlides,
-        dispatch,
-        store.getState,
-      );
-      isInitializedProgressData.current = true;
-      */
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isContentLoaded,
     isOverridesLoaded,
     isAuthenticated,
-    isSessionInitialized,
+    isCmi5RangeConnectionComplete,
     contentErrorMessage,
     cmi5ErrorMessage,
     auManagerState,
     auJson,
     activeTab, // Re-added to trigger progress updates on slide navigation
-    initializationAttempt,
     cmi5ReadyAttempts, // Added to trigger CMI5 readiness checks
+    isInitSessionCmi5Complete,
   ]);
 
   /**
