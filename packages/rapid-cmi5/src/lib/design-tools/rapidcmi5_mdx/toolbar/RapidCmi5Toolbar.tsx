@@ -13,15 +13,9 @@ import {
   BoldItalicUnderlineToggles,
   CodeToggle,
   CreateLink,
-  DiffSourceToggleWrapper,
   InsertCodeBlock,
-  InsertThematicBreak,
   ListsToggle,
-  ShowSandpackInfo,
   StrikeThroughSupSubToggles,
-  DirectiveNode,
-  EditorInFocus,
-  ConditionalContents,
   Separator,
   usePublisher,
   viewMode$,
@@ -32,35 +26,16 @@ import {
   iconComponentFor$,
   useCellValues,
   useTranslation,
-  IS_STRIKETHROUGH,
-  IS_BOLD,
-  IS_ITALIC,
-  IS_UNDERLINE,
 } from '@mdxeditor/editor';
 import { CLEAR_HISTORY_COMMAND } from 'lexical';
-//import { InsertActivity } from './components/InsertActivity';
 import { InsertImage } from './components/InsertImage';
 import { InsertVideo } from './components/InsertVideo';
-import { InsertLayoutBox } from './components/InsertLayoutBox';
+//REF import { InsertLayoutBox } from './components/InsertLayoutBox';
 
 /** Icons */
-import AttachFileIcon from '@mui/icons-material/AttachFile';
-import PaletteIcon from '@mui/icons-material/Palette';
-import ScreenShareIcon from '@mui/icons-material/ScreenShare';
-import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
-import WidgetsIcon from '@mui/icons-material/Widgets';
-
-import { Box, IconButton, Stack, Tooltip } from '@mui/material';
-
-import { InsertAdmonition } from './components/InsertAdmonition';
-import {
-  iconButtonSize,
-  iconButtonStyle,
-  tooltipStyle,
-} from '../styles/styles';
-
+import { Box, Stack } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { BlockTypeSelect } from './components/BlockTypeSelect';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -69,23 +44,13 @@ import { ColorTextSplitButton } from './components/ColorTextSplitButton';
 import { HighlightSplitButton } from './components/HighlightSplitButton';
 import { TextFxButton } from './components/TextFxButton';
 import { InsertAudio } from './components/InsertAudio';
-import { InsertTable } from './components/InsertTable';
 import { InsertAnimation } from './components/InsertAnimation';
-import {
-  AdmonitionTypeEnum,
-  AdmonitionTypes,
-  ActivityType,
-  RC5ActivityTypeEnum,
-} from '@rapid-cmi5/cmi5-build-common';
+
 import {
   editorInPlayback$,
   CONTENT_UPDATED_COMMAND,
-  InsertTabs,
-  InsertAccordion,
   dividerColor,
-  iconColor,
   InsertGrid,
-  InsertSteps,
 } from '@rapid-cmi5/ui';
 import { displayData } from '../../../redux/courseBuilderReducer';
 import { SlideMenu } from '../menu/SlideMenu';
@@ -228,7 +193,6 @@ export const RapidCmi5Toolbar: React.FC = () => {
                   )}
                 </Stack>
                 <Separator />
-
                 <ListsToggle />
                 <CreateLink />
                 <CodeToggle />

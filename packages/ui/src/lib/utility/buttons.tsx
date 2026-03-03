@@ -80,13 +80,6 @@ export function ButtonInfoField({
   const [isAlert, setIsAlert] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
 
-  //REF
-  // const handleToggleAlert = (event: any) => {
-  //   setAnchorEl(event?.currentTarget);
-  //   setIsSticky(!isAlert);
-  //   setIsAlert(!isAlert);
-  // };
-
   const handleClick = (event: any) => {
     event.stopPropagation();
     if (triggerOnClick) {
@@ -155,13 +148,11 @@ export function ButtonInfoField({
         <ClickAwayListener onClickAway={handleCloseAlert}>
           <Alert
             severity="info"
-            //REF onClose={handleCloseAlert}
             sx={{
               maxWidth: '480px',
               whiteSpace: 'pre-wrap',
               wordWrap: 'break-word',
               margin: '4px',
-              padding: '6px 16px 6px 6px',
               ...alertSxProps,
             }}
             {...alertProps}
@@ -169,7 +160,7 @@ export function ButtonInfoField({
               <>
                 {triggerOnClick ? (
                   <IconButton
-                    sx={{ marginRight: '12px', padding: '0px' }}
+                    sx={{ position: 'absolute', right: '12px' }}
                     aria-label="close"
                     color="inherit"
                     size="small"

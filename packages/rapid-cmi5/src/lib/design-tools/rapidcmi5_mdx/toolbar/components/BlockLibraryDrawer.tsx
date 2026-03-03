@@ -11,16 +11,21 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
+import Markdown from 'react-markdown';
+import rehypeKatex from 'rehype-katex';
+import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
+
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 
 import { drawerMode$, DRAWER_TYPE } from './drawers';
 import {
+  ButtonInfoField,
   InsertAccordion,
   InsertGrid,
   InsertSteps,
   InsertTabs,
-  themeColor,
   ViewExpander,
 } from '@rapid-cmi5/ui';
 
@@ -36,6 +41,7 @@ import { InsertThematicBreak } from './InsertThematicBreak';
 import { InsertFile } from './InsertFile';
 
 import WidgetsIcon from '@mui/icons-material/Widgets';
+import { activitiesTable } from '../../constants/toolbar';
 
 const headerSxProps = {
   cursor: 'pointer',
@@ -68,16 +74,10 @@ export function BlockLibraryDrawer() {
       onClose={handleClose}
       sx={{
         position: 'absolute',
-        zIndex: 1400,
-        // Higher than MUI modals (1300) and directive editors
+        zIndex: 1400, // Higher than MUI modals (1300) and directive editors
         '& .MuiDrawer-paper': {
           width: 360,
           maxWidth: '90vw',
-          zIndex: 1400, // Ensure paper also has high z-index
-        },
-      }}
-      PaperProps={{
-        sx: {
           zIndex: 1400, // Ensure paper also has high z-index
         },
       }}
@@ -85,7 +85,7 @@ export function BlockLibraryDrawer() {
       <Stack
         id="block-library"
         direction="column"
-        sx={{ height: '100%', zIndex: 200 }}
+        sx={{ height: '100%' }}
         spacing={0}
       >
         {/* Header */}
@@ -120,6 +120,25 @@ export function BlockLibraryDrawer() {
             title="Activities"
             defaultIsExpanded={false}
             headerSxProps={headerSxProps}
+            rightMenuChildren={
+              <ButtonInfoField
+                alertSxProps={{
+                  maxWidth: '640px',
+                }}
+                popperPlacement="auto-end"
+                message={
+                  <Markdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeRaw, rehypeKatex]}
+                  >
+                    {activitiesTable}
+                  </Markdown>
+                }
+                triggerOnClick={true}
+              />
+            }
+            shouldStartWithDivider={true}
+            shouldEndWithDivider={true}
           >
             <InsertActivities />
           </ViewExpander>
@@ -127,6 +146,7 @@ export function BlockLibraryDrawer() {
             title="Admonitions"
             defaultIsExpanded={false}
             headerSxProps={headerSxProps}
+            shouldEndWithDivider={true}
           >
             <InsertAdmonitions />
           </ViewExpander>
@@ -134,6 +154,7 @@ export function BlockLibraryDrawer() {
             title="Layout"
             defaultIsExpanded={false}
             headerSxProps={headerSxProps}
+            shouldEndWithDivider={true}
           >
             <Stack direction="column">
               <InsertAccordion isDrawer={true} />
@@ -148,6 +169,7 @@ export function BlockLibraryDrawer() {
             title="Media"
             defaultIsExpanded={false}
             headerSxProps={headerSxProps}
+            shouldEndWithDivider={true}
           >
             <Stack direction="column">
               <InsertAudio isDrawer={true} />
