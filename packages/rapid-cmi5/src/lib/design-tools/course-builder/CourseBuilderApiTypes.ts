@@ -22,6 +22,8 @@ export type CreateLocalRepoType = {
   repoBranch: string;
   authorName: string;
   authorEmail: string;
+  repoUsername?: string;
+  repoPassword?: string;
 };
 
 export type ImportRepoZipType = {

@@ -14,6 +14,10 @@ import { DecoratorNode } from 'lexical';
 import { ImageEditor } from './ImageEditor';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
+import { useTimeStampUUID } from '@rapid-cmi5/ui';
+
+const { generateId } = useTimeStampUUID();
+
 function convertImageElement(domNode: Node): null | DOMConversionOutput {
   if (domNode instanceof HTMLImageElement) {
     const { alt: altText, id, src, title, width, height } = domNode;
@@ -99,7 +103,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       width,
       rest,
       href,
-      id, 
+      id,
     });
     return node;
   }
@@ -157,7 +161,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     this.__height = height ? height : 'inherit';
     this.__rest = rest ?? [];
     this.__href = href;
-    this.__id = id;
+    this.__id = id ?? generateId();
   }
 
   /** @internal */
@@ -170,7 +174,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       src: this.getSrc(),
       rest: this.__rest,
       href: this.__href,
-      id: this.__id, 
+      id: this.__id,
       type: 'image',
       version: 1,
     };

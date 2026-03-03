@@ -1,10 +1,19 @@
-import { FolderStruct } from '@rapid-cmi5/cmi5-build-common';
+import {
+  DirMeta,
+  FolderStruct,
+  sortProjectMetas,
+} from '@rapid-cmi5/cmi5-build-common';
 
 import fs, { constants } from 'fs';
 
-import { app } from 'electron';
+import { app, dialog } from 'electron';
+import {
+  recentProjectsStore,
+  addRecentProject,
+  removeRecentProject,
+} from '../userSettings/recentProjects';
 
-import path, { join } from 'path';
+import path, { basename, join } from 'path';
 import git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
 import { getAssetPath } from '../cmi5Builder/build';
@@ -24,6 +33,7 @@ export interface FileStat {
   size: number;
   mtimeMs: number;
   ctimeMs: number;
+  birthtimeMs: number;
   mode: number;
   isFile: boolean;
   isDirectory: boolean;
@@ -81,12 +91,14 @@ export class ElectronFsHandler {
     this.isTestMode = isTestMode;
 
     const base = getRapidBase(isTestMode);
-    // reset before each test run
-    if (isTestMode) {
-      clearDirectory(base);
-    }
 
-    this.baseReady = fsp.mkdir(base, { recursive: true }).then(() => {});
+    this.baseReady = (async () => {
+      if (isTestMode) {
+        await clearDirectory(base);
+      }
+
+      await fsp.mkdir(base, { recursive: true });
+    })();
   }
 
   async readPlayerConfig(): Promise<Record<string, any>> {
@@ -121,10 +133,13 @@ export class ElectronFsHandler {
     return true;
   }
 
-  async readFile(p: string): Promise<Uint8Array> {
+  async readFile(
+    p: string,
+    encoding?: BufferEncoding,
+  ): Promise<string | Buffer<ArrayBufferLike>> {
     const full = await this.getFullPath(p);
-    const data = await fsp.readFile(full);
-    return new Uint8Array(data);
+    const data = await fsp.readFile(full, { encoding });
+    return data;
   }
 
   async exists(p: string) {
@@ -146,6 +161,7 @@ export class ElectronFsHandler {
         size: s.size,
         mtimeMs: s.mtimeMs,
         ctimeMs: s.ctimeMs,
+        birthtimeMs: s.birthtimeMs,
         mode: s.mode,
         isFile: s.isFile(),
         isDirectory: s.isDirectory(),
@@ -456,6 +472,7 @@ export class ElectronFsHandler {
     const fullPath = await this.getFullPath(p);
 
     await git.init({ fs, dir: fullPath, defaultBranch });
+    addRecentProject(basename(p));
   }
 
   async gitResolveRef(p: string, branch: string) {
@@ -496,6 +513,7 @@ export class ElectronFsHandler {
       singleBranch: true,
       onAuth: () => ({ username, password }),
     });
+    addRecentProject(basename(p));
   }
 
   async gitCommit(
@@ -633,7 +651,6 @@ export class ElectronFsHandler {
       fs,
       dir: fullPath,
       trees: [git.TREE({ ref: 'HEAD' }), git.TREE({ ref: 'refs/stash' })],
-
       map: async (filepath: string, [left, right]: any) => {
         if (filepath === '.') return undefined;
 
@@ -659,5 +676,79 @@ export class ElectronFsHandler {
       name: file.path,
       status: file.change,
     }));
+  }
+
+  async getRecentProjects(): Promise<DirMeta[]> {
+    const recentProjects = recentProjectsStore.get('recentProjects');
+
+    const metas: DirMeta[] = [];
+    for (const project of recentProjects) {
+      try {
+        const stats = await this.stat(join('localFileSystem', project.id));
+        if (!stats) continue;
+
+        metas.push({
+          createdAt: new Date(stats.birthtimeMs).toISOString(),
+          lastAccessed: project.lastAccessed,
+          id: project.id,
+          isValid: true,
+          name: project.id,
+          remoteUrl: await this.getGitRemoteUrlElectron(
+            join('localFileSystem', project.id),
+          ),
+        });
+      } catch (error: any) {
+        console.error('could not get stats for project', error);
+        removeRecentProject(project.id);
+        continue;
+      }
+    }
+
+    return sortProjectMetas(metas);
+  }
+
+  async getGitRemoteUrlElectron(path: string): Promise<string | undefined> {
+    try {
+      const file = await this.readFile(join(path, '.git/config'), 'utf8');
+
+      if (!file) return undefined;
+
+      const text = file.toString();
+      // Match: [remote "origin"] ... url = xxx
+      const match = text.match(/\[remote\s+"origin"\][\s\S]*?url\s*=\s*(.+)/);
+
+      return match?.[1]?.trim();
+    } catch (err) {
+      // Not a git repo or no access
+      return undefined;
+    }
+  }
+
+  async chooseProject(): Promise<string | null> {
+    await this.baseReady;
+    const base = getRapidBase(this.isTestMode);
+    const localFsBase = path.join(base, 'localFileSystem');
+
+    await fsp.mkdir(localFsBase, { recursive: true });
+
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: 'Choose Project',
+      defaultPath: localFsBase,
+      properties: ['openDirectory'],
+    });
+
+    if (canceled || filePaths.length === 0) {
+      return null;
+    }
+
+    const chosen = filePaths[0];
+    const rel = path.relative(base, chosen);
+    if (rel.startsWith('..') || path.isAbsolute(rel)) {
+      throw new Error('Selected path is outside the RapidCMI5 sandbox');
+    }
+    const projectName = basename(chosen);
+    addRecentProject(projectName);
+
+    return projectName;
   }
 }

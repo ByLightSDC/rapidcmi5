@@ -38,7 +38,6 @@ import type { BlockContent } from 'mdast';
 import {
   disableImageResize$,
   editImageToolbarComponent$,
-  ImageNode,
   imagePlaceholder$ as imagePlaceholderComponent$,
   imagePreviewHandler$,
 } from './index';
@@ -50,7 +49,7 @@ import {
   viewMode$,
   DirectiveNode,
 } from '@mdxeditor/editor';
-import { $isImageNode } from './ImageNode';
+import { $isImageNode,   ImageNode, } from './ImageNode';
 import ImageResizer from './ImageResizer';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 import { useSelector } from 'react-redux';
@@ -67,9 +66,7 @@ import {
   MARKER_HALF_WIDTH,
   MARKER_HALF_HEIGHT,
   isLabelDropping$,
-  clickPosition$,
   isTextDropping$,
-  clickImageTextPosition$,
   DEFAULT_IMAGE_TEXT_CONTENT,
 } from '@rapid-cmi5/ui';
 import { currentAuPath } from '@rapid-cmi5/react-editor';
@@ -612,10 +609,13 @@ export function ImageEditor({
             return true;
           }
 
-          if (
-            event.target === imageRef.current ||
-            event.target === labelsRef.current
-          ) {
+          const hitImage = event.target === imageRef.current;
+          const hitLabels = !!(
+            labelsRef.current &&
+            labelsRef.current.contains(event.target as Node)
+          );
+
+          if (hitImage || hitLabels) {
             if (id) {
               //check click outside with label
               onCheckClickOutsideImageLabel(id);
@@ -646,18 +646,6 @@ export function ImageEditor({
             }
 
             return true;
-          } else {
-            //reset position after label dropped
-            if (isLabelDropping$.value && event.target) {
-              if (clickPosition$.value[0] !== event.clientX) {
-                isLabelDropping$.value = false;
-              }
-            }
-            if (isTextDropping$.value && event.target) {
-              if (clickImageTextPosition$.value[0] !== event.clientX) {
-                isTextDropping$.value = false;
-              }
-            }
           }
 
           return false;

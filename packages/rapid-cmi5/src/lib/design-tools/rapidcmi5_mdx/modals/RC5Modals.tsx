@@ -294,7 +294,7 @@ export default function RC5Modals() {
               modalObj?.name || '',
               modalObj.meta?.message || '',
               true,
-              'repository name',
+              'project name',
               modalObj?.meta?.permanentWarning,
             )}
             specialCancelLayout="2%"

@@ -112,7 +112,7 @@ export function DownloadCmi5ZipForm({
           doAction={handleDownloadCmi5Zip}
           formTitle="Publish Course"
           getFormFields={pullFormFields}
-          instructions="Download a CMI5 zip file containing all of the lessons in this course. The downloaded file can be uploaded to a course in RangeOS LMS."
+          instructions="Download a CMI5 zip file containing all of the lessons in this course. The downloaded file can be uploaded to a RangeOS LMS course activity."
           submitButtonText="Download"
           successToasterMessage="Download Succeeded"
           onClose={onClose}

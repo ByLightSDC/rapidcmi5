@@ -16,11 +16,11 @@ export const InsertAnimation = () => {
 
   return (
     <ButtonWithTooltip
-      title="Animations"
+      title="Animation Library"
       onClick={handleClick}
-      aria-label="Toggle animation drawer"
+      aria-label="Toggle Animation Library"
     >
-      <MotionPhotosAutoIcon fontSize="small" />
+      <MotionPhotosAutoIcon fontSize="medium" />
     </ButtonWithTooltip>
   );
 };

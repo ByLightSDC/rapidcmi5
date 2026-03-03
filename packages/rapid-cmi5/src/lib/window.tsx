@@ -5,6 +5,7 @@ import {
   SSOConfig,
   TokenResponse,
   CertInfo,
+  DirMeta
 } from '@rapid-cmi5/cmi5-build-common';
 import { ModifiedFile } from './design-tools/course-builder/GitViewer/Components/GitActions/GitFileStatus';
 import { DirEntry } from './design-tools/course-builder/GitViewer/utils/ElectronFsApi';
@@ -140,6 +141,10 @@ export interface fsApi {
   ) => Promise<void>;
 
   pushRepo: (dir: string, username: string, password: string) => Promise<void>;
+  chooseProject: () => Promise<string>;
+  getRecentProjects: () => Promise<DirMeta[]>;
+  removeRecentProject: (id: string) => Promise<void>;
+  addRecentProject: (id: string) => Promise<void>;
   readPlayerConfig: () => Promise<any>;
   writePlayerConfig: (content: string) => void;
 }

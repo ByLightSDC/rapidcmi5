@@ -96,7 +96,7 @@ export function CreateCourseForm({
     formMethods: UseFormReturn,
     formState: FormStateType,
   ): JSX.Element => {
-    const { control, setValue, trigger, watch } = formMethods;
+    const { control, watch } = formMethods;
     const { errors } = formState;
     const isUploading = watch('zipFile');
 
@@ -108,39 +108,40 @@ export function CreateCourseForm({
           helperText={errors?.firstAuName?.message}
           name="firstAuName"
           required
-          label="Default Lesson AU Name"
+          label="Name of First Lesson"
+          infoText="The first lesson in this course will be created for you. After that, click the lesson ➕📖 icon."
         />
       </Grid>
     );
 
-    const zipUploadField = (
-      <Grid size={12}>
-        <Tooltip title="Upload an existing CMI5 course zip file into the repo. Must have a valid RC5 version.">
-          <IconButton size="small">
-            <InfoOutlinedIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <FileUpload
-          buttonEmphasis={false}
-          buttonTitle="Import..."
-          dataCache={[]}
-          fileTypes=".zip"
-          isUploading={false}
-          noFileSelectedMessage="Import from CMI5 zip"
-          onFileSelected={async (file: File, selected: boolean) => {
-            if (selected && file instanceof File) {
-              setValue('zipFile', file, { shouldValidate: true });
-            } else {
-              setValue('zipFile', undefined, { shouldValidate: true });
-            }
-            trigger('zipFile');
-          }}
-        />
-        {errors?.zipFile && (
-          <Alert severity="error">{errors.zipFile.message}</Alert>
-        )}
-      </Grid>
-    );
+    //REF const zipUploadField = (
+    //   <Grid size={12}>
+    //     <Tooltip title="Upload an existing CMI5 course zip file into the repo. Must have a valid RC5 version.">
+    //       <IconButton size="small">
+    //         <InfoOutlinedIcon fontSize="small" />
+    //       </IconButton>
+    //     </Tooltip>
+    //     <FileUpload
+    //       buttonEmphasis={false}
+    //       buttonTitle="Import..."
+    //       dataCache={[]}
+    //       fileTypes=".zip"
+    //       isUploading={false}
+    //       noFileSelectedMessage="Import from CMI5 zip"
+    //       onFileSelected={async (file: File, selected: boolean) => {
+    //         if (selected && file instanceof File) {
+    //           setValue('zipFile', file, { shouldValidate: true });
+    //         } else {
+    //           setValue('zipFile', undefined, { shouldValidate: true });
+    //         }
+    //         trigger('zipFile');
+    //       }}
+    //     />
+    //     {errors?.zipFile && (
+    //       <Alert severity="error">{errors.zipFile.message}</Alert>
+    //     )}
+    //   </Grid>
+    // );
 
     return (
       <>
@@ -183,7 +184,7 @@ export function CreateCourseForm({
           />
         </Grid>
         {defaultLessonField}
-        {zipUploadField}
+        {/* {zipUploadField} */}
       </>
     );
   };

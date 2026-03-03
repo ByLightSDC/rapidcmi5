@@ -8,10 +8,13 @@ import {
   useTheme,
   Tooltip,
   Stack,
+  IconButton,
+  alpha,
+  Box,
 } from '@mui/material';
 import TocIcon from '@mui/icons-material/Toc';
 import { TableOfContentsEntry } from './TocPlugin';
-
+import CloseIcon from '@mui/icons-material/Close';
 
 /**
  * TOCComponent (Table of Contents Component)
@@ -71,7 +74,6 @@ export const TOCComponent = ({
   return (
     <Accordion
       expanded={isExpanded}
-      onChange={toggleExpanded}
       key="TOC"
       variant="outlined"
       sx={{
@@ -82,15 +84,12 @@ export const TOCComponent = ({
         right: 24,
         top: 12 + topOffSet,
         maxWidth: '320px',
-        backgroundColor: 'background.default',
-        borderColor: 'info',
-        borderStyle: 'solid',
-        borderRadius: 2,
-        borderWidth: '1px',
+        backgroundColor: isExpanded ? 'background.default' : 'transparent',
+        borderStyle: 'none',
         minHeight: 0,
         padding: '4px',
         margin: 0,
-        marginTop: isExpanded ? 0:2
+        marginTop: isExpanded ? 0 : 2,
       }}
     >
       <AccordionSummary
@@ -98,21 +97,39 @@ export const TOCComponent = ({
           padding: 0,
           margin: 0,
           minHeight: 0,
-          maxHeight: '32px', //hack to avoid extra vertical space below Table of Contents
+          maxHeight: '32px',
+          borderRadius: isExpanded ? 0 : 8, //hack to avoid extra vertical space below Table of Contents
         }}
         expandIcon={
           isExpanded ? null : (
             <Tooltip title="Table of Contents: Click to expand, then click on a heading to jump to its location in the slide.">
-              <span>
+              <Box
+                sx={{
+                  backgroundColor: 'primary.main',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: '2px',
+                  borderRadius: 8,
+                  '&:hover': {
+                    bgcolor: alpha(theme.palette.primary.main, 0.3),
+                  },
+                  fontSize: '24px',
+                  width: '32px',
+                  height: '32px',
+                }}
+              >
                 <TocIcon
-                  color="primary"
+                  onClick={() => {
+                    setIsExpanded(true);
+                  }}
+                  color="action"
+                  fontSize="inherit"
                   sx={{
-                    margin: '1px',
-                    marginBottom: 0,
-                    padding: '0px',
+                    color: 'white',
                   }}
                 />
-              </span>
+              </Box>
             </Tooltip>
           )
         }
@@ -121,18 +138,17 @@ export const TOCComponent = ({
           <Stack
             direction="row"
             sx={{
-              
               marginLeft: '12px',
               marginRight: '12px',
               display: 'flex',
-              justifyContent: 'center',
+              justifyContent: 'space-between',
+              alignItems: 'center',
             }}
           >
-            <TocIcon color="primary" sx={{ marginBottom: 0, padding: '0px' }} />
             <Typography
               variant="h5"
               align="center"
-              color="text.primary"
+              color="primary.main"
               sx={{
                 width: '100%',
                 fontWeight: 500,
@@ -140,6 +156,12 @@ export const TOCComponent = ({
             >
               Table of Contents
             </Typography>
+            <IconButton
+              onClick={() => setIsExpanded(false)}
+              aria-label="Close Table of Contents"
+            >
+              <CloseIcon />
+            </IconButton>
           </Stack>
         )}
       </AccordionSummary>

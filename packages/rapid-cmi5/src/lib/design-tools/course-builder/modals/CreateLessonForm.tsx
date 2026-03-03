@@ -73,23 +73,15 @@ export function CreateLessonForm({
 
     return (
       <>
-        <Grid size={6}>
+        <Grid size={12}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.auName)}
             helperText={errors?.auName?.message}
             name="auName"
             required
-            label="Lesson AU Name"
+            label="Lesson Name"
             readOnly={false}
-          />
-        </Grid>
-        <Grid size={6}>
-          <FormControlTextField
-            control={control}
-            name="courseName"
-            label="Course Name"
-            readOnly={true}
           />
         </Grid>
       </>
@@ -103,7 +95,7 @@ export function CreateLessonForm({
       dialogProps={{
         open: modalObj.type === createNewLessonModalId,
       }}
-      maxWidth="sm"
+      maxWidth="xs"
     >
       <FormControlUIProvider>
         <MiniForm

@@ -7,8 +7,8 @@ import {
   generateCourseDist,
   FsOperations,
   generateCmi5Xml,
-  generateBlockId,
-  CourseAU,
+  DirMeta,
+  sortProjectMetas,
 } from '@rapid-cmi5/cmi5-build-common';
 import JSZip from 'jszip';
 import path, { basename, dirname, join, relative } from 'path-browserify';
@@ -16,12 +16,11 @@ import YAML from 'yaml';
 import { configure, fs as zenFs } from '@zenfs/core';
 import { IndexedDB, WebAccess } from '@zenfs/dom';
 import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
-import { set, get, keys, getMany } from 'idb-keyval';
+import { set, get, keys, getMany, del } from 'idb-keyval';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import { electronFs } from './ElectronFsApi';
 import { IFs } from 'memfs';
 import saveAs from 'file-saver';
-import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 
 export const getRepoPath = (r: RepoAccessObject) =>
   `/${r.fileSystemType}/${r.repoName}`;
@@ -40,16 +39,8 @@ export type FolderStructWithMtime = FolderStruct & {
   mtimeDate?: string; // ISO string
 };
 
-export type DirMeta = {
-  // not needed for electron
-  dirHandle?: FileSystemDirectoryHandle;
-  id: string;
-  createdAt: string;
-  name: string;
-  isValid: boolean;
-  lastAccessed: string;
-  remoteUrl?: string;
-};
+const noGitInProjectError =
+  'The selected directory does not contain a .git folder. Please choose a valid rapid cmi5 project';
 
 export class GitFS {
   public fs: FileSystemObject;
@@ -59,6 +50,9 @@ export class GitFS {
   public isMountStarted: boolean = false;
   public isElectron: boolean = false;
   public cache = {};
+  // This allows us to remove a recent project from the recents list
+  // If we delete it in the UI
+  public currentProjectRecentsId?: string = undefined;
 
   constructor(isElectron: boolean = false) {
     if (isElectron) {
@@ -325,18 +319,6 @@ export class GitFS {
     }
   };
 
-  // Helper to count files
-  private countFiles(folders: FolderStruct[]): number {
-    let count = 0;
-    for (const item of folders) {
-      if (!item.isBranch) {
-        count++;
-      } else if (item.children) {
-        count += this.countFiles(item.children);
-      }
-    }
-    return count;
-  }
   // this is browser specific
   openLocalDirectory = async (
     dirHandle: FileSystemDirectoryHandle,
@@ -347,11 +329,9 @@ export class GitFS {
     try {
       if (forClone) {
         zenFs.umount('/localFileSystem');
-
         zenFs.mount('/localFileSystem', webacess);
       } else {
         zenFs.umount('/localFileSystem/' + dirHandle.name);
-
         zenFs.mount('/localFileSystem/' + dirHandle.name, webacess);
       }
       this.isBrowserFsLoaded = true;
@@ -362,16 +342,24 @@ export class GitFS {
 
   async openLocalRepo(id?: string) {
     if (this.isElectron) {
-      if (!id) throw Error('No directory ID given');
-      if (!(await this.dirExists('/' + fsType.localFileSystem + '/' + id)))
-        throw Error('Could not find dir');
-      const dirName = basename(id);
-      return dirName;
+      if (id) {
+        if (!(await this.dirExists('/' + fsType.localFileSystem + '/' + id)))
+          throw Error('Could not find dir');
+        // We need to readd to recent projects to update the last opened time
+        await window.fsApi.addRecentProject(id);
+        const dirName = basename(id);
+        return dirName;
+      } else {
+        const dirname = await window.fsApi.chooseProject();
+        if (!dirname) throw new Error('No project selected');
+        return dirname;
+      }
     } else {
       let dirHandle: FileSystemDirectoryHandle | undefined;
 
       if (id) {
         dirHandle = await this.getDirHandle(id);
+        this.currentProjectRecentsId = id;
       }
       if (!dirHandle) {
         // @ts-ignore
@@ -379,17 +367,38 @@ export class GitFS {
           mode: 'readwrite',
           startIn: 'documents',
         });
-        if (!dirHandle) throw Error('Could not get the dir handle');
 
-        await this.setDirHandle(dirHandle);
+        if (!dirHandle)
+          throw Error(
+            'There was an error when selecting the project directory, please try again',
+          );
+
+        // We do not want to add to recent projects if this is not a git project
+        try {
+          const gitFolder = await dirHandle.getDirectoryHandle('.git');
+          if (!gitFolder) {
+            this.currentProjectRecentsId = undefined;
+            throw Error(noGitInProjectError);
+          }
+
+          await this.setDirHandle(dirHandle);
+        } catch (error: any) {
+          this.currentProjectRecentsId = undefined;
+          throw Error(noGitInProjectError);
+        }
       }
-
-      // ensure the file has a .git folder
-      const gitFolder = await dirHandle.getDirectoryHandle('.git');
-      if (!gitFolder) throw Error('No git folder');
 
       await this.openLocalDirectory(dirHandle);
       return dirHandle.name;
+    }
+  }
+
+  // This will just remove a recent local project
+  async removeRecentProject(id: string) {
+    if (this.isElectron) {
+      await window.fsApi.removeRecentProject(id);
+    } else {
+      await del('courses/' + id);
     }
   }
 
@@ -399,6 +408,7 @@ export class GitFS {
   ) {
     if (this.isElectron) {
       await createFunction();
+      // We don't need to take care of recents here, thats an electron backend job
     } else {
       // @ts-ignore
       let dirHandle = (await window.showDirectoryPicker({
@@ -409,6 +419,13 @@ export class GitFS {
       if (!dirHandle) throw Error('No directory selected for clone');
 
       await this.openLocalDirectory(dirHandle, true);
+
+      // Unmount any stale sub-mount for this repo name so initGitRepo writes
+      // to the new parent directory, not a leftover WebAccess handle.
+      try {
+        zenFs.umount('/localFileSystem/' + parentDir);
+      } catch {}
+
       await createFunction();
 
       // verify repo dir actually exits
@@ -418,9 +435,11 @@ export class GitFS {
         await this.setDirHandle(repoDir);
 
         await this.openLocalDirectory(repoDir);
-      } catch {
+      } catch (error: any) {
+        console.error(error);
+        this.currentProjectRecentsId = undefined;
         throw Error(
-          'The clone operation failed to save files to your local computer.',
+          'The create project operation failed to save files to your local computer.',
         );
       }
     }
@@ -451,34 +470,37 @@ export class GitFS {
     }
   }
 
-  async getGitRemoteUrlElectron(path: string): Promise<string | undefined> {
-    try {
-      const r: RepoAccessObject = {
-        fileSystemType: fsType.localFileSystem,
-        repoName: path,
-      };
-
-      const file = await this.getFileContent(r, '.git/config');
-
-      if (!file) return undefined;
-
-      const text = file.content.toString();
-      // Match: [remote "origin"] ... url = xxx
-      const match = text.match(/\[remote\s+"origin"\][\s\S]*?url\s*=\s*(.+)/);
-
-      return match?.[1]?.trim();
-    } catch (err) {
-      // Not a git repo or no access
-      return undefined;
-    }
-  }
-
   // save the local file access directory handle so we dont have to ask for it each time
   setDirHandle = async (dirHandle: FileSystemDirectoryHandle) => {
+    // Check if this directory is already in recents using isSameEntry
+    const allKeys = await keys();
+    const matchingKeys = allKeys.filter(
+      (key): key is string =>
+        typeof key === 'string' && key.startsWith('courses/'),
+    );
+    const dirMetas = await getMany<DirMeta>(matchingKeys);
+
+    for (const meta of dirMetas) {
+      if (!meta?.dirHandle) continue;
+      try {
+        const isSame = await meta.dirHandle.isSameEntry(dirHandle);
+        if (isSame) {
+          const updatedMeta: DirMeta = {
+            ...meta,
+            lastAccessed: new Date().toISOString(),
+            dirHandle,
+          };
+          this.currentProjectRecentsId = meta.id;
+          await set('courses/' + meta.id, updatedMeta);
+          return;
+        }
+      } catch {}
+    }
+
+    // No existing entry found — create a new one
     const id = crypto.randomUUID();
 
     const dirMeta: DirMeta = {
-      createdAt: new Date().toISOString(),
       lastAccessed: new Date().toISOString(),
       dirHandle,
       id,
@@ -486,30 +508,38 @@ export class GitFS {
       isValid: true,
       remoteUrl: await this.getGitRemoteUrl(dirHandle),
     };
+    this.currentProjectRecentsId = id;
 
-    await set('courses/' + id || 'rootdir', dirMeta);
+    await set('courses/' + id, dirMeta);
+
+    // Enforce 10-project limit: remove oldest entries beyond the cap
+    const updatedKeys = await keys();
+    const courseKeys = updatedKeys.filter(
+      (key): key is string =>
+        typeof key === 'string' && key.startsWith('courses/'),
+    );
+    if (courseKeys.length > 10) {
+      const allMetas = await getMany<DirMeta>(courseKeys);
+      const sorted = allMetas
+        .filter((m): m is DirMeta => !!m)
+        .sort(
+          (a, b) =>
+            new Date(a.lastAccessed).getTime() -
+            new Date(b.lastAccessed).getTime(),
+        );
+      const toRemove = sorted.slice(0, sorted.length - 10);
+      for (const old of toRemove) {
+        await del('courses/' + old.id);
+      }
+    }
   };
 
-  getLocalDirs = async () => {
+  getRecentProjects = async () => {
     const newMetas: DirMeta[] = [];
 
     if (this.isElectron) {
       try {
-        const dirs = await this.fs.promises.readdir(fsType.localFileSystem);
-
-        for (const dir of dirs) {
-          const stats = await this.fs.promises.stat(
-            fsType.localFileSystem + '/' + dir.toString(),
-          );
-          newMetas.push({
-            createdAt: new Date(stats.ctimeMs as number).toISOString(),
-            lastAccessed: new Date(stats.mtimeMs as number).toISOString(),
-            id: dir.toString(),
-            isValid: true,
-            name: dir.toString(),
-            remoteUrl: await this.getGitRemoteUrlElectron(dir.toString()),
-          });
-        }
+        return await window.fsApi.getRecentProjects();
       } catch {
         return [];
       }
@@ -537,11 +567,7 @@ export class GitFS {
         await set('courses/' + meta.id, meta);
       }
     }
-    return newMetas.sort((a, b) => {
-      const aTime = new Date(a.lastAccessed ?? a.createdAt).getTime();
-      const bTime = new Date(b.lastAccessed ?? b.createdAt).getTime();
-      return bTime - aTime;
-    });
+    return sortProjectMetas(newMetas);
   };
 
   getDirHandle = async (id: string) => {
@@ -566,6 +592,7 @@ export class GitFS {
 
     return saved?.dirHandle;
   };
+
   /**
    * Deletes a local repository directory by name.
    *
@@ -592,6 +619,22 @@ export class GitFS {
     }
 
     await this.clearDirectory(repoPath);
+    // .git is blocked from enumeration by the browser's File System Access API,
+    // so clearDirectory won't see it. Delete it explicitly by name.
+    try {
+      await this.fs.promises.rmdir(`${repoPath}/.git`);
+    } catch {}
+
+    // For local filesystem repos in the browser, the root WebAccess mount point
+    // cannot be deleted via removeEntry (browser throws "Name is not allowed").
+    // Instead, unmount the zenFs path so the name can be reused immediately.
+    if (!this.isElectron && r.fileSystemType === fsType.localFileSystem) {
+      try {
+        zenFs.umount(repoPath);
+      } catch {}
+      return;
+    }
+
     await this.fs.promises.rmdir(repoPath);
   };
 

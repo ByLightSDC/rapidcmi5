@@ -5,14 +5,18 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 
 import { Buffer } from 'buffer';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { CourseData } from '@rapid-cmi5/cmi5-build-common';
+import {
+  CourseData,
+  DirMeta,
+  Credentials,
+  GitUserConfig,
+} from '@rapid-cmi5/cmi5-build-common';
 import {
   CreateCloneType,
   CreateCommitType,
@@ -43,7 +47,7 @@ import { usePublishActions } from './usePublishActions';
 import { useImageCache } from './useImageCache';
 import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 import { INode } from 'react-accessible-treeview';
-import { DirMeta, FileContent, getRepoPath, GitFS } from '../utils/fileSystem';
+import { FileContent, getRepoPath, GitFS } from '../utils/fileSystem';
 import { GitOperations } from '../utils/gitOperations';
 import JSZip from 'jszip';
 import { FolderStruct } from '@rapid-cmi5/cmi5-build-common';
@@ -196,6 +200,7 @@ interface IGitContext {
   openSandbox: () => Promise<void>;
   getLocalFolders: () => Promise<DirMeta[]>;
   openLocalRepo: (id?: string) => Promise<void>;
+  deleteRecentProject: (id: string) => Promise<void>;
   getDirHandle: () => Promise<FileSystemDirectoryHandle | null>;
   gettingRepoStatus: boolean;
 }
@@ -314,6 +319,7 @@ const defaultGitContext: IGitContext = {
   getLocalFolders: async (): Promise<DirMeta[]> => [],
   openSandbox: async (): Promise<void> => {},
   openLocalRepo: async (): Promise<void> => {},
+  deleteRecentProject: async (): Promise<void> => {},
   getDirHandle: async (): Promise<FileSystemDirectoryHandle | null> => null,
   gettingRepoStatus: false,
 };
@@ -358,7 +364,6 @@ export const GitContextProvider = (props: tProviderProps) => {
   const availableCourses = fileState?.availableCourses ?? [];
   const currentCourse = fileState.selectedCourse;
   const directoryTree = fileState.directoryTree;
-  const isCopyingGit = useRef(false);
   const slideNumber = useSelector(currentSlideNum);
 
   const currentRepo = repoAccessObject?.repoName || null;
@@ -496,6 +501,13 @@ export const GitContextProvider = (props: tProviderProps) => {
 
     setIsGitLoaded(false);
     await deleteRepo(r);
+    const recentProjectIOd = gitFs.currentProjectRecentsId;
+    // Electron will remove its own recent projects in the backend
+    if (!isElectron && recentProjectIOd) {
+      gitFs.currentProjectRecentsId = undefined;
+      gitFs.removeRecentProject(recentProjectIOd);
+    }
+
     await resetRepoStatus();
     dispatch(changeViewMode(ViewModeEnum.RepoSelector));
   };
@@ -526,7 +538,7 @@ export const GitContextProvider = (props: tProviderProps) => {
   const handleUnstageAll = async () => {
     const r = getRepoAccess(repoAccessObject);
 
-    const chagnedFiles = await unstageFiles(modifiedFiles);
+    await unstageFiles(modifiedFiles);
     await resolveGitRepoStatus(r);
     setCanCommit(false);
   };
@@ -557,6 +569,29 @@ export const GitContextProvider = (props: tProviderProps) => {
     await loadCourse(coursePath, r);
   };
 
+  const attemptGlobalGitConfigOverride = (
+    authorEmail: string,
+    authorName: string,
+    repoUsername?: string,
+    repoPassword?: string,
+  ) => {
+    if (rapidCmi5Opts.handleOverrideGlobalGitConfig) {
+      const gitUserConfig: GitUserConfig = {
+        authorEmail: authorEmail,
+        authorName: authorName,
+      };
+
+      const creds: Credentials | undefined =
+        repoUsername && repoPassword
+          ? {
+              username: repoUsername,
+              password: repoPassword,
+            }
+          : undefined;
+      rapidCmi5Opts.handleOverrideGlobalGitConfig(gitUserConfig, creds);
+    }
+  };
+
   const handleCloneRepo = async (req: CreateCloneType) => {
     const cleanedName = slugifyPath(req.repoDirName);
     dispatch(setLoadingState(LoadingState.cloningRepo));
@@ -565,6 +600,7 @@ export const GitContextProvider = (props: tProviderProps) => {
       fileSystemType: fsType.localFileSystem,
       repoName: req.repoDirName,
     };
+
     try {
       await gitFs.createRepoInDir(
         req.repoDirName,
@@ -589,6 +625,12 @@ export const GitContextProvider = (props: tProviderProps) => {
       setLocalFileSystemLoaded(true);
       setBrowserFileSystemLoaded(true);
       await resolveCurrentRepo(r);
+      attemptGlobalGitConfigOverride(
+        req.authorEmail,
+        req.authorName,
+        req.repoUsername,
+        req.repoPassword,
+      );
     } finally {
       dispatch(setLoadingState(LoadingState.loaded));
     }
@@ -635,7 +677,7 @@ export const GitContextProvider = (props: tProviderProps) => {
   };
 
   const getLocalFolders = async () => {
-    return await gitFs.getLocalDirs();
+    return await gitFs.getRecentProjects();
   };
 
   const populateSandBox = async () => {
@@ -683,6 +725,12 @@ export const GitContextProvider = (props: tProviderProps) => {
     } finally {
       dispatch(setLoadingState(LoadingState.loaded));
     }
+  };
+
+  // Will delete the project on electron application
+  // Will simply remove from the recent project list in the web application
+  const deleteRecentProject = async (id: string) => {
+    await gitFs.removeRecentProject(id);
   };
 
   const getDirHandle = async () => {
@@ -1103,6 +1151,12 @@ export const GitContextProvider = (props: tProviderProps) => {
         fileSystemType: fsType.localFileSystem,
         repoName: cleanedName,
       });
+      attemptGlobalGitConfigOverride(
+        req.authorEmail,
+        req.authorName,
+        req.repoUsername,
+        req.repoPassword,
+      );
     } finally {
       dispatch(setLoadingState(LoadingState.loaded));
     }
@@ -1228,6 +1282,7 @@ export const GitContextProvider = (props: tProviderProps) => {
         getLocalFolders,
         openSandbox,
         openLocalRepo,
+        deleteRecentProject,
         getDirHandle,
       }}
     >

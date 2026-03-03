@@ -94,15 +94,15 @@ export function PublishPcteDialogs() {
                     {repo.name}
                   </MenuItem>
                 ))}
-                <MenuItem value="NEW_REPO">Create New Repository</MenuItem>
+                <MenuItem value="NEW_REPO">Create New Project</MenuItem>
               </Select>
             </FormControl>
-            {/* Input Field for New Repository Name */}
+            {/* Input Field for New Project Name */}
             {isCreatingNewRepo && (
               <TextField
                 fullWidth
                 margin="dense"
-                label="New Repository Name"
+                label="New Project Name"
                 variant="outlined"
                 value={newRepoName}
                 onChange={(e) => setNewRepoName(e.target.value)}

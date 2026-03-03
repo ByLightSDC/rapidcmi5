@@ -1,9 +1,7 @@
-import { Box, Container } from '@mui/material';
-import { DirMeta } from '../../../course-builder/GitViewer/utils/fileSystem';
-import CloneLoadingOverlay from './LoadingOverlay';
+import { Box } from '@mui/material';
 import ProductionModeSelection from './ProductionModeSelection';
 import RecentProjectSelection from './RecentProjectSelection';
-import { LoadingState } from 'packages/rapid-cmi5/src/lib/redux/repoManagerReducer';
+import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
 
 interface OptionDocumentation {
   title: string;
@@ -11,19 +9,19 @@ interface OptionDocumentation {
 }
 
 export default function ElectronAppSelection({
-  openLocalFolderAndSet,
-  openLocalRecentProject,
-  handleCreateRepo,
+  onOpenLocalFolder,
+  onOpenRecentProject,
+  onCreateRepo,
   recentProjects,
-  handleCloneRepo,
-  handleShowDocumentation,
+  onCloneRepo,
+  onShowDocumentation,
 }: {
-  openLocalFolderAndSet: () => Promise<void>;
-  openLocalRecentProject: (id: string) => Promise<void>;
-  handleCreateRepo: () => void;
+  onOpenLocalFolder: () => Promise<void>;
+  onOpenRecentProject: (id: string) => Promise<void>;
+  onCreateRepo: () => void;
   recentProjects: DirMeta[];
-  handleShowDocumentation: (doc: OptionDocumentation) => void;
-  handleCloneRepo: () => void;
+  onShowDocumentation: (doc: OptionDocumentation) => void;
+  onCloneRepo: () => void;
 }) {
   return (
     <Box
@@ -36,16 +34,16 @@ export default function ElectronAppSelection({
       }}
     >
       <ProductionModeSelection
-        openLocalFolder={openLocalFolderAndSet}
-        cloneRepo={handleCloneRepo}
-        createRepo={handleCreateRepo}
-        onShowDocumentation={handleShowDocumentation}
+        openLocalFolder={onOpenLocalFolder}
+        cloneRepo={onCloneRepo}
+        createRepo={onCreateRepo}
+        onShowDocumentation={onShowDocumentation}
         isElectron={true}
       />
 
       <RecentProjectSelection
         recentProjects={recentProjects}
-        openRecentProject={openLocalRecentProject}
+        onOpenRecentProject={onOpenRecentProject}
       />
     </Box>
   );

@@ -7,27 +7,30 @@ import {
 } from '@mdxeditor/editor';
 
 import { $getSelection, $isRangeSelection } from 'lexical';
-
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
-
-import InputIcon from '@mui/icons-material/Input';
-
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { DEFAULT_STEPS } from './constants';
 import { placeCaretInsideDirective } from '../../util/caret';
 import { convertMarkdownToMdast } from '../../util/conversion';
+import { ButtonMinorUi } from 'packages/ui/src/lib/utility/buttons';
+import { useTheme } from '@emotion/react';
 
-
+/**
+ * Icons
+ */
+import AddIcon from '@mui/icons-material/Add';
+import InputIcon from '@mui/icons-material/Input';
 
 /**
  * A toolbar button component that inserts a stepper structure into the editor.
  * @component
  * @returns A button with a tooltip labeled "Insert Stepper" and a stepper icon.
  */
-export const InsertSteps = () => {
+export const InsertSteps = ({ isDrawer }: { isDrawer?: boolean }) => {
   const editor = useCellValue(activeEditor$);
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
+  const theme: any = useTheme();
 
   /**
    * Inserts default Tabs at the current selection
@@ -46,7 +49,7 @@ export const InsertSteps = () => {
         return; //no applying tab to selection
       }
 
-      // create children tabs content nodes 
+      // create children tabs content nodes
       const theChildMDast = convertMarkdownToMdast(
         DEFAULT_STEPS,
         syntaxExtensions,
@@ -57,7 +60,7 @@ export const InsertSteps = () => {
         type: 'containerDirective',
         name: 'steps',
         attributes: {
-          style: "margin: 4px;",
+          style: 'margin: 4px;',
         },
         children: (theChildMDast?.children as BlockContent[]) || [],
       };
@@ -70,14 +73,50 @@ export const InsertSteps = () => {
   };
 
   return (
-    <ButtonWithTooltip
-      title="Insert Stepper"
-      aria-label="insert-steps"
-      onClick={() => {
-        insertAtSelection();
-      }}
-    >
-      <InputIcon fontSize="small" />
-    </ButtonWithTooltip>
+    <>
+      {isDrawer ? (
+        <ButtonMinorUi
+          title="Insert Steps"
+          aria-label="insert-steps"
+          startIcon={
+            <>
+              <AddIcon
+                fontSize="large"
+                sx={{
+                  color: theme.palette.primary.main,
+                  fill: theme.palette.primary.main,
+                }}
+              />
+              <InputIcon
+                fontSize="small"
+                sx={{ fill: theme.palette.primary.main, marginRight: 1 }}
+              />
+            </>
+          }
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            margin: 1,
+            padding: 1,
+          }}
+          onClick={() => {
+            insertAtSelection();
+          }}
+        >
+          Stepper
+        </ButtonMinorUi>
+      ) : (
+        <ButtonWithTooltip
+          title="Insert Steps"
+          aria-label="insert-steps"
+          onClick={() => {
+            insertAtSelection();
+          }}
+        >
+          <InputIcon fontSize="small" />
+        </ButtonWithTooltip>
+      )}
+    </>
   );
 };

@@ -111,7 +111,7 @@ export function ImportRepoZipForm({
             helperText={errors?.repoDirName?.message}
             name="repoDirName"
             required
-            label="Repository Name"
+            label="Project Name"
           />
         </Grid>
 
