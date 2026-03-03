@@ -345,6 +345,8 @@ export class GitFS {
       if (id) {
         if (!(await this.dirExists('/' + fsType.localFileSystem + '/' + id)))
           throw Error('Could not find dir');
+        // We need to readd to recent projects to update the last opened time
+        await window.fsApi.addRecentProject(id);
         const dirName = basename(id);
         return dirName;
       } else {
