@@ -11,7 +11,6 @@ import {
   auDisplayInitializedSel,
   auJsonSel,
   auViewedSlidesSel,
-  courseAUProgressSel,
   setIsConfigInitialized,
   setIsDisplayInitialized,
 } from '../redux/auReducer';
@@ -34,7 +33,6 @@ import {
   AuManagerState,
   QuizState,
   RC5ActivityTypeEnum,
-  SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 import MenuLayout from '../components/MenuLayout';
 import { getAutoGradersProgress } from '../utils/Cmi5Helpers';
@@ -78,7 +76,6 @@ function AuManager() {
   const viewedSlides = useSelector(auViewedSlidesSel);
   const isDisplayInitialized = useSelector(auDisplayInitializedSel);
   const dispatch = useDispatch();
-  const courseAUProgress = useSelector(courseAUProgressSel);
 
   const isInitializedProgressData = useRef(false);
   const [auManagerState, setAuManagerState] = useState(AuManagerState.waiting);
@@ -91,9 +88,11 @@ function AuManager() {
     isAuthenticated,
     isTestMode,
     initializeCmi5,
+    initializeSession,
     testCmi5,
     isSessionInitialized,
     cmi5ErrorMessage,
+    isInitSessionComplete,
   } = useCMI5Session();
 
   const {
@@ -290,18 +289,9 @@ function AuManager() {
       setLoadingMessage(cmi5ErrorMessage);
       setAuManagerState(AuManagerState.error);
     }
-
     if (auManagerState === AuManagerState.waiting) {
-      loadOverrides('./cfg.json');
-      setAuManagerState(AuManagerState.loadingOverrides);
-      return;
-    } else if (auManagerState === AuManagerState.loadingOverrides) {
-      if (isOverridesLoaded) {
-        // Refresh logging configuration after overrides are applied
-        refreshLoggingConfig();
-        loadContent('./config.json');
-        setAuManagerState(AuManagerState.loadingContent);
-      }
+      loadContent('./config.json');
+      setAuManagerState(AuManagerState.loadingContent);
       return;
     } else if (auManagerState === AuManagerState.loadingContent) {
       if (isContentLoaded) {
@@ -327,6 +317,8 @@ function AuManager() {
 
         if (checkForDevMode()) {
           logger.debug('[AU] test mode', undefined, 'auManager');
+          loadOverrides('./cfg.json', false);
+
           testCmi5(true);
           logger.debug(
             '[AU] state >',
@@ -340,7 +332,7 @@ function AuManager() {
             dispatch(setIsConfigInitialized(true));
           }
         } else {
-          initializeCmi5(shouldRequireClassId, auHasScenario);
+          initializeSession();
           setAuManagerState(AuManagerState.authenticating);
         }
       }
@@ -350,12 +342,18 @@ function AuManager() {
       }
       return;
     } else if (auManagerState === AuManagerState.authenticating) {
-      if (!isAuthenticated) {
-        setTimeout(() => {
-          setInitializationAttempt(initializationAttempt + 1);
-        }, 1000);
-      } else {
+      if (isInitSessionComplete) {
+        setAuManagerState(AuManagerState.loadingOverrides);
+      }
+      return;
+    } else if (auManagerState === AuManagerState.loadingOverrides) {
+      if (isOverridesLoaded) {
+        // Refresh logging configuration after overrides are applied
+        refreshLoggingConfig();
         setAuManagerState(AuManagerState.loadingScenario);
+        console.log('config loaded after overrides', config);
+      } else {
+        loadOverrides('./cfg.json');
       }
       return;
     } else if (auManagerState === AuManagerState.loadingScenario) {
@@ -399,6 +397,8 @@ function AuManager() {
             setCmi5ReadyAttempts(0);
           }
         }
+      } else {
+        initializeCmi5(shouldRequireClassId, auHasScenario);
       }
       return;
     } else if (auManagerState === AuManagerState.error) {
@@ -480,6 +480,7 @@ function AuManager() {
     activeTab, // Re-added to trigger progress updates on slide navigation
     initializationAttempt,
     cmi5ReadyAttempts, // Added to trigger CMI5 readiness checks
+    isInitSessionComplete,
   ]);
 
   /**

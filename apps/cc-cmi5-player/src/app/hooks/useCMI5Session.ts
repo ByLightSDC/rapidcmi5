@@ -1,8 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import axios, { AxiosError } from 'axios';
-import { v4 as uuidv4 } from 'uuid';
-import sha256 from 'crypto-js/sha256';
-import { Statement } from '@xapi/xapi';
 import Cmi5 from '@xapi/cmi5';
 import { debugLog } from '../debug';
 
@@ -70,6 +67,8 @@ export const useCMI5Session = () => {
   //const [isSessionInitialized, setIsSessioninitialized] = useState(false);
   const [isTestMode, setIsTestMode] = useState(checkForDevMode());
   const [cmi5ErrorMessage, setCMI5ErrorMessage] = useState('');
+  const [initSessionError, setInitSessionError] = useState<string | null>(null);
+  const [isInitSessionComplete, setIsInitSessionComplete] = useState(false);
   const isSessionInitialized = useSelector(auSessionInitializedSel);
 
   /**
@@ -170,6 +169,8 @@ export const useCMI5Session = () => {
    * @returns
    */
   const initializeSession = async () => {
+    setInitSessionError(null);
+    setIsInitSessionComplete(false);
     const launchParams = cmi5Instance.getLaunchParameters();
     console.log('🚀 CMI5 Player Launch Parameters:', {
       fetch: launchParams.fetch,
@@ -182,6 +183,7 @@ export const useCMI5Session = () => {
     if (cmi5Instance.getLaunchParameters().fetch === 'test') {
       debugLog('Cmi5 is in test mode');
       setIsTestMode(true);
+      setIsInitSessionComplete(true);
       return;
     }
 
@@ -279,13 +281,16 @@ export const useCMI5Session = () => {
           '💥 FATAL: Error initializing CMI5 with new session, this is a fatal error',
           error,
         );
-        //throw new Error('Error initializing CMI5 with new session');
-        setCMI5ErrorMessage('Error initializing CMI5 with new session');
+        const errorMsg = 'Error initializing CMI5 with new session';
+        setCMI5ErrorMessage(errorMsg);
+        setInitSessionError(errorMsg);
+        return;
       }
     }
 
     console.info('Successful CMI5 Session initialization', initializeData);
     setCMI5ErrorMessage('');
+    setInitSessionError(null);
 
     // CRITICAL LOGGING: Track xAPI instance status
     console.log('🔍 xAPI Instance Status After Initialization:', {
@@ -307,7 +312,29 @@ export const useCMI5Session = () => {
       // Don't throw error - initialization should continue even if LRS statement fails
     }
 
-    return { sessionStorageId, fetchUrl: launchParams.fetch };
+    if (sessionStorageId === undefined) return;
+    const authToken = cmi5Instance.getAuthToken();
+    if (!config.CMI5_SSO_ENABLED) {
+      storeAuthToken(authToken);
+    }
+    const initializedDate = cmi5Instance.getInitializedDate();
+    // Store this in session storage since fetch can only be done once and we need the token on page refresh
+    if (sessionStorageId) {
+      const sessionData = {
+        authToken,
+        initializedDate: initializedDate.getTime(),
+        activityId: cmi5Instance.getLaunchParameters().activityId, // Store the activity ID for comparison
+        fetchUrl: launchParams.fetch,
+      };
+      console.log('💾 Storing CMI5 session data:', {
+        sessionStorageId,
+        authToken: authToken ? `${authToken.substring(0, 20)}...` : 'null',
+        initializedDate: initializedDate.toISOString(),
+        activityId: sessionData.activityId,
+      });
+      sessionStorage.setItem(sessionStorageId, JSON.stringify(sessionData));
+    }
+    setIsInitSessionComplete(true);
   };
 
   /**
@@ -414,32 +441,6 @@ export const useCMI5Session = () => {
   ) => {
     debugLog('initialize CMI5 session', shouldPromptClassId);
     try {
-      const res = await initializeSession();
-      const sessionStorageId = res?.sessionStorageId;
-      const fetchUrl = res?.fetchUrl;
-
-      if (sessionStorageId === undefined) return;
-      const authToken = cmi5Instance.getAuthToken();
-      if (!config.CMI5_SSO_ENABLED) {
-        storeAuthToken(authToken);
-      }
-      const initializedDate = cmi5Instance.getInitializedDate();
-      // Store this in session storage since fetch can only be done once and we need the token on page refresh
-      if (sessionStorageId) {
-        const sessionData = {
-          authToken,
-          initializedDate: initializedDate.getTime(),
-          activityId: cmi5Instance.getLaunchParameters().activityId, // Store the activity ID for comparison
-          fetchUrl: fetchUrl,
-        };
-        console.log('💾 Storing CMI5 session data:', {
-          sessionStorageId,
-          authToken: authToken ? `${authToken.substring(0, 20)}...` : 'null',
-          initializedDate: initializedDate.toISOString(),
-          activityId: sessionData.activityId,
-        });
-        sessionStorage.setItem(sessionStorageId, JSON.stringify(sessionData));
-      }
       await postAuAuth();
       debugLog('has scenario', auHasScenario);
       rangeDataAttempts.current = 0;
@@ -498,7 +499,7 @@ export const useCMI5Session = () => {
   }, [savedRangeDataAttempts, dispatch, initializeScenarios]);
 
   /**
-   * 
+   *
    */
   useEffect(() => {
     if (rangeData) {
@@ -522,9 +523,12 @@ export const useCMI5Session = () => {
 
   return {
     initializeCmi5,
+    initializeSession,
     initializeScenarios,
     isAuthenticated: cmi5Instance?.isAuthenticated,
     isSessionInitialized,
+    isInitSessionComplete,
+    initSessionError,
     isTestMode,
     testCmi5,
     cmi5ErrorMessage,
