@@ -11,7 +11,6 @@ interface OptionDocumentation {
 export default function ElectronAppSelection({
   onOpenLocalFolder,
   onOpenRecentProject,
-  onRemoveRecentProject,
   onCreateRepo,
   recentProjects,
   onCloneRepo,
@@ -19,7 +18,6 @@ export default function ElectronAppSelection({
 }: {
   onOpenLocalFolder: () => Promise<void>;
   onOpenRecentProject: (id: string) => Promise<void>;
-  onRemoveRecentProject: (id: string[]) => Promise<void>;
   onCreateRepo: () => void;
   recentProjects: DirMeta[];
   onShowDocumentation: (doc: OptionDocumentation) => void;
@@ -46,7 +44,6 @@ export default function ElectronAppSelection({
       <RecentProjectSelection
         recentProjects={recentProjects}
         onOpenRecentProject={onOpenRecentProject}
-        onRemoveRecentProject={onRemoveRecentProject}
       />
     </Box>
   );

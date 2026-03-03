@@ -1,19 +1,15 @@
 import {
   Typography,
-  IconButton,
   ListItemText,
   ListItemButton,
   TextField,
   InputAdornment,
   Alert,
   AlertTitle,
-  Tooltip,
-  Checkbox,
-  Button,
-  Switch,
+  IconButton,
 } from '@mui/material';
 import { alpha, Box, Stack, useTheme } from '@mui/system';
-import { History, Search, Clear, Info } from '@mui/icons-material';
+import { History, Search, Clear } from '@mui/icons-material';
 import { GlassCard } from './GlassCard';
 
 import ThemedOptionCard from './ThemedOption';
@@ -23,20 +19,15 @@ import { useState, useMemo } from 'react';
 export type RecentProjectSelectionProps = {
   recentProjects: DirMeta[];
   onOpenRecentProject: (path: string) => void;
-  onRemoveRecentProject: (path: string[]) => Promise<void>;
   isDisabled?: boolean;
 };
 
 export default function RecentProjectSelection({
   recentProjects,
   onOpenRecentProject,
-  onRemoveRecentProject,
   isDisabled = false,
 }: RecentProjectSelectionProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [isRemoving, setIsRemoving] = useState(false);
   const theme = useTheme();
   const { palette } = theme;
 
@@ -58,57 +49,11 @@ export default function RecentProjectSelection({
     setSearchQuery('');
   };
 
-  const handleEnterEditMode = () => {
-    setIsEditMode(true);
-    setSelectedIds(new Set());
-  };
-
-  const handleCancelEditMode = () => {
-    setIsEditMode(false);
-    setSelectedIds(new Set());
-  };
-
-  const handleToggleSelect = (id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
-
-  const handleRemoveSelected = async () => {
-    setIsRemoving(true);
-    await onRemoveRecentProject([...selectedIds])
-    setIsRemoving(false);
-    setIsEditMode(false);
-    setSelectedIds(new Set());
-  };
-
-  const editButton =
-    recentProjects.length > 0 ? (
-      <Tooltip
-        title={isEditMode ? 'Exit edit mode' : 'Select projects to remove'}
-        placement="left"
-        arrow
-      >
-        <Switch
-          checked={isEditMode}
-          onChange={(e) => e.target.checked ? handleEnterEditMode() : handleCancelEditMode()}
-          disabled={isDisabled}
-        />
-      </Tooltip>
-    ) : null;
-
   return (
     <GlassCard
       sx={{ height: 'clamp(650px, 80vh, 700px)' }}
       title="Recent Projects"
       icon={<History sx={{ color: 'white' }} />}
-      headerAction={editButton}
     >
       <Box
         data-testid="recent-projects-card"
@@ -119,38 +64,6 @@ export default function RecentProjectSelection({
           minHeight: 0,
         }}
       >
-        {/* Edit mode info banner */}
-        {isEditMode && (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: 1,
-              mb: 2,
-              p: 1.5,
-              borderRadius: 1.5,
-              backgroundColor: alpha(palette.info.main, 0.08),
-              border: `1px solid ${alpha(palette.info.main, 0.2)}`,
-              flexShrink: 0,
-            }}
-          >
-            <Info
-              sx={{ fontSize: 16, color: 'info.main', mt: 0.15, flexShrink: 0 }}
-            />
-            <Typography
-              variant="caption"
-              sx={{
-                fontFamily: '"IBM Plex Sans", sans-serif',
-                color: 'text.secondary',
-                lineHeight: 1.5,
-              }}
-            >
-              Select projects to remove from this list. Projects won't be
-              deleted — they'll reappear here if opened again.
-            </Typography>
-          </Box>
-        )}
-
         {/* Search Bar */}
         {recentProjects.length > 0 && (
           <TextField
@@ -228,13 +141,7 @@ export default function RecentProjectSelection({
             {filteredProjects.map((project) => (
               <ThemedOptionCard key={project.id}>
                 <ListItemButton
-                  onClick={() => {
-                    if (isEditMode) {
-                      handleToggleSelect(project.id);
-                    } else {
-                      onOpenRecentProject(project.id);
-                    }
-                  }}
+                  onClick={() => onOpenRecentProject(project.id)}
                   disabled={isDisabled}
                   sx={{
                     borderRadius: 2,
@@ -247,21 +154,6 @@ export default function RecentProjectSelection({
                     '&:hover': { background: 'transparent' },
                   }}
                 >
-                  {isEditMode && (
-                    <Checkbox
-                      checked={selectedIds.has(project.id)}
-                      size="small"
-                      disableRipple
-                      onClick={(e) => e.stopPropagation()}
-                      onChange={() => handleToggleSelect(project.id)}
-                      sx={{
-                        p: 0,
-                        flexShrink: 0,
-                        color: alpha(palette.error.main, 0.5),
-                        '&.Mui-checked': { color: 'error.main' },
-                      }}
-                    />
-                  )}
                   <Box sx={{ flex: 1, minWidth: 0 }}>
                     <Box sx={{ mb: 0.5 }}>
                       <ListItemText
@@ -353,33 +245,6 @@ export default function RecentProjectSelection({
               You must click allow access when the browser prompts you.
             </Stack>
           </Alert>
-        )}
-
-        {/* Edit mode action bar */}
-        {isEditMode && (
-          <Stack direction="row" spacing={1} sx={{ mt: 2, flexShrink: 0 }}>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={handleCancelEditMode}
-              disabled={isRemoving}
-              sx={{ fontFamily: '"IBM Plex Sans", sans-serif', flex: 1 }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              size="small"
-              onClick={handleRemoveSelected}
-              disabled={selectedIds.size === 0 || isRemoving}
-              sx={{ fontFamily: '"IBM Plex Sans", sans-serif', flex: 1 }}
-            >
-              {isRemoving
-                ? 'Removing…'
-                : `Remove Selected${selectedIds.size > 0 ? ` (${selectedIds.size})` : ''}`}
-            </Button>
-          </Stack>
         )}
       </Box>
     </GlassCard>

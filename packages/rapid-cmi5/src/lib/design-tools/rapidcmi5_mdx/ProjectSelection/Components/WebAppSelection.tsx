@@ -19,11 +19,9 @@ export default function WebAppSelection({
   onCloneRepo,
   onShowDocumentation,
   isSandboxLaunching = false,
-  onRemoveRecentProject,
 }: {
   onOpenLocalFolder: () => Promise<void>;
   onOpenRecentProject: (id: string) => Promise<void>;
-  onRemoveRecentProject: (ids: string[]) => Promise<void>;
   onCreateRepo: () => void;
   onOpenSandbox: () => Promise<void>;
   recentProjects: DirMeta[];
@@ -64,7 +62,6 @@ export default function WebAppSelection({
         <RecentProjectSelection
           recentProjects={recentProjects}
           onOpenRecentProject={onOpenRecentProject}
-          onRemoveRecentProject={onRemoveRecentProject}
           isDisabled={isSandboxLaunching}
         />
       </Box>

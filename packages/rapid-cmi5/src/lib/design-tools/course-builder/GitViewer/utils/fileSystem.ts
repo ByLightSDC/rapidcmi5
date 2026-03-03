@@ -509,6 +509,27 @@ export class GitFS {
     this.currentProjectRecentsId = id;
 
     await set('courses/' + id, dirMeta);
+
+    // Enforce 10-project limit: remove oldest entries beyond the cap
+    const updatedKeys = await keys();
+    const courseKeys = updatedKeys.filter(
+      (key): key is string =>
+        typeof key === 'string' && key.startsWith('courses/'),
+    );
+    if (courseKeys.length > 10) {
+      const allMetas = await getMany<DirMeta>(courseKeys);
+      const sorted = allMetas
+        .filter((m): m is DirMeta => !!m)
+        .sort(
+          (a, b) =>
+            new Date(a.lastAccessed).getTime() -
+            new Date(b.lastAccessed).getTime(),
+        );
+      const toRemove = sorted.slice(0, sorted.length - 10);
+      for (const old of toRemove) {
+        await del('courses/' + old.id);
+      }
+    }
   };
 
   getRecentProjects = async () => {

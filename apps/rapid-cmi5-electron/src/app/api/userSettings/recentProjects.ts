@@ -26,7 +26,16 @@ export function addRecentProject(id: string): void {
     existingIndex >= 0
       ? projects.map((p, i) => (i === existingIndex ? entry : p))
       : [...projects, entry];
-  recentProjectsStore.set('recentProjects', updated);
+
+  // Keep only the 10 most recently accessed projects
+  const trimmed = updated
+    .sort(
+      (a, b) =>
+        new Date(b.lastAccessed).getTime() - new Date(a.lastAccessed).getTime(),
+    )
+    .slice(0, 10);
+
+  recentProjectsStore.set('recentProjects', trimmed);
 }
 
 export function removeRecentProject(id: string): void {

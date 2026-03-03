@@ -103,25 +103,6 @@ export default function SelectProjectHomePage({}: {}) {
     populateRecentProjects();
   }, []);
 
-  const removeRecentProjects = async (ids: string[]) => {
-    if (!ids?.length) return;
-
-    for (const id of ids) {
-      await deleteRecentProject(id);
-    }
-
-    displayToaster({
-      message:
-        ids.length === 1
-          ? `Removed project from your recents`
-          : `Removed ${ids.length} projects from your recents`,
-      severity: 'success',
-      autoHideDuration: 3000,
-    });
-
-    populateRecentProjects();
-  };
-
   const handleOpenRecentProject = async (id: string) => {
     try {
       await openLocalRepo(id);
@@ -193,7 +174,6 @@ export default function SelectProjectHomePage({}: {}) {
               onCreateRepo={promptCreateLocalRepo}
               onOpenLocalFolder={handleOpenLocalFolder}
               onOpenRecentProject={handleOpenRecentProject}
-              onRemoveRecentProject={removeRecentProjects}
             />
           ) : (
             <WebAppSelection
@@ -205,7 +185,6 @@ export default function SelectProjectHomePage({}: {}) {
               onCreateRepo={promptCreateLocalRepo}
               onOpenLocalFolder={handleOpenLocalFolder}
               onOpenRecentProject={handleOpenRecentProject}
-              onRemoveRecentProject={removeRecentProjects}
             />
           )}
         </Container>
