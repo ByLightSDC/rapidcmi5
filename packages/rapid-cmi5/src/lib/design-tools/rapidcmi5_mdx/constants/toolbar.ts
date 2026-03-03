@@ -3,15 +3,6 @@
  */
 
 
-export const activitiesInfoText = `| Activity Type      | Description |
-|--------------------|-------------|
-| Capture The Flag   | Participants solve independent challenges across several categories to “capture flags.” |
-| Jobe In The Box    | Hands-on coding and execution environment that allows participants to write and run code inside an isolated sandbox without requiring local setup. |
-| Quiz               | Structured assessment tool used to measure learner understanding of course material. |
-| RangeOS Scenario   | A fully interactive cybersecurity simulation delivered through a live cyber range environment, providing structured training content alongside direct console access to systems so learners can perform real-world tasks in a controlled setting. |
-| Team Exercise      | A shared interactive cybersecurity simulation where multiple participants share access to deployed resources. |
-`;
-
 //info main colors (clone theme, same for light and dark mode)
 const infoMainColor = '#0288d1';
 const infoBorder = '#92CEF5';
@@ -75,11 +66,11 @@ export const activitiesTable = `<table style="border-collapse: separate; ">
     </tr>
     <tr >
       <td style="${borderStyle}${borderRightStyle}">${quizSvg}Quiz</td>
-      <td style="${paddingStyle}${borderStyle}">Structured assessment tool used to measure learner understanding of course material.</td>
+      <td style="${paddingStyle}${borderStyle}">Structured assessment tool used to measure participant understanding of course material.</td>
     </tr>
     <tr>
       <td style="${borderStyle}${borderRightStyle}">${terminalSvg}RangeOS Scenario</td>
-      <td style="${paddingStyle}${borderStyle}">A fully interactive cybersecurity simulation delivered through a live cyber range environment, providing structured training content alongside direct console access to systems so learners can perform real-world tasks in a controlled setting.</td>
+      <td style="${paddingStyle}${borderStyle}">A fully interactive cybersecurity simulation delivered through a live cyber range environment, providing structured training content alongside direct console access to systems so participants can perform real-world tasks in a controlled setting.</td>
     </tr>
     <tr>
       <td style="${borderRightStyle}">${terminalSvg}Team Exercise</td>
