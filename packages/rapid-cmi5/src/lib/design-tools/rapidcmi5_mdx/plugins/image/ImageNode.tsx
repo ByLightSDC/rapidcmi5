@@ -14,14 +14,9 @@ import { DecoratorNode } from 'lexical';
 import { ImageEditor } from './ImageEditor';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
-/**
- * Creates a random ID for each created image. This allows them to be referencable later.
- *
- * @returns - A random string of numbers to be used in ID for image
- */
-function generateImageId() {
-  return `image-${crypto.randomUUID()}`;
-}
+import { useTimeStampUUID } from '@rapid-cmi5/ui';
+
+const { generateId } = useTimeStampUUID();
 
 function convertImageElement(domNode: Node): null | DOMConversionOutput {
   if (domNode instanceof HTMLImageElement) {
@@ -166,7 +161,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     this.__height = height ? height : 'inherit';
     this.__rest = rest ?? [];
     this.__href = href;
-    this.__id = id ?? generateImageId();
+    this.__id = id ?? generateId();
   }
 
   /** @internal */
