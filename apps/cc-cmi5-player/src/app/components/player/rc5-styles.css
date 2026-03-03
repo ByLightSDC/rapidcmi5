@@ -92,3 +92,8 @@
 .mdxeditor-popup-container {
   z-index: 9999;
 }
+
+.imageWrapper img {
+  max-width: 100%;
+  max-height: 100%;
+}
