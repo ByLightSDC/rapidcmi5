@@ -5,6 +5,7 @@ import {
   readOnly$,
   syntaxExtensions$,
   useCellValues,
+  useLexicalNodeRemove,
   usePublisher,
 } from '@mdxeditor/editor';
 import * as Mdast from 'mdast';
@@ -81,7 +82,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     readOnly$,
     syntaxExtensions$,
   );
-
+  const removeNode = useLexicalNodeRemove();
   /**
    * Accessibility params
    * @param index
@@ -356,11 +357,17 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
                 <IconButton
                   aria-label="delete"
                   disabled={readOnly}
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     e.preventDefault();
-                    editor.update(() => {
-                      lexicalNode?.remove();
+                    parentEditor.update(() => {
+                      if (lexicalNode.getPreviousSibling()) {
+                        lexicalNode.selectPrevious();
+                      } else {
+                        lexicalNode.selectNext();
+                      }
                     });
+                    await delay(50);
+                    removeNode();
                   }}
                 >
                   <DeleteForeverIcon />
