@@ -22,9 +22,11 @@ export const getRepoPath = (r: RepoAccessObject) =>
 
 export class GitOperations {
   private gitFs: GitFS;
+  private http: typeof http;
 
-  constructor(gitFs: GitFS) {
+  constructor(gitFs: GitFS, httpPlugin?: typeof http) {
     this.gitFs = gitFs;
+    this.http = httpPlugin ?? http;
   }
 
   cache = {};
@@ -90,7 +92,7 @@ export class GitOperations {
       } else {
         await git.clone({
           fs: this.gitFs.fs,
-          http,
+          http: this.http,
           dir,
           url: repoRemoteUrl,
           ref: branch,
@@ -263,7 +265,7 @@ export class GitOperations {
       } else {
         await git.pull({
           fs: this.gitFs.fs,
-          http,
+          http: this.http,
           dir,
 
           ref: branch,
@@ -720,7 +722,7 @@ export class GitOperations {
       } else {
         await git.push({
           fs: this.gitFs.fs,
-          http,
+          http: this.http,
           dir,
           force,
           onAuth: () => ({ username, password }),

@@ -2,6 +2,8 @@ import { vol } from 'memfs';
 import { createFsFromVolume } from 'memfs';
 import { getRepoPath, GitOperations } from './gitOperations';
 import * as git from 'isomorphic-git';
+import http from 'isomorphic-git/http/node';
+
 import {
   RepoAccessObject,
   fsType,
@@ -62,7 +64,7 @@ async function setupTestContext(
     repoName,
   };
 
-  const gitOps = new GitOperations(instance);
+  const gitOps = new GitOperations(instance, http);
 
   return { instance, r, gitOps, fileState: initFileState };
 }
