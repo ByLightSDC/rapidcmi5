@@ -41,6 +41,46 @@ Certain env vars can be overridden by editing cfg.json
 In order to test locally, you need a cmi5 course to be present in your published build directory.<br/>
 As a one time set up, copy the placeholder files into the nx project. Note - this directory is ignored by git.
 
+#### Running local tests to send statements
+
+Running locally, the player is not automatically connected to an LRS. To test statement sending or flow, there is a script that enables it to communicate with the LRS at adlnet.gov, those username and password are needed separately for that service.
+
+The script to run your hosted content can be found in the root of the repo ie rapidcmi5/scripts/launchCmi5AsTest.ps1.
+
+To connect to the player there is a secret bearer token. This is not to be shared. In the ./scripts folder is an example.env file, use that to make a .env and place your secret token.
+
+Then make sure you are in the root folder and run
+
+```
+launchCmi5AsTest.ps1 "Your username"
+```
+
+If you forget to enter a username you will be prompted, this is the name that will be used as the actor in the statements.
+
+You will receive a URL in the commandline similar to
+
+```
+http://localhost:4200/content/1/1604/compiled_course/blocks/dave-course/introduction/index.html?endpoint=https%3A%2F%2Fcpt-player.develop-cp.rangeos.engineering%2Flrs&fetch=https%3A%2F%2Fcpt....etc
+
+```
+
+The next step is to take everything, starting at the ?, after index.html. Copy it, then paste it at the end of your local hosted version of the player in your URL bar.
+`http://localhost:4200/content/1/1604/.../index.html` -> Highlight and copy everything after this.
+
+So if you are hosting on
+
+```
+http://localhost:4300
+```
+
+it would become
+
+```
+http:localhost:4300?endpoint=https%3A%2F%2Fcpt-player.develop-cp.rangeos.engineering%2Flrs&fetch=https%3A%2F%2Fcpt....etc
+```
+
+That will allow you to see statements work in realtime.
+
 ##### Destination Path
 
 /libs/ui/components/branded/src/assets/cmi5-player/
