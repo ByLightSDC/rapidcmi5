@@ -67,10 +67,8 @@ export const InsertSteps = ({ isDrawer }: { isDrawer?: boolean }) => {
 
       const stepsNode = $createDirectiveNode(mdastTabs) as DirectiveNode;
       selection.insertNodes([stepsNode]);
-      //REF don't do this unless you want to get the cursor eaten
-      //see CCUI-2768, 2779, 2769
-      //const insertedKey = tabsNode.getKey();
-      //placeCaretInsideDirective(editor, insertedKey);
+      const insertedKey = stepsNode.getKey();
+      placeCaretInsideDirective(editor, insertedKey);
     });
   };
 
