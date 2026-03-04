@@ -319,7 +319,11 @@ export const AccordionEditor: React.FC<
                   onClick={async (e) => {
                     e.preventDefault();
                     parentEditor.update(() => {
-                      lexicalNode.selectPrevious();
+                      if (lexicalNode.getPreviousSibling()) {
+                        lexicalNode.selectPrevious();
+                      } else {
+                        lexicalNode.selectNext();
+                      }
                     });
                     await delay(50);
                     removeNode();
