@@ -115,6 +115,7 @@ function RC5VisualEditor() {
   const ref = React.useRef<MDXEditorMethods>(null);
   const dispatch = useDispatch();
   const { addEditor, removeEditor } = useContext(RC5Context);
+
   const currentSlideIndex = useSelector(currentSlideNum);
 
   const theme = useTheme();
@@ -185,6 +186,19 @@ function RC5VisualEditor() {
       const oldAnimations =
         slideAnimationsRef.current.get(currentSlideIndex) || [];
       slideAnimationsRef.current.set(currentSlideIndex, animations);
+
+      // Check if animations actually changed (deep comparison of relevant fields)
+      const hasActuallyChanged = !areAnimationsEqual(oldAnimations, animations);
+
+      if (!hasActuallyChanged) {
+        debugLog(
+          '⏭️  Animations unchanged (same content), skipping dirty flag',
+        );
+        // Note: AnimationResolver will update indicators after key resolution
+        return; // Don't rebuild plugins or mark as dirty if nothing changed
+      }
+
+      // Only increment version (triggers plugin rebuild) when animations actually changed
       setAnimationsVersion((v) => {
         const newVersion = v + 1;
         debugLog(
@@ -195,17 +209,6 @@ function RC5VisualEditor() {
         );
         return newVersion;
       });
-
-      // Check if animations actually changed (deep comparison of relevant fields)
-      const hasActuallyChanged = !areAnimationsEqual(oldAnimations, animations);
-
-      if (!hasActuallyChanged) {
-        debugLog(
-          '⏭️  Animations unchanged (same content), skipping dirty flag',
-        );
-        // Note: AnimationResolver will update indicators after key resolution
-        return; // Don't mark as dirty if nothing changed
-      }
 
       debugLog('✅ Animations have changed, marking as dirty');
 
@@ -695,7 +698,7 @@ function RC5VisualEditor() {
 
       ref.current?.focus();
     }
-  }, [content, currentSlideIndex]); //DO NOT REMOVE currentSlideIndex
+  }, [content, currentSlideIndex, currentCourse]); //DO NOT REMOVE currentSlideIndex
 
   /**
    * Note: Animation indicators are now updated by AnimationResolver
