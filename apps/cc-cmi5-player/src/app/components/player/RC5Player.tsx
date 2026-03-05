@@ -53,6 +53,7 @@ import {
   generateLessonThemeStyleTag,
   StepsDirectiveDescriptor,
   StepContentDirectiveDescriptor,
+  LessonThemeContext,
 } from '@rapid-cmi5/ui';
 
 import { RC5PlayerToolbar } from './RC5PlayerToolbar';
@@ -318,14 +319,16 @@ function RC5Player() {
           </style>
         )}
         {thePlugins && thePlugins.length > 0 && (
-          <MDXEditor
-            className={mdxTheme}
-            ref={ref}
-            markdown={''}
-            plugins={thePlugins}
-            readOnly={true}
-            key={activeTab}
-          />
+          <LessonThemeContext.Provider value={{ lessonTheme: currentLessonTheme }}>
+            <MDXEditor
+              className={mdxTheme}
+              ref={ref}
+              markdown={''}
+              plugins={thePlugins}
+              readOnly={true}
+              key={activeTab}
+            />
+          </LessonThemeContext.Provider>
         )}
       </Box>
       {fullScreenImage && (

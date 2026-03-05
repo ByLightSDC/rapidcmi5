@@ -103,6 +103,8 @@ import { directiveLinter } from './code/codeMirrorUtils';
 import { ActivityDirectiveDescriptor } from './directives/ActivityDirectiveDescriptor';
 import { LayoutBoxDirectiveDescriptor } from './directives/layout-box/LayoutBoxDirectiveDescriptor';
 
+import { LessonThemeContext } from '@rapid-cmi5/ui';
+
 import { RC5Context } from '../contexts/RC5Context';
 import { RapidCmi5Toolbar } from '../toolbar/RapidCmi5Toolbar';
 import { ErrorBoundary } from './ErrorBoundary';
@@ -718,16 +720,21 @@ function RC5VisualEditor() {
               {generateLessonThemeStyleTag(themeClass, currentLessonTheme)}
             </style>
           )}
+
           <ErrorBoundary>
-            <MDXEditor
-              className={mdxTheme}
-              onChange={onChange}
-              ref={ref}
-              markdown={''}
-              plugins={thePlugins}
-              readOnly={!isEditing}
-              onError={onErrorHelper}
-            />
+            <LessonThemeContext.Provider
+              value={{ lessonTheme: currentLessonTheme }}
+            >
+              <MDXEditor
+                className={mdxTheme}
+                onChange={onChange}
+                ref={ref}
+                markdown={''}
+                plugins={thePlugins}
+                readOnly={!isEditing}
+                onError={onErrorHelper}
+              />
+            </LessonThemeContext.Provider>
           </ErrorBoundary>
         </Box>
       ) : (
