@@ -55,7 +55,6 @@ import {
 } from './MdastVideoVisitor';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
-
 export const CAN_USE_DOM: boolean =
   typeof window !== 'undefined' &&
   typeof window.document.createElement !== 'undefined';
@@ -153,9 +152,16 @@ const internalInsertVideo$ = Signal<SrcVideoParameters>((r) => {
           height: values.height,
           autoplay: values.autoplay,
         });
+        
         $insertNodes([videoNode]);
+        const paragraph = $createParagraphNode();
         if ($isRootOrShadowRoot(videoNode.getParentOrThrow())) {
           $wrapNodeInElement(videoNode, $createParagraphNode).selectEnd();
+        }
+
+        if (paragraph) {
+          videoNode.insertAfter(paragraph);
+          paragraph.select();
         }
       });
     },
