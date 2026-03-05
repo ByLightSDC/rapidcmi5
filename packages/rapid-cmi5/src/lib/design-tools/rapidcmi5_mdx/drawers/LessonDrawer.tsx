@@ -104,7 +104,6 @@ export const LessonDrawer = () => {
         icon: (
           <Stack direction="row">
             <IosShareIcon />
-            <FolderZipIcon color="inherit" />
           </Stack>
         ),
         disabled: !currentCourse?.basePath,
@@ -219,7 +218,7 @@ export const LessonDrawer = () => {
           />
           <Tooltip
             title={
-              currentRepo ? 'Create course' : 'Select a repo to create a course'
+              currentRepo ? 'Create Course' : 'Select a repo to create a course'
             }
           >
             <span>
@@ -291,7 +290,7 @@ export const LessonDrawer = () => {
             <Tooltip
               title={
                 currentRepo
-                  ? 'Publish course'
+                  ? 'Publish Course'
                   : 'Publish Not Available. Create a Course.'
               }
             >
