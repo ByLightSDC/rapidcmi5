@@ -55,7 +55,6 @@ import {
 } from './MdastVideoVisitor';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
-
 export const CAN_USE_DOM: boolean =
   typeof window !== 'undefined' &&
   typeof window.document.createElement !== 'undefined';
@@ -153,9 +152,37 @@ const internalInsertVideo$ = Signal<SrcVideoParameters>((r) => {
           height: values.height,
           autoplay: values.autoplay,
         });
+
         $insertNodes([videoNode]);
+
         if ($isRootOrShadowRoot(videoNode.getParentOrThrow())) {
           $wrapNodeInElement(videoNode, $createParagraphNode).selectEnd();
+        }
+
+        // video is inserted in previous node, rarely root
+        // video is the only child (majority of cases)
+        // caret is ungrabbable on the video row
+        // this code checks to see if there is a node below the video, if present, it selects it
+        // if there is no following node, creates a paragraph node and selects it
+        const parent = videoNode.getParent();
+        const children = parent?.getChildren();
+        let shouldCreateParagraph = false;
+        if (children && children?.length <= 1) {
+          shouldCreateParagraph = true;
+        } else {
+          const next = videoNode.getNextSibling();
+          if (next === null) {
+            shouldCreateParagraph = true;
+          } else {
+            videoNode.selectNext();
+          }
+          if (shouldCreateParagraph) {
+            const paragraph = $createParagraphNode();
+            if (paragraph) {
+              videoNode.insertAfter(paragraph);
+              paragraph.select();
+            }
+          }
         }
       });
     },
