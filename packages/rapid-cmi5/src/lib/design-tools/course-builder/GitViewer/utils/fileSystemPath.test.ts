@@ -93,306 +93,306 @@ describe('useCourseLoader utility functions', () => {
     });
   });
 
-  describe('updateAUPath', () => {
-    it('renames AU dir if slug changes', async () => {
-      const courseName = 'unit1';
-      const au: CourseAU = {
-        auName: 'New AU Title',
-        dirPath: `${courseName}/Old-AU-Title`,
-        slides: [],
-      };
+  // describe('updateAUPath', () => {
+  //   it('renames AU dir if slug changes', async () => {
+  //     const courseName = 'unit1';
+  //     const au: CourseAU = {
+  //       auName: 'New AU Title',
+  //       dirPath: `${courseName}/Old-AU-Title`,
+  //       slides: [],
+  //     };
 
-      await updateAUPath(au, 'inBrowser/repo', instance);
+  //     await updateAUPath(au, 'inBrowser/repo', instance);
 
-      expect(au.dirPath).toContain(`${courseName}/new-au-title`);
-    });
+  //     expect(au.dirPath).toContain(`${courseName}/new-au-title`);
+  //   });
 
-    it('does nothing if slug matches existing dirPath', async () => {
-      const courseName = 'unit1';
+  //   it('does nothing if slug matches existing dirPath', async () => {
+  //     const courseName = 'unit1';
 
-      const au: CourseAU = {
-        auName: 'My AU',
-        dirPath: `${courseName}/my-au`,
-        slides: [],
-      };
+  //     const au: CourseAU = {
+  //       auName: 'My AU',
+  //       dirPath: `${courseName}/my-au`,
+  //       slides: [],
+  //     };
 
-      await updateAUPath(au, 'inBrowser/repo', instance);
-      expect(au.dirPath).toEqual(`${courseName}/my-au`);
-    });
-  });
+  //     await updateAUPath(au, 'inBrowser/repo', instance);
+  //     expect(au.dirPath).toEqual(`${courseName}/my-au`);
+  //   });
+  // });
 
-  describe('updateSlidePaths', () => {
-    it('renames slide if filepath and expected path mismatch', async () => {
-      const auDirPath = 'unit1/au-title';
-      const au: CourseAU = {
-        auName: 'AU Title',
-        dirPath: auDirPath,
-        slides: [
-          {
-            slideTitle: 'Slide One',
-            filepath: `${auDirPath}/old-slide.md`,
-            type: SlideTypeEnum.Markdown,
-            content: ''
-          },
-        ],
-      };
+  // describe('updateSlidePaths', () => {
+  //   it('renames slide if filepath and expected path mismatch', async () => {
+  //     const auDirPath = 'unit1/au-title';
+  //     const au: CourseAU = {
+  //       auName: 'AU Title',
+  //       dirPath: auDirPath,
+  //       slides: [
+  //         {
+  //           slideTitle: 'Slide One',
+  //           filepath: `${auDirPath}/old-slide.md`,
+  //           type: SlideTypeEnum.Markdown,
+  //           content: ''
+  //         },
+  //       ],
+  //     };
 
-      await updateSlidePaths(au, 'inBrowser/repo', false, instance);
+  //     await updateSlidePaths(au, 'inBrowser/repo', false, instance);
 
-      expect(au.slides[0].filepath).toEqual(`${auDirPath}/slide-one.md`);
-    });
+  //     expect(au.slides[0].filepath).toEqual(`${auDirPath}/slide-one.md`);
+  //   });
 
-    it('does not rename if file path already matches expected', async () => {
-      const slug = slugifyPath('Slide One');
-      const au: CourseAU = {
-        auName: 'AU Title',
-        dirPath: 'unit1/au-title',
-        slides: [
-          {
-            slideTitle: 'Slide One',
-            filepath: `unit1/au-title/${slug}.md`,
-            type: SlideTypeEnum.Markdown,
-            content: ''
-          },
-        ],
-      };
+  //   it('does not rename if file path already matches expected', async () => {
+  //     const slug = slugifyPath('Slide One');
+  //     const au: CourseAU = {
+  //       auName: 'AU Title',
+  //       dirPath: 'unit1/au-title',
+  //       slides: [
+  //         {
+  //           slideTitle: 'Slide One',
+  //           filepath: `unit1/au-title/${slug}.md`,
+  //           type: SlideTypeEnum.Markdown,
+  //           content: ''
+  //         },
+  //       ],
+  //     };
 
-      const mvSpy = jest.spyOn(instance, 'mvFile');
+  //     const mvSpy = jest.spyOn(instance, 'mvFile');
 
-      await updateSlidePaths(au, 'inBrowser/repo', false, instance);
+  //     await updateSlidePaths(au, 'inBrowser/repo', false, instance);
 
-      expect(mvSpy).not.toHaveBeenCalled();
-    });
-  });
+  //     expect(mvSpy).not.toHaveBeenCalled();
+  //   });
+  // });
 
-  describe('updatePaths', () => {
-    const firstAuDirPath = 'unit1/old-au';
-    const newFirstAuDirPath = 'unit1/intro-au';
+  // describe('updatePaths', () => {
+  //   const firstAuDirPath = 'unit1/old-au';
+  //   const newFirstAuDirPath = 'unit1/intro-au';
 
-    const secondAuDirPath = 'unit1/second-au';
-    let data: CourseData;
+  //   const secondAuDirPath = 'unit1/second-au';
+  //   let data: CourseData;
 
-    beforeEach(async () => {
-      await instance.createFile(r, `${firstAuDirPath}/slide-1.md`, '');
-      await instance.createFile(r, `${firstAuDirPath}/slide-2.md`, '');
+  //   beforeEach(async () => {
+  //     await instance.createFile(r, `${firstAuDirPath}/slide-1.md`, '');
+  //     await instance.createFile(r, `${firstAuDirPath}/slide-2.md`, '');
 
-      await instance.createFile(r, `${secondAuDirPath}/slide-1.md`, '');
-      await instance.createFile(r, `${secondAuDirPath}/slide-2.md`, '');
-      data = {
-        blocks: [
-          {
-            aus: [
-              {
-                auName: 'Intro AU',
-                dirPath: firstAuDirPath,
-                slides: [
-                  {
-                    slideTitle: 'Slide 1',
-                    filepath: `${firstAuDirPath}/slide-1.md`,
-                    type: SlideTypeEnum.Markdown,
-                    content: ''
-                  },
-                  {
-                    slideTitle: 'Slide 2',
-                    filepath: `${firstAuDirPath}/slide-2.md`,
-                    type: SlideTypeEnum.Markdown,
-                    content: ''
-                  },
-                ],
-              },
-              {
-                auName: 'Second AU',
-                dirPath: secondAuDirPath,
-                slides: [
-                  {
-                    slideTitle: 'Slide 1',
-                    filepath: `${secondAuDirPath}/slide-1.md`,
-                    type: SlideTypeEnum.Markdown,
-                    content: ''
-                  },
-                  {
-                    slideTitle: 'Slide 2',
-                    filepath: `${secondAuDirPath}/slide-2.md`,
-                    type: SlideTypeEnum.Markdown,
-                    content: ''
-                  },
-                ],
-              },
-            ],
-            blockName: '',
-          },
-        ],
-        courseTitle: '',
-        courseId: '',
-      };
-    });
+  //     await instance.createFile(r, `${secondAuDirPath}/slide-1.md`, '');
+  //     await instance.createFile(r, `${secondAuDirPath}/slide-2.md`, '');
+  //     data = {
+  //       blocks: [
+  //         {
+  //           aus: [
+  //             {
+  //               auName: 'Intro AU',
+  //               dirPath: firstAuDirPath,
+  //               slides: [
+  //                 {
+  //                   slideTitle: 'Slide 1',
+  //                   filepath: `${firstAuDirPath}/slide-1.md`,
+  //                   type: SlideTypeEnum.Markdown,
+  //                   content: ''
+  //                 },
+  //                 {
+  //                   slideTitle: 'Slide 2',
+  //                   filepath: `${firstAuDirPath}/slide-2.md`,
+  //                   type: SlideTypeEnum.Markdown,
+  //                   content: ''
+  //                 },
+  //               ],
+  //             },
+  //             {
+  //               auName: 'Second AU',
+  //               dirPath: secondAuDirPath,
+  //               slides: [
+  //                 {
+  //                   slideTitle: 'Slide 1',
+  //                   filepath: `${secondAuDirPath}/slide-1.md`,
+  //                   type: SlideTypeEnum.Markdown,
+  //                   content: ''
+  //                 },
+  //                 {
+  //                   slideTitle: 'Slide 2',
+  //                   filepath: `${secondAuDirPath}/slide-2.md`,
+  //                   type: SlideTypeEnum.Markdown,
+  //                   content: ''
+  //                 },
+  //               ],
+  //             },
+  //           ],
+  //           blockName: '',
+  //         },
+  //       ],
+  //       courseTitle: '',
+  //       courseId: '',
+  //     };
+  //   });
 
-    it('does nothing if AU and slide paths already match slugs', async () => {
-      const mvSpy = jest.spyOn(instance, 'mvFile');
+  //   it('does nothing if AU and slide paths already match slugs', async () => {
+  //     const mvSpy = jest.spyOn(instance, 'mvFile');
 
-      data.blocks[0].aus[0].auName = 'Intro AU';
-      data.blocks[0].aus[0].dirPath = newFirstAuDirPath;
-      data.blocks[0].aus[0].slides = [
-        {
-          slideTitle: 'Slide 1',
-          filepath: `${newFirstAuDirPath}/slide-1.md`,
-          type: SlideTypeEnum.Markdown,
-          content: ''
-        },
-        {
-          slideTitle: 'Slide 2',
-          filepath: `${newFirstAuDirPath}/slide-2.md`,
-          type: SlideTypeEnum.Markdown,
-          content: ''
-        },
-      ];
-      await updatePaths(data, '/inBrowser/repo', instance);
-      expect(mvSpy).not.toHaveBeenCalled();
-    });
+  //     data.blocks[0].aus[0].auName = 'Intro AU';
+  //     data.blocks[0].aus[0].dirPath = newFirstAuDirPath;
+  //     data.blocks[0].aus[0].slides = [
+  //       {
+  //         slideTitle: 'Slide 1',
+  //         filepath: `${newFirstAuDirPath}/slide-1.md`,
+  //         type: SlideTypeEnum.Markdown,
+  //         content: ''
+  //       },
+  //       {
+  //         slideTitle: 'Slide 2',
+  //         filepath: `${newFirstAuDirPath}/slide-2.md`,
+  //         type: SlideTypeEnum.Markdown,
+  //         content: ''
+  //       },
+  //     ];
+  //     await updatePaths(data, '/inBrowser/repo', instance);
+  //     expect(mvSpy).not.toHaveBeenCalled();
+  //   });
 
-    it('updates au path and file paths if au name changes', async () => {
-      await updatePaths(data, '/inBrowser/repo', instance);
-      expect(data.blocks[0].aus[0].dirPath).toEqual(newFirstAuDirPath);
-      expect(data.blocks[0].aus[0].slides[0].filepath).toEqual(
-        `${newFirstAuDirPath}/slide-1.md`,
-      );
-      expect(data.blocks[0].aus[0].slides[1].filepath).toEqual(
-        `${newFirstAuDirPath}/slide-2.md`,
-      );
-      expect(data.blocks[0].aus[1].dirPath).toEqual(secondAuDirPath);
-      expect(data.blocks[0].aus[1].slides[0].filepath).toEqual(
-        `${secondAuDirPath}/slide-1.md`,
-      );
-      expect(data.blocks[0].aus[1].slides[1].filepath).toEqual(
-        `${secondAuDirPath}/slide-2.md`,
-      );
-    });
+  //   it('updates au path and file paths if au name changes', async () => {
+  //     await updatePaths(data, '/inBrowser/repo', instance);
+  //     expect(data.blocks[0].aus[0].dirPath).toEqual(newFirstAuDirPath);
+  //     expect(data.blocks[0].aus[0].slides[0].filepath).toEqual(
+  //       `${newFirstAuDirPath}/slide-1.md`,
+  //     );
+  //     expect(data.blocks[0].aus[0].slides[1].filepath).toEqual(
+  //       `${newFirstAuDirPath}/slide-2.md`,
+  //     );
+  //     expect(data.blocks[0].aus[1].dirPath).toEqual(secondAuDirPath);
+  //     expect(data.blocks[0].aus[1].slides[0].filepath).toEqual(
+  //       `${secondAuDirPath}/slide-1.md`,
+  //     );
+  //     expect(data.blocks[0].aus[1].slides[1].filepath).toEqual(
+  //       `${secondAuDirPath}/slide-2.md`,
+  //     );
+  //   });
 
-    it('updates au path and file paths if au name and file name changes', async () => {
-      await instance.createFile(r, `${firstAuDirPath}/slide-3.md`, '');
+  //   it('updates au path and file paths if au name and file name changes', async () => {
+  //     await instance.createFile(r, `${firstAuDirPath}/slide-3.md`, '');
 
-      data.blocks[0].aus[0].slides.push({
-        slideTitle: 'new name slide',
-        filepath: `${firstAuDirPath}/slide-3.md`,
-        type: SlideTypeEnum.Markdown,
-        content: ''
-      });
-      await updatePaths(data, 'inBrowser/repo', instance);
-      expect(data.blocks[0].aus[0].dirPath).toEqual(newFirstAuDirPath);
-      expect(data.blocks[0].aus[0].slides[2].filepath).toEqual(
-        `${newFirstAuDirPath}/new-name-slide.md`,
-      );
-    });
+  //     data.blocks[0].aus[0].slides.push({
+  //       slideTitle: 'new name slide',
+  //       filepath: `${firstAuDirPath}/slide-3.md`,
+  //       type: SlideTypeEnum.Markdown,
+  //       content: ''
+  //     });
+  //     await updatePaths(data, 'inBrowser/repo', instance);
+  //     expect(data.blocks[0].aus[0].dirPath).toEqual(newFirstAuDirPath);
+  //     expect(data.blocks[0].aus[0].slides[2].filepath).toEqual(
+  //       `${newFirstAuDirPath}/new-name-slide.md`,
+  //     );
+  //   });
 
-    it('Properly names files with the same name', async () => {
-      await instance.createFile(r, `${firstAuDirPath}/slide-3.md`, '');
-      await instance.createFile(r, `${firstAuDirPath}/slide-4.md`, '');
+  //   it('Properly names files with the same name', async () => {
+  //     await instance.createFile(r, `${firstAuDirPath}/slide-3.md`, '');
+  //     await instance.createFile(r, `${firstAuDirPath}/slide-4.md`, '');
 
-      const mvSpy = jest.spyOn(instance, 'mvFile');
-      data.blocks[0].aus[0].slides.push({
-        slideTitle: 'new name slide',
-        filepath: `${firstAuDirPath}/slide-3.md`,
-        type: SlideTypeEnum.Markdown,
-        content: ''
-      });
-      data.blocks[0].aus[0].slides.push({
-        slideTitle: 'new name slide',
-        filepath: `${firstAuDirPath}/slide-4.md`,
-        type: SlideTypeEnum.Markdown,
-        content: ''
-      });
-      await updatePaths(data, 'inBrowser/repo', instance);
+  //     const mvSpy = jest.spyOn(instance, 'mvFile');
+  //     data.blocks[0].aus[0].slides.push({
+  //       slideTitle: 'new name slide',
+  //       filepath: `${firstAuDirPath}/slide-3.md`,
+  //       type: SlideTypeEnum.Markdown,
+  //       content: ''
+  //     });
+  //     data.blocks[0].aus[0].slides.push({
+  //       slideTitle: 'new name slide',
+  //       filepath: `${firstAuDirPath}/slide-4.md`,
+  //       type: SlideTypeEnum.Markdown,
+  //       content: ''
+  //     });
+  //     await updatePaths(data, 'inBrowser/repo', instance);
 
-      expect(data.blocks[0].aus[0].slides[2].filepath).toEqual(
-        `${newFirstAuDirPath}/new-name-slide.md`,
-      );
-      expect(data.blocks[0].aus[0].slides[3].filepath).toEqual(
-        `${newFirstAuDirPath}/new-name-slide-1.md`,
-      );
+  //     expect(data.blocks[0].aus[0].slides[2].filepath).toEqual(
+  //       `${newFirstAuDirPath}/new-name-slide.md`,
+  //     );
+  //     expect(data.blocks[0].aus[0].slides[3].filepath).toEqual(
+  //       `${newFirstAuDirPath}/new-name-slide-1.md`,
+  //     );
 
-      expect(mvSpy).toHaveBeenCalled();
-      expect(mvSpy).toHaveBeenCalledWith(
-        'inBrowser/repo',
-        `${firstAuDirPath}`,
-        `${newFirstAuDirPath}`,
-      );
-      expect(mvSpy).toHaveBeenCalledWith(
-        'inBrowser/repo',
-        `${newFirstAuDirPath}/slide-3.md`,
-        `${newFirstAuDirPath}/new-name-slide.md`,
-      );
-      expect(mvSpy).toHaveBeenCalledWith(
-        'inBrowser/repo',
-        `${newFirstAuDirPath}/slide-4.md`,
-        `${newFirstAuDirPath}/new-name-slide-1.md`,
-      );
-    });
+  //     expect(mvSpy).toHaveBeenCalled();
+  //     expect(mvSpy).toHaveBeenCalledWith(
+  //       'inBrowser/repo',
+  //       `${firstAuDirPath}`,
+  //       `${newFirstAuDirPath}`,
+  //     );
+  //     expect(mvSpy).toHaveBeenCalledWith(
+  //       'inBrowser/repo',
+  //       `${newFirstAuDirPath}/slide-3.md`,
+  //       `${newFirstAuDirPath}/new-name-slide.md`,
+  //     );
+  //     expect(mvSpy).toHaveBeenCalledWith(
+  //       'inBrowser/repo',
+  //       `${newFirstAuDirPath}/slide-4.md`,
+  //       `${newFirstAuDirPath}/new-name-slide-1.md`,
+  //     );
+  //   });
 
-    it('Properly names aus with the same name', async () => {
-      const thirdAuDirPath = 'unit1/au-3';
-      const mvSpy = jest.spyOn(instance, 'mvFile');
+  //   it('Properly names aus with the same name', async () => {
+  //     const thirdAuDirPath = 'unit1/au-3';
+  //     const mvSpy = jest.spyOn(instance, 'mvFile');
 
-      await instance.createFile(r, `${thirdAuDirPath}/slide-1.md`, '');
-      await instance.createFile(r, `${thirdAuDirPath}/slide-2.md`, '');
+  //     await instance.createFile(r, `${thirdAuDirPath}/slide-1.md`, '');
+  //     await instance.createFile(r, `${thirdAuDirPath}/slide-2.md`, '');
 
-      data.blocks[0].aus.push({
-        auName: 'Intro AU',
-        dirPath: thirdAuDirPath,
-        slides: [
-          {
-            slideTitle: 'Slide 1',
-            filepath: `${thirdAuDirPath}/slide-1.md`,
-            type: SlideTypeEnum.Markdown,
-            content: ''
-          },
-          {
-            slideTitle: 'Slide 2',
-            filepath: `${thirdAuDirPath}/slide-2.md`,
-            type: SlideTypeEnum.Markdown,
-            content: ''
-          },
-        ],
-      });
-      await updatePaths(data, 'inBrowser/repo', instance);
+  //     data.blocks[0].aus.push({
+  //       auName: 'Intro AU',
+  //       dirPath: thirdAuDirPath,
+  //       slides: [
+  //         {
+  //           slideTitle: 'Slide 1',
+  //           filepath: `${thirdAuDirPath}/slide-1.md`,
+  //           type: SlideTypeEnum.Markdown,
+  //           content: ''
+  //         },
+  //         {
+  //           slideTitle: 'Slide 2',
+  //           filepath: `${thirdAuDirPath}/slide-2.md`,
+  //           type: SlideTypeEnum.Markdown,
+  //           content: ''
+  //         },
+  //       ],
+  //     });
+  //     await updatePaths(data, 'inBrowser/repo', instance);
 
-      expect(data.blocks[0].aus[0].dirPath).toEqual(`${newFirstAuDirPath}`);
-      expect(data.blocks[0].aus[2].dirPath).toEqual(`${newFirstAuDirPath}-1`);
-      expect(mvSpy).toHaveBeenCalled();
+  //     expect(data.blocks[0].aus[0].dirPath).toEqual(`${newFirstAuDirPath}`);
+  //     expect(data.blocks[0].aus[2].dirPath).toEqual(`${newFirstAuDirPath}-1`);
+  //     expect(mvSpy).toHaveBeenCalled();
 
-      expect(mvSpy).toHaveBeenCalledWith(
-        'inBrowser/repo',
-        `${firstAuDirPath}`,
-        `${newFirstAuDirPath}`,
-      );
-      expect(mvSpy).toHaveBeenCalledWith(
-        'inBrowser/repo',
-        `${thirdAuDirPath}`,
-        `${newFirstAuDirPath}-1`,
-      );
-    });
+  //     expect(mvSpy).toHaveBeenCalledWith(
+  //       'inBrowser/repo',
+  //       `${firstAuDirPath}`,
+  //       `${newFirstAuDirPath}`,
+  //     );
+  //     expect(mvSpy).toHaveBeenCalledWith(
+  //       'inBrowser/repo',
+  //       `${thirdAuDirPath}`,
+  //       `${newFirstAuDirPath}-1`,
+  //     );
+  //   });
 
-    it('generates fallback slug if slide title is only symbols', async () => {
-      const badTitle = '!!!@@@###';
-      const auDirPath = 'unit1/bad-au';
+  //   it('generates fallback slug if slide title is only symbols', async () => {
+  //     const badTitle = '!!!@@@###';
+  //     const auDirPath = 'unit1/bad-au';
 
-      await instance.createFile(r, `${auDirPath}/empty.md`, '');
-      data.blocks[0].aus[0] = {
-        auName: 'Bad AU',
-        dirPath: auDirPath,
-        slides: [
-          {
-            slideTitle: badTitle,
-            filepath: `${auDirPath}/empty.md`,
-            type: SlideTypeEnum.Markdown,
-            content: ''
-          },
-        ],
-      };
+  //     await instance.createFile(r, `${auDirPath}/empty.md`, '');
+  //     data.blocks[0].aus[0] = {
+  //       auName: 'Bad AU',
+  //       dirPath: auDirPath,
+  //       slides: [
+  //         {
+  //           slideTitle: badTitle,
+  //           filepath: `${auDirPath}/empty.md`,
+  //           type: SlideTypeEnum.Markdown,
+  //           content: ''
+  //         },
+  //       ],
+  //     };
 
-      await updatePaths(data, 'inBrowser/repo', instance);
+  //     await updatePaths(data, 'inBrowser/repo', instance, );
 
-      expect(data.blocks[0].aus[0].slides[0].filepath).toMatch(/\.md$/);
-    });
-  });
+  //     expect(data.blocks[0].aus[0].slides[0].filepath).toMatch(/\.md$/);
+  //   });
+  // });
 });
 

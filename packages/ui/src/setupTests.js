@@ -157,6 +157,38 @@ jest.mock('mdast-util-math', () => ({
   mathToMarkdown: jest.fn(),
 }));
 
+jest.mock('react-syntax-highlighter', () => ({
+  __esModule: true,
+  Prism: {},
+}));
+
+jest.mock('hastscript', () => ({
+  __esModule: true,
+}));
+
+jest.mock('micromark-extension-gfm-strikethrough', () => ({
+  __esModule: true,
+  gfmStrikethrough: jest.fn(),
+}));
+
+jest.mock('mdast-util-gfm-table', () => ({
+  __esModule: true,
+  gfmTable: jest.fn(),
+  gfmTableToMarkdown: jest.fn(),
+}));
+
+
+jest.mock('mdast-util-to-hast', () => ({
+  __esModule: true,
+  toHast: jest.fn(),
+}));
+
+jest.mock('hast-util-to-html', () => ({
+  __esModule: true,
+  toHtml: jest.fn(),
+}));
+
+
 /**
  * MDX stuff
  */

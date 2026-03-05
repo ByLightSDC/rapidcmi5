@@ -165,11 +165,17 @@ jest.mock('mdast-util-mdx-jsx', () => ({
   mdxJsxToMarkdown: jest.fn(),
 }));
 
+jest.mock('micromark-extension-gfm-strikethrough', () => ({
+  __esModule: true,
+  gfmStrikethrough: jest.fn(),
+}));
+
 jest.mock('mdast-util-gfm-strikethrough', () => ({
   __esModule: true,
   gfmStrikethroughFromMarkdown: jest.fn(),
   gfmStrikethroughToMarkdown: jest.fn(),
 }));
+
 
 jest.mock('mdast-util-frontmatter', () => ({
   __esModule: true,

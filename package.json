@@ -166,7 +166,7 @@
     "@nx/js": "21.6.8",
     "@nx/node": "21.6.8",
     "@nx/playwright": "^21.6.8",
-    "@nx/react": "^22.3.3",
+    "@nx/react": "21.6.8",
     "@nx/rollup": "21.6.8",
     "@nx/storybook": "21.6.8",
     "@nx/vite": "21.6.8",
