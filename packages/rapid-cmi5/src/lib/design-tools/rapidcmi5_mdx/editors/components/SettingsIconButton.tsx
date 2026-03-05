@@ -1,5 +1,5 @@
 import { IconButton } from '@mui/material';
-import { rapidIconFor, RapidIconKey } from '../Icons';
+import EditIcon from '@mui/icons-material/Edit';
 
 /**
  * Editor Settings
@@ -9,7 +9,7 @@ import { rapidIconFor, RapidIconKey } from '../Icons';
 function SettingsIconButton({ onConfigure }: { onConfigure: () => void }) {
   return (
     <IconButton aria-label="configure" onClick={onConfigure}>
-      {rapidIconFor(RapidIconKey.configure)}
+     <EditIcon/>
     </IconButton>
   );
 }

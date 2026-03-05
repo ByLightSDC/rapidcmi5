@@ -8,6 +8,7 @@ import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import SettingsIcon from '@mui/icons-material/Settings';
+import EditIcon from '@mui/icons-material/Edit';
 
 /** Icons */
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -172,7 +173,7 @@ export function EditImageToolbar({
             });
           }}
         >
-          <SettingsIcon />
+          <EditIcon />
         </IconButton>
 
         <IconButton

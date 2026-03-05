@@ -35,6 +35,7 @@ import {
 // MUI components for Accordion-style icons
 import { Box, IconButton, Stack, Tooltip } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
+import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { debugLog } from '@rapid-cmi5/ui';
 
@@ -362,7 +363,7 @@ export const AnimDirectiveDescriptor: DirectiveDescriptor<ContainerDirective> =
                       }
                     }}
                   >
-                    <SettingsIcon fontSize="small" />
+                    <EditIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
                 <Tooltip
@@ -760,7 +761,7 @@ export const InlineAnimDirectiveDescriptor: DirectiveDescriptor<TextDirective> =
                   }}
                   sx={{ padding: '2px' }}
                 >
-                  <SettingsIcon sx={{ fontSize: '14px' }} />
+                  <EditIcon sx={{ fontSize: '14px' }} />
                 </IconButton>
               </Tooltip>
               <Tooltip
