@@ -50,9 +50,14 @@ export default function SelectProjectHomePage({}: {}) {
         severity: 'success',
         autoHideDuration: 3000,
       });
-    } catch (e: any) {
+    } catch (e: unknown) {
+      // We shouldn't show an error if a user aborts the folder selection
+      if (e instanceof DOMException && e.name === 'AbortError') return;
+
       const msg =
-        e?.message || e?.name || 'Failed to open repository. Please try again.';
+        e instanceof Error
+          ? e.message
+          : 'Failed to open repository. Please try again.';
 
       displayToaster({
         message: `Open repository failed: ${msg}`,
