@@ -115,8 +115,9 @@ export const InsertGrid = ({ isDrawer }: { isDrawer?: boolean }) => {
 
       const gridNode = $createDirectiveNode(mdastGrid) as DirectiveNode;
       selection.insertNodes([gridNode]);
-      const insertedKey = gridNode.getKey();
-      placeCaretInsideDirective(editor, insertedKey);
+      //REF these lines eat the cursor
+      // const insertedKey = gridNode.getKey();
+      // placeCaretInsideDirective(editor, insertedKey);
     });
   };
 
