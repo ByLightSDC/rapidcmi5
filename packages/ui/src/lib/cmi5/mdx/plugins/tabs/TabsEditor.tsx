@@ -343,7 +343,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
         backgroundColor,
       }
     : {
-        boxShadow: dropShadow,
+        //boxShadow: dropShadow,
       };
 
   // Inner box: fills all available width (lesson content width applies to text
@@ -352,6 +352,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   const innerSx: SxProps = backgroundColor
     ? {
         backgroundColor: muiTheme.palette.background.paper,
+        boxShadow: 6,
       }
     : {};
 
@@ -411,16 +412,18 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
           </Tabs>
 
           <TabsContext.Provider value={{ tab }}>
-            <NestedLexicalEditor<ContainerDirective>
-              block={true}
-              getContent={(node) => {
-                return node.children;
-              }}
-              getUpdatedMdastNode={(node, children: any) => ({
-                ...node,
-                children,
-              })}
-            />
+            <Box sx={{ margin: '4px', minHeight: '180px' }}>
+              <NestedLexicalEditor<ContainerDirective>
+                block={true}
+                getContent={(node) => {
+                  return node.children;
+                }}
+                getUpdatedMdastNode={(node, children: any) => ({
+                  ...node,
+                  children,
+                })}
+              />
+            </Box>
           </TabsContext.Provider>
         </Box>
 
