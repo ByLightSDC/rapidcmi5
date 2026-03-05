@@ -12,10 +12,9 @@ import * as Mdast from 'mdast';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import { $getRoot } from 'lexical';
-
 
 import {
   Box,
@@ -37,6 +36,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import PaletteIcon from '@mui/icons-material/Palette';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
@@ -49,6 +49,11 @@ import { ButtonMinorUi, ButtonOptions } from '../../../../utility/buttons';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
+import { LessonThemeContext } from '../../contexts/LessonThemeContext';
+import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { getDirectiveBlockShadow } from '../../../../styles/directiveStyles';
+import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
+import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 
 /**
  * Accordion Editor for accordion directives
@@ -61,6 +66,11 @@ export const AccordionEditor: React.FC<
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
   const muiTheme = useTheme();
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  const blockPadding = resolvedThemeCSS
+    ? (resolvedThemeCSS.blockPadding ?? '0px')
+    : '32px';
   const [sxProps, setSxProps] = useState<SxProps>({});
   const [formData, setFormData] = useState<
     Array<AccordionContentDirectiveNode>
@@ -68,6 +78,16 @@ export const AccordionEditor: React.FC<
   const insertMarkdown = usePublisher(insertMarkdown$);
   const [editor] = useLexicalComposerContext();
   const [isConfiguring, setIsConfiguring] = useState(false);
+  const [backgroundColor, setBackgroundColor] = useState<string>(
+    mdastNode?.attributes.backgroundColor ?? '',
+  );
+  const [colorPickerAnchor, setColorPickerAnchor] =
+    useState<HTMLButtonElement | null>(null);
+  const [pendingColor, setPendingColor] = useState<string>(
+    mdastNode?.attributes.backgroundColor ?? '',
+  );
+  const pendingColorRef = useRef(pendingColor);
+  const skipNextCloseRebuildRef = useRef(false);
   const [isPlayback, readOnly, syntaxExtensions] = useCellValues(
     editorInPlayback$,
     readOnly$,
@@ -157,70 +177,81 @@ export const AccordionEditor: React.FC<
   );
 
   /**
-   * Saves changes
-   * inserts new node with updated content
-   * removes the original
-   * this flow is work around for not being able to create custom directive node without cloning the directives plugin
-   * the accordionContent directives dont appear in the lexical tree, probably because the lexical DirectiveNode extends DecoratorNode which does not support children
-   * the hasChildren property specifies that a directive can have children, but this does not add implementing append, getChildren, etc to the lexical node
+   * Core rebuild: inserts a new accordion node with given data then removes old node.
    */
-  const handleSubmit = useCallback(async () => {
-    setIsConfiguring(false);
-    if (!parentEditor) return;
+  const rebuildNode = useCallback(
+    async (children: AccordionContentDirectiveNode[], bgColor: string) => {
+      if (!parentEditor) return;
 
-    // first select AFTER the current accordion
-    parentEditor.update(() => {
-      const nextSibling = lexicalNode.getNextSibling();
-      if (nextSibling) {
-        nextSibling.selectStart();
-      } else {
-        const root = $getRoot();
-        const lastChild = root.getChildren().at(-1);
-        if (lastChild) {
-          // If it's a text container (like paragraph), move cursor to end
-          if ($isElementNode(lastChild)) {
-            const lastText = lastChild.getLastDescendant();
-            if (lastText) {
-              lastText.selectEnd();
+      parentEditor.update(() => {
+        const nextSibling = lexicalNode.getNextSibling();
+        if (nextSibling) {
+          nextSibling.selectStart();
+        } else {
+          const root = $getRoot();
+          const lastChild = root.getChildren().at(-1);
+          if (lastChild) {
+            if ($isElementNode(lastChild)) {
+              const lastText = lastChild.getLastDescendant();
+              if (lastText) {
+                lastText.selectEnd();
+              } else {
+                lastChild.selectEnd();
+              }
             } else {
               lastChild.selectEnd();
             }
-          } else {
-            // If it's just a text node
-            lastChild.selectEnd();
           }
         }
-      }
-    });
-    //selection is not immediate
-    await delay(50);
+      });
 
-    // Insert a brand new accordion directive node with updated accordions using markdown
-    // using the insertMarkdown method ensures new node will have correct position information so nested content displays correctly
-    // tried hard to find an alternate solution that would allow me to simply update existing mdastnode, but no solution found
-    // since position data is generated from markdown and mdast utilities during parsing
-    parentEditor.update(() => {
-      const mdast: ContainerDirective = {
-        type: 'containerDirective',
-        name: 'accordion',
-        attributes: {
-          color: 'transparent',
-        },
-        children: [...formData],
-      };
+      await delay(50);
 
-      const childMarkdown = convertMdastToMarkdown(mdast as Mdast.RootContent);
+      parentEditor.update(() => {
+        const attributes: Record<string, string> = {};
+        if (bgColor) {
+          attributes['backgroundColor'] = bgColor;
+        }
 
-      insertMarkdown(childMarkdown);
-    });
-    //selection is not immediate
-    await delay(50);
+        const mdast: ContainerDirective = {
+          type: 'containerDirective',
+          name: 'accordion',
+          attributes,
+          children: [...children],
+        };
 
-    //remove original node
-    parentEditor.update(() => {
-      lexicalNode.remove();
-    });
-  }, [insertMarkdown, formData, lexicalNode, parentEditor]);
+        const childMarkdown = convertMdastToMarkdown(mdast as Mdast.RootContent);
+        insertMarkdown(childMarkdown);
+      });
+
+      await delay(50);
+
+      parentEditor.update(() => {
+        lexicalNode.remove();
+      });
+    },
+    [insertMarkdown, lexicalNode, parentEditor],
+  );
+
+  /**
+   * Saves changes (from configure modal)
+   */
+  const handleSubmit = useCallback(async () => {
+    setIsConfiguring(false);
+    await rebuildNode(formData, backgroundColor);
+  }, [rebuildNode, formData, backgroundColor]);
+
+  /**
+   * Clears the background color
+   */
+  const handleClearColor = useCallback(async () => {
+    setColorPickerAnchor(null);
+    pendingColorRef.current = '';
+    skipNextCloseRebuildRef.current = true;
+    setPendingColor('');
+    setBackgroundColor('');
+    await rebuildNode(formData, '');
+  }, [rebuildNode, formData]);
 
   /**
    * Updates accordion title text
@@ -254,10 +285,9 @@ export const AccordionEditor: React.FC<
   }, [isConfiguring]);
 
   /**
-   * UE Synchs form data
+   * Syncs form data, style and backgroundColor from mdastNode on change
    */
   useEffect(() => {
-    //update content
     setFormData(mdastNode.children);
 
     if (mdastNode.attributes.style) {
@@ -268,7 +298,40 @@ export const AccordionEditor: React.FC<
         // no styles applied
       }
     }
+    const bgColor = mdastNode.attributes.backgroundColor ?? '';
+    setBackgroundColor(bgColor);
+    pendingColorRef.current = bgColor;
+    setPendingColor(bgColor);
   }, [mdastNode]);
+
+  const dropShadow = getDirectiveBlockShadow(muiTheme);
+
+  const outerSx: SxProps = backgroundColor
+    ? {
+        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+        clipPath: `inset(-${blockPadding} -100vmax -${blockPadding})`,
+        backgroundColor,
+      }
+    : {
+        boxShadow: dropShadow,
+      };
+
+  const innerSx: SxProps = backgroundColor
+    ? {
+        backgroundColor: muiTheme.palette.background.paper,
+        // Remove all padding from the outer nestedEditor wrapper when bgcolor is active
+        // (eliminates white border). Uses > to avoid affecting each accordion item's own editor.
+        '& > [class*="_nestedEditor"]': {
+          padding: 0,
+        },
+      }
+    : {
+        // Remove all padding from the outer nestedEditor wrapper (no bgcolor case).
+        // Each accordion item's own nested editor retains its padding via the > selector.
+        '& > [class*="_nestedEditor"]': {
+          padding: 0,
+        },
+      };
 
   /**
    * Render Accordion and Nested Content
@@ -280,62 +343,103 @@ export const AccordionEditor: React.FC<
           margin: 0,
           padding: 0,
           position: 'relative',
+          // Flex row only when backgroundColor is set: inner content + gutter sit side by side
+          // inside the colored band. Without a background color the original layout is preserved.
+          ...(backgroundColor && !isPlayback
+            ? { display: 'flex', alignItems: 'center', paddingRight: '20px' }
+            : {}),
+          ...outerSx,
           ...sxProps,
         }}
       >
-        <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <NestedLexicalEditor<ContainerDirective>
-              block={true}
-              getContent={(node) => {
-                return node.children;
-              }}
-              getUpdatedMdastNode={(node, children: any) => ({
-                ...node,
-                children,
-              })}
-            />
-          </Box>
-          <div>
-            {!isPlayback && (
-              <Box
-                sx={{
-                  backgroundColor:
-                    muiTheme.palette.mode === 'dark'
-                      ? '#282b30e6'
-                      : '#EEEEEEe6',
-                  position: 'absolute',
-                  display: 'flex',
+        <Box sx={{ ...(backgroundColor ? { flex: 1, minWidth: 0 } : {}), ...innerSx }}>
+          <NestedLexicalEditor<ContainerDirective>
+            block={true}
+            getContent={(node) => {
+              return node.children;
+            }}
+            getUpdatedMdastNode={(node, children: any) => ({
+              ...node,
+              children,
+            })}
+          />
+        </Box>
+
+        {!isPlayback && (
+          <Box
+            sx={{
+              backgroundColor:
+                muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
+              display: 'flex',
+              // When no background color: absolute position (original behavior).
+              // When background color: flex sibling in the colored band.
+              ...(backgroundColor
+                ? { flexShrink: 0, alignSelf: 'flex-start' }
+                : { position: 'absolute', top: 0, right: 0 }),
+            }}
+          >
+            <Tooltip title="Background Color">
+              <IconButton
+                onClick={(e) => {
+                  pendingColorRef.current = backgroundColor;
+                  setPendingColor(backgroundColor);
+                  setColorPickerAnchor(e.currentTarget);
                 }}
+                size="small"
               >
-                <Tooltip title="Edit Sections">
-                  <IconButton onClick={handleConfigure}>
-                    <SettingsIcon />
-                  </IconButton>
-                </Tooltip>
-                <IconButton
-                  aria-label="delete"
-                  disabled={readOnly}
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    parentEditor.update(() => {
-                      if (lexicalNode.getPreviousSibling()) {
-                        lexicalNode.selectPrevious();
-                      } else {
-                        lexicalNode.selectNext();
-                      }
-                    });
-                    await delay(50);
-                    removeNode();
-                  }}
-                >
-                  <DeleteForeverIcon />
-                </IconButton>
-              </Box>
-            )}
-          </div>
-        </Stack>
+                <PaletteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Edit Sections">
+              <IconButton onClick={handleConfigure}>
+                <SettingsIcon />
+              </IconButton>
+            </Tooltip>
+            <IconButton
+              aria-label="delete"
+              disabled={readOnly}
+              onClick={async (e) => {
+                e.preventDefault();
+                parentEditor.update(() => {
+                  if (lexicalNode.getPreviousSibling()) {
+                    lexicalNode.selectPrevious();
+                  } else {
+                    lexicalNode.selectNext();
+                  }
+                });
+                await delay(50);
+                removeNode();
+              }}
+            >
+              <DeleteForeverIcon />
+            </IconButton>
+          </Box>
+        )}
       </Box>
+
+      <ColorSelectionPopover
+        anchorEl={colorPickerAnchor}
+        onClose={() => {
+          setColorPickerAnchor(null);
+          if (skipNextCloseRebuildRef.current) {
+            skipNextCloseRebuildRef.current = false;
+            return;
+          }
+          const latest = pendingColorRef.current;
+          if (latest !== backgroundColor) {
+            setBackgroundColor(latest);
+            rebuildNode(formData, latest);
+          }
+        }}
+        lastColor={pendingColor}
+        palette={SHAPE_PRESET_COLORS}
+        onPickColor={(color) => {
+          pendingColorRef.current = color;
+          setPendingColor(color);
+        }}
+        onClear={handleClearColor}
+        noneLabel="No background"
+      />
       {isConfiguring && (
         <ModalDialog
           maxWidth="md"
