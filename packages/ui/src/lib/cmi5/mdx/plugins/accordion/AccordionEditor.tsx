@@ -359,16 +359,16 @@ export const AccordionEditor: React.FC<
           margin: 0,
           padding: 0,
           position: 'relative',
-          // Flex row only when backgroundColor is set: inner content + gutter sit side by side
-          // inside the colored band. Without a background color the original layout is preserved.
-          ...(backgroundColor && !isPlayback
-            ? { display: 'flex', alignItems: 'center', paddingRight: '20px' }
+          // Always use flex row in edit mode so the gutter buttons are always a flex sibling
+          // and never overlap the accordion content.
+          ...(!isPlayback
+            ? { display: 'flex', alignItems: 'flex-start', paddingRight: '20px' }
             : {}),
           ...outerSx,
           ...sxProps,
         }}
       >
-        <Box sx={{ ...(backgroundColor ? { flex: 1, minWidth: 0 } : {}), ...innerSx }}>
+        <Box sx={{ flex: 1, minWidth: 0, ...innerSx }}>
           <NestedLexicalEditor<ContainerDirective>
             block={true}
             getContent={(node) => {
@@ -387,11 +387,8 @@ export const AccordionEditor: React.FC<
               backgroundColor:
                 muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
               display: 'flex',
-              // When no background color: absolute position (original behavior).
-              // When background color: flex sibling in the colored band.
-              ...(backgroundColor
-                ? { flexShrink: 0, alignSelf: 'flex-start' }
-                : { position: 'absolute', top: 0, right: 0 }),
+              flexShrink: 0,
+              alignSelf: 'flex-start',
             }}
           >
             <Tooltip title="Background Color">
