@@ -114,7 +114,7 @@ export function LessonStyleDrawer() {
         );
       }
     },
-    [currentLessonNode],
+    [currentLessonNode, au],
   );
 
   /**
@@ -130,7 +130,7 @@ export function LessonStyleDrawer() {
         );
       }
     },
-    [currentLessonNode],
+    [currentLessonNode, au],
   );
 
   /**
@@ -146,7 +146,7 @@ export function LessonStyleDrawer() {
         );
       }
     },
-    [currentLessonNode],
+    [currentLessonNode, au],
   );
 
   /**
@@ -162,7 +162,7 @@ export function LessonStyleDrawer() {
         );
       }
     },
-    [currentLessonNode],
+    [currentLessonNode, au],
   );
 
   /**
@@ -237,7 +237,10 @@ export function LessonStyleDrawer() {
           >
             Lesson Appearance
           </Typography>
-          <IconButton onClick={handleClose} aria-label="Close Lesson Appearance">
+          <IconButton
+            onClick={handleClose}
+            aria-label="Close Lesson Appearance"
+          >
             <CloseIcon />
           </IconButton>
         </Stack>
