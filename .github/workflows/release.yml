@@ -114,11 +114,14 @@ jobs:
           path: dist/apps/cc-cmi5-player/
           retention-days: 1
 
+      - name: Zip player dist for release
+        run: zip -r cc-cmi5-player-${{ needs.create-release.outputs.version }}.zip dist/apps/cc-cmi5-player/
+
       - name: Upload cc-cmi5-player to release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ needs.create-release.outputs.version }}
-          files: dist/apps/cc-cmi5-player/**
+          files: cc-cmi5-player-${{ needs.create-release.outputs.version }}.zip
           fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
