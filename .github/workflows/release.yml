@@ -83,6 +83,7 @@ jobs:
 
             ### Changelog
             <!-- Add changelog here -->
+
   build-cc-cmi5-player:
     name: Build cc-cmi5-player
     runs-on: ubuntu-latest
@@ -104,16 +105,20 @@ jobs:
           npm version ${{ needs.create-release.outputs.version }} --no-git-tag-version --allow-same-version
 
       - name: Build cc-cmi5-player
-        run: |
-          npx nx build cc-cmi5-player
+        run: npx nx build cc-cmi5-player
 
-      - name: Upload cc-cmi5-player assets
+      - name: Upload player dist as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cc-cmi5-player-dist
+          path: dist/apps/cc-cmi5-player/
+          retention-days: 1
+
+      - name: Upload cc-cmi5-player to release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ needs.create-release.outputs.version }}
-          files: |
-            dist/**/cc-cmi5-player*
-
+          files: dist/apps/cc-cmi5-player/**
           fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -121,7 +126,7 @@ jobs:
   build-electron:
     name: Build Electron (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-    needs: create-release
+    needs: [create-release, build-cc-cmi5-player]
     strategy:
       matrix:
         include:
@@ -152,6 +157,12 @@ jobs:
       - name: Update package.json version
         run: |
           npm version ${{ needs.create-release.outputs.version }} --no-git-tag-version --allow-same-version
+
+      - name: Download cc-cmi5-player artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: cc-cmi5-player-dist
+          path: apps/rapid-cmi5-electron/src/assets/cc-cmi5-player-dist
 
       - name: Import Code Signing Certificate (macOS)
         if: ${{ matrix.platform == 'darwin' && env.APPLE_CERTIFICATE != '' }}
