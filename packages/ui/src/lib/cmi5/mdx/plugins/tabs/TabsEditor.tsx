@@ -71,7 +71,11 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   const muiTheme = useTheme();
   const { lessonTheme } = useContext(LessonThemeContext);
   const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
-  const blockPadding = resolvedThemeCSS?.blockPadding ?? '16px';
+  // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
+  // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
+  const blockPadding = resolvedThemeCSS
+    ? (resolvedThemeCSS.blockPadding ?? '0px')
+    : '32px';
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
   const [tab, setTab] = useState(0);
 
@@ -324,95 +328,112 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     setPendingColor(bgColor);
   }, [tab, mdastNode]);
 
-  /**
-   * Full-width background color applied via box-shadow + clip-path.
-   * This technique extends the background across the full viewport width
-   * without requiring width/transform changes that break inside overflow:hidden
-   * ancestor containers. Content width is preserved — only the color spreads.
-   */
   const dropShadow = getDirectiveBlockShadow(muiTheme);
 
-  const fullWidthBackgroundSx: SxProps = backgroundColor
+  // Outer box: full-width background color band when backgroundColor is set,
+  // otherwise a plain drop shadow block.
+  // clipPath negative top/bottom insets absorb the decorator margin-top/bottom gap
+  // added by lesson theme CSS, so the colored band fills flush to adjacent blocks.
+  // No extra paddingTop/Bottom needed — the clip-path extension provides the visual fill.
+  const outerSx: SxProps = backgroundColor
     ? {
-        // box-shadow spreads the background color full-width via the clip-path technique.
-        // Drop shadow is omitted here: clip-path clips all box-shadow paint, so a
-        // combined drop shadow would be invisible regardless of inset values.
         boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        // Negative top inset extends the clip region upward by blockPadding,
-        // so the box-shadow color fills the margin-top gap that the lesson
-        // theme CSS adds to [data-lexical-decorator] adjacent siblings.
-        clipPath: `inset(-${blockPadding} -100vmax 0)`,
+        clipPath: `inset(-${blockPadding} -100vmax -${blockPadding})`,
         backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
       }
     : {
         boxShadow: dropShadow,
       };
+
+  // Inner box: fills all available width (lesson content width applies to text
+  // inside via lesson theme CSS, not to this container). Page background color
+  // creates the visual separation from the outer colored band.
+  const innerSx: SxProps = backgroundColor
+    ? {
+        backgroundColor: muiTheme.palette.background.paper,
+      }
+    : {};
 
   /**
    * Render Tabs and Nested Content
    */
   return (
     <>
+      {/* Outer box is a flex row: inner content expands, gutter sits to its right.
+          paddingRight: 20px keeps the gutter 20px from the right edge of the content area
+          (which equals the viewport right edge at L content width). */}
       <Box
         sx={{
           margin: 0,
           padding: 0,
-          position: 'relative',
-          // Reserve space on the right for the gutter button group so the
-          // tab bar never extends under them, even at full content width.
-          paddingRight: isPlayback ? 0 : '100px',
-          ...fullWidthBackgroundSx,
+          display: 'flex',
+          alignItems: 'center',
+          paddingRight: isPlayback ? 0 : '20px',
+          ...outerSx,
           ...sxProps,
         }}
       >
-        <Tabs
-          variant="fullWidth"
-          sx={{ width: '100%' }}
-          value={tab}
-          onChange={handleTabChange}
-          aria-label="basic tabs example"
-          textColor="secondary"
-          indicatorColor="primary"
-        >
-          {mdastNode.children.map((item, index) => {
-            if (
-              (item.type === 'containerDirective' ||
-                item.type === 'leafDirective') &&
-              item.name === 'tabContent'
-            ) {
-              return (
-                <Tab
-                  //force dark theme styling in RC5Player since CMI5 player does not support theme switching
-                  sx={
-                    readOnly
-                      ? { ...darkTab, borderRadius: 0 }
-                      : { borderRadius: 0 }
-                  }
-                  label={item.attributes?.title}
-                  {...a11yProps(index)}
-                  key={index}
-                />
-              );
-            }
+        {/* Inner content box — flex:1 fills all space left of the gutter */}
+        <Box sx={{ flex: 1, minWidth: 0, ...innerSx }}>
+          <Tabs
+            variant="fullWidth"
+            sx={{ width: '100%' }}
+            value={tab}
+            onChange={handleTabChange}
+            aria-label="basic tabs example"
+            textColor="secondary"
+            indicatorColor="primary"
+          >
+            {mdastNode.children.map((item, index) => {
+              if (
+                (item.type === 'containerDirective' ||
+                  item.type === 'leafDirective') &&
+                item.name === 'tabContent'
+              ) {
+                return (
+                  <Tab
+                    //force dark theme styling in RC5Player since CMI5 player does not support theme switching
+                    sx={
+                      readOnly
+                        ? { ...darkTab, borderRadius: 0 }
+                        : { borderRadius: 0 }
+                    }
+                    label={item.attributes?.title}
+                    {...a11yProps(index)}
+                    key={index}
+                  />
+                );
+              }
 
-            return null;
-          })}
-        </Tabs>
+              return null;
+            })}
+          </Tabs>
 
+          <TabsContext.Provider value={{ tab }}>
+            <NestedLexicalEditor<ContainerDirective>
+              block={true}
+              getContent={(node) => {
+                return node.children;
+              }}
+              getUpdatedMdastNode={(node, children: any) => ({
+                ...node,
+                children,
+              })}
+            />
+          </TabsContext.Provider>
+        </Box>
+
+        {/* Gutter buttons — flex sibling, sits in the colored band to the right of the inner box */}
         {!isPlayback && (
           <Box
             sx={{
               backgroundColor:
                 muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
-              position: 'absolute',
-              top: backgroundColor ? blockPadding : 0,
-              right: 0,
               display: 'flex',
+              flexShrink: 0,
+              alignSelf: 'flex-start',
             }}
           >
-            {/* Background Color Picker Button */}
             <Tooltip title="Background Color">
               <IconButton
                 onClick={(e) => {
@@ -445,19 +466,6 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
             </IconButton>
           </Box>
         )}
-
-        <TabsContext.Provider value={{ tab }}>
-          <NestedLexicalEditor<ContainerDirective>
-            block={true}
-            getContent={(node) => {
-              return node.children;
-            }}
-            getUpdatedMdastNode={(node, children: any) => ({
-              ...node,
-              children,
-            })}
-          />
-        </TabsContext.Provider>
       </Box>
 
       {/* Background Color Popover */}
