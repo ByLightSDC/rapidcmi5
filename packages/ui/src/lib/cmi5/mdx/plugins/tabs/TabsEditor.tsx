@@ -347,9 +347,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
         clipPath: `inset(-${blockPadding} -100vmax -${blockPadding})`,
         backgroundColor,
       }
-    : {
-        boxShadow: dropShadow,
-      };
+    : {};
 
   // Inner box: fills all available width (lesson content width applies to text
   // inside via lesson theme CSS, not to this container). Page background color
