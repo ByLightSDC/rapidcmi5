@@ -112,7 +112,7 @@ export const createNewCourseInFs = async ({
   courseAu,
   courseDescription,
   courseId,
-  baseSlideTitle = '01 slide',
+  baseSlideTitle = 'Slide 1',
   baseSlideContent = defaultEmptySlide.content,
 }: CreateNewCourseInFsOptions) => {
   try {
@@ -123,34 +123,36 @@ export const createNewCourseInFs = async ({
     const firstSlidePath = join(auDirPath, sluggedFilename + '.md');
 
     // Create the course meta file
+    const courseDataFileContent = {
+      blocks: [
+        {
+          blockName: coursePath,
+          aus: [
+            {
+              auName: courseAu,
+              dirPath: auDirPath,
+              slides: [
+                {
+                  slideTitle: baseSlideTitle,
+                  type: SlideTypeEnum.Markdown,
+                  filepath: firstSlidePath,
+                },
+              ],
+            },
+          ],
+          blockDescription: '',
+        },
+      ],
+      courseId,
+      courseTitle: courseTitle,
+      courseDescription: courseDescription,
+      rc5Version: RC5_VERSION,
+    };
+
     await fsInstance.createFile(
       r,
       join(coursePath, rc5MetaFilename),
-      YAML.stringify({
-        blocks: [
-          {
-            blockName: coursePath,
-            aus: [
-              {
-                auName: courseAu,
-                dirPath: auDirPath,
-                slides: [
-                  {
-                    slideTitle: baseSlideTitle,
-                    type: SlideTypeEnum.Markdown,
-                    filepath: firstSlidePath,
-                  },
-                ],
-              },
-            ],
-            blockDescription: '',
-          },
-        ],
-        courseId,
-        courseTitle: courseTitle,
-        courseDescription: courseDescription,
-        rc5Version: RC5_VERSION,
-      } as CourseData),
+      YAML.stringify(courseDataFileContent),
     );
 
     // Create the base slide title
@@ -158,11 +160,10 @@ export const createNewCourseInFs = async ({
 
     const courseData = await getCourseDataInFs({ r, fsInstance, coursePath });
 
-    const course = {
-      name: coursePath,
+    const course: Course = {
       basePath: coursePath,
       courseData: courseData,
-    } as Course;
+    };
 
     return course;
   } catch (error: any) {

@@ -6,7 +6,7 @@ export const jsonFormatSpaces = 1;
 export const defaultEmptySlide = {
   slideTitle: 'Slide 1',
   type: SlideTypeEnum.Markdown,
-  content: 'New Slide',
+  content: '# Slide',
   filepath: '',
 };
 
