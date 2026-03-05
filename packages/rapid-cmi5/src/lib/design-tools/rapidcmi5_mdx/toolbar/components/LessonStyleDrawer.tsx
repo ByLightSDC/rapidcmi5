@@ -82,7 +82,6 @@ export function LessonStyleDrawer() {
   const { au } = useAuContext();
 
   const [currentLessonNode, setLessonNode] = useState<ILessonNode>();
-  const [isInitialized, setIsInitialized] = useState(false);
   const [contentWidth, setContentWidth] = useState<ContentWidthEnum>(
     ContentWidthEnum.None,
   );
@@ -169,16 +168,15 @@ export function LessonStyleDrawer() {
    * UE set default values from persisted lesson
    */
   useEffect(() => {
-    if (!isInitialized && au?.lessonTheme) {
+    if (au?.lessonTheme) {
       setContentWidth(au?.lessonTheme.contentWidth || ContentWidthEnum.None);
       setBlockPadding(au?.lessonTheme.blockPadding || BlockPaddingEnum.None);
       setCustomPadding(au?.lessonTheme.blockPaddingCustomValue ?? 16);
       setDefaultAlignment(
         au?.lessonTheme.defaultAlignment || DefaultAlignmentEnum.Left,
       );
-      setIsInitialized(true);
     }
-  }, [au?.lessonTheme, isInitialized]);
+  }, [au, au?.lessonTheme]);
 
   /**
    * UE creates fake lesson node to pass to change lesson method when a setting is applied
