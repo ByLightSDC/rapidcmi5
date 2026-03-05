@@ -17,6 +17,7 @@ import {
   useScopedAlignmentStyles,
 } from '../shared/useScopedAlignmentStyles';
 import { useFocusWithin } from '../shared/useFocusWithin';
+import { TAB_CONTENT_MIN_HEIGHT } from '../../constants/directiveLayout';
 
 /**
  * Tab Content Editor for tabs plugin
@@ -130,6 +131,7 @@ export const TabContentEditor: React.FC<
         })}
         contentEditableProps={{
           className: scopedClass,
+          style: { minHeight: isPlayback ? undefined : TAB_CONTENT_MIN_HEIGHT },
         }}
       />
     </div>

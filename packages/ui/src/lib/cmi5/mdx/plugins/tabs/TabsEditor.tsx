@@ -58,6 +58,11 @@ import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
 import { getDirectiveBlockShadow } from '../../../../styles/directiveStyles';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
+import {
+  DIRECTIVE_GUTTER_GAP,
+  DIRECTIVE_GUTTER_PADDING_RIGHT,
+  DIRECTIVE_INNER_BOX_SHADOW,
+} from '../../constants/directiveLayout';
 
 /**
  * Tabs Editor for tabs directive
@@ -352,6 +357,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   const innerSx: SxProps = backgroundColor
     ? {
         backgroundColor: muiTheme.palette.background.paper,
+        boxShadow: DIRECTIVE_INNER_BOX_SHADOW,
       }
     : {};
 
@@ -369,7 +375,8 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
           padding: 0,
           display: 'flex',
           alignItems: 'center',
-          paddingRight: isPlayback ? 0 : '20px',
+          gap: isPlayback ? 0 : DIRECTIVE_GUTTER_GAP,
+          paddingRight: isPlayback ? 0 : DIRECTIVE_GUTTER_PADDING_RIGHT,
           ...outerSx,
           ...sxProps,
         }}
