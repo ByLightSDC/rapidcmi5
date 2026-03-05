@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs grep -l \"backgroundColor.*tab\\\\|tabContent\")",
+      "Bash(xargs grep -l \"TabsDirectiveDescriptor\\\\|tabs.*directive\")",
+      "Bash(xargs grep -l \"directive.*render\\\\|renderDirective\")",
+      "Bash(xargs grep -l \"SHAPE_PRESET_COLORS\\\\|color\")"
+    ]
+  }
+}

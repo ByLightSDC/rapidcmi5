@@ -6,6 +6,7 @@ import {
   syntaxExtensions$,
   useCellValues,
   useLexicalNodeRemove,
+  useMdastNodeUpdater,
   usePublisher,
 } from '@mdxeditor/editor';
 import * as Mdast from 'mdast';
@@ -14,7 +15,7 @@ import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
-import { $getRoot } from 'lexical';
+import { $createParagraphNode, $getRoot } from 'lexical';
 
 import {
   Box,
@@ -84,6 +85,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     structuredClone(mdastNode.children),
   );
   const insertMarkdown = usePublisher(insertMarkdown$);
+  const updateMdastNode = useMdastNodeUpdater();
   const [editor] = useLexicalComposerContext();
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [boxStyle, setBoxStyle] = useState<string | undefined>(
@@ -202,26 +204,25 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     async (children: TabContentDirectiveNode[], bgColor: string) => {
       if (!parentEditor) return;
 
-      // select AFTER the current tab first
+      // select AFTER the current node first; fall back to prev sibling or a new paragraph.
+      // Only use standard block types (paragraph/heading) — custom nodes like TOCHeadingNode
+      // extend ElementNode but cannot be used as insertion anchors.
       parentEditor.update(() => {
+        const SAFE_TYPES = new Set(['paragraph', 'heading']);
+        const isSafeElement = (node: ReturnType<typeof lexicalNode.getNextSibling>) =>
+          node !== null && $isElementNode(node) && SAFE_TYPES.has(node.getType());
+
         const nextSibling = lexicalNode.getNextSibling();
-        if (nextSibling) {
-          nextSibling.selectStart();
+        const prevSibling = lexicalNode.getPreviousSibling();
+
+        if (isSafeElement(nextSibling)) {
+          nextSibling!.selectStart();
+        } else if (isSafeElement(prevSibling)) {
+          prevSibling!.selectEnd();
         } else {
-          const root = $getRoot();
-          const lastChild = root.getChildren().at(-1);
-          if (lastChild) {
-            if ($isElementNode(lastChild)) {
-              const lastText = lastChild.getLastDescendant();
-              if (lastText) {
-                lastText.selectEnd();
-              } else {
-                lastChild.selectEnd();
-              }
-            } else {
-              lastChild.selectEnd();
-            }
-          }
+          const para = $createParagraphNode();
+          $getRoot().append(para);
+          para.selectEnd();
         }
       });
 
@@ -264,16 +265,30 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   }, [rebuildNode, formData, backgroundColor]);
 
   /**
+   * Updates just the backgroundColor attribute without a full node rebuild.
+   * Safe for color-only changes — avoids flicker and sibling selection issues of rebuildNode.
+   */
+  const updateColor = useCallback((color: string) => {
+    const updatedAttributes = { ...mdastNode.attributes };
+    if (color) {
+      updatedAttributes.backgroundColor = color;
+    } else {
+      delete updatedAttributes.backgroundColor;
+    }
+    updateMdastNode({ ...mdastNode, attributes: updatedAttributes });
+  }, [mdastNode, updateMdastNode]);
+
+  /**
    * Clears the background color
    */
-  const handleClearColor = useCallback(async () => {
+  const handleClearColor = useCallback(() => {
     setColorPickerAnchor(null);
     pendingColorRef.current = '';
     skipNextCloseRebuildRef.current = true;
     setPendingColor('');
     setBackgroundColor('');
-    await rebuildNode(formData, '');
-  }, [rebuildNode, formData]);
+    updateColor('');
+  }, [updateColor]);
 
   /**
    * Handle Change Tab
@@ -491,7 +506,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
           const latest = pendingColorRef.current;
           if (latest !== backgroundColor) {
             setBackgroundColor(latest);
-            rebuildNode(formData, latest);
+            updateColor(latest);
           }
         }}
         lastColor={pendingColor}

@@ -6,6 +6,7 @@ import {
   syntaxExtensions$,
   useCellValues,
   useLexicalNodeRemove,
+  useMdastNodeUpdater,
   usePublisher,
 } from '@mdxeditor/editor';
 import * as Mdast from 'mdast';
@@ -14,7 +15,7 @@ import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
-import { $getRoot } from 'lexical';
+import { $createParagraphNode, $getRoot } from 'lexical';
 
 import {
   Box,
@@ -76,6 +77,7 @@ export const AccordionEditor: React.FC<
     Array<AccordionContentDirectiveNode>
   >(structuredClone(mdastNode.children));
   const insertMarkdown = usePublisher(insertMarkdown$);
+  const updateMdastNode = useMdastNodeUpdater();
   const [editor] = useLexicalComposerContext();
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState<string>(
@@ -184,24 +186,24 @@ export const AccordionEditor: React.FC<
       if (!parentEditor) return;
 
       parentEditor.update(() => {
+        // Only use standard block nodes (paragraph/heading) as selection anchors.
+        // TOCHeadingNode and other custom nodes extend ElementNode but can't be used for insertion.
+        const SAFE_TYPES = new Set(['paragraph', 'heading']);
+        const isSafeElement = (node: ReturnType<typeof lexicalNode.getNextSibling>) =>
+          node !== null && $isElementNode(node) && SAFE_TYPES.has(node.getType());
+
         const nextSibling = lexicalNode.getNextSibling();
-        if (nextSibling) {
-          nextSibling.selectStart();
+        const prevSibling = lexicalNode.getPreviousSibling();
+
+        if (isSafeElement(nextSibling)) {
+          nextSibling!.selectStart();
+        } else if (isSafeElement(prevSibling)) {
+          prevSibling!.selectEnd();
         } else {
-          const root = $getRoot();
-          const lastChild = root.getChildren().at(-1);
-          if (lastChild) {
-            if ($isElementNode(lastChild)) {
-              const lastText = lastChild.getLastDescendant();
-              if (lastText) {
-                lastText.selectEnd();
-              } else {
-                lastChild.selectEnd();
-              }
-            } else {
-              lastChild.selectEnd();
-            }
-          }
+          // No safe sibling — append a temporary paragraph to anchor the selection
+          const para = $createParagraphNode();
+          $getRoot().append(para);
+          para.selectEnd();
         }
       });
 
@@ -244,14 +246,28 @@ export const AccordionEditor: React.FC<
   /**
    * Clears the background color
    */
-  const handleClearColor = useCallback(async () => {
+  /**
+   * Updates just the backgroundColor attribute without a full node rebuild.
+   * Safe for color-only changes — avoids the sibling selection issues of rebuildNode.
+   */
+  const updateColor = useCallback((color: string) => {
+    const updatedAttributes = { ...mdastNode.attributes };
+    if (color) {
+      updatedAttributes.backgroundColor = color;
+    } else {
+      delete updatedAttributes.backgroundColor;
+    }
+    updateMdastNode({ ...mdastNode, attributes: updatedAttributes });
+  }, [mdastNode, updateMdastNode]);
+
+  const handleClearColor = useCallback(() => {
     setColorPickerAnchor(null);
     pendingColorRef.current = '';
     skipNextCloseRebuildRef.current = true;
     setPendingColor('');
     setBackgroundColor('');
-    await rebuildNode(formData, '');
-  }, [rebuildNode, formData]);
+    updateColor('');
+  }, [updateColor]);
 
   /**
    * Updates accordion title text
@@ -428,7 +444,7 @@ export const AccordionEditor: React.FC<
           const latest = pendingColorRef.current;
           if (latest !== backgroundColor) {
             setBackgroundColor(latest);
-            rebuildNode(formData, latest);
+            updateColor(latest);
           }
         }}
         lastColor={pendingColor}
