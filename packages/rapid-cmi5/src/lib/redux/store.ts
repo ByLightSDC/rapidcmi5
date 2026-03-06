@@ -9,6 +9,7 @@ import repoReducer from './repoManagerReducer';
 import {
   commonAppReducer,
   commonAppTransReducer,
+  ctfReducer,
   paginationReducer,
 } from '@rapid-cmi5/ui';
 
@@ -50,6 +51,7 @@ const rootReducer = combineReducers({
   ),
   pagination: paginationReducer,
   repoManager: repoReducer,
+  auCTF: ctfReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
