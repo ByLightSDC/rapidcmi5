@@ -7,6 +7,7 @@ import { AuContextProps } from '@rapid-cmi5/cmi5-build-common';
 import { Typography } from '@mui/material';
 import { MarkdownConvertorSlide } from './MarkdownConvertor';
 import { markDownSlideStyle } from './styles';
+import { imagePopper$ } from '../mdx';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const h = require('hastscript');
 
