@@ -4,6 +4,7 @@ import { openEditAudioDialog$ } from './index';
 import { usePublisher } from '@mdxeditor/gurx';
 import { IconButton, Tooltip } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
+import EditIcon from '@mui/icons-material/Edit';
 
 export interface EditAudioToolbarProps {
   nodeKey: string;
@@ -53,7 +54,7 @@ export function EditAudioToolbar({
             });
           }}
         >
-          <SettingsIcon fontSize="small" />
+          <EditIcon fontSize="small" />
         </IconButton>
       </Tooltip>
     </div>

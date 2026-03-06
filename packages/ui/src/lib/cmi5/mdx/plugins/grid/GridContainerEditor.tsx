@@ -31,6 +31,7 @@ import Grid from '@mui/material/Grid2';
 
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import SettingsIcon from '@mui/icons-material/Settings';
+import EditIcon from '@mui/icons-material/Edit';
 
 import {
   GridCellDirectiveNode,
@@ -280,7 +281,7 @@ export const GridContainerEditor: React.FC<
           >
             <Tooltip title="Edit Grid Layout">
               <IconButton onClick={handleConfigure}>
-                <SettingsIcon />
+                <EditIcon />
               </IconButton>
             </Tooltip>
             <IconButton

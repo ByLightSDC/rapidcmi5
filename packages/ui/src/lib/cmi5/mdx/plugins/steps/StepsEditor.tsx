@@ -45,6 +45,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 //REF import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SettingsIcon from '@mui/icons-material/Settings';
+import EditIcon from '@mui/icons-material/Edit';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
 import { StepsContext } from './StepsContext';
@@ -282,13 +283,6 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   const handleStepChange = (newValue: number) => {
     setStep(newValue);
   };
-  //  * Handle Change Tab
-  //  * @param event
-  //  * @param newValue
-  //  */
-  // const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-  //   setStep(newValue);
-  // };
 
   /**
    * Updates step title text
@@ -426,7 +420,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                   >
                     <Tooltip title="Edit Steps Settings">
                       <IconButton onClick={handleConfigure}>
-                        <SettingsIcon />
+                        <EditIcon />
                       </IconButton>
                     </Tooltip>
                     <IconButton

@@ -38,6 +38,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SettingsIcon from '@mui/icons-material/Settings';
+import EditIcon from '@mui/icons-material/Edit';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
 import { AccordionContentDirectiveNode, AccordionDirectiveNode } from './types';
@@ -310,7 +311,7 @@ export const AccordionEditor: React.FC<
               >
                 <Tooltip title="Edit Sections">
                   <IconButton onClick={handleConfigure}>
-                    <SettingsIcon />
+                    <EditIcon />
                   </IconButton>
                 </Tooltip>
                 <IconButton

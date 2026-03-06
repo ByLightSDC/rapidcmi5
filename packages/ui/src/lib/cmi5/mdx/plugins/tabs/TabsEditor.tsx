@@ -40,6 +40,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PaletteIcon from '@mui/icons-material/Palette';
 import SettingsIcon from '@mui/icons-material/Settings';
+import EditIcon from '@mui/icons-material/Edit';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
 import { TabsContext } from './TabsContext';
@@ -455,7 +456,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
 
             <Tooltip title="Edit Tabs Settings">
               <IconButton onClick={handleConfigure}>
-                <SettingsIcon />
+                <EditIcon />
               </IconButton>
             </Tooltip>
             <IconButton
