@@ -135,6 +135,7 @@ function RC5VisualEditor() {
   const courseData = useSelector(courseDataCache);
   const currentAuIndex = useSelector(currentAu);
   const currentBlockIndex = useSelector(currentBlock);
+  const editorContainerRef = React.useRef<HTMLDivElement>(null);
   const isEditing = true;
   const pixelTop = (isAppHeaderShowing ? 40 : 0) + (isEditing ? 87 : 0);
 
@@ -612,6 +613,35 @@ function RC5VisualEditor() {
       savedAnimations,
     );
   }, [currentSlideIndex]);
+
+
+   /**
+   * Scroll to top when tab changes
+   */
+  useEffect(() => {
+    // Defer until after setMarkdown and its DOM updates complete
+    const timeoutId = setTimeout(() => {
+      const el = editorContainerRef.current?.querySelector(
+        '.mdxeditor-root-contenteditable',
+      ) as HTMLElement | null;
+
+      if (!el) return;
+
+      // walk up to find the nearest scrollable ancestor
+      let scroller: HTMLElement | null = el;
+      while (scroller) {
+        const style = window.getComputedStyle(scroller);
+        const overflowY = style.overflowY;
+        if (overflowY === 'auto' || overflowY === 'scroll') break;
+        scroller = scroller.parentElement;
+      }
+
+      (scroller ?? el).scrollTo({ top: 0 });
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [currentSlideIndex]);
+
   /**
    * UE injects markdown from lesson into editor and resets focus
    */
@@ -717,6 +747,7 @@ function RC5VisualEditor() {
         <Box
           className={themeClass}
           sx={{ height: `calc(100vh - ${pixelTop}px)` }}
+          ref={editorContainerRef}
         >
           {currentLessonTheme && (
             <style>

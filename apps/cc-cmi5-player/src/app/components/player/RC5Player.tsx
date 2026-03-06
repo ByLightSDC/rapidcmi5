@@ -259,6 +259,27 @@ function RC5Player() {
   }, [slideData, activeTab]);
 
   /**
+   * Scroll to top when tab changes
+   */
+  useEffect(() => {
+    const el = editorContainerRef.current?.querySelector(
+      '.mdxeditor-root-contenteditable',
+    ) as HTMLElement | null;
+    if (!el) return;
+
+    // walk up to find the nearest scrollable ancestor
+    let scroller: HTMLElement | null = el;
+    while (scroller) {
+      const style = window.getComputedStyle(scroller);
+      const overflowY = style.overflowY;
+      if (overflowY === 'auto' || overflowY === 'scroll') break;
+      scroller = scroller.parentElement;
+    }
+
+    (scroller ?? el).scrollTo({ top: 0 });
+  }, [activeTab]);
+
+  /**
    * Inject markdown into editor and reset focus
    */
   useEffect(() => {
@@ -319,7 +340,9 @@ function RC5Player() {
           </style>
         )}
         {thePlugins && thePlugins.length > 0 && (
-          <LessonThemeContext.Provider value={{ lessonTheme: currentLessonTheme }}>
+          <LessonThemeContext.Provider
+            value={{ lessonTheme: currentLessonTheme }}
+          >
             <MDXEditor
               className={mdxTheme}
               ref={ref}
