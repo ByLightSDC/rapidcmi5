@@ -14,7 +14,7 @@ import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
-import { $getRoot } from 'lexical';
+import { $createParagraphNode, $getRoot } from 'lexical';
 
 import {
   Box,
@@ -46,7 +46,6 @@ import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
 import { TabsContext } from './TabsContext';
 import { TabContentDirectiveNode, TabDirectiveNode } from './types';
 
-import { $isElementNode } from 'lexical';
 import { DEFAULT_TAB } from './constants';
 import { darkTab } from './styles';
 import ModalDialog from '../../../../modals/ModalDialog';
@@ -208,26 +207,20 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     async (children: TabContentDirectiveNode[], bgColor: string) => {
       if (!parentEditor) return;
 
-      // select AFTER the current tab first
+      // select AFTER the current tab first.
+      // When there is no next sibling we append a plain paragraph as a safe
+      // insertion anchor — selecting a DecoratorNode (e.g. TOCHeadingNode) via
+      // selectEnd() yields a NodeSelection, which causes insertMarkdown to call
+      // insertAfter on a node that has no parent, throwing "Expected node N to
+      // have a parent". The temp paragraph is removed in the final cleanup update.
       parentEditor.update(() => {
         const nextSibling = lexicalNode.getNextSibling();
         if (nextSibling) {
           nextSibling.selectStart();
         } else {
-          const root = $getRoot();
-          const lastChild = root.getChildren().at(-1);
-          if (lastChild) {
-            if ($isElementNode(lastChild)) {
-              const lastText = lastChild.getLastDescendant();
-              if (lastText) {
-                lastText.selectEnd();
-              } else {
-                lastChild.selectEnd();
-              }
-            } else {
-              lastChild.selectEnd();
-            }
-          }
+          const safeParagraph = $createParagraphNode();
+          $getRoot().append(safeParagraph);
+          safeParagraph.selectEnd();
         }
       });
 
