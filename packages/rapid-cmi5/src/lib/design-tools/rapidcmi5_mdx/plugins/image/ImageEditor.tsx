@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-//
+
 import type { BaseSelection, LexicalEditor } from 'lexical';
 import { $isLinkNode } from '@lexical/link';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
