@@ -18,6 +18,7 @@ export interface AccordionDirectiveNode extends ContainerDirective {
    */
   attributes: {
     style?: string;
+    backgroundColor?: string;
   };
 
   children: AccordionContentDirectiveNode[];
