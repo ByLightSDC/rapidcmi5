@@ -19,6 +19,13 @@
   background-color: transparent !important;
 }
 
+/* Remove paragraph margin/padding inside admonition title headers. */
+.admonition-header p {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+
 /* makes accordion nested content dark TODO -- remove?*/
 .light-editor {
   --basePageBg: #f8f8f8;

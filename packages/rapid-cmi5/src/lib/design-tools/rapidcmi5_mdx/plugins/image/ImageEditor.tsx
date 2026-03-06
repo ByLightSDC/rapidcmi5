@@ -49,7 +49,7 @@ import {
   viewMode$,
   DirectiveNode,
 } from '@mdxeditor/editor';
-import { $isImageNode,   ImageNode, } from './ImageNode';
+import { $isImageNode, ImageNode } from './ImageNode';
 import ImageResizer from './ImageResizer';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 import { useSelector } from 'react-redux';
@@ -68,8 +68,10 @@ import {
   isLabelDropping$,
   isTextDropping$,
   DEFAULT_IMAGE_TEXT_CONTENT,
+  imagePopper$,
 } from '@rapid-cmi5/ui';
 import { currentAuPath } from '@rapid-cmi5/react-editor';
+import { useSignalEffect } from '@preact/signals-react';
 
 const BROKEN_IMG_URI =
   'data:image/svg+xml;charset=utf-8,' +
@@ -271,7 +273,6 @@ export function ImageEditor({
     syntaxExtensions$,
     viewMode$,
   );
-
   const imageRef = React.useRef<null | HTMLImageElement>(null);
   const labelsRef = React.useRef<null | HTMLImageElement>(null);
   const urlRef = React.useRef<string | null>(null);
@@ -317,9 +318,10 @@ export function ImageEditor({
    * For images with links, flag to show url panel
    */
   const onClickImage = useCallback(() => {
-    if (id) {
-      onCheckClickOutsideImageLabel(id);
-    }
+    //REF
+    // if (id) {
+    //   onCheckClickOutsideImageLabel(id);
+    // }
 
     editor.update(() => {
       let node = $getNodeByKey(nodeKey);
@@ -617,8 +619,11 @@ export function ImageEditor({
 
           if (hitImage || hitLabels) {
             if (id) {
-              //check click outside with label
-              onCheckClickOutsideImageLabel(id);
+              if (imagePopper$.value?.contains(event.target)) {
+                //ignore click on popper
+              } else {
+                onCheckClickOutsideImageLabel(id);
+              }
             }
             if (event.shiftKey) {
               setSelected(!isSelected);
@@ -746,7 +751,7 @@ export function ImageEditor({
               onResizeEnd={onResizeEnd}
             />
           )}
-          {!readOnly && !isPlayback && (
+          {!readOnly && !isPlayback && isFocused && (
             <EditImageToolbar
               nodeKey={nodeKey}
               imageSource={imageSource}

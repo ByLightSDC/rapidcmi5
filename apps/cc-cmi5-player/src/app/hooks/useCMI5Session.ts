@@ -63,10 +63,11 @@ export const useCMI5Session = () => {
   );
   const rangeDataAttempts = useRef<number>(0);
   const rangeConsoleDataAttempts = useRef<number>(0);
-  
+
   const [isTestMode, setIsTestMode] = useState(checkForDevMode());
   const [cmi5ErrorMessage, setCMI5ErrorMessage] = useState('');
-  const [isInitSessionCmi5Complete, setIsInitSessionCmi5Complete] = useState(false);
+  const [isInitSessionCmi5Complete, setIsInitSessionCmi5Complete] =
+    useState(false);
   const isCmi5RangeConnectionComplete = useSelector(auSessionInitializedSel);
 
   /**
@@ -379,15 +380,30 @@ export const useCMI5Session = () => {
       );
 
       // this may be a timing thing
-      if (response.data.deployedScenarios?.length === 0) {
-        let errorMessage = `No deployed scenarios found`;
+      if (response.data.scheduledScenarios?.length > 0) {
+        if (rangeDataAttempts.current < numRetries) {
+          rangeDataAttempts.current += 1;
+          debugLog(
+            'Waiting for a scheduled scenario',
+            response.data.scheduledScenarios[0],
+          );
+          setTimeout(() => initializeScenarios(), retryDelay);
+          dispatch(setRangeDataAttempts(rangeDataAttempts.current));
+        } else {
+          const errorMessage =
+            'Scenario still scheduled. Maximum attempts reached.';
+          setCMI5ErrorMessage(errorMessage);
+          dispatch(setRangeDataError(errorMessage));
+        }
+      } else if (response.data.deployedScenarios?.length === 0) {
+        let errorMessage = `No deployed or scheduled scenarios found`;
         if (classId) {
           errorMessage = `No deployed scenarios found for Class Id ${classId}`;
         }
 
         if (rangeDataAttempts.current < numRetries) {
           rangeDataAttempts.current = rangeDataAttempts.current + 1;
-          console.log('rangeDataAttempts.current', rangeDataAttempts.current);
+          debugLog('rangeDataAttempts.current', rangeDataAttempts.current);
           errorMessage =
             errorMessage +
             '. Retrying...' +

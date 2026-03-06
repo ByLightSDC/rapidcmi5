@@ -339,6 +339,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
       >
         <AccordionSummary
           expandIcon={expandIcon}
+          className="admonition-header"
           sx={{
             fontSize: '18px',
             backgroundColor: adSeverityHexColor || adHexColor || adColor,
