@@ -281,6 +281,7 @@ export function ImageEditor({
     useLexicalNodeSelection(nodeKey);
   const [editor] = useLexicalComposerContext();
   const [selection, setSelection] = React.useState<BaseSelection | null>(null);
+  const [isHovered, setIsHovered] = React.useState(false);
   const activeEditorRef = React.useRef<LexicalEditor | null>(null);
   const [isResizing, setIsResizing] = React.useState<boolean>(false);
   const [imageSource, setImageSource] = React.useState<string | null>(null);
@@ -728,7 +729,11 @@ export function ImageEditor({
         ImagePlaceholderComponent ? <ImagePlaceholderComponent /> : null
       }
     >
-      <div style={wrapperStyle}>
+      <div
+        style={wrapperStyle}
+        onMouseOver={() => setIsHovered(true)}
+        onMouseOut={() => setIsHovered(false)}
+      >
         <div className={styles['imageWrapper']} data-editor-block-type="image">
           <div
             id={`image-labels-${id}`}
@@ -751,19 +756,22 @@ export function ImageEditor({
               onResizeEnd={onResizeEnd}
             />
           )}
-          {!readOnly && !isPlayback && isFocused && (
-            <EditImageToolbar
-              nodeKey={nodeKey}
-              imageSource={imageSource}
-              initialImagePath={initialImagePath}
-              title={title ?? ''}
-              alt={alt ?? ''}
-              rest={rest ?? []}
-              width={width === 'inherit' ? undefined : width}
-              height={height === 'inherit' ? undefined : height}
-              href={href}
-            />
-          )}
+          {!readOnly &&
+            !isPlayback &&
+            (isFocused ||
+              isHovered) && (
+              <EditImageToolbar
+                nodeKey={nodeKey}
+                imageSource={imageSource}
+                initialImagePath={initialImagePath}
+                title={title ?? ''}
+                alt={alt ?? ''}
+                rest={rest ?? []}
+                width={width === 'inherit' ? undefined : width}
+                height={height === 'inherit' ? undefined : height}
+                href={href}
+              />
+            )}
         </div>
       </div>
       {isUrlShowing && urlRef.current && (
