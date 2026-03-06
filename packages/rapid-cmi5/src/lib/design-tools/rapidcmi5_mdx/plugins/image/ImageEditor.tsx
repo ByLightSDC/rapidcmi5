@@ -746,7 +746,7 @@ export function ImageEditor({
               onResizeEnd={onResizeEnd}
             />
           )}
-          {!readOnly && !isPlayback && (
+          {!readOnly && !isPlayback && isFocused && (
             <EditImageToolbar
               nodeKey={nodeKey}
               imageSource={imageSource}
