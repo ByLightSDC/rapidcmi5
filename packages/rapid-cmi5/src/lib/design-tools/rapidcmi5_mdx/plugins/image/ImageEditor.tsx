@@ -355,6 +355,11 @@ export function ImageEditor({
 
   const onDelete = React.useCallback(
     (payload: KeyboardEvent) => {
+      const target = payload.target as HTMLElement;
+      if (target.role === 'textbox') {
+        return false;
+      }
+
       if (isSelected && $isNodeSelection($getSelection())) {
         const event: KeyboardEvent = payload;
         event.preventDefault();
