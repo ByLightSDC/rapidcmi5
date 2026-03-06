@@ -10,6 +10,7 @@ export type StateInitStatement = {
 export type InitScenarioResponse = {
   classId?: string;
   deployedScenarios: Array<string>;
+  scheduledScenarios: Array<string>;
   rangeId: string;
 };
 
