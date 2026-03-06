@@ -1,5 +1,4 @@
-import { imageLabelKeys$ } from "./vars";
-
+import { imageLabelKeys$ } from './vars';
 
 /**
  * Checks to see ifimage id has content open
@@ -19,4 +18,3 @@ export const onCheckClickOutsideImageLabel = (imageId: string) => {
   }
   return false;
 };
-

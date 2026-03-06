@@ -10,6 +10,8 @@ import { signal } from '@preact/signals-react';
  */
 export const imageLabelKeys$ = signal<Record<string, string | null>>({});
 
+export const imagePopper$ = signal<any>(null);
+
 /**
  * Indicates whether a label is currently being dragged/dropped.
  *
