@@ -21,7 +21,6 @@ import {
   currentAuPath,
   currentSlideNum,
   deleteASlide,
-  isDisplayDirty,
   navigateSlide,
 } from '../../../redux/courseBuilderReducer';
 import {
@@ -29,9 +28,8 @@ import {
   SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 
-import { useRC5Prompts } from '../modals/useRC5Prompts';
 import { RC5Context } from '../contexts/RC5Context';
-import { useContext, useMemo } from 'react';
+import { useContext } from 'react';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
 /**
@@ -136,14 +134,16 @@ export const SlideMenu = () => {
             <DeleteForeverIcon color="inherit" />
           </IconButton>
         </Tooltip>
-        <IconButton
-          aria-label="prev-slide"
-          disabled={currentSlideIndex <= 0}
-          sx={iconButtonStyle}
-          onClick={onPrevSlide}
-        >
-          <ArrowBackIcon color="inherit" />
-        </IconButton>
+        <Tooltip arrow title={`Previous Slide`} {...tooltipStyle}>
+          <IconButton
+            aria-label="prev-slide"
+            disabled={currentSlideIndex <= 0}
+            sx={iconButtonStyle}
+            onClick={onPrevSlide}
+          >
+            <ArrowBackIcon color="inherit" />
+          </IconButton>
+        </Tooltip>
         <Typography
           sx={{
             height: '20px',
@@ -152,16 +152,17 @@ export const SlideMenu = () => {
         >
           {`${currentSlideIndex + 1} / ${lessonSlides.length}`}
         </Typography>
-        <IconButton
-          aria-label="next-slide"
-          disabled={currentSlideIndex >= lessonSlides.length - 1}
-          sx={iconButtonStyle}
-          color="inherit"
-          onClick={onNextSlide}
-        >
-          <ArrowForwardIcon color="inherit" />
-        </IconButton>
-
+        <Tooltip arrow title={`Next Slide`} {...tooltipStyle}>
+          <IconButton
+            aria-label="next-slide"
+            disabled={currentSlideIndex >= lessonSlides.length - 1}
+            sx={iconButtonStyle}
+            color="inherit"
+            onClick={onNextSlide}
+          >
+            <ArrowForwardIcon color="inherit" />
+          </IconButton>
+        </Tooltip>
         <IconButton
           aria-label="add-markdown-slide"
           color="primary"

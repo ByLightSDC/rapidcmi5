@@ -12,6 +12,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Tooltip,
   Typography,
   TypographyOwnProps,
 } from '@mui/material';
@@ -384,7 +385,6 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
         </Typography>
 
         <Box sx={{ flexGrow: 1 }} />
-
         {element.type === LessonTreeNodeType.Slide && (
           <ButtonOptions
             optionButton={(handleClick: any, tooltip: string) => {
@@ -464,82 +464,107 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
         )}
 
         {element.type === LessonTreeNodeType.Lesson && (
-          <ButtonOptions
-            optionButton={(handleClick: any, tooltip: string) => {
-              return (
+          <>
+            {isCurrentLessonFolder && (
+              <Tooltip title="Add Slide">
                 <IconButton
-                  aria-label="lesson options"
+                  aria-label="add slide"
                   className="nodrag"
                   sx={{
                     color: 'primary',
+                    marginRight:-1,
                   }}
-                  onClick={handleClick}
+                  onClick={(event) => {
+                    if (onAction) {
+                      onAction(event, element, LessonNodeActionEnum.AddSlide);
+                    }
+                  }}
                 >
-                  <MoreVertIcon fontSize="inherit" color="primary" />
+                  <NoteAddIcon color="inherit" />
                 </IconButton>
-              );
-            }}
-            closeOnClick={true}
-            onTrigger={(event?: any) => {
-              if (onAction) {
-                onAction(event, element, LessonNodeActionEnum.TriggerRename);
-              }
-            }}
-          >
-            <List
-              sx={{
-                backgroundColor: (theme: any) => `${theme.nav.fill}`,
-                color: (theme: any) => `${theme.nav.icon}`,
-                display: 'flex',
-                flexDirection: 'column',
-                width: '100%',
-                height: 'auto',
-              }}
-              component="nav"
-            >
-              <Typography sx={{ marginLeft: '12px' }} variant="caption">
-                {element.name}
-              </Typography>
-
-              {lessonNodeActions.map((option: RowAction, index: number) => {
-                if (option.hidden) return null;
-                // only allow add slide on current lesson
-                if (
-                  index === LessonNodeActionEnum.AddSlide &&
-                  !isCurrentLessonFolder
-                )
-                  return null;
+              </Tooltip>
+            )}
+            <ButtonOptions
+              optionButton={(handleClick: any, tooltip: string) => {
                 return (
-                  <React.Fragment key={option.tooltip}>
-                    {index > 0 && <Divider />}
-                    <ListItemButton
-                      sx={{ height: 30 }}
-                      onClick={(event) => {
-                        if (onAction) {
-                          onAction(event, element, index);
-                        }
-                      }}
-                    >
-                      <ListItemIcon
+                  <Tooltip title="Lesson Options">
+                    <span>
+                      <IconButton
+                        aria-label="lesson options"
+                        className="nodrag"
                         sx={{
-                          padding: '0px',
-                          margin: '0px',
-                          marginRight: '2px',
-                          minWidth: '0px',
+                          color: 'primary',
+                        }}
+                        onClick={handleClick}
+                      >
+                        <MoreVertIcon fontSize="inherit" color="primary" />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                );
+              }}
+              closeOnClick={true}
+              onTrigger={(event?: any) => {
+                if (onAction) {
+                  onAction(event, element, LessonNodeActionEnum.TriggerRename);
+                }
+              }}
+            >
+              <List
+                sx={{
+                  backgroundColor: (theme: any) => `${theme.nav.fill}`,
+                  color: (theme: any) => `${theme.nav.icon}`,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  width: '100%',
+                  height: 'auto',
+                }}
+                component="nav"
+              >
+                <Typography sx={{ marginLeft: '12px' }} variant="caption">
+                  {element.name}
+                </Typography>
+
+                {lessonNodeActions.map((option: RowAction, index: number) => {
+                  if (option.hidden) return null;
+                  // only allow add slide on current lesson
+                  if (
+                    index === LessonNodeActionEnum.AddSlide &&
+                    !isCurrentLessonFolder
+                  )
+                    return null;
+                  return (
+                    <React.Fragment key={option.tooltip}>
+                      {index > 0 && <Divider />}
+                      <ListItemButton
+                        sx={{ height: 30 }}
+                        onClick={(event) => {
+                          if (onAction) {
+                            onAction(event, element, index);
+                          }
                         }}
                       >
-                        {option.icon}
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={option.tooltip}
-                        slotProps={{ primary: listItemProps }}
-                      />
-                    </ListItemButton>
-                  </React.Fragment>
-                );
-              })}
-            </List>
-          </ButtonOptions>
+                        <ListItemIcon
+                          sx={{
+                            padding: '0px',
+                            margin: '0px',
+                            marginRight: '2px',
+                            minWidth: '0px',
+                          }}
+                        >
+                          {option.icon}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={option.tooltip}
+                          slotProps={{ primary: listItemProps }}
+                        />
+                      </ListItemButton>
+                    </React.Fragment>
+                  );
+                })}
+              </List>
+            </ButtonOptions>
+          </>
         )}
       </Box>
     </Box>

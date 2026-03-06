@@ -321,7 +321,7 @@ export const LessonDrawer = () => {
 
             <ButtonOptions
               optionButton={(handleClick: any) => (
-                <Tooltip title="More Options">
+                <Tooltip title="Course Options">
                   <span>
                     <IconButton
                       aria-label="course options"
