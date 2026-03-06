@@ -176,14 +176,15 @@ export const ImageLabelEditor: React.FC<
    * If mouse is in toolbar area, disregard the click so users can apply text effects
    * If mouse is in label content, disregard
    * If mouse is outside label content, hide
-   * @param event 
-   * @returns 
+   * @param event
+   * @returns
    */
   const handleMouseDown = (event: MouseEvent) => {
+
     // detect click in toolbar area
     if (
       toolbarRect$.value &&
-      event.clientY >= toolbarRect$.value.left &&
+      event.clientX >= toolbarRect$.value.left &&
       event.clientY < toolbarRect$.value.bottom
     ) {
       //ignore clicks on toolbar so user can apply text effects
