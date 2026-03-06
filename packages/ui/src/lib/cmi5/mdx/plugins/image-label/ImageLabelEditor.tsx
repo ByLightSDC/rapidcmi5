@@ -9,7 +9,7 @@ import type { ContainerDirective } from 'mdast-util-directive';
 
 import { Paragraph } from 'mdast';
 import { toMarkdown } from 'mdast-util-to-markdown';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import Popper, { PopperPlacementType } from '@mui/material/Popper';
 import { createPortal } from 'react-dom';
@@ -33,7 +33,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 import { ImageLabelDirectiveNode } from './types';
-import { imageLabelKeys$ } from './vars';
+import { imageLabelKeys$, imagePopper$ } from './vars';
 import { useSelector } from 'react-redux';
 import { ButtonIcon } from '../../../../utility/buttons';
 import { debugLog } from '../../../../utility/logger';
@@ -49,6 +49,7 @@ import { convertMarkdownToMdast } from '../../util/conversion';
 export const ImageLabelEditor: React.FC<
   DirectiveEditorProps<ImageLabelDirectiveNode>
 > = ({ lexicalNode, mdastNode, parentEditor }) => {
+  const popperRef = useRef<null | HTMLDivElement>(null);
   const [editor] = useLexicalComposerContext();
   const [isOpen, setIsOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -165,6 +166,7 @@ export const ImageLabelEditor: React.FC<
       }
     }
   };
+
   /**
    * Open Label Content
    * @param event
@@ -172,7 +174,6 @@ export const ImageLabelEditor: React.FC<
   const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (imageId) {
       checkLabelPlacement();
-
       setAnchorEl(event?.currentTarget);
       imageLabelKeys$.value = {
         ...imageLabelKeys$.value,
@@ -189,8 +190,10 @@ export const ImageLabelEditor: React.FC<
    */
   useSignalEffect(() => {
     const labels = imageLabelKeys$.value;
+
     if (Object.prototype.hasOwnProperty.call(labels, imageId)) {
       if (labels[imageId] === transientId) {
+        imagePopper$.value = popperRef.current;
         setIsOpen(true);
         return;
       }
@@ -235,6 +238,7 @@ export const ImageLabelEditor: React.FC<
             name="image-marker"
             props={{
               onClick: (event) => {
+                event.stopPropagation();
                 handleOpen(event);
               },
             }}
@@ -257,6 +261,7 @@ export const ImageLabelEditor: React.FC<
         </Stack>
         {/* disablePortal prevents breaking theme and layout */}
         <Popper
+          ref={popperRef}
           open={isOpen}
           anchorEl={anchorEl}
           autoFocus={true}
