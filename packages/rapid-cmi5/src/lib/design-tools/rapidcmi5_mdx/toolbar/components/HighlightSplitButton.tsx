@@ -81,9 +81,16 @@ export function HighlightSplitButton() {
   return (
     <>
       <MUIButtonWithTooltip
-        title="Change text background color"
+        title="Apply text background color"
         onClick={handleMainClick}
         disabled={disabled}
+        sx={{
+          '& svg': {
+            stroke: 'grey', // resolves issue where some text isnt readable against background
+            strokeWidth: 1,
+          },
+          marginRight: '-4px',
+        }}
       >
         <BorderColorIcon
           fontSize="small"
@@ -96,16 +103,18 @@ export function HighlightSplitButton() {
         onClick={openPicker}
         disabled={disabled}
         sx={{
-          width: '10px',
+          width: '12px',
           minWidth: 0,
-          padding: 0,
+          padding: '8px',
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
           lineHeight: 1,
+          height: '12px',
+          marginTop: '10px',
         }}
       >
-        <ArrowDropDownIcon fontSize="small" />
+        <ArrowDropDownIcon fontSize="medium" />
       </MUIButtonWithTooltip>
 
       <ColorSelectionPopover

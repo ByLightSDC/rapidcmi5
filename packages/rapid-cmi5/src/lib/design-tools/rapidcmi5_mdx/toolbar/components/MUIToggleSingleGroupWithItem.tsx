@@ -21,8 +21,10 @@ export const MUIToggleSingleGroupWithItem = ({
       <IconButton
         sx={{
           ...sx,
-          borderRadius:1,
-          backgroundColor: on ? alpha(theme.palette.primary.light, 0.20) : undefined,
+          borderRadius: on ? 1 : undefined,
+          backgroundColor: on
+            ? alpha(theme.palette.primary.light, 0.2)
+            : undefined,
           '&:hover': {
             backgroundColor: alpha(theme.palette.primary.light, 0.4), // custom hover color
           },

@@ -1,4 +1,10 @@
-import { alpha, ButtonProps, IconButton, Tooltip, useTheme } from '@mui/material';
+import {
+  alpha,
+  ButtonProps,
+  IconButton,
+  Tooltip,
+  useTheme,
+} from '@mui/material';
 
 import { tooltipStyle } from '../../styles/styles';
 
@@ -13,16 +19,16 @@ export const MUIButtonWithTooltip = ({
   disabled,
   sx,
 }: ButtonProps) => {
-
   const theme = useTheme();
   return (
     <Tooltip title={title} {...tooltipStyle}>
       <IconButton
         sx={{
-          ...sx,
           height: '30px',
+          ...sx,
+
           '&:hover': {
-            backgroundColor: alpha(theme.palette.primary.light, 0.40), // custom hover color
+            backgroundColor: alpha(theme.palette.primary.light, 0.4), // custom hover color
           },
         }}
         disabled={disabled}
