@@ -16,15 +16,17 @@ export const MUIButtonWithTooltip = ({
   children,
   className,
   disabled,
+  testId,
   title,
   onClick,
   sx,
-}: ButtonProps) => {
+}: ButtonProps & { testId?: string }) => {
   const theme = useTheme();
   return (
     <Tooltip title={title} {...tooltipStyle}>
       <IconButton
         className={className}
+        data-testid={testId}
         sx={{
           //backgroundColor:'pink',
           height: '30px',

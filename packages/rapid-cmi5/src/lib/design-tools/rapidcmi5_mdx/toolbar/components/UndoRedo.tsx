@@ -61,40 +61,21 @@ export function UndoRedo() {
   }, [activeEditor]);
 
   return (
-    // <MultipleChoiceToggleGroup
-    //   items={[
-    //     {
-    //       title: t('toolbar.undo', 'Undo {{shortcut}}', { shortcut: IS_APPLE ? '⌘Z' : 'Ctrl+Z' }),
-    //       disabled: !canUndo,
-    //       contents: iconComponentFor('undo'),
-    //       active: false,
-    //       onChange: () => activeEditor?.dispatchCommand(UNDO_COMMAND, undefined)
-    //     },
-    //     {
-    //       title: t('toolbar.redo', 'Redo {{shortcut}}', { shortcut: IS_APPLE ? '⌘Y' : 'Ctrl+Y' }),
-    //       disabled: !canRedo,
-    //       contents: iconComponentFor('redo'),
-    //       active: false,
-    //       onChange: () => activeEditor?.dispatchCommand(REDO_COMMAND, undefined)
-    //     }
-    //   ]}
-    // />
     <>
       <MUIButtonWithTooltip
         disabled={!canUndo}
-        title="Insert Tabs"
-        aria-label="insert-tabs"
+        title="Undo"
+        aria-label="undo"
         onClick={() => {
           activeEditor?.dispatchCommand(UNDO_COMMAND, undefined);
         }}
       >
-        {/* {iconComponentFor('undo')} */}
         <UndoIcon />
       </MUIButtonWithTooltip>
       <MUIButtonWithTooltip
         disabled={!canRedo}
-        title="Insert Tabs"
-        aria-label="insert-tabs"
+        title="Redo"
+        aria-label="redo"
         onClick={() => {
           activeEditor?.dispatchCommand(REDO_COMMAND, undefined);
         }}

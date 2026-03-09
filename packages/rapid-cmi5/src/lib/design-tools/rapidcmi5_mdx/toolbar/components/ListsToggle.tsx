@@ -22,9 +22,9 @@ export const ListsToggle: React.FC<{ options?: ('bullet' | 'number' | 'check')[]
   const t = useTranslation()
 
   const LIST_TITLE_MAP = {
-    bullet: t('toolbar.bulletedList', 'Bulleted list'),
-    number: t('toolbar.numberedList', 'Numbered list'),
-    check: t('toolbar.checkList', 'Check list')
+    bullet: t('toolbar.bulletedList', 'Bulleted List'),
+    number: t('toolbar.numberedList', 'Numbered List'),
+    check: t('toolbar.checkList', 'Check List')
   } as const
 
   const items = options.map((type) => ({

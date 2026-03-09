@@ -38,6 +38,7 @@ import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
 import { appHeaderVisible } from '@rapid-cmi5/ui';
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
+import { MUIButtonWithTooltip } from '../toolbar/components/MUIButtonWithTooltip';
 
 /**
  * Menu to deal with adding slides, navigating slides, deleting slide
@@ -117,33 +118,31 @@ export const SlideMenu = () => {
           borderRadius: '6px',
           justifyContent: 'center',
           alignItems: 'center',
-          padding: 0.25,
+          padding: 0.2,
+          paddingLeft: 1,
+          paddingRight: 1,
         }}
       >
-        <Tooltip arrow title={`Delete Current Slide`} {...tooltipStyle}>
-          <IconButton
-            aria-label="delete-slide"
-            color="secondary"
-            size={iconButtonSize}
-            sx={iconButtonStyle}
-            disabled={lessonSlides.length <= 1}
-            onClick={() => {
-              onDeleteSlide();
-            }}
-          >
-            <DeleteForeverIcon color="inherit" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip arrow title={`Previous Slide`} {...tooltipStyle}>
-          <IconButton
-            aria-label="prev-slide"
-            disabled={currentSlideIndex <= 0}
-            sx={iconButtonStyle}
-            onClick={onPrevSlide}
-          >
-            <ArrowBackIcon color="inherit" />
-          </IconButton>
-        </Tooltip>
+        <MUIButtonWithTooltip
+          disabled={lessonSlides.length <= 1}
+          sx={{ color: 'secondary' }}
+          title="Delete Slide"
+          aria-label="delete-slide"
+          onClick={() => {
+            onDeleteSlide();
+          }}
+        >
+          <DeleteForeverIcon color="inherit" />
+        </MUIButtonWithTooltip>
+        <MUIButtonWithTooltip
+          disabled={currentSlideIndex <= 0}
+          sx={{ color: 'secondary' }}
+          title="Previous Slide"
+          aria-label="prev-slide"
+          onClick={onPrevSlide}
+        >
+          <ArrowBackIcon color="inherit" />
+        </MUIButtonWithTooltip>
         <Typography
           sx={{
             height: '20px',
@@ -152,29 +151,25 @@ export const SlideMenu = () => {
         >
           {`${currentSlideIndex + 1} / ${lessonSlides.length}`}
         </Typography>
-        <Tooltip arrow title={`Next Slide`} {...tooltipStyle}>
-          <IconButton
-            aria-label="next-slide"
-            disabled={currentSlideIndex >= lessonSlides.length - 1}
-            sx={iconButtonStyle}
-            color="inherit"
-            onClick={onNextSlide}
-          >
-            <ArrowForwardIcon color="inherit" />
-          </IconButton>
-        </Tooltip>
-        <IconButton
-          aria-label="add-markdown-slide"
-          color="primary"
+        <MUIButtonWithTooltip
+          disabled={currentSlideIndex >= lessonSlides.length - 1}
+          sx={{ color: 'secondary' }}
+          title="Next Slide"
+          aria-label="next-slide"
+          onClick={onNextSlide}
+        >
+          <ArrowForwardIcon color="inherit" />
+        </MUIButtonWithTooltip>
+        <MUIButtonWithTooltip
           data-testid="add-markdown-slide-button"
-          size={iconButtonSize}
-          style={iconButtonStyle}
+          disabled={lessonSlides.length <= 1}
+          sx={{ color: 'secondary' }}
+          title="Add Slide"
+          aria-label="add-markdown-slide"
           onClick={() => onAddSlide()}
         >
-          <Tooltip arrow title={`Add Slide`} {...tooltipStyle}>
-            <NoteAddIcon color="primary" />
-          </Tooltip>
-        </IconButton>
+          <NoteAddIcon color="primary" />
+        </MUIButtonWithTooltip>
       </Stack>
     </Stack>
   );

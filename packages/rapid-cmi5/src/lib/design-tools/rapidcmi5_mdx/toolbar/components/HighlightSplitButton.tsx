@@ -81,7 +81,7 @@ export function HighlightSplitButton() {
   return (
     <>
       <MUIButtonWithTooltip
-        title="Apply text background color"
+        title="Apply Text Background Color"
         onClick={handleMainClick}
         disabled={disabled}
         sx={{
@@ -99,7 +99,7 @@ export function HighlightSplitButton() {
       </MUIButtonWithTooltip>
 
       <MUIButtonWithTooltip
-        title="Select text background color"
+        title="Select Text Background Color"
         onClick={openPicker}
         disabled={disabled}
         sx={{

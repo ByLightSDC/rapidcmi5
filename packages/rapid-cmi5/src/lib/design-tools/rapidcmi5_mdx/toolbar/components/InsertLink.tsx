@@ -14,8 +14,8 @@ export const InsertLink = () => {
   const t = useTranslation()
   return (
     <MUIButtonWithTooltip
-      aria-label={t('toolbar.link', 'Create link')}
-      title={t('toolbar.link', 'Create link')}
+      aria-label={t('toolbar.link', 'Insert Hyperlink')}
+      title={t('toolbar.link', 'Insert Hyperlink')}
       onClick={(_) => {
         openLinkDialog()
       }}

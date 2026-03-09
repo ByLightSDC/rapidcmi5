@@ -12,8 +12,7 @@ import {
 } from '@mdxeditor/editor';
 
 import { FormatButton } from './FormatButton';
-
-
+import { Stack } from '@mui/material';
 
 /**
  * A toolbar component that lets the user toggle bold, italic and underline formatting.
@@ -23,11 +22,11 @@ export const BoldItalicUnderlineToggles = () => {
   const t = useTranslation();
 
   return (
-    <div>
+    <Stack direction="row" spacing={0.5}>
       <FormatButton
         format={IS_BOLD}
         addTitle={t('toolbar.bold', 'Bold')}
-        removeTitle={t('toolbar.removeBold', 'Remove bold')}
+        removeTitle={t('toolbar.removeBold', 'Remove Bold')}
         icon="format_bold"
         formatName="bold"
       />
@@ -35,7 +34,7 @@ export const BoldItalicUnderlineToggles = () => {
       <FormatButton
         format={IS_ITALIC}
         addTitle={t('toolbar.italic', 'Italic')}
-        removeTitle={t('toolbar.removeItalic', 'Remove italic')}
+        removeTitle={t('toolbar.removeItalic', 'Remove Italic')}
         icon="format_italic"
         formatName="italic"
       />
@@ -43,18 +42,18 @@ export const BoldItalicUnderlineToggles = () => {
       <FormatButton
         format={IS_UNDERLINE}
         addTitle={t('toolbar.underline', 'Underline')}
-        removeTitle={t('toolbar.removeUnderline', 'Remove underline')}
+        removeTitle={t('toolbar.removeUnderline', 'Remove Underline')}
         icon="format_underlined"
         formatName="underline"
       />
 
       <FormatButton
         format={IS_CODE}
-        addTitle={t('toolbar.inlineCode', 'Inline code format')}
-        removeTitle={t('toolbar.removeInlineCode', 'Remove code format')}
+        addTitle={t('toolbar.inlineCode', 'Inline Code Format')}
+        removeTitle={t('toolbar.removeInlineCode', 'Remove Code Format')}
         icon="code"
         formatName="code"
       />
-    </div>
+    </Stack>
   );
 };
