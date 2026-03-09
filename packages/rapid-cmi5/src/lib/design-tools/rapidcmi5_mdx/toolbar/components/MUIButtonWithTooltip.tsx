@@ -14,21 +14,33 @@ import { tooltipStyle } from '../../styles/styles';
  */
 export const MUIButtonWithTooltip = ({
   children,
+  className,
+  disabled,
   title,
   onClick,
-  disabled,
   sx,
 }: ButtonProps) => {
   const theme = useTheme();
   return (
     <Tooltip title={title} {...tooltipStyle}>
       <IconButton
+        className={className}
         sx={{
+          //backgroundColor:'pink',
           height: '30px',
           ...sx,
-
           '&:hover': {
             backgroundColor: alpha(theme.palette.primary.light, 0.4), // custom hover color
+          },
+          /* disabled button styles */
+          '&.Mui-disabled': {
+            //backgroundColor: theme.palette.action.disabledBackground,
+            color: theme.palette.action.disabled,
+          },
+
+          /* ensure the icon itself matches disabled color */
+          '&.Mui-disabled svg': {
+            fill: theme.palette.action.disabled,
           },
         }}
         disabled={disabled}

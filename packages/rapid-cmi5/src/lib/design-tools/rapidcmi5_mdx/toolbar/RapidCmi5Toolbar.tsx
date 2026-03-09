@@ -8,16 +8,12 @@ import React, {
 } from 'react';
 
 import {
-  CodeToggle,
-  CreateLink,
-  InsertCodeBlock,
   StrikeThroughSupSubToggles,
   Separator,
   usePublisher,
   viewMode$,
   useCellValue,
   useRealm,
-  UndoRedo,
   iconComponentFor$,
   useCellValues,
   useTranslation,
@@ -53,8 +49,12 @@ import { SlideMenu } from '../menu/SlideMenu';
 import { SaveSlideButton } from './components/SaveSlideButton';
 import { LessonStyleButton } from './components/LessonStyleButton';
 import { BlockTypeSelect } from './components/BlockTypeSelect';
-import { InsertBlockMenu } from './components/InsertBlockMenu';
+
 import { InsertAccordion } from './components/InsertAccordion';
+import { InsertAudio } from './components/InsertAudio';
+import { InsertAnimation } from './components/InsertAnimation';
+import { InsertBlockMenu } from './components/InsertBlockMenu';
+import { InsertCodeBlock } from './components/InsertCodeBlock';
 import { InsertFile } from './components/InsertFile';
 import { InsertGrid } from './components/InsertGrid';
 import { InsertImage } from './components/InsertImage';
@@ -63,24 +63,25 @@ import { InsertTabs } from './components/InsertTabs';
 import { InsertVideo } from './components/InsertVideo';
 //REF import { InsertLayoutBox } from './components/InsertLayoutBox';
 import { InsertLayoutBox } from './components/InsertLayoutBox';
+import { InsertLink } from './components/InsertLink';
 import { InsertThematicBreak } from './components/InsertThematicBreak';
 import { InsertTable } from './components/InsertTable';
 import { ColorTextSplitButton } from './components/ColorTextSplitButton';
 import { HighlightSplitButton } from './components/HighlightSplitButton';
 import { TextFxButton } from './components/TextFxButton';
-import { InsertAudio } from './components/InsertAudio';
-import { InsertAnimation } from './components/InsertAnimation';
+
 import { MUIButtonWithTooltip } from './components/MUIButtonWithTooltip';
 import { BoldItalicUnderlineToggles } from './components/BoldItalicUnderlineToggles';
 import { ListsToggle } from './components/ListsToggle';
+import { UndoRedo } from './components/UndoRedo';
 
 /**
  * Layout Constants
  *
  */
-const leftToolWidthContainer = 609;
-const rightToolWidthContainer = 96;
-const toolIconWidth = 29.0;
+const leftToolWidthContainer = 582; //563; //609;
+const rightToolWidthContainer = 131; //96;
+const toolIconWidth = 32.0;
 const rightToolbarMargin = 24;
 const moreTextToolWidth = 100;
 
@@ -105,12 +106,10 @@ export const RapidCmi5Toolbar: React.FC = () => {
   const [maxExtraToolsWidth, setMaxExtraToolsWidth] = useState(0);
 
   const [isMoreTextTools, setIsMoreTextTools] = useState(false);
-  const observerRef = useRef<ResizeObserver | null>(null);
 
   const isPlayback = useCellValue(editorInPlayback$);
-  const [viewMode, iconComponentFor] = useCellValues(
-    viewMode$,
-    iconComponentFor$,
+  const [viewMode] = useCellValues(
+    viewMode$
   );
   const t = useTranslation();
   const theme = useTheme();
@@ -220,7 +219,6 @@ export const RapidCmi5Toolbar: React.FC = () => {
             <Stack direction="row" spacing={1}>
               <Stack direction="row" spacing={0} sx={{ flexGrow: 1 }}>
                 <BoldItalicUnderlineToggles />
-
                 <ColorTextSplitButton />
                 <HighlightSplitButton />
                 <TextFxButton />
@@ -258,8 +256,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                 </Stack>
                 <Separator />
                 <ListsToggle />
-                <CreateLink />
-                <CodeToggle />
+                <InsertLink />
                 <Separator />
                 <BlockTypeSelect />
                 <Separator />
@@ -287,14 +284,12 @@ export const RapidCmi5Toolbar: React.FC = () => {
                       <InsertCodeBlock />
                       <InsertGrid />
                       <InsertLayoutBox />
-                      <Separator />
                       <InsertAccordion />
                       <InsertSteps />
                       <InsertTable />
                       <InsertTabs />
                       <InsertThematicBreak />
                     </Stack>
-                    <Separator />
                   </Stack>
                 )}
                 <Stack
@@ -304,6 +299,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                     justifyContent: 'flex-end',
                   }}
                 >
+                  <Separator />
                   <LessonStyleButton />
                   <InsertAnimation />
                   <InsertBlockMenu />

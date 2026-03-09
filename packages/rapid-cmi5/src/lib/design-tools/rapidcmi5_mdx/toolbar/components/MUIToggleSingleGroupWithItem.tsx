@@ -20,6 +20,7 @@ export const MUIToggleSingleGroupWithItem = ({
     <Tooltip title={title} {...tooltipStyle}>
       <IconButton
         sx={{
+            height:'30px',
           ...sx,
           borderRadius: on ? 1 : undefined,
           backgroundColor: on
