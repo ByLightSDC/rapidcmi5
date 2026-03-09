@@ -370,10 +370,14 @@ export class AnimationEngine {
     const className = `anim-entrance-${animation.entranceEffect}${direction}`;
 
     // Set animation properties
-    const duration = this.options.prefersReducedMotion
-      ? 0.01
-      : animation.duration;
-    const delay = this.options.prefersReducedMotion ? 0 : animation.delay;
+    // "appear" snaps instantly — roll duration into CSS delay so the snap
+    // happens at the right moment (delay + duration), then the totalDuration
+    // timeout resolves the promise for sequencing.
+    const isAppear = animation.entranceEffect === EntranceEffect.APPEAR;
+    const baseDuration = this.options.prefersReducedMotion ? 0 : animation.duration;
+    const baseDelay = this.options.prefersReducedMotion ? 0 : animation.delay;
+    const duration = isAppear ? 0.01 : baseDuration;
+    const delay = isAppear ? baseDelay + baseDuration : baseDelay;
     const easing = animation.easing || 'ease';
 
     // Apply animation class
