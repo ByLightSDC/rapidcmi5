@@ -1,28 +1,30 @@
-import { alpha, ButtonProps, IconButton, Tooltip, useTheme } from '@mui/material';
-
+import {
+  alpha,
+  ButtonProps,
+  IconButton,
+  Tooltip,
+  useTheme,
+} from '@mui/material';
 import { tooltipStyle } from '../../styles/styles';
 
-/**
- * MUI Button
- * @returns
- */
-export const MUIButtonWithTooltip = ({
+export const MUIToggleSingleGroupWithItem = ({
   children,
+  on,
   title,
   onClick,
   disabled,
   sx,
-}: ButtonProps) => {
-
+}: ButtonProps & { on: boolean }) => {
   const theme = useTheme();
   return (
     <Tooltip title={title} {...tooltipStyle}>
       <IconButton
         sx={{
           ...sx,
-          height: '30px',
+          borderRadius:1,
+          backgroundColor: on ? alpha(theme.palette.primary.light, 0.20) : undefined,
           '&:hover': {
-            backgroundColor: alpha(theme.palette.primary.light, 0.40), // custom hover color
+            backgroundColor: alpha(theme.palette.primary.light, 0.4), // custom hover color
           },
         }}
         disabled={disabled}

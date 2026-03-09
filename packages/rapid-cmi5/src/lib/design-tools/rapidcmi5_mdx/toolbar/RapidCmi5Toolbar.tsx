@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 
 import {
-  BoldItalicUnderlineToggles,
+
   CodeToggle,
   CreateLink,
   InsertCodeBlock,
@@ -74,6 +74,7 @@ import { TextFxButton } from './components/TextFxButton';
 import { InsertAudio } from './components/InsertAudio';
 import { InsertAnimation } from './components/InsertAnimation';
 import { MUIButtonWithTooltip } from './components/MUIButtonWithTooltip';
+import { BoldItalicUnderlineToggles } from './components/BoldItalicUnderlineToggles';
 
 
 /**
