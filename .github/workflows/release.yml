@@ -92,13 +92,10 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
       
-      - name: Verify npm authentication
-        run: npm whoami
-
       - run: npm ci
 
       - name: Test packages
@@ -107,6 +104,10 @@ jobs:
       - name: Build packages
         run: npx nx run-many --target=build --projects=packages/* --parallel=3
 
+      - name: Publish @rapid-cmi5/react-editor
+        run: npm publish --provenance
+        working-directory: dist/packages/rapid-cmi5
+      
       - name: Publish @rapid-cmi5/cmi5-build-common
         run: npm publish --provenance
         working-directory: dist/packages/common
@@ -114,10 +115,6 @@ jobs:
       - name: Publish @rapid-cmi5/ui
         run: npm publish --provenance
         working-directory: dist/packages/ui
-
-      - name: Publish @rapid-cmi5/react-editor
-        run: npm publish --provenance
-        working-directory: dist/packages/rapid-cmi5
 
   build-cc-cmi5-player:
     name: Build cc-cmi5-player
