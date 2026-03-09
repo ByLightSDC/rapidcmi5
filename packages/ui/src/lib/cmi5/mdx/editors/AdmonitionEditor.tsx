@@ -387,7 +387,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
           <Accordion
             expanded={isCollapsible ? isOpen : true}
             onChange={onAccordionChange}
-            style={{ margin: '1em 0' }}
+            style={{ margin: 0 }}
             variant="outlined"
             sx={{
               borderColor: 'transparent',
