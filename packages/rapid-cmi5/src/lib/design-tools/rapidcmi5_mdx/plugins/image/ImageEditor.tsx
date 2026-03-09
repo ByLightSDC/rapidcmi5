@@ -59,7 +59,6 @@ import {
   debugLogError,
   editorInPlayback$,
   useTimeStampUUID,
-  onCheckClickOutsideImageLabel,
   debugLog,
   convertMarkdownToMdast,
   DEFAULT_IMAGE_LABEL_CONTENT,
@@ -319,10 +318,6 @@ export function ImageEditor({
    * For images with links, flag to show url panel
    */
   const onClickImage = useCallback(() => {
-    //REF
-    // if (id) {
-    //   onCheckClickOutsideImageLabel(id);
-    // }
 
     editor.update(() => {
       let node = $getNodeByKey(nodeKey);
@@ -624,13 +619,7 @@ export function ImageEditor({
           );
 
           if (hitImage || hitLabels) {
-            if (id) {
-              if (imagePopper$.value?.contains(event.target)) {
-                //ignore click on popper
-              } else {
-                onCheckClickOutsideImageLabel(id);
-              }
-            }
+  
             if (event.shiftKey) {
               setSelected(!isSelected);
             } else {
@@ -657,7 +646,7 @@ export function ImageEditor({
             }
 
             return true;
-          }
+          } 
 
           return false;
         },

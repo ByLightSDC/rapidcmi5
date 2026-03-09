@@ -22,7 +22,7 @@
   animation-fill-mode: both;
 }
 
-/* Appear (instant) */
+/* Appear */
 @keyframes appear {
   from {
     opacity: 0;
@@ -34,7 +34,6 @@
 
 .anim-entrance-appear {
   animation-name: appear;
-  animation-duration: 0.01s !important; /* Instant appearance */
   animation-fill-mode: both;
 }
 

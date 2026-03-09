@@ -1,23 +1,17 @@
-## 0.9.0 (2026-02-05)
+## 0.8.6 (2026-03-09)
 
-This was a version bump only, there were no code changes.
+### 🚀 Features
 
-## 0.8.1 (2026-02-04)
+- added automated npm release when a tag is created ([17ac632](https://github.com/ByLightSDC/rapidcmi5/commit/17ac632))
 
-This was a version bump only, there were no code changes.
+### 🩹 Fixes
 
-## 0.8.0 (2026-02-04)
+- Added base project to the nx release process ([5306fe8](https://github.com/ByLightSDC/rapidcmi5/commit/5306fe8))
 
-This was a version bump only, there were no code changes.
+### ❤️ Thank You
 
-## 0.2.0 (2026-02-04)
+- Aaron Crawford @aaiirr123
 
-This was a version bump only, there were no code changes.
-
-## 0.1.1 (2025-12-19)
-
-This was a version bump only, there were no code changes.
-
-## 0.1.0 (2025-12-19)
+## 0.8.5 (2026-03-09)
 
 This was a version bump only, there were no code changes.
