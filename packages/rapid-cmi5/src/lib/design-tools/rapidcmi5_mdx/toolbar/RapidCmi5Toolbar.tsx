@@ -1,5 +1,4 @@
 import React, {
-  useCallback,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -12,7 +11,6 @@ import {
   CodeToggle,
   CreateLink,
   InsertCodeBlock,
-  ListsToggle,
   StrikeThroughSupSubToggles,
   Separator,
   usePublisher,
@@ -74,6 +72,7 @@ import { InsertAudio } from './components/InsertAudio';
 import { InsertAnimation } from './components/InsertAnimation';
 import { MUIButtonWithTooltip } from './components/MUIButtonWithTooltip';
 import { BoldItalicUnderlineToggles } from './components/BoldItalicUnderlineToggles';
+import { ListsToggle } from './components/ListsToggle';
 
 /**
  * Layout Constants

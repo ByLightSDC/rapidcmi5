@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { ButtonWithTooltip, activeEditor$, Cell } from '@mdxeditor/editor';
+import { activeEditor$, Cell } from '@mdxeditor/editor';
 import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 import { $getSelection, $isRangeSelection } from 'lexical';
 import {

@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
 import {
-  ButtonWithTooltip,
   activeEditor$,
   Cell,
   useCellValue,
