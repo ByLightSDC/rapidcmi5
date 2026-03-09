@@ -14,7 +14,7 @@ import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
-import { $createParagraphNode, $getRoot } from 'lexical';
+import { $createParagraphNode } from 'lexical';
 
 import {
   Box,
@@ -182,21 +182,16 @@ export const AccordionEditor: React.FC<
     async (children: AccordionContentDirectiveNode[], bgColor: string) => {
       if (!parentEditor) return;
 
-      // select AFTER the current accordion first.
-      // When there is no next sibling we append a plain paragraph as a safe
-      // insertion anchor — selecting a DecoratorNode (e.g. TOCHeadingNode) via
-      // selectEnd() yields a NodeSelection, which causes insertMarkdown to call
-      // insertAfter on a node that has no parent, throwing "Expected node N to
-      // have a parent". The temp paragraph is removed in the final cleanup update.
+      // Insert a plain paragraph immediately after lexicalNode as the insertion anchor.
+      // We cannot use nextSibling.selectStart() because it could be a DecoratorNode
+      // (e.g. TOCHeadingNode), which yields a NodeSelection rather than a RangeSelection,
+      // causing insertMarkdown to throw "Expected node N to have a parent".
+      // We insert the safe paragraph as a sibling (not root append) so that insertMarkdown
+      // places the rebuilt node at the correct position in the document.
       parentEditor.update(() => {
-        const nextSibling = lexicalNode.getNextSibling();
-        if (nextSibling) {
-          nextSibling.selectStart();
-        } else {
-          const safeParagraph = $createParagraphNode();
-          $getRoot().append(safeParagraph);
-          safeParagraph.selectEnd();
-        }
+        const safeParagraph = $createParagraphNode();
+        lexicalNode.insertAfter(safeParagraph);
+        safeParagraph.selectEnd();
       });
 
       await delay(50);
