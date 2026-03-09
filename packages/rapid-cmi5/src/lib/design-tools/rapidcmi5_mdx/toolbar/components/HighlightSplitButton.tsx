@@ -10,6 +10,7 @@ import {
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { ColorSelectionPopover, HIGHLIGHT_PRESET_COLORS } from '@rapid-cmi5/ui';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 const DEFAULT_HIGHLIGHT = '#FFFF00';
 export const highlightColorLast$ = Cell<string>(DEFAULT_HIGHLIGHT);
@@ -79,7 +80,7 @@ export function HighlightSplitButton() {
 
   return (
     <>
-      <ButtonWithTooltip
+      <MUIButtonWithTooltip
         title="Change text background color"
         onClick={handleMainClick}
         disabled={disabled}
@@ -88,13 +89,13 @@ export function HighlightSplitButton() {
           fontSize="small"
           style={showDefaultIcon ? undefined : { color: lastColor }}
         />
-      </ButtonWithTooltip>
+      </MUIButtonWithTooltip>
 
-      <ButtonWithTooltip
+      <MUIButtonWithTooltip
         title="Select text background color"
         onClick={openPicker}
         disabled={disabled}
-        style={{
+        sx={{
           width: '10px',
           minWidth: 0,
           padding: 0,
@@ -105,7 +106,7 @@ export function HighlightSplitButton() {
         }}
       >
         <ArrowDropDownIcon fontSize="small" />
-      </ButtonWithTooltip>
+      </MUIButtonWithTooltip>
 
       <ColorSelectionPopover
         anchorEl={anchorEl}

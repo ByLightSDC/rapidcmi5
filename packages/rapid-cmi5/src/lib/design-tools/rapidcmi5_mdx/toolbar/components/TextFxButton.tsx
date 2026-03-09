@@ -42,6 +42,7 @@ import CircleIcon from '@mui/icons-material/Circle';
 import { useSelector } from 'react-redux';
 import { FxDirectiveAttributes, DEFAULT_SHAPE, selFxNode$, showTextFx$, refreshDelay, debugLog, exportMarkdownFromLexical, defaultToMarkdownExtensions, convertMarkdownToMdast, placeCaretInsideDirective, refreshTextFx$, defaultFxColor } from '@rapid-cmi5/ui';
 import { dirtyDisplay } from '../../../../redux/courseBuilderReducer';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 export const shapeStyleLast$ = Cell<FxDirectiveAttributes>(DEFAULT_SHAPE);
 
@@ -232,8 +233,7 @@ export function TextFxButton() {
 
   return (
     <>
-      <ButtonWithTooltip
-        //style={{ minWidth: '64px' }}
+      <MUIButtonWithTooltip
         title={'Text Fx'}
         onClick={openPicker}
         disabled={disabled}
@@ -264,7 +264,7 @@ export function TextFxButton() {
             }}
           />
         </Stack>
-      </ButtonWithTooltip>
+      </MUIButtonWithTooltip>
 
       <TextFxPopover
         anchorEl={anchorEl}

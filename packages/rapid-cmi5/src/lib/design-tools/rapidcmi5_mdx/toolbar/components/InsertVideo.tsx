@@ -1,7 +1,5 @@
-import React from 'react';
-
 import { openNewVideoDialog$ } from '../../plugins/video';
-import { ButtonWithTooltip, readOnly$ } from '@mdxeditor/editor';
+import { readOnly$ } from '@mdxeditor/editor';
 import { useCellValues, usePublisher } from '@mdxeditor/gurx';
 import VideocamIcon from '@mui/icons-material/Videocam';
 /**
@@ -10,6 +8,7 @@ import VideocamIcon from '@mui/icons-material/Videocam';
 import AddIcon from '@mui/icons-material/Add';
 import { ButtonMinorUi } from '@rapid-cmi5/ui';
 import { useTheme } from '@mui/material';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 /**
  * This toolbar button allows the user to insert a video from either a URL
  * or a file.
@@ -57,7 +56,7 @@ export const InsertVideo = ({ isDrawer }: { isDrawer?: boolean }) => {
           Video
         </ButtonMinorUi>
       ) : (
-        <ButtonWithTooltip
+        <MUIButtonWithTooltip
           title="Insert Video"
           aria-label="insert-video"
           onClick={() => {
@@ -65,18 +64,8 @@ export const InsertVideo = ({ isDrawer }: { isDrawer?: boolean }) => {
           }}
         >
           <VideocamIcon fontSize="small" />
-        </ButtonWithTooltip>
+        </MUIButtonWithTooltip>
       )}
     </>
-    // <ButtonWithTooltip
-    //   title={'Insert video'}
-    //   aria-label="insert-video"
-    //   disabled={readOnly}
-    //   onClick={() => {
-    //     openNewVideoDialog();
-    //   }}
-    // >
-    //   <VideocamIcon />
-    // </ButtonWithTooltip>
   );
 };

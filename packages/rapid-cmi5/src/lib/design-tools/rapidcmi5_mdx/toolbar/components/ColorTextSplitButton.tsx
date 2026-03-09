@@ -15,6 +15,7 @@ import {
 import FormatColorTextIcon from '@mui/icons-material/FormatColorText';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { ColorSelectionPopover, TEXT_PRESET_COLORS } from '@rapid-cmi5/ui';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 
 const DEFAULT_COLOR = '#FFFFFF';
@@ -94,7 +95,7 @@ export function ColorTextSplitButton() {
 
   return (
     <>
-      <ButtonWithTooltip
+      <MUIButtonWithTooltip
         title="Change text color"
         onClick={handleMainClick}
         disabled={disabled}
@@ -103,13 +104,13 @@ export function ColorTextSplitButton() {
           fontSize="small"
           style={showDefaultIcon ? undefined : { color: lastColor }}
         />
-      </ButtonWithTooltip>
+      </MUIButtonWithTooltip>
 
-      <ButtonWithTooltip
+      <MUIButtonWithTooltip
         title="Select text color"
         onClick={openPicker}
         disabled={disabled}
-        style={{
+        sx={{
           width: '10px',
           minWidth: 0,
           padding: 0,
@@ -120,7 +121,7 @@ export function ColorTextSplitButton() {
         }}
       >
         <ArrowDropDownIcon fontSize="small" />
-      </ButtonWithTooltip>
+      </MUIButtonWithTooltip>
 
       <ColorSelectionPopover
         anchorEl={anchorEl}

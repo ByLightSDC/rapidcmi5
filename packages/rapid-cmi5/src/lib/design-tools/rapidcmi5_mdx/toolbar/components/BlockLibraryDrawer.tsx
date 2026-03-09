@@ -22,16 +22,14 @@ import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 import { drawerMode$, DRAWER_TYPE } from './drawers';
 import {
   ButtonInfoField,
-  InsertAccordion,
-  InsertGrid,
-  InsertSteps,
-  InsertTabs,
   ViewExpander,
 } from '@rapid-cmi5/ui';
 
 import { InsertActivities } from './InsertActivities';
 import { InsertAdmonitions } from './InsertAdmonitions';
 
+import { InsertAccordion } from './InsertAccordion';
+import { InsertGrid } from './InsertGrid';
 import { InsertTable } from './InsertTable';
 import { InsertVideo } from './InsertVideo';
 import { InsertAudio } from './InsertAudio';
@@ -39,7 +37,8 @@ import { InsertImage } from './InsertImage';
 import { InsertCodeBlock } from './InsertCodeBlock';
 import { InsertThematicBreak } from './InsertThematicBreak';
 import { InsertFile } from './InsertFile';
-
+import { InsertSteps } from './InsertSteps';
+import { InsertTabs } from './InsertTabs';
 import WidgetsIcon from '@mui/icons-material/Widgets';
 import { activitiesTable } from '../../constants/toolbar';
 

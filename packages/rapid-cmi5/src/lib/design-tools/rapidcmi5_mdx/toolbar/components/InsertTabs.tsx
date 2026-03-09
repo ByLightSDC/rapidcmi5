@@ -7,48 +7,36 @@ import {
 } from '@mdxeditor/editor';
 
 import { $getSelection, $isRangeSelection } from 'lexical';
+
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
+
+import TabIcon from '@mui/icons-material/Tab';
+
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { placeCaretInsideDirective } from '../../util/caret';
-import { convertMarkdownToMdast } from '../../util/conversion';
 import { ButtonMinorUi } from 'packages/ui/src/lib/utility/buttons';
 
 /**
  * Icons
  */
 import AddIcon from '@mui/icons-material/Add';
-import ViewStreamIcon from '@mui/icons-material/ViewStream';
-import { useTheme } from '@mui/material';
-
-/** The first line return is REQUIRED!!!! */
-const DEFAULT_ACCORDION = `
-:::accordionContent{title="Accordion 1 Title"}
-
-Accordion 1 Content Goes Here
-:::
-
-:::accordionContent{title="Accordion 2 Title"}
-
-Accordion 2 Content Goes Here
-:::
-
-:::accordionContent{title="Accordion 3 Title"}
-
-Accordion 3 Content Goes Here
-:::`;
+import { useTheme } from '@emotion/react';
+import { DEFAULT_TABS } from 'packages/ui/src/lib/cmi5/mdx/plugins/tabs/constants';
+import { convertMarkdownToMdast } from '@rapid-cmi5/ui';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 /**
- * A toolbar button component that inserts an accordion structure into the editor.
+ * A toolbar button component that inserts a tab structure into the editor.
  * @component
- * @returns A button with a tooltip labeled "Accordion" and an Accordion icon.
+ * @returns A button with a tooltip labeled "Tabs" and a tab icon.
  */
-export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
+export const InsertTabs = ({ isDrawer }: { isDrawer?: boolean }) => {
   const editor = useCellValue(activeEditor$);
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
-  const theme = useTheme();
+  const theme: any = useTheme();
+  
   /**
-   * Inserts default Accordion at the current selection
+   * Inserts default Tabs at the current selection
    * If it is NOT empty, nothing is inserted
    */
   const insertAtSelection = () => {
@@ -66,26 +54,27 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
 
       // create children tabs content nodes
       const theChildMDast = convertMarkdownToMdast(
-        DEFAULT_ACCORDION,
+        DEFAULT_TABS,
         syntaxExtensions,
       );
 
-      // create accordion node
-      const mdastAccordion: ContainerDirective = {
+      // create tabs node with default style
+      const mdastTabs: ContainerDirective = {
         type: 'containerDirective',
-        name: 'accordion',
+        name: 'tabs',
         attributes: {
           style: 'margin: 4px;',
         },
         children: (theChildMDast?.children as BlockContent[]) || [],
       };
 
-      const accordionNode = $createDirectiveNode(
-        mdastAccordion,
-      ) as DirectiveNode;
-      selection.insertNodes([accordionNode]);
-      const insertedKey = accordionNode.getKey();
-      placeCaretInsideDirective(editor, insertedKey);
+      const tabsNode = $createDirectiveNode(mdastTabs) as DirectiveNode;
+      console.log('selection', selection);
+      selection.insertNodes([tabsNode]);
+      //REF don't do this unless you want to get the cursor eaten
+      //see CCUI-2768, 2779, 2769
+      //const insertedKey = tabsNode.getKey();
+      //placeCaretInsideDirective(editor, insertedKey);
     });
   };
 
@@ -93,8 +82,8 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
     <>
       {isDrawer ? (
         <ButtonMinorUi
-          title="Insert Accordion"
-          aria-label="insert-accordion"
+          title="Insert Tabs"
+          aria-label="insert-tabs"
           startIcon={
             <>
               <AddIcon
@@ -105,7 +94,7 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
                 }}
               />
 
-              <ViewStreamIcon
+              <TabIcon
                 fontSize="small"
                 sx={{ fill: theme.palette.primary.main, marginRight: 1 }}
               />
@@ -122,18 +111,18 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
             insertAtSelection();
           }}
         >
-          Accordion
+          Tabs
         </ButtonMinorUi>
       ) : (
-        <ButtonWithTooltip
-          title="Insert Accordion"
-          aria-label="insert-accordion"
+        <MUIButtonWithTooltip
+          title="Insert Tabs"
+          aria-label="insert-tabs"
           onClick={() => {
             insertAtSelection();
           }}
         >
-          <ViewStreamIcon fontSize="small" />
-        </ButtonWithTooltip>
+          <TabIcon fontSize="small" />
+        </MUIButtonWithTooltip>
       )}
     </>
   );

@@ -20,15 +20,11 @@ import {
   useCellValue,
   useRealm,
   UndoRedo,
-  ButtonWithTooltip,
   iconComponentFor$,
   useCellValues,
   useTranslation,
 } from '@mdxeditor/editor';
 import { CLEAR_HISTORY_COMMAND } from 'lexical';
-import { InsertImage } from './components/InsertImage';
-import { InsertVideo } from './components/InsertVideo';
-//REF import { InsertLayoutBox } from './components/InsertLayoutBox';
 
 /** Icons */
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
@@ -36,40 +32,49 @@ import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import ArtTrackIcon from '@mui/icons-material/ArtTrack';
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
+import { MarkdownIconSvg } from './constants';
+
 
 import { alpha, Box, Divider, Stack, useTheme } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { BlockTypeSelect } from './components/BlockTypeSelect';
+
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { RC5Context } from '../contexts/RC5Context';
-import { ColorTextSplitButton } from './components/ColorTextSplitButton';
-import { HighlightSplitButton } from './components/HighlightSplitButton';
-import { TextFxButton } from './components/TextFxButton';
-import { InsertAudio } from './components/InsertAudio';
-import { InsertAnimation } from './components/InsertAnimation';
 
 import {
   editorInPlayback$,
   CONTENT_UPDATED_COMMAND,
   dividerColor,
-  InsertGrid,
-  InsertAccordion,
-  InsertSteps,
-  InsertTabs,
 } from '@rapid-cmi5/ui';
 
 import { displayData } from '../../../redux/courseBuilderReducer';
 import { SlideMenu } from '../menu/SlideMenu';
-import { InsertBlockMenu } from './components/InsertBlockMenu';
 
+/**
+ * Tool bar Buttons
+ */
 import { SaveSlideButton } from './components/SaveSlideButton';
 import { LessonStyleButton } from './components/LessonStyleButton';
+import { BlockTypeSelect } from './components/BlockTypeSelect';
+import { InsertBlockMenu } from './components/InsertBlockMenu';
+import { InsertAccordion } from './components/InsertAccordion';
 import { InsertFile } from './components/InsertFile';
+import { InsertGrid } from './components/InsertGrid';
+import { InsertImage } from './components/InsertImage';
+import { InsertSteps } from './components/InsertSteps';
+import { InsertTabs } from './components/InsertTabs';
+import { InsertVideo } from './components/InsertVideo';
+//REF import { InsertLayoutBox } from './components/InsertLayoutBox';
 import { InsertLayoutBox } from './components/InsertLayoutBox';
 import { InsertThematicBreak } from './components/InsertThematicBreak';
 import { InsertTable } from './components/InsertTable';
+import { ColorTextSplitButton } from './components/ColorTextSplitButton';
+import { HighlightSplitButton } from './components/HighlightSplitButton';
+import { TextFxButton } from './components/TextFxButton';
+import { InsertAudio } from './components/InsertAudio';
+import { InsertAnimation } from './components/InsertAnimation';
 import { MUIButtonWithTooltip } from './components/MUIButtonWithTooltip';
-import { MarkdownIconSvg } from './constants';
+
 
 /**
  * Layout Constants
@@ -119,7 +124,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
     }
     return MarkdownIconSvg(activeIconColor);
   }, [viewMode, disabledIconColor, activeIconColor]);
-  
+
   /**
    * UE sets view to Rich Text Editor on mount
    */
@@ -219,7 +224,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                     alignItems: 'center',
                   }}
                 >
-                  <ButtonWithTooltip
+                  <MUIButtonWithTooltip
                     title={
                       isMoreTextTools
                         ? 'Less Text Tools...'
@@ -232,7 +237,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                     ) : (
                       <UnfoldMoreIcon fontSize="medium" />
                     )}
-                  </ButtonWithTooltip>
+                  </MUIButtonWithTooltip>
                   {isMoreTextTools && (
                     <Box sx={{ marginLeft: -1 }}>
                       <StrikeThroughSupSubToggles />

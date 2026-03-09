@@ -11,10 +11,16 @@ export const MUIButtonWithTooltip = ({
   title,
   onClick,
   disabled,
+  sx,
 }: ButtonProps) => {
   return (
     <Tooltip title={title} {...tooltipStyle}>
-      <IconButton disabled={disabled} size={'small'} onClick={onClick}>
+      <IconButton
+        sx={{ ...sx, height: '30px' }}
+        disabled={disabled}
+        size={'small'}
+        onClick={onClick}
+      >
         {children}
       </IconButton>
     </Tooltip>
