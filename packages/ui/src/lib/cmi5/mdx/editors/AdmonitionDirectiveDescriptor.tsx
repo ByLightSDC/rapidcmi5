@@ -31,7 +31,7 @@ Hello2
  */
 export interface AdmonitionDirectiveNode extends ContainerDirective {
   name: 'admonition';
-  attributes: { collapsed: string; title: string };
+  attributes: { collapsed: string; title: string; backgroundColor?: string };
 }
 
 /**
@@ -43,7 +43,7 @@ export const AdmonitionDirectiveDescriptor: DirectiveDescriptor = {
     return AdmonitionTypes.includes(node.name);
   },
   // set some attribute names to have the editor display a property editor popup.
-  attributes: ['collapse'],
+  attributes: ['collapse', 'backgroundColor'],
   // used by the generic editor to determine whether or not to render a nested editor.
   hasChildren: true,
   Editor: AdmonitionEditor,
