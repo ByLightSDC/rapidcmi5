@@ -1,4 +1,5 @@
 import React, {
+  useCallback,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -8,7 +9,6 @@ import React, {
 } from 'react';
 
 import {
-
   CodeToggle,
   CreateLink,
   InsertCodeBlock,
@@ -33,7 +33,6 @@ import ArtTrackIcon from '@mui/icons-material/ArtTrack';
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
 import { MarkdownIconSvg } from './constants';
-
 
 import { alpha, Box, Divider, Stack, useTheme } from '@mui/material';
 import { useSelector } from 'react-redux';
@@ -76,7 +75,6 @@ import { InsertAnimation } from './components/InsertAnimation';
 import { MUIButtonWithTooltip } from './components/MUIButtonWithTooltip';
 import { BoldItalicUnderlineToggles } from './components/BoldItalicUnderlineToggles';
 
-
 /**
  * Layout Constants
  *
@@ -85,6 +83,7 @@ const leftToolWidthContainer = 609;
 const rightToolWidthContainer = 96;
 const toolIconWidth = 29.0;
 const rightToolbarMargin = 24;
+const moreTextToolWidth = 100;
 
 /**
  * A toolbar component that includes all toolbar components.
@@ -102,8 +101,12 @@ export const RapidCmi5Toolbar: React.FC = () => {
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef<HTMLDivElement>(null);
   const [leftToolbarPos, setLeftToolbarPos] = useState<number | 0>(0);
+
+  const [minExtraToolsWidth, setMinExtraToolsWidth] = useState(0);
   const [maxExtraToolsWidth, setMaxExtraToolsWidth] = useState(0);
+
   const [isMoreTextTools, setIsMoreTextTools] = useState(false);
+  const observerRef = useRef<ResizeObserver | null>(null);
 
   const isPlayback = useCellValue(editorInPlayback$);
   const [viewMode, iconComponentFor] = useCellValues(
@@ -164,10 +167,15 @@ export const RapidCmi5Toolbar: React.FC = () => {
         const extraWidth =
           window.innerWidth -
           (left + leftToolWidthContainer + rightToolWidthContainer);
-        const fitCount = Math.floor(extraWidth / toolIconWidth);
 
         // avoid partial display
-        setMaxExtraToolsWidth(fitCount * toolIconWidth);
+        setMinExtraToolsWidth(
+          Math.floor((extraWidth - moreTextToolWidth) / toolIconWidth) *
+            toolIconWidth,
+        );
+        setMaxExtraToolsWidth(
+          Math.floor(extraWidth / toolIconWidth) * toolIconWidth,
+        );
 
         //tool bar left plus 24 px right margin
         setLeftToolbarPos(left + rightToolbarMargin);
@@ -181,6 +189,10 @@ export const RapidCmi5Toolbar: React.FC = () => {
 
     // Ensure the ref is attached to a DOM element and that element exists
   }, []);
+
+  const currentExtraToolWidth = isMoreTextTools
+    ? minExtraToolsWidth
+    : maxExtraToolsWidth;
 
   return (
     <Box
@@ -252,7 +264,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                 <Separator />
                 <BlockTypeSelect />
                 <Separator />
-                {maxExtraToolsWidth > 0 && (
+                {currentExtraToolWidth > 0 && (
                   <Stack
                     direction="row"
                     sx={{
@@ -264,7 +276,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                     <Stack
                       direction="row"
                       sx={{
-                        width: `${maxExtraToolsWidth}px`,
+                        width: `${currentExtraToolWidth}px`,
                         flexWrap: 'nowrap',
                         overflow: 'hidden',
                       }}
@@ -344,8 +356,6 @@ export const RapidCmi5Toolbar: React.FC = () => {
               direction="row"
               spacing={1}
               sx={{
-                //backgroundColor: 'primary.main',
-                //backgroundColor: 'green',
                 display: 'flex',
                 justifyContent: 'flex-end',
                 alignItems: 'center',
