@@ -7,7 +7,7 @@ import React, {
   useState,
 } from 'react';
 
-import ReactDOM from 'react-dom';
+
 
 import {
   BoldItalicUnderlineToggles,
@@ -54,6 +54,7 @@ import {
   InsertAccordion,
   InsertSteps,
   InsertTabs,
+  toolbarRect$,
 } from '@rapid-cmi5/ui';
 import { displayData } from '../../../redux/courseBuilderReducer';
 import { SlideMenu } from '../menu/SlideMenu';
@@ -66,6 +67,7 @@ import { InsertLayoutBox } from './components/InsertLayoutBox';
 import { InsertThematicBreak } from './components/InsertThematicBreak';
 import { InsertTable } from './components/InsertTable';
 
+
 /**
  * Layout Constants
  *
@@ -74,6 +76,7 @@ const leftToolWidthContainer = 609;
 const rightToolWidthContainer = 96;
 const toolIconWidth = 29.0;
 const rightToolbarMargin = 24;
+
 
 /**
  * A toolbar component that includes all toolbar components.
@@ -130,6 +133,10 @@ export const RapidCmi5Toolbar: React.FC = () => {
       if (toolbarRef.current) {
         // Get the position relative to the viewport
         const rect = toolbarRef.current.getBoundingClientRect();
+
+        //store for other components
+        toolbarRect$.value = rect;
+
         // Calculate the absolute position relative to the document
         const left = rect.left + window.scrollX;
 
@@ -138,7 +145,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
           window.innerWidth -
           (left + leftToolWidthContainer + rightToolWidthContainer);
         const fitCount = Math.floor(extraWidth / toolIconWidth);
-        
+
         // avoid partial display
         setMaxExtraToolsWidth(fitCount * toolIconWidth);
 
