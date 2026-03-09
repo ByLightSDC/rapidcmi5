@@ -95,6 +95,10 @@ jobs:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
+      
+      - name: Verify npm authentication
+        run: npm whoami
+
       - run: npm ci
 
       - name: Test packages

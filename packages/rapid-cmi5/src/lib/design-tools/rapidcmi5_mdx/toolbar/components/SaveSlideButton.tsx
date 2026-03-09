@@ -17,7 +17,7 @@ import SaveIcon from '@mui/icons-material/Save';
 
 import { useContext } from 'react';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
-import { isDisplayDirty } from 'packages/rapid-cmi5/src/lib/redux/courseBuilderReducer';
+import { isDisplayDirty } from '@rapid-cmi5/react-editor';
 import { useRC5Prompts } from '../../modals/useRC5Prompts';
 import { RC5Context } from '../../contexts/RC5Context';
 import { MessageType } from '../../../course-builder/CourseBuilderTypes';

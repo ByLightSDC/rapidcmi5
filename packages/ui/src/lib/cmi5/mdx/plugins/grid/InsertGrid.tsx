@@ -13,12 +13,11 @@ import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 import GridViewIcon from '@mui/icons-material/GridView';
 
 import { convertMarkdownToMdast } from '../../util/conversion';
-import { placeCaretInsideDirective } from '../../util/caret';
 
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { DEFAULT_GRID } from './constants';
-import { ButtonMinorUi } from 'packages/ui/src/lib/utility/buttons';
+import { ButtonMinorUi } from '@rapid-cmi5/ui';
 
 /**
  * Icons
