@@ -277,7 +277,7 @@ function RC5Player() {
     }
 
     (scroller ?? el).scrollTo({ top: 0 });
-  }, [activeTab]);
+  }, [slideData, activeTab]);
 
   /**
    * Inject markdown into editor and reset focus
@@ -292,7 +292,7 @@ function RC5Player() {
       }
       ref.current?.focus();
     }
-  }, [slideData]);
+  }, [slideData, activeTab]);
 
   /**
    * Attach media event listeners after slide content renders
