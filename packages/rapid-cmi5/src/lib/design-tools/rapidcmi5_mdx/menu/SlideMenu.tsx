@@ -162,7 +162,7 @@ export const SlideMenu = () => {
         </MUIButtonWithTooltip>
         <MUIButtonWithTooltip
           data-testid="add-markdown-slide-button"
-          disabled={lessonSlides.length <= 1}
+          disabled={lessonSlides.length < 1}
           sx={{ color: 'secondary' }}
           title="Add Slide"
           aria-label="add-markdown-slide"
