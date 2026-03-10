@@ -37,7 +37,7 @@ export const MUISingleChoiceToggleGroup = <T extends string>({
                 },
               }}
               size={'small'}
-              onClick={() => onChange(item.value)}
+              onClick={() => onChange(on ? '': item.value)}
             >
               {item.contents}
             </IconButton>

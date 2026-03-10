@@ -40,8 +40,8 @@ import {
   defaultAlignmentLabels,
 } from '../../drawers/constants';
 import { RC5Context } from '../../contexts/RC5Context';
-import { currentAu } from 'packages/rapid-cmi5/src/lib/redux/courseBuilderReducer';
 import { ILessonNode } from '../../drawers/components/LessonTreeNode';
+import { currentAu } from '@rapid-cmi5/react-editor';
 
 
 /**
