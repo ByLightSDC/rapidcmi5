@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { ButtonWithTooltip, readOnly$ } from '@mdxeditor/editor';
+import { readOnly$ } from '@mdxeditor/editor';
 import { useCellValues, usePublisher } from '@mdxeditor/gurx';
 
 import { insertActivityDirective$ } from '../../plugins/Activity';
@@ -14,6 +12,7 @@ import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import AddIcon from '@mui/icons-material/Add';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import { useTheme } from '@mui/material';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 /**
  * This toolbar button allows the user to attach a file that can be downloaded
@@ -74,7 +73,7 @@ export const InsertFile = ({ isDrawer }: { isDrawer?: boolean }) => {
           File
         </ButtonMinorUi>
       ) : (
-        <ButtonWithTooltip
+        <MUIButtonWithTooltip
           title="Insert File"
           aria-label="insert-file"
           onClick={() => {
@@ -82,7 +81,7 @@ export const InsertFile = ({ isDrawer }: { isDrawer?: boolean }) => {
           }}
         >
           <AttachFileIcon fontSize="small" />
-        </ButtonWithTooltip>
+        </MUIButtonWithTooltip>
       )}
     </>
   );

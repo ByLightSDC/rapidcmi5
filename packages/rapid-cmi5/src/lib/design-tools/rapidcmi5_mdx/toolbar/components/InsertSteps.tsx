@@ -1,5 +1,4 @@
 import {
-  ButtonWithTooltip,
   activeEditor$,
   $createDirectiveNode,
   DirectiveNode,
@@ -10,10 +9,9 @@ import { $getSelection, $isRangeSelection } from 'lexical';
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { DEFAULT_STEPS } from './constants';
-import { placeCaretInsideDirective } from '../../util/caret';
-import { convertMarkdownToMdast } from '../../util/conversion';
-import { ButtonMinorUi } from '@rapid-cmi5/ui';
+import { convertMarkdownToMdast } from '@rapid-cmi5/ui';
+import { DEFAULT_STEPS } from 'packages/ui/src/lib/cmi5/mdx/plugins/steps/constants';
+import { ButtonMinorUi } from 'packages/ui/src/lib/utility/buttons';
 import { useTheme } from '@emotion/react';
 
 /**
@@ -21,6 +19,7 @@ import { useTheme } from '@emotion/react';
  */
 import AddIcon from '@mui/icons-material/Add';
 import InputIcon from '@mui/icons-material/Input';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 /**
  * A toolbar button component that inserts a stepper structure into the editor.
@@ -109,7 +108,7 @@ export const InsertSteps = ({ isDrawer }: { isDrawer?: boolean }) => {
           Stepper
         </ButtonMinorUi>
       ) : (
-        <ButtonWithTooltip
+        <MUIButtonWithTooltip
           title="Insert Steps"
           aria-label="insert-steps"
           onClick={() => {
@@ -117,7 +116,7 @@ export const InsertSteps = ({ isDrawer }: { isDrawer?: boolean }) => {
           }}
         >
           <InputIcon fontSize="small" />
-        </ButtonWithTooltip>
+        </MUIButtonWithTooltip>
       )}
     </>
   );

@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
 import {
-  ButtonWithTooltip,
   activeEditor$,
   Cell,
   useCellValue,
@@ -15,7 +14,7 @@ import {
 import FormatColorTextIcon from '@mui/icons-material/FormatColorText';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { ColorSelectionPopover, TEXT_PRESET_COLORS } from '@rapid-cmi5/ui';
-
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 const DEFAULT_COLOR = '#FFFFFF';
 export const textColorLast$ = Cell<string>(DEFAULT_COLOR);
@@ -94,33 +93,42 @@ export function ColorTextSplitButton() {
 
   return (
     <>
-      <ButtonWithTooltip
-        title="Change text color"
+      <MUIButtonWithTooltip
+        title="Apply Text Color"
         onClick={handleMainClick}
         disabled={disabled}
+        sx={{
+          '& svg': {
+            stroke: 'grey', // resolves issue where some text isnt readable against background
+            strokeWidth: 1,
+          },
+          marginRight: '-4px',
+        }}
       >
         <FormatColorTextIcon
           fontSize="small"
           style={showDefaultIcon ? undefined : { color: lastColor }}
         />
-      </ButtonWithTooltip>
+      </MUIButtonWithTooltip>
 
-      <ButtonWithTooltip
-        title="Select text color"
+      <MUIButtonWithTooltip
+        title="Select Text Color"
         onClick={openPicker}
         disabled={disabled}
-        style={{
-          width: '10px',
+        sx={{
+          width: '12px',
           minWidth: 0,
-          padding: 0,
+          padding: '8px',
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
           lineHeight: 1,
+          height: '12px',
+          marginTop: '10px',
         }}
       >
-        <ArrowDropDownIcon fontSize="small" />
-      </ButtonWithTooltip>
+        <ArrowDropDownIcon fontSize="medium" />
+      </MUIButtonWithTooltip>
 
       <ColorSelectionPopover
         anchorEl={anchorEl}

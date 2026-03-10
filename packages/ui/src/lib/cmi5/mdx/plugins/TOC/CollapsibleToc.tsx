@@ -16,6 +16,9 @@ import TocIcon from '@mui/icons-material/Toc';
 import { TableOfContentsEntry } from './TocPlugin';
 import CloseIcon from '@mui/icons-material/Close';
 
+import { toolbarRect$ } from '@rapid-cmi5/ui';
+import { useSignalEffect } from '@preact/signals-react';
+
 /**
  * TOCComponent (Table of Contents Component)
  *
@@ -44,32 +47,40 @@ import CloseIcon from '@mui/icons-material/Close';
 export const TOCComponent = ({
   tocEntries,
   editor,
-  topOffSet = 0,
+  defaultTopOffset = 0,
 }: {
   tocEntries: Array<TableOfContentsEntry>;
   editor: any;
-  topOffSet?: number;
+  defaultTopOffset?: number;
 }) => {
-  // a function that will publish a new value into the viewMode cell
+  const [topPosition, setTopPosition] = useState<number>(defaultTopOffset);
+
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const [basePath, setBasePath] = useState<string>(
     window.location.pathname + window.location.search,
   );
+  const theme = useTheme();
+
+  const toggleExpanded = () => {
+    setIsExpanded((prev) => !prev);
+  };
 
   useEffect(() => {
     setBasePath(window.location.pathname + window.location.search);
   }, [window.location.pathname, window.location.search]);
 
-  const [isExpanded, setIsExpanded] = useState(false);
-
   useEffect(() => {
     setIsExpanded(false);
   }, [tocEntries]);
 
-  const toggleExpanded = () => {
-    setIsExpanded((prev) => !prev);
-  };
-  const theme = useTheme();
+  /**
+   * Listen for toolbar rect changed and set TOC button top
+   */
+  useSignalEffect(() => {
+    const rect = toolbarRect$.value;
+    setTopPosition(rect?.bottom || defaultTopOffset);
+  });
 
   return (
     <Accordion
@@ -82,7 +93,7 @@ export const TOCComponent = ({
         overflow: 'auto',
         position: 'absolute',
         right: 24,
-        top: 12 + topOffSet,
+        top: topPosition,
         maxWidth: '320px',
         backgroundColor: isExpanded ? 'background.default' : 'transparent',
         borderStyle: 'none',

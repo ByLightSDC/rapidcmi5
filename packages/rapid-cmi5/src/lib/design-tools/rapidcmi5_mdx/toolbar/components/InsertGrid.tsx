@@ -12,11 +12,10 @@ import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 
 import GridViewIcon from '@mui/icons-material/GridView';
 
-import { convertMarkdownToMdast } from '../../util/conversion';
+import { convertMarkdownToMdast } from '@rapid-cmi5/ui';
 
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { DEFAULT_GRID } from './constants';
 import { ButtonMinorUi } from '@rapid-cmi5/ui';
 
 /**
@@ -24,6 +23,8 @@ import { ButtonMinorUi } from '@rapid-cmi5/ui';
  */
 import AddIcon from '@mui/icons-material/Add';
 import { useTheme } from '@mui/material';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
+import { DEFAULT_GRID } from 'packages/ui/src/lib/cmi5/mdx/plugins/grid/constants';
 
 /**
  * Checks if the current selection is inside a grid container or grid cell.
@@ -156,7 +157,7 @@ export const InsertGrid = ({ isDrawer }: { isDrawer?: boolean }) => {
           Layout Grid
         </ButtonMinorUi>
       ) : (
-        <ButtonWithTooltip
+        <MUIButtonWithTooltip
           title="Insert Layout Grid"
           aria-label="insert-layout-grid"
           onClick={() => {
@@ -164,7 +165,7 @@ export const InsertGrid = ({ isDrawer }: { isDrawer?: boolean }) => {
           }}
         >
           <GridViewIcon fontSize="small" />
-        </ButtonWithTooltip>
+        </MUIButtonWithTooltip>
       )}
     </>
   );
