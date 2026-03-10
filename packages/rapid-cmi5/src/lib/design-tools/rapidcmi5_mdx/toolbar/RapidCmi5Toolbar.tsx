@@ -76,8 +76,8 @@ import { UndoRedo } from './components/UndoRedo';
  * Layout Constants
  *
  */
-const leftToolWidthContainer = 582; //563; //609;
-const rightToolWidthContainer = 131; //96;
+const leftToolWidthContainer = 582; 
+const rightToolWidthContainer = 131;
 const toolIconWidth = 32.0;
 const rightToolbarMargin = 24;
 const moreTextToolWidth = 100;

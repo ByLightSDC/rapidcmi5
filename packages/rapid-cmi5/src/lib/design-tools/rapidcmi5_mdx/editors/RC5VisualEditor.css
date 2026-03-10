@@ -11,7 +11,7 @@
   --basePageBg: #212125;
   /* --baseText:rgb(10, 243, 76); */
   /* --baseTextContrast:rgb(23, 213, 156); tooltip color, content editable */
-  --tooltip-bg: #50f01b;
+  /* --tooltip-bg:  */
 }
 
 /* makes accordion nested content dark */
@@ -19,7 +19,7 @@
   --basePageBg: #f8f8f8;
   /* --baseTextContrast:rgb(59, 9, 222); */
   /* --baseText:rgb(215, 9, 222); */
-  --tooltip-bg: #f01bd0;
+  /* --tooltip-bg:  */
 }
 
 /* future fix background color of code editors by passing in themes

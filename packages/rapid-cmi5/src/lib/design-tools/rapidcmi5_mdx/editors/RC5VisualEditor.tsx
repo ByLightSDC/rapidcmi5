@@ -754,21 +754,21 @@ function RC5VisualEditor() {
             </style>
           )}
 
-          {/* <ErrorBoundary> */}
-          <LessonThemeContext.Provider
-            value={{ lessonTheme: currentLessonTheme }}
-          >
-            <MDXEditor
-              className={mdxTheme}
-              onChange={onChange}
-              ref={ref}
-              markdown={''}
-              plugins={thePlugins}
-              readOnly={!isEditing}
-              onError={onErrorHelper}
-            />
-          </LessonThemeContext.Provider>
-          {/* </ErrorBoundary> */}
+          <ErrorBoundary>
+            <LessonThemeContext.Provider
+              value={{ lessonTheme: currentLessonTheme }}
+            >
+              <MDXEditor
+                className={mdxTheme}
+                onChange={onChange}
+                ref={ref}
+                markdown={''}
+                plugins={thePlugins}
+                readOnly={!isEditing}
+                onError={onErrorHelper}
+              />
+            </LessonThemeContext.Provider>
+          </ErrorBoundary>
         </Box>
       ) : (
         <Box
