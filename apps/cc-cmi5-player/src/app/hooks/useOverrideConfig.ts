@@ -238,8 +238,12 @@ export const useOverrideConfigs = () => {
         },
         'auManager',
       );
-
-      dispatch(setAuLogo(config.THEME.SLIDE_LOGO));
+      dispatch(
+        setAuLogo({
+          dark: config.THEME.SLIDE_LOGO,
+          light: config.THEME.LIGHT_MODE.SLIDE_LOGO || config.THEME.SLIDE_LOGO,
+        }),
+      );
       setIsOverridesLoaded(true);
 
       // CRITICAL FIX: Refresh logging config after overrides are loaded

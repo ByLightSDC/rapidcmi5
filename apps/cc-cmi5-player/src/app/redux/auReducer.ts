@@ -9,7 +9,8 @@ import { initializeCourseAUProgress as createCourseAUProgress } from '../utils/C
 import { logger } from '../debug';
 
 type tAuState = {
-  auLogo: string;
+  auLogoDark: string;
+  auLogoLight: string;
   auPath: string;
   auProgress: number;
   auViewedSlides: number[];
@@ -33,7 +34,8 @@ type tAuState = {
 
 //Defaults
 export const initialState: tAuState = {
-  auLogo: '',
+  auLogoDark: '',
+  auLogoLight: '',
   auPath: '',
   auProgress: 0,
   auViewedSlides: [],
@@ -68,7 +70,9 @@ export const auSlice = createSlice({
       state.auJson = action.payload;
     },
     setAuLogo: (state, action) => {
-      state.auLogo = action.payload;
+      const { dark, light } = action.payload;
+      state.auLogoDark = dark;
+      state.auLogoLight = light;
     },
     setAuProgress: (state, action) => {
       state.auProgress = action.payload;
@@ -227,7 +231,8 @@ export const {
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of
 // in the slice file. For example: `useSelector((state: RootState) => state.counter.value)`
-export const auLogoSel = (state: RootState) => state.au.auLogo;
+export const auLogoDarkSel = (state: RootState) => state.au.auLogoDark;
+export const auLogoLightSel = (state: RootState) => state.au.auLogoLight;
 export const classIdSel = (state: RootState) => state.au.classId;
 export const studentIdSel = (state: RootState) => state.au.studentId;
 export const auPathSel = (state: RootState) => state.au.auPath;

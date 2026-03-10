@@ -120,5 +120,6 @@ export const config = {
   THEME: {
     SLIDE_BACKGROUND: '',
     SLIDE_LOGO: './assets/rapid-cmi5/RapidCMI5.png',
+    LIGHT_MODE: { SLIDE_LOGO: './assets/rapid-cmi5/RapidCMI5.png' },
   },
 };
