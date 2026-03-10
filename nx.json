@@ -18,7 +18,8 @@
   },
   "release": {
     "projects": [
-      "packages/*"
+      "packages/*",
+      "."
     ]
   },
   "defaultProject": "rapid-cmi5-electron-frontend",

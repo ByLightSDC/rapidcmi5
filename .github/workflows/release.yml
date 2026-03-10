@@ -11,6 +11,7 @@ on:
         required: true
 
 permissions:
+  id-token: write 
   contents: write
 
 jobs:
@@ -83,6 +84,36 @@ jobs:
 
             ### Changelog
             <!-- Add changelog here -->
+  # publish to the npm registry
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+      - run: npm ci
+
+      - name: Test packages
+        run: npx nx run-many --target=test --projects=packages/* --parallel=3
+
+      - name: Build packages
+        run: npx nx run-many --target=build --projects=packages/* --parallel=3
+
+      - name: Publish @rapid-cmi5/cmi5-build-common
+        run: npm publish --provenance
+        working-directory: dist/packages/common
+
+      - name: Publish @rapid-cmi5/ui
+        run: npm publish --provenance
+        working-directory: dist/packages/ui
+
+      - name: Publish @rapid-cmi5/react-editor
+        run: npm publish --provenance
+        working-directory: dist/packages/rapid-cmi5
 
   build-cc-cmi5-player:
     name: Build cc-cmi5-player
@@ -121,6 +152,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ needs.create-release.outputs.version }}
+          draft: true
           files: cc-cmi5-player-${{ needs.create-release.outputs.version }}.zip
           fail_on_unmatched_files: false
         env:
@@ -210,6 +242,8 @@ jobs:
       - name: Upload release assets
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: v${{ needs.create-release.outputs.version }}
+          draft: true
           files: |
             dist/executables/*.dmg
             dist/executables/*.dmg.blockmap

@@ -38,7 +38,11 @@ import { useSelector } from 'react-redux';
 import { ButtonIcon } from '../../../../utility/buttons';
 import { debugLog } from '../../../../utility/logger';
 import { editorInPlayback$ } from '../../state/vars';
-import { dividerColor } from '@rapid-cmi5/ui';
+import {
+  dividerColor,
+  onCheckClickOutsideImageLabel,
+  toolbarRect$,
+} from '@rapid-cmi5/ui';
 import { convertMarkdownToMdast } from '../../util/conversion';
 
 /**
@@ -168,6 +172,37 @@ export const ImageLabelEditor: React.FC<
   };
 
   /**
+   * Detect clicks outside of open label content
+   * If mouse is in toolbar area, disregard the click so users can apply text effects
+   * If mouse is in label content, disregard
+   * If mouse is outside label content, hide
+   * @param event
+   * @returns
+   */
+  const handleMouseDown = (event: MouseEvent) => {
+
+    // detect click in toolbar area
+    if (
+      toolbarRect$.value &&
+      event.clientX >= toolbarRect$.value.left &&
+      event.clientY < toolbarRect$.value.bottom
+    ) {
+      //ignore clicks on toolbar so user can apply text effects
+      return;
+    }
+
+    // if clicking on label content, ignore
+    const target = event.target as HTMLElement;
+    if (popperRef.current?.contains(target)) {
+      return;
+    }
+
+    // detect click outside
+    document.removeEventListener('mousedown', handleMouseDown);
+    onCheckClickOutsideImageLabel(imageId);
+  };
+
+  /**
    * Open Label Content
    * @param event
    */
@@ -179,6 +214,8 @@ export const ImageLabelEditor: React.FC<
         ...imageLabelKeys$.value,
         [imageId]: transientId,
       };
+      document.removeEventListener('mousedown', handleMouseDown);
+      document.addEventListener('mousedown', handleMouseDown);
     } else {
       debugLog('no imageId found for label');
     }

@@ -31,6 +31,7 @@ export * from './plugins/footnote/methods';
 export * from './plugins/footnote/types';
 export * from './plugins/footnote/vars';
 export * from './plugins/link/util';
+export * from './plugins/toolbar/vars';
 export * from './plugins/animation-directive';
 export * from './editors/FxDirectiveDescriptor';
 

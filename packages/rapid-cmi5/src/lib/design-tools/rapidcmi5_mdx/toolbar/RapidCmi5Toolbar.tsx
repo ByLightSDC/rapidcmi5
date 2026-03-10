@@ -38,14 +38,11 @@ import {
   editorInPlayback$,
   CONTENT_UPDATED_COMMAND,
   dividerColor,
+  toolbarRect$,
 } from '@rapid-cmi5/ui';
 
 import { displayData } from '../../../redux/courseBuilderReducer';
 import { SlideMenu } from '../menu/SlideMenu';
-
-/**
- * Tool bar Buttons
- */
 import { SaveSlideButton } from './components/SaveSlideButton';
 import { LessonStyleButton } from './components/LessonStyleButton';
 import { BlockTypeSelect } from './components/BlockTypeSelect';
@@ -108,9 +105,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
   const [isMoreTextTools, setIsMoreTextTools] = useState(false);
 
   const isPlayback = useCellValue(editorInPlayback$);
-  const [viewMode] = useCellValues(
-    viewMode$
-  );
+  const [viewMode] = useCellValues(viewMode$);
   const t = useTranslation();
   const theme = useTheme();
 
@@ -158,6 +153,10 @@ export const RapidCmi5Toolbar: React.FC = () => {
       if (toolbarRef.current) {
         // Get the position relative to the viewport
         const rect = toolbarRef.current.getBoundingClientRect();
+
+        //store for other components
+        toolbarRect$.value = rect;
+
         // Calculate the absolute position relative to the document
         const left = rect.left + window.scrollX;
 
@@ -363,6 +362,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                 onClick={() => {
                   changeViewMode('rich-text');
                   realm.pub(editorInPlayback$, !isPlayback);
+                  realm.pub(editorInPlayback$, !isPlayback);
                 }}
                 disabled={viewMode === 'source'}
               >
@@ -443,6 +443,56 @@ export const RapidCmi5Toolbar: React.FC = () => {
                   {markDownIcon}
                 </MUIButtonWithTooltip>
               </Stack>
+
+              {/* <Stack
+                direction="row"
+                sx={{
+                  borderRadius: 4,
+                  paddingLeft: 0.5,
+                  paddingRight: 0.5,
+                  height: '32px',
+                  border: `1px solid ${disabledIconColor}`,
+                  transition:
+                    'transform 120ms ease, background-color 120ms ease',
+                }}
+              >
+                <MUIButtonWithTooltip
+                  title={t('toolbar.richText', 'Edit Rich Text')}
+                  onClick={() => {
+                    changeViewMode('rich-text');
+                  }}
+                  disabled={viewMode === 'rich-text'}
+                >
+                  <ArtTrackIcon
+                    sx={{
+                      fontSize: '32px',
+                      color:
+                        viewmode === 'rich-text'
+                          ? disabledIconColor
+                          : activeIconColor,
+                      fill:
+                        viewmode === 'rich-text'
+                          ? disabledIconColor
+                          : activeIconColor,
+                    }}
+                  />
+                </MUIButtonWithTooltip>
+                <Divider
+                  orientation="vertical"
+                  color="divider"
+                  flexItem
+                  sx={{ mx: 0 }}
+                />
+                <MUIButtonWithTooltip
+                  title="Edit Markdown"
+                  onClick={() => {
+                    changeViewMode('source');
+                  }}
+                  disabled={viewMode === 'source'}
+                >
+                  {markDownIcon}
+                </MUIButtonWithTooltip>
+              </Stack> */}
             </Stack>
           </Stack>
         </Stack>
