@@ -20,6 +20,7 @@ export const iconButtonStyle = {
 
 export const tooltipStyle: Partial<TooltipProps> = {
   placement: 'top',
+  sx: { textTransform: 'capitalize' },
 };
 
 export const iconButtonSize = undefined;

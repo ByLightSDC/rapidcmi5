@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { ButtonWithTooltip, activeEditor$, Cell } from '@mdxeditor/editor';
+import { activeEditor$, Cell } from '@mdxeditor/editor';
 import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 import { $getSelection, $isRangeSelection } from 'lexical';
 import {
@@ -10,6 +10,7 @@ import {
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { ColorSelectionPopover, HIGHLIGHT_PRESET_COLORS } from '@rapid-cmi5/ui';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 const DEFAULT_HIGHLIGHT = '#FFFF00';
 export const highlightColorLast$ = Cell<string>(DEFAULT_HIGHLIGHT);
@@ -79,33 +80,42 @@ export function HighlightSplitButton() {
 
   return (
     <>
-      <ButtonWithTooltip
-        title="Change text background color"
+      <MUIButtonWithTooltip
+        title="Apply Text Background Color"
         onClick={handleMainClick}
         disabled={disabled}
+        sx={{
+          '& svg': {
+            stroke: 'grey', // resolves issue where some text isnt readable against background
+            strokeWidth: 1,
+          },
+          marginRight: '-4px',
+        }}
       >
         <BorderColorIcon
           fontSize="small"
           style={showDefaultIcon ? undefined : { color: lastColor }}
         />
-      </ButtonWithTooltip>
+      </MUIButtonWithTooltip>
 
-      <ButtonWithTooltip
-        title="Select text background color"
+      <MUIButtonWithTooltip
+        title="Select Text Background Color"
         onClick={openPicker}
         disabled={disabled}
-        style={{
-          width: '10px',
+        sx={{
+          width: '12px',
           minWidth: 0,
-          padding: 0,
+          padding: '8px',
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
           lineHeight: 1,
+          height: '12px',
+          marginTop: '10px',
         }}
       >
-        <ArrowDropDownIcon fontSize="small" />
-      </ButtonWithTooltip>
+        <ArrowDropDownIcon fontSize="medium" />
+      </MUIButtonWithTooltip>
 
       <ColorSelectionPopover
         anchorEl={anchorEl}

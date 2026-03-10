@@ -614,8 +614,7 @@ function RC5VisualEditor() {
     );
   }, [currentSlideIndex]);
 
-
-   /**
+  /**
    * Scroll to top when tab changes
    */
   useEffect(() => {

@@ -21,29 +21,9 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 
 import { drawerMode$, DRAWER_TYPE } from './drawers';
-import {
-  InsertAccordion,
-  InsertGrid,
-  InsertSteps,
-  InsertTabs,
-  themeColor,
-  useToaster,
-  ViewExpander,
-} from '@rapid-cmi5/ui';
 
-import { InsertActivities } from './InsertActivities';
-import { InsertAdmonitions } from './InsertAdmonitions';
 import { useSelector } from 'react-redux';
 
-import { InsertTable } from './InsertTable';
-import { InsertVideo } from './InsertVideo';
-import { InsertAudio } from './InsertAudio';
-import { InsertImage } from './InsertImage';
-import { InsertCodeBlock } from './InsertCodeBlock';
-import { InsertThematicBreak } from './InsertThematicBreak';
-import { InsertFile } from './InsertFile';
-
-import WidgetsIcon from '@mui/icons-material/Widgets';
 import CloseIcon from '@mui/icons-material/Close';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import PaletteIcon from '@mui/icons-material/Palette';
@@ -63,10 +43,6 @@ import { RC5Context } from '../../contexts/RC5Context';
 import { ILessonNode } from '../../drawers/components/LessonTreeNode';
 import { currentAu } from '@rapid-cmi5/react-editor';
 
-const headerSxProps = {
-  cursor: 'pointer',
-  marginTop: 2,
-};
 
 /**
  * LessonStyle

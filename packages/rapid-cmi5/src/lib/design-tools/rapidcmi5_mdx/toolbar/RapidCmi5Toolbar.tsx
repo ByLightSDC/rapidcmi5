@@ -8,27 +8,17 @@ import React, {
 } from 'react';
 
 import {
-  BoldItalicUnderlineToggles,
-  CodeToggle,
-  CreateLink,
-  InsertCodeBlock,
-  ListsToggle,
   StrikeThroughSupSubToggles,
   Separator,
   usePublisher,
   viewMode$,
   useCellValue,
   useRealm,
-  UndoRedo,
-  ButtonWithTooltip,
   iconComponentFor$,
   useCellValues,
   useTranslation,
 } from '@mdxeditor/editor';
 import { CLEAR_HISTORY_COMMAND } from 'lexical';
-import { InsertImage } from './components/InsertImage';
-import { InsertVideo } from './components/InsertVideo';
-//REF import { InsertLayoutBox } from './components/InsertLayoutBox';
 
 /** Icons */
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
@@ -36,52 +26,61 @@ import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import ArtTrackIcon from '@mui/icons-material/ArtTrack';
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
+import { MarkdownIconSvg } from './constants';
 
 import { alpha, Box, Divider, Stack, useTheme } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { BlockTypeSelect } from './components/BlockTypeSelect';
+
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { RC5Context } from '../contexts/RC5Context';
-import { ColorTextSplitButton } from './components/ColorTextSplitButton';
-import { HighlightSplitButton } from './components/HighlightSplitButton';
-import { TextFxButton } from './components/TextFxButton';
-import { InsertAudio } from './components/InsertAudio';
-import { InsertAnimation } from './components/InsertAnimation';
 
 import {
   editorInPlayback$,
   CONTENT_UPDATED_COMMAND,
   dividerColor,
-  InsertGrid,
-  InsertAccordion,
-  InsertSteps,
-  InsertTabs,
   toolbarRect$,
 } from '@rapid-cmi5/ui';
 
 import { displayData } from '../../../redux/courseBuilderReducer';
 import { SlideMenu } from '../menu/SlideMenu';
-import { InsertBlockMenu } from './components/InsertBlockMenu';
-
 import { SaveSlideButton } from './components/SaveSlideButton';
 import { LessonStyleButton } from './components/LessonStyleButton';
+import { BlockTypeSelect } from './components/BlockTypeSelect';
+
+import { InsertAccordion } from './components/InsertAccordion';
+import { InsertAudio } from './components/InsertAudio';
+import { InsertAnimation } from './components/InsertAnimation';
+import { InsertBlockMenu } from './components/InsertBlockMenu';
+import { InsertCodeBlock } from './components/InsertCodeBlock';
 import { InsertFile } from './components/InsertFile';
+import { InsertGrid } from './components/InsertGrid';
+import { InsertImage } from './components/InsertImage';
+import { InsertSteps } from './components/InsertSteps';
+import { InsertTabs } from './components/InsertTabs';
+import { InsertVideo } from './components/InsertVideo';
+//REF import { InsertLayoutBox } from './components/InsertLayoutBox';
 import { InsertLayoutBox } from './components/InsertLayoutBox';
+import { InsertLink } from './components/InsertLink';
 import { InsertThematicBreak } from './components/InsertThematicBreak';
 import { InsertTable } from './components/InsertTable';
-import { MUIButtonWithTooltip } from './components/MUIButtonWithTooltip';
-import { MarkdownIconSvg } from './constants';
+import { ColorTextSplitButton } from './components/ColorTextSplitButton';
+import { HighlightSplitButton } from './components/HighlightSplitButton';
+import { TextFxButton } from './components/TextFxButton';
 
+import { MUIButtonWithTooltip } from './components/MUIButtonWithTooltip';
+import { BoldItalicUnderlineToggles } from './components/BoldItalicUnderlineToggles';
+import { ListsToggle } from './components/ListsToggle';
+import { UndoRedo } from './components/UndoRedo';
 
 /**
  * Layout Constants
  *
  */
-const leftToolWidthContainer = 609;
-const rightToolWidthContainer = 96;
-const toolIconWidth = 29.0;
+const leftToolWidthContainer = 582; 
+const rightToolWidthContainer = 131;
+const toolIconWidth = 32.0;
 const rightToolbarMargin = 24;
-
+const moreTextToolWidth = 100;
 
 /**
  * A toolbar component that includes all toolbar components.
@@ -99,14 +98,14 @@ export const RapidCmi5Toolbar: React.FC = () => {
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef<HTMLDivElement>(null);
   const [leftToolbarPos, setLeftToolbarPos] = useState<number | 0>(0);
+
+  const [minExtraToolsWidth, setMinExtraToolsWidth] = useState(0);
   const [maxExtraToolsWidth, setMaxExtraToolsWidth] = useState(0);
+
   const [isMoreTextTools, setIsMoreTextTools] = useState(false);
 
   const isPlayback = useCellValue(editorInPlayback$);
-  const [viewMode, iconComponentFor] = useCellValues(
-    viewMode$,
-    iconComponentFor$,
-  );
+  const [viewMode] = useCellValues(viewMode$);
   const t = useTranslation();
   const theme = useTheme();
 
@@ -122,7 +121,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
     }
     return MarkdownIconSvg(activeIconColor);
   }, [viewMode, disabledIconColor, activeIconColor]);
-  
+
   /**
    * UE sets view to Rich Text Editor on mount
    */
@@ -165,10 +164,15 @@ export const RapidCmi5Toolbar: React.FC = () => {
         const extraWidth =
           window.innerWidth -
           (left + leftToolWidthContainer + rightToolWidthContainer);
-        const fitCount = Math.floor(extraWidth / toolIconWidth);
 
         // avoid partial display
-        setMaxExtraToolsWidth(fitCount * toolIconWidth);
+        setMinExtraToolsWidth(
+          Math.floor((extraWidth - moreTextToolWidth) / toolIconWidth) *
+            toolIconWidth,
+        );
+        setMaxExtraToolsWidth(
+          Math.floor(extraWidth / toolIconWidth) * toolIconWidth,
+        );
 
         //tool bar left plus 24 px right margin
         setLeftToolbarPos(left + rightToolbarMargin);
@@ -182,6 +186,10 @@ export const RapidCmi5Toolbar: React.FC = () => {
 
     // Ensure the ref is attached to a DOM element and that element exists
   }, []);
+
+  const currentExtraToolWidth = isMoreTextTools
+    ? minExtraToolsWidth
+    : maxExtraToolsWidth;
 
   return (
     <Box
@@ -210,7 +218,6 @@ export const RapidCmi5Toolbar: React.FC = () => {
             <Stack direction="row" spacing={1}>
               <Stack direction="row" spacing={0} sx={{ flexGrow: 1 }}>
                 <BoldItalicUnderlineToggles />
-
                 <ColorTextSplitButton />
                 <HighlightSplitButton />
                 <TextFxButton />
@@ -226,7 +233,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                     alignItems: 'center',
                   }}
                 >
-                  <ButtonWithTooltip
+                  <MUIButtonWithTooltip
                     title={
                       isMoreTextTools
                         ? 'Less Text Tools...'
@@ -239,7 +246,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                     ) : (
                       <UnfoldMoreIcon fontSize="medium" />
                     )}
-                  </ButtonWithTooltip>
+                  </MUIButtonWithTooltip>
                   {isMoreTextTools && (
                     <Box sx={{ marginLeft: -1 }}>
                       <StrikeThroughSupSubToggles />
@@ -248,12 +255,11 @@ export const RapidCmi5Toolbar: React.FC = () => {
                 </Stack>
                 <Separator />
                 <ListsToggle />
-                <CreateLink />
-                <CodeToggle />
+                <InsertLink />
                 <Separator />
                 <BlockTypeSelect />
                 <Separator />
-                {maxExtraToolsWidth > 0 && (
+                {currentExtraToolWidth > 0 && (
                   <Stack
                     direction="row"
                     sx={{
@@ -265,7 +271,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                     <Stack
                       direction="row"
                       sx={{
-                        width: `${maxExtraToolsWidth}px`,
+                        width: `${currentExtraToolWidth}px`,
                         flexWrap: 'nowrap',
                         overflow: 'hidden',
                       }}
@@ -277,14 +283,12 @@ export const RapidCmi5Toolbar: React.FC = () => {
                       <InsertCodeBlock />
                       <InsertGrid />
                       <InsertLayoutBox />
-                      <Separator />
                       <InsertAccordion />
                       <InsertSteps />
                       <InsertTable />
                       <InsertTabs />
                       <InsertThematicBreak />
                     </Stack>
-                    <Separator />
                   </Stack>
                 )}
                 <Stack
@@ -294,6 +298,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                     justifyContent: 'flex-end',
                   }}
                 >
+                  <Separator />
                   <LessonStyleButton />
                   <InsertAnimation />
                   <InsertBlockMenu />
@@ -345,8 +350,6 @@ export const RapidCmi5Toolbar: React.FC = () => {
               direction="row"
               spacing={1}
               sx={{
-                //backgroundColor: 'primary.main',
-                //backgroundColor: 'green',
                 display: 'flex',
                 justifyContent: 'flex-end',
                 alignItems: 'center',
@@ -358,6 +361,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                 title={isPlayback ? 'Preview OFF' : 'Preview ON'}
                 onClick={() => {
                   changeViewMode('rich-text');
+                  realm.pub(editorInPlayback$, !isPlayback);
                   realm.pub(editorInPlayback$, !isPlayback);
                 }}
                 disabled={viewMode === 'source'}
@@ -439,6 +443,56 @@ export const RapidCmi5Toolbar: React.FC = () => {
                   {markDownIcon}
                 </MUIButtonWithTooltip>
               </Stack>
+
+              {/* <Stack
+                direction="row"
+                sx={{
+                  borderRadius: 4,
+                  paddingLeft: 0.5,
+                  paddingRight: 0.5,
+                  height: '32px',
+                  border: `1px solid ${disabledIconColor}`,
+                  transition:
+                    'transform 120ms ease, background-color 120ms ease',
+                }}
+              >
+                <MUIButtonWithTooltip
+                  title={t('toolbar.richText', 'Edit Rich Text')}
+                  onClick={() => {
+                    changeViewMode('rich-text');
+                  }}
+                  disabled={viewMode === 'rich-text'}
+                >
+                  <ArtTrackIcon
+                    sx={{
+                      fontSize: '32px',
+                      color:
+                        viewmode === 'rich-text'
+                          ? disabledIconColor
+                          : activeIconColor,
+                      fill:
+                        viewmode === 'rich-text'
+                          ? disabledIconColor
+                          : activeIconColor,
+                    }}
+                  />
+                </MUIButtonWithTooltip>
+                <Divider
+                  orientation="vertical"
+                  color="divider"
+                  flexItem
+                  sx={{ mx: 0 }}
+                />
+                <MUIButtonWithTooltip
+                  title="Edit Markdown"
+                  onClick={() => {
+                    changeViewMode('source');
+                  }}
+                  disabled={viewMode === 'source'}
+                >
+                  {markDownIcon}
+                </MUIButtonWithTooltip>
+              </Stack> */}
             </Stack>
           </Stack>
         </Stack>

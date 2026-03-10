@@ -33,15 +33,28 @@ import { TextDirective } from 'mdast-util-directive';
 
 import { TextFxPopover } from './TextFxPopover';
 
-
-
 /** MUI  */
 import RttIcon from '@mui/icons-material/Rtt';
-import { Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CircleIcon from '@mui/icons-material/Circle';
 import { useSelector } from 'react-redux';
-import { FxDirectiveAttributes, DEFAULT_SHAPE, selFxNode$, showTextFx$, refreshDelay, debugLog, exportMarkdownFromLexical, defaultToMarkdownExtensions, convertMarkdownToMdast, placeCaretInsideDirective, refreshTextFx$, defaultFxColor } from '@rapid-cmi5/ui';
+import {
+  FxDirectiveAttributes,
+  DEFAULT_SHAPE,
+  selFxNode$,
+  showTextFx$,
+  refreshDelay,
+  debugLog,
+  exportMarkdownFromLexical,
+  defaultToMarkdownExtensions,
+  convertMarkdownToMdast,
+  placeCaretInsideDirective,
+  refreshTextFx$,
+  defaultFxColor,
+} from '@rapid-cmi5/ui';
 import { dirtyDisplay } from '../../../../redux/courseBuilderReducer';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 export const shapeStyleLast$ = Cell<FxDirectiveAttributes>(DEFAULT_SHAPE);
 
@@ -232,39 +245,43 @@ export function TextFxButton() {
 
   return (
     <>
-      <ButtonWithTooltip
-        //style={{ minWidth: '64px' }}
+      <MUIButtonWithTooltip
         title={'Text Fx'}
         onClick={openPicker}
         disabled={disabled}
         aria-label="Text Fx"
+        sx={{
+          marginRight: '-6px',
+        }}
       >
-        <Stack
-          direction="row"
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignContent: 'center',
-            alignItems: 'center',
+        <RttIcon
+          fontSize="small"
+          style={{
+            color: selFxNode?.attributes.color || defaultFxColor,
+            stroke: 'grey', // resolves issue where some text isnt readable against background
+            strokeWidth: 1,
           }}
-        >
-          <RttIcon
-            fontSize="small"
-            //TODO style={{ color: lastShape?.borderColor || 'black' }}
-          />
-          <CircleIcon
-            style={{
-              //backgroundColor: 'pink',
-              fontSize: '14px',
-              padding: 0,
-              margin: 0,
-              marginLeft: -2,
-              //position: 'absolute',
-              color: selFxNode?.attributes.color || defaultFxColor,
-            }}
-          />
-        </Stack>
-      </ButtonWithTooltip>
+        />
+      </MUIButtonWithTooltip>
+
+      <MUIButtonWithTooltip
+        title="Select Text Fx Color"
+        onClick={openPicker}
+        disabled={disabled}
+        sx={{
+          width: '12px',
+          minWidth: 0,
+          padding: '8px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          lineHeight: 1,
+          height: '12px',
+          marginTop: '10px',
+        }}
+      >
+        <ArrowDropDownIcon fontSize="medium" />
+      </MUIButtonWithTooltip>
 
       <TextFxPopover
         anchorEl={anchorEl}

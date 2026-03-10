@@ -16,6 +16,7 @@ import { ButtonMinorUi, insertTable$ } from '@rapid-cmi5/ui';
 import AddIcon from '@mui/icons-material/Add';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import { useTheme } from '@emotion/react';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 const disableInsertTableButton$ = Cell<boolean>(false, (r) => {
   r.link(
@@ -90,7 +91,7 @@ export const InsertTable = ({ isDrawer }: { isDrawer?: boolean }) => {
           Table
         </ButtonMinorUi>
       ) : (
-        <ButtonWithTooltip
+        <MUIButtonWithTooltip
           title={t('toolbar.table', 'Insert Table')}
           onClick={() => {
             insertTable({ rows: 3, columns: 3 });
@@ -100,7 +101,7 @@ export const InsertTable = ({ isDrawer }: { isDrawer?: boolean }) => {
             : {})}
         >
           {iconComponentFor('table')}
-        </ButtonWithTooltip>
+        </MUIButtonWithTooltip>
       )}
     </>
   );

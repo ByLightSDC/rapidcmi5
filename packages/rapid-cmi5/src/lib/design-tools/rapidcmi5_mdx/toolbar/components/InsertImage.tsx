@@ -1,8 +1,5 @@
-import React from 'react';
-
 import { openNewImageDialog$ } from '../../plugins/image';
 import {
-  ButtonWithTooltip,
   iconComponentFor$,
   readOnly$,
 } from '@mdxeditor/editor';
@@ -14,6 +11,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ImageIcon from '@mui/icons-material/Image';
 import { useTheme } from '@mui/material';
 import { ButtonMinorUi } from '@rapid-cmi5/ui';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 /**
  * This toolbar button allows the user to insert an image from either a URL
@@ -29,10 +27,6 @@ import { ButtonMinorUi } from '@rapid-cmi5/ui';
 export const InsertImage = ({ isDrawer }: { isDrawer?: boolean }) => {
   const openNewImageDialog = usePublisher(openNewImageDialog$);
   const theme = useTheme();
-  const [readOnly, iconComponentFor] = useCellValues(
-    readOnly$,
-    iconComponentFor$,
-  );
 
   return (
     <>
@@ -68,7 +62,7 @@ export const InsertImage = ({ isDrawer }: { isDrawer?: boolean }) => {
           Image
         </ButtonMinorUi>
       ) : (
-        <ButtonWithTooltip
+        <MUIButtonWithTooltip
           title="Insert Image"
           aria-label="insert-image"
           onClick={() => {
@@ -76,7 +70,7 @@ export const InsertImage = ({ isDrawer }: { isDrawer?: boolean }) => {
           }}
         >
           <ImageIcon fontSize="small" />
-        </ButtonWithTooltip>
+        </MUIButtonWithTooltip>
       )}
     </>
   );

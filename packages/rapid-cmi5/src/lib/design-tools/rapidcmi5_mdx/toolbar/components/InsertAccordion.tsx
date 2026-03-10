@@ -1,5 +1,4 @@
 import {
-  ButtonWithTooltip,
   activeEditor$,
   $createDirectiveNode,
   DirectiveNode,
@@ -10,8 +9,6 @@ import { $getSelection, $isRangeSelection } from 'lexical';
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { placeCaretInsideDirective } from '../../util/caret';
-import { convertMarkdownToMdast } from '../../util/conversion';
 import { ButtonMinorUi } from '@rapid-cmi5/ui';
 
 /**
@@ -20,6 +17,8 @@ import { ButtonMinorUi } from '@rapid-cmi5/ui';
 import AddIcon from '@mui/icons-material/Add';
 import ViewStreamIcon from '@mui/icons-material/ViewStream';
 import { useTheme } from '@mui/material';
+import { convertMarkdownToMdast, placeCaretInsideDirective } from '@rapid-cmi5/ui';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 /** The first line return is REQUIRED!!!! */
 const DEFAULT_ACCORDION = `
@@ -125,7 +124,7 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
           Accordion
         </ButtonMinorUi>
       ) : (
-        <ButtonWithTooltip
+        <MUIButtonWithTooltip
           title="Insert Accordion"
           aria-label="insert-accordion"
           onClick={() => {
@@ -133,7 +132,7 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
           }}
         >
           <ViewStreamIcon fontSize="small" />
-        </ButtonWithTooltip>
+        </MUIButtonWithTooltip>
       )}
     </>
   );

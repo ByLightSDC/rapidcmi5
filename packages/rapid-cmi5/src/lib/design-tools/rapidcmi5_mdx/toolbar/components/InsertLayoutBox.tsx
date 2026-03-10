@@ -1,5 +1,4 @@
 import {
-  ButtonWithTooltip,
   activeEditor$,
   $createDirectiveNode,
   DirectiveNode,
@@ -13,25 +12,12 @@ import {
   $getSelection,
   $setSelection,
   $isRangeSelection,
-  $getNodeByKey,
-  type LexicalEditor,
   LexicalNode,
 } from 'lexical';
 
-import {
-  directiveToMarkdown,
-} from 'mdast-util-directive';
-import { mdxJsxToMarkdown } from 'mdast-util-mdx-jsx';
-import {
-  gfmStrikethroughToMarkdown,
-} from 'mdast-util-gfm-strikethrough';
 
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
-
 import ViewComfyIcon from '@mui/icons-material/ViewComfy';
-
-
-
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { Options as ToMarkdownOptions } from 'mdast-util-to-markdown';
@@ -41,6 +27,7 @@ import {
   defaultToMarkdownExtensions,
   placeCaretInsideDirective,
 } from '@rapid-cmi5/ui';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
   listItemIndent: 'one',
@@ -158,13 +145,13 @@ export const InsertLayoutBox = () => {
   };
 
   return (
-    <ButtonWithTooltip
+    <MUIButtonWithTooltip
       title="Layout Box"
       onClick={() => {
         wrapSelectionOrBlock();
       }}
     >
       <ViewComfyIcon fontSize="small" />
-    </ButtonWithTooltip>
+    </MUIButtonWithTooltip>
   );
 };
