@@ -9,7 +9,7 @@ import { $getSelection, $isRangeSelection } from 'lexical';
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { ButtonMinorUi } from 'packages/ui/src/lib/utility/buttons';
+import { ButtonMinorUi } from '@rapid-cmi5/ui';
 
 /**
  * Icons

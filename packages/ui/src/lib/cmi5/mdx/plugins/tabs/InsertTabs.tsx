@@ -17,7 +17,7 @@ import { ContainerDirective } from 'mdast-util-directive';
 import { DEFAULT_TABS } from './constants';
 import { placeCaretInsideDirective } from '../../util/caret';
 import { convertMarkdownToMdast } from '../../util/conversion';
-import { ButtonMinorUi } from 'packages/ui/src/lib/utility/buttons';
+import { ButtonMinorUi } from '@rapid-cmi5/ui';
 
 /**
  * Icons
