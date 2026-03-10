@@ -122,7 +122,7 @@ export const headingsPlugin = realmPlugin<{
               <TOCComponent
                 editor={editor}
                 tocEntries={tocEntries}
-                topOffSet={params?.topOffset}
+                defaultTopOffset={params?.topOffset}
               />
             ) : (
               <></>

@@ -1,13 +1,14 @@
 import { usePublisher } from '@mdxeditor/gurx';
 import AudioFileIcon from '@mui/icons-material/AudioFile';
 import { openNewAudioDialog$ } from '../../plugins/audio';
-import { ButtonWithTooltip } from '@mdxeditor/editor';
+
 /**
  * Icons
  */
 import AddIcon from '@mui/icons-material/Add';
 import { useTheme } from '@mui/material';
 import { ButtonMinorUi } from '@rapid-cmi5/ui';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 /**
  * A toolbar button that allows the user to insert audio.
  * For this button to work, you must include `audioPlugin`.
@@ -51,7 +52,7 @@ export const InsertAudio = ({ isDrawer }: { isDrawer?: boolean }) => {
           Audio
         </ButtonMinorUi>
       ) : (
-        <ButtonWithTooltip
+        <MUIButtonWithTooltip
           title="Insert Audio"
           aria-label="insert-audio"
           onClick={() => {
@@ -59,7 +60,7 @@ export const InsertAudio = ({ isDrawer }: { isDrawer?: boolean }) => {
           }}
         >
           <AudioFileIcon fontSize="small" />
-        </ButtonWithTooltip>
+        </MUIButtonWithTooltip>
       )}
     </>
   );

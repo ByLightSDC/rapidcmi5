@@ -1,9 +1,6 @@
-import { useCellValue, usePublisher } from '@mdxeditor/gurx';
+import { usePublisher } from '@mdxeditor/gurx';
 import {
-  ButtonWithTooltip,
-  iconComponentFor$,
   insertThematicBreak$,
-  useTranslation,
 } from '@mdxeditor/editor';
 
 /**
@@ -13,6 +10,7 @@ import AddIcon from '@mui/icons-material/Add';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import { useTheme } from '@mui/material';
 import { ButtonMinorUi } from '@rapid-cmi5/ui';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 /**
  * A toolbar button that allows the user to insert a thematic break (rendered as an HR HTML element).
@@ -58,7 +56,7 @@ export const InsertThematicBreak = ({ isDrawer }: { isDrawer?: boolean }) => {
           Thematic Break
         </ButtonMinorUi>
       ) : (
-        <ButtonWithTooltip
+        <MUIButtonWithTooltip
           title="Insert Thematic Break"
           aria-label="insert-thematic-break"
           onClick={() => {
@@ -66,7 +64,7 @@ export const InsertThematicBreak = ({ isDrawer }: { isDrawer?: boolean }) => {
           }}
         >
           <HorizontalRuleIcon fontSize="small" />
-        </ButtonWithTooltip>
+        </MUIButtonWithTooltip>
       )}
     </>
   );

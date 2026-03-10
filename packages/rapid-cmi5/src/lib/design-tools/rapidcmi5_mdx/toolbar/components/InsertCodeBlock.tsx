@@ -13,6 +13,7 @@ import {
   ButtonWithTooltip,
   insertCodeBlock$,
 } from '@mdxeditor/editor';
+import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 /**
  * A toolbar button that allows the user to insert a fenced code block.
@@ -59,7 +60,7 @@ export const InsertCodeBlock = ({ isDrawer }: { isDrawer?: boolean }) => {
           Code Block
         </ButtonMinorUi>
       ) : (
-        <ButtonWithTooltip
+        <MUIButtonWithTooltip
           title="Insert Code Block"
           aria-label="insert-code-block"
           onClick={() => {
@@ -67,7 +68,7 @@ export const InsertCodeBlock = ({ isDrawer }: { isDrawer?: boolean }) => {
           }}
         >
           <IntegrationInstructionsIcon fontSize="small" />
-        </ButtonWithTooltip>
+        </MUIButtonWithTooltip>
       )}
     </>
   );
