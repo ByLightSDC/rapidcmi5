@@ -76,3 +76,8 @@ export * from './plugins/image-text/ImageTextDirectiveDescriptor';
 export * from './plugins/image-text/vars';
 export * from './plugins/image-text/constants';
 export * from './util/validateYamlFrontmatter';
+export * from './plugins/grid/constants';
+export * from './plugins/steps/constants';
+export * from './plugins/tabs/constants';
+
+

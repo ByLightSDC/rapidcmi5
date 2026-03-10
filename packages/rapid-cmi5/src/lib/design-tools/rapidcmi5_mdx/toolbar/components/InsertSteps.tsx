@@ -9,9 +9,7 @@ import { $getSelection, $isRangeSelection } from 'lexical';
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { convertMarkdownToMdast } from '@rapid-cmi5/ui';
-import { DEFAULT_STEPS } from 'packages/ui/src/lib/cmi5/mdx/plugins/steps/constants';
-import { ButtonMinorUi } from 'packages/ui/src/lib/utility/buttons';
+import { convertMarkdownToMdast, DEFAULT_STEPS, ButtonMinorUi} from '@rapid-cmi5/ui';
 import { useTheme } from '@emotion/react';
 
 /**

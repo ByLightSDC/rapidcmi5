@@ -16,7 +16,7 @@ import { convertMarkdownToMdast } from '@rapid-cmi5/ui';
 
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { ButtonMinorUi } from '@rapid-cmi5/ui';
+import { ButtonMinorUi, DEFAULT_GRID } from '@rapid-cmi5/ui';
 
 /**
  * Icons
@@ -24,7 +24,6 @@ import { ButtonMinorUi } from '@rapid-cmi5/ui';
 import AddIcon from '@mui/icons-material/Add';
 import { useTheme } from '@mui/material';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
-import { DEFAULT_GRID } from 'packages/ui/src/lib/cmi5/mdx/plugins/grid/constants';
 
 /**
  * Checks if the current selection is inside a grid container or grid cell.
