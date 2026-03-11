@@ -1,11 +1,12 @@
 import {
-  activeEditor$,
+  rootEditor$,
   $createDirectiveNode,
   DirectiveNode,
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
 import { $getSelection, $isRangeSelection } from 'lexical';
+import type { LexicalEditor } from 'lexical';
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
@@ -43,7 +44,7 @@ Accordion 3 Content Goes Here
  * @returns A button with a tooltip labeled "Accordion" and an Accordion icon.
  */
 export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
-  const editor = useCellValue(activeEditor$);
+  const editor = useCellValue(rootEditor$) as LexicalEditor | null;
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const theme = useTheme();
   /**
@@ -84,7 +85,7 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
       ) as DirectiveNode;
       selection.insertNodes([accordionNode]);
       const insertedKey = accordionNode.getKey();
-      placeCaretInsideDirective(editor, insertedKey);
+      //placeCaretInsideDirective(editor, insertedKey);
     });
   };
 

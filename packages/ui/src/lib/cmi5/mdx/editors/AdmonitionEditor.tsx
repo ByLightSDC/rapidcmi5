@@ -57,6 +57,9 @@ import { SelectorMainUi } from '../../../inputs/selectors/selectors';
 import { debugLogError } from '../../../utility/logger';
 import { editorInPlayback$ } from '../state/vars';
 import { convertMarkdownToMdast } from '../util/conversion';
+import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft';
+import { $createParagraphNode } from 'lexical';
+import { IconButton, Tooltip } from '@mui/material';
 
 export declare interface AdmonitionDirectiveEditorProps<
   T extends Directives = Directives,
@@ -324,6 +327,20 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
               />
             )}
           </>
+          <Tooltip title="Insert paragraph after">
+            <IconButton
+              size="small"
+              onClick={() => {
+                parentEditor.update(() => {
+                  const p = $createParagraphNode();
+                  lexicalNode.insertAfter(p);
+                  p.selectEnd();
+                });
+              }}
+            >
+              <SubdirectoryArrowLeftIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
           <SettingsIconButton onConfigure={onConfigure} />
           <DeleteIconButton onDelete={onDelete} />
         </RightMenuContainer>

@@ -10,7 +10,7 @@ import * as Mdast from 'mdast';
 
 import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { $getRoot, $isElementNode } from 'lexical';
+import { $createParagraphNode, $getRoot, $isElementNode } from 'lexical';
 
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { editorInPlayback$ } from '../../state/vars';
@@ -31,6 +31,7 @@ import Grid from '@mui/material/Grid2';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
+import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft';
 
 import {
   GridCellDirectiveNode,
@@ -278,6 +279,20 @@ export const GridContainerEditor: React.FC<
             <Tooltip title="Edit Grid Layout">
               <IconButton onClick={handleConfigure}>
                 <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Insert paragraph after">
+              <IconButton
+                size="small"
+                onClick={() => {
+                  parentEditor.update(() => {
+                    const p = $createParagraphNode();
+                    lexicalNode.insertAfter(p);
+                    p.selectEnd();
+                  });
+                }}
+              >
+                <SubdirectoryArrowLeftIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <IconButton

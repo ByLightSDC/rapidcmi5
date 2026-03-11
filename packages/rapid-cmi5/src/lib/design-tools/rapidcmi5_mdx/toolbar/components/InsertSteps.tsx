@@ -1,11 +1,12 @@
 import {
-  activeEditor$,
+  rootEditor$,
   $createDirectiveNode,
   DirectiveNode,
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
 import { $getSelection, $isRangeSelection } from 'lexical';
+import type { LexicalEditor } from 'lexical';
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
@@ -25,7 +26,7 @@ import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
  * @returns A button with a tooltip labeled "Insert Stepper" and a stepper icon.
  */
 export const InsertSteps = ({ isDrawer }: { isDrawer?: boolean }) => {
-  const editor = useCellValue(activeEditor$);
+  const editor = useCellValue(rootEditor$) as LexicalEditor | null;
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const theme: any = useTheme();
 

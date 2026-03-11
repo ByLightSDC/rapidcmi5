@@ -13,7 +13,7 @@ import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
-import { $getRoot } from 'lexical';
+import { $createParagraphNode, $getRoot } from 'lexical';
 
 import {
   Box,
@@ -40,6 +40,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PaletteIcon from '@mui/icons-material/Palette';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
+import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
 import { TabsContext } from './TabsContext';
@@ -336,16 +337,17 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
 
   const dropShadow = getDirectiveBlockShadow(muiTheme);
 
-  // Outer box: full-width background color band when backgroundColor is set,
-  // otherwise a plain drop shadow block.
-  // clipPath negative top/bottom insets absorb the decorator margin-top/bottom gap
-  // added by lesson theme CSS, so the colored band fills flush to adjacent blocks.
-  // No extra paddingTop/Bottom needed — the clip-path extension provides the visual fill.
+  // Outer box: full-width background color band when backgroundColor is set.
+  // paddingTop provides the colored space above the content (safe, layout-based).
+  // clipPath 0 top avoids overdrawing elements above; negative bottom absorbs the
+  // trailing <p>'s margin-top so the band fills flush to the next block.
   const outerSx: SxProps = backgroundColor
     ? {
         boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(-${blockPadding} -100vmax -${blockPadding})`,
+        clipPath: `inset(0 -100vmax 0)`,
         backgroundColor,
+        paddingTop: blockPadding,
+        paddingBottom: blockPadding,
       }
     : {};
 
@@ -450,6 +452,21 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
                 size="small"
               >
                 <PaletteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Insert paragraph after">
+              <IconButton
+                size="small"
+                onClick={() => {
+                  parentEditor.update(() => {
+                    const p = $createParagraphNode();
+                    lexicalNode.insertAfter(p);
+                    p.selectEnd();
+                  });
+                }}
+              >
+                <SubdirectoryArrowLeftIcon fontSize="small" />
               </IconButton>
             </Tooltip>
 

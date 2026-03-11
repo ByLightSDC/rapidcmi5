@@ -127,9 +127,8 @@ export function generateLessonThemeStyleTag(
 
   const blockPaddingRule = css.blockPadding
     ? `
-    .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] + [data-lexical-decorator],
-    .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] + p,
-    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p + [data-lexical-decorator] {
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:not(:first-child),
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p:not(:first-child) {
       margin-top: ${css.blockPadding};
     }`
     : '';

@@ -1,12 +1,13 @@
 import {
   ButtonWithTooltip,
-  activeEditor$,
+  rootEditor$,
   $createDirectiveNode,
   DirectiveNode,
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
 import { $getSelection, $isRangeSelection } from 'lexical';
+import type { LexicalEditor } from 'lexical';
 
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 
@@ -69,7 +70,7 @@ const isInsideGrid = (editor: any): boolean => {
  * @returns A button with a tooltip labeled "Insert Layout Grid" and a grid icon.
  */
 export const InsertGrid = ({ isDrawer }: { isDrawer?: boolean }) => {
-  const editor = useCellValue(activeEditor$);
+  const editor = useCellValue(rootEditor$) as LexicalEditor | null;
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const theme = useTheme();
 

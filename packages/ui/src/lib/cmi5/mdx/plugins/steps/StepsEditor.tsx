@@ -13,7 +13,7 @@ import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useEffect, useState } from 'react';
 import { toMarkdown } from 'mdast-util-to-markdown';
-import { $getRoot } from 'lexical';
+import { $createParagraphNode, $getRoot } from 'lexical';
 
 import {
   Box,
@@ -45,6 +45,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
+import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
 import { StepsContext } from './StepsContext';
@@ -419,6 +420,20 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                     <Tooltip title="Edit Steps Settings">
                       <IconButton onClick={handleConfigure}>
                         <EditIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Insert paragraph after">
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          parentEditor.update(() => {
+                            const p = $createParagraphNode();
+                            lexicalNode.insertAfter(p);
+                            p.selectEnd();
+                          });
+                        }}
+                      >
+                        <SubdirectoryArrowLeftIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                     <IconButton
