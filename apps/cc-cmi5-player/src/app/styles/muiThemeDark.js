@@ -164,88 +164,6 @@ export const darkTheme = createTheme({
         },
       },
     },
-    //   MuiAlert: {
-    //     styleOverrides: {
-    //       root: {
-    //         border: '1px solid',
-    //         backgroundColor: '#383838',
-    //         '& .MuiAlert-action': {
-    //           '& .MuiIconButton-root': {
-    //             color: '#b0b0b0', //close button
-    //             '&:hover': { color: '#fff', background: '#ffffff1a' },
-    //           },
-    //         },
-    //       },
-    //       standardInfo: {
-    //         backgroundColor: '#03a9f4',
-    //         color: 'white',
-    //         borderColor: 'transparent',
-    //         '& .MuiAlert-icon': { color: 'white' },
-    //         '& .MuiAlert-action': {
-    //           color: 'white',
-    //           '& .MuiIconButton-root': {
-    //             color: 'white', //close button
-    //             '&:hover': { background: '#0288d1' }, //10% opacity
-    //           },
-    //         },
-    //       }, //palette.info.main
-    //       standardWarning: {
-    //         backgroundColor: '#ff9800',
-    //         color: 'white',
-    //         borderColor: 'transparent',
-    //         '& .MuiAlert-icon': { color: 'white' },
-    //         '& .MuiAlert-action': {
-    //           color: 'white',
-    //           '& .MuiIconButton-root': {
-    //             color: 'white', //close button
-    //             '&:hover': { background: '#ed6c02' }, //10% opacity
-    //           },
-    //         },
-    //       }, //palette.warning.main
-    //       standardError: {
-    //         backgroundColor: '#ef5350',
-    //         color: 'white',
-    //         borderColor: 'transparent',
-    //         '& .MuiAlert-icon': { color: 'white' },
-    //         '& .MuiAlert-action': {
-    //           color: 'white',
-    //           '& .MuiIconButton-root': {
-    //             color: 'white', //close button
-    //             '&:hover': { background: '#d32f2f' },
-    //           },
-    //         },
-    //       }, //palette.error.main
-    //       standardSuccess: {
-    //         backgroundColor: '#4caf50',
-    //         color: 'white',
-    //         borderColor: 'transparent',
-    //         '& .MuiAlert-icon': { color: 'white' },
-    //         '& .MuiAlert-action': {
-    //           color: 'white',
-    //           '& .MuiIconButton-root': {
-    //             color: 'white', //close button
-    //             '&:hover': { background: '#2e7d32' }, //10% opacity
-    //           },
-    //         },
-    //       }, //palette.success.main},
-    //     },
-    //   },
-    //   MuiAutocomplete: {
-    //     styleOverrides: {
-    //       root: {
-    //         '& .MuiAutocomplete-popupIndicator': {
-    //           //dropdown arrow
-    //           color: '#6F96FF', //primary.main
-    //           bottom: '6px', //vertically centers
-    //         },
-    //         '& .MuiAutocomplete-clearIndicator': {
-    //           //clear X button
-    //           color: '#6F96FF', //primary.main
-    //           bottom: '6px', //vertically centers
-    //         },
-    //       },
-    //     },
-    //   },
     MuiDialog: {
       styleOverrides: {
         paperWidthSm: {
@@ -299,31 +217,6 @@ export const darkTheme = createTheme({
         },
       },
     },
-    //   MuiListItemIcon: {
-    //     styleOverrides: {
-    //       root: {
-    //         color: mainColor,
-    //         minWidth: 32,
-    //         fontSize: 24,
-    //         '&:hover': {
-    //           color: '#6F96FF', // primary.main
-    //           cursor: 'pointer',
-    //         },
-    //       },
-    //     },
-    //   },
-    //   MuiListItemText: {
-    //     styleOverrides: {
-    //       root: {
-    //         color: '#FFFFFF',
-    //         fontWeight: 'bold',
-    //         textTransform: 'uppercase',
-    //       },
-    //       primary: {
-    //         fontWeight: 'bold',
-    //       },
-    //     },
-    //   },
     MuiButton: {
       styleOverrides: {
         endIcon: {
@@ -357,47 +250,6 @@ export const darkTheme = createTheme({
         },
       },
     },
-    //   MuiSelect: {
-    //     styleOverrides: {
-    //       icon: {
-    //         color: '#6F96FF', //primary.main - dropdown arrow color
-    //       },
-    //     },
-    //   },
-    //   MuiTab: {
-    //     styleOverrides: {
-    //       root: {
-    //         height: tabHeight,
-    //         minHeight: tabHeight,
-    //         minWidth: 144,
-    //         borderRadius: 4,
-    //         border: '1px solid #6F96FF',
-    //         color: 'common.white',
-    //         backgroundColor: '#3C59A2',
-    //         fontSize: '14px',
-    //         '&.Mui-selected': {
-    //           border: '2px solid #293658',
-    //           backgroundColor: '#293658',
-    //           color: '#FFFFFFCC',
-    //           '&:hover': {
-    //             // border: '2px solid #ffffff88',
-    //             // backgroundColor: '#9e9e9e40',
-    //             // color: '#FFF',
-    //             border: '2px solid #293658',
-    //             backgroundColor: '#293658',
-    //             color: '#FFFFFFCC',
-    //             cursor: 'default',
-    //           },
-    //         },
-    //         '&:hover': {
-    //           border: '1px solid',
-    //           backgroundColor: '#8AA6D0',
-    //           color: 'common.white',
-    //           cursor: 'pointer',
-    //         },
-    //       },
-    //     },
-    //   },
     // careful, settings here can trigger scrollbar
     MuiTab: {
       styleOverrides: {
@@ -405,28 +257,6 @@ export const darkTheme = createTheme({
           height: tabHeight,
           minHeight: tabHeight,
           minWidth: 144,
-          borderRadius: 4,
-          color: 'white',
-          backgroundColor: '#3C59A2',
-          border: '1px solid #07128525',
-          fontSize: '14px',
-          '&.Mui-selected': {
-            border: '0px solid #07128590',
-            backgroundColor: '#7f8cb9',
-            color: 'white',
-            '&:hover': {
-              border: '0px solid #07128590',
-              backgroundColor: '#7f8cb9',
-              color: 'white',
-              cursor: 'default',
-            },
-          },
-          '&:hover': {
-            border: '1px solid #8AA6D0',
-            backgroundColor: '#8AA6D0',
-            color: '#FFFFFF',
-            cursor: 'pointer',
-          },
         },
       },
     },
