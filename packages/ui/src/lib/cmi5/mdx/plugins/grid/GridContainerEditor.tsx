@@ -4,7 +4,6 @@ import {
   NestedLexicalEditor,
   readOnly$,
   useCellValues,
-  useLexicalNodeRemove,
   usePublisher,
 } from '@mdxeditor/editor';
 import * as Mdast from 'mdast';
@@ -56,7 +55,6 @@ export const GridContainerEditor: React.FC<
     structuredClone(mdastNode.children),
   );
   const insertMarkdown = usePublisher(insertMarkdown$);
-  const removeNode = useLexicalNodeRemove();
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [isPlayback, readOnly] = useCellValues(editorInPlayback$, readOnly$);
 
@@ -269,9 +267,7 @@ export const GridContainerEditor: React.FC<
           <Box
             sx={{
               backgroundColor:
-                muiTheme.palette.mode === 'dark'
-                  ? '#282b30e6'
-                  : '#EEEEEEe6',
+                muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
               position: 'absolute',
               top: 0,
               right: 0,
@@ -287,13 +283,16 @@ export const GridContainerEditor: React.FC<
             <IconButton
               aria-label="delete"
               disabled={readOnly}
-              onClick={async (e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 parentEditor.update(() => {
-                  lexicalNode.selectPrevious();
+                  if (lexicalNode.getPreviousSibling()) {
+                    lexicalNode.selectPrevious();
+                  } else {
+                    lexicalNode.selectNext();
+                  }
+                  lexicalNode.remove();
                 });
-                await delay(50);
-                removeNode();
               }}
             >
               <DeleteForeverIcon />

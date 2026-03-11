@@ -5,7 +5,6 @@ import {
   readOnly$,
   syntaxExtensions$,
   useCellValues,
-  useLexicalNodeRemove,
   usePublisher,
 } from '@mdxeditor/editor';
 import * as Mdast from 'mdast';
@@ -91,7 +90,6 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   const [title, setTitle] = useState('');
 
   const [isPlayback, readOnly] = useCellValues(editorInPlayback$, readOnly$);
-  const removeNode = useLexicalNodeRemove();
 
   const a11yStepProps = (index: number) => ({
     id: `step-${index}`,
@@ -426,7 +424,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                     <IconButton
                       aria-label="delete"
                       disabled={readOnly}
-                      onClick={async (e) => {
+                      onClick={(e) => {
                         e.preventDefault();
                         parentEditor.update(() => {
                           if (lexicalNode.getPreviousSibling()) {
@@ -434,9 +432,8 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                           } else {
                             lexicalNode.selectNext();
                           }
+                          lexicalNode.remove();
                         });
-                        await delay(50);
-                        removeNode();
                       }}
                     >
                       <DeleteForeverIcon />

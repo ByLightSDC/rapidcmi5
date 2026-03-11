@@ -5,7 +5,6 @@ import {
   readOnly$,
   syntaxExtensions$,
   useCellValues,
-  useLexicalNodeRemove,
   usePublisher,
 } from '@mdxeditor/editor';
 import * as Mdast from 'mdast';
@@ -15,7 +14,6 @@ import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useEffect, useState } from 'react';
 
 import { $getRoot } from 'lexical';
-
 
 import {
   Box,
@@ -74,7 +72,6 @@ export const AccordionEditor: React.FC<
     readOnly$,
     syntaxExtensions$,
   );
-  const removeNode = useLexicalNodeRemove();
 
   /**
    * Safely retrieves the value of a specific attribute from a node's attributes object.
@@ -317,7 +314,7 @@ export const AccordionEditor: React.FC<
                 <IconButton
                   aria-label="delete"
                   disabled={readOnly}
-                  onClick={async (e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     parentEditor.update(() => {
                       if (lexicalNode.getPreviousSibling()) {
@@ -325,9 +322,8 @@ export const AccordionEditor: React.FC<
                       } else {
                         lexicalNode.selectNext();
                       }
+                      lexicalNode.remove();
                     });
-                    await delay(50);
-                    removeNode();
                   }}
                 >
                   <DeleteForeverIcon />
