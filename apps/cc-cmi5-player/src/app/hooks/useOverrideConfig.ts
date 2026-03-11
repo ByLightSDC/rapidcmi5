@@ -44,7 +44,12 @@ export const useOverrideConfigs = () => {
     'LOGGING_COMPONENTS',
   ];
 
-  const themeWhiteList: string[] = ['SLIDE_BACKGROUND', 'SLIDE_LOGO'];
+  const themeWhiteList: string[] = [
+    'SLIDE_BACKGROUND',
+    'SLIDE_LOGO',
+    'LOGO_DARK',
+    'LOGO_LIGHT',
+  ];
 
   const loadOverrides = async (path: string, inProductionMode = true) => {
     let launchData;
@@ -226,6 +231,8 @@ export const useOverrideConfigs = () => {
         {
           DEVOPS_API_URL: config.DEVOPS_API_URL,
           SLIDE_LOGO: config.THEME.SLIDE_LOGO,
+          LOGO_LIGHT: config.THEME.LOGO_LIGHT,
+          LOGO_DARK: config.THEME.LOGO_DARK,
         },
         'auManager',
       );
@@ -240,8 +247,8 @@ export const useOverrideConfigs = () => {
       );
       dispatch(
         setAuLogo({
-          dark: config.THEME.SLIDE_LOGO,
-          light: config.THEME.LIGHT_MODE.SLIDE_LOGO || config.THEME.SLIDE_LOGO,
+          dark: config.THEME.LOGO_DARK || config.THEME.SLIDE_LOGO,
+          light: config.THEME.LOGO_LIGHT || config.THEME.SLIDE_LOGO,
         }),
       );
       setIsOverridesLoaded(true);
@@ -271,7 +278,12 @@ export const useOverrideConfigs = () => {
         undefined,
         'auManager',
       );
-      dispatch(setAuLogo(config.THEME.SLIDE_LOGO));
+      dispatch(
+        setAuLogo({
+          dark: config.THEME.LOGO_DARK || config.THEME.SLIDE_LOGO,
+          light: config.THEME.LOGO_LIGHT || config.THEME.SLIDE_LOGO,
+        }),
+      );
       setIsOverridesLoaded(true);
     }
   };

@@ -119,7 +119,7 @@ export const config = {
   MSW_MOCK,
   THEME: {
     SLIDE_BACKGROUND: '',
-    SLIDE_LOGO: './assets/rapid-cmi5/RapidCMI5.png',
-    LIGHT_MODE: { SLIDE_LOGO: './assets/rapid-cmi5/RapidCMI5.png' },
+    LOGO_DARK: './assets/rapid-cmi5/RapidCMI5.png',
+    LOGO_LIGHT: './assets/rapid-cmi5/RapidCMI5.png',
   },
 };
