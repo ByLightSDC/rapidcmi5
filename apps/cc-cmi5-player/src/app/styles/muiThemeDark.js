@@ -102,13 +102,13 @@ export const darkTheme = createTheme({
     borderSelected: '#FFC840',
   },
   typography: {
-    // fontFamily: [
-    //   'Roboto',
-    //   'BarlowCondensed',
-    //   'Helvetica',
-    //   'Arial',
-    //   'sans-serif',
-    // ].join(','),
+    fontFamily: [
+      'Roboto',
+      'BarlowCondensed',
+      'Helvetica',
+      'Arial',
+      'sans-serif',
+    ].join(','),
     h1: {
       fontSize: 36,
     },
@@ -131,6 +131,7 @@ export const darkTheme = createTheme({
       fontSize: 16,
       fontWeight: 'bold',
     },
+
     button: {
       fontWeight: 'bold',
     },
@@ -145,7 +146,7 @@ export const darkTheme = createTheme({
           '*::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb': {
             borderRadius: '4px',
             backgroundColor: '#808080b0',
-            borderLeft: '4px solid #2d2d2d',
+            border: '2px solid #dd6fff00', //inset thumb on track background color
             minHeight: '48px',
           },
           '*::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover':
@@ -155,7 +156,7 @@ export const darkTheme = createTheme({
               cursor: 'pointer',
             },
           '*::-webkit-scrollbar, & *::-webkit-scrollbar': {
-            width: '14px',
+            width: '16px',
           },
           '*::-webkit-scrollbar-corner, & *::-webkit-scrollbar-corner': {
             backgroundColor: '#transparent',
@@ -397,5 +398,37 @@ export const darkTheme = createTheme({
     //       },
     //     },
     //   },
+    // careful, settings here can trigger scrollbar
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          height: tabHeight,
+          minHeight: tabHeight,
+          minWidth: 144,
+          borderRadius: 4,
+          color: 'white',
+          backgroundColor: '#3C59A2',
+          border: '1px solid #07128525',
+          fontSize: '14px',
+          '&.Mui-selected': {
+            border: '0px solid #07128590',
+            backgroundColor: '#7f8cb9',
+            color: 'white',
+            '&:hover': {
+              border: '0px solid #07128590',
+              backgroundColor: '#7f8cb9',
+              color: 'white',
+              cursor: 'default',
+            },
+          },
+          '&:hover': {
+            border: '1px solid #8AA6D0',
+            backgroundColor: '#8AA6D0',
+            color: '#FFFFFF',
+            cursor: 'pointer',
+          },
+        },
+      },
+    },
   },
 });
