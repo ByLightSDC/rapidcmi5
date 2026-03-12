@@ -1,12 +1,13 @@
 import {
   ButtonWithTooltip,
-  activeEditor$,
+  rootEditor$,
   $createDirectiveNode,
   DirectiveNode,
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
 import { $getSelection, $isRangeSelection } from 'lexical';
+import type { LexicalEditor } from 'lexical';
 
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 
@@ -20,7 +21,11 @@ import { ContainerDirective } from 'mdast-util-directive';
  */
 import AddIcon from '@mui/icons-material/Add';
 import { useTheme } from '@emotion/react';
-import { convertMarkdownToMdast, ButtonMinorUi, DEFAULT_TABS } from '@rapid-cmi5/ui';
+import {
+  convertMarkdownToMdast,
+  ButtonMinorUi,
+  DEFAULT_TABS,
+} from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 /**
@@ -29,7 +34,7 @@ import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
  * @returns A button with a tooltip labeled "Tabs" and a tab icon.
  */
 export const InsertTabs = ({ isDrawer }: { isDrawer?: boolean }) => {
-  const editor = useCellValue(activeEditor$);
+  const editor = useCellValue(rootEditor$) as LexicalEditor | null;
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const theme: any = useTheme();
 

@@ -2,9 +2,8 @@ import {
   DirectiveEditorProps,
   insertMarkdown$,
   NestedLexicalEditor,
-  readOnly$,
+
   useCellValues,
-  useLexicalNodeRemove,
   usePublisher,
 } from '@mdxeditor/editor';
 import * as Mdast from 'mdast';
@@ -29,9 +28,10 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import DeleteIconButton from '../../components/DeleteIconButton';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
+import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
 import {
   GridCellDirectiveNode,
@@ -56,9 +56,8 @@ export const GridContainerEditor: React.FC<
     structuredClone(mdastNode.children),
   );
   const insertMarkdown = usePublisher(insertMarkdown$);
-  const removeNode = useLexicalNodeRemove();
   const [isConfiguring, setIsConfiguring] = useState(false);
-  const [isPlayback, readOnly] = useCellValues(editorInPlayback$, readOnly$);
+  const [isPlayback] = useCellValues(editorInPlayback$);
 
   /**
    * Determine the current preset based on cell count
@@ -269,9 +268,7 @@ export const GridContainerEditor: React.FC<
           <Box
             sx={{
               backgroundColor:
-                muiTheme.palette.mode === 'dark'
-                  ? '#282b30e6'
-                  : '#EEEEEEe6',
+                muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
               position: 'absolute',
               top: 0,
               right: 0,
@@ -284,20 +281,19 @@ export const GridContainerEditor: React.FC<
                 <EditIcon />
               </IconButton>
             </Tooltip>
-            <IconButton
-              aria-label="delete"
-              disabled={readOnly}
-              onClick={async (e) => {
-                e.preventDefault();
+            <InsertLineReturnButton parentEditor={parentEditor} lexicalNode={lexicalNode} />
+            <DeleteIconButton
+              onDelete={() => {
                 parentEditor.update(() => {
-                  lexicalNode.selectPrevious();
+                  if (lexicalNode.getPreviousSibling()) {
+                    lexicalNode.selectPrevious();
+                  } else {
+                    lexicalNode.selectNext();
+                  }
+                  lexicalNode.remove();
                 });
-                await delay(50);
-                removeNode();
               }}
-            >
-              <DeleteForeverIcon />
-            </IconButton>
+            />
           </Box>
         )}
       </Box>

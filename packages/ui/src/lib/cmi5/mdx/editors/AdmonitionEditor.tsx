@@ -51,6 +51,7 @@ import {
 import { AdmonitionDirectiveNode } from './AdmonitionDirectiveDescriptor';
 import DeleteIconButton from '../components/DeleteIconButton';
 import SettingsIconButton from '../components/SettingsIconButton';
+import InsertLineReturnButton from '../components/InsertLineReturnButton';
 import RightMenuContainer from '../components/RightMenuContainer';
 import { AdmonitionTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { SelectorMainUi } from '../../../inputs/selectors/selectors';
@@ -325,6 +326,10 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
             )}
           </>
           <SettingsIconButton onConfigure={onConfigure} />
+          <InsertLineReturnButton
+            parentEditor={parentEditor}
+            lexicalNode={lexicalNode}
+          />
           <DeleteIconButton onDelete={onDelete} />
         </RightMenuContainer>
       )}

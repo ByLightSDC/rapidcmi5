@@ -5,7 +5,6 @@ import {
   readOnly$,
   syntaxExtensions$,
   useCellValues,
-  useLexicalNodeRemove,
   usePublisher,
 } from '@mdxeditor/editor';
 import * as Mdast from 'mdast';
@@ -15,7 +14,6 @@ import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useEffect, useState } from 'react';
 
 import { $getRoot } from 'lexical';
-
 
 import {
   Box,
@@ -34,11 +32,11 @@ import {
 
 /** Icons */
 import AddIcon from '@mui/icons-material/Add';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import DeleteIconButton from '../../components/DeleteIconButton';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
+import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
 import { AccordionContentDirectiveNode, AccordionDirectiveNode } from './types';
@@ -74,7 +72,6 @@ export const AccordionEditor: React.FC<
     readOnly$,
     syntaxExtensions$,
   );
-  const removeNode = useLexicalNodeRemove();
 
   /**
    * Safely retrieves the value of a specific attribute from a node's attributes object.
@@ -314,24 +311,22 @@ export const AccordionEditor: React.FC<
                     <EditIcon />
                   </IconButton>
                 </Tooltip>
-                <IconButton
-                  aria-label="delete"
-                  disabled={readOnly}
-                  onClick={async (e) => {
-                    e.preventDefault();
+                <InsertLineReturnButton
+                  parentEditor={parentEditor}
+                  lexicalNode={lexicalNode}
+                />
+                <DeleteIconButton
+                  onDelete={() => {
                     parentEditor.update(() => {
                       if (lexicalNode.getPreviousSibling()) {
                         lexicalNode.selectPrevious();
                       } else {
                         lexicalNode.selectNext();
                       }
+                      lexicalNode.remove();
                     });
-                    await delay(50);
-                    removeNode();
                   }}
-                >
-                  <DeleteForeverIcon />
-                </IconButton>
+                />
               </Box>
             )}
           </div>

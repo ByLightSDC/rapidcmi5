@@ -1,11 +1,12 @@
 import {
-  activeEditor$,
+  rootEditor$,
   $createDirectiveNode,
   DirectiveNode,
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
 import { $getSelection, $isRangeSelection } from 'lexical';
+import type { LexicalEditor } from 'lexical';
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
@@ -17,7 +18,10 @@ import { ButtonMinorUi } from '@rapid-cmi5/ui';
 import AddIcon from '@mui/icons-material/Add';
 import ViewStreamIcon from '@mui/icons-material/ViewStream';
 import { useTheme } from '@mui/material';
-import { convertMarkdownToMdast, placeCaretInsideDirective } from '@rapid-cmi5/ui';
+import {
+  convertMarkdownToMdast,
+  placeCaretInsideDirective,
+} from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 /** The first line return is REQUIRED!!!! */
@@ -43,7 +47,7 @@ Accordion 3 Content Goes Here
  * @returns A button with a tooltip labeled "Accordion" and an Accordion icon.
  */
 export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
-  const editor = useCellValue(activeEditor$);
+  const editor = useCellValue(rootEditor$) as LexicalEditor | null;
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const theme = useTheme();
   /**
@@ -83,8 +87,6 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
         mdastAccordion,
       ) as DirectiveNode;
       selection.insertNodes([accordionNode]);
-      const insertedKey = accordionNode.getKey();
-      placeCaretInsideDirective(editor, insertedKey);
     });
   };
 
