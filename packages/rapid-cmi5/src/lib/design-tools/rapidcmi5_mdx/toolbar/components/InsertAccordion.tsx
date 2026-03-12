@@ -18,7 +18,10 @@ import { ButtonMinorUi } from '@rapid-cmi5/ui';
 import AddIcon from '@mui/icons-material/Add';
 import ViewStreamIcon from '@mui/icons-material/ViewStream';
 import { useTheme } from '@mui/material';
-import { convertMarkdownToMdast, placeCaretInsideDirective } from '@rapid-cmi5/ui';
+import {
+  convertMarkdownToMdast,
+  placeCaretInsideDirective,
+} from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 /** The first line return is REQUIRED!!!! */
@@ -84,8 +87,6 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
         mdastAccordion,
       ) as DirectiveNode;
       selection.insertNodes([accordionNode]);
-      const insertedKey = accordionNode.getKey();
-      //placeCaretInsideDirective(editor, insertedKey);
     });
   };
 

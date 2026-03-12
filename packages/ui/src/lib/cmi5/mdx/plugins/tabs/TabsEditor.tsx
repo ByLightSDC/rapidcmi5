@@ -13,7 +13,7 @@ import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
-import { $createParagraphNode, $getRoot } from 'lexical';
+import { $getRoot } from 'lexical';
 
 import {
   Box,
@@ -34,13 +34,13 @@ import {
 
 /** Icons */
 import AddIcon from '@mui/icons-material/Add';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import DeleteIconButton from '../../components/DeleteIconButton';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PaletteIcon from '@mui/icons-material/Palette';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
-import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft';
+import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
 import { TabsContext } from './TabsContext';
@@ -455,31 +455,15 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
               </IconButton>
             </Tooltip>
 
-            <Tooltip title="Insert paragraph after">
-              <IconButton
-                size="small"
-                onClick={() => {
-                  parentEditor.update(() => {
-                    const p = $createParagraphNode();
-                    lexicalNode.insertAfter(p);
-                    p.selectEnd();
-                  });
-                }}
-              >
-                <SubdirectoryArrowLeftIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
+            <InsertLineReturnButton parentEditor={parentEditor} lexicalNode={lexicalNode} />
 
             <Tooltip title="Edit Tabs Settings">
               <IconButton onClick={handleConfigure}>
                 <EditIcon />
               </IconButton>
             </Tooltip>
-            <IconButton
-              aria-label="delete"
-              disabled={readOnly}
-              onClick={(e) => {
-                e.preventDefault();
+            <DeleteIconButton
+              onDelete={() => {
                 parentEditor.update(() => {
                   if (lexicalNode.getPreviousSibling()) {
                     lexicalNode.selectPrevious();
@@ -489,9 +473,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
                   lexicalNode.remove();
                 });
               }}
-            >
-              <DeleteForeverIcon />
-            </IconButton>
+            />
           </Box>
         )}
       </Box>

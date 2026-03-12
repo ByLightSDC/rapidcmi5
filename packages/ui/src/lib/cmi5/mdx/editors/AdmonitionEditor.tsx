@@ -51,15 +51,13 @@ import {
 import { AdmonitionDirectiveNode } from './AdmonitionDirectiveDescriptor';
 import DeleteIconButton from '../components/DeleteIconButton';
 import SettingsIconButton from '../components/SettingsIconButton';
+import InsertLineReturnButton from '../components/InsertLineReturnButton';
 import RightMenuContainer from '../components/RightMenuContainer';
 import { AdmonitionTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { SelectorMainUi } from '../../../inputs/selectors/selectors';
 import { debugLogError } from '../../../utility/logger';
 import { editorInPlayback$ } from '../state/vars';
 import { convertMarkdownToMdast } from '../util/conversion';
-import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft';
-import { $createParagraphNode } from 'lexical';
-import { IconButton, Tooltip } from '@mui/material';
 
 export declare interface AdmonitionDirectiveEditorProps<
   T extends Directives = Directives,
@@ -327,20 +325,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
               />
             )}
           </>
-          <Tooltip title="Insert paragraph after">
-            <IconButton
-              size="small"
-              onClick={() => {
-                parentEditor.update(() => {
-                  const p = $createParagraphNode();
-                  lexicalNode.insertAfter(p);
-                  p.selectEnd();
-                });
-              }}
-            >
-              <SubdirectoryArrowLeftIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          <InsertLineReturnButton parentEditor={parentEditor} lexicalNode={lexicalNode} />
           <SettingsIconButton onConfigure={onConfigure} />
           <DeleteIconButton onDelete={onDelete} />
         </RightMenuContainer>

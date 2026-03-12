@@ -2,7 +2,7 @@ import {
   DirectiveEditorProps,
   insertMarkdown$,
   NestedLexicalEditor,
-  readOnly$,
+
   useCellValues,
   usePublisher,
 } from '@mdxeditor/editor';
@@ -10,7 +10,7 @@ import * as Mdast from 'mdast';
 
 import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { $createParagraphNode, $getRoot, $isElementNode } from 'lexical';
+import { $getRoot, $isElementNode } from 'lexical';
 
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { editorInPlayback$ } from '../../state/vars';
@@ -28,10 +28,10 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import DeleteIconButton from '../../components/DeleteIconButton';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
-import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft';
+import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
 import {
   GridCellDirectiveNode,
@@ -57,7 +57,7 @@ export const GridContainerEditor: React.FC<
   );
   const insertMarkdown = usePublisher(insertMarkdown$);
   const [isConfiguring, setIsConfiguring] = useState(false);
-  const [isPlayback, readOnly] = useCellValues(editorInPlayback$, readOnly$);
+  const [isPlayback] = useCellValues(editorInPlayback$);
 
   /**
    * Determine the current preset based on cell count
@@ -281,25 +281,9 @@ export const GridContainerEditor: React.FC<
                 <EditIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Insert paragraph after">
-              <IconButton
-                size="small"
-                onClick={() => {
-                  parentEditor.update(() => {
-                    const p = $createParagraphNode();
-                    lexicalNode.insertAfter(p);
-                    p.selectEnd();
-                  });
-                }}
-              >
-                <SubdirectoryArrowLeftIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <IconButton
-              aria-label="delete"
-              disabled={readOnly}
-              onClick={(e) => {
-                e.preventDefault();
+            <InsertLineReturnButton parentEditor={parentEditor} lexicalNode={lexicalNode} />
+            <DeleteIconButton
+              onDelete={() => {
                 parentEditor.update(() => {
                   if (lexicalNode.getPreviousSibling()) {
                     lexicalNode.selectPrevious();
@@ -309,9 +293,7 @@ export const GridContainerEditor: React.FC<
                   lexicalNode.remove();
                 });
               }}
-            >
-              <DeleteForeverIcon />
-            </IconButton>
+            />
           </Box>
         )}
       </Box>

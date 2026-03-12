@@ -13,7 +13,7 @@ import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useEffect, useState } from 'react';
 import { toMarkdown } from 'mdast-util-to-markdown';
-import { $createParagraphNode, $getRoot } from 'lexical';
+import { $getRoot } from 'lexical';
 
 import {
   Box,
@@ -38,14 +38,14 @@ import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 //REF import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import DeleteIconButton from '../../components/DeleteIconButton';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 //REF import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
-import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft';
+import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
 import { StepsContext } from './StepsContext';
@@ -422,25 +422,9 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Insert paragraph after">
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          parentEditor.update(() => {
-                            const p = $createParagraphNode();
-                            lexicalNode.insertAfter(p);
-                            p.selectEnd();
-                          });
-                        }}
-                      >
-                        <SubdirectoryArrowLeftIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <IconButton
-                      aria-label="delete"
-                      disabled={readOnly}
-                      onClick={(e) => {
-                        e.preventDefault();
+                    <InsertLineReturnButton parentEditor={parentEditor} lexicalNode={lexicalNode} />
+                    <DeleteIconButton
+                      onDelete={() => {
                         parentEditor.update(() => {
                           if (lexicalNode.getPreviousSibling()) {
                             lexicalNode.selectPrevious();
@@ -450,9 +434,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                           lexicalNode.remove();
                         });
                       }}
-                    >
-                      <DeleteForeverIcon />
-                    </IconButton>
+                    />
                   </Box>
                 )}
               </div>
