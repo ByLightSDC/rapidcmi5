@@ -1,12 +1,13 @@
 import {
   ButtonWithTooltip,
-  activeEditor$,
+  rootEditor$,
   $createDirectiveNode,
   DirectiveNode,
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
 import { $getSelection, $isRangeSelection } from 'lexical';
+import type { LexicalEditor } from 'lexical';
 
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 
@@ -16,7 +17,7 @@ import { convertMarkdownToMdast } from '@rapid-cmi5/ui';
 
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { ButtonMinorUi } from '@rapid-cmi5/ui';
+import { ButtonMinorUi, DEFAULT_GRID } from '@rapid-cmi5/ui';
 
 /**
  * Icons
@@ -24,7 +25,6 @@ import { ButtonMinorUi } from '@rapid-cmi5/ui';
 import AddIcon from '@mui/icons-material/Add';
 import { useTheme } from '@mui/material';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
-import { DEFAULT_GRID } from 'packages/ui/src/lib/cmi5/mdx/plugins/grid/constants';
 
 /**
  * Checks if the current selection is inside a grid container or grid cell.
@@ -70,7 +70,7 @@ const isInsideGrid = (editor: any): boolean => {
  * @returns A button with a tooltip labeled "Insert Layout Grid" and a grid icon.
  */
 export const InsertGrid = ({ isDrawer }: { isDrawer?: boolean }) => {
-  const editor = useCellValue(activeEditor$);
+  const editor = useCellValue(rootEditor$) as LexicalEditor | null;
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const theme = useTheme();
 

@@ -1,5 +1,5 @@
 import {
-  activeEditor$,
+  rootEditor$,
   $createDirectiveNode,
   DirectiveNode,
   exportVisitors$,
@@ -14,6 +14,7 @@ import {
   $isRangeSelection,
   LexicalNode,
 } from 'lexical';
+import type { LexicalEditor } from 'lexical';
 
 
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
@@ -34,7 +35,7 @@ const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
 };
 
 export const InsertLayoutBox = () => {
-  const editor = useCellValue(activeEditor$);
+  const editor = useCellValue(rootEditor$) as LexicalEditor | null;
 
   const [
     exportVisitors,

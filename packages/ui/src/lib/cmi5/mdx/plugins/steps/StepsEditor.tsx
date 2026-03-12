@@ -5,7 +5,6 @@ import {
   readOnly$,
   syntaxExtensions$,
   useCellValues,
-  useLexicalNodeRemove,
   usePublisher,
 } from '@mdxeditor/editor';
 import * as Mdast from 'mdast';
@@ -39,13 +38,14 @@ import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 //REF import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import DeleteIconButton from '../../components/DeleteIconButton';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 //REF import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
+import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
 import { StepsContext } from './StepsContext';
@@ -91,7 +91,6 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   const [title, setTitle] = useState('');
 
   const [isPlayback, readOnly] = useCellValues(editorInPlayback$, readOnly$);
-  const removeNode = useLexicalNodeRemove();
 
   const a11yStepProps = (index: number) => ({
     id: `step-${index}`,
@@ -423,24 +422,19 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
-                    <IconButton
-                      aria-label="delete"
-                      disabled={readOnly}
-                      onClick={async (e) => {
-                        e.preventDefault();
+                    <InsertLineReturnButton parentEditor={parentEditor} lexicalNode={lexicalNode} />
+                    <DeleteIconButton
+                      onDelete={() => {
                         parentEditor.update(() => {
                           if (lexicalNode.getPreviousSibling()) {
                             lexicalNode.selectPrevious();
                           } else {
                             lexicalNode.selectNext();
                           }
+                          lexicalNode.remove();
                         });
-                        await delay(50);
-                        removeNode();
                       }}
-                    >
-                      <DeleteForeverIcon />
-                    </IconButton>
+                    />
                   </Box>
                 )}
               </div>

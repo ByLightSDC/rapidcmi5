@@ -34,7 +34,7 @@ export const InsertTabs = ({ isDrawer }: { isDrawer?: boolean }) => {
   const editor = useCellValue(activeEditor$);
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const theme: any = useTheme();
-  
+
   /**
    * Inserts default Tabs at the current selection
    * If it is NOT empty, nothing is inserted
@@ -69,7 +69,6 @@ export const InsertTabs = ({ isDrawer }: { isDrawer?: boolean }) => {
       };
 
       const tabsNode = $createDirectiveNode(mdastTabs) as DirectiveNode;
-      console.log('selection', selection);
       selection.insertNodes([tabsNode]);
       //REF don't do this unless you want to get the cursor eaten
       //see CCUI-2768, 2779, 2769
