@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { config } from '@rapid-cmi5/ui';
 import { logger } from '../debug';
 import { useState } from 'react';
@@ -5,6 +6,14 @@ import { useDispatch } from 'react-redux';
 import { setAuLogo } from '../redux/auReducer';
 import { overrideDevOpsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
 import { cmi5Instance } from '../session/cmi5';
+
+export type ConfigType = {
+  [key: string]:
+    | string
+    | boolean
+    | DeploymentLocation[]
+    | { [key: string]: string };
+};
 
 /**
  * Processes a template.
@@ -14,7 +23,7 @@ import { cmi5Instance } from '../session/cmi5';
 export type DeploymentLocation = {
   name: string;
   url: string;
-  config: { [key: string]: string | boolean };
+  config: { [key: string]: string | boolean | { [key: string]: string } };
 };
 
 /**
@@ -42,9 +51,32 @@ export const useOverrideConfigs = () => {
     'LOGGING_ENABLED',
     'LOGGING_LEVEL',
     'LOGGING_COMPONENTS',
+    'THEME',
   ];
 
-  const themeWhiteList: string[] = ['SLIDE_BACKGROUND', 'SLIDE_LOGO'];
+  const themeWhiteList: string[] = [
+    'SLIDE_BACKGROUND',
+    'LOGO_DARK',
+    'LOGO_LIGHT',
+  ];
+
+  /**
+   * Only allow whitelisted properties in theme
+   * @param propToOverride
+   * @param cfg
+   * @returns
+   */
+  const getSanitizedTheme = (defaults: ConfigType, cfg: ConfigType) => {
+    const themeConfig: ConfigType = structuredClone(defaults);
+    const themeKeys = Object.keys(cfg);
+    for (let j = 0; j < themeKeys.length; j++) {
+      const themeKey = themeKeys[j];
+      if (themeWhiteList.includes(themeKey)) {
+        themeConfig[themeKey] = cfg[themeKey];
+      }
+    }
+    return themeConfig;
+  };
 
   const loadOverrides = async (path: string, inProductionMode = true) => {
     let launchData;
@@ -71,8 +103,7 @@ export const useOverrideConfigs = () => {
       const response = await fetch(path);
 
       if (response.ok) {
-        const cfg: { [key: string]: string | boolean | DeploymentLocation[] } =
-          await response.json();
+        const cfg: ConfigType = await response.json();
         logger.debug(
           'Override config loaded',
           {
@@ -87,21 +118,18 @@ export const useOverrideConfigs = () => {
         for (let i = 0; i < kk.length; i++) {
           const propToOverride: string = kk[i];
           if (whiteList.includes(propToOverride)) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (config as any)[propToOverride] = cfg[propToOverride];
+            //sanitize theme
+            if (propToOverride === 'THEME') {
+              (config as any)[propToOverride] = getSanitizedTheme(
+                (config as any)[propToOverride],
+                cfg[propToOverride] as { [key: string]: string },
+              );
+            } else {
+              (config as any)[propToOverride] = cfg[propToOverride];
+            }
+
             logger.debug(
               'Overrode config property',
-              {
-                property: propToOverride,
-                value: cfg[propToOverride],
-              },
-              'auManager',
-            );
-          } else if (themeWhiteList.includes(propToOverride)) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (config.THEME as any)[propToOverride] = cfg[propToOverride];
-            logger.debug(
-              'Overrode theme property',
               {
                 property: propToOverride,
                 value: cfg[propToOverride],
@@ -144,9 +172,20 @@ export const useOverrideConfigs = () => {
               for (let l = 0; l < locationConfigKeys.length; l++) {
                 const propToOverride: string = locationConfigKeys[l];
                 if (whiteList.includes(propToOverride)) {
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  (config as any)[propToOverride] =
-                    deployments[k].config[propToOverride];
+                  //sanitize theme
+                  if (propToOverride === 'THEME') {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    (config as any)[propToOverride] = getSanitizedTheme(
+                      (config as any)[propToOverride],
+                      deployments[k].config[propToOverride] as {
+                        [key: string]: string;
+                      },
+                    );
+                  } else {
+                    (config as any)[propToOverride] =
+                      deployments[k].config[propToOverride];
+                  }
+
                   logger.debug(
                     'Overrode config from location',
                     {
@@ -221,14 +260,7 @@ export const useOverrideConfigs = () => {
         }
       }
 
-      logger.debug(
-        'Config after overrides',
-        {
-          DEVOPS_API_URL: config.DEVOPS_API_URL,
-          SLIDE_LOGO: config.THEME.SLIDE_LOGO,
-        },
-        'auManager',
-      );
+      logger.debug('Config after overrides', config, 'auManager');
 
       overrideDevOpsApiClient(config.DEVOPS_API_URL);
       logger.debug(
@@ -238,8 +270,12 @@ export const useOverrideConfigs = () => {
         },
         'auManager',
       );
-
-      dispatch(setAuLogo(config.THEME.SLIDE_LOGO));
+      dispatch(
+        setAuLogo({
+          dark: config.THEME.LOGO_DARK,
+          light: config.THEME.LOGO_LIGHT,
+        }),
+      );
       setIsOverridesLoaded(true);
 
       // CRITICAL FIX: Refresh logging config after overrides are loaded
@@ -267,7 +303,12 @@ export const useOverrideConfigs = () => {
         undefined,
         'auManager',
       );
-      dispatch(setAuLogo(config.THEME.SLIDE_LOGO));
+      dispatch(
+        setAuLogo({
+          dark: config.THEME.LOGO_DARK,
+          light: config.THEME.LOGO_LIGHT,
+        }),
+      );
       setIsOverridesLoaded(true);
     }
   };

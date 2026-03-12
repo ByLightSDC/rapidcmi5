@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useDispatch, useSelector } from 'react-redux';
-import { auJsonSel, auLogoSel, courseAUProgressSel } from '../redux/auReducer';
+import {
+  auJsonSel,
+  auLogoDarkSel,
+  auLogoLightSel,
+  courseAUProgressSel,
+} from '../redux/auReducer';
 import { activeTabSel, setActiveTab } from '../redux/navigationReducer';
 import ProgressBar from './ProgressBar';
 import { Box, Stack, Typography, useTheme } from '@mui/material';
@@ -12,11 +17,20 @@ import { CustomTheme } from '../styles/createPalette';
 
 export default function TabPanel() {
   const auJson = useSelector(auJsonSel);
-  const auLogo = useSelector(auLogoSel);
+  const auLogoDark = useSelector(auLogoDarkSel);
+  const auLogoLight = useSelector(auLogoLightSel);
   const dispatch = useDispatch();
   const activeTab = useSelector(activeTabSel);
   const courseAUProgress = useSelector(courseAUProgressSel);
   const currentTheme: CustomTheme = useTheme();
+
+  const currentLogo = useMemo(() => {
+    if (currentTheme.palette.mode === 'light') {
+      return auLogoLight;
+    }
+    return auLogoDark;
+  }, [currentTheme.palette.mode, auLogoDark, auLogoLight]);
+
   const tabClicked = (_: React.SyntheticEvent, newValue: number) => {
     dispatch(setActiveTab(newValue));
   };
@@ -116,17 +130,13 @@ export default function TabPanel() {
     }
     return null; // No icon for incomplete slides
   };
-
   return (
     <Box
       sx={{
         maxWidth: '260px',
         width: '100%',
         //left panel background
-        bgcolor:
-          currentTheme.palette.mode === 'light'
-            ? '#8a91ac'
-            : 'background.default',
+        bgcolor: 'background.default',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -141,7 +151,7 @@ export default function TabPanel() {
           borderRadius: 1,
         }}
       >
-        {auLogo && (
+        {currentLogo && (
           <img
             alt="logo"
             width="200px"
@@ -149,7 +159,7 @@ export default function TabPanel() {
               padding: '16px',
               paddingBottom: 0,
             }}
-            src={auLogo}
+            src={currentLogo}
           />
         )}
       </Box>
