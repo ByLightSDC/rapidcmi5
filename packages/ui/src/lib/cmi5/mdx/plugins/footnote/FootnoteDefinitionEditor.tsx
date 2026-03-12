@@ -73,6 +73,7 @@ export const FootnoteDefinitionEditor: React.FC<FootnoteDefEditorProps> = ({
             getUpdatedMdastNode={(mdastNode, children) => {
               return { ...mdastNode, children } as any;
             }}
+            contentEditableProps={{ 'aria-label': `Footnote ${label} definition` }}
           />
         </NestedEditorsContext.Provider>
       </div>

@@ -426,6 +426,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
                 ...node,
                 children,
               })}
+              contentEditableProps={{ 'aria-label': 'Tab sections' }}
             />
           </TabsContext.Provider>
         </Box>

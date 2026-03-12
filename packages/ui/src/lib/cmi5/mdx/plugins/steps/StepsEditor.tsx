@@ -475,6 +475,9 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                     ...node,
                     children,
                   })}
+                  contentEditableProps={{
+                    'aria-label': title ? `${title} step content` : 'Step content',
+                  }}
                 />
               </Stack>
             </StepsContext.Provider>

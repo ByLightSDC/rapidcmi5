@@ -257,6 +257,7 @@ export const ImageTextEditor: React.FC<
               ...node,
               children,
             })}
+            contentEditableProps={{ 'aria-label': 'Image text overlay' }}
           />
           {!readOnly && !isPlayback && isHovered && (
             <IconButton

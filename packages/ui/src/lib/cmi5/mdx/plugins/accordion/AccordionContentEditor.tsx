@@ -149,6 +149,9 @@ export const AccordionContentEditor: React.FC<
           })}
           contentEditableProps={{
             className: scopedClass,
+            'aria-label': mdastNode.attributes?.title
+              ? `${mdastNode.attributes.title} content`
+              : 'Accordion panel content',
           }}
         />
       </AccordionDetails>

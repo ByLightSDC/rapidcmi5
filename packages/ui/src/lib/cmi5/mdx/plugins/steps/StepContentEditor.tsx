@@ -130,6 +130,9 @@ export const StepContentEditor: React.FC<
         })}
         contentEditableProps={{
           className: scopedClass,
+          'aria-label': mdastNode.attributes?.title
+            ? `${mdastNode.attributes.title} step content`
+            : `Step ${tabIndex + 1} content`,
         }}
       />
     </div>

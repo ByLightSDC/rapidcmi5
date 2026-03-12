@@ -389,6 +389,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
 
                 return mdastParagraphNode;
               }}
+              contentEditableProps={{ 'aria-label': 'Admonition Title' }}
             />
           </div>
         </AccordionSummary>
@@ -410,6 +411,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
             getUpdatedMdastNode={(mdastNode, containerChildren: any) => {
               return { ...mdastNode, children: containerChildren };
             }}
+            contentEditableProps={{ 'aria-label': 'Admonition Content' }}
           />
         </AccordionDetails>
       </Accordion>

@@ -295,6 +295,7 @@ export const AccordionEditor: React.FC<
                 ...node,
                 children,
               })}
+              contentEditableProps={{ 'aria-label': 'Accordion sections' }}
             />
           </Box>
           <div>

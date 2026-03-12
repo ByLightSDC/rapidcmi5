@@ -132,6 +132,9 @@ export const TabContentEditor: React.FC<
         contentEditableProps={{
           className: scopedClass,
           style: { minHeight: isPlayback ? undefined : TAB_CONTENT_MIN_HEIGHT },
+          'aria-label': mdastNode.attributes?.title
+            ? `${mdastNode.attributes.title} tab content`
+            : `Tab ${tabIndex + 1} content`,
         }}
       />
     </div>
