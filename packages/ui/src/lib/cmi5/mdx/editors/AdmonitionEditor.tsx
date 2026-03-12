@@ -325,8 +325,11 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
               />
             )}
           </>
-          <InsertLineReturnButton parentEditor={parentEditor} lexicalNode={lexicalNode} />
           <SettingsIconButton onConfigure={onConfigure} />
+          <InsertLineReturnButton
+            parentEditor={parentEditor}
+            lexicalNode={lexicalNode}
+          />
           <DeleteIconButton onDelete={onDelete} />
         </RightMenuContainer>
       )}

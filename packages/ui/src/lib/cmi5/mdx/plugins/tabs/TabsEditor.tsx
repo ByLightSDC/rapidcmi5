@@ -455,13 +455,15 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
               </IconButton>
             </Tooltip>
 
-            <InsertLineReturnButton parentEditor={parentEditor} lexicalNode={lexicalNode} />
-
             <Tooltip title="Edit Tabs Settings">
               <IconButton onClick={handleConfigure}>
                 <EditIcon />
               </IconButton>
             </Tooltip>
+            <InsertLineReturnButton
+              parentEditor={parentEditor}
+              lexicalNode={lexicalNode}
+            />
             <DeleteIconButton
               onDelete={() => {
                 parentEditor.update(() => {

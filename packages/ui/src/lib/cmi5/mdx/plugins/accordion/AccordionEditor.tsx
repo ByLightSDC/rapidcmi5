@@ -306,12 +306,15 @@ export const AccordionEditor: React.FC<
                   display: 'flex',
                 }}
               >
-                <InsertLineReturnButton parentEditor={parentEditor} lexicalNode={lexicalNode} />
                 <Tooltip title="Edit Sections">
                   <IconButton onClick={handleConfigure}>
                     <EditIcon />
                   </IconButton>
                 </Tooltip>
+                <InsertLineReturnButton
+                  parentEditor={parentEditor}
+                  lexicalNode={lexicalNode}
+                />
                 <DeleteIconButton
                   onDelete={() => {
                     parentEditor.update(() => {
