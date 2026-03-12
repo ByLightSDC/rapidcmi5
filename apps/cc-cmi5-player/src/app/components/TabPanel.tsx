@@ -233,6 +233,29 @@ export default function TabPanel() {
             }
           />
         ))}
+        {/* Synthetic exit tab — always injected by the player, never part of course content */}
+        <Tab
+          key="exit"
+          sx={{
+            width: '100%',
+            backgroundColor: activeTab === auJson?.slides?.length ? 'rgba(0, 123, 255, 0.25)' : '',
+            position: 'relative',
+            minHeight: '48px',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            display: 'flex',
+          }}
+          label={
+            <Typography
+              variant="h5"
+              color="text.primary"
+              align="center"
+            >
+              Exit
+            </Typography>
+          }
+        />
       </Tabs>
     </Box>
   );
