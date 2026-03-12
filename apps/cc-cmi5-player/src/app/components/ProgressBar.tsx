@@ -21,6 +21,7 @@ function LinearProgressWithLabel(
         <LinearProgress
           variant="determinate"
           color={props.value === 100 ? 'success' : 'primary'}
+          aria-label={`Course progress: ${Math.round(props.value)}%`}
           {...props}
           sx={{
             borderRadius: 5,
