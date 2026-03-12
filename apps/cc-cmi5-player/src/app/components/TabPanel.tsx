@@ -232,7 +232,7 @@ export default function TabPanel() {
               >
                 <Typography
                   variant="h5"
-                  color="text.primary"
+                  color="primary.contrastText"
                   sx={{ flexGrow: 1 }}
                   align="center"
                 >

@@ -19,7 +19,7 @@ export const lightTheme = createTheme({
       main: mainColor,
       dark: '#3C59A2',
       light: hoverMainColor,
-      contrastText: '#FFFFFF',
+      contrastText: '#000',
     },
     secondary: {
       main: '#D2042D',
@@ -248,7 +248,6 @@ export const lightTheme = createTheme({
         },
       },
     },
-
     MuiButton: {
       styleOverrides: {
         endIcon: {
@@ -263,7 +262,6 @@ export const lightTheme = createTheme({
         },
       },
     },
-
     MuiIconButton: {
       styleOverrides: {
         root: {
