@@ -212,6 +212,7 @@ export const FxDirectiveDescriptor: DirectiveDescriptor<FxDirectiveNode> = {
               children,
             })}
             block={false} // explicit, but same as default here
+            contentEditableProps={{ 'aria-label': 'Text effect content' }}
           />
         </div>
       </RoughNotation>

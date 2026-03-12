@@ -115,6 +115,7 @@ export const GridCellEditor: React.FC<
         })}
         contentEditableProps={{
           className: scopedClass,
+          'aria-label': `Grid cell ${cellIndex + 1} content`,
         }}
       />
     </Box>

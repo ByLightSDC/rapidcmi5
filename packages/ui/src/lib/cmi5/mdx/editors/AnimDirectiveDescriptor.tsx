@@ -338,6 +338,7 @@ export const AnimDirectiveDescriptor: DirectiveDescriptor<ContainerDirective> =
                   ...mdastNode,
                   children,
                 })}
+                contentEditableProps={{ 'aria-label': 'Animation content' }}
               />
             </Box>
 
@@ -804,6 +805,7 @@ export const InlineAnimDirectiveDescriptor: DirectiveDescriptor<TextDirective> =
               children,
             })}
             block={false}
+            contentEditableProps={{ 'aria-label': 'Animated text content' }}
           />
         </span>
       );

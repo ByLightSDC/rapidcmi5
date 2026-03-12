@@ -355,6 +355,7 @@ export const ImageLabelEditor: React.FC<
 
                       return mdastParagraphNode;
                     }}
+                    contentEditableProps={{ 'aria-label': 'Image label title' }}
                   />
                 </Box>
                 <Divider sx={{ paddingTop: 0, marginBottom: 0 }} />
@@ -376,6 +377,11 @@ export const ImageLabelEditor: React.FC<
                       ...node,
                       children,
                     })}
+                    contentEditableProps={{
+                      'aria-label': theTitle
+                        ? `${theTitle} label content`
+                        : 'Image label content',
+                    }}
                   />
                 </Box>
               </Stack>

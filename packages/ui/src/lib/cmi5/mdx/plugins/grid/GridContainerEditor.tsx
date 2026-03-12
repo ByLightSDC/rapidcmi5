@@ -261,6 +261,7 @@ export const GridContainerEditor: React.FC<
                 ...node,
                 children,
               })}
+              contentEditableProps={{ 'aria-label': 'Grid layout sections' }}
             />
           </Box>
         </GridContextProvider>
