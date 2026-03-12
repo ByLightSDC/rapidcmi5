@@ -213,6 +213,7 @@ export default function MenuLayout() {
               </IconButton>
               <Switch
                 checked={theColor === 'dark'}
+                slotProps={{ input: { 'aria-label': 'Toggle dark mode' } }}
                 icon={
                   <LightModeIcon
                     color="primary"
