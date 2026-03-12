@@ -120,6 +120,7 @@ export default function CollapsibleThing({
 
   return (
     <Accordion
+      slots={{ heading: 'div' }}
       key={myKey}
       defaultExpanded={defaultOpen}
       expanded={isExpanded}

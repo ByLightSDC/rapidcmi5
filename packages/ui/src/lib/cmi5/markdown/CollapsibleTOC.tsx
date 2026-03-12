@@ -72,6 +72,7 @@ export default function CollapsibleTOC({
 
   return (
     <Accordion
+      slots={{ heading: 'div' }}
       expanded={isExpanded}
       onChange={toggleExpanded}
       className="text-sm"

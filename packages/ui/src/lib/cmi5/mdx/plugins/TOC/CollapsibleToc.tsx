@@ -84,6 +84,7 @@ export const TOCComponent = ({
 
   return (
     <Accordion
+      slots={{ heading: 'div' }}
       expanded={isExpanded}
       key="TOC"
       variant="outlined"

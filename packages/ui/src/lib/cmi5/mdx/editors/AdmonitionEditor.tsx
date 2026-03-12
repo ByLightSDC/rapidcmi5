@@ -334,6 +334,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
         </RightMenuContainer>
       )}
       <Accordion
+        slots={{ heading: 'div' }}
         expanded={isCollapsible ? isOpen : true}
         onChange={onAccordionChange}
         style={{ margin: '1em 0' }}
