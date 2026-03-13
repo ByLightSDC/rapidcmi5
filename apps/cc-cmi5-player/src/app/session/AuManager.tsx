@@ -416,6 +416,9 @@ function AuManager() {
     logger.debug('[AU] activeSlide', { activeTab }, 'auManager');
 
     if (auJson?.slides) {
+      // Exit slide (synthetic tab beyond last real slide) should not trigger progress
+      if (activeTab === auJson.slides.length) return;
+
       // this prevents completion of an activity slide until the desired activities are completed
       let makeProgress = true;
 
