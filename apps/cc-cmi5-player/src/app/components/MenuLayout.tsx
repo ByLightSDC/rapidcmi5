@@ -139,15 +139,14 @@ export default function MenuLayout() {
             backgroundColor: 'background.default',
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
+            overflow: 'hidden',
           },
         }}
         variant="persistent"
         anchor="left"
         open={isMenuDrawerOpen}
       >
-        <div>
-          <TabPanel />
-        </div>
+        <TabPanel />
       </Drawer>
 
       <PanelGroup direction="horizontal">
