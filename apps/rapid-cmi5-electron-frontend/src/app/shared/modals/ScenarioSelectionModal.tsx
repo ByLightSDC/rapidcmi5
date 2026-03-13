@@ -311,7 +311,7 @@ export function ScenarioSelectionForm({
               Select Scenario
             </Typography>
             <IconButton
-              aria-label="close"
+              aria-label="Close"
               onClick={() => setOpen(false)}
               sx={{
                 color: colors.textSecondary,
@@ -740,6 +740,7 @@ export function ScenarioSelectionForm({
               </Typography>
 
               <IconButton
+                aria-label="Show First Page"
                 size="small"
                 onClick={() => handlePageChange(1)}
                 disabled={currentPage === 1 || isLoading}
@@ -753,6 +754,7 @@ export function ScenarioSelectionForm({
               </IconButton>
 
               <IconButton
+                aria-label="Show Previous Page"
                 size="small"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1 || isLoading}
@@ -785,6 +787,7 @@ export function ScenarioSelectionForm({
               </Box>
 
               <IconButton
+                aria-label="Show Next Page"
                 size="small"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages || isLoading}
@@ -798,6 +801,7 @@ export function ScenarioSelectionForm({
               </IconButton>
 
               <IconButton
+                aria-label="Show Last Page"
                 size="small"
                 onClick={() => handlePageChange(totalPages)}
                 disabled={currentPage === totalPages || isLoading}

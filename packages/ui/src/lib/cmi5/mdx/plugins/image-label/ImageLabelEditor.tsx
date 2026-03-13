@@ -272,7 +272,7 @@ export const ImageLabelEditor: React.FC<
           }}
         >
           <ButtonIcon
-            name="image-marker"
+            name="Image Marker"
             props={{
               onClick: (event) => {
                 event.stopPropagation();

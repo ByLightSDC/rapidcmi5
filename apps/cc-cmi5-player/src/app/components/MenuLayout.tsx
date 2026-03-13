@@ -165,94 +165,126 @@ export default function MenuLayout() {
                 //backgroundColor: leave blank so it matches presentation background
               }}
             >
-              <IconButton
-                tabIndex={-1}
-                aria-label="split"
-                size={'small'}
-                color="primary"
-                onClick={() => {
-                  if (isMenuDrawerOpen) {
-                    handleMenuDrawerClose();
-                  } else {
-                    handleMenuDrawerOpen();
-                  }
-                }}
-              >
-                {isMenuDrawerOpen ? <KeyboardArrowLeftIcon /> : <KeyboardArrowRightIcon />}
-              </IconButton>
-
-              <IconButton
-                tabIndex={-1}
-                aria-label="split"
-                color="primary"
-                disabled={isSplitPanelShown}
-                onClick={() => {
-                  if (isSplitPanelShown) {
-                    handleDividerOff();
-                  } else {
-                    handleDividerOn();
-                  }
-                }}
-              >
-                <VerticalSplitIcon />
-              </IconButton>
-
-              <IconButton
-                aria-label="split"
-                color="primary"
-                disabled={!isSplitPanelShown}
-                onClick={() => {
-                  if (isSplitPanelShown) {
-                    handleDividerOff();
-                  } else {
-                    handleDividerOn();
-                  }
-                }}
-              >
-                <ReorderIcon />
-              </IconButton>
-              <Switch
-                checked={theColor === 'dark'}
-                slotProps={{ input: { 'aria-label': 'Toggle dark mode' } }}
-                icon={
-                  <LightModeIcon
-                    color="primary"
-                    fontSize="small"
-                    sx={{
-                      backgroundColor: 'background.default',
-                      borderRadius: '12px',
-                      borderStyle: 1,
-                    }}
-                  />
+              <Tooltip
+                title={
+                  isMenuDrawerOpen
+                    ? 'Close Navigation Menu'
+                    : 'Open Navigation Menu'
                 }
-                checkedIcon={
-                  <DarkModeIcon
-                    color="primary"
-                    fontSize="small"
-                    sx={{
-                      backgroundColor: 'background.default',
-                      borderRadius: '12px',
-                      borderStyle: 1,
-                    }}
-                  />
-                }
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  if (event.target.checked) {
-                    dispatch(setTheme('dark'));
-                    return;
+              >
+                <IconButton
+                  aria-label={
+                    isMenuDrawerOpen
+                      ? 'Close Navigation Menu'
+                      : 'Open Navigation Menu'
                   }
-                  dispatch(setTheme('light'));
-                }}
-              />
+                  tabIndex={-1}
+                  size={'small'}
+                  color="primary"
+                  onClick={() => {
+                    if (isMenuDrawerOpen) {
+                      handleMenuDrawerClose();
+                    } else {
+                      handleMenuDrawerOpen();
+                    }
+                  }}
+                >
+                  {isMenuDrawerOpen ? (
+                    <KeyboardArrowLeftIcon />
+                  ) : (
+                    <KeyboardArrowRightIcon />
+                  )}
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Turn Split View On">
+                <IconButton
+                  aria-label="Turn Split View On"
+                  tabIndex={-1}
+                  color="primary"
+                  disabled={isSplitPanelShown}
+                  onClick={() => {
+                    if (isSplitPanelShown) {
+                      handleDividerOff();
+                    } else {
+                      handleDividerOn();
+                    }
+                  }}
+                >
+                  <VerticalSplitIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Turn Split View Off">
+                <IconButton
+                  aria-label="Turn Split View Off"
+                  color="primary"
+                  disabled={!isSplitPanelShown}
+                  onClick={() => {
+                    if (isSplitPanelShown) {
+                      handleDividerOff();
+                    } else {
+                      handleDividerOn();
+                    }
+                  }}
+                >
+                  <ReorderIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip
+                title={
+                  theColor === 'dark'
+                    ? 'Switch to Light Mode'
+                    : 'Switch to Dark Mode'
+                }
+              >
+                <Switch
+                  checked={theColor === 'dark'}
+                  slotProps={{ input: { 'aria-label': 'Toggle dark mode' } }}
+                  icon={
+                    <LightModeIcon
+                      name="Light Mode"
+                      color="primary"
+                      fontSize="small"
+                      sx={{
+                        backgroundColor: 'background.default',
+                        borderRadius: '12px',
+                        borderStyle: 1,
+                      }}
+                    />
+                  }
+                  checkedIcon={
+                    <DarkModeIcon
+                      name="Dark Mode"
+                      color="primary"
+                      fontSize="small"
+                      sx={{
+                        backgroundColor: 'background.default',
+                        borderRadius: '12px',
+                        borderStyle: 1,
+                      }}
+                    />
+                  }
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    if (event.target.checked) {
+                      dispatch(setTheme('dark'));
+                      return;
+                    }
+                    dispatch(setTheme('light'));
+                  }}
+                />
+              </Tooltip>
               {featureFlagChangeClassRoom && (
                 <ButtonInfoField
                   alertSxProps={{
                     borderStyle: 'solid',
                     borderWidth: '1px',
-                    borderColor: (theme: CustomTheme) => `${theme.input.outlineColor}`,
+                    borderColor: (theme: CustomTheme) =>
+                      `${theme.input.outlineColor}`,
                     color: 'white',
                   }}
-                  infoIcon={<AccountCircleIcon fontSize="inherit" color="primary" />}
+                  infoIcon={
+                    <AccountCircleIcon fontSize="inherit" color="primary" />
+                  }
                   name="account-info-icon"
                   message={
                     <Stack
@@ -262,9 +294,19 @@ export default function MenuLayout() {
                         marginLeft: '8px',
                       }}
                     >
-                      {studentId && <Typography variant="caption">Student Id: {studentId}</Typography>}
-                      <Typography variant="caption">Registration Id: {regId}</Typography>
-                      {classId && <Typography variant="caption">Class Id: {classId}</Typography>}
+                      {studentId && (
+                        <Typography variant="caption">
+                          Student Id: {studentId}
+                        </Typography>
+                      )}
+                      <Typography variant="caption">
+                        Registration Id: {regId}
+                      </Typography>
+                      {classId && (
+                        <Typography variant="caption">
+                          Class Id: {classId}
+                        </Typography>
+                      )}
                       <Typography variant="caption">
                         User Name:
                         {clearUserName}
@@ -301,7 +343,7 @@ export default function MenuLayout() {
               )}
 
               {!featureFlagChangeClassRoom && (
-                <IconButton aria-label="split" color="primary">
+                <IconButton aria-label="Student Information" color="primary">
                   <Tooltip
                     arrow
                     enterDelay={500}
@@ -314,9 +356,19 @@ export default function MenuLayout() {
                           display: 'flex',
                         }}
                       >
-                        {studentId && <Typography variant="caption">Student Id:{studentId}</Typography>}
-                        <Typography variant="caption">Registration Id:{regId}</Typography>
-                        {classId && <Typography variant="caption">Class Id:{classId}</Typography>}
+                        {studentId && (
+                          <Typography variant="caption">
+                            Student Id:{studentId}
+                          </Typography>
+                        )}
+                        <Typography variant="caption">
+                          Registration Id:{regId}
+                        </Typography>
+                        {classId && (
+                          <Typography variant="caption">
+                            Class Id:{classId}
+                          </Typography>
+                        )}
                         <Typography variant="caption">
                           User Name:
                           {clearUserName}
