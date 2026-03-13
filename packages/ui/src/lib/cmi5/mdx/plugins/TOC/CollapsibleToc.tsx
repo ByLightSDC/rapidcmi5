@@ -83,7 +83,6 @@ export const TOCComponent = ({
   });
 
   return (
-    <nav aria-label="Table of Contents">
     <Accordion
       slots={{ heading: 'div' }}
       expanded={isExpanded}
@@ -118,31 +117,33 @@ export const TOCComponent = ({
         expandIcon={
           isExpanded ? null : (
             <Tooltip title="Table of Contents: Click to expand, then click on a heading to jump to its location in the slide.">
-              <Box
-                aria-hidden="true"
-                sx={{
-                  backgroundColor: 'primary.main',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  padding: '2px',
-                  borderRadius: 8,
-                  '&:hover': {
-                    bgcolor: alpha(theme.palette.primary.main, 0.3),
-                  },
-                  fontSize: '24px',
-                  width: '32px',
-                  height: '32px',
-                }}
-              >
-                <TocIcon
-                  color="action"
-                  fontSize="inherit"
+              <span>
+                <Box
+                  aria-hidden="true"
                   sx={{
-                    color: 'white',
+                    backgroundColor: 'primary.main',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: '2px',
+                    borderRadius: 8,
+                    '&:hover': {
+                      bgcolor: alpha(theme.palette.primary.main, 0.3),
+                    },
+                    fontSize: '24px',
+                    width: '32px',
+                    height: '32px',
                   }}
-                />
-              </Box>
+                >
+                  <TocIcon
+                    color="action"
+                    fontSize="inherit"
+                    sx={{
+                      color: 'white',
+                    }}
+                  />
+                </Box>
+              </span>
             </Tooltip>
           )
         }
@@ -171,7 +172,10 @@ export const TOCComponent = ({
               Table of Contents
             </Typography>
             <IconButton
-              onClick={(e) => { e.stopPropagation(); setIsExpanded(false); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(false);
+              }}
               aria-label="Close Table of Contents"
             >
               <CloseIcon />
@@ -187,42 +191,43 @@ export const TOCComponent = ({
             marginTop: -2,
           }}
         >
-          <ul
-            role="list"
-            style={{
-              margin: 0,
-              padding: 0,
-              listStyle: 'none',
-              marginTop: -8, //hack to bring list closer to bottom of Table of Contents
-            }}
-          >
-            {tocEntries.map(([key, text, tag, id]) => (
-              <li
-                key={key}
-                style={{
-                  padding: '6px 12px',
-                  marginLeft: `${(parseInt(tag[1]) - 1) * 12}px`,
-                }}
-              >
-                <a
-                  href={`${basePath}#${id}`}
+          <nav aria-label="Table of Contents">
+            <ul
+              role="list"
+              style={{
+                margin: 0,
+                padding: 0,
+                listStyle: 'none',
+                marginTop: -8, //hack to bring list closer to bottom of Table of Contents
+              }}
+            >
+              {tocEntries.map(([key, text, tag, id]) => (
+                <li
+                  key={key}
                   style={{
-                    fontSize: '1rem',
-                    display: 'block',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
+                    padding: '6px 12px',
+                    marginLeft: `${(parseInt(tag[1]) - 1) * 12}px`,
                   }}
-                  onClick={toggleExpanded}
                 >
-                  {text}
-                </a>
-              </li>
-            ))}
-          </ul>
+                  <a
+                    href={`${basePath}#${id}`}
+                    style={{
+                      fontSize: '1rem',
+                      display: 'block',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                    onClick={toggleExpanded}
+                  >
+                    {text}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </AccordionDetails>
       )}
     </Accordion>
-    </nav>
   );
 };
