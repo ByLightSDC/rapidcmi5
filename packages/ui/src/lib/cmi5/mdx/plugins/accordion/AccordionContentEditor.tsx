@@ -87,6 +87,7 @@ export const AccordionContentEditor: React.FC<
 
   return (
     <Accordion
+      slots={{ heading: 'div' }}
       sx={{
         backgroundColor: (theme: any) => `${theme.form.backgroundColor}`,
         borderColor: 'white',
