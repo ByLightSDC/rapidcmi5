@@ -83,9 +83,11 @@ export const TOCComponent = ({
   });
 
   return (
+    <nav aria-label="Table of Contents">
     <Accordion
       slots={{ heading: 'div' }}
       expanded={isExpanded}
+      onChange={toggleExpanded}
       key="TOC"
       variant="outlined"
       sx={{
@@ -105,6 +107,7 @@ export const TOCComponent = ({
       }}
     >
       <AccordionSummary
+        aria-label={isExpanded ? 'Table of Contents' : 'Open Table of Contents'}
         sx={{
           padding: 0,
           margin: 0,
@@ -116,6 +119,7 @@ export const TOCComponent = ({
           isExpanded ? null : (
             <Tooltip title="Table of Contents: Click to expand, then click on a heading to jump to its location in the slide.">
               <Box
+                aria-hidden="true"
                 sx={{
                   backgroundColor: 'primary.main',
                   display: 'flex',
@@ -132,9 +136,6 @@ export const TOCComponent = ({
                 }}
               >
                 <TocIcon
-                  onClick={() => {
-                    setIsExpanded(true);
-                  }}
                   color="action"
                   fontSize="inherit"
                   sx={{
@@ -159,6 +160,7 @@ export const TOCComponent = ({
           >
             <Typography
               variant="h5"
+              component="span"
               align="center"
               color="primary.main"
               sx={{
@@ -169,7 +171,7 @@ export const TOCComponent = ({
               Table of Contents
             </Typography>
             <IconButton
-              onClick={() => setIsExpanded(false)}
+              onClick={(e) => { e.stopPropagation(); setIsExpanded(false); }}
               aria-label="Close Table of Contents"
             >
               <CloseIcon />
@@ -186,6 +188,7 @@ export const TOCComponent = ({
           }}
         >
           <ul
+            role="list"
             style={{
               margin: 0,
               padding: 0,
@@ -204,7 +207,6 @@ export const TOCComponent = ({
                 <a
                   href={`${basePath}#${id}`}
                   style={{
-                    textDecoration: 'none',
                     fontSize: '1rem',
                     display: 'block',
                     whiteSpace: 'nowrap',
@@ -221,5 +223,6 @@ export const TOCComponent = ({
         </AccordionDetails>
       )}
     </Accordion>
+    </nav>
   );
 };
