@@ -21,35 +21,38 @@ export default function ExitSlide() {
 
   const handleExit = async () => {
     setIsExiting(true);
-    console.log('[ExitSlide] Exit Course clicked — sending terminated verb...');
 
+    // For development, can be removed later -TODO.
     if (checkForDevMode()) {
       console.log('[ExitSlide] 🧪 Dev/standalone mode detected');
       console.log('[ExitSlide] Would send: terminated verb to LRS');
       const launchParams = cmi5Instance.getLaunchParameters();
       console.log('[ExitSlide] Launch params:', launchParams);
-      console.log('[ExitSlide] Would redirect to: returnURL (not available in dev mode)');
-      logger.debug('Dev mode — skipping LRS call and returnURL redirect', undefined, 'lms');
+      console.log(
+        '[ExitSlide] Would redirect to: returnURL (not available in dev mode)',
+      );
+      logger.debug(
+        'Dev mode — skipping LRS call and returnURL redirect',
+        undefined,
+        'lms',
+      );
       setIsExiting(false);
       return;
     }
 
     try {
       await sendTerminatedVerb();
-      console.log('[ExitSlide] ✅ Terminated verb sent successfully');
       logger.info('Terminated verb sent successfully', undefined, 'lms');
     } catch (error) {
-      console.error('[ExitSlide] ❌ Error sending terminated verb', error);
       logger.error('Error sending terminated verb', error, 'lms');
       // Don't block the exit even if the LRS call fails
     }
 
+    // Return user to launcher if applicable.
     const returnURL = cmi5Instance.getLaunchData().returnURL;
-    console.log('[ExitSlide] returnURL:', returnURL);
     if (returnURL) {
       window.location.href = returnURL;
     } else {
-      console.warn('[ExitSlide] ⚠️ No returnURL in CMI5 launch data');
       logger.warn('No returnURL in CMI5 launch data', undefined, 'lms');
       setIsExiting(false);
     }
@@ -68,15 +71,22 @@ export default function ExitSlide() {
       }}
     >
       <Typography variant="h4" color="text.primary" align="center">
-        Ready to leave?
+        Ready to Leave?
       </Typography>
       <Typography variant="body1" color="text.secondary" align="center">
-        Your progress has been saved. You can return and pick up where you left off at any time.
+        Your progress has been saved. You can return and pick up where you left
+        off at any time.
       </Typography>
       <Button
         variant="contained"
         size="large"
-        startIcon={isExiting ? <CircularProgress size={18} color="inherit" /> : <ExitToAppIcon />}
+        startIcon={
+          isExiting ? (
+            <CircularProgress size={18} color="inherit" />
+          ) : (
+            <ExitToAppIcon />
+          )
+        }
         onClick={handleExit}
         disabled={isExiting}
       >
