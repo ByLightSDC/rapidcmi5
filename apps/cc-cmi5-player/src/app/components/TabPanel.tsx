@@ -14,7 +14,6 @@ import { activeTabSel, setActiveTab } from '../redux/navigationReducer';
 import ProgressBar from './ProgressBar';
 import { Box, Stack, Typography, useTheme } from '@mui/material';
 import { CustomTheme } from '../styles/createPalette';
-
 export default function TabPanel() {
   const auJson = useSelector(auJsonSel);
   const auLogoDark = useSelector(auLogoDarkSel);
