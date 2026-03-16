@@ -125,6 +125,21 @@ export function generateLessonThemeStyleTag(
       text-align: ${css.textAlign};
     }`;
 
+  // Zero margin-top on colored decorators (they carry data-bgcolor on their inner Box)
+  // so the full-width band starts flush — no gap above the color. The band's own
+  // paddingTop provides the internal top spacing.
+  // Also zero empty <p> nodes flanking decorators so they don't add phantom whitespace.
+  const blockBaseRule = `
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:has([data-bgcolor]) {
+      margin-top: 0;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] + p:empty,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p:empty:has(+ [data-lexical-decorator]) {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+`;
+
   const blockPaddingRule = css.blockPadding
     ? `
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:not(:first-child),
@@ -133,5 +148,5 @@ export function generateLessonThemeStyleTag(
     }`
     : '';
 
-  return widthRule + alignmentRule + blockPaddingRule;
+  return widthRule + alignmentRule + blockPaddingRule + blockBaseRule;
 }
