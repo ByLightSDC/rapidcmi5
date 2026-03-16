@@ -202,7 +202,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
         position: 'sticky',
         top: 0,
         left: 0,
-        zIndex: 100,
+        zIndex: 1500, // Above drawer roots (1400) so toolbar buttons are never blocked
       }}
     >
       {/* Scroll container */}

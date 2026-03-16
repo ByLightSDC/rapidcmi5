@@ -7,6 +7,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Stack,
+  Tooltip,
   Typography,
   alpha,
   useTheme,
@@ -20,13 +21,17 @@ import Grid from '@mui/material/Grid2';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 
-import { drawerMode$, DRAWER_TYPE } from './drawers';
+import { drawerMode$, DRAWER_TYPE, stylesShowSeq$ } from './drawers';
 
 import { useSelector } from 'react-redux';
 
 import CloseIcon from '@mui/icons-material/Close';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import PaletteIcon from '@mui/icons-material/Palette';
+import PushPinIcon from '@mui/icons-material/PushPin';
+import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
+
+import { useDrawerAutoHide } from './useDrawerAutoHide';
 
 import {
   BlockPaddingEnum,
@@ -72,9 +77,14 @@ export function LessonStyleDrawer() {
     return drawerMode === DRAWER_TYPE.STYLES;
   }, [drawerMode]);
 
+  const showSeq = useCellValue(stylesShowSeq$);
+
   const handleClose = useCallback(() => {
     changeViewMode(DRAWER_TYPE.NONE);
   }, [changeViewMode]);
+
+  const { autoHide, toggleAutoHide, handleMouseEnter, handleMouseLeave, effectiveOpen, getDrawerSx } =
+    useDrawerAutoHide('styles', isOpen, showSeq);
 
   /**
    * apply content width changes
@@ -169,23 +179,24 @@ export function LessonStyleDrawer() {
   return (
     <Drawer
       anchor="right"
-      open={isOpen}
+      open={effectiveOpen}
       variant="persistent" // Stay open while user clicks elsewhere
       onClose={handleClose}
-      sx={{
+      sx={getDrawerSx({
         position: 'absolute',
-        zIndex: 1400,
-        // Higher than MUI modals (1300) and directive editors
+        zIndex: 1400, // Higher than MUI modals (1300) and directive editors
+        pointerEvents: 'none', // Root div never captures clicks; Paper has its own pointer events
         '& .MuiDrawer-paper': {
           width: 360,
           maxWidth: '90vw',
-          zIndex: 1400, // Ensure paper also has high z-index
+          zIndex: 1400,
+          pointerEvents: 'auto',
         },
-      }}
+      })}
       PaperProps={{
-        sx: {
-          zIndex: 1400, // Ensure paper also has high z-index
-        },
+        onMouseEnter: handleMouseEnter,
+        onMouseLeave: handleMouseLeave,
+        sx: { zIndex: 1400 },
       }}
     >
       <Stack
@@ -211,6 +222,16 @@ export function LessonStyleDrawer() {
           >
             Lesson Appearance
           </Typography>
+          <Tooltip title={autoHide ? 'Auto-hide on (click to pin)' : 'Auto-hide off (click to enable)'}>
+            <IconButton
+              onClick={toggleAutoHide}
+              aria-label={autoHide ? 'Disable auto-hide' : 'Enable auto-hide'}
+              size="small"
+              sx={{ color: autoHide ? 'primary.main' : 'text.disabled' }}
+            >
+              {autoHide ? <PushPinOutlinedIcon fontSize="small" /> : <PushPinIcon fontSize="small" />}
+            </IconButton>
+          </Tooltip>
           <IconButton
             onClick={handleClose}
             aria-label="Close Lesson Appearance"
