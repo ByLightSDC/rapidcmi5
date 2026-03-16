@@ -18,12 +18,14 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 
 import { Box, Switch, Tooltip, Typography, useTheme } from '@mui/material';
-import { classIdSel, studentIdSel } from '../redux/auReducer';
+import { auJsonSel, classIdSel, studentIdSel } from '../redux/auReducer';
+import { activeTabSel } from '../redux/navigationReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { cmi5Instance } from '../session/cmi5';
 
 import { classChangeModalId } from './CourseModals';
 import RC5Player from './player/RC5Player';
+import ExitSlide from './ExitSlide';
 
 import ScenarioWrapper from './scenario/ScenarioWrapper';
 import { TeamScenarioContextProvider } from './team-consoles/TeamScenarioContext';
@@ -54,6 +56,9 @@ export default function MenuLayout() {
   const dispatch = useDispatch();
   const classId = useSelector(classIdSel);
   const studentId = useSelector(studentIdSel);
+  const auJson = useSelector(auJsonSel);
+  const activeTab = useSelector(activeTabSel);
+  const isExitSlide = activeTab === auJson?.slides?.length;
   const themedDividerColor = useSelector(dividerColor);
   const theColor = useSelector(themeColor);
   const muiTheme = useTheme();
@@ -134,15 +139,14 @@ export default function MenuLayout() {
             backgroundColor: 'background.default',
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
+            overflow: 'hidden',
           },
         }}
         variant="persistent"
         anchor="left"
         open={isMenuDrawerOpen}
       >
-        <div>
-          <TabPanel />
-        </div>
+        <TabPanel />
       </Drawer>
 
       <PanelGroup direction="horizontal">
@@ -338,12 +342,13 @@ export default function MenuLayout() {
             </Stack>
 
             <>
-              {!config.CMI5_SSO_ENABLED && (
+              {isExitSlide && <ExitSlide />}
+              {!isExitSlide && !config.CMI5_SSO_ENABLED && (
                 <ScenarioWrapper>
                   <RC5Player />
                 </ScenarioWrapper>
               )}
-              {config.CMI5_SSO_ENABLED && (
+              {!isExitSlide && config.CMI5_SSO_ENABLED && (
                 <TeamScenarioContextProvider isEnabled={true}>
                   <RC5Player />
                 </TeamScenarioContextProvider>

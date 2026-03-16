@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -130,11 +130,34 @@ export default function TabPanel() {
     }
     return null; // No icon for incomplete slides
   };
+
+  const isExitActive = activeTab === auJson?.slides?.length;
+
+  // Track whether the Exit tab in the list is currently visible in the scroll container.
+  // Only show the pinned Exit button at the bottom when the real one has scrolled out of view.
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const exitTabRef = useRef<HTMLDivElement>(null);
+  const [isExitTabVisible, setIsExitTabVisible] = useState(true);
+
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    const exitEl = exitTabRef.current;
+    if (!scrollContainer || !exitEl) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsExitTabVisible(entry.isIntersecting),
+      { root: scrollContainer, threshold: 0.5 },
+    );
+    observer.observe(exitEl);
+    return () => observer.disconnect();
+  }, [auJson?.slides?.length]);
+
   return (
     <Box
       sx={{
         maxWidth: '260px',
         width: '100%',
+        height: '100vh',
         //left panel background
         bgcolor: 'background.default',
         display: 'flex',
@@ -142,6 +165,7 @@ export default function TabPanel() {
         alignItems: 'center',
       }}
     >
+      {/* Logo — fixed, never scrolls */}
       <Box
         sx={{
           zIndex: 50,
@@ -149,6 +173,7 @@ export default function TabPanel() {
           display: 'flex',
           alignContent: 'center',
           borderRadius: 1,
+          flexShrink: 0,
         }}
       >
         {currentLogo && (
@@ -163,87 +188,155 @@ export default function TabPanel() {
           />
         )}
       </Box>
-      <ProgressBar />
-      <Tabs
-        orientation="vertical"
-        variant="scrollable"
-        value={activeTab}
-        onChange={tabClicked}
-        scrollButtons={false}
-        aria-label="Slides"
-        sx={{
-          width: '100%',
-          //TABS background color
-          bgcolor: 'background.default',
-          color: 'white',
-          '& .MuiTabs-indicator': {
-            backgroundColor: getActiveTabIndicatorColor(),
-            width: '4px',
-          },
-          '& .MuiTab-root': {
-            minHeight: '48px',
-            padding: '12px 16px',
-            textTransform: 'none',
-            fontSize: '14px',
-            fontWeight: 'normal',
-            lineHeight: '1.2',
-            backgroundColor: 'background.default',
-            borderStyle: 'solid',
-            borderColor: currentTheme.input.outlineColor,
-            borderRadius: 0,
-            borderWidth: 1,
-          },
-          '& .MuiTab-root.Mui-selected': {
-            fontWeight: 'bold',
-            backgroundColor: '#3C59A266',
-            borderStyle: 'none',
-            borderColor: '#3C59A266',
-            borderRadius: 0,
-            borderWidth: 1,
-          },
-        }}
-        textColor="inherit"
+
+      {/* Progress bar — fixed, never scrolls */}
+      <Box sx={{ flexShrink: 0, width: '100%' }}>
+        <ProgressBar />
+      </Box>
+
+      {/* Slide list — scrolls when there are many slides */}
+      <Box
+        ref={scrollContainerRef}
+        sx={{ flex: 1, minHeight: 0, width: '100%', overflowY: 'auto' }}
       >
-        {auJson?.slides?.map((slide, index) => (
+        <Tabs
+          orientation="vertical"
+          variant="scrollable"
+          value={activeTab}
+          onChange={tabClicked}
+          scrollButtons={false}
+          aria-label="Slides"
+          sx={{
+            width: '100%',
+            //TABS background color
+            bgcolor: 'background.default',
+            color: 'white',
+            '& .MuiTabs-indicator': {
+              backgroundColor: getActiveTabIndicatorColor(),
+              width: '4px',
+            },
+            '& .MuiTab-root': {
+              minHeight: '48px',
+              padding: '12px 16px',
+              textTransform: 'none',
+              fontSize: '14px',
+              fontWeight: 'normal',
+              lineHeight: '1.2',
+              backgroundColor: 'background.default',
+              borderStyle: 'solid',
+              borderColor: currentTheme.input.outlineColor,
+              borderRadius: 0,
+              borderWidth: 1,
+            },
+            '& .MuiTab-root.Mui-selected': {
+              fontWeight: 'bold',
+              backgroundColor: '#3C59A266',
+              borderStyle: 'none',
+              borderColor: '#3C59A266',
+              borderRadius: 0,
+              borderWidth: 1,
+            },
+          }}
+          textColor="inherit"
+        >
+          {auJson?.slides?.map((slide, index) => (
+            <Tab
+              sx={{
+                width: '100%',
+                backgroundColor: getSlideBackgroundColor(index),
+                borderRight: getSlideRightBorder(index),
+                position: 'relative',
+                paddingRight: '4px',
+                minHeight: '48px',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+                display: 'flex',
+              }}
+              key={index}
+              label={
+                <Stack
+                  direction="row"
+                  sx={{
+                    position: 'relative',
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    minHeight: '24px',
+                  }}
+                >
+                  <Typography
+                    variant="h5"
+                    color="text.primary"
+                    sx={{ flexGrow: 1 }}
+                    align="center"
+                  >
+                    {slide.slideTitle}
+                  </Typography>
+                  {getSlideStatusIcon(index)}
+                </Stack>
+              }
+            />
+          ))}
+          {/* Exit tab in its natural position at the end of the list */}
           <Tab
+            ref={exitTabRef}
+            value={auJson?.slides?.length ?? 0}
             sx={{
               width: '100%',
-              backgroundColor: getSlideBackgroundColor(index),
-              borderRight: getSlideRightBorder(index),
+              backgroundColor: isExitActive ? 'rgba(0, 123, 255, 0.25)' : '',
               position: 'relative',
-              paddingRight: '4px',
               minHeight: '48px',
               alignItems: 'center',
               justifyContent: 'center',
               textAlign: 'center',
               display: 'flex',
             }}
-            key={index}
             label={
-              <Stack
-                direction="row"
-                sx={{
-                  position: 'relative',
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  minHeight: '24px',
-                }}
-              >
-                <Typography
-                  variant="h5"
-                  color="primary.contrastText"
-                  sx={{ flexGrow: 1 }}
-                  align="center"
-                >
-                  {slide.slideTitle}
-                </Typography>
-                {getSlideStatusIcon(index)}
-              </Stack>
+              <Typography variant="h5" color="text.primary" align="center">
+                Exit
+              </Typography>
             }
           />
-        ))}
-      </Tabs>
+        </Tabs>
+      </Box>
+
+      {/* Pinned Exit — only appears when the real Exit tab has scrolled out of view */}
+      {!isExitTabVisible && (
+        <Box
+          onClick={() => dispatch(setActiveTab(auJson?.slides?.length ?? 0))}
+          sx={{
+            flexShrink: 0,
+            width: '100%',
+            height: '48px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            bgcolor: isExitActive ? '#3C59A266' : 'background.default',
+            borderTop: `1px solid ${currentTheme.input.outlineColor}`,
+            borderLeft: isExitActive
+              ? '4px solid #007bff'
+              : '4px solid transparent',
+            '&:hover': {
+              bgcolor: isExitActive ? '#3C59A266' : 'rgba(0, 123, 255, 0.08)',
+            },
+          }}
+        >
+          {/* Change typography to mimic tabs */}
+          <Typography
+            variant="h5"
+            color="text.primary"
+            align="center"
+            sx={{
+              opacity: isExitActive ? 1 : 0.6,
+              transition: 'opacity 0.2s',
+            }}
+          >
+            Exit
+          </Typography>
+        </Box>
+      )}
     </Box>
   );
 }
