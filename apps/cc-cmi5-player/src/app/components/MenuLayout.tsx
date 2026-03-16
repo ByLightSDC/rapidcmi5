@@ -140,7 +140,7 @@ export default function MenuLayout() {
         anchor="left"
         open={isMenuDrawerOpen}
       >
-        <div>
+        <div role="navigation" aria-label="Slides">
           <TabPanel />
         </div>
       </Drawer>
@@ -158,6 +158,8 @@ export default function MenuLayout() {
             }}
           >
             <Stack
+              role="toolbar"
+              aria-label="Lesson Options"
               direction="row"
               sx={{
                 position: 'absolute',
@@ -167,18 +169,14 @@ export default function MenuLayout() {
             >
               <Tooltip
                 title={
-                  isMenuDrawerOpen
-                    ? 'Close Navigation Menu'
-                    : 'Open Navigation Menu'
+                  isMenuDrawerOpen ? 'Collapse Navigation' : 'Open Navigation'
                 }
               >
                 <IconButton
                   aria-label={
-                    isMenuDrawerOpen
-                      ? 'Close Navigation Menu'
-                      : 'Open Navigation Menu'
+                    isMenuDrawerOpen ? 'Collapse Navigation' : 'Open Navigation'
                   }
-                  tabIndex={-1}
+                  //tabIndex={-1}
                   size={'small'}
                   color="primary"
                   onClick={() => {
@@ -197,10 +195,10 @@ export default function MenuLayout() {
                 </IconButton>
               </Tooltip>
 
-              <Tooltip title="Turn Split View On">
+              <Tooltip title="Turn Split Screen On">
                 <IconButton
-                  aria-label="Turn Split View On"
-                  tabIndex={-1}
+                  aria-label="Turn Split Screen On"
+                  //tabIndex={-1}
                   color="primary"
                   disabled={isSplitPanelShown}
                   onClick={() => {
@@ -214,9 +212,9 @@ export default function MenuLayout() {
                   <VerticalSplitIcon />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Turn Split View Off">
+              <Tooltip title="Turn Split Screen Off">
                 <IconButton
-                  aria-label="Turn Split View Off"
+                  aria-label="Turn Split Screen Off"
                   color="primary"
                   disabled={!isSplitPanelShown}
                   onClick={() => {
@@ -239,7 +237,15 @@ export default function MenuLayout() {
               >
                 <Switch
                   checked={theColor === 'dark'}
-                  slotProps={{ input: { 'aria-label': 'Toggle dark mode' } }}
+                  slotProps={{
+                    input: {
+                      'aria-label':
+                        theColor === 'dark'
+                          ? 'Switch to Light Mode'
+                          : 'Switch to Dark Mode',
+                      role: 'switch',
+                    },
+                  }}
                   icon={
                     <LightModeIcon
                       name="Light Mode"

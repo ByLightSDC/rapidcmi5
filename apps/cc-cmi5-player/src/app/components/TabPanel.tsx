@@ -153,7 +153,7 @@ export default function TabPanel() {
       >
         {currentLogo && (
           <img
-            alt="logo"
+            alt="Course or Logo"
             width="200px"
             style={{
               padding: '16px',
@@ -171,6 +171,8 @@ export default function TabPanel() {
         onChange={tabClicked}
         scrollButtons={false}
         aria-label="Slides"
+        role="tablist"
+        aria-controls="slide-content"
         sx={{
           width: '100%',
           //TABS background color
@@ -231,9 +233,9 @@ export default function TabPanel() {
                 }}
               >
                 <Typography
-                  variant="h5"
+                  component="span"
                   color="primary.contrastText"
-                  sx={{ flexGrow: 1 }}
+                  sx={{ flexGrow: 1, fontSize: '18px', fontWeight: 'bold' }}
                   align="center"
                 >
                   {slide.slideTitle}

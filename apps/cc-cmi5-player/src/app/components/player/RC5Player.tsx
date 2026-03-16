@@ -343,19 +343,22 @@ function RC5Player() {
           <LessonThemeContext.Provider
             value={{ lessonTheme: currentLessonTheme }}
           >
-            <MDXEditor
-              className={mdxTheme}
-              ref={ref}
-              markdown={''}
-              plugins={thePlugins}
-              readOnly={true}
-              key={activeTab}
-            />
+            <div role="tabpanel" aria-label="slide-content">
+              <div id="toc-portal-target" />
+              <MDXEditor
+                className={mdxTheme}
+                ref={ref}
+                markdown={''}
+                plugins={thePlugins}
+                readOnly={true}
+                key={activeTab}
+              />
+            </div>
           </LessonThemeContext.Provider>
         )}
       </Box>
       {fullScreenImage && (
-        <div
+        <div role='dialog'
           onClick={(e: React.MouseEvent<HTMLDivElement>) => {
             e.stopPropagation();
             setFullScreenImage('');
