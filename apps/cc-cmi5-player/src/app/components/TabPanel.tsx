@@ -170,7 +170,7 @@ export default function TabPanel() {
         value={activeTab}
         onChange={tabClicked}
         scrollButtons={false}
-        aria-label="Slides"
+        aria-label="Slide Navigation Menu"
         role="tablist"
         aria-controls="slide-content"
         sx={{
