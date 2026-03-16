@@ -24,16 +24,10 @@ export default function ExitSlide() {
 
     // For development, can be removed later -TODO.
     if (checkForDevMode()) {
-      console.log('[ExitSlide] 🧪 Dev/standalone mode detected');
-      console.log('[ExitSlide] Would send: terminated verb to LRS');
       const launchParams = cmi5Instance.getLaunchParameters();
-      console.log('[ExitSlide] Launch params:', launchParams);
-      console.log(
-        '[ExitSlide] Would redirect to: returnURL (not available in dev mode)',
-      );
       logger.debug(
-        'Dev mode — skipping LRS call and returnURL redirect',
-        undefined,
+        'Dev/standalone mode detected. Skipping redirection and sending terminated verb to an LRS. Launch params are:',
+        launchParams,
         'lms',
       );
       setIsExiting(false);
