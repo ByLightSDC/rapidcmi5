@@ -170,8 +170,6 @@ export default function TabPanel() {
         onChange={tabClicked}
         scrollButtons={false}
         aria-label="Slide Navigation Menu"
-        role="tablist"
-        aria-controls="slide-content"
         sx={{
           width: '100%',
           //TABS background color
