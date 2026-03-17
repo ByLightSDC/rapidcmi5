@@ -161,6 +161,14 @@ export default function LrsHeaderWithDetails({
                   <b>activityPassed</b> / <b>activityFailed</b> — indicates
                   whether the student’s final score met the passing threshold.
                 </li>
+                <li>
+                  <b>terminated</b> — sent when the learner exits the AU
+                  normally (e.g., clicks Exit).
+                </li>
+                <li>
+                  <b>abandoned</b> — sent when the session ends without a
+                  normal exit (e.g., browser closed or session timed out).
+                </li>
               </ul>
             </Typography>
           )}
@@ -210,6 +218,14 @@ export default function LrsHeaderWithDetails({
                   <b>activityPassed</b> — indicates the learner successfully
                   completed the scenario requirements.
                 </li>
+                <li>
+                  <b>terminated</b> — sent when the learner exits the AU
+                  normally (e.g., clicks Exit).
+                </li>
+                <li>
+                  <b>abandoned</b> — sent when the session ends without a
+                  normal exit (e.g., browser closed or session timed out).
+                </li>
               </ul>
             </Typography>
           )}
@@ -253,6 +269,14 @@ export default function LrsHeaderWithDetails({
                 </li>
                 <li>
                   <b>activityPassed</b> — confirms successful completion.
+                </li>
+                <li>
+                  <b>terminated</b> — sent when the learner exits the AU
+                  normally (e.g., clicks Exit).
+                </li>
+                <li>
+                  <b>abandoned</b> — sent when the session ends without a
+                  normal exit (e.g., browser closed or session timed out).
                 </li>
               </ul>
             </Typography>
