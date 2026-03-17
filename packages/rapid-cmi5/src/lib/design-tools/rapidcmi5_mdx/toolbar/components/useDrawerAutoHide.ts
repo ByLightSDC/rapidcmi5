@@ -17,7 +17,11 @@ const STORAGE_KEY_PREFIX = 'rc5_drawer_autohide_';
  * @param showSeq      Incrementing counter from toolbar button — re-shows panel
  *                     even when isActivated was already true
  */
-export function useDrawerAutoHide(panelKey: string, isActivated: boolean, showSeq = 0) {
+export function useDrawerAutoHide(
+  panelKey: string,
+  isActivated: boolean,
+  showSeq = 0,
+) {
   const storageKey = `${STORAGE_KEY_PREFIX}${panelKey}`;
 
   const [autoHide, setAutoHideState] = useState<boolean>(() => {
@@ -45,9 +49,7 @@ export function useDrawerAutoHide(panelKey: string, isActivated: boolean, showSe
     prevActivatedRef.current = isActivated;
     prevShowSeqRef.current = showSeq;
 
-    console.log(`[useDrawerAutoHide:${panelKey}] effect — isActivated=${isActivated} showSeq=${showSeq} justActivated=${justActivated} seqIncreased=${seqIncreased}`);
     if (justActivated || (isActivated && seqIncreased)) {
-      console.log(`[useDrawerAutoHide:${panelKey}] → setHoverVisible(true)`);
       setHoverVisible(true);
     }
   }, [isActivated, showSeq]);
