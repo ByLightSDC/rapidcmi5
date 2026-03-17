@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 - <<'PYEOF'\nimport json\n\nwith open\\('/tmp/lighthouse-report3.json'\\) as f:\n    r = json.load\\(f\\)\n\na11y = r['categories']['accessibility']\nscore = round\\(a11y['score'] * 100\\)\nprint\\(f'Accessibility Score: {score}/100\\\\n'\\)\n\naudits = r['audits']\nfailed, passed = [], []\n\nfor ref in a11y['auditRefs']:\n    audit = audits.get\\(ref['id']\\)\n    if not audit:\n        continue\n    s = audit.get\\('score'\\)\n    mode = audit.get\\('scoreDisplayMode'\\)\n    if mode in \\('manual', 'notApplicable', 'informative'\\):\n        continue\n    if s == 0:\n        failed.append\\(audit\\)\n    elif s == 1:\n        passed.append\\(audit\\)\n\nprint\\(f'FAILED \\({len\\(failed\\)}\\):'\\)\nfor a in failed:\n    print\\(f\"  [FAIL] {a['id']}\"\\)\n    print\\(f\"         {a['title']}\"\\)\n    items = \\(a.get\\('details'\\) or {}\\).get\\('items', []\\)\n    for item in items[:3]:\n        node = item.get\\('node'\\) or item.get\\('element'\\) or {}\n        snippet = node.get\\('snippet', ''\\)\n        if snippet:\n            print\\(f\"         -> {snippet[:120]}\"\\)\n\nprint\\(f'\\\\nPASSED \\({len\\(passed\\)}\\):'\\)\nfor a in passed:\n    print\\(f\"  [PASS] {a['id']}\"\\)\nPYEOF)",
+      "Bash(npx lighthouse:*)"
+    ]
+  }
+}

@@ -6,10 +6,15 @@ import {
   Drawer,
   IconButton,
   Stack,
+  Tooltip,
   Typography,
   useTheme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import PushPinIcon from '@mui/icons-material/PushPin';
+import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
+
+import { useDrawerAutoHide } from './useDrawerAutoHide';
 
 import Markdown from 'react-markdown';
 import rehypeKatex from 'rehype-katex';
@@ -19,7 +24,7 @@ import remarkGfm from 'remark-gfm';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 
-import { drawerMode$, DRAWER_TYPE } from './drawers';
+import { drawerMode$, DRAWER_TYPE, blockShowSeq$ } from './drawers';
 import {
   ButtonInfoField,
   ViewExpander,
@@ -61,26 +66,34 @@ export function BlockLibraryDrawer() {
     return drawerMode === DRAWER_TYPE.BLOCK;
   }, [drawerMode]);
 
+  const showSeq = useCellValue(blockShowSeq$);
+
   const handleClose = useCallback(() => {
     changeViewMode(DRAWER_TYPE.NONE);
   }, [changeViewMode]);
 
+  const { autoHide, toggleAutoHide, handleMouseEnter, handleMouseLeave, effectiveOpen, getDrawerSx } =
+    useDrawerAutoHide('block', isOpen, showSeq);
+
   return (
     <Drawer
       anchor="right"
-      open={isOpen}
+      open={effectiveOpen}
       variant="persistent" // Stay open while user clicks elsewhere
       onClose={handleClose}
-      sx={{
+      sx={getDrawerSx({
         position: 'absolute',
         zIndex: 1400, // Higher than MUI modals (1300) and directive editors
+        pointerEvents: 'none', // Root div never captures clicks; Paper has its own pointer events
         '& .MuiDrawer-paper': {
           width: 360,
           maxWidth: '90vw',
-          zIndex: 1400, // Ensure paper also has high z-index
+          zIndex: 1400,
           overflowY: 'hidden',
+          pointerEvents: 'auto',
         },
-      }}
+      })}
+      PaperProps={{ onMouseEnter: handleMouseEnter, onMouseLeave: handleMouseLeave }}
     >
       <Stack
         id="block-library"
@@ -106,6 +119,16 @@ export function BlockLibraryDrawer() {
           >
             Block Library
           </Typography>
+          <Tooltip title={autoHide ? 'Auto-hide on (click to pin)' : 'Auto-hide off (click to enable)'}>
+            <IconButton
+              onClick={toggleAutoHide}
+              aria-label={autoHide ? 'Disable auto-hide' : 'Enable auto-hide'}
+              size="small"
+              sx={{ color: autoHide ? 'primary.main' : 'text.disabled' }}
+            >
+              {autoHide ? <PushPinOutlinedIcon fontSize="small" /> : <PushPinIcon fontSize="small" />}
+            </IconButton>
+          </Tooltip>
           <IconButton onClick={handleClose} aria-label="Close Block Library">
             <CloseIcon />
           </IconButton>

@@ -282,6 +282,7 @@ function TeamScenarioExercise({
               {scenarioStatus}
               <Tabs
                 orientation="horizontal"
+                aria-label="Scenario Tabs"
                 sx={{
                   marginTop: 0,
                 }}

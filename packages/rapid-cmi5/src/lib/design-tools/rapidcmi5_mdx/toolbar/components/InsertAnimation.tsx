@@ -1,19 +1,22 @@
 import { useCallback } from 'react';
-import { ButtonWithTooltip } from '@mdxeditor/editor';
-import { usePublisher } from '@mdxeditor/gurx';
+import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 import MotionPhotosAutoIcon from '@mui/icons-material/MotionPhotosAuto';
-import { toggleAnimationDrawer$ } from '../../plugins/animation';
+import { animationDrawerOpen$ } from '../../plugins/animation';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
+import { animationShowSeq$ } from './drawers';
 
 /**
- * Toolbar button to toggle animation drawer
+ * Toolbar button to open animation drawer (always opens, never toggles off)
  */
 export const InsertAnimation = () => {
-  const toggle = usePublisher(toggleAnimationDrawer$);
+  const publishOpen = usePublisher(animationDrawerOpen$);
+  const publishShowSeq = usePublisher(animationShowSeq$);
+  const showSeq = useCellValue(animationShowSeq$);
 
   const handleClick = useCallback(() => {
-    toggle();
-  }, [toggle]);
+    publishOpen(true);
+    publishShowSeq(showSeq + 1);
+  }, [publishOpen, publishShowSeq, showSeq]);
 
   return (
     <MUIButtonWithTooltip

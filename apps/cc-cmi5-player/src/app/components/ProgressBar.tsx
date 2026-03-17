@@ -21,7 +21,7 @@ function LinearProgressWithLabel(
         <LinearProgress
           variant="determinate"
           color={props.value === 100 ? 'success' : 'primary'}
-          aria-label={`Course progress: ${Math.round(props.value)}%`}
+          aria-label='Course Progress'
           {...props}
           sx={{
             borderRadius: 5,
@@ -30,7 +30,7 @@ function LinearProgressWithLabel(
         />
       </Box>
       <Box sx={{ minWidth: 35 }}>
-        <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+        <Typography aria-hidden="true" variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
           {`${Math.round(props.value)}%`}
         </Typography>
       </Box>

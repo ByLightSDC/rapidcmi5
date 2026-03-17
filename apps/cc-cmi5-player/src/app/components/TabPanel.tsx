@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -14,7 +14,6 @@ import { activeTabSel, setActiveTab } from '../redux/navigationReducer';
 import ProgressBar from './ProgressBar';
 import { Box, Stack, Typography, useTheme } from '@mui/material';
 import { CustomTheme } from '../styles/createPalette';
-
 export default function TabPanel() {
   const auJson = useSelector(auJsonSel);
   const auLogoDark = useSelector(auLogoDarkSel);
@@ -30,6 +29,7 @@ export default function TabPanel() {
     }
     return auLogoDark;
   }, [currentTheme.palette.mode, auLogoDark, auLogoLight]);
+
 
   const tabClicked = (_: React.SyntheticEvent, newValue: number) => {
     dispatch(setActiveTab(newValue));
@@ -178,7 +178,7 @@ export default function TabPanel() {
       >
         {currentLogo && (
           <img
-            alt="logo"
+            alt="Course or Logo"
             width="200px"
             style={{
               padding: '16px',
@@ -205,7 +205,7 @@ export default function TabPanel() {
           value={activeTab}
           onChange={tabClicked}
           scrollButtons={false}
-          aria-label="Slides"
+          aria-label="Slide Navigation Menu"
           sx={{
             width: '100%',
             //TABS background color
@@ -266,9 +266,9 @@ export default function TabPanel() {
                   }}
                 >
                   <Typography
-                    variant="h5"
+                    component="span"
                     color="text.primary"
-                    sx={{ flexGrow: 1 }}
+                    sx={{ flexGrow: 1, fontSize: '18px', fontWeight: 'bold' }}
                     align="center"
                   >
                     {slide.slideTitle}

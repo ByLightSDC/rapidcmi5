@@ -29,7 +29,7 @@ export default function AuTabPanel({ auProps }: { auProps: AuContextProps }) {
     >
       <div className="z-50 bg-zinc-950 ">
         {/* <img
-          alt="logo"
+          alt="Course Logo"
           width="200px" //without this img scales huge, TODO match
           className="p-4 pb-0 filter"
           src={RangeOS_Logo_White}

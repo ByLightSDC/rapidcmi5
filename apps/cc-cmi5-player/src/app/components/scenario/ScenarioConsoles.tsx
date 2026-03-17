@@ -322,7 +322,6 @@ function ScenarioStatus({
                 margin: 0,
                 height: '32px',
                 minWidth: 0,
-                //backgroundColor: 'pink',
               }}
             >
               {rowStatus.icon}
@@ -330,7 +329,6 @@ function ScenarioStatus({
           )}
           <Box
             sx={{
-              //backgroundColor: 'orange',
               marginLeft: '0px',
               height: '32px',
               display: 'flex',
@@ -340,6 +338,7 @@ function ScenarioStatus({
           >
             <Tabs
               orientation="horizontal"
+              aria-label="Scenario Tabs"
               sx={{ marginTop: 0 }}
               value={currentTab}
               onChange={handleChangeTab}
