@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -29,6 +29,7 @@ export default function TabPanel() {
     }
     return auLogoDark;
   }, [currentTheme.palette.mode, auLogoDark, auLogoLight]);
+
 
   const tabClicked = (_: React.SyntheticEvent, newValue: number) => {
     dispatch(setActiveTab(newValue));
