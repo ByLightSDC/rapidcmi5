@@ -1,43 +1,35 @@
-/* eslint-disable react/jsx-no-useless-fragment */
 import {
   activeEditor$,
   currentSelection$,
   DirectiveDescriptor,
   DirectiveEditorProps,
   editorInFocus$,
+  insertMarkdown$,
   NestedLexicalEditor,
   syntaxExtensions$,
-  useCellValue,
   useCellValues,
   useLexicalNodeRemove,
   useMdastNodeUpdater,
   usePublisher,
 } from '@mdxeditor/editor';
 import { LexicalEditor } from 'lexical';
-import {
-  ContainerDirective,
-  Directives,
-  LeafDirective,
-  TextDirective,
-} from 'mdast-util-directive';
-import type { Paragraph, Text } from 'mdast';
+import { ContainerDirective, Directives } from 'mdast-util-directive';
+import type { Paragraph, RootContent } from 'mdast';
 
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Divider,
-  TextField,
-  Typography,
-  AlertColor,
-  AlertTitle,
   Box,
-  Alert,
-  Stack,
+  IconButton,
+  SxProps,
+  Tooltip,
+  useTheme,
 } from '@mui/material';
+import PaletteIcon from '@mui/icons-material/Palette';
 
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { toMarkdown } from 'mdast-util-to-markdown';
 
 import {
@@ -52,12 +44,19 @@ import { AdmonitionDirectiveNode } from './AdmonitionDirectiveDescriptor';
 import DeleteIconButton from '../components/DeleteIconButton';
 import SettingsIconButton from '../components/SettingsIconButton';
 import InsertLineReturnButton from '../components/InsertLineReturnButton';
-import RightMenuContainer from '../components/RightMenuContainer';
 import { AdmonitionTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { SelectorMainUi } from '../../../inputs/selectors/selectors';
 import { debugLogError } from '../../../utility/logger';
 import { editorInPlayback$ } from '../state/vars';
-import { convertMarkdownToMdast } from '../util/conversion';
+import { convertMarkdownToMdast, convertMdastToMarkdown } from '../util/conversion';
+import { LessonThemeContext } from '../contexts/LessonThemeContext';
+import { resolveLessonThemeCSS } from '../../../styles/lessonThemeStyles';
+import {
+  DIRECTIVE_GUTTER_GAP,
+  DIRECTIVE_GUTTER_PADDING_RIGHT,
+} from '../constants/directiveLayout';
+import { ColorSelectionPopover } from '../../../colors/ColorSelectionPopover';
+import { SHAPE_PRESET_COLORS } from '../constants/colors';
 
 export declare interface AdmonitionDirectiveEditorProps<
   T extends Directives = Directives,
@@ -91,12 +90,19 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   parentEditor,
   descriptor,
 }) => {
+  const muiTheme = useTheme();
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  const blockPadding = resolvedThemeCSS ? (resolvedThemeCSS.blockPadding ?? '0px') : '32px';
+
   //REF const markdownSourceEditorValue = useCellValue(markdownSourceEditorValue$);
   const [defaultCollapseSel, setDefaultCollapseSel] = useState<
     string | undefined
   >(undefined);
   const removeNode = useLexicalNodeRemove();
   const updateMdastNode = useMdastNodeUpdater();
+  const insertMarkdown = usePublisher(insertMarkdown$);
+  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
   const [isCollapsible, setIsCollapsible] = useState(false);
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [isFocused, setIsFocused] = useState(false); //editor focused
@@ -111,6 +117,17 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   const [adType, setAdType] = useState<AdmonitionTypeEnum>(
     AdmonitionTypeEnum.note,
   );
+  const [backgroundColor, setBackgroundColor] = useState<string>(
+    mdastNode?.attributes?.['backgroundColor'] ?? '',
+  );
+  const [colorPickerAnchor, setColorPickerAnchor] =
+    useState<HTMLButtonElement | null>(null);
+  const [pendingColor, setPendingColor] = useState<string>(
+    mdastNode?.attributes?.['backgroundColor'] ?? '',
+  );
+  const pendingColorRef = useRef(pendingColor);
+  const skipNextCloseRebuildRef = useRef(false);
+
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const [adColor, setAdColor] = useState<
     | 'info'
@@ -213,6 +230,48 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   }, [lexicalNode]);
 
   /**
+   * Rebuilds the admonition node with a new background color.
+   */
+  const rebuildNode = useCallback(
+    async (bgColor: string) => {
+      if (!parentEditor) return;
+
+      parentEditor.update(() => {
+        const nextSibling = lexicalNode.getNextSibling();
+        if (nextSibling) {
+          nextSibling.selectStart();
+        } else {
+          lexicalNode.selectEnd();
+        }
+      });
+
+      await delay(50);
+
+      parentEditor.update(() => {
+        const attributes: Record<string, string> = {};
+        if (attCollapse) attributes['collapse'] = attCollapse;
+        if (bgColor) attributes['backgroundColor'] = bgColor;
+
+        const mdast: ContainerDirective = {
+          type: 'containerDirective',
+          name: mdastNode.name,
+          attributes,
+          children: [...mdastNode.children] as ContainerDirective['children'],
+        };
+
+        insertMarkdown(convertMdastToMarkdown(mdast as RootContent));
+      });
+
+      await delay(50);
+
+      parentEditor.update(() => {
+        lexicalNode.remove();
+      });
+    },
+    [attCollapse, insertMarkdown, lexicalNode, mdastNode, parentEditor],
+  );
+
+  /**
    * Sets local state from mdast attributes
    */
   useEffect(() => {
@@ -282,6 +341,24 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
     setIsFocused(editorIsFocused);
   }, [editorInFocus, lexicalNode]);
 
+  // Sync backgroundColor from mdastNode
+  useEffect(() => {
+    const bgColor = mdastNode?.attributes?.['backgroundColor'] ?? '';
+    setBackgroundColor(bgColor);
+    pendingColorRef.current = bgColor;
+    setPendingColor(bgColor);
+  }, [mdastNode]);
+
+  const outerSx: SxProps = backgroundColor
+    ? {
+        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+        clipPath: `inset(0 -100vmax 0)`,
+        backgroundColor,
+        paddingTop: blockPadding,
+        paddingBottom: blockPadding,
+      }
+    : {};
+
   const expandIcon = useMemo(() => {
     if (!isCollapsible) {
       return undefined;
@@ -298,129 +375,193 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   }, [adHexColor, adColor, isCollapsible]);
 
   return (
-    // eslint-disable-next-line react/jsx-no-useless-fragment
-    <>
-      {!isPlayback && (
-        <RightMenuContainer sxProps={{ marginBottom: isCollapsible ? -2 : 0 }}>
-          <>
-            {isConfiguring && (
-              <SelectorMainUi
-                defaultValue={defaultCollapseSel}
-                divProps={{ marginLeft: -24 }}
-                key="select-collapse"
-                isTransient={false}
-                listItemProps={{
-                  color: 'primary',
-                  fontSize: 'small',
-                  fontWeight: 'lighter',
+    <Box
+      {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
+      sx={{
+        margin: 0,
+        padding: 0,
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: isPlayback ? 0 : DIRECTIVE_GUTTER_GAP,
+        paddingRight: isPlayback ? 0 : DIRECTIVE_GUTTER_PADDING_RIGHT,
+        ...outerSx,
+      }}
+    >
+      {/* Inner content box — flex:1 fills all space left of the gutter */}
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        {isConfiguring && !isPlayback && (
+          <SelectorMainUi
+            defaultValue={defaultCollapseSel}
+            divProps={{ marginLeft: -24 }}
+            key="select-collapse"
+            isTransient={false}
+            listItemProps={{
+              color: 'primary',
+              fontSize: 'small',
+              fontWeight: 'lighter',
+            }}
+            options={[
+              'Collapse Start Open',
+              'Collapse Start Closed',
+              'No Collapse',
+            ]}
+            sxProps={{ minWidth: '100px', height: '30px' }}
+            isFormStyle={false}
+            onSelect={onSelectCollapsible}
+          />
+        )}
+        <Accordion
+          expanded={isCollapsible ? isOpen : true}
+          onChange={onAccordionChange}
+          variant="outlined"
+          sx={{
+            borderColor: 'transparent',
+            margin: 0,
+            ...(backgroundColor ? { borderRadius: '8px' } : {}),
+          }}
+        >
+          <AccordionSummary
+            expandIcon={expandIcon}
+            className="admonition-header"
+            sx={{
+              fontSize: '18px',
+              backgroundColor: adSeverityHexColor || adHexColor || adColor,
+              borderRadius: isOpen ? '8px 8px 0 0' : '8px',
+              borderColor: adSeverityHexBorderColor,
+              borderStyle: 'solid',
+              borderWidth: '1px',
+              zIndex: 100,
+            }}
+          >
+            {getAdmonitionIcon(adType)}
+            <div
+              style={{
+                // @ts-ignore
+                '--basePageBg': 'transparent',
+              }}
+            >
+              <NestedLexicalEditor<Paragraph>
+                getContent={(node) => {
+                  const theNode = convertMarkdownToMdast(
+                    getTitle(mdastNode.attributes),
+                    syntaxExtensions,
+                  );
+                  return theNode.children;
                 }}
-                options={[
-                  'Collapse Start Open',
-                  'Collapse Start Closed',
-                  'No Collapse',
-                ]}
-                sxProps={{ minWidth: '100px', height: '30px' }}
-                isFormStyle={false}
-                onSelect={onSelectCollapsible}
+                getUpdatedMdastNode={(
+                  mdastParagraphNode,
+                  paragraphChildren: any,
+                ) => {
+                  if (paragraphChildren.length > 0) {
+                    const titleStr = toMarkdown(paragraphChildren[0]);
+                    if (titleStr === title) {
+                      return mdastParagraphNode;
+                    }
+
+                    setTitle(titleStr);
+
+                    return {
+                      ...mdastParagraphNode,
+                      attributes: {
+                        collapse: attCollapse,
+                        title: titleStr,
+                      },
+                    };
+                  }
+
+                  return mdastParagraphNode;
+                }}
+                contentEditableProps={{ 'aria-label': 'Admonition Title' }}
               />
-            )}
-          </>
+            </div>
+          </AccordionSummary>
+
+          <AccordionDetails
+            sx={{
+              backgroundColor: 'background.paper',
+              borderColor: adSeverityHexBorderColor,
+              borderRadius: '0 0 8px 8px',
+              borderStyle: 'solid',
+              borderWidth: '1px',
+            }}
+          >
+            <NestedLexicalEditor<ContainerDirective>
+              block={true}
+              getContent={(node) => {
+                return node.children;
+              }}
+              getUpdatedMdastNode={(mdastNode, containerChildren: any) => {
+                return { ...mdastNode, children: containerChildren };
+              }}
+              contentEditableProps={{ 'aria-label': 'Admonition Content' }}
+            />
+          </AccordionDetails>
+        </Accordion>
+      </Box>
+
+      {/* Gutter buttons — flex sibling, sits to the right of the inner box */}
+      {!isPlayback && (
+        <Box
+          sx={{
+            backgroundColor:
+              muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
+            display: 'flex',
+            flexShrink: 0,
+            alignSelf: 'flex-start',
+          }}
+        >
+          <Tooltip title="Background Color">
+            <IconButton
+              onClick={(e) => {
+                pendingColorRef.current = backgroundColor;
+                setPendingColor(backgroundColor);
+                setColorPickerAnchor(e.currentTarget);
+              }}
+              size="small"
+            >
+              <PaletteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
           <SettingsIconButton onConfigure={onConfigure} />
           <InsertLineReturnButton
             parentEditor={parentEditor}
             lexicalNode={lexicalNode}
           />
           <DeleteIconButton onDelete={onDelete} />
-        </RightMenuContainer>
+        </Box>
       )}
-      <Accordion
-        slots={{ heading: 'div' }}
-        expanded={isCollapsible ? isOpen : true}
-        onChange={onAccordionChange}
-        style={{ margin: '1em 0' }}
-        variant="outlined"
-        sx={{
-          borderColor: 'transparent',
+
+      {/* Background Color Popover */}
+      <ColorSelectionPopover
+        anchorEl={colorPickerAnchor}
+        onClose={() => {
+          setColorPickerAnchor(null);
+          if (skipNextCloseRebuildRef.current) {
+            skipNextCloseRebuildRef.current = false;
+            return;
+          }
+          const latest = pendingColorRef.current;
+          if (latest !== backgroundColor) {
+            setBackgroundColor(latest);
+            rebuildNode(latest);
+          }
         }}
-      >
-        <AccordionSummary
-          expandIcon={expandIcon}
-          className="admonition-header"
-          sx={{
-            fontSize: '18px',
-            backgroundColor: adSeverityHexColor || adHexColor || adColor,
-            borderRadius: isOpen ? '8px 8px 0 0' : '8px',
-            borderColor: adSeverityHexBorderColor,
-            borderStyle: 'solid',
-            borderWidth: isFocused ? '1px' : '1px',
-            zIndex: 100,
-          }}
-        >
-          {getAdmonitionIcon(adType)}
-          <div
-            style={{
-              // @ts-ignore
-              '--basePageBg': 'transparent',
-              //backgroundColor: 'adSeverityHexColor || adHexColor || adColor',
-            }}
-          >
-            <NestedLexicalEditor<Paragraph>
-              getContent={(node) => {
-                const theNode = convertMarkdownToMdast(
-                  getTitle(mdastNode.attributes),
-                  syntaxExtensions,
-                );
-                return theNode.children;
-              }}
-              getUpdatedMdastNode={(
-                mdastParagraphNode,
-                paragraphChildren: any,
-              ) => {
-                if (paragraphChildren.length > 0) {
-                  const titleStr = toMarkdown(paragraphChildren[0]);
-                  if (titleStr === title) {
-                    return mdastParagraphNode;
-                  }
-
-                  setTitle(titleStr);
-
-                  return {
-                    ...mdastParagraphNode,
-                    attributes: {
-                      collapse: attCollapse,
-                      title: titleStr,
-                    },
-                  };
-                }
-
-                return mdastParagraphNode;
-              }}
-              contentEditableProps={{ 'aria-label': 'Admonition Title' }}
-            />
-          </div>
-        </AccordionSummary>
-
-        <AccordionDetails
-          sx={{
-            backgroundColor: 'background.paper',
-            borderColor: adSeverityHexBorderColor,
-            borderRadius: '0 0 8px 8px ',
-            borderStyle: 'solid',
-            borderWidth: isFocused ? '1px' : '1px',
-          }}
-        >
-          <NestedLexicalEditor<ContainerDirective>
-            block={true}
-            getContent={(node) => {
-              return node.children;
-            }}
-            getUpdatedMdastNode={(mdastNode, containerChildren: any) => {
-              return { ...mdastNode, children: containerChildren };
-            }}
-            contentEditableProps={{ 'aria-label': 'Admonition Content' }}
-          />
-        </AccordionDetails>
-      </Accordion>
-    </>
+        lastColor={pendingColor}
+        palette={SHAPE_PRESET_COLORS}
+        onPickColor={(color) => {
+          pendingColorRef.current = color;
+          setPendingColor(color);
+        }}
+        onClear={() => {
+          setColorPickerAnchor(null);
+          pendingColorRef.current = '';
+          skipNextCloseRebuildRef.current = true;
+          setPendingColor('');
+          setBackgroundColor('');
+          rebuildNode('');
+        }}
+        noneLabel="No background"
+      />
+    </Box>
   );
 };
