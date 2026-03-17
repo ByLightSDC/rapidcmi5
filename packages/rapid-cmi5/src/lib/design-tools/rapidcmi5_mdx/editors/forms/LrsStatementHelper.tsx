@@ -219,8 +219,8 @@ export default function LrsHeaderWithDetails({
                   completed the scenario requirements.
                 </li>
                 <li>
-                  <b>terminated</b> — sent when the learner exits the AU
-                  normally (e.g., clicks Exit).
+                  <b>terminated</b> — sent when the learner exits the scenario
+                  normally.
                 </li>
                 <li>
                   <b>abandoned</b> — sent when the session ends without a
@@ -271,8 +271,8 @@ export default function LrsHeaderWithDetails({
                   <b>activityPassed</b> — confirms successful completion.
                 </li>
                 <li>
-                  <b>terminated</b> — sent when the learner exits the AU
-                  normally (e.g., clicks Exit).
+                  <b>terminated</b> — sent when the learner exits the console
+                  scenario normally.
                 </li>
                 <li>
                   <b>abandoned</b> — sent when the session ends without a
