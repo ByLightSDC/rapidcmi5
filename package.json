@@ -6,6 +6,9 @@
   "scripts": {
     "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\"",
     "bp": "node utils/player-replacer.js",
+    "build:player-for-editor": "bash scripts/buildCmi5PlayerForEditor.sh",
+    "load:course-for-test": "bash scripts/loadCourseForPlayerTest.sh",
+    "build-and-test-player": "bash scripts/buildAndTestPlayer.sh",
     "cmi5-builder": "nx run cmi5-builder:build",
     "cmi5-player": "nx run cc-cmi5-player:build",
     "postinstall": "electron-builder install-app-deps",
