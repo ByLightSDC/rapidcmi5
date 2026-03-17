@@ -4,7 +4,6 @@ import Cmi5 from '@xapi/cmi5';
 import { debugLog } from '../debug';
 
 import {
-  sendInitializedVerb,
   sendRangeosAuthVerb,
 } from '../utils/LmsStatementManager';
 import {
@@ -315,14 +314,6 @@ export const useCMI5Session = () => {
       activityId: cmi5Instance.getLaunchParameters().activityId,
     });
 
-    // Send Initialized verb to LRS after successful CMI5 initialization
-    try {
-      await sendInitializedVerb();
-    } catch (error) {
-      debugLog('Error sending Initialized verb to LRS:', error);
-      console.log('Error sending Initialized verb to LRS');
-      // Don't throw error - initialization should continue even if LRS statement fails
-    }
 
     const authToken = cmi5Instance.getAuthToken();
     if (!config.CMI5_SSO_ENABLED) {
