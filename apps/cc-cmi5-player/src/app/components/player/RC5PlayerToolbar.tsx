@@ -25,5 +25,12 @@ export const RC5PlayerToolbar: React.FC = () => {
     realm.pub(setActivityCache$, setActivityCache);
   }, [realm, setProgress, submitScore]);
 
+  useEffect(() => {
+    const toolbar = document.querySelector('.mdxeditor-preview-toolbar');
+    if (toolbar) {
+      toolbar.setAttribute('aria-hidden', 'true');
+    }
+  }, []);
+
   return <div />;
 };

@@ -5,6 +5,7 @@ import { cmi5Instance } from '../session/cmi5';
 import { sendTerminatedVerb } from '../utils/LmsStatementManager';
 import { checkForDevMode } from '../utils/DevMode';
 import { logger } from '../debug';
+import { ButtonMainUi } from '@rapid-cmi5/ui';
 
 /**
  * ExitSlide is a synthetic final slide always injected by the player.
@@ -71,9 +72,7 @@ export default function ExitSlide() {
         Your progress has been saved. You can return and pick up where you left
         off at any time.
       </Typography>
-      <Button
-        variant="contained"
-        size="large"
+      <ButtonMainUi
         startIcon={
           isExiting ? (
             <CircularProgress size={18} color="inherit" />
@@ -85,7 +84,7 @@ export default function ExitSlide() {
         disabled={isExiting}
       >
         {isExiting ? 'Exiting...' : 'Exit Course'}
-      </Button>
+      </ButtonMainUi>
     </Box>
   );
 }

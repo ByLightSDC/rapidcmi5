@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import {
   Accordion,
@@ -82,7 +83,10 @@ export const TOCComponent = ({
     setTopPosition(rect?.bottom || defaultTopOffset);
   });
 
-  return (
+  const portalTarget = document.getElementById('toc-portal-target');
+
+  const toc = (
+    <nav aria-label="Table of Contents">
     <Accordion
       slots={{ heading: 'div' }}
       expanded={isExpanded}
@@ -134,7 +138,7 @@ export const TOCComponent = ({
                     width: '32px',
                     height: '32px',
                   }}
-                >
+                > 
                   <TocIcon
                     color="action"
                     fontSize="inherit"
@@ -191,7 +195,6 @@ export const TOCComponent = ({
             marginTop: -2,
           }}
         >
-          <nav aria-label="Table of Contents">
             <ul
               role="list"
               style={{
@@ -225,9 +228,11 @@ export const TOCComponent = ({
                 </li>
               ))}
             </ul>
-          </nav>
         </AccordionDetails>
       )}
     </Accordion>
+    </nav>
   );
+
+  return portalTarget ? createPortal(toc, portalTarget) : toc;
 };

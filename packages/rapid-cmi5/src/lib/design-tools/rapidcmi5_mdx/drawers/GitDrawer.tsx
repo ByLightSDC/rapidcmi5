@@ -73,6 +73,7 @@ export const GitDrawer = () => {
       </Stack>
       <Tabs
         orientation="vertical"
+        aria-label="Git Tabs"
         sx={{ marginTop: '12px' }}
         value={currentTab}
         onChange={handleTabChange}

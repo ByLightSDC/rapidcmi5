@@ -389,7 +389,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
             sx={{ width: '100%' }}
             value={tab}
             onChange={handleTabChange}
-            aria-label="basic tabs example"
+            aria-label="Content Tabs"
             textColor="secondary"
             indicatorColor="primary"
           >
@@ -428,7 +428,9 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
                 ...node,
                 children,
               })}
-              contentEditableProps={{ 'aria-label': 'Tab sections' }}
+              contentEditableProps={{
+                'aria-label': 'Tabs content',
+              }}
             />
           </TabsContext.Provider>
         </Box>
