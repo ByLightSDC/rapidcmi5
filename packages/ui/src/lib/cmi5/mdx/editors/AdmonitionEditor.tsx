@@ -417,7 +417,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
           sx={{
             borderColor: 'transparent',
             margin: 0,
-            ...(backgroundColor ? { borderRadius: '8px' } : {}),
+            '&.MuiPaper-rounded': { borderRadius: '8px' },
           }}
         >
           <AccordionSummary
