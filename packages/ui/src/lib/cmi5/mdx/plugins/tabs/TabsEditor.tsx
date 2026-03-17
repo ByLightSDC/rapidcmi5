@@ -370,6 +370,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
           paddingRight: 20px keeps the gutter 20px from the right edge of the content area
           (which equals the viewport right edge at L content width). */}
       <Box
+        {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         sx={{
           margin: 0,
           padding: 0,

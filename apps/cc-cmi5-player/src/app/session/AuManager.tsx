@@ -178,7 +178,10 @@ function AuManager() {
 
   useEffect(() => {
     if (auJson?.slides && auJson.slides.length > 0 && activeTab >= 0) {
-      if (activeTab >= auJson.slides.length) {
+      // activeTab === auJson.slides.length is the synthetic exit slide — allow it through
+      if (activeTab === auJson.slides.length) {
+        setSlideData('');
+      } else if (activeTab > auJson.slides.length) {
         debugLogError(`Slide Index ${activeTab} does not exist`);
         dispatch(setActiveTab(0));
         setSlideData('There was a problem loading this slide.');
@@ -413,6 +416,9 @@ function AuManager() {
     logger.debug('[AU] activeSlide', { activeTab }, 'auManager');
 
     if (auJson?.slides) {
+      // Exit slide (synthetic tab beyond last real slide) should not trigger progress
+      if (activeTab === auJson.slides.length) return;
+
       // this prevents completion of an activity slide until the desired activities are completed
       let makeProgress = true;
 

@@ -11,7 +11,7 @@ import * as Mdast from 'mdast';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import { $getRoot } from 'lexical';
 
@@ -35,6 +35,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIconButton from '../../components/DeleteIconButton';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import PaletteIcon from '@mui/icons-material/Palette';
 import EditIcon from '@mui/icons-material/Edit';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
@@ -48,6 +49,14 @@ import { ButtonMinorUi, ButtonOptions } from '../../../../utility/buttons';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
+import { LessonThemeContext } from '../../contexts/LessonThemeContext';
+import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
+import { SHAPE_PRESET_COLORS } from '../../constants/colors';
+import {
+  DIRECTIVE_GUTTER_GAP,
+  DIRECTIVE_GUTTER_PADDING_RIGHT,
+} from '../../constants/directiveLayout';
 
 /**
  * Accordion Editor for accordion directives
@@ -60,6 +69,11 @@ export const AccordionEditor: React.FC<
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
   const muiTheme = useTheme();
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  const blockPadding = resolvedThemeCSS
+    ? (resolvedThemeCSS.blockPadding ?? '0px')
+    : '32px';
   const [sxProps, setSxProps] = useState<SxProps>({});
   const [formData, setFormData] = useState<
     Array<AccordionContentDirectiveNode>
@@ -67,6 +81,17 @@ export const AccordionEditor: React.FC<
   const insertMarkdown = usePublisher(insertMarkdown$);
   const [editor] = useLexicalComposerContext();
   const [isConfiguring, setIsConfiguring] = useState(false);
+  const [backgroundColor, setBackgroundColor] = useState<string>(
+    (mdastNode?.attributes as AccordionDirectiveNode['attributes'])?.backgroundColor ?? '',
+  );
+  const [colorPickerAnchor, setColorPickerAnchor] =
+    useState<HTMLButtonElement | null>(null);
+  const [pendingColor, setPendingColor] = useState<string>(
+    mdastNode?.attributes.backgroundColor ?? '',
+  );
+  const pendingColorRef = useRef(pendingColor);
+  const skipNextCloseRebuildRef = useRef(false);
+  const colorPickerOpen = Boolean(colorPickerAnchor);
   const [isPlayback, readOnly, syntaxExtensions] = useCellValues(
     editorInPlayback$,
     readOnly$,
@@ -75,12 +100,6 @@ export const AccordionEditor: React.FC<
 
   /**
    * Safely retrieves the value of a specific attribute from a node's attributes object.
-   *
-   * @param nodeAttributes - An object representing attribute key-value pairs,
-   *                         where each value can be a string, null, or undefined.
-   * @param attributeName - The name of the attribute to retrieve.
-   *
-   * @returns The value of the attribute if it exists (even if null), or `undefined` if the key is not present.
    */
   const getAttributeValue = (
     nodeAttributes: Record<string, string | null | undefined>,
@@ -94,7 +113,6 @@ export const AccordionEditor: React.FC<
 
   /**
    * Inserts new accordion before accordion index
-   * @param index - Accordion index.
    */
   const handleAddAccordionBefore = useCallback(
     (index: number) => {
@@ -108,7 +126,6 @@ export const AccordionEditor: React.FC<
 
   /**
    * Inserts new accordion after accordion index
-   * @param index - Accordion index.
    */
   const handleAddAccordionAfter = useCallback(
     (index: number) => {
@@ -132,7 +149,7 @@ export const AccordionEditor: React.FC<
   };
 
   /**
-   * Adds a accordion to the end
+   * Adds an accordion to the end
    */
   const handleAddAccordion = useCallback(() => {
     const children = [...formData];
@@ -143,7 +160,6 @@ export const AccordionEditor: React.FC<
 
   /**
    * Removes accordion at accordion index
-   * @param index - Accordion index.
    */
   const handleRemoveAccordion = useCallback(
     (index: number) => {
@@ -155,74 +171,87 @@ export const AccordionEditor: React.FC<
   );
 
   /**
-   * Saves changes
-   * inserts new node with updated content
-   * removes the original
-   * this flow is work around for not being able to create custom directive node without cloning the directives plugin
-   * the accordionContent directives dont appear in the lexical tree, probably because the lexical DirectiveNode extends DecoratorNode which does not support children
-   * the hasChildren property specifies that a directive can have children, but this does not add implementing append, getChildren, etc to the lexical node
+   * Core rebuild: inserts a new accordion node with given data then removes old node.
+   * Used by both handleSubmit (section management) and handleApplyColor.
    */
-  const handleSubmit = useCallback(async () => {
-    setIsConfiguring(false);
-    if (!parentEditor) return;
+  const rebuildNode = useCallback(
+    async (children: AccordionContentDirectiveNode[], bgColor: string) => {
+      if (!parentEditor) return;
 
-    // first select AFTER the current accordion
-    parentEditor.update(() => {
-      const nextSibling = lexicalNode.getNextSibling();
-      if (nextSibling) {
-        nextSibling.selectStart();
-      } else {
-        const root = $getRoot();
-        const lastChild = root.getChildren().at(-1);
-        if (lastChild) {
-          // If it's a text container (like paragraph), move cursor to end
-          if ($isElementNode(lastChild)) {
-            const lastText = lastChild.getLastDescendant();
-            if (lastText) {
-              lastText.selectEnd();
+      parentEditor.update(() => {
+        const nextSibling = lexicalNode.getNextSibling();
+        if (nextSibling) {
+          nextSibling.selectStart();
+        } else {
+          const root = $getRoot();
+          const lastChild = root.getChildren().at(-1);
+          if (lastChild) {
+            if ($isElementNode(lastChild)) {
+              const lastText = lastChild.getLastDescendant();
+              if (lastText) {
+                lastText.selectEnd();
+              } else {
+                lastChild.selectEnd();
+              }
             } else {
               lastChild.selectEnd();
             }
-          } else {
-            // If it's just a text node
-            lastChild.selectEnd();
           }
         }
-      }
-    });
-    //selection is not immediate
-    await delay(50);
+      });
 
-    // Insert a brand new accordion directive node with updated accordions using markdown
-    // using the insertMarkdown method ensures new node will have correct position information so nested content displays correctly
-    // tried hard to find an alternate solution that would allow me to simply update existing mdastnode, but no solution found
-    // since position data is generated from markdown and mdast utilities during parsing
-    parentEditor.update(() => {
-      const mdast: ContainerDirective = {
-        type: 'containerDirective',
-        name: 'accordion',
-        attributes: {
-          color: 'transparent',
-        },
-        children: [...formData],
-      };
+      await delay(50);
 
-      const childMarkdown = convertMdastToMarkdown(mdast as Mdast.RootContent);
+      parentEditor.update(() => {
+        const attributes: Record<string, string> = {};
+        if (bgColor) {
+          attributes['backgroundColor'] = bgColor;
+        }
 
-      insertMarkdown(childMarkdown);
-    });
-    //selection is not immediate
-    await delay(50);
+        const mdast: ContainerDirective = {
+          type: 'containerDirective',
+          name: 'accordion',
+          attributes,
+          children: [...children],
+        };
 
-    //remove original node
-    parentEditor.update(() => {
-      lexicalNode.remove();
-    });
-  }, [insertMarkdown, formData, lexicalNode, parentEditor]);
+        const childMarkdown = convertMdastToMarkdown(
+          mdast as Mdast.RootContent,
+        );
+        insertMarkdown(childMarkdown);
+      });
+
+      await delay(50);
+
+      parentEditor.update(() => {
+        lexicalNode.remove();
+      });
+    },
+    [insertMarkdown, lexicalNode, parentEditor],
+  );
+
+  /**
+   * Saves accordion structure changes (from configure modal)
+   */
+  const handleSubmit = useCallback(async () => {
+    setIsConfiguring(false);
+    await rebuildNode(formData, backgroundColor);
+  }, [rebuildNode, formData, backgroundColor]);
+
+  /**
+   * Clears the background color
+   */
+  const handleClearColor = useCallback(async () => {
+    setColorPickerAnchor(null);
+    pendingColorRef.current = '';
+    skipNextCloseRebuildRef.current = true;
+    setPendingColor('');
+    setBackgroundColor('');
+    await rebuildNode(formData, '');
+  }, [rebuildNode, formData]);
 
   /**
    * Updates accordion title text
-   * @param index - Accordion index.
    */
   const handleUpdateAccordionText = useCallback(
     (index: number, text: string) => {
@@ -255,7 +284,6 @@ export const AccordionEditor: React.FC<
    * UE Synchs form data
    */
   useEffect(() => {
-    //update content
     setFormData(mdastNode.children);
 
     if (mdastNode.attributes.style) {
@@ -266,73 +294,133 @@ export const AccordionEditor: React.FC<
         // no styles applied
       }
     }
+    const bgColor = (mdastNode.attributes as AccordionDirectiveNode['attributes'])?.backgroundColor ?? '';
+    setBackgroundColor(bgColor);
+    pendingColorRef.current = bgColor;
+    setPendingColor(bgColor);
   }, [mdastNode]);
+
+  // Outer box: full-width background color band when backgroundColor is set.
+  const outerSx: SxProps = backgroundColor
+    ? {
+        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+        clipPath: `inset(0 -100vmax 0)`,
+        backgroundColor,
+        paddingTop: blockPadding,
+        paddingBottom: blockPadding,
+      }
+    : {};
+
+  const innerSx: SxProps = {};
 
   /**
    * Render Accordion and Nested Content
    */
   return (
     <>
+      {/* Outer box is a flex row: inner content expands, gutter sits to its right. */}
       <Box
+        {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         sx={{
           margin: 0,
           padding: 0,
-          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          gap: isPlayback ? 0 : DIRECTIVE_GUTTER_GAP,
+          paddingRight: isPlayback ? 0 : DIRECTIVE_GUTTER_PADDING_RIGHT,
+          ...outerSx,
           ...sxProps,
         }}
       >
-        <Stack direction="row" spacing={1} sx={{ width: '100%' }}>
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <NestedLexicalEditor<ContainerDirective>
-              block={true}
-              getContent={(node) => {
-                return node.children;
+        {/* Inner content box — flex:1 fills all space left of the gutter */}
+        <Box sx={{ flex: 1, minWidth: 0, ...innerSx }}>
+          <NestedLexicalEditor<ContainerDirective>
+            block={true}
+            getContent={(node) => {
+              return node.children;
+            }}
+            getUpdatedMdastNode={(node, children: any) => ({
+              ...node,
+              children,
+            })}
+            contentEditableProps={{ 'aria-label': 'Accordion sections' }}
+          />
+        </Box>
+
+        {/* Gutter buttons — flex sibling, sits to the right of the inner box */}
+        {!isPlayback && (
+          <Box
+            sx={{
+              backgroundColor:
+                muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
+              display: 'flex',
+              flexShrink: 0,
+              alignSelf: 'flex-start',
+            }}
+          >
+            <Tooltip title="Background Color">
+              <IconButton
+                onClick={(e) => {
+                  pendingColorRef.current = backgroundColor;
+                  setPendingColor(backgroundColor);
+                  setColorPickerAnchor(e.currentTarget);
+                }}
+                size="small"
+              >
+                <PaletteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Edit Sections">
+              <IconButton onClick={handleConfigure}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <InsertLineReturnButton
+              parentEditor={parentEditor}
+              lexicalNode={lexicalNode}
+            />
+            <DeleteIconButton
+              onDelete={() => {
+                parentEditor.update(() => {
+                  if (lexicalNode.getPreviousSibling()) {
+                    lexicalNode.selectPrevious();
+                  } else {
+                    lexicalNode.selectNext();
+                  }
+                  lexicalNode.remove();
+                });
               }}
-              getUpdatedMdastNode={(node, children: any) => ({
-                ...node,
-                children,
-              })}
-              contentEditableProps={{ 'aria-label': 'Accordion sections' }}
             />
           </Box>
-          <div>
-            {!isPlayback && (
-              <Box
-                sx={{
-                  backgroundColor:
-                    muiTheme.palette.mode === 'dark'
-                      ? '#282b30e6'
-                      : '#EEEEEEe6',
-                  position: 'absolute',
-                  display: 'flex',
-                }}
-              >
-                <Tooltip title="Edit Sections">
-                  <IconButton onClick={handleConfigure}>
-                    <EditIcon />
-                  </IconButton>
-                </Tooltip>
-                <InsertLineReturnButton
-                  parentEditor={parentEditor}
-                  lexicalNode={lexicalNode}
-                />
-                <DeleteIconButton
-                  onDelete={() => {
-                    parentEditor.update(() => {
-                      if (lexicalNode.getPreviousSibling()) {
-                        lexicalNode.selectPrevious();
-                      } else {
-                        lexicalNode.selectNext();
-                      }
-                      lexicalNode.remove();
-                    });
-                  }}
-                />
-              </Box>
-            )}
-          </div>
-        </Stack>
+        )}
       </Box>
+
+      {/* Background Color Popover */}
+      <ColorSelectionPopover
+        anchorEl={colorPickerAnchor}
+        onClose={() => {
+          setColorPickerAnchor(null);
+          if (skipNextCloseRebuildRef.current) {
+            skipNextCloseRebuildRef.current = false;
+            return;
+          }
+          const latest = pendingColorRef.current;
+          if (latest !== backgroundColor) {
+            setBackgroundColor(latest);
+            rebuildNode(formData, latest);
+          }
+        }}
+        lastColor={pendingColor}
+        palette={SHAPE_PRESET_COLORS}
+        onPickColor={(color) => {
+          pendingColorRef.current = color;
+          setPendingColor(color);
+        }}
+        onClear={handleClearColor}
+        noneLabel="No background"
+      />
+
       {isConfiguring && (
         <ModalDialog
           maxWidth="md"
@@ -387,7 +475,7 @@ export const AccordionEditor: React.FC<
                       );
 
                       return (
-                        <Stack direction="row">
+                        <Stack direction="row" key={index}>
                           <TextFieldMainUi
                             value={theTitle}
                             onChange={(textValue: string) => {
