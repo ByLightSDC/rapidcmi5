@@ -359,7 +359,9 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
         backgroundColor: muiTheme.palette.background.paper,
         boxShadow: DIRECTIVE_INNER_BOX_SHADOW,
       }
-    : {};
+    : {
+        boxShadow: dropShadow,
+      };
 
   /**
    * Render Tabs and Nested Content
