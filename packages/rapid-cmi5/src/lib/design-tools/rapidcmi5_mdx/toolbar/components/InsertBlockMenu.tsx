@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import { ButtonWithTooltip } from '@mdxeditor/editor';
-import { usePublisher } from '@mdxeditor/gurx';
+import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 import WidgetsIcon from '@mui/icons-material/Widgets';
-import { drawerMode$, DRAWER_TYPE } from './drawers';
+import { drawerMode$, DRAWER_TYPE, blockShowSeq$ } from './drawers';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 /**
@@ -10,10 +10,13 @@ import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
  */
 export const InsertBlockMenu = () => {
   const changeViewMode = usePublisher(drawerMode$);
+  const publishShowSeq = usePublisher(blockShowSeq$);
+  const showSeq = useCellValue(blockShowSeq$);
 
   const handleClick = useCallback(() => {
     changeViewMode(DRAWER_TYPE.BLOCK);
-  }, [changeViewMode]);
+    publishShowSeq(showSeq + 1);
+  }, [changeViewMode, publishShowSeq, showSeq]);
 
   return (
     <MUIButtonWithTooltip

@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
 import { ButtonWithTooltip } from '@mdxeditor/editor';
-import { usePublisher } from '@mdxeditor/gurx';
+import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 import MotionPhotosAutoIcon from '@mui/icons-material/MotionPhotosAuto';
 import { toggleAnimationDrawer$ } from '../../plugins/animation';
 import PaletteIcon from '@mui/icons-material/Palette';
-import { DRAWER_TYPE, drawerMode$ } from './drawers';
+import { DRAWER_TYPE, drawerMode$, stylesShowSeq$ } from './drawers';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 
 /**
@@ -12,10 +12,13 @@ import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
  */
 export const LessonStyleButton = () => {
   const changeViewMode = usePublisher(drawerMode$);
+  const publishShowSeq = usePublisher(stylesShowSeq$);
+  const showSeq = useCellValue(stylesShowSeq$);
 
   const handleClick = useCallback(() => {
     changeViewMode(DRAWER_TYPE.STYLES);
-  }, [changeViewMode]);
+    publishShowSeq(showSeq + 1);
+  }, [changeViewMode, publishShowSeq, showSeq]);
 
   return (
     <MUIButtonWithTooltip

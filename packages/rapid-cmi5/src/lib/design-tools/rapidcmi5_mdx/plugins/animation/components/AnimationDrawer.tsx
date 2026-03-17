@@ -4,6 +4,7 @@ import {
   Drawer,
   IconButton,
   Stack,
+  Tooltip,
   Typography,
   Alert,
   Divider,
@@ -34,6 +35,11 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import MotionPhotosAutoIcon from '@mui/icons-material/MotionPhotosAuto';
+import PushPinIcon from '@mui/icons-material/PushPin';
+import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
+
+import { useDrawerAutoHide } from '../../../toolbar/components/useDrawerAutoHide';
+import { animationShowSeq$ } from '../../../toolbar/components/drawers';
 
 /**
  * Main animation drawer component
@@ -48,6 +54,11 @@ export function AnimationDrawer() {
   const moveUp = usePublisher(moveAnimationUp$);
   const moveDown = usePublisher(moveAnimationDown$);
   const theme = useTheme();
+
+  const showSeq = useCellValue(animationShowSeq$);
+
+  const { autoHide, toggleAutoHide, handleMouseEnter, handleMouseLeave, effectiveOpen, getDrawerSx } =
+    useDrawerAutoHide('animation', isOpen, showSeq);
 
   // Hook into Lexical selection
   const { selectedInfo, isAnimatable } = useLexicalSelection();
@@ -99,20 +110,19 @@ export function AnimationDrawer() {
   return (
     <Drawer
       anchor="right"
-      open={isOpen}
+      open={effectiveOpen}
       variant="persistent" // Stay open while user clicks elsewhere
       onClose={handleClose}
-      sx={{
+      sx={getDrawerSx({
         position: 'absolute',
         zIndex: 1400, // Higher than MUI modals (1300) and directive editors
-      }}
+        pointerEvents: 'none', // Root div never captures clicks; Paper has its own pointer events
+        '& .MuiDrawer-paper': { pointerEvents: 'auto' },
+      })}
       PaperProps={{
-        sx: {
-          width: 360,
-          maxWidth: '90vw',
-
-          zIndex: 1400, // Ensure paper also has high z-index
-        },
+        onMouseEnter: handleMouseEnter,
+        onMouseLeave: handleMouseLeave,
+        sx: { width: 360, maxWidth: '90vw', zIndex: 1400 },
       }}
     >
       <Stack id="animation-library" direction="column" sx={{ height: '100%' }}>
@@ -131,6 +141,16 @@ export function AnimationDrawer() {
           <Typography variant="h6" sx={{ color:'primary.main', flex: 1, marginLeft: 1 }}>
             Animation Library
           </Typography>
+          <Tooltip title={autoHide ? 'Auto-hide on (click to pin)' : 'Auto-hide off (click to enable)'}>
+            <IconButton
+              onClick={toggleAutoHide}
+              aria-label={autoHide ? 'Disable auto-hide' : 'Enable auto-hide'}
+              size="small"
+              sx={{ color: autoHide ? 'primary.main' : 'text.disabled' }}
+            >
+              {autoHide ? <PushPinOutlinedIcon fontSize="small" /> : <PushPinIcon fontSize="small" />}
+            </IconButton>
+          </Tooltip>
           <IconButton
             onClick={handleClose}
             aria-label="Close Animation Library"
