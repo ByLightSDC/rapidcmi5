@@ -2,7 +2,6 @@ import {
   DirectiveEditorProps,
   insertMarkdown$,
   NestedLexicalEditor,
-
   useCellValues,
   usePublisher,
 } from '@mdxeditor/editor';
@@ -228,7 +227,7 @@ export const GridContainerEditor: React.FC<
           margin: 0,
           padding: 1,
           position: 'relative',
-          border: '1px dashed',
+          border: isPlayback ? '1px' : '1px dashed',
           borderColor: 'divider',
           borderRadius: 1,
           ...sxProps,
@@ -282,7 +281,10 @@ export const GridContainerEditor: React.FC<
                 <EditIcon />
               </IconButton>
             </Tooltip>
-            <InsertLineReturnButton parentEditor={parentEditor} lexicalNode={lexicalNode} />
+            <InsertLineReturnButton
+              parentEditor={parentEditor}
+              lexicalNode={lexicalNode}
+            />
             <DeleteIconButton
               onDelete={() => {
                 parentEditor.update(() => {

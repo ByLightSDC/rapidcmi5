@@ -72,7 +72,7 @@ export const GridCellEditor: React.FC<
       sx={{
         position: 'relative',
         minHeight: '60px',
-        border: '1px dashed',
+        border: isPlayback ? '1px' : '1px dashed',
         borderColor: isFocused ? 'primary.main' : 'divider',
         borderRadius: 1,
         p: 1,
