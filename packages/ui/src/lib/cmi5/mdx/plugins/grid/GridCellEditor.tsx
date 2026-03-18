@@ -16,6 +16,7 @@ import {
   useScopedAlignmentStyles,
 } from '../shared/useScopedAlignmentStyles';
 import { useFocusWithin } from '../shared/useFocusWithin';
+import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 
 /**
  * Grid Cell Editor for the Grid Layout plugin.
@@ -106,7 +107,7 @@ export const GridCellEditor: React.FC<
         </Box>
       )}
 
-      <NestedLexicalEditor<ContainerDirective>
+      <RC5NestedLexicalEditor<ContainerDirective>
         block={true}
         getContent={(node) => node.children}
         getUpdatedMdastNode={(node, children: any) => ({
