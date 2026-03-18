@@ -1,30 +1,23 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 import {
-  $addUpdateTag,
-  $getNodeByKey,
   $getRoot,
   BLUR_COMMAND,
   FOCUS_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_HIGH,
-  DecoratorNode,
-  EditorConfig,
   KEY_BACKSPACE_COMMAND,
-  LexicalEditor,
   SELECTION_CHANGE_COMMAND,
   createEditor,
   COMMAND_PRIORITY_LOW,
   KEY_DELETE_COMMAND,
 } from 'lexical';
 import * as Mdast from 'mdast';
-import { Node } from 'unist';
+
 import React from 'react';
 import styles from './styles.module.css';
 import {
-  DirectiveNode,
   NESTED_EDITOR_UPDATED_COMMAND,
-  NestedEditorsContext,
   codeBlockEditorDescriptors$,
   directiveDescriptors$,
   editorInFocus$,
@@ -40,7 +33,6 @@ import {
   useMdastNodeUpdater,
   useNestedEditorContext,
   usedLexicalNodes$,
-  voidEmitter,
 } from '@mdxeditor/editor';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
