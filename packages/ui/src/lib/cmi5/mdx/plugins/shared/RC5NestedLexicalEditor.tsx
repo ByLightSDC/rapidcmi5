@@ -59,7 +59,7 @@ import { RC5SharedHistoryPlugin } from '../history/RC5SharedHistoryPlugin';
  *   children: Mdast.PhrasingContent[]
  * }
  *
- * return <NestedLexicalEditor<CalloutDirectiveNode> getContent={node => node.children} getUpdatedMdastNode={(node, children) => ({ ...node, children })} />
+ * return <RC5NestedLexicalEditor<CalloutDirectiveNode> getContent={node => node.children} getUpdatedMdastNode={(node, children) => ({ ...node, children })} />
  * ```
  * @group Custom Editor Primitives
  */
