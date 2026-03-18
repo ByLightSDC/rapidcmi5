@@ -15,14 +15,16 @@ import {
   SELECTION_CHANGE_COMMAND,
   createEditor,
   COMMAND_PRIORITY_LOW,
+  KEY_DELETE_COMMAND,
 } from 'lexical';
 import * as Mdast from 'mdast';
 import { Node } from 'unist';
 import React from 'react';
-
+import styles from './styles.module.css';
 import {
   DirectiveNode,
   NESTED_EDITOR_UPDATED_COMMAND,
+  NestedEditorsContext,
   codeBlockEditorDescriptors$,
   directiveDescriptors$,
   editorInFocus$,
@@ -34,120 +36,122 @@ import {
   lexicalTheme$,
   nestedEditorChildren$,
   rootEditor$,
+  useLexicalNodeRemove,
+  useMdastNodeUpdater,
+  useNestedEditorContext,
   usedLexicalNodes$,
   voidEmitter,
-  
 } from '@mdxeditor/editor';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import classNames from 'classnames';
-
-import styles from '../../styles/ui.module.css';
 import { mergeRegister } from '@lexical/utils';
 import { useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx';
 import { exportLexicalTreeToMdast } from '../../util/exportMarkdownFromLexical';
-import { RC5SharedHistoryPlugin } from './RC5SharedHistoryPlugin';
+import { importMdastTreeToLexical } from '../../util/importMarkdownToLexical';
+
 import { LexicalJsxNode } from '../jsx/LexicalJsxNode';
+import { RC5SharedHistoryPlugin } from '../history/RC5SharedHistoryPlugin';
 
 /**
  * The value of the {@link NestedEditorsContext} React context.
  * @group Custom Editor Primitives
  */
-export interface NestedEditorsContextValue<T extends Node> {
-  /**
-   * The parent lexical editor
-   */
-  parentEditor: LexicalEditor;
-  /**
-   * The parent editor config
-   */
-  config: EditorConfig;
-  /**
-   * The mdast node that is being edited
-   */
-  mdastNode: T;
-  /**
-   * The lexical node that is being edited
-   */
-  lexicalNode: DecoratorNode<any> & {
-    /**
-     * Use this method to update the mdast node. This will also update the mdast tree of the parent editor.
-     */
-    setMdastNode: (mdastNode: any) => void;
-  };
-  /**
-   * Subscribe to the emitter and implement the logic to focus the custom editor.
-   */
-  focusEmitter: typeof voidEmitter;
-}
+// export interface NestedEditorsContextValue<T extends Node> {
+//   /**
+//    * The parent lexical editor
+//    */
+//   parentEditor: LexicalEditor;
+//   /**
+//    * The parent editor config
+//    */
+//   config: EditorConfig;
+//   /**
+//    * The mdast node that is being edited
+//    */
+//   mdastNode: T;
+//   /**
+//    * The lexical node that is being edited
+//    */
+//   lexicalNode: DecoratorNode<any> & {
+//     /**
+//      * Use this method to update the mdast node. This will also update the mdast tree of the parent editor.
+//      */
+//     setMdastNode: (mdastNode: any) => void;
+//   };
+//   /**
+//    * Subscribe to the emitter and implement the logic to focus the custom editor.
+//    */
+//   focusEmitter: ReturnType<typeof voidEmitter>;
+// }
 
-/**
- * Use this context to provide the necessary values to the {@link NestedLexicalEditor} React component.
- * Place it as a wrapper in your custom lexical node decorators.
- * @group Custom Editor Primitives
- */
-export const NestedEditorsContext = React.createContext<
-  NestedEditorsContextValue<Node> | undefined
->(undefined);
+// /**
+//  * Use this context to provide the necessary values to the {@link NestedLexicalEditor} React component.
+//  * Place it as a wrapper in your custom lexical node decorators.
+//  * @group Custom Editor Primitives
+//  */
+// export const NestedEditorsContext = React.createContext<
+//   NestedEditorsContextValue<Node> | undefined
+// >(undefined);
 
 /**
  * A hook to get the current {@link NestedEditorsContext} value. Use this in your custom editor components.
  * @group Custom Editor Primitives
  */
-export function useNestedEditorContext<T extends Mdast.RootContent>() {
-  const context = React.useContext(NestedEditorsContext) as
-    | NestedEditorsContextValue<T>
-    | undefined;
-  if (!context) {
-    throw new Error(
-      'useNestedEditor must be used within a NestedEditorsProvider',
-    );
-  }
-  return context;
-}
+// export function useNestedEditorContext<T extends Mdast.RootContent>() {
+//   const context = React.useContext(NestedEditorsContext) as
+//     | NestedEditorsContextValue<T>
+//     | undefined;
+//   if (!context) {
+//     throw new Error(
+//       'useNestedEditor must be used within a NestedEditorsProvider',
+//     );
+//   }
+//   return context;
+// }
 
 /**
  * A hook that returns a function that can be used to update the mdast node. Use this in your custom editor components.
  * @group Custom Editor Primitives
  */
-export function useMdastNodeUpdater<T extends Mdast.RootContent>() {
-  const { parentEditor, mdastNode, lexicalNode } = useNestedEditorContext<T>();
+// export function useMdastNodeUpdater<T extends Mdast.RootContent>() {
+//   const { parentEditor, mdastNode, lexicalNode } = useNestedEditorContext<T>();
 
-  return function updateMdastNode(node: Partial<T>) {
-    parentEditor.update(
-      () => {
-        $addUpdateTag('history-push');
-        const currentNode = $getNodeByKey(lexicalNode.getKey()) as
-          | DirectiveNode
-          | LexicalJsxNode
-          | null;
-        if (currentNode) {
-          currentNode.setMdastNode({ ...mdastNode, ...node } as any);
-        }
-      },
-      { discrete: true },
-    );
-    parentEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined);
-  };
-}
+//   return function updateMdastNode(node: Partial<T>) {
+//     parentEditor.update(
+//       () => {
+//         $addUpdateTag('history-push');
+//         const currentNode = $getNodeByKey(lexicalNode.getKey()) as
+//           | DirectiveNode
+//           | LexicalJsxNode
+//           | null;
+//         if (currentNode) {
+//           currentNode.setMdastNode({ ...mdastNode, ...node } as any);
+//         }
+//       },
+//       { discrete: true },
+//     );
+//     parentEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined);
+//   };
+// }
 
 /**
  * A hook that returns a function that removes the lexical node from the editor.
  * @group Custom Editor Primitives
  */
-export function useLexicalNodeRemove() {
-  const { parentEditor, lexicalNode } = useNestedEditorContext();
+// export function useLexicalNodeRemove() {
+//   const { parentEditor, lexicalNode } = useNestedEditorContext();
 
-  return () => {
-    parentEditor.update(() => {
-      const node = $getNodeByKey(lexicalNode.getKey());
-      node!.selectNext();
-      node!.remove();
-    });
-  };
-}
+//   return () => {
+//     parentEditor.update(() => {
+//       const node = $getNodeByKey(lexicalNode.getKey());
+//       node!.selectNext();
+//       node!.remove();
+//     });
+//   };
+// }
 
 /**
  * A nested editor React component that allows editing of the contents of complex markdown nodes that have nested markdown content (for example, custom directives or JSX elements).
@@ -166,7 +170,7 @@ export function useLexicalNodeRemove() {
  * ```
  * @group Custom Editor Primitives
  */
-export const NestedLexicalEditor = function <
+export const RC5NestedLexicalEditor = function <
   T extends Mdast.RootContent,
 >(props: {
   /**
@@ -235,6 +239,19 @@ export const NestedLexicalEditor = function <
     return editor;
   });
 
+  const onCheckDelete = (payload: KeyboardEvent, editor: any) => {
+    const editorElement = editor.getRootElement();
+    // the innerText here is actually the text before backspace takes effect.
+    if (editorElement?.innerText === '\n') {
+      //REF removeNode();
+      // never remove this nested lexical node, even if the text string is empty
+      // if we discover use cases where we want to retain this, we can add a flag
+      // but the current use case for this component is that it is holding a place for text
+      return true; // trap this event
+    }
+    return false; // dont trap this event
+  };
+
   React.useEffect(() => {
     focusEmitter.subscribe(() => {
       editor.focus();
@@ -279,7 +296,7 @@ export const NestedLexicalEditor = function <
           jsxComponentDescriptors,
           jsxIsAvailable,
           addImportStatements: false,
-        });
+        }) as unknown as Mdast.Root;
         const content: Mdast.RootContent[] = block
           ? mdast.children
           : (mdast.children[0] as Mdast.Paragraph)!.children;
@@ -296,7 +313,11 @@ export const NestedLexicalEditor = function <
       editor.registerCommand(
         FOCUS_COMMAND,
         () => {
-          setEditorInFocus({ editorType: 'lexical', rootNode: lexicalNode });
+          setEditorInFocus({
+            editorType: 'lexical',
+            rootNode: lexicalNode,
+            editorRef: editor,
+          });
           return false;
         },
         COMMAND_PRIORITY_LOW,
@@ -328,22 +349,23 @@ export const NestedLexicalEditor = function <
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         () => {
-          setEditorInFocus({ editorType: 'lexical', rootNode: lexicalNode });
+          setEditorInFocus({
+            editorType: 'lexical',
+            rootNode: lexicalNode,
+            editorRef: editor,
+          });
           return false;
         },
         COMMAND_PRIORITY_HIGH,
       ),
       editor.registerCommand(
         KEY_BACKSPACE_COMMAND,
-        (_, editor) => {
-          const editorElement = editor.getRootElement();
-          // the innerText here is actually the text before backspace takes effect.
-          if (editorElement?.innerText === '\n') {
-            removeNode();
-            return true;
-          }
-          return false;
-        },
+        onCheckDelete,
+        COMMAND_PRIORITY_CRITICAL,
+      ),
+      editor.registerCommand(
+        KEY_DELETE_COMMAND,
+        onCheckDelete,
         COMMAND_PRIORITY_CRITICAL,
       ),
     );
@@ -369,7 +391,7 @@ export const NestedLexicalEditor = function <
           <ContentEditable
             {...contentEditableProps}
             className={classNames(
-              styles.nestedEditor,
+              styles['nestedEditor'],
               contentEditableProps?.className,
             )}
           />

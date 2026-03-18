@@ -12,8 +12,13 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-
-import { $getRoot } from 'lexical';
+import { mergeRegister } from '@lexical/utils';
+import {
+  $getRoot,
+  COMMAND_PRIORITY_CRITICAL,
+  KEY_DELETE_COMMAND,
+  KEY_BACKSPACE_COMMAND,
+} from 'lexical';
 
 import {
   Box,
@@ -363,6 +368,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
         boxShadow: dropShadow,
       };
 
+
   /**
    * Render Tabs and Nested Content
    */
@@ -426,10 +432,9 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
               getContent={(node) => {
                 return node.children;
               }}
-              getUpdatedMdastNode={(node, children: any) => ({
-                ...node,
-                children,
-              })}
+              getUpdatedMdastNode={(node, children: any) => {
+                return { ...node, children };
+              }}
               contentEditableProps={{
                 'aria-label': 'Tabs content',
               }}

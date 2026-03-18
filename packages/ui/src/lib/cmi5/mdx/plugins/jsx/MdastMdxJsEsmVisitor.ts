@@ -1,5 +1,5 @@
+import { MdastImportVisitor } from '@mdxeditor/editor'
 import { MdxjsEsm } from 'mdast-util-mdx'
-import { MdastImportVisitor } from '../../importMarkdownToLexical'
 
 export const MdastMdxJsEsmVisitor: MdastImportVisitor<MdxjsEsm> = {
   testNode: 'mdxjsEsm',
