@@ -614,7 +614,7 @@ export class GitFS {
     }
     const exists = await this.fs.promises.stat(repoPath).catch(() => null);
     if (!exists) {
-      console.error('Repository does not exist');
+      debugLogError('Repository does not exist');
       return;
     }
 
