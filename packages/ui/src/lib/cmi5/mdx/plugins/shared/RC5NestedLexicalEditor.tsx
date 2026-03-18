@@ -132,6 +132,13 @@ export const RC5NestedLexicalEditor = function <
     return editor;
   });
 
+  /**
+   * Handles delete & backspace key events occuring in nested lexical editor content
+   * Blocks the event from bubbling if the content is empty
+   * @param payload 
+   * @param editor 
+   * @returns 
+   */
   const onCheckDelete = (payload: KeyboardEvent, editor: any) => {
     const editorElement = editor.getRootElement();
     // the innerText here is actually the text before backspace takes effect.
