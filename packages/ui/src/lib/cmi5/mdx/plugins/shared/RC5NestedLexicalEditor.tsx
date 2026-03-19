@@ -1,4 +1,3 @@
-
 import {
   $getRoot,
   BLUR_COMMAND,
@@ -14,7 +13,6 @@ import {
 } from 'lexical';
 import * as Mdast from 'mdast';
 
-import React from 'react';
 import styles from './styles.module.css';
 import {
   NESTED_EDITOR_UPDATED_COMMAND,
@@ -44,7 +42,7 @@ import { useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx';
 import { exportLexicalTreeToMdast } from '../../util/exportMarkdownFromLexical';
 import { importMdastTreeToLexical } from '../../util/importMarkdownToLexical';
 import { RC5SharedHistoryPlugin } from '../history/RC5SharedHistoryPlugin';
-
+import { useEffect, useState } from 'react';
 
 /**
  * A nested editor React component that allows editing of the contents of complex markdown nodes that have nested markdown content (for example, custom directives or JSX elements).
@@ -124,7 +122,7 @@ export const RC5NestedLexicalEditor = function <
 
   const setEditorInFocus = usePublisher(editorInFocus$);
 
-  const [editor] = React.useState(() => {
+  const [editor] = useState(() => {
     const editor = createEditor({
       nodes: usedLexicalNodes,
       theme: realm.getValue(lexicalTheme$),
@@ -135,9 +133,9 @@ export const RC5NestedLexicalEditor = function <
   /**
    * Handles delete & backspace key events occuring in nested lexical editor content
    * Blocks the event from bubbling if the content is empty
-   * @param payload 
-   * @param editor 
-   * @returns 
+   * @param payload
+   * @param editor
+   * @returns
    */
   const onCheckDelete = (payload: KeyboardEvent, editor: any) => {
     const editorElement = editor.getRootElement();
@@ -152,13 +150,13 @@ export const RC5NestedLexicalEditor = function <
     return false; // dont trap this event
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     focusEmitter.subscribe(() => {
       editor.focus();
     });
   }, [editor, focusEmitter]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     editor.update(() => {
       $getRoot().clear();
       let theContent: Mdast.PhrasingContent[] | Mdast.RootContent[] = content;
@@ -187,7 +185,7 @@ export const RC5NestedLexicalEditor = function <
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor, block, importVisitors]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     function updateParentNode() {
       editor.getEditorState().read(() => {
         const mdast = exportLexicalTreeToMdast({
