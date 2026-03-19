@@ -89,6 +89,7 @@ export const AccordionContentEditor: React.FC<
     <Accordion
       slots={{ heading: 'div' }}
       sx={{
+        width: '100%',
         backgroundColor: (theme: any) => `${theme.form.backgroundColor}`,
         borderColor: 'white',
         border: (theme: any) => `1px solid ${theme.palette.divider}`,
