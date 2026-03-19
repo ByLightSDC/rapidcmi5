@@ -12,12 +12,8 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { mergeRegister } from '@lexical/utils';
 import {
   $getRoot,
-  COMMAND_PRIORITY_CRITICAL,
-  KEY_DELETE_COMMAND,
-  KEY_BACKSPACE_COMMAND,
 } from 'lexical';
 
 import {
@@ -43,7 +39,6 @@ import DeleteIconButton from '../../components/DeleteIconButton';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PaletteIcon from '@mui/icons-material/Palette';
-import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 

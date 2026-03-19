@@ -17,14 +17,6 @@ import {
 } from '../shared/useScopedAlignmentStyles';
 import { useFocusWithin } from '../shared/useFocusWithin';
 import { TAB_CONTENT_MIN_HEIGHT } from '../../constants/directiveLayout';
-import { mergeRegister } from '@lexical/utils';
-import {
-  $getRoot,
-  COMMAND_PRIORITY_CRITICAL,
-  KEY_DELETE_COMMAND,
-  KEY_BACKSPACE_COMMAND,
-} from 'lexical';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 
 /**
@@ -43,7 +35,6 @@ export const TabContentEditor: React.FC<
   const [contentIsVisible, setContentIsVisible] = useState(false);
   const [tabIndex, setTabIndex] = useState(-1);
   const { isFocused, ref: contentRef } = useFocusWithin<HTMLDivElement>();
-  const [editor] = useLexicalComposerContext();
   const rawTextAlign = mdastNode.attributes?.textAlign;
   const textAlign: TextAlign =
     rawTextAlign === 'center' || rawTextAlign === 'right'
