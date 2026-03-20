@@ -57,6 +57,7 @@ import {
 } from '../constants/directiveLayout';
 import { ColorSelectionPopover } from '../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../constants/colors';
+import { RC5NestedLexicalEditor } from '../plugins/shared/RC5NestedLexicalEditor';
 
 export declare interface AdmonitionDirectiveEditorProps<
   T extends Directives = Directives,
@@ -440,7 +441,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
                 '--basePageBg': 'transparent',
               }}
             >
-              <NestedLexicalEditor<Paragraph>
+              <RC5NestedLexicalEditor<Paragraph>
                 getContent={(node) => {
                   const theNode = convertMarkdownToMdast(
                     getTitle(mdastNode.attributes),
@@ -485,7 +486,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
               borderWidth: '1px',
             }}
           >
-            <NestedLexicalEditor<ContainerDirective>
+            <RC5NestedLexicalEditor<ContainerDirective>
               block={true}
               getContent={(node) => {
                 return node.children;
