@@ -1,6 +1,7 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getNodeByKey } from 'lexical';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { ImageNode } from './ImageNode';
 
 /**
  *  This will allow Style Dialog to be called from the palette button. Effectively separated from ImageDialog.
@@ -10,40 +11,52 @@ import { useEffect, useState } from 'react';
  */
 export function useImageStyle(nodeKey: string) {
   const [editor] = useLexicalComposerContext();
-  const [imageStyle, setImageStyle] = useState<string>('');
+  const isUserUpdate = useRef(false);
+
+  const [imageStyle, setImageStyle] = useState<string>(() => {
+    let initialStyle = '';
+    editor.getEditorState().read(() => {
+      const node = $getNodeByKey(nodeKey) as ImageNode | null;
+      if (!node) return;
+      const rest = node.getRest() ?? [];
+      const styleAttr = rest.find((attr): attr is Extract<typeof attr, { name: string }> => 'name' in attr && attr.name === 'style');
+      if (styleAttr) initialStyle = (styleAttr.value as string) ?? '';
+    });
+    return initialStyle;
+  });
+
+  // Wrap setImageStyle so we can distinguish user-triggered updates from initial state.
+  const setImageStyleFromDialog = (style: string | ((prev: string) => string)) => {
+    isUserUpdate.current = true;
+    setImageStyle(style);
+  };
 
   useEffect(() => {
     if (!imageStyle) return;
+    if (!isUserUpdate.current) return;
+    isUserUpdate.current = false;
 
     // Otherwise, update.
     editor.update(() => {
-      const node = $getNodeByKey(nodeKey);
+      const node = $getNodeByKey(nodeKey) as ImageNode | null;
       if (!node) return;
 
-      // Attributes such as style and width exist in'rest'.
-      if (
-        'getRest' in node &&
-        'setRest' in node &&
-        typeof node.getRest === 'function' &&
-        typeof node.setRest === 'function'
-      ) {
-        //Get the current set attributes.
-        const rest = node.getRest() ?? [];
+      // Attributes such as style and width exist in 'rest'.
+      const rest = node.getRest() ?? [];
 
-        // Update them with changes.
-        const nextRest = [
-          ...rest.filter((attr: any) => attr.name !== 'style'),
-          {
-            type: 'mdxJsxAttribute',
-            name: 'style',
-            value: imageStyle,
-          },
-        ];
-        // Set and render update.
-        node.setRest(nextRest);
-      }
+      // Update them with changes.
+      const nextRest = [
+        ...rest.filter((attr): attr is Extract<typeof attr, { name: string }> => !('name' in attr) || attr.name !== 'style'),
+        {
+          type: 'mdxJsxAttribute' as const,
+          name: 'style',
+          value: imageStyle,
+        },
+      ];
+      // Set and render update.
+      node.setRest(nextRest);
     });
   }, [imageStyle, editor, nodeKey]);
 
-  return { imageStyle, setImageStyle };
+  return { imageStyle, setImageStyle: setImageStyleFromDialog };
 }
