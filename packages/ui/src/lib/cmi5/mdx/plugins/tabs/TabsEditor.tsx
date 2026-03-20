@@ -12,8 +12,9 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-
-import { $getRoot } from 'lexical';
+import {
+  $getRoot,
+} from 'lexical';
 
 import {
   Box,
@@ -38,7 +39,6 @@ import DeleteIconButton from '../../components/DeleteIconButton';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PaletteIcon from '@mui/icons-material/Palette';
-import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
@@ -363,6 +363,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
         boxShadow: dropShadow,
       };
 
+
   /**
    * Render Tabs and Nested Content
    */
@@ -426,10 +427,9 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
               getContent={(node) => {
                 return node.children;
               }}
-              getUpdatedMdastNode={(node, children: any) => ({
-                ...node,
-                children,
-              })}
+              getUpdatedMdastNode={(node, children: any) => {
+                return { ...node, children };
+              }}
               contentEditableProps={{
                 'aria-label': 'Tabs content',
               }}
