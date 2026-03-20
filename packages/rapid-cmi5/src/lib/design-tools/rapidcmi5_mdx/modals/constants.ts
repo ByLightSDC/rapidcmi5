@@ -1,5 +1,11 @@
+export const cacheWarning = `Changes will be committed locally.
+• If you are using the RapidCMI5 desktop application, commits are saved to the local folder you selected when creating the project.
+• If you are running RapidCMI5 in a web browser, commits are saved to your web browser cache.`;
+export const pushCommits = 'Commits will be pushed to the main branch of the linked remote repository';
+export const remindFileSystem =
+  'Content is stored locally, Use Version Control to back up your work!';
 
-export const cacheWarning = 'Content will be saved locally.';
+// modal ids
 export const cloneRepoModalId = 'cloneRepoModalId';
 export const createLocalRepoModalId = 'createLocalRepoModalId';
 export const importRepoZipModalId = 'importRepoZipModalId';
@@ -20,6 +26,3 @@ export const saveCourseFileBeforeModalId = 'saveCourseFileBeforeModalId';
 export const selectRepoModalId = 'selectRepoModalId';
 export const setGitConfigModalId = 'setGitConfigModalId';
 export const warningModalId = 'warning';
-
-export const remindFileSystem =
-  'Content is stored locally, Use Version Control to back up your work!';
