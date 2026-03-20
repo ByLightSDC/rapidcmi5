@@ -89,10 +89,14 @@ export function generateLessonThemeStyleTag(
   theme?: LessonTheme,
 ): string {
   const css = resolveLessonThemeCSS(theme);
-  if (!css) return '';
+  // Always emit --content-margin so directive calc() expressions resolve even when no theme is set.
+  if (!css) return `.${scopedClass} { --content-margin: 0px; }`;
 
   const widthRule = css.maxWidth
     ? `
+    .${scopedClass} {
+      --content-margin: calc((100% - ${css.maxWidth}) / 2);
+    }
     .${scopedClass} .mdxeditor-root-contenteditable {
       max-width: ${css.maxWidth};
       margin-left: auto;
@@ -107,8 +111,14 @@ export function generateLessonThemeStyleTag(
       max-width: none;
       margin-left: unset;
       margin-right: unset;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] {
+      --content-margin: 0px;
     }`
-    : '';
+    : `
+    .${scopedClass} {
+      --content-margin: 0px;
+    }`;
 
   const alignmentRule = `
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > p,
