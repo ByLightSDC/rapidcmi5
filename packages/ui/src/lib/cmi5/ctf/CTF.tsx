@@ -11,7 +11,7 @@ import {
 
 import Grid from '@mui/material/Grid2';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { debugLog } from '../../utility/logger';
@@ -19,7 +19,6 @@ import { useDisplayFocus } from '../../hooks/useDisplayFocus';
 import useCTFGrader from './useCTFGrader';
 
 import { Alert, Paper, TextField, Typography } from '@mui/material';
-
 
 /* Icons */
 import InfoIcon from '@mui/icons-material/Info';
@@ -40,12 +39,14 @@ import {
   setCurrentCTFAnswer as setCurrentAnswer,
   getAllCTFAnswers as getAllAnswers,
 } from './ctfReducer';
-import { Box, Stack } from '@mui/system';
+import { Box, Stack, SxProps } from '@mui/system';
 import {
   ButtonInfoField,
   ButtonMainUi,
   ButtonMinorUi,
 } from '../../utility/buttons';
+import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
+import { resolveLessonThemeCSS } from '../../styles/lessonThemeStyles';
 
 const answerBoxGridSize = 3.8;
 const attemptedLabel = '#Attempted';
@@ -93,6 +94,13 @@ export function AuCTF({
   /* Constants */
   const noneFound = 'No Questions Found';
   const passingScore = ctfContent.passingScore || 80;
+
+  /* Lesson Theme */
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
+  // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
+  const blockPadding = resolvedThemeCSS?.blockPadding ? '0px' : '32px';
 
   /**
    * Selects question if it is available (no grade or bad grade)
@@ -330,6 +338,13 @@ export function AuCTF({
     />
   );
 
+  // paddingTop provides space within content (safe, layout-based).
+  const outerSx: SxProps = {
+    padding: blockPadding,
+    marginBottom: blockPadding,
+    marginTop: blockPadding,
+  };
+
   return (
     ctfContent.questions && (
       <Paper
@@ -337,8 +352,7 @@ export function AuCTF({
         variant="outlined"
         sx={{
           backgroundColor: 'background.default',
-          minWidth: '320px',
-          marginBottom: '12px',
+          ...outerSx,
         }}
       >
         {ctfContent.title && (

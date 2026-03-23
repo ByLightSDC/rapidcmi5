@@ -1,4 +1,3 @@
-
 import {
   BlockPaddingEnum,
   ContentWidthEnum,
@@ -91,24 +90,43 @@ export function generateLessonThemeStyleTag(
   const css = resolveLessonThemeCSS(theme);
   if (!css) return '';
 
-  const widthRule = css.maxWidth
+  const widthRuleOld = css.maxWidth
     ? `
-    .${scopedClass} .mdxeditor-root-contenteditable {
+    .${scopedClass} .mdxeditor-root-contenteditable :not(.paper-activity){
       max-width: ${css.maxWidth};
       margin-left: auto;
       margin-right: auto;
     }
-    .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] {
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:not(.paper-activity) {
       max-width: ${css.maxWidth};
       margin-left: auto;
       margin-right: auto;
     }
-    .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] [data-lexical-decorator] {
+    .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] [data-lexical-decorator]:not(.paper-activity) {
       max-width: none;
       margin-left: unset;
       margin-right: unset;
     }`
     : '';
+
+const widthRule = css.maxWidth
+  ? `
+  .${scopedClass} .mdxeditor-root-contenteditable:not(:has(.paper-activity)) {
+    max-width: ${css.maxWidth};
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:not(:has(.paper-activity)) {
+    max-width: ${css.maxWidth};
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] [data-lexical-decorator]:not(:has(.paper-activity)) {
+    max-width: none;
+    margin-left: unset;
+    margin-right: unset;
+  }`
+  : '';
 
   const alignmentRule = `
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > p,
@@ -148,5 +166,5 @@ export function generateLessonThemeStyleTag(
     }`
     : '';
 
-  return widthRule + alignmentRule + blockPaddingRule + blockBaseRule;
+  return alignmentRule + widthRule + blockPaddingRule + blockBaseRule;
 }

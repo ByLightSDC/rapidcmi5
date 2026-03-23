@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   rangeConsoleDataAttemptsSel,
@@ -13,9 +13,6 @@ import {
 
 import { ScenarioUpdatesContext } from './ScenarioUpdatesContext';
 
-
-
-
 /* MUI */
 import {
   Alert,
@@ -25,6 +22,7 @@ import {
   ListItemIcon,
   Paper,
   Stack,
+  SxProps,
   Tabs,
   Tooltip,
   Typography,
@@ -50,10 +48,27 @@ import { classChangeModalId } from '../CourseModals';
 import ScenarioProgress from './ScenarioProgress';
 import { useAutoGraderProgress } from './hooks/useAutoGraderProgress';
 import AutoGraderSubscription from './graph/AutoGraderSubscription';
-import { DeployedScenario, DeployedScenarioDetailStatusEnum } from '@rangeos-nx/frontend/clients/devops-api';
-import { queryKeyRangeResourceContainers, getScenarioStatusIcon, Topic, AutoGraderEvent } from '@rangeos-nx/frontend/clients/hooks';
+import {
+  DeployedScenario,
+  DeployedScenarioDetailStatusEnum,
+} from '@rangeos-nx/frontend/clients/devops-api';
+import {
+  queryKeyRangeResourceContainers,
+  getScenarioStatusIcon,
+  Topic,
+  AutoGraderEvent,
+} from '@rangeos-nx/frontend/clients/hooks';
 import { AuContextProps, ScenarioContent } from '@rapid-cmi5/cmi5-build-common';
-import { ButtonMainUi, setModal, ButtonMinorUi, OverflowTypography, TabMainUi } from '@rapid-cmi5/ui';
+import {
+  ButtonMainUi,
+  setModal,
+  ButtonMinorUi,
+  OverflowTypography,
+  TabMainUi,
+  modal,
+  LessonThemeContext,
+  resolveLessonThemeCSS,
+} from '@rapid-cmi5/ui';
 
 /**
  * Slide that displays a Deployed Scenario status, VMs, Containers, and provides Consoles access
@@ -73,14 +88,19 @@ function ScenarioConsoles({
   const numRangeDataAttempts = useSelector(rangeDataAttemptsSel);
   const numRangeConsoleDataAttempts = useSelector(rangeConsoleDataAttemptsSel);
   const [currentTab, setCurrentTab] = useState(0);
-
   const { rangeId, scenarioId } = useContext(ScenarioUpdatesContext);
+  /* Lesson Theme */
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
+  // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
+  const blockPadding = resolvedThemeCSS?.blockPadding ? '0px' : '32px';
 
-  // /**
-  //  * REF UE debug
-  //  */
+  /**
+   * REF UE debug
+   */
   // useEffect(() => {
-  //   console.log('ScenarioConsoles', scenarioId);
+  //   console.log('scenarioId', scenarioId);
   //   console.log('rangeDataError', rangeDataError);
   //   console.log('numRangeDataAttempts', '' + numRangeDataAttempts + '/5');
   //   console.log('rangeConsoleDataError', rangeConsoleDataError);
@@ -123,15 +143,20 @@ function ScenarioConsoles({
       scenarioContent: content,
     });
 
+  // paddingTop provides space within content (safe, layout-based).
+  const outerSx: SxProps = {
+    padding: blockPadding,
+    marginBottom: blockPadding,
+    marginTop: blockPadding,
+  };
+
   return (
     <Paper
       className="paper-activity hover:prose-a:text-blue-500 prose prose-invert"
       variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        minWidth: '320px',
-        maxWidth: '1440px',
-        marginBottom: '12px',
+        ...outerSx,
       }}
     >
       {content.introTitle && (
@@ -148,6 +173,8 @@ function ScenarioConsoles({
         </Typography>
       )}
       {content.introContent && <p>{content.introContent}</p>}
+      <p>Scenario</p>
+
       {(!rangeDataError || numRangeDataAttempts < numRetries) &&
         (!rangeConsoleDataError || numRangeConsoleDataAttempts < numRetries) &&
         !scenarioId && <p>Loading...</p>}
@@ -226,7 +253,6 @@ function ScenarioConsoles({
               />
             </>
           )}
-
           {currentTab === 1 && autoGraders.length > 0 && (
             <ScenarioProgress
               autoGraders={autoGraders}
@@ -329,13 +355,35 @@ function ScenarioStatus({
           )}
           <Box
             sx={{
-              marginLeft: '0px',
+              marginLeft: 2,
               height: '32px',
               display: 'flex',
               flexGrow: 1,
               justifyContent: 'flex-end',
             }}
           >
+            <Stack
+              direction="row"
+              sx={{ display: 'flex', alignItems: 'center' }}
+            >
+              <IconButton aria-label="toggle-clock" onClick={toggleClock}>
+                <Tooltip
+                  arrow
+                  enterDelay={500}
+                  enterNextDelay={500}
+                  title={isClockShowing ? 'Hide Clock' : 'Show Clock'}
+                  placement="bottom"
+                >
+                  <AccessTimeIcon />
+                </Tooltip>
+              </IconButton>
+              {isClockShowing && (
+                <TimeClock
+                  startDateStr={scenarioWithStatus?.dateCreated || ''}
+                />
+              )}
+            </Stack>
+            <Box sx={{ flexGrow: 1 }}></Box>
             <Tabs
               orientation="horizontal"
               aria-label="Scenario Tabs"
@@ -356,21 +404,6 @@ function ScenarioStatus({
                 style={{ marginBottom: 0 }}
               />
             </Tabs>
-
-            <IconButton aria-label="toggle-clock" onClick={toggleClock}>
-              <Tooltip
-                arrow
-                enterDelay={500}
-                enterNextDelay={500}
-                title={isClockShowing ? 'Hide Clock' : 'Show Clock'}
-                placement="bottom"
-              >
-                <AccessTimeIcon />
-              </Tooltip>
-            </IconButton>
-            {isClockShowing && (
-              <TimeClock startDateStr={scenarioWithStatus?.dateCreated || ''} />
-            )}
           </Box>
 
           <ScenarioModals

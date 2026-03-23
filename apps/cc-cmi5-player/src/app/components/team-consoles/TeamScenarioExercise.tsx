@@ -7,7 +7,6 @@ import {
   useRef,
 } from 'react';
 
-
 import {
   DeployedScenario,
   DeployedScenarioDetailStatusEnum,
@@ -21,6 +20,7 @@ import {
   ListItemIcon,
   Paper,
   Stack,
+  SxProps,
   Tabs,
   Tooltip,
 } from '@mui/material';
@@ -30,7 +30,6 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AutoModeIcon from '@mui/icons-material/AutoMode';
 import TerminalIcon from '@mui/icons-material/Terminal';
 
-
 import TimeClock from '../scenario/TimeClock';
 import RangeResources from './list-views/RangeResources';
 import { TeamConsolesContext } from './TeamScenarioContext';
@@ -39,9 +38,22 @@ import TeamVMUpdates from './queries/TeamVMUpdates';
 import TeamContainerUpdates from './queries/TeamContainerUpdates';
 import TeamConsoleUpdates from './queries/TeamConsoleUpdates';
 import TeamAutoGraderUpdates from './queries/TeamAutoGraderUpdates';
-import { getScenarioStatusIcon, queryKeyRangeResourceAutoGraders, queryKeyRangeResourceContainers, Topic } from '@rangeos-nx/frontend/clients/hooks';
-import { AuContextProps, TeamConsolesContent } from '@rapid-cmi5/cmi5-build-common';
-import { OverflowTypography, TabMainUi } from '@rapid-cmi5/ui';
+import {
+  getScenarioStatusIcon,
+  queryKeyRangeResourceAutoGraders,
+  queryKeyRangeResourceContainers,
+  Topic,
+} from '@rangeos-nx/frontend/clients/hooks';
+import {
+  AuContextProps,
+  TeamConsolesContent,
+} from '@rapid-cmi5/cmi5-build-common';
+import {
+  LessonThemeContext,
+  OverflowTypography,
+  resolveLessonThemeCSS,
+  TabMainUi,
+} from '@rapid-cmi5/ui';
 
 /**
  * Activity displays a Deployed Scenario status, VMs, Containers, and Autograders
@@ -63,6 +75,12 @@ function TeamScenarioExercise({
   const [scenarioId, setScenarioId] = useState<string>('');
   const [errorDetails, setErrorDetails] = useState<string>('');
   const [isClockShowing, setIsClockShowing] = useState(false);
+  /* Lesson Theme */
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
+  // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
+  const blockPadding = resolvedThemeCSS?.blockPadding ? '0px' : '32px';
 
   const {
     addListener,
@@ -249,15 +267,20 @@ function TeamScenarioExercise({
     scenarioStatusChangeCounter,
   ]);
 
+  // paddingTop provides space within content (safe, layout-based).
+  const outerSx: SxProps = {
+    padding: blockPadding,
+    marginBottom: blockPadding,
+    marginTop: blockPadding,
+  };
+
   return (
     <Paper
-      className="paper-activity hover:prose-a:text-blue-500 prose prose-invert"
+      className="paper-activity"
       variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        minWidth: '320px',
-        maxWidth: '1440px',
-        marginBottom: '12px',
+        ...outerSx,
       }}
     >
       {errorDetails && <Alert severity="error">{errorDetails}</Alert>}
@@ -271,20 +294,38 @@ function TeamScenarioExercise({
           >
             <Box
               sx={{
-                marginLeft: '0px',
-                height: '32px',
+                height: '100%',
                 display: 'flex',
                 flexGrow: 1,
-                //justifyContent: 'flex-end',
                 marginBottom: '24px',
               }}
             >
               {scenarioStatus}
+     
+              <Stack
+                direction="row"
+                sx={{ display: 'flex', alignItems: 'center' }}
+              >
+                <IconButton aria-label="toggle-clock" onClick={toggleClock}>
+                  <Tooltip
+                    arrow
+                    enterDelay={500}
+                    enterNextDelay={500}
+                    title={isClockShowing ? 'Hide Clock' : 'Show Clock'}
+                    placement="bottom"
+                  >
+                    <AccessTimeIcon />
+                  </Tooltip>
+                </IconButton>
+                {isClockShowing && scenarioClock}
+              </Stack>
+
+              <Box sx={{ flexGrow: 1 }}></Box>
               <Tabs
                 orientation="horizontal"
                 aria-label="Scenario Tabs"
                 sx={{
-                  marginTop: 0,
+                  marginTop: '2px',
                 }}
                 value={currentTab}
                 onChange={handleChangeTab}
@@ -311,19 +352,6 @@ function TeamScenarioExercise({
                   style={{ marginBottom: 0 }}
                 />
               </Tabs>
-
-              <IconButton aria-label="toggle-clock" onClick={toggleClock}>
-                <Tooltip
-                  arrow
-                  enterDelay={500}
-                  enterNextDelay={500}
-                  title={isClockShowing ? 'Hide Clock' : 'Show Clock'}
-                  placement="bottom"
-                >
-                  <AccessTimeIcon />
-                </Tooltip>
-              </IconButton>
-              {isClockShowing && scenarioClock}
             </Box>
           </Stack>
           {currentTab === 0 && (

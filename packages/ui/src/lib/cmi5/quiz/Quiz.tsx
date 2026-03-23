@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import useQuizGrader from './hooks/useQuizGrader';
 
@@ -18,6 +25,7 @@ import {
   IconButton,
   Paper,
   Stack,
+  SxProps,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -26,8 +34,19 @@ import QuizReview from './QuizReview';
 import QuestionNav from './QuestionNav';
 import { usePersistQuizProgress } from './hooks/usePersistQuiz';
 import { useHydrateQuiz } from './hooks/useHydrateQuiz';
-import { AnswerType, AuContextProps, QuizContent, QuizQuestion, QuestionResponse, QuizCompletionEnum, ActivityScore, RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import {
+  AnswerType,
+  AuContextProps,
+  QuizContent,
+  QuizQuestion,
+  QuestionResponse,
+  QuizCompletionEnum,
+  ActivityScore,
+  RC5ActivityTypeEnum,
+} from '@rapid-cmi5/cmi5-build-common';
 import { ButtonMinorUi, ButtonMainUi } from '../../utility/buttons';
+import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
+import { resolveLessonThemeCSS } from '../../styles/lessonThemeStyles';
 
 export type PotentialAnswerType = AnswerType | null;
 
@@ -53,6 +72,12 @@ export function AuQuiz({
   const [allAnswers, setAllAnswers] = useState<AnswerType[]>(
     Array(content.questions.length).fill(null),
   );
+  /* Lesson Theme */
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
+  // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
+  const blockPadding = resolvedThemeCSS?.blockPadding ? '0px' : '32px';
 
   const readyToHydrate = useMemo(() => {
     return isTestMode || isAuthenticated || false;
@@ -336,17 +361,20 @@ export function AuQuiz({
     updateUnanswered();
   }, [currentQuestionHasAnswer, currentQuestion, updateUnanswered]);
 
+  // paddingTop provides space within content (safe, layout-based).
+  const outerSx: SxProps = {
+    padding: blockPadding,
+    marginBottom: blockPadding,
+    marginTop: blockPadding,
+  };
+
   return (
     <Paper
       className="paper-activity"
       variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        minWidth: '320px',
-        maxWidth: '1152px',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        marginBottom: '12px',
+        ...outerSx,
       }}
     >
       {content.title && (
