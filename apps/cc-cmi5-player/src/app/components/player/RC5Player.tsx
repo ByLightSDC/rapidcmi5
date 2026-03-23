@@ -88,6 +88,18 @@ function RC5Player() {
     `lesson-theme-${Math.random().toString(36).slice(2, 9)}`,
   ).current;
 
+  const slideContentRef = useRef<HTMLDivElement>(null);
+
+  // MDXEditor hardcodes role="textbox" aria-label="editable markdown" on its contentEditable div.
+  // We patch it after render so screen readers treat it as a readable document, not an editable field.
+  useEffect(() => {
+    const el = slideContentRef.current?.querySelector<HTMLElement>('[data-lexical-editor="true"]');
+    if (el) {
+      el.setAttribute('role', 'document');
+      el.setAttribute('aria-label', 'Slide content');
+    }
+  }, [activeTab]);
+
   const pixelTop = '40px';
 
   const thePlugins = useMemo(() => {
@@ -343,7 +355,7 @@ function RC5Player() {
           <LessonThemeContext.Provider
             value={{ lessonTheme: currentLessonTheme }}
           >
-            <div role="tabpanel" aria-label="slide-content">
+            <div role="tabpanel" aria-label="slide-content" ref={slideContentRef}>
               <div id="toc-portal-target" />
               <MDXEditor
                 className={mdxTheme}

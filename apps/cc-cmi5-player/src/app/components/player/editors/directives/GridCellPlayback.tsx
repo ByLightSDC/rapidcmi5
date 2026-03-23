@@ -78,6 +78,7 @@ export const GridCellPlayback: React.FC<
         })}
         contentEditableProps={{
           className: scopedClass,
+          role: 'none',
         }}
       />
     </div>
