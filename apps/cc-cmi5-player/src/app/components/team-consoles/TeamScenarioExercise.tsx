@@ -301,7 +301,7 @@ function TeamScenarioExercise({
               }}
             >
               {scenarioStatus}
-     
+
               <Stack
                 direction="row"
                 sx={{ display: 'flex', alignItems: 'center' }}
@@ -320,7 +320,7 @@ function TeamScenarioExercise({
                 {isClockShowing && scenarioClock}
               </Stack>
 
-              <Box sx={{ flexGrow: 1 }}></Box>
+              <Box sx={{ flexGrow: 1, maxWidth:'24px', minWidth:'8px' }}></Box>
               <Tabs
                 orientation="horizontal"
                 aria-label="Scenario Tabs"
