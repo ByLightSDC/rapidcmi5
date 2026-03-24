@@ -6,15 +6,18 @@ import { useContext } from 'react';
 
 /* Branded */
 
-
 /* MUI */
 import Box from '@mui/material/Box';
 
 import RangeResourceVMActionRow from './RangeResourceVMActionRow';
 import RangeResourceContainerActionRow from './RangeResourceContainerActionRow';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
-import { queryKeyRangeResourceVMs, Topic } from '@rangeos-nx/frontend/clients/hooks';
-import { ListView, iListItemType } from '@rapid-cmi5/ui';
+import {
+  queryKeyRangeResourceVMs,
+  Topic,
+} from '@rangeos-nx/frontend/clients/hooks';
+import { ListView, LoadingUi, iListItemType } from '@rapid-cmi5/ui';
+import { Alert } from '@mui/material';
 
 /**
  * Displays Deployed Scenario VMs & Containers from Scenario Context
@@ -34,7 +37,7 @@ export default function RangeResources({
 }) {
   const { getUpdates } = useContext(ScenarioUpdatesContext);
   const rows = Object.values(getUpdates(topic));
-
+  const isContextInitialized = true;
   return (
     <>
       {rows.length > 0 ? (
@@ -88,7 +91,28 @@ export default function RangeResources({
             </Box>
           </div>
         </>
-      ) : null}
+      ) : (
+        <Box sx={{ margin: '12px' }}>
+          {isContextInitialized ? (
+            <Alert
+              severity="info"
+              sx={{
+                padding: '12px',
+                maxWidth: '480px',
+                backgroundColor: 'transparent',
+                borderColor: 'transparent',
+              }}
+            >
+              {topic === Topic.ResourceVM && 'No VMs Found'}
+              {topic === Topic.ResourceContainer && 'No Containers Found'}
+            </Alert>
+          ) : (
+            <LoadingUi
+              message={`Loading ${topic === Topic.ResourceVM ? 'VMs...' : topic === Topic.ResourceContainer ? 'Containers...' : 'AutoGraders'}`}
+            />
+          )}
+        </Box>
+      )}
     </>
   );
 }

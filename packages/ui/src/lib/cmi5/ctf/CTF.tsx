@@ -239,6 +239,14 @@ export function AuCTF({
     //REF maybe go to next available here?
   };
 
+  // marginBottom and Top provides space between activity block and sibling lexical nodes
+  // marginLeft and right adjust to textAlign setting
+  const outerSx: SxProps = {
+    padding: blockPadding,
+    marginBottom: blockPadding,
+    marginTop: blockPadding,
+  };
+
   /**
    * Submit Score to LRS
    */
@@ -337,13 +345,6 @@ export function AuCTF({
       }}
     />
   );
-
-  // paddingTop provides space within content (safe, layout-based).
-  const outerSx: SxProps = {
-    padding: blockPadding,
-    marginBottom: blockPadding,
-    marginTop: blockPadding,
-  };
 
   return (
     ctfContent.questions && (
@@ -523,9 +524,9 @@ export function AuCTF({
                             )}
                           </div>
                           <Typography
-                            variant="h5"
+                            variant="h6"
                             sx={{
-                              lineHeight: 1.1,
+                              lineHeight: 1.3,
                             }}
                           >
                             {option.question}
@@ -544,9 +545,9 @@ export function AuCTF({
                           )}
 
                           <Typography
-                            variant="h5"
+                            variant="h6"
                             sx={{
-                              lineHeight: 1.1,
+                              lineHeight: 1.3,
                             }}
                           >
                             {option.question}

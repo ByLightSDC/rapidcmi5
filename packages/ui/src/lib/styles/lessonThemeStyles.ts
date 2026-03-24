@@ -90,27 +90,8 @@ export function generateLessonThemeStyleTag(
   const css = resolveLessonThemeCSS(theme);
   if (!css) return '';
 
-  const widthRuleOld = css.maxWidth
+  const widthRule = css.maxWidth
     ? `
-    .${scopedClass} .mdxeditor-root-contenteditable :not(.paper-activity){
-      max-width: ${css.maxWidth};
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:not(.paper-activity) {
-      max-width: ${css.maxWidth};
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] [data-lexical-decorator]:not(.paper-activity) {
-      max-width: none;
-      margin-left: unset;
-      margin-right: unset;
-    }`
-    : '';
-
-const widthRule = css.maxWidth
-  ? `
   .${scopedClass} .mdxeditor-root-contenteditable:not(:has(.paper-activity)) {
     max-width: ${css.maxWidth};
     margin-left: auto;
@@ -126,7 +107,7 @@ const widthRule = css.maxWidth
     margin-left: unset;
     margin-right: unset;
   }`
-  : '';
+    : '';
 
   const alignmentRule = `
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > p,
@@ -139,7 +120,7 @@ const widthRule = css.maxWidth
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > h3,
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > h4,
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > h5,
-    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h6 {
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h6,
       text-align: ${css.textAlign};
     }`;
 

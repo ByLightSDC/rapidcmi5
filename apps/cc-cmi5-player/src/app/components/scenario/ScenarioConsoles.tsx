@@ -148,11 +148,12 @@ function ScenarioConsoles({
     padding: blockPadding,
     marginBottom: blockPadding,
     marginTop: blockPadding,
+    maxWidth: 1152,
   };
 
   return (
     <Paper
-      className="paper-activity hover:prose-a:text-blue-500 prose prose-invert"
+      className="paper-activity"
       variant="outlined"
       sx={{
         backgroundColor: 'background.default',
@@ -173,7 +174,7 @@ function ScenarioConsoles({
         </Typography>
       )}
       {content.introContent && <p>{content.introContent}</p>}
-      <p>Scenario</p>
+      <Typography variant="caption">Scenario</Typography>
 
       {(!rangeDataError || numRangeDataAttempts < numRetries) &&
         (!rangeConsoleDataError || numRangeConsoleDataAttempts < numRetries) &&
@@ -270,7 +271,7 @@ function ScenarioConsoles({
                 height: '48px',
               }}
             >
-              No AutoGraders found for this Scenario
+              No AutoGraders Found
             </Alert>
           )}
         </>
@@ -328,6 +329,7 @@ function ScenarioStatus({
           direction="row"
           sx={{
             padding: 0,
+            position: 'relative',
           }}
         >
           <OverflowTypography
@@ -353,43 +355,57 @@ function ScenarioStatus({
               {rowStatus.icon}
             </ListItemIcon>
           )}
+          <Stack
+            direction="row"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              minWidth: '132px',
+            }}
+          >
+            <IconButton aria-label="toggle-clock" onClick={toggleClock}>
+              <Tooltip
+                arrow
+                enterDelay={500}
+                enterNextDelay={500}
+                title={isClockShowing ? 'Hide Clock' : 'Show Clock'}
+                placement="bottom"
+              >
+                <AccessTimeIcon />
+              </Tooltip>
+            </IconButton>
+            {isClockShowing && (
+              <TimeClock startDateStr={scenarioWithStatus?.dateCreated || ''} />
+            )}
+          </Stack>
+
           <Box
             sx={{
-              marginLeft: 2,
-              height: '32px',
+              height: '30px',
               display: 'flex',
               flexGrow: 1,
               justifyContent: 'flex-end',
+              position: 'absolute', //force tabs to sit on divider
+              top: '10px',
+              right: 0,
             }}
           >
-            <Stack
-              direction="row"
-              sx={{ display: 'flex', alignItems: 'center' }}
-            >
-              <IconButton aria-label="toggle-clock" onClick={toggleClock}>
-                <Tooltip
-                  arrow
-                  enterDelay={500}
-                  enterNextDelay={500}
-                  title={isClockShowing ? 'Hide Clock' : 'Show Clock'}
-                  placement="bottom"
-                >
-                  <AccessTimeIcon />
-                </Tooltip>
-              </IconButton>
-              {isClockShowing && (
-                <TimeClock
-                  startDateStr={scenarioWithStatus?.dateCreated || ''}
-                />
-              )}
-            </Stack>
-            <Box sx={{ flexGrow: 1 }}></Box>
             <Tabs
               orientation="horizontal"
               aria-label="Scenario Tabs"
               sx={{ marginTop: 0 }}
               value={currentTab}
               onChange={handleChangeTab}
+              slotProps={{
+                indicator: {
+                  sx: {
+                    height: 4,
+                    margin: '12px',
+                    marginLeft: '0px',
+                    marginBottom: 1,
+                  },
+                },
+              }}
             >
               <TabMainUi
                 icon={<TerminalIcon color="inherit" fontSize="small" />}

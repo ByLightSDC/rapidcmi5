@@ -78,6 +78,8 @@ export function AuQuiz({
   // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
   // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
   const blockPadding = resolvedThemeCSS?.blockPadding ? '0px' : '32px';
+  const objectAlignMent = resolvedThemeCSS?.textAlign; 
+
 
   const readyToHydrate = useMemo(() => {
     return isTestMode || isAuthenticated || false;
@@ -361,11 +363,27 @@ export function AuQuiz({
     updateUnanswered();
   }, [currentQuestionHasAnswer, currentQuestion, updateUnanswered]);
 
-  // paddingTop provides space within content (safe, layout-based).
+
+  // marginBottom and Top provides space between activity block and sibling lexical nodes
+  // marginLeft and right adjust to textAlign setting
   const outerSx: SxProps = {
     padding: blockPadding,
     marginBottom: blockPadding,
     marginTop: blockPadding,
+    maxWidth: '1152px',
+    marginLeft:
+      objectAlignMent === 'center'
+        ? 'auto'
+        : objectAlignMent === 'start'
+          ?0
+          : 'auto',
+
+    marginRight:
+      objectAlignMent === 'center'
+        ? 'auto'
+        : objectAlignMent === 'end'
+          ? 0
+          : 'auto',
   };
 
   return (

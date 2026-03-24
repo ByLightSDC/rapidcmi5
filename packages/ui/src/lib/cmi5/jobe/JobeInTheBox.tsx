@@ -1,4 +1,3 @@
-
 import Editor from 'react-simple-code-editor';
 // @ts-expect-error - prismjs types are not fully compatible
 import { highlight, languages } from 'prismjs/components/prism-core';
@@ -6,15 +5,29 @@ import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/themes/prism.css'; //Example style, you can use another
 
-import { Alert, AlertTitle, Box, Paper, Typography } from '@mui/material';
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  Paper,
+  SxProps,
+  Typography,
+} from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 
 import useJobeGrader from './useJobeGrader';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { AuContextProps, JobeContent, ActivityScore, RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import {
+  AuContextProps,
+  JobeContent,
+  ActivityScore,
+  RC5ActivityTypeEnum,
+} from '@rapid-cmi5/cmi5-build-common';
 import { dividerColor } from '../../redux/commonAppReducer';
 import { ButtonMainUi } from '../../utility/buttons';
+import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
+import { resolveLessonThemeCSS } from '../../styles/lessonThemeStyles';
 
 export function JobeInTheBox({
   auProps,
@@ -33,6 +46,14 @@ export function JobeInTheBox({
   const [submissionStr, setSubmissionStr] = useState<string>('');
   const [successStr, setSuccessStr] = useState<string>('');
   const [errorStr, setErrorStr] = useState<string>('');
+
+  /* Lesson Theme */
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
+  // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
+  const blockPadding = resolvedThemeCSS?.blockPadding ? '0px' : '32px';
+  const objectAlignMent = resolvedThemeCSS?.textAlign;
 
   const handleSubmit = async () => {
     setSuccessStr('');
@@ -126,22 +147,39 @@ export function JobeInTheBox({
     }
   };
 
+  // marginBottom and Top provides space between activity block and sibling lexical nodes
+  // marginLeft and right adjust to textAlign setting
+  const outerSx: SxProps = {
+    padding: blockPadding,
+    marginBottom: blockPadding,
+    marginTop: blockPadding,
+    maxWidth: '1152px',
+    marginLeft:
+      objectAlignMent === 'center'
+        ? 'auto'
+        : objectAlignMent === 'start'
+          ? 0
+          : 'auto',
+
+    marginRight:
+      objectAlignMent === 'center'
+        ? 'auto'
+        : objectAlignMent === 'end'
+          ? 0
+          : 'auto',
+  };
+
   useEffect(() => {
     setSubmissionStr(jobeContent.student);
   }, [jobeContent]);
 
-  //REF TODO className="hover:prose-a:text-blue-500"
   return (
     <Paper
       className="paper-activity"
       variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        minWidth: '320px',
-        maxWidth: '1152px',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        marginBottom: '12px',
+        ...outerSx,
       }}
     >
       {jobeContent.title && (

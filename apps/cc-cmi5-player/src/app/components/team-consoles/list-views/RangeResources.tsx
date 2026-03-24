@@ -4,7 +4,6 @@
 
 import { useEffect, useMemo } from 'react';
 
-
 /* MUI */
 import { Alert } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -14,7 +13,11 @@ import TeamRangeResourceContainerActionRow from './TeamRangeResourceContainerAct
 import { DeployedRangeConsole } from '@rangeos-nx/frontend/clients/devops-api';
 import TeamRangeResourceAutoGraderActionActionRow from './TeamRangeResourceAutoGraderActionRow';
 import AutoGraderProgressDisplay from './AutoGraderProgressDisplay';
-import { DeployedAutoGrader, queryKeyRangeResourceVMs, Topic } from '@rangeos-nx/frontend/clients/hooks';
+import {
+  DeployedAutoGrader,
+  queryKeyRangeResourceVMs,
+  Topic,
+} from '@rangeos-nx/frontend/clients/hooks';
 import { ListView, iListItemType, LoadingUi } from '@rapid-cmi5/ui';
 
 /**
@@ -183,13 +186,23 @@ export default function RangeResources({
       ) : (
         <Box sx={{ margin: '12px' }}>
           {isContextInitialized ? (
-            <Alert severity="info" sx={{ padding: '12px', maxWidth: '480px' }}>
+            <Alert
+              severity="info"
+              sx={{
+                padding: '12px',
+                maxWidth: '480px',
+                backgroundColor: 'transparent',
+                borderColor: 'transparent',
+              }}
+            >
               {topic === Topic.ResourceVM && 'No VMs Found'}
               {topic === Topic.ResourceContainer && 'No Containers Found'}
-              {topic === Topic.ResourceAutoGrader && 'No Auto Graders Found'}
+              {topic === Topic.ResourceAutoGrader && 'No AutoGraders Found'}
             </Alert>
           ) : (
-            <LoadingUi />
+            <LoadingUi
+              message={`Loading ${topic === Topic.ResourceVM ? 'VMs...' : topic === Topic.ResourceContainer ? 'Containers...' : 'AutoGraders'}`}
+            />
           )}
         </Box>
       )}

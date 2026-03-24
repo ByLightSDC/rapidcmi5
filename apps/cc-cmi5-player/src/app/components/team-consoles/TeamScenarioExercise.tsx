@@ -16,6 +16,7 @@ import {
 import {
   Alert,
   Box,
+  Divider,
   IconButton,
   ListItemIcon,
   Paper,
@@ -23,6 +24,7 @@ import {
   SxProps,
   Tabs,
   Tooltip,
+  Typography,
 } from '@mui/material';
 
 /* Icons*/
@@ -177,11 +179,21 @@ function TeamScenarioExercise({
       const theIcon = getScenarioStatusChild(scenarioRecord);
 
       return (
-        <Stack direction="row" sx={{ display: 'flex', alignItems: 'center' }}>
+        <Stack
+          direction="row"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            alignContent: 'center',
+          }}
+        >
           <OverflowTypography
             uuid={scenarioRecord.uuid}
             title={scenarioRecord.name}
-            sxProps={{ fontWeight: 'bold', textTransform: 'uppercase' }}
+            variant="h5"
+            sxProps={{
+              fontWeight: 'bold',
+            }}
           />
           {theIcon}
         </Stack>
@@ -272,6 +284,7 @@ function TeamScenarioExercise({
     padding: blockPadding,
     marginBottom: blockPadding,
     marginTop: blockPadding,
+    maxWidth:1152
   };
 
   return (
@@ -283,6 +296,7 @@ function TeamScenarioExercise({
         ...outerSx,
       }}
     >
+      <Typography variant="caption">Team Exercise</Typography>
       {errorDetails && <Alert severity="error">{errorDetails}</Alert>}
       {scenarioId && (
         <>
@@ -290,43 +304,46 @@ function TeamScenarioExercise({
             direction="row"
             sx={{
               padding: 0,
+              position: 'relative',
             }}
           >
-            <Box
+            {scenarioStatus}
+            <Stack
+              direction="row"
               sx={{
-                height: '100%',
                 display: 'flex',
-                flexGrow: 1,
-                marginBottom: '24px',
+                alignItems: 'center',
+                minWidth: '132px',
               }}
             >
-              {scenarioStatus}
-
-              <Stack
-                direction="row"
-                sx={{ display: 'flex', alignItems: 'center' }}
-              >
-                <IconButton aria-label="toggle-clock" onClick={toggleClock}>
-                  <Tooltip
-                    arrow
-                    enterDelay={500}
-                    enterNextDelay={500}
-                    title={isClockShowing ? 'Hide Clock' : 'Show Clock'}
-                    placement="bottom"
-                  >
-                    <AccessTimeIcon />
-                  </Tooltip>
-                </IconButton>
-                {isClockShowing && scenarioClock}
-              </Stack>
-
-              <Box sx={{ flexGrow: 1, maxWidth:'24px', minWidth:'8px' }}></Box>
+              <IconButton aria-label="toggle-clock" onClick={toggleClock}>
+                <Tooltip
+                  arrow
+                  enterDelay={500}
+                  enterNextDelay={500}
+                  title={isClockShowing ? 'Hide Clock' : 'Show Clock'}
+                  placement="bottom"
+                >
+                  <AccessTimeIcon />
+                </Tooltip>
+              </IconButton>
+              {isClockShowing && scenarioClock}
+            </Stack>
+            <Box
+              sx={{
+                height: '30px',
+                display: 'flex',
+                flexGrow: 1,
+                justifyContent: 'flex-end',
+                position: 'absolute', //force tabs to sit on divider
+                top: '10px',
+                right: 0,
+              }}
+            >
               <Tabs
                 orientation="horizontal"
                 aria-label="Scenario Tabs"
-                sx={{
-                  marginTop: '2px',
-                }}
+                sx={{ marginTop: 0 }}
                 value={currentTab}
                 onChange={handleChangeTab}
                 slotProps={{
@@ -335,6 +352,7 @@ function TeamScenarioExercise({
                       height: 4,
                       margin: '12px',
                       marginLeft: '0px',
+                      marginBottom: 1,
                     },
                   },
                 }}
