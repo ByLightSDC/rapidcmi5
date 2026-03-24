@@ -12,11 +12,7 @@
           "type": "string"
         },
         "element_type": {
-          "enum": [
-            "task",
-            "knowledge",
-            "skill"
-          ],
+          "enum": ["task", "knowledge", "skill"],
           "type": "string"
         },
         "text": {
@@ -36,12 +32,7 @@
       "type": "object"
     },
     "MoveOnCriteriaEnum": {
-      "enum": [
-        "completed",
-        "passed",
-        "completed-and-passed",
-        "not-applicable"
-      ],
+      "enum": ["completed", "passed", "completed-and-passed", "not-applicable"],
       "type": "string"
     },
     "RC5ScenarioContent": {
@@ -69,13 +60,14 @@
         "rc5id": {
           "type": "string"
         },
+        "defaultClassId": {
+          "type": "string"
+        },
         "uuid": {
           "type": "string"
         }
       },
-      "required": [
-        "uuid"
-      ],
+      "required": ["uuid"],
       "type": "object"
     }
   }
