@@ -92,12 +92,21 @@ function RC5Player() {
 
   // MDXEditor hardcodes role="textbox" aria-label="editable markdown" on its contentEditable div.
   // We patch it after render so screen readers treat it as a readable document, not an editable field.
+  // We also move focus to it so NVDA starts reading the slide from the top when a slide changes,
+  // rather than leaving focus on whatever navigation button the user just pressed.
   useEffect(() => {
-    const el = slideContentRef.current?.querySelector<HTMLElement>('[data-lexical-editor="true"]');
-    if (el) {
-      el.setAttribute('role', 'document');
-      el.setAttribute('aria-label', 'Slide content');
-    }
+    const id = setTimeout(() => {
+      const el = slideContentRef.current?.querySelector<HTMLElement>('[data-lexical-editor="true"]');
+      if (el) {
+        el.setAttribute('role', 'document');
+        el.setAttribute('aria-label', 'Slide content');
+        // tabindex="-1" is required to programmatically focus a non-interactive element
+        // (readOnly MDXEditor sets contenteditable="false", so focus() alone won't work)
+        el.setAttribute('tabindex', '-1');
+        el.focus({ preventScroll: true });
+      }
+    }, 150);
+    return () => clearTimeout(id);
   }, [activeTab]);
 
   const pixelTop = '40px';
