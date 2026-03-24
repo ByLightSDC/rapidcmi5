@@ -3,6 +3,10 @@
  * that use the flex-row gutter button pattern.
  */
 
+/** CSS custom property name for the computed left/right content margin width.
+ *  Set on the lesson theme scoped class; inherited by all directive editors. */
+export const DIRECTIVE_CONTENT_MARGIN_VAR = '--content-margin';
+
 /** Gap between the directive content box and the gutter button group */
 export const DIRECTIVE_GUTTER_GAP = '10px';
 
