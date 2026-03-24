@@ -46,7 +46,7 @@ import {
   ButtonMinorUi,
 } from '../../utility/buttons';
 import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
-import { resolveLessonThemeCSS } from '../../styles/lessonThemeStyles';
+import { useLessonThemeStyles } from '../../hooks/useLessonThemeStyles';
 
 const answerBoxGridSize = 3.8;
 const attemptedLabel = '#Attempted';
@@ -86,7 +86,7 @@ export function AuCTF({
     setNumAttempted,
     setNumCorrect,
   } = useCTFGrader(ctfContent);
-  const [isInitialized, setIsInitialized] = useState(false);
+
   const [isFocused, setIsFocused] = useState(currentQuestionIndex >= 0);
   const focusHelper = useDisplayFocus();
   const countRef = useRef(currentQuestionIndex); //for tabbing
@@ -97,10 +97,7 @@ export function AuCTF({
 
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
-  // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
-  // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
-  const blockPadding = resolvedThemeCSS?.blockPadding ? '0px' : '32px';
+  const { blockPadding } = useLessonThemeStyles(lessonTheme);
 
   /**
    * Selects question if it is available (no grade or bad grade)

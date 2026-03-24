@@ -248,7 +248,6 @@ function AuManager() {
         </Alert>
       );
     }
-
     if (auManagerState !== AuManagerState.ready) {
       return (
         <div
@@ -313,11 +312,13 @@ function AuManager() {
         //otherwise token use effect will update it after sso authentication achieved
         if (!config.CMI5_SSO_ENABLED) {
           dispatch(setIsDisplayInitialized(true));
+          logger.debug('[AU] basic auth configured', undefined, 'auth');
+        } else {
+          logger.debug('[AU] waiting for SSO token', undefined, 'auth');
         }
 
         if (checkForDevMode()) {
           logger.debug('[AU] test mode', undefined, 'auManager');
-          loadOverrides('./cfg.json', false);
 
           testCmi5(true);
           logger.debug(
@@ -327,9 +328,9 @@ function AuManager() {
           );
           if (auHasScenario && shouldRequireClassId) {
             dispatch(setModal({ type: classPromptModalId, id: '', name: '' }));
+            logger.debug('[AuManager] prompt class id', undefined, 'auth');
           } else {
-            setAuManagerState(AuManagerState.ready);
-            dispatch(setIsConfigInitialized(true));
+            setAuManagerState(AuManagerState.loadingOverrides);
           }
         } else {
           initializeSessionCmi5();
@@ -351,12 +352,21 @@ function AuManager() {
         // Refresh logging configuration after overrides are applied
         refreshLoggingConfig();
         setAuManagerState(AuManagerState.loadingScenario);
-        console.log('config loaded after overrides', config);
       } else {
         loadOverrides('./cfg.json');
       }
       return;
     } else if (auManagerState === AuManagerState.loadingScenario) {
+      if (isTestMode) {
+        logger.debug(
+          '[AuManager] setIsConfigInitialized in testmode',
+          undefined,
+          'auth',
+        );
+        dispatch(setIsConfigInitialized(true));
+        setAuManagerState(AuManagerState.ready);
+        return;
+      }
       if (isCmi5RangeConnectionComplete) {
         // Add additional check for CMI5 readiness before calling resumeAU
         if (cmi5Instance.xapi !== null && cmi5Instance.xapi !== undefined) {
@@ -367,6 +377,12 @@ function AuManager() {
           );
           resumeAU(dispatch, isInitializedProgressData, auJson); // gets cmi5 progress and sets active tab
           setAuManagerState(AuManagerState.ready);
+
+          logger.debug(
+            '[AuManager] setIsConfigInitialized after loadingScenario success',
+            undefined,
+            'auth',
+          );
           dispatch(setIsConfigInitialized(true));
 
           // Reset CMI5 ready attempts on success
@@ -392,6 +408,12 @@ function AuManager() {
             );
             resumeAU(dispatch, isInitializedProgressData, auJson);
             setAuManagerState(AuManagerState.ready);
+
+            logger.debug(
+              '[AuManager] setIsConfigInitialized after loadingScenario failed attempts',
+              undefined,
+              'auth',
+            );
             dispatch(setIsConfigInitialized(true));
 
             setCmi5ReadyAttempts(0);
@@ -408,12 +430,11 @@ function AuManager() {
     }
 
     // After active tab or config (auJson) populates -----------------
+    logger.debug('[AU] activeSlide', { activeTab }, 'auManager');
 
     if (isTestMode) {
       return;
     }
-
-    logger.debug('[AU] activeSlide', { activeTab }, 'auManager');
 
     if (auJson?.slides) {
       // Exit slide (synthetic tab beyond last real slide) should not trigger progress
@@ -509,8 +530,8 @@ function AuManager() {
       <>
         {getReadyDisplay()}
         {isDisplayInitialized && <MenuLayout />}
-        {!isDisplayInitialized && config.CMI5_SSO_ENABLED && (
-          <Typography>Waiting for SSO Authentication</Typography>
+        {!isDisplayInitialized && (
+          <Typography color="textPrimary">Authenticating...</Typography>
         )}
       </>
     </AuManagerContext.Provider>

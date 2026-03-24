@@ -27,7 +27,7 @@ import {
 import { dividerColor } from '../../redux/commonAppReducer';
 import { ButtonMainUi } from '../../utility/buttons';
 import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
-import { resolveLessonThemeCSS } from '../../styles/lessonThemeStyles';
+import { useLessonThemeStyles } from '../../hooks/useLessonThemeStyles';
 
 export function JobeInTheBox({
   auProps,
@@ -49,11 +49,7 @@ export function JobeInTheBox({
 
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
-  // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
-  // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
-  const blockPadding = resolvedThemeCSS?.blockPadding ? '0px' : '32px';
-  const objectAlignMent = resolvedThemeCSS?.textAlign;
+  const { blockPadding, activityAlign } = useLessonThemeStyles(lessonTheme);
 
   const handleSubmit = async () => {
     setSuccessStr('');
@@ -155,16 +151,16 @@ export function JobeInTheBox({
     marginTop: blockPadding,
     maxWidth: '1152px',
     marginLeft:
-      objectAlignMent === 'center'
+      activityAlign === 'center'
         ? 'auto'
-        : objectAlignMent === 'start'
+        : activityAlign === 'start'
           ? 0
           : 'auto',
 
     marginRight:
-      objectAlignMent === 'center'
+      activityAlign === 'center'
         ? 'auto'
-        : objectAlignMent === 'end'
+        : activityAlign === 'end'
           ? 0
           : 'auto',
   };

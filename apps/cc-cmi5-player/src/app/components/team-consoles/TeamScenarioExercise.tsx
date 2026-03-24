@@ -16,7 +16,6 @@ import {
 import {
   Alert,
   Box,
-  Divider,
   IconButton,
   ListItemIcon,
   Paper,
@@ -56,6 +55,7 @@ import {
   resolveLessonThemeCSS,
   TabMainUi,
 } from '@rapid-cmi5/ui';
+import { useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
 
 /**
  * Activity displays a Deployed Scenario status, VMs, Containers, and Autograders
@@ -79,10 +79,7 @@ function TeamScenarioExercise({
   const [isClockShowing, setIsClockShowing] = useState(false);
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
-  // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
-  // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
-  const blockPadding = resolvedThemeCSS?.blockPadding ? '0px' : '32px';
+  const { blockPadding, activityAlign } = useLessonThemeStyles(lessonTheme);
 
   const {
     addListener,
@@ -279,12 +276,26 @@ function TeamScenarioExercise({
     scenarioStatusChangeCounter,
   ]);
 
-  // paddingTop provides space within content (safe, layout-based).
+  // marginBottom and Top provides space between activity block and sibling lexical nodes
+  // marginLeft and right adjust to textAlign setting
   const outerSx: SxProps = {
     padding: blockPadding,
     marginBottom: blockPadding,
     marginTop: blockPadding,
-    maxWidth:1152
+    maxWidth: '1152px',
+    marginLeft:
+      activityAlign === 'center'
+        ? 'auto'
+        : activityAlign === 'start'
+          ? 0
+          : 'auto',
+
+    marginRight:
+      activityAlign === 'center'
+        ? 'auto'
+        : activityAlign === 'end'
+          ? 0
+          : 'auto',
   };
 
   return (

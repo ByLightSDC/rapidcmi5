@@ -20,6 +20,7 @@ import SavedSearchIcon from '@mui/icons-material/SavedSearch';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 
 import {
+  Alert,
   Box,
   CircularProgress,
   IconButton,
@@ -46,7 +47,7 @@ import {
 } from '@rapid-cmi5/cmi5-build-common';
 import { ButtonMinorUi, ButtonMainUi } from '../../utility/buttons';
 import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
-import { resolveLessonThemeCSS } from '../../styles/lessonThemeStyles';
+import { useLessonThemeStyles } from '../../hooks/useLessonThemeStyles';
 
 export type PotentialAnswerType = AnswerType | null;
 
@@ -67,19 +68,14 @@ export function AuQuiz({
     isAuthenticated,
     isTestMode,
   } = auProps;
-
+  const noneFound = 'During a lesson, questions appear here. There are currently no questions in this quiz.';
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [allAnswers, setAllAnswers] = useState<AnswerType[]>(
     Array(content.questions.length).fill(null),
   );
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
-  // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
-  // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
-  const blockPadding = resolvedThemeCSS?.blockPadding ? '0px' : '32px';
-  const objectAlignMent = resolvedThemeCSS?.textAlign; 
-
+  const { blockPadding, activityAlign } = useLessonThemeStyles(lessonTheme);
 
   const readyToHydrate = useMemo(() => {
     return isTestMode || isAuthenticated || false;
@@ -363,7 +359,6 @@ export function AuQuiz({
     updateUnanswered();
   }, [currentQuestionHasAnswer, currentQuestion, updateUnanswered]);
 
-
   // marginBottom and Top provides space between activity block and sibling lexical nodes
   // marginLeft and right adjust to textAlign setting
   const outerSx: SxProps = {
@@ -372,16 +367,16 @@ export function AuQuiz({
     marginTop: blockPadding,
     maxWidth: '1152px',
     marginLeft:
-      objectAlignMent === 'center'
+      activityAlign === 'center'
         ? 'auto'
-        : objectAlignMent === 'start'
-          ?0
+        : activityAlign === 'start'
+          ? 0
           : 'auto',
 
     marginRight:
-      objectAlignMent === 'center'
+      activityAlign === 'center'
         ? 'auto'
-        : objectAlignMent === 'end'
+        : activityAlign === 'end'
           ? 0
           : 'auto',
   };
@@ -586,6 +581,21 @@ export function AuQuiz({
             </Stack>
           )}
         </>
+      )}
+      {!isLoading && !activeQuestion && (
+        <Box sx={{ margin: '12px' }}>
+          <Alert
+            severity="info"
+            sx={{
+              backgroundColor: 'transparent',
+              borderColor: 'transparent',
+              padding: '12px',
+              maxWidth: '640px',
+            }}
+          >
+            {noneFound}
+          </Alert>
+        </Box>
       )}
     </Paper>
   );
