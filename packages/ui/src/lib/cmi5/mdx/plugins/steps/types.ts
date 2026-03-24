@@ -18,6 +18,7 @@ export interface StepDirectiveNode extends ContainerDirective {
    */
   attributes: {
     style?: string;
+    backgroundColor?: string;
   };
 
   children: StepContentDirectiveNode[];

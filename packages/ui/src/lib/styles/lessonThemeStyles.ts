@@ -88,26 +88,36 @@ export function generateLessonThemeStyleTag(
   theme?: LessonTheme,
 ): string {
   const css = resolveLessonThemeCSS(theme);
-  if (!css) return '';
+  // Always emit --content-margin so directive calc() expressions resolve even when no theme is set.
+  if (!css) return `.${scopedClass} { --content-margin: 0px; }`;
 
   const widthRule = css.maxWidth
     ? `
-  .${scopedClass} .mdxeditor-root-contenteditable:not(:has(.paper-activity)) {
-    max-width: ${css.maxWidth};
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:not(:has(.paper-activity)) {
-    max-width: ${css.maxWidth};
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] [data-lexical-decorator]:not(:has(.paper-activity)) {
-    max-width: none;
-    margin-left: unset;
-    margin-right: unset;
-  }`
-    : '';
+    .${scopedClass} {
+      --content-margin: calc((100% - ${css.maxWidth}) / 2);
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable:not(:has(.paper-activity)) {
+      max-width: ${css.maxWidth};
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:not(:has(.paper-activity)) {
+      max-width: ${css.maxWidth};
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] [data-lexical-decorator]:not(:has(.paper-activity)) {
+      max-width: none;
+      margin-left: unset;
+      margin-right: unset;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"]:not(:has(.paper-activity)) {
+      --content-margin: 0px;
+    }`
+    : `
+    .${scopedClass} {
+      --content-margin: 0px;
+    }`;
 
   const alignmentRule = `
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > p,
