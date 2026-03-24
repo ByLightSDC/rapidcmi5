@@ -16,22 +16,22 @@ import { Alert, Typography } from '@mui/material';
 import * as yup from 'yup';
 
 import { UseFormReturn } from 'react-hook-form';
-import { SuperSaveFormType } from '../CourseBuilderApiTypes';
+import { SuperSaveFormType } from '../../CourseBuilderApiTypes';
 
 import {
   cacheWarning,
   saveCourseFileModalId,
-} from '../../rapidcmi5_mdx/modals/constants';
+} from '../../../rapidcmi5_mdx/modals/constants';
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { GitContext } from '../GitViewer/session/GitContext';
-import { MessageType } from '../CourseBuilderTypes';
-import { useRC5Prompts } from '../../rapidcmi5_mdx/modals/useRC5Prompts';
+import { GitContext } from '../../GitViewer/session/GitContext';
+import { MessageType } from '../../CourseBuilderTypes';
+import { useRC5Prompts } from '../../../rapidcmi5_mdx/modals/useRC5Prompts';
 import { useDispatch, useSelector } from 'react-redux';
-import { RC5Context } from '../../rapidcmi5_mdx/contexts/RC5Context';
+import { RC5Context } from '../../../rapidcmi5_mdx/contexts/RC5Context';
 import {
   courseOperations,
   updateDirtyDisplay,
-} from '../../../redux/courseBuilderReducer';
+} from '../../../../redux/courseBuilderReducer';
 
 export function SaveCourseForm({
   defaultData,

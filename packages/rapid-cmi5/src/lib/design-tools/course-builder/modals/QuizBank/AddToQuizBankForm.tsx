@@ -40,6 +40,7 @@ export function AddToQuizBankForm({
   };
 
   const handleConfirm = () => {
+    
     handleModalAction({ ...question, tags });
   };
 

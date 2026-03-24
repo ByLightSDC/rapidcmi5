@@ -17,7 +17,7 @@ import { UserConfigContext } from './contexts/UserConfigContext';
 import { AuthContext } from './contexts/AuthContext';
 import { IQuizBankContext } from 'packages/rapid-cmi5/src/lib/contexts/QuizBankContext';
 import axios from 'axios';
-import { QuestionType } from 'packages/rapid-cmi5/src/lib/design-tools/course-builder/modals/QuizBank/QuizBankSearchForm';
+import { QuestionType } from 'packages/rapid-cmi5/src/lib/design-tools/course-builder/modals/quizBank/QuizBankSearchForm';
 
 export const apiClient = axios.create({
   baseURL: 'http://localhost:8080', // change to your backend
@@ -95,13 +95,14 @@ export function RapidCmi5Wrapper() {
   const quizBankContextProps: IQuizBankContext = {
     addToQuizBank: async (question: QuestionType) => {
       try {
+        console.log("data", question)
         const response = await apiClient.post(
           '/v1/quizBank/questionBank',
           {
-            quizId: question.questionData,
+            quizId: 1,
             rc5Version: 1,
             tags: question.tags,
-            quizQuestion: question.questionData,
+            quizQuestion: question,
             question: question.question
           },
           {

@@ -291,13 +291,7 @@ export function QuizBankSearchForm({
                 {results.map((q) => {
                   const isSelected = selected.has(q.id);
                   const isExpanded = expandedIds.has(q.id);
-                  const qd = q.quizQuestion ?? {};
-                  const choices: {
-                    text?: string;
-                    label?: string;
-                    correct?: boolean;
-                  }[] = qd.choices ?? qd.options ?? [];
-                  const correctAnswer = qd.answer ?? qd.correctAnswer;
+
                   return (
                     <QuestionCard
                       multiSelect={multiSelect}

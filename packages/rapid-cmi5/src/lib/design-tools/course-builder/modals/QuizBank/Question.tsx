@@ -17,7 +17,6 @@ import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { QuestionResponse, QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
-import { requireField } from '../../../rapidcmi5_mdx/editors/forms/QuizForm';
 
 const TYPE_COLORS: Record<
   string,
@@ -290,7 +289,7 @@ export default function QuestionCard({
             )}
             {q.rc5Version && (
               <Typography variant="caption" color="text.secondary">
-                v{q.rc5Version}
+                version: {q.rc5Version}
               </Typography>
             )}
           </Box>

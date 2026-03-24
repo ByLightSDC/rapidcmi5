@@ -45,7 +45,7 @@ import { useContext, useState } from 'react';
 import { QuizBankContext } from 'packages/rapid-cmi5/src/lib/contexts/QuizBankContext';
 import QuizBankSearchForm, {
   QuestionType,
-} from '../../../course-builder/modals/QuizBank/QuizBankSearchForm';
+} from '../../../course-builder/modals/quizBank/QuizBankSearchForm';
 
 export function requireField<T>(value: T | undefined | null, field: string): T {
   if (value === undefined || value === null) {

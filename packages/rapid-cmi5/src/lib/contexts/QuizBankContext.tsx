@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { createContext } from 'react';
-import { QuestionType } from '../design-tools/course-builder/modals/QuizBank/QuizBankSearchForm';
+import { QuestionType } from '../design-tools/course-builder/modals/quizBank/QuizBankSearchForm';
 
 export interface QuestionBankApi {
   author: string;

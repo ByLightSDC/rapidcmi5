@@ -19,7 +19,7 @@ import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
 import { RootState } from '../../../redux/store';
 import { RepoState } from '../../../redux/repoManagerReducer';
-import SaveCourseForm from '../../course-builder/modals/SaveCourseForm';
+import SaveCourseForm from '../../course-builder/modals/courses/SaveCourseForm';
 import { SuperSaveFormType } from '../../course-builder/CourseBuilderApiTypes';
 
 export default function RC5Modals() {

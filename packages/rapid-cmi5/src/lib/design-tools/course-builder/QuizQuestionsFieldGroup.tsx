@@ -22,12 +22,8 @@ import {
   setModal,
 } from '@rapid-cmi5/ui';
 
-import { useRC5Prompts } from '../rapidcmi5_mdx/modals/useRC5Prompts';
-import { QuizBankContext } from '../../contexts/QuizBankContext';
-import QuizBankSearchForm, {
-  QuestionType,
-} from './modals/QuizBank/QuizBankSearchForm';
-import AddToQuizBankForm from './modals/QuizBank/AddToQuizBankForm';
+import { QuestionType } from './modals/quizBank/QuizBankSearchForm';
+import AddToQuizBankForm from './modals/quizBank/AddToQuizBankForm';
 
 /**
  * @interface fieldGroupProps
