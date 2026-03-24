@@ -158,6 +158,7 @@ export default function MenuLayout() {
             sx={{
               //presentation background color
               backgroundColor: palette.background.paper,
+
               height: '100%',
               width: '100%',
               overflow: 'auto',
@@ -412,6 +413,12 @@ export default function MenuLayout() {
                 <TeamScenarioContextProvider isEnabled={true}>
                   <RC5Player />
                 </TeamScenarioContextProvider>
+                // REF debugging - keep for testing individual Scenario UI with deployed scenario
+                // <ScenarioWrapper>
+                //   <TeamScenarioContextProvider isEnabled={true}>
+                //     <RC5Player />
+                //   </TeamScenarioContextProvider>
+                // </ScenarioWrapper>
               )}
             </>
           </Box>
