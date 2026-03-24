@@ -1,6 +1,6 @@
-import { MenuItem } from '@mui/material';
+import { Button, ListItemIcon, MenuItem } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import { UseFormReturn } from 'react-hook-form';
-
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
@@ -10,9 +10,49 @@ import * as yup from 'yup';
 import { QuizQuestionsFieldGroup } from '../../../course-builder/QuizQuestionsFieldGroup';
 import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
 import LrsHeaderWithDetails from './LrsStatementHelper';
-import { RC5ActivityTypeEnum, QuizContent, SlideTypeEnum, QuizCompletionEnum, MoveOnCriteriaEnum, QuestionResponse, QuestionGrading, moveOnCriteriaOptions } from '@rapid-cmi5/cmi5-build-common';
-import { ENUM_GROUP, REQUIRED_ERROR, REQUIRED_ENTRY, SPECIFY_AT_LEAST_ONE_ERROR, defaultQuestion, FormControlIntegerField, FormControlSelectField, FormControlTextField, FormControlUIProvider, FormCrudType, FormFieldArray, FormStateType, MiniForm, tFormFieldRendererProps } from '@rapid-cmi5/ui';
+import {
+  RC5ActivityTypeEnum,
+  QuizContent,
+  SlideTypeEnum,
+  QuizCompletionEnum,
+  MoveOnCriteriaEnum,
+  QuestionResponse,
+  QuestionGrading,
+  moveOnCriteriaOptions,
+  QuizQuestion,
+} from '@rapid-cmi5/cmi5-build-common';
+import {
+  ENUM_GROUP,
+  REQUIRED_ERROR,
+  REQUIRED_ENTRY,
+  SPECIFY_AT_LEAST_ONE_ERROR,
+  defaultQuestion,
+  FormControlIntegerField,
+  FormControlSelectField,
+  FormControlTextField,
+  FormControlUIProvider,
+  FormCrudType,
+  FormFieldArray,
+  FormStateType,
+  MiniForm,
+  tFormFieldRendererProps,
+  modal,
+  ButtonModalMinorUi,
+} from '@rapid-cmi5/ui';
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
+
+import { useContext, useState } from 'react';
+import { QuizBankContext } from 'packages/rapid-cmi5/src/lib/contexts/QuizBankContext';
+import QuizBankSearchForm, {
+  QuestionType,
+} from '../../../course-builder/modals/QuizBank/QuizBankSearchForm';
+
+export function requireField<T>(value: T | undefined | null, field: string): T {
+  if (value === undefined || value === null) {
+    throw new Error(`Missing "${field}" in quiz bank question`);
+  }
+  return value;
+}
 
 export const QuizForm = ({
   activityKind,
@@ -28,13 +68,14 @@ export const QuizForm = ({
   handleCloseModal?: () => void;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
+  const { addToQuizBank, searchQuizBank } = useContext(QuizBankContext);
+
   const slideType =
     activityKind === RC5ActivityTypeEnum.quiz
       ? SlideTypeEnum.Quiz
       : SlideTypeEnum.CTF;
 
-  // Get the unique rc5id from the form data for scoping ksats to individual activity
-  const rc5id = defaultFormData?.rc5id;
+  const [isSearchBankOpen, setIsSearchBankOpen] = useState(false);
 
   const validationSchema = yup.object().shape({
     //cmi5QuizId: read-only field auto populated/updated
@@ -105,7 +146,7 @@ export const QuizForm = ({
     formMethods: UseFormReturn,
     formState: FormStateType,
   ): JSX.Element => {
-    const { control, getValues } = formMethods;
+    const { control, getValues, setValue } = formMethods;
     const { errors } = formState;
 
     /**
@@ -116,6 +157,42 @@ export const QuizForm = ({
       questions.forEach((question: any, index: number) => {
         question.cmi5QuestionId = `q${index + 1}`;
       });
+    };
+
+    const mapBankQuestionToFormQuestion = (
+      question: QuestionType,
+      index: number,
+    ): QuizQuestion => {
+      const data = requireField(question.questionData, 'questionData');
+
+      return {
+        question: requireField(data.question, 'question'),
+        type: requireField(data.type, 'type'),
+        typeAttributes: requireField(data.typeAttributes, 'typeAttributes'),
+        cmi5QuestionId: data.cmi5QuestionId ?? `q${index + 1}`,
+      };
+    };
+
+    const handleModalResponse = (selectedQuestions: QuestionType[]) => {
+      const existingQuestions = getValues('questions') || [];
+
+      const mappedQuestions = selectedQuestions.map((question, idx) =>
+        mapBankQuestionToFormQuestion(question, existingQuestions.length + idx),
+      );
+
+      const updatedQuestions = [...existingQuestions, ...mappedQuestions].map(
+        (question, index) => ({
+          ...question,
+          cmi5QuestionId: `q${index + 1}`,
+        }),
+      );
+
+      setValue('questions', updatedQuestions, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+
+      setIsSearchBankOpen(false);
     };
 
     return (
@@ -133,31 +210,12 @@ export const QuizForm = ({
           />
         </Grid>
 
-        {/*<Grid size={2.5}>*/}
-        {/*  <FormControlSelectField*/}
-        {/*    control={control}*/}
-        {/*    name={'completionRequired'}*/}
-        {/*    required*/}
-        {/*    label="Completion"*/}
-        {/*    error={Boolean(errors?.completionRequired)}*/}
-        {/*    helperText={errors?.completionRequired?.message}*/}
-        {/*    readOnly={crudType === FormCrudType.view}*/}
-        {/*  >*/}
-        {/*    {completionOptions.map((item) => (*/}
-        {/*      <MenuItem key={item} value={item}>*/}
-        {/*        {item}*/}
-        {/*      </MenuItem>*/}
-        {/*    ))}*/}
-        {/*  </FormControlSelectField>*/}
-        {/*</Grid>*/}
-
         <Grid size={4}>
           <FormControlIntegerField
             {...formMethods}
             control={control}
             error={Boolean(errors?.passingScore)}
             helperText={errors?.passingScore?.message}
-            //infoText={interfaceIndexHelperText}
             name={'passingScore'}
             label="Passing %"
             readOnly={crudType === FormCrudType.view}
@@ -192,18 +250,39 @@ export const QuizForm = ({
             readOnly={crudType === FormCrudType.view}
           />
         </Grid>
+        {isSearchBankOpen && (
+          <QuizBankSearchForm
+            handleCloseModal={() => setIsSearchBankOpen(false)}
+            handleModalAction={handleModalResponse}
+            onSearch={searchQuizBank}
+            multiSelect={true}
+          />
+        )}
+
         <Grid size={11}>
           <FormFieldArray
             errors={errors?.questions}
             allowReOrder={true}
             allowSingleItemView={true}
             arrayFieldName={`questions`}
+            additionalButtons={[
+              <ButtonModalMinorUi
+                aria-label="search-question-bank"
+                id="search-question-bank-button"
+                size="small"
+                onClick={() => setIsSearchBankOpen(true)}
+                startIcon={<SearchIcon fontSize="small" />}
+              >
+                Quiz Bank
+              </ButtonModalMinorUi>,
+            ]}
             arrayRenderItem={(props: tFormFieldRendererProps) => {
               return (
                 <QuizQuestionsFieldGroup
                   crudType={crudType}
                   formProps={props}
                   slideType={slideType}
+                  addToQuizBank={addToQuizBank}
                 />
               );
             }}

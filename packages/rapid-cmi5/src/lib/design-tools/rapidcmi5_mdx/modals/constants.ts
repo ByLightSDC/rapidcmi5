@@ -1,4 +1,3 @@
-
 export const cacheWarning = 'Content will be saved locally.';
 export const cloneRepoModalId = 'cloneRepoModalId';
 export const createLocalRepoModalId = 'createLocalRepoModalId';
@@ -18,6 +17,7 @@ export const publishPcteModalId = 'publishPcteModalId';
 export const saveCourseFileModalId = 'saveCourseFileModalId';
 export const saveCourseFileBeforeModalId = 'saveCourseFileBeforeModalId';
 export const selectRepoModalId = 'selectRepoModalId';
+export const quizBankSearchModalId = 'quizBankSearchModal';
 export const setGitConfigModalId = 'setGitConfigModalId';
 export const warningModalId = 'warning';
 

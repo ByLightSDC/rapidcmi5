@@ -28,6 +28,7 @@ import {
   gitPullModalId,
   gitPushModalId,
   importRepoZipModalId,
+  quizBankSearchModalId,
   revertCommitModalId,
   selectRepoModalId,
   setGitConfigModalId,
@@ -47,8 +48,6 @@ import ImportRepoZipForm from './ImportRepoZipForm';
 import { TextField, Alert } from '@mui/material';
 import { RC5Context } from '../../rapidcmi5_mdx/contexts/RC5Context';
 import CreateLocalRepoForm from './CreateLocalRepoForm';
-import { detectIsElectron } from '../GitViewer/utils/gitFsInstance';
-
 /**
  * Select Repo, Course, AU
  * @returns

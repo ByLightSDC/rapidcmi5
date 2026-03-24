@@ -15,6 +15,17 @@ import { useContext, useEffect } from 'react';
 import { ScenarioSelectionForm } from './shared/modals/ScenarioSelectionModal';
 import { UserConfigContext } from './contexts/UserConfigContext';
 import { AuthContext } from './contexts/AuthContext';
+import { IQuizBankContext } from 'packages/rapid-cmi5/src/lib/contexts/QuizBankContext';
+import axios from 'axios';
+import { QuestionType } from 'packages/rapid-cmi5/src/lib/design-tools/course-builder/modals/QuizBank/QuizBankSearchForm';
+
+export const apiClient = axios.create({
+  baseURL: 'http://localhost:8080', // change to your backend
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 export function RapidCmi5Wrapper() {
   const { token, parsedUserToken } = useContext(AuthContext);
@@ -79,6 +90,56 @@ export function RapidCmi5Wrapper() {
       scenarioUUID = matchingScenarios.data.data?.at(0)?.uuid;
     }
     return scenarioUUID;
+  };
+
+  const quizBankContextProps: IQuizBankContext = {
+    addToQuizBank: async (question: QuestionType) => {
+      try {
+        const response = await apiClient.post(
+          '/v1/quizBank/questionBank',
+          {
+            quizId: question.questionData,
+            rc5Version: 1,
+            tags: question.tags,
+            quizQuestion: question.questionData,
+            question: question.question
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+
+        return response.data;
+      } catch (error) {
+        console.error('Failed to add question to quiz bank', error);
+        throw error;
+      }
+    },
+    searchQuizBank: async (query: string, mode: 'tags' | 'question') => {
+      try {
+        const params: Record<string, string | number> = {
+          offset: 0,
+          limit: 20,
+          sortBy: 'dateEdited',
+          sort: 'desc',
+          search: query.trim(),
+        };
+
+        const response = await apiClient.get(
+          '/v1/quizBank/questionBank',
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            params,
+          },
+        );
+
+        console.log("Main data", response)
+        return response.data.data;
+      } catch (error) {
+        console.error('Failed to add question to quiz bank', error);
+        throw error;
+      }
+    },
   };
 
   return (
@@ -171,6 +232,7 @@ export function RapidCmi5Wrapper() {
             )
           : undefined
       }
+      quizBankContextProps={quizBankContextProps}
     />
   );
 }

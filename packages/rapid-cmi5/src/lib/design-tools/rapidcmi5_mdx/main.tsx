@@ -13,6 +13,10 @@ import {
   Credentials,
   GitUserConfig,
 } from '@rapid-cmi5/cmi5-build-common';
+import {
+  IQuizBankContext,
+  QuizBankProvider,
+} from '../../contexts/QuizBankContext';
 
 export type SubmitScenarioFormFn<T = any> = (item: T) => void;
 
@@ -48,6 +52,7 @@ export interface RapidCmi5Opts {
     config?: GitUserConfig,
     creds?: Credentials,
   ) => void;
+  quizBankContextProps?: IQuizBankContext;
 }
 
 export type UserAuth = {
@@ -62,10 +67,12 @@ export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <GitContextProvider rapidCmi5Opts={rapidCmi5Opts}>
-          <RC5ContextProvider>
-            <RC5Modals />
-            <Landing showHomeButton={rapidCmi5Opts.showHomeButton} />
-          </RC5ContextProvider>
+          <QuizBankProvider quizBankProps={rapidCmi5Opts.quizBankContextProps}>
+            <RC5ContextProvider>
+              <RC5Modals />
+              <Landing showHomeButton={rapidCmi5Opts.showHomeButton} />
+            </RC5ContextProvider>
+          </QuizBankProvider>
         </GitContextProvider>
       </PersistGate>
     </Provider>
