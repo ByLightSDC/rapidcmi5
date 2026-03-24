@@ -1,7 +1,7 @@
-export const cacheWarning = `Changes will be committed locally.
-• If you are using the RapidCMI5 desktop application, commits are saved to the local folder you selected when creating the project.
-• If you are running RapidCMI5 in a web browser, commits are saved to your web browser cache.`;
-export const pushCommits = 'Commits will be pushed to the main branch of the linked remote repository';
+export const cacheWarning =
+  'Changes will be committed locally. Commits are saved to the local folder you selected when creating the project.';
+export const pushCommits =
+  'Commits will be pushed to the main branch of the linked remote repository';
 export const remindFileSystem =
   'Content is stored locally, Use Version Control to back up your work!';
 
