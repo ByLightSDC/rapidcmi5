@@ -240,7 +240,6 @@ export const GridContainerEditor: React.FC<
           <Box
             sx={{
               // Target the NestedLexicalEditor's wrapper div to apply grid layout
-              // '& > [data-lexical-editor="true"], & > [role="textbox"]': { // CCUI - commented out [role="textbox"] selector, may cause screen reader issues
               '& > [data-lexical-editor="true"]': {
                 display: 'grid',
                 gridTemplateColumns: `repeat(${mdastNode.children.length}, 1fr)`,

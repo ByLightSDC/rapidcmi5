@@ -37,7 +37,6 @@ export const GridContainerPlayback: React.FC<
     >
       <style>{`
         .${containerClass} > [data-lexical-editor="true"],
-        /* .${containerClass} > [role="textbox"], */
         .${containerClass} > div[class*="nestedEditor"] {
           display: grid;
           grid-template-columns: repeat(${columnCount}, 1fr);
