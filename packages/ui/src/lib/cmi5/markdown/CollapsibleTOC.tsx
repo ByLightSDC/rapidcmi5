@@ -79,7 +79,7 @@ export default function CollapsibleTOC({
       key="TOC"
       variant="outlined"
       sx={{
-        zIndex: 9999,
+        zIndex: (theme) => theme.zIndex.appBar + 2,
         height: isExpanded ? '90%' : undefined, //fixes inf rendering issue in authoring mode
         overflow: 'auto',
         position: 'absolute',

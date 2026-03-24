@@ -171,7 +171,9 @@ export default function MenuLayout() {
               sx={{
                 position: 'absolute',
                 zIndex: (theme) => theme.zIndex.appBar + 1,
-                //backgroundColor: leave blank so it matches presentation background
+                backgroundColor: palette.background.paper,
+                borderRadius: '6px',
+                width: '100%',
               }}
             >
               <Tooltip
