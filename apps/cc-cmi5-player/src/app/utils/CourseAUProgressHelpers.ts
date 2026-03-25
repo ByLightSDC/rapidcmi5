@@ -1273,6 +1273,11 @@ function getSlideGuidForActivity(
   return null;
 }
 
+// Module-level mutex: tracks which slides currently have a slidePassing call in flight.
+// Each handleActivityScoring call gets a deep-cloned progress object, so mutating that
+// object is not visible across concurrent calls. This Set is shared across all calls.
+const slidePassingInFlight = new Set<string>();
+
 /**
  * Check if all activities on a slide are completed and trigger slide-level events
  * This function should be called after an activity is completed (passed or failed)
@@ -1327,6 +1332,21 @@ export async function updateSlideStatus(
   //   'lms',
   // );
 
+  // Module-level mutex: claim this slide's "passing" slot synchronously before
+  // any await. Because handleActivityScoring deep-clones progress on every call,
+  // mutating the local progress object is NOT visible to concurrent calls — so we
+  // use a shared Set instead. JavaScript is single-threaded, so this add() is
+  // atomic relative to other synchronous code.
+  const alreadyClaimedByThisCall =
+    allActivitiesCompleted &&
+    allActivitiesPassed &&
+    !progress.slideStatus[slideGuid]?.passed &&
+    !slidePassingInFlight.has(slideGuid);
+
+  if (alreadyClaimedByThisCall) {
+    slidePassingInFlight.add(slideGuid);
+  }
+
   // Import slide verbs here to avoid circular dependencies
   const { sendSlideCompletedVerb, sendSlidePassingVerb } = await import(
     './LmsStatementManager'
@@ -1335,16 +1355,7 @@ export async function updateSlideStatus(
   // Use provided previous status or fall back to current status
   const wasPreviouslyCompleted =
     previousStatus?.wasCompleted ?? progress.slideStatus[slideGuid]?.completed;
-  const wasPreviouslyPassed =
-    previousStatus?.wasPassed ?? progress.slideStatus[slideGuid]?.passed;
-
-  console.log(
-    'wasPreviouslyCompleted, wasPreviouslyPassed,allActivitiesCompleted,allActivitiesPassed',
-    wasPreviouslyCompleted,
-    wasPreviouslyPassed,
-    allActivitiesCompleted,
-    allActivitiesPassed,
-  );
+  const wasPreviouslyPassed = previousStatus?.wasPassed ?? progress.slideStatus[slideGuid]?.passed;
 
   if (allActivitiesCompleted && !wasPreviouslyCompleted) {
     // All activities completed - send slideCompleted event
@@ -1402,7 +1413,7 @@ export async function updateSlideStatus(
     'lms',
   );
 
-  if (allActivitiesCompleted && allActivitiesPassed && !wasPreviouslyPassed) {
+  if (alreadyClaimedByThisCall) {
     // All activities completed and passed - send slidePassing event
     logger.info(
       'ALL activities passed on slide - sending slidePassing event',
@@ -1410,30 +1421,29 @@ export async function updateSlideStatus(
       'lms',
     );
 
-    await sendSlidePassingVerb(slideIndex);
+    try {
+      await sendSlidePassingVerb(slideIndex);
 
-    // Update slide status to passed
-    if (progress.slideStatus[slideGuid]) {
-      progress.slideStatus[slideGuid].passed = true;
-    }
-
-    // Save progress to LRS when slide is passed (only if not already saved for completion)
-    if (wasPreviouslyCompleted) {
-      try {
-        courseAUProgress.lastUpdated = new Date().toISOString();
-        await saveCourseAUProgressToLRS(courseAUProgress);
-        logger.debug(
-          'Saved CourseAUProgress to LRS after slide passed',
-          { slideGuid, slideIndex },
-          'lms',
-        );
-      } catch (error) {
-        logger.error(
-          'Error saving CourseAUProgress to LRS after slide passed',
-          { error, slideGuid, slideIndex },
-          'lms',
-        );
+      // Save progress to LRS when slide is passed (only if not already saved for completion)
+      if (wasPreviouslyCompleted) {
+        try {
+          courseAUProgress.lastUpdated = new Date().toISOString();
+          await saveCourseAUProgressToLRS(courseAUProgress);
+          logger.debug(
+            'Saved CourseAUProgress to LRS after slide passed',
+            { slideGuid, slideIndex },
+            'lms',
+          );
+        } catch (error) {
+          logger.error(
+            'Error saving CourseAUProgress to LRS after slide passed',
+            { error, slideGuid, slideIndex },
+            'lms',
+          );
+        }
       }
+    } finally {
+      slidePassingInFlight.delete(slideGuid);
     }
   }
 

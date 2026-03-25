@@ -39,6 +39,7 @@ import { ButtonLoadingUi } from '../utility/buttons';
  * @property {boolean} [shouldAutoSave] Whether form should auto save
  * @property {boolean} [shouldDisplaySave] Whether form should display cancel and save buttons
  * @property {boolean} [shouldCheckIsDirty] Whether form should disable save button if form fields arent dirty
+ * @property {boolean} [shouldOverrideIsSubmitting] Whether form should ignore internal isSubmitting state and rely on isOverrideSubmitting prop injection instead
  * @property {boolean} [showPaper] Whether form style should color paper, if false, form inherits parent background
  * @property {string} [submitButtonText] Submit button text
  * @property {string} [failToasterMessage] Toaster to display if submit action fails
@@ -61,16 +62,20 @@ export type MiniFormProps = {
     formMethods: UseFormReturn,
     formState: FormStateType,
   ) => JSX.Element;
+
   formTitle?: string;
   loadingButtonText?: string;
+  savingButtonText?: string;
   shouldAutoSave?: boolean;
   shouldDisplaySave?: boolean;
   shouldCheckIsDirty?: boolean;
+  shouldOverrideIsSubmitting?: boolean;
   showInternalError?: boolean;
   shouldShowAutoSaveIndicator?: boolean;
   showPaper?: boolean;
   submitButtonText?: string;
   failToasterMessage?: string;
+  isOverrideSubmitting?: boolean;
   successToasterMessage?: string;
   titleEndChildren?: JSX.Element;
   validationSchema?: any;
@@ -88,11 +93,14 @@ export function MiniForm({
   formWidth,
   instructions,
   loadingButtonText = 'Loading',
+  isOverrideSubmitting = false,
   showInternalError = false,
   showPaper = false,
   shouldCheckIsDirty,
+  shouldOverrideIsSubmitting = false,
   submitButtonText = 'Save',
   failToasterMessage,
+  savingButtonText = 'Saving',
   shouldAutoSave = false,
   shouldDisplaySave = true,
   shouldShowAutoSaveIndicator = true,
@@ -403,9 +411,13 @@ export function MiniForm({
                       disabled={
                         !isValid ||
                         isSubmitting ||
+                        (shouldOverrideIsSubmitting && isOverrideSubmitting) ||
                         (shouldCheckIsDirty && !isDirty)
                       }
-                      loading={isSubmitting}
+                      loading={
+                        isSubmitting ||
+                        (shouldOverrideIsSubmitting && isOverrideSubmitting)
+                      }
                       loadingText={loadingButtonText}
                     >
                       {submitButtonText}
@@ -413,10 +425,13 @@ export function MiniForm({
                   </Stack>
                 ) : (
                   <>
-                    {shouldAutoSave &&
+                    {(shouldAutoSave &&
                       shouldShowAutoSaveIndicator &&
                       !shouldDisplaySave &&
-                      isSubmitting && <LoadingUi message="Saving" />}
+                      isSubmitting) ||
+                      (shouldOverrideIsSubmitting && isOverrideSubmitting && (
+                        <LoadingUi message={savingButtonText} />
+                      ))}
                     {onClose && (
                       <ButtonModalMainUi
                         id="close-button"
