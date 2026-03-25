@@ -46,7 +46,10 @@ import {
   ButtonMinorUi,
 } from '../../utility/buttons';
 import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
-import { maxFormWidths, useLessonThemeStyles } from '../../hooks/useLessonThemeStyles';
+import {
+  maxFormWidths,
+  useLessonThemeStyles,
+} from '../../hooks/useLessonThemeStyles';
 
 const answerBoxGridSize = 3.8;
 const attemptedLabel = '#Attempted';
@@ -96,7 +99,8 @@ export function AuCTF({
 
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
-  const { outerActivitySxFullWidth } = useLessonThemeStyles(lessonTheme, maxFormWidths.ctfPlayback);
+  const { outerActivitySxFullWidth, outerActivitySxWithConstrainedWidthForm, outerActivitySxWithConstrainedWidth } =
+    useLessonThemeStyles(lessonTheme, maxFormWidths.ctfPlayback);
 
   /**
    * Selects question if it is available (no grade or bad grade)
@@ -340,7 +344,7 @@ export function AuCTF({
         className="paper-activity"
         variant="outlined"
         sx={{
-          ...outerActivitySxFullWidth,
+          ...outerActivitySxWithConstrainedWidth,
         }}
       >
         {ctfContent.title && (

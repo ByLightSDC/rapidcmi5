@@ -89,11 +89,15 @@ export function generateLessonThemeStyleTag(
   theme?: LessonTheme,
 ): string {
   const css = resolveLessonThemeCSS(theme);
+
+  //console.log('css.maxWidth', css?.maxWidth);
+  //max-width: 100vw;
+
   // Always emit --content-margin so directive calc() expressions resolve even when no theme is set.
   if (!css) return `.${scopedClass} { --content-margin: 0px; }`;
 
   const widthRule = css.maxWidth
-  ? `
+    ? `
   .${scopedClass} {
     --content-margin: calc((100% - ${css.maxWidth}) / 2);
   }
@@ -109,8 +113,8 @@ export function generateLessonThemeStyleTag(
     margin-right: auto;
   }
   .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:has(.paper-activity) {
-    width: 100vw;
-    max-width: 100vw;
+    width: calc(100vw - var(--panel-width));
+    max-width: calc(100vw - var(--panel-width));
     position: relative;
     left: 50%;
     transform: translateX(-50%);
@@ -121,12 +125,10 @@ export function generateLessonThemeStyleTag(
     margin-left: unset;
     margin-right: unset;
   }`
-  : `
+    : `
   .${scopedClass} {
     --content-margin: 0px;
   }`;
-
- 
 
   const alignmentRule = `
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > p,

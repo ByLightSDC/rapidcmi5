@@ -7,7 +7,7 @@ import { resolveLessonThemeCSS } from '../styles/lessonThemeStyles';
 
 export const useLessonThemeStyles = (
   lessonTheme: LessonTheme | undefined,
-  maxWidth?: number,
+  maxWidth?: number | string,
 ) => {
   /* Lesson Theme */
   const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
@@ -86,7 +86,7 @@ export const maxFormWidths = {
   quizEditor: 800,
   scenarioEditor: 800,
   downloadsEditor: 640,
-  ctfPlayback: undefined,
+  ctfPlayback: 1024,
   jobePlayback: 1024,
   quizPlayback: 800,
   scenarioPlayback: 1024,
