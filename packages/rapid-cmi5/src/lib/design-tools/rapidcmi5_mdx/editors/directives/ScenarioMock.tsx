@@ -24,7 +24,7 @@ import {
   OverflowTypography,
   TabMainUi,
 } from '@rapid-cmi5/ui';
-import { useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
+import { maxFormWidths, useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 
 /**
@@ -42,7 +42,7 @@ function ScenarioMock({
 
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
-  const { blockPadding, activityAlign } = useLessonThemeStyles(lessonTheme);
+  const { outerActivitySxWithConstrainedWidth} = useLessonThemeStyles(lessonTheme, maxFormWidths.scenarioPlayback);
 
   const handleChangeTab = useCallback(
     (event: React.SyntheticEvent, newValue: number) => {
@@ -73,35 +73,13 @@ function ScenarioMock({
     );
   }, []);
 
-  // marginBottom and Top provides space between activity block and sibling lexical nodes
-  // marginLeft and right adjust to textAlign setting
-  const outerSx: SxProps = {
-    padding: blockPadding,
-    marginBottom: blockPadding,
-    marginTop: blockPadding,
-    maxWidth: '1152px',
-    marginLeft:
-      activityAlign === 'center'
-        ? 'auto'
-        : activityAlign === 'start'
-          ? 0
-          : 'auto',
-
-    marginRight:
-      activityAlign === 'center'
-        ? 'auto'
-        : activityAlign === 'end'
-          ? 0
-          : 'auto',
-  };
-
   return (
     <Paper
       className="paper-activity"
       variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        ...outerSx,
+        ...outerActivitySxWithConstrainedWidth,
       }}
     >
       <Typography variant="caption">{activity}</Typography>

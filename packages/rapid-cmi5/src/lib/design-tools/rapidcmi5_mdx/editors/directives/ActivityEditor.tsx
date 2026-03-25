@@ -309,24 +309,7 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
       {name === 'jobe' && fromJson && (
         <>
           {isPlayback && (
-            // eslint-disable-next-line react/jsx-no-useless-fragment
-            <>
-              {!fromJson.evaluator ? (
-                <Stack direction="column" sx={staticStyle}>
-                  <Typography sx={{ fontWeight: 'bold' }}>
-                    Jobe In The Box
-                  </Typography>
-                  <Typography>
-                    {'Jobe In The Box is missing an evaluation script.'}
-                  </Typography>
-                </Stack>
-              ) : (
-                <JobeInTheBox
-                  auProps={auProps}
-                  content={fromJson as JobeContent}
-                />
-              )}
-            </>
+            <JobeInTheBox auProps={auProps} content={fromJson as JobeContent} />
           )}
           {!isPlayback && (
             <JobeForm

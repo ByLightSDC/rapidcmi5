@@ -31,7 +31,7 @@ export function Form({
   titleEndChildren?: JSX.Element;
   titleStartIcon?: JSX.Element;
   subTitle?: string;
-  formWidth?: number | string;
+  formWidth?: number | string | null;
   formHeight?: number | string; // limit the height of the form - defaults to "auto"
   formButtons?: any; // any buttons to display
   formFields: any; // grid container / items for any fields to display

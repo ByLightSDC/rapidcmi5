@@ -2,13 +2,88 @@ import { SxProps } from '@mui/system';
 import { LessonTheme } from '@rapid-cmi5/cmi5-build-common';
 import { resolveLessonThemeCSS } from '../styles/lessonThemeStyles';
 
-export const useLessonThemeStyles = (lessonTheme: LessonTheme | undefined) => {
+export const useLessonThemeStyles = (
+  lessonTheme: LessonTheme | undefined,
+  maxWidth?: number,
+) => {
   /* Lesson Theme */
   const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
 
+  const activityAlign = resolvedThemeCSS?.textAlign;
+
   // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
   // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
-  const blockPadding = resolvedThemeCSS?.blockPadding ? resolvedThemeCSS?.blockPadding : '32px';
+  const blockPadding = resolvedThemeCSS?.blockPadding
+    ? resolvedThemeCSS?.blockPadding
+    : '32px';
 
-  return { blockPadding, activityAlign: resolvedThemeCSS?.textAlign };
+  /**
+   * sx applied to outer div of activities with constrained width
+   * CTF is an example of no constrained width, it should go full screen
+   */
+  const outerActivitySxWithConstrainedWidth: SxProps = {
+    backgroundColor: 'background.default',
+    borderColor: 'divider',
+    borderRadius: '12px',
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    padding: blockPadding,
+    marginBottom: blockPadding,
+    marginTop: blockPadding,
+    maxWidth: maxWidth,
+    marginLeft:
+      activityAlign === 'center'
+        ? 'auto'
+        : activityAlign === 'start'
+          ? 0
+          : 'auto',
+
+    marginRight:
+      activityAlign === 'center'
+        ? 'auto'
+        : activityAlign === 'end'
+          ? 0
+          : 'auto',
+  };
+
+  /**
+   * we need to clear padding for views that use Form.tsx which applies an inner padding
+   */
+  const outerActivitySxWithConstrainedWidthForm: SxProps = {
+    ...outerActivitySxWithConstrainedWidth,
+    padding: 0,
+  };
+
+  /**
+   * some activities make more sense full width
+   */
+  const outerActivitySxFullWidth: SxProps = {
+    backgroundColor: 'background.default',
+    borderRadius: '12px',
+    padding: blockPadding,
+    marginBottom: blockPadding,
+    marginTop: blockPadding,
+  };
+
+  return {
+    blockPadding,
+    activityAlign: resolvedThemeCSS?.textAlign,
+    outerActivitySxWithConstrainedWidth,
+    outerActivitySxWithConstrainedWidthForm,
+    outerActivitySxFullWidth,
+  };
+};
+
+/**
+ * max widths for forms and playback views
+ */
+export const maxFormWidths = {
+  jobeEditor: 1024,
+  quizEditor: 800,
+  scenarioEditor: 800,
+  downloadsEditor: 800,
+  ctfPlayback: undefined,
+  jobePlayback: 1024,
+  quizPlayback: 800,
+  scenarioPlayback: 1024,
 };

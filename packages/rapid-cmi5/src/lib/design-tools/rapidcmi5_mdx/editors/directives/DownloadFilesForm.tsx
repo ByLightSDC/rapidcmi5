@@ -1,7 +1,19 @@
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { DownloadFilesContent, RC5ActivityTypeEnum, DownloadFileData } from '@rapid-cmi5/cmi5-build-common';
-import { FormCrudType, FormStateType, FileFormFieldArray, FileDownloadLink, FormControlUIProvider, MiniForm } from '@rapid-cmi5/ui';
+import {
+  DownloadFilesContent,
+  RC5ActivityTypeEnum,
+  DownloadFileData,
+} from '@rapid-cmi5/cmi5-build-common';
+import {
+  FormCrudType,
+  FormStateType,
+  FileFormFieldArray,
+  FileDownloadLink,
+  FormControlUIProvider,
+  MiniForm,
+  LessonThemeContext,
+} from '@rapid-cmi5/ui';
 import { useState, useContext } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { useSelector } from 'react-redux';
@@ -9,6 +21,7 @@ import { GitContext } from '../../../course-builder/GitViewer/session/GitContext
 import { useImageFile } from '../../data-hooks/useImageFile';
 import * as yup from 'yup';
 import { currentAuPath } from '@rapid-cmi5/react-editor';
+import { maxFormWidths, useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
 
 /**
  * Form course creators can use to attack files to a Lesson AU
@@ -37,6 +50,13 @@ export const DownloadFilesForm = ({
   const { getLocalFileBlob, getLocalFileBlobUrl } = useContext(GitContext);
   const { defaultDownloadFilePath } = useImageFile();
   const isDebugId = false;
+
+  /* Lesson Theme */
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const { outerActivitySxWithConstrainedWidthForm } = useLessonThemeStyles(
+    lessonTheme,
+    maxFormWidths.downloadsEditor,
+  );
 
   /**
    * fileDownloadHandler
@@ -113,18 +133,24 @@ export const DownloadFilesForm = ({
       {crudType !== FormCrudType.preview && (
         <FormControlUIProvider>
           <MiniForm
+            className="paper-activity"
+            outerSx={outerActivitySxWithConstrainedWidthForm}
             autoSaveDebounceTime={1000}
             dataCache={defaultFormData}
             titleEndChildren={deleteButton}
             doAction={onSaveAction}
             formTitle={formHeadTitle}
-            formWidth="640px"
+            formWidth={null}
+            formSxProps={{
+              flexGrow: 1,
+              maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
+            }}
             getFormFields={getFormFields}
             loadingButtonText="Saving"
             shouldAutoSave={crudType === FormCrudType.edit}
             shouldCheckIsDirty={true}
             shouldDisplaySave={false}
-            showPaper={true}
+            showPaper={false}
             submitButtonText="Save"
             validationSchema={validationSchema}
           />

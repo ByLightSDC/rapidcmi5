@@ -9,11 +9,19 @@ import {
   FormControlUIProvider,
   FormCrudType,
   FormStateType,
+  LessonThemeContext,
   MiniForm,
   NAME_GROUP_OPT,
   UUID_GROUP,
 } from '@rapid-cmi5/ui';
-import { Alert, alpha, Box, MenuItem, Typography, useTheme } from '@mui/material';
+import {
+  Alert,
+  alpha,
+  Box,
+  MenuItem,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import * as yup from 'yup';
@@ -27,6 +35,7 @@ import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import LrsHeaderWithDetails from './LrsStatementHelper';
 import { useContext } from 'react';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
+import { maxFormWidths, useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
 
 export const ScenarioForm = ({
   crudType,
@@ -42,6 +51,13 @@ export const ScenarioForm = ({
 }) => {
   const { GetScenariosForm } = useContext(GitContext);
   const theme = useTheme();
+
+  /* Lesson Theme */
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const { outerActivitySxWithConstrainedWidthForm } = useLessonThemeStyles(
+    lessonTheme,
+    maxFormWidths.scenarioEditor,
+  );
 
   const validationSchema = yup.object().shape({
     uuid: UUID_GROUP,
@@ -87,12 +103,13 @@ export const ScenarioForm = ({
     };
 
     return (
-      <Grid>
+      // <Grid container>
+      <>
         <Grid size={11}>
           <Typography variant="body2">
             This activity will present participants with console access to a
-            deployed scenario. If <b>Prompt User for Class ID</b> is selected,
-            instructor must pre-deploy Scenarios from the <br />
+            deployed scenario. If <b>Prompt Student for Class Id</b> is
+            selected, instructor must pre-deploy Scenarios from the{' '}
             <span>
               <AssignmentIndIcon
                 sx={{ position: 'relative', top: 4 }}
@@ -100,12 +117,12 @@ export const ScenarioForm = ({
               />
               <b> CLASSES</b>
             </span>{' '}
-            dashboard. If left unchecked, an instance of this scenario will be
-            automatically deployed.
+            dashboard in RangeOS. If left unchecked, an instance of this
+            scenario will be automatically deployed.
           </Typography>
         </Grid>
         <Grid size={11}>
-          <Alert severity="warning">
+          <Alert severity="warning" sx={{ maxWidth: '640px' }}>
             This activity requires Basic AUTH authentication and cannot be used
             in conjunction with a Team Exercise Scenario which authenticates via
             SSO.
@@ -177,7 +194,7 @@ export const ScenarioForm = ({
                   alignItems: 'center',
                   gap: 1.5,
                   my: 1,
-                  p:1,
+                  p: 1,
                   borderRadius: 2,
                   border: `1px dashed ${theme.palette.divider}`,
                   bgcolor: theme.palette.background.paper,
@@ -203,7 +220,7 @@ export const ScenarioForm = ({
           </Grid>
         ) : (
           <>
-            <Grid size={7.5}>
+            <Grid size={6}>
               <FormControlTextField
                 control={control}
                 name={'name'}
@@ -214,7 +231,7 @@ export const ScenarioForm = ({
                 readOnly={crudType === FormCrudType.view}
               />
             </Grid>
-            <Grid size={7.5}>
+            <Grid size={6}>
               <FormControlTextField
                 control={control}
                 name={'uuid'}
@@ -228,7 +245,7 @@ export const ScenarioForm = ({
           </>
         )}
 
-        <Grid size={4.5}>
+        <Grid size={2.8}>
           <FormControlSelectField
             control={control}
             name={'moveOnCriteria'}
@@ -245,11 +262,11 @@ export const ScenarioForm = ({
             ))}
           </FormControlSelectField>
         </Grid>
-        <Grid size={5.4}>
+        <Grid size={3.2}>
           <FormControlCheckboxField
             control={control}
             name="promptClass"
-            label="Prompt User for Class ID"
+            label="Prompt Student for Class Id"
             infoText={getInfoText('cmiCourse', 'promptClass')}
             checkboxProps={{
               disabled: crudType === FormCrudType.view,
@@ -257,7 +274,7 @@ export const ScenarioForm = ({
           />
         </Grid>
         {watchPromptClass && (
-          <Grid size={5.6} sx={{ marginTop: '-12px' }}>
+          <Grid size={5.6}>
             <FormControlTextField
               control={control}
               error={Boolean(errors?.defaultClassId)}
@@ -274,24 +291,30 @@ export const ScenarioForm = ({
         <Grid size={11}>
           <LrsHeaderWithDetails activityType={RC5ActivityTypeEnum.scenario} />
         </Grid>
-      </Grid>
+      </>
     );
   };
 
   return (
     <FormControlUIProvider>
       <MiniForm
+        className="paper-activity"
+        outerSx={outerActivitySxWithConstrainedWidthForm}
         dataCache={defaultFormData}
         titleEndChildren={deleteButton}
         doAction={onSaveAction}
         formTitle="Individual Training Scenario"
-        formWidth="640px"
+        formWidth={null}
+        formSxProps={{
+          flexGrow: 1,
+          maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
+        }}
         getFormFields={getFormFields}
         loadingButtonText="Saving"
         shouldAutoSave={true}
         shouldCheckIsDirty={true}
         shouldDisplaySave={false}
-        showPaper={true}
+        showPaper={false}
         submitButtonText="Save"
         validationSchema={validationSchema}
       />

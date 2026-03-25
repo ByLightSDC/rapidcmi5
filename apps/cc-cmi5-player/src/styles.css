@@ -35,7 +35,7 @@ a:visited {
   padding: 0;
   min-width: '320px';
   max-width: 1440;
-  border-radius: 16px;
+  border-radius: 12px;
   box-shadow:
     0 3px 6px rgba(0, 0, 0, 0.16),
     0 3px 6px rgba(0, 0, 0, 0.23);

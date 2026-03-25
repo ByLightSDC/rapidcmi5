@@ -47,7 +47,7 @@ import {
 } from '@rapid-cmi5/cmi5-build-common';
 import { ButtonMinorUi, ButtonMainUi } from '../../utility/buttons';
 import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
-import { useLessonThemeStyles } from '../../hooks/useLessonThemeStyles';
+import { maxFormWidths, useLessonThemeStyles } from '../../hooks/useLessonThemeStyles';
 
 export type PotentialAnswerType = AnswerType | null;
 
@@ -68,14 +68,18 @@ export function AuQuiz({
     isAuthenticated,
     isTestMode,
   } = auProps;
-  const noneFound = 'During a lesson, questions appear here. There are currently no questions in this quiz.';
+  const noneFound =
+    'During a lesson, questions appear here. There are currently no questions in this quiz.';
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [allAnswers, setAllAnswers] = useState<AnswerType[]>(
     Array(content.questions.length).fill(null),
   );
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
-  const { blockPadding, activityAlign } = useLessonThemeStyles(lessonTheme);
+  const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
+    lessonTheme,
+    maxFormWidths.quizPlayback,
+  );
 
   const readyToHydrate = useMemo(() => {
     return isTestMode || isAuthenticated || false;
@@ -359,35 +363,13 @@ export function AuQuiz({
     updateUnanswered();
   }, [currentQuestionHasAnswer, currentQuestion, updateUnanswered]);
 
-  // marginBottom and Top provides space between activity block and sibling lexical nodes
-  // marginLeft and right adjust to textAlign setting
-  const outerSx: SxProps = {
-    padding: blockPadding,
-    marginBottom: blockPadding,
-    marginTop: blockPadding,
-    maxWidth: '1152px',
-    marginLeft:
-      activityAlign === 'center'
-        ? 'auto'
-        : activityAlign === 'start'
-          ? 0
-          : 'auto',
-
-    marginRight:
-      activityAlign === 'center'
-        ? 'auto'
-        : activityAlign === 'end'
-          ? 0
-          : 'auto',
-  };
-
   return (
     <Paper
       className="paper-activity"
       variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        ...outerSx,
+        ...outerActivitySxWithConstrainedWidth,
       }}
     >
       {content.title && (

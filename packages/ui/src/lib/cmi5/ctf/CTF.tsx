@@ -46,7 +46,7 @@ import {
   ButtonMinorUi,
 } from '../../utility/buttons';
 import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
-import { useLessonThemeStyles } from '../../hooks/useLessonThemeStyles';
+import { maxFormWidths, useLessonThemeStyles } from '../../hooks/useLessonThemeStyles';
 
 const answerBoxGridSize = 3.8;
 const attemptedLabel = '#Attempted';
@@ -64,7 +64,6 @@ export function AuCTF({
   content: CTFContent;
 }) {
   const { setProgress, submitScore } = auProps;
-  //TODO const ctfContent = content || slides[activeTab].content as CTFContent;
   const ctfContent = content;
 
   const dispatch = useDispatch();
@@ -97,7 +96,7 @@ export function AuCTF({
 
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
-  const { blockPadding } = useLessonThemeStyles(lessonTheme);
+  const { outerActivitySxFullWidth } = useLessonThemeStyles(lessonTheme, maxFormWidths.ctfPlayback);
 
   /**
    * Selects question if it is available (no grade or bad grade)
@@ -236,14 +235,6 @@ export function AuCTF({
     //REF maybe go to next available here?
   };
 
-  // marginBottom and Top provides space between activity block and sibling lexical nodes
-  // marginLeft and right adjust to textAlign setting
-  const outerSx: SxProps = {
-    padding: blockPadding,
-    marginBottom: blockPadding,
-    marginTop: blockPadding,
-  };
-
   /**
    * Submit Score to LRS
    */
@@ -349,8 +340,7 @@ export function AuCTF({
         className="paper-activity"
         variant="outlined"
         sx={{
-          backgroundColor: 'background.default',
-          ...outerSx,
+          ...outerActivitySxFullWidth,
         }}
       >
         {ctfContent.title && (

@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 import { yupResolver } from '@hookform/resolvers/yup';
 import Grid from '@mui/material/Grid2';
-import { Alert, Box, Button, Stack } from '@mui/material';
+import { Alert, Box, Button, Stack, SxProps } from '@mui/material';
 import {
   useCallback,
   useContext,
@@ -52,10 +52,13 @@ import { ButtonLoadingUi } from '../utility/buttons';
  */
 export type MiniFormProps = {
   autoSaveDebounceTime?: number;
+  className?: string;
   crudType?: FormCrudType;
   dataCache?: any;
   doAction?: (data: any) => Promise<void> | void;
-  formWidth?: number | string;
+  formWidth?: number | string | null;
+  formMaxWidth?: number | string | null;
+  formSxProps?: SxProps;
   instructions?: string;
   getFormFields: (
     formMethods: UseFormReturn,
@@ -63,6 +66,7 @@ export type MiniFormProps = {
   ) => JSX.Element;
   formTitle?: string;
   loadingButtonText?: string;
+  outerSx?: SxProps;
   shouldAutoSave?: boolean;
   shouldDisplaySave?: boolean;
   shouldCheckIsDirty?: boolean;
@@ -80,12 +84,15 @@ export type MiniFormProps = {
 };
 export function MiniForm({
   autoSaveDebounceTime = 3000,
+  className,
   crudType = FormCrudType.edit,
   dataCache,
   doAction,
   getFormFields,
   formTitle,
   formWidth,
+  formMaxWidth,
+  formSxProps = { margin: '12px' },
   instructions,
   loadingButtonText = 'Loading',
   showInternalError = false,
@@ -93,6 +100,7 @@ export function MiniForm({
   shouldCheckIsDirty,
   submitButtonText = 'Save',
   failToasterMessage,
+  outerSx = {},
   shouldAutoSave = false,
   shouldDisplaySave = true,
   shouldShowAutoSaveIndicator = true,
@@ -336,10 +344,12 @@ export function MiniForm({
     <>
       {/* box so we can have vertical or horizontal stepper */}
       <Box
+        className={className}
         sx={{
           display: 'flex',
           maxHeight: '100%', // so form will be correct height for scrolling when necessary
           overflow: 'hidden', // so only form will have scrollbar
+          ...outerSx,
         }}
       >
         {isLoaded && (
@@ -347,13 +357,9 @@ export function MiniForm({
             instructions={instructions}
             title={formTitle}
             subTitle=""
-            //TODO testId={testId}
-            //TODO titleStartIcon={titleStartIcon}
             titleEndChildren={titleEndChildren}
-            formWidth={formWidth} //!isModal ? formWidth : 880}
-            sxProps={{
-              margin: '12px',
-            }}
+            formWidth={formWidth || undefined}
+            sxProps={{ ...formSxProps }}
             showBorder={showPaper}
             showPaper={showPaper}
             // 8px below fixes top row getting clipped in Blueprint and VM Image forms
