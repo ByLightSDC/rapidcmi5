@@ -52,7 +52,6 @@ import {
 import {
   LessonThemeContext,
   OverflowTypography,
-  resolveLessonThemeCSS,
   TabMainUi,
 } from '@rapid-cmi5/ui';
 import { useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
