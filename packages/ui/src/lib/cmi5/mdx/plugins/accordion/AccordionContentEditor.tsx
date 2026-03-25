@@ -26,6 +26,7 @@ import {
   useScopedAlignmentStyles,
 } from '../shared/useScopedAlignmentStyles';
 import { useFocusWithin } from '../shared/useFocusWithin';
+import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 
 /**
  * Accordion Content Editor for accordion plugin
@@ -89,6 +90,7 @@ export const AccordionContentEditor: React.FC<
     <Accordion
       slots={{ heading: 'div' }}
       sx={{
+        width: '100%',
         backgroundColor: (theme: any) => `${theme.form.backgroundColor}`,
         borderColor: 'white',
         border: (theme: any) => `1px solid ${theme.palette.divider}`,
@@ -139,7 +141,7 @@ export const AccordionContentEditor: React.FC<
           </Box>
         )}
 
-        <NestedLexicalEditor<ContainerDirective>
+        <RC5NestedLexicalEditor<ContainerDirective>
           block={true}
           getContent={(node) => {
             return node.children;

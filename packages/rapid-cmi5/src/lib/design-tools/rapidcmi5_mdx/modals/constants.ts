@@ -1,4 +1,11 @@
-export const cacheWarning = 'Content will be saved locally.';
+export const cacheWarning =
+  'Changes will be committed locally. Commits are saved to the local folder you selected when creating the project.';
+export const pushCommits =
+  'Commits will be pushed to the main branch of the linked remote repository';
+export const remindFileSystem =
+  'Content is stored locally, Use Version Control to back up your work!';
+
+// modal ids
 export const cloneRepoModalId = 'cloneRepoModalId';
 export const createLocalRepoModalId = 'createLocalRepoModalId';
 export const importRepoZipModalId = 'importRepoZipModalId';
@@ -20,6 +27,3 @@ export const selectRepoModalId = 'selectRepoModalId';
 export const quizBankSearchModalId = 'quizBankSearchModal';
 export const setGitConfigModalId = 'setGitConfigModalId';
 export const warningModalId = 'warning';
-
-export const remindFileSystem =
-  'Content is stored locally, Use Version Control to back up your work!';

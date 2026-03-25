@@ -51,12 +51,9 @@ import { editorInPlayback$ } from '../state/vars';
 import { convertMarkdownToMdast, convertMdastToMarkdown } from '../util/conversion';
 import { LessonThemeContext } from '../contexts/LessonThemeContext';
 import { resolveLessonThemeCSS } from '../../../styles/lessonThemeStyles';
-import {
-  DIRECTIVE_GUTTER_GAP,
-  DIRECTIVE_GUTTER_PADDING_RIGHT,
-} from '../constants/directiveLayout';
 import { ColorSelectionPopover } from '../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../constants/colors';
+import { RC5NestedLexicalEditor } from '../plugins/shared/RC5NestedLexicalEditor';
 
 export declare interface AdmonitionDirectiveEditorProps<
   T extends Directives = Directives,
@@ -127,6 +124,8 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   );
   const pendingColorRef = useRef(pendingColor);
   const skipNextCloseRebuildRef = useRef(false);
+  const gutterRef = useRef<HTMLDivElement>(null);
+  const [gutterRight, setGutterRight] = useState('-100px');
 
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const [adColor, setAdColor] = useState<
@@ -349,6 +348,16 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
     setPendingColor(bgColor);
   }, [mdastNode]);
 
+  // Measure gutter button group width after mount so right offset is exact.
+  useEffect(() => {
+    if (gutterRef.current) {
+      const w = gutterRef.current.offsetWidth;
+      setGutterRight(`-${w + 15}px`);
+    }
+  }, []);
+
+  const hasGutter = !!resolvedThemeCSS?.maxWidth && resolvedThemeCSS.maxWidth !== '100%';
+
   const outerSx: SxProps = backgroundColor
     ? {
         boxShadow: `0 0 0 100vmax ${backgroundColor}`,
@@ -380,15 +389,11 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
       sx={{
         margin: 0,
         padding: 0,
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: isPlayback ? 0 : DIRECTIVE_GUTTER_GAP,
-        paddingRight: isPlayback ? 0 : DIRECTIVE_GUTTER_PADDING_RIGHT,
+        position: 'relative',
         ...outerSx,
       }}
     >
-      {/* Inner content box — flex:1 fills all space left of the gutter */}
-      <Box sx={{ flex: 1, minWidth: 0 }}>
+      <Box sx={{ width: '100%' }}>
         {isConfiguring && !isPlayback && (
           <SelectorMainUi
             defaultValue={defaultCollapseSel}
@@ -440,7 +445,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
                 '--basePageBg': 'transparent',
               }}
             >
-              <NestedLexicalEditor<Paragraph>
+              <RC5NestedLexicalEditor<Paragraph>
                 getContent={(node) => {
                   const theNode = convertMarkdownToMdast(
                     getTitle(mdastNode.attributes),
@@ -485,7 +490,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
               borderWidth: '1px',
             }}
           >
-            <NestedLexicalEditor<ContainerDirective>
+            <RC5NestedLexicalEditor<ContainerDirective>
               block={true}
               getContent={(node) => {
                 return node.children;
@@ -499,15 +504,17 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
         </Accordion>
       </Box>
 
-      {/* Gutter buttons — flex sibling, sits to the right of the inner box */}
+      {/* Gutter buttons — absolutely positioned outside decorator at S/M, inside at L/None */}
       {!isPlayback && (
         <Box
+          ref={gutterRef as any}
           sx={{
             backgroundColor:
               muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
             display: 'flex',
-            flexShrink: 0,
-            alignSelf: 'flex-start',
+            position: 'absolute',
+            top: backgroundColor ? blockPadding : 0,
+            right: hasGutter ? gutterRight : 0,
           }}
         >
           <Tooltip title="Background Color">

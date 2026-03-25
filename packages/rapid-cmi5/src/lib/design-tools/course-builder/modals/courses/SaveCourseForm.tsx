@@ -70,6 +70,7 @@ export function SaveCourseForm({
 
   const [saveError, setSaveErrorMessage] = useState<string | null>(null);
   const [saveProgressMessage, setSaveProgressMessage] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
   const handleFormChanges = (data: any) => {
@@ -102,6 +103,7 @@ export function SaveCourseForm({
 
   const handleSaveFileActions = useCallback(
     async (whichButton: number, meta?: any) => {
+      setIsSaving(false);
       if (whichButton === 0) {
         handleCloseModal();
         await discardLessonChanges();
@@ -110,9 +112,14 @@ export function SaveCourseForm({
         return;
       } else if (whichButton === 2) {
         console.time('saveCourseFile');
+        setIsSaving(true);
 
         let successMessage = 'Files Saved Locally';
-        if (isRepoConnectedToRemote && superSaveData.shouldAutoCommit && superSaveData.shouldAutoPush) {
+        if (
+          isRepoConnectedToRemote &&
+          superSaveData.shouldAutoCommit &&
+          superSaveData.shouldAutoPush
+        ) {
           successMessage = 'Files Saved & Pushed to Remote';
         } else if (isRepoConnectedToRemote && superSaveData.shouldAutoPush) {
           successMessage = 'Files Saved & Pushed to Remote';
@@ -147,6 +154,8 @@ export function SaveCourseForm({
             console.log('superSaveData.push', superSaveData.push);
             await handlePushRepo(superSaveData.push);
           }
+
+          setIsSaving(false);
         } catch (e: any) {
           console.log('e while saving', e);
           //setSaveProgressMessage('Error ' + saveProgressMessage);
@@ -156,6 +165,7 @@ export function SaveCourseForm({
             stack: e?.stack,
           };
           setSaveErrorMessage(errorInfo.message);
+          setIsSaving(false);
           return;
         }
         displayToaster({
@@ -183,7 +193,8 @@ export function SaveCourseForm({
       modalId,
       saveCourseFile,
       sendMessage,
-      isRepoConnectedToRemote
+      setIsSaving,
+      isRepoConnectedToRemote,
     ],
   );
 
@@ -215,11 +226,7 @@ export function SaveCourseForm({
       <>
         {/* {!isRepoConnectedToRemote && (
           <>
-            <Grid size={12}>
-              <Typography sx={{ whiteSpace: 'preWrap', paddingBottom: '8px' }}>
-                {cacheWarning}
-              </Typography>
-            </Grid>
+
             <Grid size={12}>
               <Alert severity="warning">
                 <Stack direction="column">
@@ -240,19 +247,21 @@ export function SaveCourseForm({
         )} */}
 
         <>
-          <Grid size={12}>
-            <Typography sx={{ whiteSpace: 'preWrap' }}>
-              {cacheWarning}
-            </Typography>
-          </Grid>
-          <Grid size={12}>
-            <Typography
-              variant="subtitle2"
-              sx={{ fontWeight: 'bold', marginTop: 2 }}
-            >
-              More Save Options...
-            </Typography>
-          </Grid>
+          {shouldCommit && (
+            <Grid size={11.5}>
+              <FormControlTextField
+                control={control}
+                error={Boolean(errors?.commit?.commitMessage)}
+                helperText={errors?.commit?.commitMessage?.message}
+                name="commit.commitMessage"
+                required
+                label="Commit Message"
+                multiline={true}
+                maxRows={8}
+                readOnly={false}
+              />
+            </Grid>
+          )}
           <Grid
             size={12}
             sx={{
@@ -264,7 +273,7 @@ export function SaveCourseForm({
               control={control}
               name={'shouldAutoCommit'}
               label="Commit Changes"
-              infoText="Save a snapshot of changes to the local repository in yourweb browser."
+              infoText={cacheWarning}
             />
             {isRepoConnectedToRemote && (
               <FormControlCheckboxField
@@ -281,21 +290,6 @@ export function SaveCourseForm({
               />
             )}
           </Grid>
-          {shouldCommit && (
-            <Grid size={11.5}>
-              <FormControlTextField
-                control={control}
-                error={Boolean(errors?.commit?.commitMessage)}
-                helperText={errors?.commit?.commitMessage?.message}
-                name="commit.commitMessage"
-                required
-                label="Commit Message"
-                multiline={true}
-                maxRows={8}
-                readOnly={false}
-              />
-            </Grid>
-          )}
           {shouldPush && isRepoConnectedToRemote && (
             <>
               <Grid size={6}>
@@ -304,6 +298,7 @@ export function SaveCourseForm({
                   error={Boolean(errors?.push?.repoUsername)}
                   helperText={errors?.push?.repoUsername?.message}
                   name="push.repoUsername"
+                  placeholder="user.name"
                   required
                   label="User Name"
                   readOnly={false}
@@ -315,28 +310,13 @@ export function SaveCourseForm({
                   error={Boolean(errors?.push?.repoPassword)}
                   helperText={errors?.push?.repoPassword?.message}
                   name="push.repoPassword"
+                  placeholder="personal access token"
                   required
                   label="Password"
                   readOnly={false}
                 />
               </Grid>
-              <Grid size={6}>
-                <FormControlTextField
-                  control={control}
-                  error={Boolean(errors?.push?.branch)}
-                  helperText={errors?.push?.branch?.message}
-                  name="push.branch"
-                  label="Branch"
-                  readOnly={true}
-                />
-              </Grid>
             </>
-          )}
-
-          {saveProgressMessage && (
-            <Grid size={12}>
-              <Typography variant="body1">{saveProgressMessage}</Typography>
-            </Grid>
           )}
         </>
 
@@ -365,6 +345,7 @@ export function SaveCourseForm({
         fullWidth: true,
         open: modalObj.type === modalId,
       }}
+      disableButtons={isSaving}
       handleAction={(whichButton) =>
         handleSaveFileActions(whichButton, modalObj.meta)
       }
@@ -379,8 +360,11 @@ export function SaveCourseForm({
           formWidth="100%"
           getFormFields={getFormFields}
           instructions=""
+          isOverrideSubmitting={isSaving}
+          savingButtonText={saveProgressMessage}
           submitButtonText="Save"
           shouldAutoSave={true}
+          shouldOverrideIsSubmitting={true}
           shouldShowAutoSaveIndicator={false}
           shouldDisplaySave={false}
           showInternalError={true}

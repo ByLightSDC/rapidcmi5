@@ -12,6 +12,7 @@ import Box from '@mui/material/Box';
 import Checkbox, { CheckboxProps } from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
 import { ButtonInfoField } from '../utility/buttons';
+import { Stack } from '@mui/material';
 
 /** @constant
  * Decorator appended to the checkbox label
@@ -68,10 +69,10 @@ export function FormControlCheckboxField(props: tFieldProps) {
         control={control}
         render={({ field }) => (
           <>
-            <Box
+            <Stack
+              direction="row"
               sx={{
                 display: 'flex',
-                flexDirection: 'row',
                 alignItems: 'center',
                 height: '28px',
                 paddingTop: '8px',
@@ -94,12 +95,12 @@ export function FormControlCheckboxField(props: tFieldProps) {
                 {...checkboxProps}
                 required={false} //Force required to false to avoid native validation message on hover
               />
-              <Typography variant="body1">
+              <Typography variant="body1" sx={{ marginRight: 1 }}>
                 {isRequired ? label + requiredDecorator : label}
               </Typography>
 
               {infoText && <ButtonInfoField message={infoText} />}
-            </Box>
+            </Stack>
             <FormHelperText error={error ? true : false}>
               {error || ' '}
             </FormHelperText>
