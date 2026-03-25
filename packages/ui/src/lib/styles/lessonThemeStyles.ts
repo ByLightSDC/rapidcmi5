@@ -41,6 +41,7 @@ export const DEFAULT_LESSON_THEME = {
   contentWidth: ContentWidthEnum.None,
   blockPadding: BlockPaddingEnum.None,
   defaultAlignment: DefaultAlignmentEnum.Left,
+  defaultActivityAlignment: DefaultAlignmentEnum.Center,
 };
 
 /**

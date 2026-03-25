@@ -16,6 +16,7 @@ import {
 import {
   Alert,
   Box,
+  Divider,
   IconButton,
   ListItemIcon,
   Paper,
@@ -54,7 +55,10 @@ import {
   OverflowTypography,
   TabMainUi,
 } from '@rapid-cmi5/ui';
-import { useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
+import {
+  maxFormWidths,
+  useLessonThemeStyles,
+} from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
 
 /**
  * Activity displays a Deployed Scenario status, VMs, Containers, and Autograders
@@ -78,7 +82,10 @@ function TeamScenarioExercise({
   const [isClockShowing, setIsClockShowing] = useState(false);
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
-  const { blockPadding, activityAlign } = useLessonThemeStyles(lessonTheme);
+  const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
+    lessonTheme,
+    maxFormWidths.scenarioPlayback,
+  );
 
   const {
     addListener,
@@ -100,17 +107,17 @@ function TeamScenarioExercise({
   const getScenarioStatusChild = (data: Partial<DeployedScenario>) => {
     // don't want to display icon when Running
     if (data.status !== DeployedScenarioDetailStatusEnum.Ready) {
-      const rowStatus = getScenarioStatusIcon(
-        data.status,
-        data.message,
-        true, // show color
-        true, // show hover
-      );
-      return (
-        <ListItemIcon sx={{ marginLeft: '12px' }}>
-          {rowStatus.icon}
-        </ListItemIcon>
-      );
+    const rowStatus = getScenarioStatusIcon(
+      data.status,
+      data.message,
+      true, // show color
+      true, // show hover
+    );
+    return (
+      <ListItemIcon sx={{ margin: 0, padding: 0 }}>
+        {rowStatus.icon}
+      </ListItemIcon>
+    );
     }
     return null;
   };
@@ -275,35 +282,13 @@ function TeamScenarioExercise({
     scenarioStatusChangeCounter,
   ]);
 
-  // marginBottom and Top provides space between activity block and sibling lexical nodes
-  // marginLeft and right adjust to textAlign setting
-  const outerSx: SxProps = {
-    padding: blockPadding,
-    marginBottom: blockPadding,
-    marginTop: blockPadding,
-    maxWidth: '1152px',
-    marginLeft:
-      activityAlign === 'center'
-        ? 'auto'
-        : activityAlign === 'start'
-          ? 0
-          : 'auto',
-
-    marginRight:
-      activityAlign === 'center'
-        ? 'auto'
-        : activityAlign === 'end'
-          ? 0
-          : 'auto',
-  };
-
   return (
     <Paper
       className="paper-activity"
       variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        ...outerSx,
+        ...outerActivitySxWithConstrainedWidth,
       }}
     >
       <Typography variant="caption">Team Exercise</Typography>
@@ -346,7 +331,7 @@ function TeamScenarioExercise({
                 flexGrow: 1,
                 justifyContent: 'flex-end',
                 position: 'absolute', //force tabs to sit on divider
-                top: '10px',
+                top: '0px',
                 right: 0,
               }}
             >
@@ -382,6 +367,7 @@ function TeamScenarioExercise({
               </Tabs>
             </Box>
           </Stack>
+          <Divider sx={{ margin: 1, marginLeft: 0 }} />
           {currentTab === 0 && (
             <>
               <RangeResources

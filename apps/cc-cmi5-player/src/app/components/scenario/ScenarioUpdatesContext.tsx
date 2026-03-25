@@ -14,6 +14,7 @@ import ConsoleUpdates from './graph/ConsoleUpdates';
 import ScenarioUpdates from './graph/ScenarioUpdates';
 import VMUpdates from './graph/VMUpdates';
 import { Topic } from '@rangeos-nx/frontend/clients/hooks';
+import { debugRangeId, debugScenarioId } from './constants';
 
 // the graphql data returned (based on DeployedScenario with additional package details)
 
@@ -444,8 +445,8 @@ export const ScenarioUpdatesContextProvider: any = (props: tProviderProps) => {
         getLastAddTimeByTopic,
         getUpdate,
         getUpdates,
-        rangeId: rangeIdSel,
-        scenarioId: scenarioIdSel,
+        rangeId: debugRangeId || rangeIdSel,
+        scenarioId: debugScenarioId || scenarioIdSel,
         removeListener,
         setErrorMsg,
         setInitialized,

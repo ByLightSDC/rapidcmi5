@@ -129,7 +129,7 @@ export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
             auProps={auProps}
             content={fromJson as TeamConsolesContent}
           />
-          {/* REF keep for testing individual scenario UI with a deployed scenario
+          {/* REF keep for testing individual scenario UI with a deployed scenario requires ScenarioWrapper, debugRangeId, debugScenarioId
            <ScenarioConsoles
             auProps={auProps}
             content={fromJson as TeamConsolesContent}
@@ -144,7 +144,6 @@ export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
                 fileData={fileData}
                 auDir=""
                 filePath={`./Assets/Downloads/${fileData.path}`}
-                //getLinkUrl={getLocalFileBlobUrl}
               />
             );
           })}

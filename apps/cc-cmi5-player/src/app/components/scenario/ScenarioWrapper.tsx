@@ -1,53 +1,31 @@
 /* eslint-disable react/jsx-no-useless-fragment */
-import { useContext, useMemo, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { sendScenarioEventVerb } from '../../utils/LmsStatementManager';
 import {
-  auJsonSel,
   rangeConsoleDataSel,
   rangeDataSel,
   setStudentId,
 } from '../../redux/auReducer';
 
 import { cmi5Instance } from '../../session/cmi5';
-import { LaunchData } from '@xapi/cmi5';
 
 // Console
 
-import {
-  ScenarioUpdatesContext,
-  ScenarioUpdatesContextProvider,
-} from './ScenarioUpdatesContext';
+import { ScenarioUpdatesContextProvider } from './ScenarioUpdatesContext';
 
-
-import {
-  DeployedScenario,
-  DeployedScenarioDetailStatusEnum,
-} from '@rangeos-nx/frontend/clients/devops-api';
-
-/* MUI */
-import { Box, IconButton, ListItemIcon, Stack, Tooltip } from '@mui/material';
-
-/* Icons*/
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import DangerousIcon from '@mui/icons-material/Dangerous';
-
-import {
-  confirmDeleteButtonText,
-  deleteModalId,
-  deletePrompt,
-  deleteTitle,
-} from './constants';
-import RangeResources from './list-views/RangeResources';
-import ScenarioModals from './ScenarioModals';
 import { routeDelim } from './ScenarioConsoleTab';
 import { debugLog, logger } from '../../debug';
-import TimeClock from './TimeClock';
-import { ScenarioContentType } from './scenarioSchema';
 import { useGetRangeResourceScenario } from '@rangeos-nx/frontend/clients/hooks';
 import { DataFetcher } from '@rapid-cmi5/ui';
 import { ConsoleProvider } from './console/ConsoleContext';
 import ConsolesDisplay from './console/ConsolesDisplay';
+import {
+  debugPassword,
+  debugRangeId,
+  debugScenarioId,
+  debugUserName,
+} from './constants';
 
 /**
  * Wraps course to persist Scenario Console State across slides
@@ -56,6 +34,7 @@ import ConsolesDisplay from './console/ConsolesDisplay';
 function ScenarioWrapper({ children }: { children: any }) {
   const dispatch = useDispatch();
   const [initializationAttempt, setInitializationAttempt] = useState(0);
+  const [rangeId, setRangeId] = useState<string | undefined>(undefined);
   const [scenarioId, setScenarioId] = useState<string | undefined>(undefined);
   const rangeData = useSelector(rangeDataSel);
   const rangeConsoleData = useSelector(rangeConsoleDataSel);
@@ -66,6 +45,14 @@ function ScenarioWrapper({ children }: { children: any }) {
    * UE forces render when rangeData updates
    */
   useEffect(() => {
+    if (debugRangeId && debugScenarioId && debugUserName && debugPassword) {
+      setUsername(debugUserName);
+      setPassword(debugPassword);
+      setScenarioId(debugScenarioId);
+      setRangeId(debugRangeId);
+      return;
+    }
+
     const isDisabled =
       rangeData?.rangeId &&
       rangeData.deployedScenarios &&
@@ -133,7 +120,7 @@ function ScenarioWrapper({ children }: { children: any }) {
           key={scenarioId}
           guacUser={username}
           guacPassword={password}
-          rangeId={rangeData?.rangeId}
+          rangeId={debugRangeId || rangeData?.rangeId}
           scenarioId={scenarioId}
           onScenarioEvent={async (eventType, scenarioIdParam, metadata) => {
             // Send LRS statement
@@ -153,7 +140,7 @@ function ScenarioWrapper({ children }: { children: any }) {
           <DataFetcher
             showIndicator={false}
             apiHook={useGetRangeResourceScenario}
-            payload={{ id: scenarioId, rangeId: rangeData?.rangeId }}
+            payload={{ id: scenarioId, rangeId: debugRangeId || rangeData?.rangeId }}
             shouldSuppressToaster={false}
             onDataLoad={(data) => {
               // console.log('deployed scenario', data);
@@ -165,7 +152,7 @@ function ScenarioWrapper({ children }: { children: any }) {
             <ScenarioUpdatesContextProvider
               key={scenarioId}
               filterScenarios={scenarioId}
-              rangeIdSel={rangeData?.rangeId}
+              rangeIdSel={debugRangeId || rangeData?.rangeId}
               scenarioIdSel={scenarioId}
             >
               {children}
