@@ -12,7 +12,6 @@ export const useLessonThemeStyles = (
   /* Lesson Theme */
   const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
 
-
   const activityAlign =
     lessonTheme?.defaultActivityAlignment || DefaultAlignmentEnum.Center;
 
@@ -86,7 +85,7 @@ export const maxFormWidths = {
   jobeEditor: 1024,
   quizEditor: 800,
   scenarioEditor: 800,
-  downloadsEditor: 800,
+  downloadsEditor: 640,
   ctfPlayback: undefined,
   jobePlayback: 1024,
   quizPlayback: 800,
