@@ -1,78 +1,96 @@
-import { ModalDialog } from '@rapid-cmi5/ui';
+/* eslint-disable react/jsx-no-useless-fragment */
+import {
+  FormControlCheckboxField,
+  FormControlTextField,
+  FormControlUIProvider,
+  FormStateType,
+  MiniForm,
+  ModalDialog,
+} from '@rapid-cmi5/ui';
+import * as yup from 'yup';
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 import InputAdornment from '@mui/material/InputAdornment';
-import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
+import TextField from '@mui/material/TextField';
+import Grid from '@mui/material/Grid2';
 import LabelIcon from '@mui/icons-material/Label';
-import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import { useState } from 'react';
-import { QuestionType } from './QuizBankSearchForm';
+import { UseFormReturn } from 'react-hook-form';
+import { QuestionBankApiCreate } from 'packages/rapid-cmi5/src/lib/contexts/QuizBankContext';
 
 export function AddToQuizBankForm({
   question,
   handleCloseModal,
   handleModalAction,
 }: {
-  question: QuestionType;
+  question: any;
   handleCloseModal: () => void;
-  handleModalAction: (question: QuestionType) => void;
+  handleModalAction: (question: QuestionBankApiCreate) => void;
 }) {
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>(question.tags ?? []);
 
-  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if ((e.key === 'Enter' || e.key === ',') && tagInput.trim()) {
-      e.preventDefault();
-      const newTag = tagInput.trim().replace(/,$/, '');
-      if (newTag && !tags.includes(newTag)) {
-        setTags((prev) => [...prev, newTag]);
+  const validationSchema = yup.object().shape({
+    public: yup.boolean(),
+  });
+
+  const doAction = async (data: any) => {
+    const newQuestion: QuestionBankApiCreate = {
+      public: data.public ?? true,
+      question: question.question,
+      quizQuestion: question,
+      rc5Version: '1',
+      tags,
+    };
+    handleModalAction(newQuestion);
+  };
+
+  const getFormFields = (
+    formMethods: UseFormReturn,
+    formState: FormStateType,
+  ): JSX.Element => {
+    const { control } = formMethods;
+
+    const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if ((e.key === 'Enter' || e.key === ',') && tagInput.trim()) {
+        e.preventDefault();
+        const newTag = tagInput.trim().replace(/,$/, '');
+        if (newTag && !tags.includes(newTag)) {
+          setTags((prev) => [...prev, newTag]);
+        }
+        setTagInput('');
       }
-      setTagInput('');
-    }
-  };
+    };
 
-  const handleRemoveTag = (tag: string) => {
-    setTags((prev) => prev.filter((t) => t !== tag));
-  };
+    const handleRemoveTag = (tag: string) => {
+      setTags((prev) => prev.filter((t) => t !== tag));
+    };
 
-  const handleConfirm = () => {
-    
-    handleModalAction({ ...question, tags });
-  };
+    return (
+      <>
+        <Grid size={12}>
+          <FormControlTextField
+            control={control}
+            name="question"
+            label="Question"
+            readOnly={true}
+          />
+        </Grid>
+        <Grid size={12}>
+          <FormControlTextField
+            control={control}
+            name="type"
+            label="Type"
+            readOnly={true}
+          />
+        </Grid>
 
-  return (
-    <ModalDialog
-      buttons={[]}
-      dialogProps={{ open: true }}
-      maxWidth="sm"
-    >
-      <Stack spacing={2} sx={{ p: 1, minWidth: 380 }}>
-        <Typography variant="h6" fontWeight={600}>
-          Add to Quiz Bank
-        </Typography>
 
-        <Box>
-          <Typography variant="caption" color="text.secondary">
-            Question
-          </Typography>
-          <Typography variant="body2" sx={{ mt: 0.5 }}>
-            {question.question}
-          </Typography>
-        </Box>
-
-        <Divider />
-
-        <Stack spacing={1}>
-          <Typography variant="caption" color="text.secondary">
-            Tags — type a tag and press Enter
-          </Typography>
+        <Grid size={12}>
           <TextField
             fullWidth
             size="small"
+            label="Tags — press Enter to add"
             placeholder="Add tag..."
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
@@ -86,7 +104,7 @@ export function AddToQuizBankForm({
             }}
           />
           {tags.length > 0 && (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
               {tags.map((tag) => (
                 <Chip
                   key={tag}
@@ -99,21 +117,39 @@ export function AddToQuizBankForm({
               ))}
             </Box>
           )}
-        </Stack>
+        </Grid>
 
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, pt: 1 }}>
-          <Button variant="outlined" onClick={handleCloseModal}>
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<BookmarkAddIcon />}
-            onClick={handleConfirm}
-          >
-            Add to Bank
-          </Button>
-        </Box>
-      </Stack>
+        <Grid size={12}>
+          <FormControlCheckboxField
+            control={control}
+            name="public"
+            label="Public"
+          />
+        </Grid>
+      </>
+    );
+  };
+
+  return (
+    <ModalDialog buttons={[]} dialogProps={{ open: true }} maxWidth="sm">
+      <FormControlUIProvider>
+        <MiniForm
+          dataCache={{
+            question: question.question,
+            public: true,
+            tags: question.tags ?? [],
+          }}
+          doAction={doAction}
+          formTitle="Add to Quiz Bank"
+          getFormFields={getFormFields}
+          instructions=""
+          submitButtonText="Add to Bank"
+          successToasterMessage="Question Added to Quiz Bank"
+          onClose={handleCloseModal}
+          onCancel={handleCloseModal}
+          validationSchema={validationSchema}
+        />
+      </FormControlUIProvider>
     </ModalDialog>
   );
 }

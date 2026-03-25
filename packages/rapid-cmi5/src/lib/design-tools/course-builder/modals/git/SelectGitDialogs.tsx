@@ -13,41 +13,27 @@ import {
   ViewExpander,
 } from '@rapid-cmi5/ui';
 import { useContext, useEffect, useState } from 'react';
-import { GitContext } from '../GitViewer/session/GitContext';
-import DirectoryTreeView from '../GitViewer/Components/SelectedRepo/DirectoryTree';
-import CourseSelector from '../selectors/CourseSelector';
-import { Box, Stack } from '@mui/system';
-
-import {
-  cloneRepoModalId,
-  commitChangesModalId,
-  createCourseModalId,
-  createLocalRepoModalId,
-  createNewLessonModalId,
-  downloadCmi5ZipModalId,
-  gitPullModalId,
-  gitPushModalId,
-  importRepoZipModalId,
-  quizBankSearchModalId,
-  revertCommitModalId,
-  selectRepoModalId,
-  setGitConfigModalId,
-} from '../../rapidcmi5_mdx/modals/constants';
+import { TextField, Alert } from '@mui/material';
+import { Stack, Box } from '@mui/system';
+import { RepoState } from 'packages/rapid-cmi5/src/lib/redux/repoManagerReducer';
+import { RootState } from 'packages/rapid-cmi5/src/lib/redux/store';
+import { RC5Context } from '../../../rapidcmi5_mdx/contexts/RC5Context';
+import { useCourseData } from '../../../rapidcmi5_mdx/data-hooks/useCourseData';
+import { createCourseModalId, cloneRepoModalId, createNewLessonModalId, selectRepoModalId, createLocalRepoModalId, importRepoZipModalId, commitChangesModalId, revertCommitModalId, gitPullModalId, downloadCmi5ZipModalId, setGitConfigModalId, gitPushModalId } from '../../../rapidcmi5_mdx/modals/constants';
+import { GitContext } from '../../GitViewer/session/GitContext';
+import CourseSelector from '../../selectors/CourseSelector';
+import CreateCourseForm from '../courses/CreateCourseForm';
+import CreateLessonForm from '../courses/CreateLessonForm';
+import DownloadCmi5ZipForm from '../courses/DownloadCmi5ZipForm';
+import ImportRepoZipForm from '../courses/ImportRepoZipForm';
 import CloneRepoForm from './CloneRepoForm';
-import { CreateCourseForm } from './CreateCourseForm';
-import { CreateLessonForm } from './CreateLessonForm';
-import { RepoState } from '../../../redux/repoManagerReducer';
 import CommitForm from './CommitForm';
-import { RootState } from '../../../redux/store';
+import CreateLocalRepoForm from './CreateLocalRepoForm';
+import GitConfigForm from './GitConfigForm';
 import PullForm from './PullForm';
 import PushForm from './PushForm';
-import GitConfigForm from './GitConfigForm';
-import DownloadCmi5ZipForm from './DownloadCmi5ZipForm';
-import { useCourseData } from '../../rapidcmi5_mdx/data-hooks/useCourseData';
-import ImportRepoZipForm from './ImportRepoZipForm';
-import { TextField, Alert } from '@mui/material';
-import { RC5Context } from '../../rapidcmi5_mdx/contexts/RC5Context';
-import CreateLocalRepoForm from './CreateLocalRepoForm';
+import DirectoryTree from '../../GitViewer/Components/SelectedRepo/DirectoryTree';
+
 /**
  * Select Repo, Course, AU
  * @returns
@@ -225,7 +211,7 @@ export function SelectGitDialogs() {
                   className="scrollingDiv"
                   style={{ margin: 0, height: '100%' }}
                 >
-                  <DirectoryTreeView
+                  <DirectoryTree
                     currentRepo={currentRepo}
                     directoryTree={directoryTree}
                     isReadOnly={true}

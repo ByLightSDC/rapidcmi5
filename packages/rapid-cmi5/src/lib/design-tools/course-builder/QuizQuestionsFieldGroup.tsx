@@ -19,11 +19,14 @@ import {
   FormControlTextField,
   FormControlCheckboxField,
   FormFieldArray,
-  setModal,
+  ButtonModalMinorUi,
+  useToaster,
 } from '@rapid-cmi5/ui';
-
-import { QuestionType } from './modals/quizBank/QuizBankSearchForm';
 import AddToQuizBankForm from './modals/quizBank/AddToQuizBankForm';
+import {
+  QuestionBankApiCreate,
+  QuizBankContext,
+} from '../../contexts/QuizBankContext';
 
 /**
  * @interface fieldGroupProps
@@ -37,7 +40,6 @@ interface fieldGroupProps {
   formProps: tFormFieldRendererProps;
   rowIndex?: number;
   slideType: SlideTypeEnum;
-  addToQuizBank?: (question: QuestionType) => void;
 }
 
 /**
@@ -46,7 +48,10 @@ interface fieldGroupProps {
  * @returns
  */
 export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
-  const { crudType, formProps, slideType, addToQuizBank } = props;
+  const { crudType, formProps, slideType } = props;
+  const { addToQuizBank } = useContext(QuizBankContext);
+  const displayToaster = useToaster();
+
   const { formMethods, indexedArrayField, indexedErrors, isFocused } =
     formProps;
   const { control, getValues, setValue, trigger, watch } = formMethods;
@@ -118,15 +123,31 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
     }
   }, [watchQuestionType]);
 
-  const handleAddToQuizBank = () => {
-    if (!addToQuizBank) return;
-    const questionData = getValues(indexedArrayField);
-    addToQuizBank({
-      question: questionData.question,
-      type: questionData.type,
-      questionData,
-    });
-  };
+  const handleAddToQuizBank = addToQuizBank
+    ? (q: QuestionBankApiCreate) => {
+        try {
+          addToQuizBank(q);
+          setIsAddQuestionBankOpen(false);
+
+          displayToaster({
+            message: 'Added Question to Bank.',
+            severity: 'success',
+            autoHideDuration: 3000,
+          });
+        } catch (e: unknown) {
+          const msg =
+            e instanceof Error
+              ? e.message
+              : 'Failed to add question to the bank. Please try again.';
+
+          displayToaster({
+            message: `Add Question to Bank Failed: ${msg}`,
+            severity: 'error',
+            autoHideDuration: 8000,
+          });
+        }
+      }
+    : undefined;
 
   return (
     <Grid
@@ -135,25 +156,14 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
       sx={{ marginLeft: '12px', width: '100%' }}
       id={indexedArrayField} // this is used for scrolling when new array entry added
     >
-      {addToQuizBank && isQuestionValid && (
-        <Tooltip title="Save this question to the quiz bank">
-          <Button
-            size="small"
-            variant="outlined"
-            startIcon={<BookmarkAddIcon />}
-            onClick={() => setIsAddQuestionBankOpen(true)}
-          >
-            Add to Quiz Bank
-          </Button>
-        </Tooltip>
-      )}
-      {addToQuizBank && isAddQuestionBankOpen && (
+      {handleAddToQuizBank && isAddQuestionBankOpen && (
         <AddToQuizBankForm
           handleCloseModal={() => setIsAddQuestionBankOpen(false)}
-          handleModalAction={addToQuizBank}
+          handleModalAction={handleAddToQuizBank}
           question={getValues(indexedArrayField)}
         />
       )}
+
       <Grid size={4}>
         <FormControlSelectField
           control={control}
@@ -238,7 +248,6 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
                     questionField={indexedArrayField}
                     questionType={watchQuestionType}
                     slideType={slideType}
-                    addToQuizBank={addToQuizBank}
                   />
                 );
               }}
@@ -310,7 +319,6 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
                   crudType={crudType}
                   formProps={props}
                   slideType={slideType}
-                  addToQuizBank={addToQuizBank}
                 />
               );
             }}
@@ -326,6 +334,19 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           />
         </Box>
       )}
+      {addToQuizBank && isQuestionValid && (
+        <Tooltip title="Save this question to the quiz bank">
+          <ButtonModalMinorUi
+            aria-label="search-question-bank"
+            id="search-question-bank-button"
+            size="small"
+            onClick={() => setIsAddQuestionBankOpen(true)}
+            startIcon={<BookmarkAddIcon fontSize="small" />}
+          >
+            Add to Quiz Bank
+          </ButtonModalMinorUi>
+        </Tooltip>
+      )}
     </Grid>
   );
 }
@@ -334,11 +355,12 @@ interface optionFieldGroupProps extends fieldGroupProps {
   questionField: string;
   questionType: QuestionResponse;
 }
+
 function QuestionOptionsFieldGroup(props: optionFieldGroupProps) {
   const { crudType, formProps, questionField, questionType } = props;
   const { formMethods, indexedArrayField, indexedErrors, isFocused, rowIndex } =
     formProps;
-  const { control, getValues, setValue, watch } = formMethods;
+  const { control, getValues, setValue } = formMethods;
 
   const focusHelper = useDisplayFocus();
   // this effect is for focusing on text field when added as row to array
@@ -401,8 +423,7 @@ function QuestionOptionsFieldGroup(props: optionFieldGroupProps) {
 
 function QuestionMatchingFieldGroup(props: fieldGroupProps) {
   const { crudType, formProps } = props;
-  const { formMethods, indexedArrayField, indexedErrors, isFocused, rowIndex } =
-    formProps;
+  const { formMethods, indexedArrayField, indexedErrors } = formProps;
   const { control } = formMethods;
 
   return (

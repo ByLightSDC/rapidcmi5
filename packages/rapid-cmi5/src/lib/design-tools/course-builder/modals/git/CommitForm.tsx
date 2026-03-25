@@ -9,9 +9,7 @@ import {
 } from '@rapid-cmi5/ui';
 import * as yup from 'yup';
 
-import {
-  commitChangesModalId,
-} from '../../rapidcmi5_mdx/modals/constants';
+
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
 import { Box } from '@mui/material';
@@ -21,13 +19,13 @@ import { UseFormReturn } from 'react-hook-form';
 import {
   DESCRIPTION_GROUP,
   EMAIL_BASE,
-  EMAIL_GROUP,
-  NAME_GROUP,
+
   NAME_GROUP_OPT,
 } from '@rapid-cmi5/ui';
-import { CreateCommitType } from '../CourseBuilderApiTypes';
 import { useContext } from 'react';
-import { GitContext } from '../GitViewer/session/GitContext';
+import { commitChangesModalId } from '../../../rapidcmi5_mdx/modals/constants';
+import { CreateCommitType } from '../../CourseBuilderApiTypes';
+import { GitContext } from '../../GitViewer/session/GitContext';
 
 export function CommitForm({
   defaultData,

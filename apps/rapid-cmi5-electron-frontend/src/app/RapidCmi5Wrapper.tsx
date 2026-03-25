@@ -17,7 +17,7 @@ import { UserConfigContext } from './contexts/UserConfigContext';
 import { AuthContext } from './contexts/AuthContext';
 import { IQuizBankContext } from 'packages/rapid-cmi5/src/lib/contexts/QuizBankContext';
 import axios from 'axios';
-import { QuestionType } from 'packages/rapid-cmi5/src/lib/design-tools/course-builder/modals/quizBank/QuizBankSearchForm';
+import { QuestionBankApiCreate } from '../../../../packages/rapid-cmi5/src/lib/contexts/QuizBankContext';
 
 export const apiClient = axios.create({
   baseURL: 'http://localhost:8080', // change to your backend
@@ -93,18 +93,12 @@ export function RapidCmi5Wrapper() {
   };
 
   const quizBankContextProps: IQuizBankContext = {
-    addToQuizBank: async (question: QuestionType) => {
+    addToQuizBank: async (question: QuestionBankApiCreate) => {
       try {
-        console.log("data", question)
+        console.log('data', question);
         const response = await apiClient.post(
-          '/v1/quizBank/questionBank',
-          {
-            quizId: 1,
-            rc5Version: 1,
-            tags: question.tags,
-            quizQuestion: question,
-            question: question.question
-          },
+          '/v1/quiz-bank/question-bank',
+          { ...question },
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -116,7 +110,7 @@ export function RapidCmi5Wrapper() {
         throw error;
       }
     },
-    searchQuizBank: async (query: string, mode: 'tags' | 'question') => {
+    searchQuizBank: async (query: string) => {
       try {
         const params: Record<string, string | number> = {
           offset: 0,
@@ -126,15 +120,12 @@ export function RapidCmi5Wrapper() {
           search: query.trim(),
         };
 
-        const response = await apiClient.get(
-          '/v1/quizBank/questionBank',
-          {
-            headers: { Authorization: `Bearer ${token}` },
-            params,
-          },
-        );
+        const response = await apiClient.get('/v1/quiz-bank/question-bank', {
+          headers: { Authorization: `Bearer ${token}` },
+          params,
+        });
 
-        console.log("Main data", response)
+        console.log('Main data', response);
         return response.data.data;
       } catch (error) {
         console.error('Failed to add question to quiz bank', error);

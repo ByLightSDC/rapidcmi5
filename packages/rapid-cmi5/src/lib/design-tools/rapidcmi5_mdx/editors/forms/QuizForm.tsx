@@ -42,10 +42,11 @@ import {
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 
 import { useContext, useState } from 'react';
-import { QuizBankContext } from 'packages/rapid-cmi5/src/lib/contexts/QuizBankContext';
-import QuizBankSearchForm, {
-  QuestionType,
-} from '../../../course-builder/modals/quizBank/QuizBankSearchForm';
+import {
+  QuestionBankApi,
+  QuizBankContext,
+} from 'packages/rapid-cmi5/src/lib/contexts/QuizBankContext';
+import QuizBankSearchForm from '../../../course-builder/modals/quizBank/QuizBankSearchForm';
 
 export function requireField<T>(value: T | undefined | null, field: string): T {
   if (value === undefined || value === null) {
@@ -68,7 +69,7 @@ export const QuizForm = ({
   handleCloseModal?: () => void;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const { addToQuizBank, searchQuizBank } = useContext(QuizBankContext);
+  const { searchQuizBank } = useContext(QuizBankContext);
 
   const slideType =
     activityKind === RC5ActivityTypeEnum.quiz
@@ -160,10 +161,10 @@ export const QuizForm = ({
     };
 
     const mapBankQuestionToFormQuestion = (
-      question: QuestionType,
+      question: QuestionBankApi,
       index: number,
     ): QuizQuestion => {
-      const data = requireField(question.questionData, 'questionData');
+      const data = requireField(question.quizQuestion, 'quizQuestion');
 
       return {
         question: requireField(data.question, 'question'),
@@ -173,7 +174,7 @@ export const QuizForm = ({
       };
     };
 
-    const handleModalResponse = (selectedQuestions: QuestionType[]) => {
+    const handleModalResponse = (selectedQuestions: QuestionBankApi[]) => {
       const existingQuestions = getValues('questions') || [];
 
       const mappedQuestions = selectedQuestions.map((question, idx) =>
@@ -250,7 +251,7 @@ export const QuizForm = ({
             readOnly={crudType === FormCrudType.view}
           />
         </Grid>
-        {isSearchBankOpen && (
+        {isSearchBankOpen && searchQuizBank && (
           <QuizBankSearchForm
             handleCloseModal={() => setIsSearchBankOpen(false)}
             handleModalAction={handleModalResponse}
@@ -282,7 +283,6 @@ export const QuizForm = ({
                   crudType={crudType}
                   formProps={props}
                   slideType={slideType}
-                  addToQuizBank={addToQuizBank}
                 />
               );
             }}

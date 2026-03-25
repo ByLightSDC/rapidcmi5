@@ -14,13 +14,13 @@ import { defaultCommitData, ModalDialog } from '@rapid-cmi5/ui';
 import { RC5Context } from '../contexts/RC5Context';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { Alert, Box, TextField, Typography } from '@mui/material';
-import SelectGitDialogs from '../../course-builder/modals/SelectGitDialogs';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
 import { RootState } from '../../../redux/store';
 import { RepoState } from '../../../redux/repoManagerReducer';
 import SaveCourseForm from '../../course-builder/modals/courses/SaveCourseForm';
 import { SuperSaveFormType } from '../../course-builder/CourseBuilderApiTypes';
+import SelectGitDialogs from '../../course-builder/modals/git/SelectGitDialogs';
 
 export default function RC5Modals() {
   const modalObj = useSelector(modal);
