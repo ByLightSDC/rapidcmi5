@@ -25,7 +25,7 @@ export function AddToQuizBankForm({
 }: {
   question: any;
   handleCloseModal: () => void;
-  handleModalAction: (question: QuestionBankApiCreate) => void;
+  handleModalAction: (question: QuestionBankApiCreate) => Promise<void>;
 }) {
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>(question.tags ?? []);
@@ -42,7 +42,7 @@ export function AddToQuizBankForm({
       rc5Version: '1',
       tags,
     };
-    handleModalAction(newQuestion);
+    await handleModalAction(newQuestion);
   };
 
   const getFormFields = (
@@ -84,7 +84,6 @@ export function AddToQuizBankForm({
             readOnly={true}
           />
         </Grid>
-
 
         <Grid size={12}>
           <TextField
