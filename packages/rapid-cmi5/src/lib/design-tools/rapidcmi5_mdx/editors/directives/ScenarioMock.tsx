@@ -4,6 +4,7 @@ import { useContext, useMemo, useState, useCallback } from 'react';
 import {
   Alert,
   Box,
+  Divider,
   IconButton,
   Paper,
   Stack,
@@ -141,7 +142,7 @@ function ScenarioMock({
               flexGrow: 1,
               justifyContent: 'flex-end',
               position: 'absolute', //force tabs to sit on divider
-              top: '10px',
+              top: '-6px',
               right: 0,
             }}
           >
@@ -177,6 +178,7 @@ function ScenarioMock({
             </Tabs>
           </Box>
         </Stack>
+        <Divider />
         {currentTab === 0 && (
           <Box sx={{ margin: '12px' }}>
             <Alert
