@@ -8,7 +8,14 @@ import {
 import * as Mdast from 'mdast';
 
 import { ContainerDirective } from 'mdast-util-directive';
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { $getRoot, $isElementNode } from 'lexical';
 
 import { convertMdastToMarkdown } from '../../util/conversion';
@@ -41,6 +48,7 @@ import { createGridCell, findMatchingPreset, GRID_PRESETS } from './constants';
 import { GridContextProvider } from './GridContext';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { useGutterRight } from '../shared/useGutterRight';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 
@@ -57,11 +65,10 @@ export const GridContainerEditor: React.FC<
   const muiTheme = useTheme();
   const { lessonTheme } = useContext(LessonThemeContext);
   const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
-  const blockPadding = resolvedThemeCSS ? (resolvedThemeCSS.blockPadding ?? '0px') : '32px';
-  const hasGutter = !!resolvedThemeCSS?.maxWidth && resolvedThemeCSS.maxWidth !== '100%';
-
-  const gutterRef = useRef<HTMLDivElement>(null);
-  const [gutterRight, setGutterRight] = useState('-100px');
+  const blockPadding = resolvedThemeCSS
+    ? (resolvedThemeCSS.blockPadding ?? '0px')
+    : '32px';
+  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
 
   const [sxProps, setSxProps] = useState<SxProps>({});
   const [formData, setFormData] = useState<Array<GridCellDirectiveNode>>(
@@ -74,20 +81,13 @@ export const GridContainerEditor: React.FC<
   const [backgroundColor, setBackgroundColor] = useState<string>(
     mdastNode?.attributes?.backgroundColor ?? '',
   );
-  const [colorPickerAnchor, setColorPickerAnchor] = useState<HTMLButtonElement | null>(null);
+  const [colorPickerAnchor, setColorPickerAnchor] =
+    useState<HTMLButtonElement | null>(null);
   const [pendingColor, setPendingColor] = useState<string>(
     mdastNode?.attributes?.backgroundColor ?? '',
   );
   const pendingColorRef = useRef(pendingColor);
   const skipNextCloseRebuildRef = useRef(false);
-
-  // Measure gutter button group width after mount so right offset is exact.
-  useEffect(() => {
-    if (gutterRef.current) {
-      const w = gutterRef.current.offsetWidth;
-      setGutterRight(`-${w + 15}px`);
-    }
-  }, []);
 
   /**
    * Determine the current preset based on cell count
@@ -180,7 +180,8 @@ export const GridContainerEditor: React.FC<
 
       parentEditor.update(() => {
         const attributes: Record<string, string> = {};
-        if (mdastNode.attributes?.style) attributes['style'] = mdastNode.attributes.style;
+        if (mdastNode.attributes?.style)
+          attributes['style'] = mdastNode.attributes.style;
         if (bgColor) attributes['backgroundColor'] = bgColor;
 
         const mdast: ContainerDirective = {
@@ -302,7 +303,7 @@ export const GridContainerEditor: React.FC<
           sx={{
             width: '100%',
             padding: 1,
-            border: '1px dashed',
+            border: isPlayback ? '1px' : '1px dashed',
             borderColor: 'divider',
             borderRadius: 1,
             backgroundColor: (theme) => theme.palette.background.paper,
@@ -313,13 +314,7 @@ export const GridContainerEditor: React.FC<
             <Box
               sx={{
                 // Target the NestedLexicalEditor's wrapper div to apply grid layout
-                '& > [data-lexical-editor="true"], & > [role="textbox"]': {
-                  display: 'grid',
-                  gridTemplateColumns: `repeat(${mdastNode.children.length}, 1fr)`,
-                  gap: 2,
-                },
-                // Also target by class pattern as fallback
-                '& > div[class*="nestedEditor"]': {
+                '& > [data-lexical-editor="true"]': {
                   display: 'grid',
                   gridTemplateColumns: `repeat(${mdastNode.children.length}, 1fr)`,
                   gap: 2,
@@ -349,7 +344,7 @@ export const GridContainerEditor: React.FC<
               position: 'absolute',
               display: 'flex',
               top: backgroundColor ? blockPadding : 0,
-              right: hasGutter ? gutterRight : 0,
+              right: gutterRight,
             }}
           >
             <Tooltip title="Background Color">
