@@ -112,8 +112,8 @@ export function generateLessonThemeStyleTag(
     margin-right: auto;
   }
   .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:has(.paper-activity) {
-    width: calc(100vw - var(--panel-width));
-    max-width: calc(100vw - var(--panel-width));
+    width: calc(98vw - var(--panel-width));
+    max-width: calc(98vw - var(--panel-width));
     position: relative;
     left: 50%;
     transform: translateX(-50%);
