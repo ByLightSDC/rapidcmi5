@@ -2,7 +2,13 @@
 import { DRAWER_WIDTH } from './ContentLayout';
 import TabPanel from './TabPanel';
 import Drawer from '@mui/material/Drawer';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
@@ -18,7 +24,12 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 
 import { Box, Switch, Tooltip, Typography, useTheme } from '@mui/material';
-import { auJsonSel, classIdSel, studentIdSel } from '../redux/auReducer';
+import {
+  auJsonSel,
+  classIdSel,
+  studentIdSel,
+  setSlideWidth,
+} from '../redux/auReducer';
 import { activeTabSel } from '../redux/navigationReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { cmi5Instance } from '../session/cmi5';
@@ -128,6 +139,36 @@ export default function MenuLayout() {
       dispatch(setDividerColor(dividerColor || 'grey'));
     }
   }, [currentTheme, dispatch]);
+
+  /**
+   * Calculate left drawer width to support activity slides fullwidth css
+   * Observer ensures it gets updated when the left drawer is resized
+   */
+  useLayoutEffect(() => {
+    if (!slideRef.current) return;
+
+    const measure = () => {
+      if (slideRef.current) {
+        // Get the position relative to the viewport
+        const rect = slideRef.current.getBoundingClientRect();
+
+        //set width in css so we can tell activities to ignore content width settings
+        document.documentElement.style.setProperty(
+          '--panel-width',
+          `${rect.left}px`,
+        );
+        //store in redux to trigger re-render
+        dispatch(setSlideWidth(rect.width));
+      }
+    };
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(slideRef.current);
+
+    return () => observer.disconnect();
+
+    // Ensure the ref is attached to a DOM element and that element exists
+  }, []);
 
   return (
     <>

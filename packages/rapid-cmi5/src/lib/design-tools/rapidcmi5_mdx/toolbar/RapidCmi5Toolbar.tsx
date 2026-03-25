@@ -177,7 +177,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
         //tool bar left plus 24 px right margin
         setLeftToolbarPos(left + rightToolbarMargin);
 
-        //set width
+        //set width in css so we can tell activities to ignore content width settings
         document.documentElement.style.setProperty('--panel-width', `${rect.left}px`);
       }
     };

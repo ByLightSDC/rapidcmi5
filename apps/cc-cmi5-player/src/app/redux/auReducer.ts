@@ -26,6 +26,8 @@ type tAuState = {
   rangeConsoleDataError?: string;
   rangeDataAttempts: number;
   rangeConsoleDataAttempts: number;
+  // Triggers lesson style re-render needed to allow activities to go fullwidth
+  slideWidth?: number;
   studentId: string;
 
   // New consolidated progress tracking
@@ -55,6 +57,7 @@ export const initialState: tAuState = {
   },
   rangeDataAttempts: 0,
   rangeConsoleDataAttempts: 0,
+  slideWidth: 800,
   studentId: '',
   courseAUProgress: undefined,
 };
@@ -118,6 +121,9 @@ export const auSlice = createSlice({
     },
     setRangeConsoleDataAttempts: (state, action) => {
       state.rangeConsoleDataAttempts = action.payload;
+    },
+    setSlideWidth: (state, action) => {
+      state.slideWidth = action.payload;
     },
     setStudentId: (state, action) => {
       state.studentId = action.payload;
@@ -221,6 +227,7 @@ export const {
   setRangeConsoleDataError,
   setRangeDataAttempts,
   setRangeConsoleDataAttempts,
+  setSlideWidth,
   setStudentId,
   // CourseAUProgress actions
   initializeCourseAUProgress,
@@ -257,6 +264,7 @@ export const rangeDataAttemptsSel = (state: RootState) =>
   state.au.rangeDataAttempts;
 export const rangeConsoleDataAttemptsSel = (state: RootState) =>
   state.au.rangeConsoleDataAttempts;
+export const slideWidth = (state: RootState) => state.au.slideWidth;
 export const courseAUProgressSel = (state: RootState) => {
   const value = state.au.courseAUProgress;
   return value;

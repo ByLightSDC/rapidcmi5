@@ -87,11 +87,10 @@ export function resolveLessonThemeCSS(theme?: LessonTheme): {
 export function generateLessonThemeStyleTag(
   scopedClass: string,
   theme?: LessonTheme,
+  slideWidth?: number,
 ): string {
   const css = resolveLessonThemeCSS(theme);
 
-  //console.log('css.maxWidth', css?.maxWidth);
-  //max-width: 100vw;
 
   // Always emit --content-margin so directive calc() expressions resolve even when no theme is set.
   if (!css) return `.${scopedClass} { --content-margin: 0px; }`;
@@ -124,13 +123,17 @@ export function generateLessonThemeStyleTag(
     max-width: none;
     margin-left: unset;
     margin-right: unset;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] {
+      --content-margin: 0px;
   }`
     : `
   .${scopedClass} {
-    --content-margin: 0px;
+      --content-margin: 0px;
   }`;
 
-  const alignmentRule = `
+  const alignmentRule = css.textAlign
+    ? `
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > p,
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-paragraph="true"],
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > ul,
@@ -141,9 +144,10 @@ export function generateLessonThemeStyleTag(
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > h3,
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > h4,
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > h5,
-    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h6,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h6 {
       text-align: ${css.textAlign};
-    }`;
+    }`
+    : '';
 
   // Zero margin-top on colored decorators (they carry data-bgcolor on their inner Box)
   // so the full-width band starts flush — no gap above the color. The band's own
