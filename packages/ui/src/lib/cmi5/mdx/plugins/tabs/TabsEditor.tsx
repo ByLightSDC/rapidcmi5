@@ -12,9 +12,8 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import {
-  $getRoot,
-} from 'lexical';
+
+import { $getRoot } from 'lexical';
 
 import {
   Box,
@@ -39,6 +38,7 @@ import DeleteIconButton from '../../components/DeleteIconButton';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PaletteIcon from '@mui/icons-material/Palette';
+import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
@@ -56,6 +56,7 @@ import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { useGutterRight } from '../shared/useGutterRight';
 import { getDirectiveBlockShadow } from '../../../../styles/directiveStyles';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
@@ -104,8 +105,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   );
   // Ref so onClose always sees the latest pendingColor regardless of closure staleness.
   const pendingColorRef = useRef(pendingColor);
-  const gutterRef = useRef<HTMLDivElement>(null);
-  const [gutterRight, setGutterRight] = useState('-100px');
+  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
   // Set to true when handleClearColor already rebuilt, so onClose skips its rebuild.
   const skipNextCloseRebuildRef = useRef(false);
   const colorPickerOpen = Boolean(colorPickerAnchor);
@@ -335,17 +335,6 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     setPendingColor(bgColor);
   }, [tab, mdastNode]);
 
-  // Measure gutter button group width after mount so right offset is exact.
-  useEffect(() => {
-    if (gutterRef.current) {
-      const w = gutterRef.current.offsetWidth;
-      setGutterRight(`-${w + 15}px`);
-    }
-  }, []);
-
-  // True when lesson content width is S or M — real gutter space exists to the right of the decorator.
-  // At L or None, the decorator fills the editor width and buttons must sit inside.
-  const hasGutter = !!resolvedThemeCSS?.maxWidth && resolvedThemeCSS.maxWidth !== '100%';
 
   const dropShadow = getDirectiveBlockShadow(muiTheme);
 
@@ -374,7 +363,6 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     : {
         boxShadow: dropShadow,
       };
-
 
   /**
    * Render Tabs and Nested Content
@@ -433,9 +421,10 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
               getContent={(node) => {
                 return node.children;
               }}
-              getUpdatedMdastNode={(node, children: any) => {
-                return { ...node, children };
-              }}
+              getUpdatedMdastNode={(node, children: any) => ({
+                ...node,
+                children,
+              })}
               contentEditableProps={{
                 'aria-label': 'Tabs content',
               }}
@@ -453,7 +442,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
               display: 'flex',
               position: 'absolute',
               top: backgroundColor ? blockPadding : 0,
-              right: hasGutter ? gutterRight : 0,
+              right: gutterRight,
             }}
           >
             <Tooltip title="Background Color">
