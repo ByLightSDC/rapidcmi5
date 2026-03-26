@@ -12,14 +12,13 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Box, Stack } from '@mui/system';
-import { QuestionBankApi } from 'packages/rapid-cmi5/src/lib/contexts/QuizBankContext';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import LockIcon from '@mui/icons-material/Lock';
-import { QuestionResponse, QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
+import { QuestionBankApi, QuestionResponse, QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
 
 /* ------------------------------------------------------------------ */
 /*  Type styling config                                                */
@@ -44,7 +43,7 @@ const TYPE_CONFIG: Record<
 /*  Sub-components                                                     */
 /* ------------------------------------------------------------------ */
 
-function QuestionTypeChip({ type }: { type: string }) {
+export function QuestionTypeChip({ type }: { type: string }) {
   const label = type
     .replace(/([A-Z])/g, ' $1')
     .replace(/^./, (s) => s.toUpperCase());
@@ -104,7 +103,7 @@ function PrivateBadge() {
   );
 }
 
-function FormatQuestionOptions({ q }: { q: QuizQuestion }) {
+export function FormatQuestionOptions({ q }: { q: QuizQuestion }) {
   const { type, typeAttributes } = q;
 
   if (

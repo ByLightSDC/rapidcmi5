@@ -20,6 +20,7 @@ import {
   QuestionGrading,
   moveOnCriteriaOptions,
   QuizQuestion,
+  QuestionBankApi,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   ENUM_GROUP,
@@ -42,13 +43,8 @@ import {
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 
 import { useContext, useState } from 'react';
-import {
-  QuizBankContext,
-  QuestionBankApi,
-  QuestionBankApiCreate,
-} from '../../../../contexts/QuizBankContext';
-import QuizBankSearchForm from '../../../course-builder/modals/QuizBank/QuizBankSearchForm';
-import AddToQuizBankForm from '../../../course-builder/modals/QuizBank/AddToQuizBankForm';
+
+import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 
 export function requireField<T>(value: T | undefined | null, field: string): T {
   if (value === undefined || value === null) {
@@ -71,44 +67,15 @@ export const QuizForm = ({
   handleCloseModal?: () => void;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const { searchQuizBank, addToQuizBank } = useContext(QuizBankContext);
+  const { QuizBankAddModal, QuizBankSearchModal } = useContext(GitContext);
 
   const slideType =
     activityKind === RC5ActivityTypeEnum.quiz
       ? SlideTypeEnum.Quiz
       : SlideTypeEnum.CTF;
 
-  const handleSearchQuizBank = async (query: string) => {
-    if (!searchQuizBank) return [];
-    return await searchQuizBank(query, activityKind);
-  };
-
   const [isSearchBankOpen, setIsSearchBankOpen] = useState(false);
   const [bankQuestion, setBankQuestion] = useState<any>(null);
-  const displayToaster = useToaster();
-
-  const handleAddToQuizBank = async (q: QuestionBankApiCreate) => {
-    if (!addToQuizBank) return;
-    try {
-      await addToQuizBank(q);
-      setBankQuestion(null);
-      displayToaster({
-        message: 'Added Question to Bank.',
-        severity: 'success',
-        autoHideDuration: 3000,
-      });
-    } catch (e: unknown) {
-      const msg =
-        e instanceof Error
-          ? e.message
-          : 'Failed to add question to the bank. Please try again.';
-      displayToaster({
-        message: `Add Question to Bank Failed: ${msg}`,
-        severity: 'error',
-        autoHideDuration: 8000,
-      });
-    }
-  };
 
   const validationSchema = yup.object().shape({
     //cmi5QuizId: read-only field auto populated/updated
@@ -282,12 +249,24 @@ export const QuizForm = ({
             readOnly={crudType === FormCrudType.view}
           />
         </Grid>
-        {isSearchBankOpen && searchQuizBank && (
-          <QuizBankSearchForm
-            handleCloseModal={() => setIsSearchBankOpen(false)}
-            handleModalAction={handleModalResponse}
-            onSearch={handleSearchQuizBank}
-            multiSelect={true}
+
+        {bankQuestion && QuizBankAddModal && (
+          <QuizBankAddModal
+            formType={crudType}
+            errors={errors}
+            formMethods={formMethods}
+            closeModal={() => setBankQuestion(null)}
+            question={bankQuestion}
+          />
+        )}
+        {isSearchBankOpen && QuizBankSearchModal && (
+          <QuizBankSearchModal
+            submitForm={handleModalResponse}
+            formType={crudType}
+            errors={errors}
+            formMethods={formMethods}
+            closeModal={() => setIsSearchBankOpen(false)}
+            activityType={activityKind}
           />
         )}
         <Grid size={11}>
@@ -314,7 +293,7 @@ export const QuizForm = ({
                   formProps={props}
                   slideType={slideType}
                   onAddToBank={
-                    addToQuizBank ? (q) => setBankQuestion(q) : undefined
+                    QuizBankAddModal ? (q) => setBankQuestion(q) : undefined
                   }
                 />
               );
@@ -352,13 +331,6 @@ export const QuizForm = ({
 
   return (
     <>
-      {bankQuestion && (
-        <AddToQuizBankForm
-          handleCloseModal={() => setBankQuestion(null)}
-          handleModalAction={handleAddToQuizBank}
-          question={bankQuestion}
-        />
-      )}
       <FormControlUIProvider>
         <MiniForm
           dataCache={defaultFormData}

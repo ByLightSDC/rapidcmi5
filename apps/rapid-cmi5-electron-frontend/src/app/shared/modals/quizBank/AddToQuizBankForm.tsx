@@ -1,6 +1,5 @@
 import {
   FormControlCheckboxField,
-  FormControlTextField,
   FormControlUIProvider,
   FormStateType,
   MiniForm,
@@ -9,23 +8,53 @@ import {
 import * as yup from 'yup';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
+import Divider from '@mui/material/Divider';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import { Stack } from '@mui/system';
 import Grid from '@mui/material/Grid2';
 import LabelIcon from '@mui/icons-material/Label';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { QuestionBankApiCreate } from 'packages/rapid-cmi5/src/lib/contexts/QuizBankContext';
+import { QuizBankAddModalProps } from '@rapid-cmi5/react-editor';
+import axios from 'axios';
+import { QuestionBankApiCreate } from '@rapid-cmi5/cmi5-build-common';
+import { FormatQuestionOptions, QuestionTypeChip } from './Question';
 
 export function AddToQuizBankForm({
+  url,
+  token,
   question,
-  handleCloseModal,
-  handleModalAction,
-}: {
-  question: any;
-  handleCloseModal: () => void;
-  handleModalAction: (question: QuestionBankApiCreate) => Promise<void>;
-}) {
+  closeModal,
+}: QuizBankAddModalProps) {
+  const apiClient = useMemo(() => {
+    return axios.create({
+      baseURL: url,
+      timeout: 10000,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }, [url]);
+
+  const addToQuizBank = async (question: QuestionBankApiCreate) => {
+    try {
+      const response = await apiClient.post(
+        '/v1/quiz-bank/question-bank',
+        { ...question },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error('Failed to add question to quiz bank', error);
+      throw error;
+    }
+  };
+
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>(question.tags ?? []);
 
@@ -34,8 +63,7 @@ export function AddToQuizBankForm({
   });
 
   const doAction = async (data: any) => {
-
-    if (!question.type) throw Error("Question type not defined");
+    if (!question.type) throw Error('Question type not defined');
     const newQuestion: QuestionBankApiCreate = {
       public: data.public ?? true,
       questionType: question.type,
@@ -44,7 +72,8 @@ export function AddToQuizBankForm({
       rc5Version: '1',
       tags,
     };
-    await handleModalAction(newQuestion);
+    await addToQuizBank(newQuestion);
+    closeModal();
   };
 
   const getFormFields = (
@@ -71,23 +100,27 @@ export function AddToQuizBankForm({
     return (
       <>
         <Grid size={12}>
-          <FormControlTextField
-            control={control}
-            name="question"
-            label="Question"
-            readOnly={true}
-          />
-        </Grid>
-        <Grid size={12}>
-          <FormControlTextField
-            control={control}
-            name="type"
-            label="Type"
-            readOnly={true}
-          />
+          <Box
+            sx={{
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 2,
+              p: 1.5,
+              bgcolor: 'action.hover',
+            }}
+          >
+            <Typography variant="h4" fontWeight={600} mb={1}>
+              Question: {question.question}
+            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1} mb={0.75}>
+              <QuestionTypeChip type={question.type} />
+            </Stack>
+            <Divider sx={{ mb: 1 }} />
+            <FormatQuestionOptions q={question} />
+          </Box>
         </Grid>
 
-        <Grid size={12}>
+        <Grid size={12} sx={{paddingTop: 1}}>
           <TextField
             fullWidth
             size="small"
@@ -146,8 +179,8 @@ export function AddToQuizBankForm({
           instructions=""
           submitButtonText="Add to Bank"
           successToasterMessage="Question Added to Quiz Bank"
-          onClose={handleCloseModal}
-          onCancel={handleCloseModal}
+          onClose={closeModal}
+          onCancel={closeModal}
           validationSchema={validationSchema}
         />
       </FormControlUIProvider>

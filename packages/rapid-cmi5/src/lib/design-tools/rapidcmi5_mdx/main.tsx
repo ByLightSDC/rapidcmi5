@@ -12,11 +12,8 @@ import {
   CourseAU,
   Credentials,
   GitUserConfig,
+  RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
-import {
-  IQuizBankContext,
-  QuizBankProvider,
-} from '../../contexts/QuizBankContext';
 
 export type SubmitScenarioFormFn<T = any> = (item: T) => void;
 
@@ -40,11 +37,52 @@ export interface GetScenarioFormProps {
   errors: any;
 }
 
+export interface GetQuizBankSearchModalProps {
+  submitForm: SubmitScenarioFormFn;
+  closeModal: () => void;
+  formMethods: UseFormReturn;
+  formType: FormCrudType;
+  activityType: RC5ActivityTypeEnum;
+  errors: any;
+}
+
+export interface GetQuizBankAddModalProps {
+  closeModal: () => void;
+  formMethods: UseFormReturn;
+  formType: FormCrudType;
+  errors: any;
+  question: any;
+}
+
+export interface QuizBankSearchModalProps {
+  submitForm: SubmitScenarioFormFn;
+  formMethods: UseFormReturn;
+  formType: FormCrudType;
+  errors: any;
+  token: string;
+  url?: string;
+  closeModal: () => void;
+  activityType: RC5ActivityTypeEnum;
+  currentUserEmail?: string;
+}
+
+export interface QuizBankAddModalProps {
+  closeModal: () => void;
+  formMethods: UseFormReturn;
+  formType: FormCrudType;
+  errors: any;
+  token: string;
+  url?: string;
+  question: any;
+}
+
 export interface RapidCmi5Opts {
   userAuth?: UserAuth;
   downloadCmi5Player?: () => Promise<any>;
   processAu?: (au: CourseAU, blockId: string) => Promise<void>;
   GetScenariosForm?: React.ComponentType<GetScenarioFormProps>;
+  QuizBankSearchModal?: React.ComponentType<GetQuizBankSearchModalProps>;
+  QuizBankAddModal?: React.ComponentType<GetQuizBankAddModalProps>;
   clearData?: () => void;
   showHomeButton?: boolean;
   clearCache?: () => void;
@@ -52,7 +90,6 @@ export interface RapidCmi5Opts {
     config?: GitUserConfig,
     creds?: Credentials,
   ) => void;
-  quizBankContextProps?: IQuizBankContext;
 }
 
 export type UserAuth = {
@@ -68,12 +105,10 @@ export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <GitContextProvider rapidCmi5Opts={rapidCmi5Opts}>
-          <QuizBankProvider quizBankProps={rapidCmi5Opts.quizBankContextProps}>
-            <RC5ContextProvider>
-              <RC5Modals />
-              <Landing showHomeButton={rapidCmi5Opts.showHomeButton} />
-            </RC5ContextProvider>
-          </QuizBankProvider>
+          <RC5ContextProvider>
+            <RC5Modals />
+            <Landing showHomeButton={rapidCmi5Opts.showHomeButton} />
+          </RC5ContextProvider>
         </GitContextProvider>
       </PersistGate>
     </Provider>

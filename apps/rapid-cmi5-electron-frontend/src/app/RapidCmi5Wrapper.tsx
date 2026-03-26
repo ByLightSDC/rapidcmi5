@@ -8,17 +8,20 @@ import {
   Credentials,
   generateAuId,
   GitUserConfig,
-  RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
-import { RapidCmi5, GetScenarioFormProps } from '@rapid-cmi5/react-editor';
+import {
+  RapidCmi5,
+  GetScenarioFormProps,
+  GetQuizBankAddModalProps,
+  GetQuizBankSearchModalProps,
+} from '@rapid-cmi5/react-editor';
 import { debugLogError } from '@rapid-cmi5/ui';
 import { useContext, useEffect } from 'react';
 import { ScenarioSelectionForm } from './shared/modals/ScenarioSelectionModal';
 import { UserConfigContext } from './contexts/UserConfigContext';
 import { AuthContext } from './contexts/AuthContext';
-import { IQuizBankContext } from 'packages/rapid-cmi5/src/lib/contexts/QuizBankContext';
-import axios from 'axios';
-import { QuestionBankApiCreate } from '../../../../packages/rapid-cmi5/src/lib/contexts/QuizBankContext';
+import AddToQuizBankForm from './shared/modals/quizBank/AddToQuizBankForm';
+import QuizBankSearchForm from './shared/modals/quizBank/QuizBankSearchForm';
 
 export function RapidCmi5Wrapper() {
   const { token, parsedUserToken } = useContext(AuthContext);
@@ -83,75 +86,6 @@ export function RapidCmi5Wrapper() {
       scenarioUUID = matchingScenarios.data.data?.at(0)?.uuid;
     }
     return scenarioUUID;
-  };
-
-  const apiClient = axios.create({
-    baseURL: ssoConfig?.quizBankApiUrl, 
-    timeout: 10000,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  const quizBankContextProps: IQuizBankContext = {
-    deleteFromQuizBank: async (uuid: string) => {
-      try {
-        await apiClient.delete(`/v1/quiz-bank/question-bank/${uuid}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      } catch (error) {
-        console.error('Failed to delete question from quiz bank', error);
-        throw error;
-      }
-    },
-
-    addToQuizBank: async (question: QuestionBankApiCreate) => {
-      try {
-        console.log('data', question);
-        const response = await apiClient.post(
-          '/v1/quiz-bank/question-bank',
-          { ...question },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-
-        return response.data;
-      } catch (error) {
-        console.error('Failed to add question to quiz bank', error);
-        throw error;
-      }
-    },
-
-    searchQuizBank: async (
-      query: string,
-      activityKind: RC5ActivityTypeEnum,
-    ) => {
-      try {
-        const params: Record<string, string | number | undefined> = {
-          offset: 0,
-          limit: 20,
-          sortBy: 'dateEdited',
-          sort: 'desc',
-          search: query.trim(),
-          questionType:
-            activityKind === RC5ActivityTypeEnum.ctf
-              ? 'freeResponse'
-              : undefined,
-        };
-
-        const response = await apiClient.get('/v1/quiz-bank/question-bank', {
-          headers: { Authorization: `Bearer ${token}` },
-          params,
-        });
-
-        console.log('Main data', response);
-        return response.data.data;
-      } catch (error) {
-        console.error('Failed to add question to quiz bank', error);
-        throw error;
-      }
-    },
   };
 
   return (
@@ -245,7 +179,34 @@ export function RapidCmi5Wrapper() {
             )
           : undefined
       }
-      quizBankContextProps={quizBankContextProps}
+      QuizBankAddModal={(props: GetQuizBankAddModalProps) =>
+        token && parsedUserToken?.email?.toLowerCase() ? (
+          <AddToQuizBankForm
+            token={token}
+            closeModal={props.closeModal}
+            formType={props.formType}
+            errors={props.errors}
+            formMethods={props.formMethods}
+            url={ssoConfig?.quizBankApiUrl}
+            question={props.question}
+          />
+        ) : undefined
+      }
+      QuizBankSearchModal={(props: GetQuizBankSearchModalProps) =>
+        token ? (
+          <QuizBankSearchForm
+            token={token}
+            submitForm={props.submitForm}
+            formType={props.formType}
+            errors={props.errors}
+            formMethods={props.formMethods}
+            url={ssoConfig?.quizBankApiUrl}
+            closeModal={props.closeModal}
+            currentUserEmail={parsedUserToken?.email?.toLowerCase()}
+            activityType={props.activityType}
+          />
+        ) : undefined
+      }
     />
   );
 }
