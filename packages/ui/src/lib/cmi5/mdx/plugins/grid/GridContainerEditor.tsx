@@ -222,14 +222,18 @@ export const GridContainerEditor: React.FC<
   /**
    * Clears the background color
    */
-  const handleClearColor = useCallback(async () => {
+  const handleClearColor = useCallback(() => {
     setColorPickerAnchor(null);
     pendingColorRef.current = '';
     skipNextCloseRebuildRef.current = true;
     setPendingColor('');
     setBackgroundColor('');
-    await rebuildNode(formData, '');
-  }, [rebuildNode, formData]);
+    parentEditor.update(() => {
+      const attrs = { ...mdastNode.attributes };
+      delete attrs.backgroundColor;
+      lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+    }, { discrete: true });
+  }, [lexicalNode, mdastNode, parentEditor]);
 
   /**
    * Opens the settings modal
@@ -396,7 +400,15 @@ export const GridContainerEditor: React.FC<
           const latest = pendingColorRef.current;
           if (latest !== backgroundColor) {
             setBackgroundColor(latest);
-            rebuildNode(formData, latest);
+            parentEditor.update(() => {
+              const attrs = { ...mdastNode.attributes };
+              if (latest) {
+                attrs.backgroundColor = latest;
+              } else {
+                delete attrs.backgroundColor;
+              }
+              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+            }, { discrete: true });
           }
         }}
         lastColor={pendingColor}
