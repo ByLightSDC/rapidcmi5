@@ -1,7 +1,10 @@
 import { useCallback, useMemo } from 'react';
 import { DynamicModal } from '@rapid-cmi5/ui';
 import QuestionCard from './Question';
-import { QuestionBankApi, RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import {
+  QuestionBankApi,
+  RC5ActivityTypeEnum,
+} from '@rapid-cmi5/cmi5-build-common';
 import axios from 'axios';
 import { QuizBankSearchModalProps } from '@rapid-cmi5/react-editor';
 
@@ -11,7 +14,7 @@ export function QuizBankSearchForm({
   closeModal,
   submitForm,
   currentUserEmail,
-  activityType
+  activityType,
 }: QuizBankSearchModalProps) {
   const apiClient = useMemo(
     () =>
@@ -41,9 +44,7 @@ export function QuizBankSearchForm({
 
   const fetchItems = useCallback(
     async (_page: number, query: string) => {
-      const onSearch = async (
-        query: string,
-      ) => {
+      const onSearch = async (query: string) => {
         try {
           const params: Record<string, string | number | undefined> = {
             offset: 0,
@@ -62,7 +63,6 @@ export function QuizBankSearchForm({
             params,
           });
 
-          console.log('Main data', response);
           return response.data.data;
         } catch (error) {
           console.error('Failed to add question to quiz bank', error);

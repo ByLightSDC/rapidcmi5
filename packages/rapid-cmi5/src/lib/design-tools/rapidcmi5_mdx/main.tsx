@@ -14,6 +14,7 @@ import {
   GitUserConfig,
   RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
+import { AxiosInstance } from 'axios';
 
 export type SubmitScenarioFormFn<T = any> = (item: T) => void;
 
@@ -21,13 +22,9 @@ export type SubmitScenarioFormFn<T = any> = (item: T) => void;
 // this prevents needing to pass the token into the package part of the application
 // we only need to pass the function for on click
 
-export interface ScenarioFormProps {
-  submitForm: SubmitScenarioFormFn;
+export interface ScenarioFormProps extends GetScenarioFormProps {
   token: string;
   url?: string;
-  formMethods: UseFormReturn;
-  formType: FormCrudType;
-  errors: any;
 }
 
 export interface GetScenarioFormProps {
@@ -46,6 +43,13 @@ export interface GetQuizBankSearchModalProps {
   errors: any;
 }
 
+export interface QuizBankSearchModalProps extends GetQuizBankSearchModalProps {
+  token: string;
+  url?: string;
+  currentUserEmail?: string;
+  apiClient: AxiosInstance;
+}
+
 export interface GetQuizBankAddModalProps {
   closeModal: () => void;
   formMethods: UseFormReturn;
@@ -54,26 +58,10 @@ export interface GetQuizBankAddModalProps {
   question: any;
 }
 
-export interface QuizBankSearchModalProps {
-  submitForm: SubmitScenarioFormFn;
-  formMethods: UseFormReturn;
-  formType: FormCrudType;
-  errors: any;
+export interface QuizBankAddModalProps extends GetQuizBankAddModalProps {
   token: string;
   url?: string;
-  closeModal: () => void;
-  activityType: RC5ActivityTypeEnum;
-  currentUserEmail?: string;
-}
-
-export interface QuizBankAddModalProps {
-  closeModal: () => void;
-  formMethods: UseFormReturn;
-  formType: FormCrudType;
-  errors: any;
-  token: string;
-  url?: string;
-  question: any;
+  apiClient: AxiosInstance;
 }
 
 export interface RapidCmi5Opts {
