@@ -3,10 +3,7 @@ import axios, { AxiosError } from 'axios';
 import Cmi5 from '@xapi/cmi5';
 import { debugLog } from '../debug';
 
-import {
-  sendInitializedVerb,
-  sendRangeosAuthVerb,
-} from '../utils/LmsStatementManager';
+import { sendRangeosAuthVerb } from '../utils/LmsStatementManager';
 import {
   auSessionInitializedSel,
   classIdSel,
@@ -315,15 +312,8 @@ export const useCMI5Session = () => {
       activityId: cmi5Instance.getLaunchParameters().activityId,
     });
 
-    // Send Initialized verb to LRS after successful CMI5 initialization
-    try {
-      await sendInitializedVerb();
-    } catch (error) {
-      debugLog('Error sending Initialized verb to LRS:', error);
-      console.log('Error sending Initialized verb to LRS');
-      // Don't throw error - initialization should continue even if LRS statement fails
-    }
-
+    // REF - this is where we were calling sendInitializedVer(), however the cmi5 library already does that.
+    // So it was removed from here. If for some reason we stop using the library, we can place it back here. -MB
     const authToken = cmi5Instance.getAuthToken();
     if (!config.CMI5_SSO_ENABLED) {
       storeAuthToken(authToken);

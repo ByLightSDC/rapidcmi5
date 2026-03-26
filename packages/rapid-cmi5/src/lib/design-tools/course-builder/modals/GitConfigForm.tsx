@@ -138,7 +138,7 @@ export function GitConfigForm({
         </Grid>
         {!isRepoConnectedToRemote && (
           <Alert severity="warning">
-            The remote Repository MUST be blank. Please ensure there is no
+            When adding a new remote, the repository MUST be blank. Please ensure there is no
             README file before you add the remote.
           </Alert>
         )}

@@ -11,12 +11,14 @@ import {
   ListItemIcon,
   ListItemText,
   Stack,
-  Tooltip,
-  Typography,
   useTheme,
 } from '@mui/material';
 
-import { ButtonOptions, ButtonMinorUi, RowAction } from '@rapid-cmi5/ui';
+import {
+  ButtonOptions,
+  RowAction,
+  setModal,
+} from '@rapid-cmi5/ui';
 
 /** Data */
 import { LessonDrawer } from './drawers/LessonDrawer';
@@ -108,6 +110,13 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
         break;
     }
   };
+
+  /**
+   * UE closes modals on landing mount
+   */
+  useEffect(() => {
+    dispatch(setModal({ type: '', id: '', name: '' }));
+  }, [dispatch]);
 
   return (
     <>

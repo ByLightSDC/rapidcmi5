@@ -7,9 +7,25 @@ import MenuItem from '@mui/material/MenuItem';
 import * as yup from 'yup';
 
 import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
-import { JobeContent, moveOnCriteriaOptions, RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
-import { FormCrudType, REQUIRED_ENTRY, FormStateType, FormControlTextField, FormControlSelectField, FormControlUIProvider, MiniForm } from '@rapid-cmi5/ui';
+import {
+  JobeContent,
+  moveOnCriteriaOptions,
+  RC5ActivityTypeEnum,
+} from '@rapid-cmi5/cmi5-build-common';
+import {
+  FormCrudType,
+  REQUIRED_ENTRY,
+  FormStateType,
+  FormControlTextField,
+  FormControlSelectField,
+  FormControlUIProvider,
+  MiniForm,
+  LessonThemeContext,
+   maxFormWidths, useLessonThemeStyles
+} from '@rapid-cmi5/ui';
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
+import { useContext } from 'react';
+import { SxProps } from '@mui/system';
 
 export const JobeForm = ({
   crudType,
@@ -25,6 +41,14 @@ export const JobeForm = ({
 }) => {
   // Get the unique rc5id from the form data for scoping ksats to individual activity
   const rc5id = defaultFormData?.rc5id;
+
+  /* Lesson Theme */
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const { outerActivitySxWithConstrainedWidthForm } = useLessonThemeStyles(
+    lessonTheme,
+    maxFormWidths.jobeEditor,
+  );
+
   const validationSchema = yup.object().shape({
     // student: DESCRIPTION_GROUP,
     // evaluator: DESCRIPTION_GROUP,
@@ -56,7 +80,7 @@ export const JobeForm = ({
 
     return (
       <>
-        <Grid size={7.5}>
+        <Grid size={6}>
           <FormControlTextField
             control={control}
             name={'title'}
@@ -65,7 +89,7 @@ export const JobeForm = ({
             sxProps={{ height: '30%' }}
           />
         </Grid>
-        <Grid size={4.5}>
+        <Grid size={5.5}>
           <FormControlSelectField
             control={control}
             name={'moveOnCriteria'}
@@ -120,17 +144,23 @@ export const JobeForm = ({
   return (
     <FormControlUIProvider>
       <MiniForm
+        className="paper-activity"
+        outerSx={outerActivitySxWithConstrainedWidthForm}
         dataCache={defaultFormData}
         titleEndChildren={deleteButton}
         doAction={onSaveAction}
         formTitle="Jobe In The Box"
-        formWidth="640px"
+        formWidth={null}
+        formSxProps={{
+          flexGrow: 1,
+          maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
+        } as SxProps}
         getFormFields={getFormFields}
         loadingButtonText="Saving"
         shouldAutoSave={true}
         shouldCheckIsDirty={true}
         shouldDisplaySave={false}
-        showPaper={true}
+        showPaper={false}
         submitButtonText="Save"
         validationSchema={validationSchema}
       />

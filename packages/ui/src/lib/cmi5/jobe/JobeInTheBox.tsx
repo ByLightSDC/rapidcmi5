@@ -27,7 +27,10 @@ import {
 import { dividerColor } from '../../redux/commonAppReducer';
 import { ButtonMainUi } from '../../utility/buttons';
 import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
-import { resolveLessonThemeCSS } from '../../styles/lessonThemeStyles';
+import {
+  maxFormWidths,
+  useLessonThemeStyles,
+} from '../../hooks/useLessonThemeStyles';
 
 export function JobeInTheBox({
   auProps,
@@ -49,11 +52,8 @@ export function JobeInTheBox({
 
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
-  // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
-  // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
-  const blockPadding = resolvedThemeCSS?.blockPadding ? '0px' : '32px';
-  const objectAlignMent = resolvedThemeCSS?.textAlign;
+  const { blockPadding, outerActivitySxWithConstrainedWidthForm } =
+    useLessonThemeStyles(lessonTheme, maxFormWidths.jobePlayback);
 
   const handleSubmit = async () => {
     setSuccessStr('');
@@ -147,28 +147,6 @@ export function JobeInTheBox({
     }
   };
 
-  // marginBottom and Top provides space between activity block and sibling lexical nodes
-  // marginLeft and right adjust to textAlign setting
-  const outerSx: SxProps = {
-    padding: blockPadding,
-    marginBottom: blockPadding,
-    marginTop: blockPadding,
-    maxWidth: '1152px',
-    marginLeft:
-      objectAlignMent === 'center'
-        ? 'auto'
-        : objectAlignMent === 'start'
-          ? 0
-          : 'auto',
-
-    marginRight:
-      objectAlignMent === 'center'
-        ? 'auto'
-        : objectAlignMent === 'end'
-          ? 0
-          : 'auto',
-  };
-
   useEffect(() => {
     setSubmissionStr(jobeContent.student);
   }, [jobeContent]);
@@ -179,7 +157,8 @@ export function JobeInTheBox({
       variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        ...outerSx,
+        ...outerActivitySxWithConstrainedWidthForm,
+        padding: blockPadding,
       }}
     >
       {jobeContent.title && (
@@ -195,23 +174,38 @@ export function JobeInTheBox({
           {jobeContent.title}
         </Typography>
       )}
-      <Editor
-        value={submissionStr}
-        onValueChange={(code) => setSubmissionStr(code)}
-        highlight={(code) => highlight(code, languages.js)}
-        padding={10}
-        style={{
-          borderRadius: '6px',
-          borderColor: themedDividerColor,
-          borderStyle: 'solid',
-          borderWidth: '2px',
-          fontFamily: '"Fira code", "Fira Mono", monospace',
-          fontSize: 15,
-          width: '100%',
-          minHeight: '120px',
-          margin: '4px',
-        }}
-      />
+      {jobeContent.evaluator && (
+        <Editor
+          value={submissionStr}
+          onValueChange={(code) => setSubmissionStr(code)}
+          highlight={(code) => highlight(code, languages.js)}
+          padding={10}
+          style={{
+            borderRadius: '6px',
+            borderColor: themedDividerColor,
+            borderStyle: 'solid',
+            borderWidth: '2px',
+            fontFamily: '"Fira code", "Fira Mono", monospace',
+            fontSize: 15,
+            width: '100%',
+            minHeight: '120px',
+            margin: '4px',
+          }}
+        />
+      )}
+      {!jobeContent.evaluator && (
+        <Alert
+          severity="error"
+          sx={{
+            maxWidth: '480px',
+            margin: '12px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+        >
+          Jobe In The Box is missing an evaluation script.
+        </Alert>
+      )}
       {successStr && (
         <Alert
           sx={{ margin: '12px' }}
@@ -225,19 +219,17 @@ export function JobeInTheBox({
       )}
       {errorStr && (
         <Alert sx={{ margin: '12px' }} severity="error">
-          <AlertTitle>BadRequest</AlertTitle>
+          <AlertTitle>Bad Request</AlertTitle>
           {errorStr}
         </Alert>
       )}
-      <Box sx={{ margin: '4px', marginTop: '12px' }}>
-        <ButtonMainUi
-          //sx={{ margin: '4px' }}
-          disabled={false}
-          onClick={handleSubmit}
-        >
-          Submit
-        </ButtonMainUi>
-      </Box>
+      {jobeContent.evaluator && (
+        <Box sx={{ margin: '4px', marginTop: '12px' }}>
+          <ButtonMainUi disabled={false} onClick={handleSubmit}>
+            Submit
+          </ButtonMainUi>
+        </Box>
+      )}
     </Paper>
   );
 }

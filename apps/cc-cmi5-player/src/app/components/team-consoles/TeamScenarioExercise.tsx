@@ -53,9 +53,11 @@ import {
 import {
   LessonThemeContext,
   OverflowTypography,
-  resolveLessonThemeCSS,
   TabMainUi,
+  maxFormWidths,
+  useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
+
 
 /**
  * Activity displays a Deployed Scenario status, VMs, Containers, and Autograders
@@ -79,10 +81,10 @@ function TeamScenarioExercise({
   const [isClockShowing, setIsClockShowing] = useState(false);
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
-  // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
-  // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
-  const blockPadding = resolvedThemeCSS?.blockPadding ? '0px' : '32px';
+  const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
+    lessonTheme,
+    maxFormWidths.scenarioPlayback,
+  );
 
   const {
     addListener,
@@ -111,7 +113,7 @@ function TeamScenarioExercise({
         true, // show hover
       );
       return (
-        <ListItemIcon sx={{ marginLeft: '12px' }}>
+        <ListItemIcon sx={{ margin: 0, padding: 0 }}>
           {rowStatus.icon}
         </ListItemIcon>
       );
@@ -279,21 +281,13 @@ function TeamScenarioExercise({
     scenarioStatusChangeCounter,
   ]);
 
-  // paddingTop provides space within content (safe, layout-based).
-  const outerSx: SxProps = {
-    padding: blockPadding,
-    marginBottom: blockPadding,
-    marginTop: blockPadding,
-    maxWidth:1152
-  };
-
   return (
     <Paper
       className="paper-activity"
       variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        ...outerSx,
+        ...outerActivitySxWithConstrainedWidth,
       }}
     >
       <Typography variant="caption">Team Exercise</Typography>
@@ -336,7 +330,7 @@ function TeamScenarioExercise({
                 flexGrow: 1,
                 justifyContent: 'flex-end',
                 position: 'absolute', //force tabs to sit on divider
-                top: '10px',
+                top: '0px',
                 right: 0,
               }}
             >
@@ -372,6 +366,7 @@ function TeamScenarioExercise({
               </Tabs>
             </Box>
           </Stack>
+          <Divider sx={{ margin: 1, marginLeft: 0 }} />
           {currentTab === 0 && (
             <>
               <RangeResources

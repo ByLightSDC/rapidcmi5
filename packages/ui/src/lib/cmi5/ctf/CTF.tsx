@@ -46,7 +46,10 @@ import {
   ButtonMinorUi,
 } from '../../utility/buttons';
 import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
-import { resolveLessonThemeCSS } from '../../styles/lessonThemeStyles';
+import {
+  maxFormWidths,
+  useLessonThemeStyles,
+} from '../../hooks/useLessonThemeStyles';
 
 const answerBoxGridSize = 3.8;
 const attemptedLabel = '#Attempted';
@@ -64,7 +67,6 @@ export function AuCTF({
   content: CTFContent;
 }) {
   const { setProgress, submitScore } = auProps;
-  //TODO const ctfContent = content || slides[activeTab].content as CTFContent;
   const ctfContent = content;
 
   const dispatch = useDispatch();
@@ -86,7 +88,7 @@ export function AuCTF({
     setNumAttempted,
     setNumCorrect,
   } = useCTFGrader(ctfContent);
-  const [isInitialized, setIsInitialized] = useState(false);
+
   const [isFocused, setIsFocused] = useState(currentQuestionIndex >= 0);
   const focusHelper = useDisplayFocus();
   const countRef = useRef(currentQuestionIndex); //for tabbing
@@ -97,10 +99,8 @@ export function AuCTF({
 
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
-  // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
-  // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
-  const blockPadding = resolvedThemeCSS?.blockPadding ? '0px' : '32px';
+  const { outerActivitySxFullWidth, outerActivitySxWithConstrainedWidthForm, outerActivitySxWithConstrainedWidth } =
+    useLessonThemeStyles(lessonTheme, maxFormWidths.ctfPlayback);
 
   /**
    * Selects question if it is available (no grade or bad grade)
@@ -239,14 +239,6 @@ export function AuCTF({
     //REF maybe go to next available here?
   };
 
-  // marginBottom and Top provides space between activity block and sibling lexical nodes
-  // marginLeft and right adjust to textAlign setting
-  const outerSx: SxProps = {
-    padding: blockPadding,
-    marginBottom: blockPadding,
-    marginTop: blockPadding,
-  };
-
   /**
    * Submit Score to LRS
    */
@@ -352,8 +344,7 @@ export function AuCTF({
         className="paper-activity"
         variant="outlined"
         sx={{
-          backgroundColor: 'background.default',
-          ...outerSx,
+          ...outerActivitySxWithConstrainedWidth,
         }}
       >
         {ctfContent.title && (

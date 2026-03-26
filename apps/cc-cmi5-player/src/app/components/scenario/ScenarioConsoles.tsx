@@ -8,9 +8,6 @@ import {
   setRangeConsoleData,
   setRangeDataAttempts,
 } from '../../redux/auReducer';
-
-// Console
-
 import { ScenarioUpdatesContext } from './ScenarioUpdatesContext';
 
 /* MUI */
@@ -18,6 +15,7 @@ import {
   Alert,
   AlertTitle,
   Box,
+  Divider,
   IconButton,
   ListItemIcon,
   Paper,
@@ -37,6 +35,8 @@ import TerminalIcon from '@mui/icons-material/Terminal';
 
 import {
   confirmDeleteButtonText,
+  debugRangeId,
+  debugScenarioId,
   deletePrompt,
   deleteTitle,
 } from './constants';
@@ -65,10 +65,10 @@ import {
   ButtonMinorUi,
   OverflowTypography,
   TabMainUi,
-  modal,
-  LessonThemeContext,
-  resolveLessonThemeCSS,
+  LessonThemeContext,  maxFormWidths,
+  useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
+
 
 /**
  * Slide that displays a Deployed Scenario status, VMs, Containers, and provides Consoles access
@@ -88,13 +88,19 @@ function ScenarioConsoles({
   const numRangeDataAttempts = useSelector(rangeDataAttemptsSel);
   const numRangeConsoleDataAttempts = useSelector(rangeConsoleDataAttemptsSel);
   const [currentTab, setCurrentTab] = useState(0);
+
   const { rangeId, scenarioId } = useContext(ScenarioUpdatesContext);
+
+  //REF debug scnearioId
+  // const rangeId = debugRangeId;
+  // const scenarioId = debugScenarioId;
+
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
-  // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
-  // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
-  const blockPadding = resolvedThemeCSS?.blockPadding ? '0px' : '32px';
+  const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
+    lessonTheme,
+    maxFormWidths.scenarioPlayback,
+  );
 
   /**
    * REF UE debug
@@ -143,21 +149,13 @@ function ScenarioConsoles({
       scenarioContent: content,
     });
 
-  // paddingTop provides space within content (safe, layout-based).
-  const outerSx: SxProps = {
-    padding: blockPadding,
-    marginBottom: blockPadding,
-    marginTop: blockPadding,
-    maxWidth: 1152,
-  };
-
   return (
     <Paper
       className="paper-activity"
       variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        ...outerSx,
+        ...outerActivitySxWithConstrainedWidth,
       }}
     >
       {content.introTitle && (
@@ -244,6 +242,7 @@ function ScenarioConsoles({
             handleChangeTab={handleChangeTab}
             slideContent={content}
           />
+          <Divider sx={{ margin: 1, marginLeft: 0 }} />
           {currentTab === 0 && (
             <>
               <RangeResources />
@@ -311,10 +310,15 @@ function ScenarioStatus({
   };
 
   const getScenarioStatusChild = useMemo(() => {
-    const scenarios = Object.values(getUpdates(Topic.ResourceScenario));
+    let scenarioWithStatus: Partial<DeployedScenario | null> = null;
 
-    const scenarioWithStatus: Partial<DeployedScenario> =
-      scenarios.length > 0 ? scenarios[0] : null;
+    if (debugRangeId && debugScenarioId) {
+      console.log('Debugging');
+      scenarioWithStatus = { status: 'Creating', message: 'Creating' };
+    } else {
+      const scenarios = Object.values(getUpdates(Topic.ResourceScenario));
+      scenarioWithStatus = scenarios.length > 0 ? scenarios[0] : null;
+    }
 
     // don't want to display icon when Running
     if (scenarioWithStatus) {
@@ -345,7 +349,6 @@ function ScenarioStatus({
             DeployedScenarioDetailStatusEnum.Ready && (
             <ListItemIcon
               sx={{
-                marginLeft: '4px',
                 padding: 0,
                 margin: 0,
                 height: '32px',
@@ -378,16 +381,13 @@ function ScenarioStatus({
               <TimeClock startDateStr={scenarioWithStatus?.dateCreated || ''} />
             )}
           </Stack>
-
           <Box
             sx={{
               height: '30px',
               display: 'flex',
               flexGrow: 1,
               justifyContent: 'flex-end',
-              position: 'absolute', //force tabs to sit on divider
-              top: '10px',
-              right: 0,
+              marginLeft: '12px',
             }}
           >
             <Tabs

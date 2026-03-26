@@ -120,7 +120,7 @@ export default function RangeResources({
                       </>
                     );
                   }}
-                  shouldShowColumnHeaders={true}
+                  shouldShowColumnHeaders={false}
                 />
               )}
               {topic === Topic.ResourceContainer && (
@@ -145,7 +145,7 @@ export default function RangeResources({
                       </>
                     );
                   }}
-                  shouldShowColumnHeaders={true}
+                  shouldShowColumnHeaders={false}
                 />
               )}
               {topic === Topic.ResourceAutoGrader && (

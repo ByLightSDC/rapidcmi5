@@ -31,6 +31,7 @@ export interface GridContainerDirectiveNode extends ContainerDirective {
    */
   attributes: {
     style?: string;
+    backgroundColor?: string;
   };
 
   children: GridCellDirectiveNode[];
