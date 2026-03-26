@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import useQuizGrader from './hooks/useQuizGrader';
 
@@ -13,11 +20,13 @@ import SavedSearchIcon from '@mui/icons-material/SavedSearch';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 
 import {
+  Alert,
   Box,
   CircularProgress,
   IconButton,
   Paper,
   Stack,
+  SxProps,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -26,8 +35,19 @@ import QuizReview from './QuizReview';
 import QuestionNav from './QuestionNav';
 import { usePersistQuizProgress } from './hooks/usePersistQuiz';
 import { useHydrateQuiz } from './hooks/useHydrateQuiz';
-import { AnswerType, AuContextProps, QuizContent, QuizQuestion, QuestionResponse, QuizCompletionEnum, ActivityScore, RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import {
+  AnswerType,
+  AuContextProps,
+  QuizContent,
+  QuizQuestion,
+  QuestionResponse,
+  QuizCompletionEnum,
+  ActivityScore,
+  RC5ActivityTypeEnum,
+} from '@rapid-cmi5/cmi5-build-common';
 import { ButtonMinorUi, ButtonMainUi } from '../../utility/buttons';
+import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
+import { maxFormWidths, useLessonThemeStyles } from '../../hooks/useLessonThemeStyles';
 
 export type PotentialAnswerType = AnswerType | null;
 
@@ -48,10 +68,17 @@ export function AuQuiz({
     isAuthenticated,
     isTestMode,
   } = auProps;
-
+  const noneFound =
+    'During a lesson, questions appear here. There are currently no questions in this quiz.';
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [allAnswers, setAllAnswers] = useState<AnswerType[]>(
     Array(content.questions.length).fill(null),
+  );
+  /* Lesson Theme */
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
+    lessonTheme,
+    maxFormWidths.quizPlayback,
   );
 
   const readyToHydrate = useMemo(() => {
@@ -342,11 +369,7 @@ export function AuQuiz({
       variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        minWidth: '320px',
-        maxWidth: '1152px',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        marginBottom: '12px',
+        ...outerActivitySxWithConstrainedWidth,
       }}
     >
       {content.title && (
@@ -540,6 +563,21 @@ export function AuQuiz({
             </Stack>
           )}
         </>
+      )}
+      {!isLoading && !activeQuestion && (
+        <Box sx={{ margin: '12px' }}>
+          <Alert
+            severity="info"
+            sx={{
+              backgroundColor: 'transparent',
+              borderColor: 'transparent',
+              padding: '12px',
+              maxWidth: '640px',
+            }}
+          >
+            {noneFound}
+          </Alert>
+        </Box>
       )}
     </Paper>
   );

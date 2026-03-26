@@ -11,8 +11,6 @@ import { Stack, Typography } from '@mui/material';
 import { ScenarioForm } from '../forms/ScenarioForm';
 import { JobeForm } from '../forms/JobeForm';
 
-
-
 import { QuizForm } from '../forms/QuizForm';
 import { useAuContext } from '../../data-hooks/useAuContext';
 import DeleteIconButton from '../components/DeleteIconButton';
@@ -21,9 +19,27 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { TeamConsolesForm } from '../forms/TeamConsolesForm';
 import { DownloadFilesForm } from './DownloadFilesForm';
-import { RC5ActivityTypeEnum, ActivityJsonNode, QuizContent, CTFContent, JobeContent } from '@rapid-cmi5/cmi5-build-common';
-import { useTimeStampUUID, editorInPlayback$, dividerColor, debugLog, debugLogError, jsonFormatSpaces, FormCrudType, AuQuiz, AuCTF, JobeInTheBox } from '@rapid-cmi5/ui';
+import {
+  RC5ActivityTypeEnum,
+  ActivityJsonNode,
+  QuizContent,
+  CTFContent,
+  JobeContent,
+} from '@rapid-cmi5/cmi5-build-common';
+import {
+  useTimeStampUUID,
+  editorInPlayback$,
+  dividerColor,
+  debugLog,
+  debugLogError,
+  jsonFormatSpaces,
+  FormCrudType,
+  AuQuiz,
+  AuCTF,
+  JobeInTheBox,
+} from '@rapid-cmi5/ui';
 import { updateScenario, updateTeamScenario } from '@rapid-cmi5/react-editor';
+import ScenarioMock from './ScenarioMock';
 
 /**
  * MDX Editor for Activities
@@ -214,12 +230,10 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
       {name === 'scenario' && fromJson && (
         <>
           {isPlayback && (
-            <Stack direction="column" sx={staticStyle}>
-              <Typography sx={{ fontWeight: 'bold' }}>Scenario</Typography>
-              <Typography>
-                {`During a lesson, access to VM consoles and Autograder tasks associated with the scenario (${fromJson?.name}) will appear here.`}
-              </Typography>
-            </Stack>
+            <ScenarioMock
+              activity={RC5ActivityTypeEnum.scenario}
+              scenarioName={fromJson?.name}
+            />
           )}
           {!isPlayback && (
             <ScenarioForm
@@ -240,17 +254,7 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
       {name === 'quiz' && fromJson && (
         <>
           {isPlayback && (
-            // eslint-disable-next-line react/jsx-no-useless-fragment
-            <>
-              {fromJson.questions.length === 0 ? (
-                <Stack direction="column" sx={staticStyle}>
-                  <Typography sx={{ fontWeight: 'bold' }}>Quiz</Typography>
-                  <Typography>{'Quiz has no questions.'}</Typography>
-                </Stack>
-              ) : (
-                <AuQuiz auProps={auProps} content={fromJson as QuizContent} />
-              )}
-            </>
+            <AuQuiz auProps={auProps} content={fromJson as QuizContent} />
           )}
           {!isPlayback && (
             <QuizForm
@@ -304,24 +308,7 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
       {name === 'jobe' && fromJson && (
         <>
           {isPlayback && (
-            // eslint-disable-next-line react/jsx-no-useless-fragment
-            <>
-              {!fromJson.evaluator ? (
-                <Stack direction="column" sx={staticStyle}>
-                  <Typography sx={{ fontWeight: 'bold' }}>
-                    Jobe In The Box
-                  </Typography>
-                  <Typography>
-                    {'Jobe In The Box is missing an evaluation script.'}
-                  </Typography>
-                </Stack>
-              ) : (
-                <JobeInTheBox
-                  auProps={auProps}
-                  content={fromJson as JobeContent}
-                />
-              )}
-            </>
+            <JobeInTheBox auProps={auProps} content={fromJson as JobeContent} />
           )}
           {!isPlayback && (
             <JobeForm
@@ -342,12 +329,10 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
       {name === 'consoles' && fromJson && (
         <>
           {isPlayback && (
-            <Stack direction="column" sx={staticStyle}>
-              <Typography sx={{ fontWeight: 'bold' }}>Team Consoles</Typography>
-              <Typography>
-                {`During a lesson, access to VM consoles and Autograder tasks associated with the scenario (${fromJson?.name}) will appear here.`}
-              </Typography>
-            </Stack>
+            <ScenarioMock
+              activity={RC5ActivityTypeEnum.consoles}
+              scenarioName={fromJson?.name}
+            />
           )}
           {!isPlayback && (
             <TeamConsolesForm

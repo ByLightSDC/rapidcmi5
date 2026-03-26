@@ -5,3 +5,7 @@ export const deletePrompt =
 export const deleteTitle = 'Stop Scenario';
 export const confirmDeleteButtonText = 'Stop';
 export const auCompletionDivWidth = '130px';
+export const debugRangeId = '';
+export const debugScenarioId = '';
+export const debugUserName = '';
+export const debugPassword = '';

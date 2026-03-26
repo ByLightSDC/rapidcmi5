@@ -7,7 +7,6 @@ import {
   useRef,
 } from 'react';
 
-
 import {
   DeployedScenario,
   DeployedScenarioDetailStatusEnum,
@@ -17,19 +16,21 @@ import {
 import {
   Alert,
   Box,
+  Divider,
   IconButton,
   ListItemIcon,
   Paper,
   Stack,
+  SxProps,
   Tabs,
   Tooltip,
+  Typography,
 } from '@mui/material';
 
 /* Icons*/
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AutoModeIcon from '@mui/icons-material/AutoMode';
 import TerminalIcon from '@mui/icons-material/Terminal';
-
 
 import TimeClock from '../scenario/TimeClock';
 import RangeResources from './list-views/RangeResources';
@@ -39,9 +40,24 @@ import TeamVMUpdates from './queries/TeamVMUpdates';
 import TeamContainerUpdates from './queries/TeamContainerUpdates';
 import TeamConsoleUpdates from './queries/TeamConsoleUpdates';
 import TeamAutoGraderUpdates from './queries/TeamAutoGraderUpdates';
-import { getScenarioStatusIcon, queryKeyRangeResourceAutoGraders, queryKeyRangeResourceContainers, Topic } from '@rangeos-nx/frontend/clients/hooks';
-import { AuContextProps, TeamConsolesContent } from '@rapid-cmi5/cmi5-build-common';
-import { OverflowTypography, TabMainUi } from '@rapid-cmi5/ui';
+import {
+  getScenarioStatusIcon,
+  queryKeyRangeResourceAutoGraders,
+  queryKeyRangeResourceContainers,
+  Topic,
+} from '@rangeos-nx/frontend/clients/hooks';
+import {
+  AuContextProps,
+  TeamConsolesContent,
+} from '@rapid-cmi5/cmi5-build-common';
+import {
+  LessonThemeContext,
+  OverflowTypography,
+  TabMainUi,
+  maxFormWidths,
+  useLessonThemeStyles,
+} from '@rapid-cmi5/ui';
+
 
 /**
  * Activity displays a Deployed Scenario status, VMs, Containers, and Autograders
@@ -63,6 +79,12 @@ function TeamScenarioExercise({
   const [scenarioId, setScenarioId] = useState<string>('');
   const [errorDetails, setErrorDetails] = useState<string>('');
   const [isClockShowing, setIsClockShowing] = useState(false);
+  /* Lesson Theme */
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
+    lessonTheme,
+    maxFormWidths.scenarioPlayback,
+  );
 
   const {
     addListener,
@@ -91,7 +113,7 @@ function TeamScenarioExercise({
         true, // show hover
       );
       return (
-        <ListItemIcon sx={{ marginLeft: '12px' }}>
+        <ListItemIcon sx={{ margin: 0, padding: 0 }}>
           {rowStatus.icon}
         </ListItemIcon>
       );
@@ -159,11 +181,21 @@ function TeamScenarioExercise({
       const theIcon = getScenarioStatusChild(scenarioRecord);
 
       return (
-        <Stack direction="row" sx={{ display: 'flex', alignItems: 'center' }}>
+        <Stack
+          direction="row"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            alignContent: 'center',
+          }}
+        >
           <OverflowTypography
             uuid={scenarioRecord.uuid}
             title={scenarioRecord.name}
-            sxProps={{ fontWeight: 'bold', textTransform: 'uppercase' }}
+            variant="h5"
+            sxProps={{
+              fontWeight: 'bold',
+            }}
           />
           {theIcon}
         </Stack>
@@ -251,15 +283,14 @@ function TeamScenarioExercise({
 
   return (
     <Paper
-      className="paper-activity hover:prose-a:text-blue-500 prose prose-invert"
+      className="paper-activity"
       variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        minWidth: '320px',
-        maxWidth: '1440px',
-        marginBottom: '12px',
+        ...outerActivitySxWithConstrainedWidth,
       }}
     >
+      <Typography variant="caption">Team Exercise</Typography>
       {errorDetails && <Alert severity="error">{errorDetails}</Alert>}
       {scenarioId && (
         <>
@@ -267,25 +298,46 @@ function TeamScenarioExercise({
             direction="row"
             sx={{
               padding: 0,
+              position: 'relative',
             }}
           >
-            <Box
+            {scenarioStatus}
+            <Stack
+              direction="row"
               sx={{
-                marginLeft: '0px',
-                height: '32px',
                 display: 'flex',
-                flexGrow: 1,
-                //justifyContent: 'flex-end',
-                marginBottom: '24px',
+                alignItems: 'center',
+                minWidth: '132px',
               }}
             >
-              {scenarioStatus}
+              <IconButton aria-label="toggle-clock" onClick={toggleClock}>
+                <Tooltip
+                  arrow
+                  enterDelay={500}
+                  enterNextDelay={500}
+                  title={isClockShowing ? 'Hide Clock' : 'Show Clock'}
+                  placement="bottom"
+                >
+                  <AccessTimeIcon />
+                </Tooltip>
+              </IconButton>
+              {isClockShowing && scenarioClock}
+            </Stack>
+            <Box
+              sx={{
+                height: '30px',
+                display: 'flex',
+                flexGrow: 1,
+                justifyContent: 'flex-end',
+                position: 'absolute', //force tabs to sit on divider
+                top: '0px',
+                right: 0,
+              }}
+            >
               <Tabs
                 orientation="horizontal"
                 aria-label="Scenario Tabs"
-                sx={{
-                  marginTop: 0,
-                }}
+                sx={{ marginTop: 0 }}
                 value={currentTab}
                 onChange={handleChangeTab}
                 slotProps={{
@@ -294,6 +346,7 @@ function TeamScenarioExercise({
                       height: 4,
                       margin: '12px',
                       marginLeft: '0px',
+                      marginBottom: 1,
                     },
                   },
                 }}
@@ -311,21 +364,9 @@ function TeamScenarioExercise({
                   style={{ marginBottom: 0 }}
                 />
               </Tabs>
-
-              <IconButton aria-label="toggle-clock" onClick={toggleClock}>
-                <Tooltip
-                  arrow
-                  enterDelay={500}
-                  enterNextDelay={500}
-                  title={isClockShowing ? 'Hide Clock' : 'Show Clock'}
-                  placement="bottom"
-                >
-                  <AccessTimeIcon />
-                </Tooltip>
-              </IconButton>
-              {isClockShowing && scenarioClock}
             </Box>
           </Stack>
+          <Divider sx={{ margin: 1, marginLeft: 0 }} />
           {currentTab === 0 && (
             <>
               <RangeResources

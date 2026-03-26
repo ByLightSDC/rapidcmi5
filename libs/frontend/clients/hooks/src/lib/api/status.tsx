@@ -41,7 +41,7 @@ const deletingIcon = (
   </div>
 );
 const boxProps = { width: '24px', height: 'auto' };
-
+const buttonIconSxProps = { backgroundColor: 'transparent' };
 /**
  * Icon for Displaying Console Status
  * @param {DeployedRangeConsoleStatusEnum | undefined} statusCondition Status
@@ -63,6 +63,7 @@ export const getConsoleStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <AutorenewIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -97,6 +98,7 @@ export const getConsoleStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: doneIcon, severity: 'success' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -128,6 +130,7 @@ export const getConsoleStatusIcon = (
             return {
               icon: (
                 <ButtonInfoField
+                  buttonSxProps={buttonIconSxProps}
                   alertProps={{
                     icon: <HourglassBottomIcon />,
                     severity: 'info',
@@ -162,6 +165,7 @@ export const getConsoleStatusIcon = (
             return {
               icon: (
                 <ButtonInfoField
+                  buttonSxProps={buttonIconSxProps}
                   alertProps={{
                     icon: <HourglassBottomIcon />,
                     severity: 'info',
@@ -194,6 +198,7 @@ export const getConsoleStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: errorIcon, severity: 'error' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -223,6 +228,7 @@ export const getConsoleStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <HourglassBottomIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -252,6 +258,7 @@ export const getConsoleStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <DangerousIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -320,6 +327,7 @@ export const getContainerStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <AutorenewIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -354,6 +362,7 @@ export const getContainerStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: doneIcon, severity: 'success' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -385,6 +394,7 @@ export const getContainerStatusIcon = (
             return {
               icon: (
                 <ButtonInfoField
+                  buttonSxProps={buttonIconSxProps}
                   alertProps={{
                     icon: <HourglassBottomIcon />,
                     severity: 'info',
@@ -419,6 +429,7 @@ export const getContainerStatusIcon = (
             return {
               icon: (
                 <ButtonInfoField
+                  buttonSxProps={buttonIconSxProps}
                   alertProps={{
                     icon: <HourglassBottomIcon />,
                     severity: 'info',
@@ -451,6 +462,7 @@ export const getContainerStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: errorIcon, severity: 'error' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -480,6 +492,7 @@ export const getContainerStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <HourglassBottomIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -509,6 +522,7 @@ export const getContainerStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <DangerousIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -580,6 +594,7 @@ export const getGhostMachineStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <AutorenewIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -615,6 +630,7 @@ export const getGhostMachineStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{
                   icon: <DirectionsRunIcon />,
                   severity: 'success',
@@ -647,6 +663,7 @@ export const getGhostMachineStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: doneIcon, severity: 'success' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -676,6 +693,7 @@ export const getGhostMachineStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <HourglassBottomIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -706,6 +724,7 @@ export const getGhostMachineStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <DangerousIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -735,6 +754,7 @@ export const getGhostMachineStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: errorIcon, severity: 'error' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -767,6 +787,7 @@ export const getGhostMachineStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <DangerousIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -796,6 +817,7 @@ export const getGhostMachineStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{
                   icon: <DirectionsRunIcon />,
                   severity: 'success',
@@ -828,6 +850,7 @@ export const getGhostMachineStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: errorIcon, severity: 'error' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -857,6 +880,7 @@ export const getGhostMachineStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: errorIcon, severity: 'error' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -925,6 +949,7 @@ export const getPackageStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <AutorenewIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -959,6 +984,7 @@ export const getPackageStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <DoneIcon />, severity: 'success' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -988,6 +1014,7 @@ export const getPackageStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: errorIcon, severity: 'error' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1017,6 +1044,7 @@ export const getPackageStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <HourglassBottomIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1086,6 +1114,7 @@ export const getRangeStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <AutorenewIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1120,6 +1149,7 @@ export const getRangeStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <DoneIcon />, severity: 'success' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1149,6 +1179,7 @@ export const getRangeStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: errorIcon, severity: 'error' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1178,6 +1209,7 @@ export const getRangeStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <HourglassBottomIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1207,6 +1239,7 @@ export const getRangeStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <DangerousIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1275,6 +1308,7 @@ export const getScenarioStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <AutorenewIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1309,6 +1343,7 @@ export const getScenarioStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <DoneIcon />, severity: 'success' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1338,6 +1373,7 @@ export const getScenarioStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: errorIcon, severity: 'error' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1367,6 +1403,7 @@ export const getScenarioStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <HourglassBottomIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1396,6 +1433,7 @@ export const getScenarioStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <DangerousIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1480,6 +1518,7 @@ export const getVmStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <AutorenewIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1514,6 +1553,7 @@ export const getVmStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: doneIcon, severity: 'success' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1544,6 +1584,7 @@ export const getVmStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <HourglassBottomIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1575,6 +1616,7 @@ export const getVmStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: errorIcon, severity: 'error' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1605,6 +1647,7 @@ export const getVmStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <DangerousIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1635,6 +1678,7 @@ export const getVmStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <QuestionMarkIcon />, severity: 'warning' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1664,6 +1708,7 @@ export const getVmStatusIcon = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <QuestionMarkIcon />, severity: 'warning' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1696,6 +1741,7 @@ export const getVmStatusIcon = (
       return {
         icon: (
           <ButtonInfoField
+            buttonSxProps={buttonIconSxProps}
             alertProps={{ icon: <HourglassBottomIcon />, severity: 'info' }}
             boxProps={boxProps}
             infoIcon={
@@ -1766,6 +1812,7 @@ export const getRangeResourceStatus = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <ReplayIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1797,6 +1844,7 @@ export const getRangeResourceStatus = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: doneIcon, severity: 'success' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1826,6 +1874,7 @@ export const getRangeResourceStatus = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <HourglassBottomIcon />, severity: 'info' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1856,6 +1905,7 @@ export const getRangeResourceStatus = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: errorIcon, severity: 'error' }}
                 boxProps={boxProps}
                 infoIcon={
@@ -1890,6 +1940,7 @@ export const getRangeResourceStatus = (
           return {
             icon: (
               <ButtonInfoField
+                buttonSxProps={buttonIconSxProps}
                 alertProps={{ icon: <HourglassBottomIcon />, severity: 'info' }}
                 boxProps={{ width: '24px', height: '24px' }}
                 infoIcon={

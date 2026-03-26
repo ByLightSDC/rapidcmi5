@@ -542,6 +542,9 @@ export const useCMI5Session = () => {
    *
    */
   useEffect(() => {
+    if (isTestMode) {
+      return;
+    }
     if (rangeData) {
       debugLog('UE rangeData loaded, get console creds', rangeData);
       getConsoleCredentials(cmi5Instance, rangeData);
@@ -552,6 +555,9 @@ export const useCMI5Session = () => {
    *
    */
   useEffect(() => {
+    if (isTestMode) {
+      return;
+    }
     if (savedRangeConsoleDataAttempts === -1) {
       rangeConsoleDataAttempts.current = 0;
       if (rangeData) {
@@ -559,7 +565,7 @@ export const useCMI5Session = () => {
         getConsoleCredentials(cmi5Instance, rangeData);
       }
     }
-  }, [savedRangeConsoleDataAttempts, getConsoleCredentials, rangeData]);
+  }, [savedRangeConsoleDataAttempts, getConsoleCredentials, rangeData, isTestMode]);
 
   return {
     initializeCmi5WithRange,
