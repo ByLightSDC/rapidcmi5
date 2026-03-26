@@ -58,7 +58,7 @@ export const useLessonThemeStyles = (
             ? 0
             : 'auto',
     };
-  }, [maxWidth, maxSlideWidth]);
+  }, [maxWidth, maxSlideWidth, activityAlign]);
 
   /**
    * we need to clear padding for views that use Form.tsx which applies an inner padding
