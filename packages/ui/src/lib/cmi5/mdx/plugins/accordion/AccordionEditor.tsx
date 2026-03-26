@@ -51,6 +51,7 @@ import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { useGutterRight } from '../shared/useGutterRight';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 /**
@@ -86,8 +87,7 @@ export const AccordionEditor: React.FC<
   );
   const pendingColorRef = useRef(pendingColor);
   const skipNextCloseRebuildRef = useRef(false);
-  const gutterRef = useRef<HTMLDivElement>(null);
-  const [gutterRight, setGutterRight] = useState('-100px');
+  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
   const colorPickerOpen = Boolean(colorPickerAnchor);
   const [isPlayback, readOnly, syntaxExtensions] = useCellValues(
     editorInPlayback$,
@@ -297,15 +297,6 @@ export const AccordionEditor: React.FC<
     setPendingColor(bgColor);
   }, [mdastNode]);
 
-  // Measure gutter button group width after mount so right offset is exact.
-  useEffect(() => {
-    if (gutterRef.current) {
-      const w = gutterRef.current.offsetWidth;
-      setGutterRight(`-${w + 15}px`);
-    }
-  }, []);
-
-  const hasGutter = !!resolvedThemeCSS?.maxWidth && resolvedThemeCSS.maxWidth !== '100%';
 
   // Outer box: full-width background color band when backgroundColor is set.
   const outerSx: SxProps = backgroundColor
@@ -359,7 +350,7 @@ export const AccordionEditor: React.FC<
               display: 'flex',
               position: 'absolute',
               top: backgroundColor ? blockPadding : 0,
-              right: hasGutter ? gutterRight : 0,
+              right: gutterRight,
             }}
           >
             <Tooltip title="Background Color">

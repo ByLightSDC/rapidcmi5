@@ -8,10 +8,10 @@ import { useState } from 'react';
 /* MUI */
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
-import Box from '@mui/material/Box';
 import Checkbox, { CheckboxProps } from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
 import { ButtonInfoField } from '../utility/buttons';
+import { Stack } from '@mui/material';
 
 /** @constant
  * Decorator appended to the checkbox label
@@ -68,10 +68,10 @@ export function FormControlCheckboxField(props: tFieldProps) {
         control={control}
         render={({ field }) => (
           <>
-            <Box
+            <Stack
+              direction="row"
               sx={{
                 display: 'flex',
-                flexDirection: 'row',
                 alignItems: 'center',
                 height: '28px',
                 paddingTop: '8px',
@@ -99,7 +99,7 @@ export function FormControlCheckboxField(props: tFieldProps) {
               </Typography>
 
               {infoText && <ButtonInfoField message={infoText} />}
-            </Box>
+            </Stack>
             <FormHelperText error={error ? true : false}>
               {error || ' '}
             </FormHelperText>
