@@ -1,3 +1,8 @@
+/**
+ * This is the generic Scenario selection modal.
+ * This can be changed when using the npm package by passing in your own scenario selection modal
+ **/
+
 import { useCallback } from 'react';
 import axios from 'axios';
 import { Typography, Stack, Box, alpha, useTheme } from '@mui/material';

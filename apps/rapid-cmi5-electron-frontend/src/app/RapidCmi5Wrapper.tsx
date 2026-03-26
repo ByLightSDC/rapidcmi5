@@ -20,14 +20,6 @@ import { IQuizBankContext } from 'packages/rapid-cmi5/src/lib/contexts/QuizBankC
 import axios from 'axios';
 import { QuestionBankApiCreate } from '../../../../packages/rapid-cmi5/src/lib/contexts/QuizBankContext';
 
-export const apiClient = axios.create({
-  baseURL: 'http://localhost:8080', // change to your backend
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
 export function RapidCmi5Wrapper() {
   const { token, parsedUserToken } = useContext(AuthContext);
   const { gitUser, gitCredentials, ssoConfig, setGitCredentials, setGitUser } =
@@ -92,6 +84,14 @@ export function RapidCmi5Wrapper() {
     }
     return scenarioUUID;
   };
+
+  const apiClient = axios.create({
+    baseURL: ssoConfig?.quizBankApiUrl, 
+    timeout: 10000,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 
   const quizBankContextProps: IQuizBankContext = {
     deleteFromQuizBank: async (uuid: string) => {
