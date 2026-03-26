@@ -1,4 +1,4 @@
-import { config } from "@rapid-cmi5/ui";
+import { config } from '@rapid-cmi5/ui';
 
 const currentMinLogLevel = config.CLIENT_LOG ? 0 : -1;
 export const debugColorSuccess = 'background:lightgreen';
@@ -20,6 +20,7 @@ export const componentColors = {
   auManager:
     'background:#e3f2fd; color:#1976d2; padding:2px 4px; border-radius:2px;',
   cmi5: 'background:#f3e5f5; color:#7b1fa2; padding:2px 4px; border-radius:2px;',
+  auth: 'background:#fdf7e3; color:#e8b81a; padding:2px 4px; border-radius:2px;',
   redux:
     'background:#fff3e0; color:#f57c00; padding:2px 4px; border-radius:2px;',
   navigation:
@@ -42,6 +43,7 @@ interface LoggingConfig {
   level: LogLevel;
   components: {
     auManager: boolean;
+    auth: boolean;
     cmi5: boolean;
     redux: boolean;
     navigation: boolean;
@@ -101,6 +103,7 @@ const getDefaultLoggingConfig = (): LoggingConfig => {
 
   // Default component settings (all enabled by default)
   const defaultComponents = {
+    auth: true,
     auManager: true,
     cmi5: true,
     redux: true,
@@ -287,6 +290,7 @@ export const enableAllLogging = () => {
     enabled: true,
     level: LogLevel.DEBUG,
     components: {
+      auth: true,
       auManager: true,
       cmi5: true,
       redux: true,

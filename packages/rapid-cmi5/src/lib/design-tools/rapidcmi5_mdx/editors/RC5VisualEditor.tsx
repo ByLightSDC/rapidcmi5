@@ -529,6 +529,14 @@ function RC5VisualEditor() {
   };
 
   /**
+   * create lesson css
+   */
+  const lessonStyleCss = useMemo(() => {
+    const css = generateLessonThemeStyleTag(themeClass, currentLessonTheme);
+    return css;
+  }, [themeClass, currentLessonTheme]);
+
+  /**
    * Create a wrapped ref that intercepts getMarkdown to inject animations
    */
   const wrappedRef = useMemo(() => {
@@ -748,11 +756,7 @@ function RC5VisualEditor() {
           sx={{ height: `calc(100vh - ${pixelTop}px)` }}
           ref={editorContainerRef}
         >
-          {currentLessonTheme && (
-            <style>
-              {generateLessonThemeStyleTag(themeClass, currentLessonTheme)}
-            </style>
-          )}
+          {currentLessonTheme && <style>{lessonStyleCss}</style>}
 
           <ErrorBoundary>
             <LessonThemeContext.Provider

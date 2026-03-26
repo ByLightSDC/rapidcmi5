@@ -4,12 +4,13 @@ import {
   FormControlTextField,
   FormControlUIProvider,
   FormStateType,
+  LessonThemeContext,
   MiniForm,
   NAME_GROUP_OPT,
   REQUIRED_ENTRY,
   UUID_GROUP,
 } from '@rapid-cmi5/ui';
-import { Alert, MenuItem, Typography } from '@mui/material';
+import { Alert, MenuItem, SxProps, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import * as yup from 'yup';
@@ -17,7 +18,7 @@ import {
   moveOnCriteriaOptions,
   TeamConsolesContent,
 } from '@rapid-cmi5/cmi5-build-common';
-import { FormCrudType } from '@rapid-cmi5/ui';
+import { FormCrudType , useLessonThemeStyles} from '@rapid-cmi5/ui';
 
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import LrsHeaderWithDetails from './LrsStatementHelper';
@@ -37,6 +38,14 @@ export const TeamConsolesForm = ({
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
   const { GetScenariosForm } = useContext(GitContext);
+
+  /* Lesson Theme */
+  const formEditorMaxWidth = 800;
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const { outerActivitySxWithConstrainedWidthForm } = useLessonThemeStyles(
+    lessonTheme,
+    formEditorMaxWidth,
+  );
 
   const validationSchema = yup.object().shape({
     uuid: UUID_GROUP,
@@ -82,8 +91,9 @@ export const TeamConsolesForm = ({
       <>
         <Grid size={11}>
           <Typography variant="body2">
-            This activity will present participants with console access to a
-            deployed scenario. Instructor MUST deploy the scenario manually.
+            This activity provides console access to VMs and Containers in a
+            deployed RangeOS scenario. The instructor MUST deploy the scenario
+            from the Manage Ranges dashboard in RangeOS.
           </Typography>
         </Grid>
         <Grid size={11}>
@@ -94,12 +104,17 @@ export const TeamConsolesForm = ({
           </Alert>
         </Grid>
         {GetScenariosForm ? (
-          <Grid size={7.5}>
-            <GetScenariosForm submitForm={onApplyScenario} errors={errors} formType={crudType} formMethods={formMethods}/>
+          <Grid size={6}>
+            <GetScenariosForm
+              submitForm={onApplyScenario}
+              errors={errors}
+              formType={crudType}
+              formMethods={formMethods}
+            />
           </Grid>
         ) : (
           <>
-            <Grid size={7.5}>
+            <Grid size={6}>
               <FormControlTextField
                 control={control}
                 name={'name'}
@@ -110,7 +125,7 @@ export const TeamConsolesForm = ({
                 readOnly={crudType === FormCrudType.view}
               />
             </Grid>
-            <Grid size={7.5}>
+            <Grid size={6}>
               <FormControlTextField
                 control={control}
                 name={'uuid'}
@@ -153,17 +168,23 @@ export const TeamConsolesForm = ({
   return (
     <FormControlUIProvider>
       <MiniForm
+        className="paper-activity"
+        outerSx={outerActivitySxWithConstrainedWidthForm}
         dataCache={defaultFormData}
         titleEndChildren={deleteButton}
         doAction={onSaveAction}
         formTitle="Team Exercise Scenario"
-        formWidth="640px"
+        formWidth={null}
+        formSxProps={{
+          flexGrow: 1,
+          maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
+        } as SxProps}
         getFormFields={getFormFields}
         loadingButtonText="Saving"
         shouldAutoSave={true}
         shouldCheckIsDirty={true}
         shouldDisplaySave={false}
-        showPaper={true}
+        showPaper={false}
         submitButtonText="Save"
         validationSchema={validationSchema}
       />

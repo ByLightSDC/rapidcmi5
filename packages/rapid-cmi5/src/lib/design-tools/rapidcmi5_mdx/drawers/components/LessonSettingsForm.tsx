@@ -21,7 +21,7 @@ import {
 import * as yup from 'yup';
 import { useSelector } from 'react-redux';
 import { modal } from '@rapid-cmi5/ui';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   BlockPaddingEnum,
   ContentWidthEnum,
@@ -56,8 +56,12 @@ export function LessonSettingsForm({
     currentTheme?.blockPaddingCustomValue ?? 16,
   );
   const [defaultAlignment, setDefaultAlignment] =
-    React.useState<DefaultAlignmentEnum>(
+    useState<DefaultAlignmentEnum>(
       currentTheme?.defaultAlignment || DefaultAlignmentEnum.Left,
+    );
+  const [defaultActivityAlignment, setDefaultActivityAlignment] =
+    useState<DefaultAlignmentEnum>(
+      currentTheme?.defaultActivityAlignment || DefaultAlignmentEnum.Left,
     );
 
   const validationSchema = yup.object().shape({});
@@ -71,6 +75,7 @@ export function LessonSettingsForm({
         contentWidth,
         blockPadding,
         defaultAlignment,
+        defaultActivityAlignment,
       };
       if (blockPadding === BlockPaddingEnum.Custom) {
         theme.blockPaddingCustomValue = customPadding;
@@ -183,6 +188,34 @@ export function LessonSettingsForm({
           </ToggleButtonGroup>
           <Typography variant="body2" sx={{ mt: 0.5 }}>
             {defaultAlignmentLabels.get(defaultAlignment) ?? 'Left'} align text
+          </Typography>
+        </Grid>
+
+        {/* Default Activity Alignment */}
+        <Grid size={11.5} sx={{ mt: 2.5 }}>
+          <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
+            Activity Alignment
+          </Typography>
+          <ToggleButtonGroup
+            value={defaultActivityAlignment}
+            exclusive
+            onChange={(_, val) => {
+              setDefaultActivityAlignment(val as DefaultAlignmentEnum);
+            }}
+            size="small"
+            fullWidth
+          >
+            <ToggleButton value={DefaultAlignmentEnum.Left}>Left</ToggleButton>
+            <ToggleButton value={DefaultAlignmentEnum.Center}>
+              Center
+            </ToggleButton>
+            <ToggleButton value={DefaultAlignmentEnum.Right}>
+              Right
+            </ToggleButton>
+          </ToggleButtonGroup>
+          <Typography variant="body2" sx={{ mt: 0.5 }}>
+            {defaultAlignmentLabels.get(defaultActivityAlignment) ?? 'Left'}{' '}
+            align text
           </Typography>
         </Grid>
       </>

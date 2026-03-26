@@ -11,7 +11,7 @@ import {
 
 import Grid from '@mui/material/Grid2';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { debugLog } from '../../utility/logger';
@@ -19,7 +19,6 @@ import { useDisplayFocus } from '../../hooks/useDisplayFocus';
 import useCTFGrader from './useCTFGrader';
 
 import { Alert, Paper, TextField, Typography } from '@mui/material';
-
 
 /* Icons */
 import InfoIcon from '@mui/icons-material/Info';
@@ -40,12 +39,17 @@ import {
   setCurrentCTFAnswer as setCurrentAnswer,
   getAllCTFAnswers as getAllAnswers,
 } from './ctfReducer';
-import { Box, Stack } from '@mui/system';
+import { Box, Stack, SxProps } from '@mui/system';
 import {
   ButtonInfoField,
   ButtonMainUi,
   ButtonMinorUi,
 } from '../../utility/buttons';
+import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
+import {
+  maxFormWidths,
+  useLessonThemeStyles,
+} from '../../hooks/useLessonThemeStyles';
 
 const answerBoxGridSize = 3.8;
 const attemptedLabel = '#Attempted';
@@ -63,7 +67,6 @@ export function AuCTF({
   content: CTFContent;
 }) {
   const { setProgress, submitScore } = auProps;
-  //TODO const ctfContent = content || slides[activeTab].content as CTFContent;
   const ctfContent = content;
 
   const dispatch = useDispatch();
@@ -85,7 +88,7 @@ export function AuCTF({
     setNumAttempted,
     setNumCorrect,
   } = useCTFGrader(ctfContent);
-  const [isInitialized, setIsInitialized] = useState(false);
+
   const [isFocused, setIsFocused] = useState(currentQuestionIndex >= 0);
   const focusHelper = useDisplayFocus();
   const countRef = useRef(currentQuestionIndex); //for tabbing
@@ -93,6 +96,11 @@ export function AuCTF({
   /* Constants */
   const noneFound = 'No Questions Found';
   const passingScore = ctfContent.passingScore || 80;
+
+  /* Lesson Theme */
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const { outerActivitySxFullWidth, outerActivitySxWithConstrainedWidthForm, outerActivitySxWithConstrainedWidth } =
+    useLessonThemeStyles(lessonTheme, maxFormWidths.ctfPlayback);
 
   /**
    * Selects question if it is available (no grade or bad grade)
@@ -336,9 +344,7 @@ export function AuCTF({
         className="paper-activity"
         variant="outlined"
         sx={{
-          backgroundColor: 'background.default',
-          minWidth: '320px',
-          marginBottom: '12px',
+          ...outerActivitySxWithConstrainedWidth,
         }}
       >
         {ctfContent.title && (
@@ -509,9 +515,9 @@ export function AuCTF({
                             )}
                           </div>
                           <Typography
-                            variant="h5"
+                            variant="h6"
                             sx={{
-                              lineHeight: 1.1,
+                              lineHeight: 1.3,
                             }}
                           >
                             {option.question}
@@ -530,9 +536,9 @@ export function AuCTF({
                           )}
 
                           <Typography
-                            variant="h5"
+                            variant="h6"
                             sx={{
-                              lineHeight: 1.1,
+                              lineHeight: 1.3,
                             }}
                           >
                             {option.question}

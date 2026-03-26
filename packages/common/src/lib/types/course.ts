@@ -51,6 +51,7 @@ export type LessonTheme = {
   blockPadding?: BlockPaddingEnum;
   blockPaddingCustomValue?: number;
   defaultAlignment?: DefaultAlignmentEnum;
+  defaultActivityAlignment?:DefaultAlignmentEnum;
 };
 
 export const contentWidthOptions = Object.values(ContentWidthEnum);

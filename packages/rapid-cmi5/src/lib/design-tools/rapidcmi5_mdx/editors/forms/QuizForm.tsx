@@ -1,5 +1,5 @@
-import { Button, ListItemIcon, MenuItem } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { MenuItem, SxProps } from '@mui/material';
 import { UseFormReturn } from 'react-hook-form';
 
 /* MUI */
@@ -39,6 +39,9 @@ import {
   tFormFieldRendererProps,
   ButtonModalMinorUi,
   useToaster,
+  LessonThemeContext,
+    maxFormWidths,
+  useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 
@@ -76,6 +79,13 @@ export const QuizForm = ({
 
   const [isSearchBankOpen, setIsSearchBankOpen] = useState(false);
   const [bankQuestion, setBankQuestion] = useState<any>(null);
+
+  /* Lesson Theme */
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const { outerActivitySxWithConstrainedWidthForm } = useLessonThemeStyles(
+    lessonTheme,
+    maxFormWidths.quizEditor,
+  );
 
   const validationSchema = yup.object().shape({
     //cmi5QuizId: read-only field auto populated/updated
@@ -330,24 +340,30 @@ export const QuizForm = ({
   };
 
   return (
-    <>
-      <FormControlUIProvider>
-        <MiniForm
-          dataCache={defaultFormData}
-          titleEndChildren={deleteButton}
-          doAction={onSaveAction}
-          formTitle={activityKind === RC5ActivityTypeEnum.quiz ? 'Quiz' : 'CTF'}
-          formWidth="800px"
-          getFormFields={getFormFields}
-          loadingButtonText="Saving"
-          shouldAutoSave={true}
-          shouldCheckIsDirty={true}
-          shouldDisplaySave={false}
-          showPaper={true}
-          submitButtonText="Save"
-          validationSchema={validationSchema}
-        />
-      </FormControlUIProvider>
-    </>
+    <FormControlUIProvider>
+      <MiniForm
+        className="paper-activity"
+        outerSx={outerActivitySxWithConstrainedWidthForm}
+        dataCache={defaultFormData}
+        titleEndChildren={deleteButton}
+        doAction={onSaveAction}
+        formTitle={activityKind === RC5ActivityTypeEnum.quiz ? 'Quiz' : 'CTF'}
+        formWidth={null}
+        formSxProps={
+          {
+            flexGrow: 1,
+            maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
+          } as SxProps
+        }
+        getFormFields={getFormFields}
+        loadingButtonText="Saving"
+        shouldAutoSave={true}
+        shouldCheckIsDirty={true}
+        shouldDisplaySave={false}
+        showPaper={false}
+        submitButtonText="Save"
+        validationSchema={validationSchema}
+      />
+    </FormControlUIProvider>
   );
 };

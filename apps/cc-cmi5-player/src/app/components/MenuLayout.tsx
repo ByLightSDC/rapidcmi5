@@ -2,7 +2,13 @@
 import { DRAWER_WIDTH } from './ContentLayout';
 import TabPanel from './TabPanel';
 import Drawer from '@mui/material/Drawer';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
@@ -40,6 +46,7 @@ import {
   setIconColor,
   setModal,
   setTheme,
+  maxSlideWidth$,
   themeColor,
 } from '@rapid-cmi5/ui';
 import { CustomTheme } from '../styles/createPalette';
@@ -129,6 +136,37 @@ export default function MenuLayout() {
     }
   }, [currentTheme, dispatch]);
 
+  /**
+   * Calculate left drawer width to support activity slides fullwidth css
+   * Observer ensures it gets updated when the left drawer is resized
+   */
+  useLayoutEffect(() => {
+    if (!slideRef.current) return;
+
+    const measure = () => {
+      if (slideRef.current) {
+        // Get the position relative to the viewport
+        const rect = slideRef.current.getBoundingClientRect();
+
+        //set width in css so we can tell activities to ignore content width settings
+        document.documentElement.style.setProperty(
+          '--panel-width',
+          `${rect.left}px`,
+        );
+
+        //store so we can constrain activities
+        maxSlideWidth$.value = rect.width;
+      }
+    };
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(slideRef.current);
+
+    return () => observer.disconnect();
+
+    // Ensure the ref is attached to a DOM element and that element exists
+  }, []);
+
   return (
     <>
       <Drawer
@@ -158,6 +196,7 @@ export default function MenuLayout() {
             sx={{
               //presentation background color
               backgroundColor: palette.background.paper,
+
               height: '100%',
               width: '100%',
               overflow: 'auto',
@@ -412,6 +451,12 @@ export default function MenuLayout() {
                 <TeamScenarioContextProvider isEnabled={true}>
                   <RC5Player />
                 </TeamScenarioContextProvider>
+                // REF debugging - keep for testing individual Scenario UI with deployed scenario
+                // <ScenarioWrapper>
+                //   <TeamScenarioContextProvider isEnabled={true}>
+                //     <RC5Player />
+                //   </TeamScenarioContextProvider>
+                // </ScenarioWrapper>
               )}
             </>
           </Box>

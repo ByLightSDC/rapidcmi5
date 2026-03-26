@@ -44,6 +44,7 @@ export function ButtonInfoField({
   alertProps = { icon: defaultInfoIcon, severity: 'info' },
   alertSxProps = {},
   boxProps = {},
+  buttonSxProps = {},
   infoIcon = (
     <QuestionMarkIcon
       fontSize="small"
@@ -59,6 +60,7 @@ export function ButtonInfoField({
   alertProps?: AlertProps;
   alertSxProps?: any;
   boxProps?: any;
+  buttonSxProps?: any;
   infoIcon?: JSX.Element;
   name?: string;
   props?: IconButtonProps;
@@ -133,7 +135,11 @@ export function ButtonInfoField({
       }}
     >
       <div
-        style={{ width: '80%', display: 'flex', justifyContent: 'center' }}
+        style={{
+          width: '80%',
+          display: 'flex',
+          justifyContent: 'center',
+        }}
         onMouseEnter={handleIn}
         onMouseLeave={handleOut}
         onFocus={handleIn}
@@ -144,7 +150,7 @@ export function ButtonInfoField({
           id={name || 'button-info'}
           name={name || 'button-info'}
           props={{ ...props }}
-          sxProps={{ backgroundColor: bgColor }}
+          sxProps={{ backgroundColor: bgColor, ...buttonSxProps }}
         >
           {infoIcon}
         </ButtonIcon>

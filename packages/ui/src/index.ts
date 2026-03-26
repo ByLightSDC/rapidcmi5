@@ -26,6 +26,7 @@ export * from './lib/data-display/ListView';
 export * from './lib/hooks/useDisplayDateFormatter';
 export * from './lib/hooks/useDisplayFocus';
 export * from './lib/hooks/useItemVisibleInBounds';
+export * from './lib/hooks/useLessonThemeStyles';
 export * from './lib/hooks/useVariableItemHeight';
 export * from './lib/hooks/useNavigateAlias';
 export * from './lib/hooks/useTimeStampUUID';
