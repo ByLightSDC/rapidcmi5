@@ -13,6 +13,8 @@ import {
   FormControlUIProvider,
   MiniForm,
   LessonThemeContext,
+    maxFormWidths,
+  useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
 import { useState, useContext } from 'react';
 import { UseFormReturn } from 'react-hook-form';
@@ -21,10 +23,7 @@ import { GitContext } from '../../../course-builder/GitViewer/session/GitContext
 import { useImageFile } from '../../data-hooks/useImageFile';
 import * as yup from 'yup';
 import { currentAuPath } from '@rapid-cmi5/react-editor';
-import {
-  maxFormWidths,
-  useLessonThemeStyles,
-} from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
+
 
 /**
  * Form course creators can use to attack files to a Lesson AU

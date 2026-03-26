@@ -21,9 +21,9 @@ import {
   FormControlUIProvider,
   MiniForm,
   LessonThemeContext,
+   maxFormWidths, useLessonThemeStyles
 } from '@rapid-cmi5/ui';
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
-import { maxFormWidths, useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
 import { useContext } from 'react';
 import { SxProps } from '@mui/system';
 

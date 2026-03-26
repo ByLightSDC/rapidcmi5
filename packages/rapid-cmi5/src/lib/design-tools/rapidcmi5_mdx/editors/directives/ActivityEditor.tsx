@@ -254,7 +254,6 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
       {name === 'quiz' && fromJson && (
         <>
           {isPlayback && (
-            // eslint-disable-next-line react/jsx-no-useless-fragment
             <AuQuiz auProps={auProps} content={fromJson as QuizContent} />
           )}
           {!isPlayback && (

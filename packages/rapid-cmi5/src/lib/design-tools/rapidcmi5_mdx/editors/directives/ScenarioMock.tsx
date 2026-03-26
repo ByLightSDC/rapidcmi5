@@ -23,8 +23,10 @@ import {
   LessonThemeContext,
   OverflowTypography,
   TabMainUi,
+  maxFormWidths,
+  useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
-import { maxFormWidths, useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
+
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 
 /**
@@ -42,7 +44,10 @@ function ScenarioMock({
 
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
-  const { outerActivitySxWithConstrainedWidth} = useLessonThemeStyles(lessonTheme, maxFormWidths.scenarioPlayback);
+  const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
+    lessonTheme,
+    maxFormWidths.scenarioPlayback,
+  );
 
   const handleChangeTab = useCallback(
     (event: React.SyntheticEvent, newValue: number) => {

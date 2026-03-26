@@ -13,6 +13,8 @@ import {
   MiniForm,
   NAME_GROUP_OPT,
   UUID_GROUP,
+  maxFormWidths,
+  useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
 import {
   Alert,
@@ -36,10 +38,6 @@ import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import LrsHeaderWithDetails from './LrsStatementHelper';
 import { useContext } from 'react';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
-import {
-  maxFormWidths,
-  useLessonThemeStyles,
-} from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
 
 export const ScenarioForm = ({
   crudType,

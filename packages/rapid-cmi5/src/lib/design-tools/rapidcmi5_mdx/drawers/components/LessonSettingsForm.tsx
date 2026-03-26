@@ -21,7 +21,7 @@ import {
 import * as yup from 'yup';
 import { useSelector } from 'react-redux';
 import { modal } from '@rapid-cmi5/ui';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   BlockPaddingEnum,
   ContentWidthEnum,
@@ -56,11 +56,11 @@ export function LessonSettingsForm({
     currentTheme?.blockPaddingCustomValue ?? 16,
   );
   const [defaultAlignment, setDefaultAlignment] =
-    React.useState<DefaultAlignmentEnum>(
+    useState<DefaultAlignmentEnum>(
       currentTheme?.defaultAlignment || DefaultAlignmentEnum.Left,
     );
   const [defaultActivityAlignment, setDefaultActivityAlignment] =
-    React.useState<DefaultAlignmentEnum>(
+    useState<DefaultAlignmentEnum>(
       currentTheme?.defaultActivityAlignment || DefaultAlignmentEnum.Left,
     );
 
@@ -75,7 +75,7 @@ export function LessonSettingsForm({
         contentWidth,
         blockPadding,
         defaultAlignment,
-        defaultActivityAlignment
+        defaultActivityAlignment,
       };
       if (blockPadding === BlockPaddingEnum.Custom) {
         theme.blockPaddingCustomValue = customPadding;
@@ -214,7 +214,8 @@ export function LessonSettingsForm({
             </ToggleButton>
           </ToggleButtonGroup>
           <Typography variant="body2" sx={{ mt: 0.5 }}>
-            {defaultAlignmentLabels.get(defaultActivityAlignment) ?? 'Left'} align text
+            {defaultAlignmentLabels.get(defaultActivityAlignment) ?? 'Left'}{' '}
+            align text
           </Typography>
         </Grid>
       </>

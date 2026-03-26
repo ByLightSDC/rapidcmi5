@@ -65,12 +65,10 @@ import {
   ButtonMinorUi,
   OverflowTypography,
   TabMainUi,
-  LessonThemeContext,
-} from '@rapid-cmi5/ui';
-import {
-  maxFormWidths,
+  LessonThemeContext,  maxFormWidths,
   useLessonThemeStyles,
-} from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
+} from '@rapid-cmi5/ui';
+
 
 /**
  * Slide that displays a Deployed Scenario status, VMs, Containers, and provides Consoles access

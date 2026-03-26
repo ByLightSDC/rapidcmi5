@@ -35,13 +35,11 @@ import {
   MiniForm,
   tFormFieldRendererProps,
   LessonThemeContext,
+    maxFormWidths,
+  useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 import { useContext } from 'react';
-import {
-  maxFormWidths,
-  useLessonThemeStyles,
-} from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
 
 export const QuizForm = ({
   activityKind,

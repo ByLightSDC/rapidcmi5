@@ -54,11 +54,10 @@ import {
   LessonThemeContext,
   OverflowTypography,
   TabMainUi,
-} from '@rapid-cmi5/ui';
-import {
   maxFormWidths,
   useLessonThemeStyles,
-} from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
+} from '@rapid-cmi5/ui';
+
 
 /**
  * Activity displays a Deployed Scenario status, VMs, Containers, and Autograders
@@ -107,17 +106,17 @@ function TeamScenarioExercise({
   const getScenarioStatusChild = (data: Partial<DeployedScenario>) => {
     // don't want to display icon when Running
     if (data.status !== DeployedScenarioDetailStatusEnum.Ready) {
-    const rowStatus = getScenarioStatusIcon(
-      data.status,
-      data.message,
-      true, // show color
-      true, // show hover
-    );
-    return (
-      <ListItemIcon sx={{ margin: 0, padding: 0 }}>
-        {rowStatus.icon}
-      </ListItemIcon>
-    );
+      const rowStatus = getScenarioStatusIcon(
+        data.status,
+        data.message,
+        true, // show color
+        true, // show hover
+      );
+      return (
+        <ListItemIcon sx={{ margin: 0, padding: 0 }}>
+          {rowStatus.icon}
+        </ListItemIcon>
+      );
     }
     return null;
   };

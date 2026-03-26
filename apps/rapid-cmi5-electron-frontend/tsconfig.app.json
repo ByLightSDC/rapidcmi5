@@ -35,7 +35,6 @@
     "**/*.mdx",
     "**/*.ts",
     "**/*.d.ts",
-    "**/*.tsx",
-    "../../packages/ui/src/lib/forms/MiniForm.tsx"
+    "**/*.tsx"
   ]
 }

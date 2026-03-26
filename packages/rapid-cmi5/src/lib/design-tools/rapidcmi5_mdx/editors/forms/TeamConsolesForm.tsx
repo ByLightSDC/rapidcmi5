@@ -18,13 +18,12 @@ import {
   moveOnCriteriaOptions,
   TeamConsolesContent,
 } from '@rapid-cmi5/cmi5-build-common';
-import { FormCrudType } from '@rapid-cmi5/ui';
+import { FormCrudType , useLessonThemeStyles} from '@rapid-cmi5/ui';
 
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import LrsHeaderWithDetails from './LrsStatementHelper';
 import { useContext } from 'react';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
-import { useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
 
 export const TeamConsolesForm = ({
   crudType,
