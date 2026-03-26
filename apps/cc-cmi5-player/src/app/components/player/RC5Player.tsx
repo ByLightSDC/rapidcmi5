@@ -91,14 +91,14 @@ function RC5Player() {
   const slideContentRef = useRef<HTMLDivElement>(null);
 
   // MDXEditor hardcodes role="textbox" aria-label="editable markdown" on its contentEditable div.
-  // We patch it after render so screen readers treat it as a readable document, not an editable field.
-  // We also move focus to it so NVDA starts reading the slide from the top when a slide changes,
-  // rather than leaving focus on whatever navigation button the user just pressed.
+  // We patch it to role="region" so NVDA treats it as a landmark and browses through it automatically,
+  // without requiring the user to manually "enter" the content.
+  // We also move focus to it so NVDA starts reading from the top when a slide changes.
   useEffect(() => {
     const id = setTimeout(() => {
       const el = slideContentRef.current?.querySelector<HTMLElement>('[data-lexical-editor="true"]');
       if (el) {
-        el.setAttribute('role', 'document');
+        el.setAttribute('role', 'region');
         el.setAttribute('aria-label', 'Slide content');
         // tabindex="-1" is required to programmatically focus a non-interactive element
         // (readOnly MDXEditor sets contenteditable="false", so focus() alone won't work)
@@ -364,7 +364,7 @@ function RC5Player() {
           <LessonThemeContext.Provider
             value={{ lessonTheme: currentLessonTheme }}
           >
-            <div role="tabpanel" aria-label="slide-content" ref={slideContentRef}>
+            <div role="tabpanel" aria-label="Slide content" ref={slideContentRef}>
               <div id="toc-portal-target" />
               <MDXEditor
                 className={mdxTheme}
