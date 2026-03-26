@@ -122,9 +122,6 @@ export const auSlice = createSlice({
     setRangeConsoleDataAttempts: (state, action) => {
       state.rangeConsoleDataAttempts = action.payload;
     },
-    setSlideWidth: (state, action) => {
-      state.slideWidth = action.payload;
-    },
     setStudentId: (state, action) => {
       state.studentId = action.payload;
     },
@@ -227,7 +224,6 @@ export const {
   setRangeConsoleDataError,
   setRangeDataAttempts,
   setRangeConsoleDataAttempts,
-  setSlideWidth,
   setStudentId,
   // CourseAUProgress actions
   initializeCourseAUProgress,

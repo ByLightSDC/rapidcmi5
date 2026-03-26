@@ -24,12 +24,7 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 
 import { Box, Switch, Tooltip, Typography, useTheme } from '@mui/material';
-import {
-  auJsonSel,
-  classIdSel,
-  studentIdSel,
-  setSlideWidth,
-} from '../redux/auReducer';
+import { auJsonSel, classIdSel, studentIdSel } from '../redux/auReducer';
 import { activeTabSel } from '../redux/navigationReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { cmi5Instance } from '../session/cmi5';
@@ -51,6 +46,7 @@ import {
   setIconColor,
   setModal,
   setTheme,
+  maxSlideWidth$,
   themeColor,
 } from '@rapid-cmi5/ui';
 import { CustomTheme } from '../styles/createPalette';
@@ -157,8 +153,9 @@ export default function MenuLayout() {
           '--panel-width',
           `${rect.left}px`,
         );
-        //store in redux to trigger re-render
-        dispatch(setSlideWidth(rect.width));
+
+        //store so we can constrain activities
+        maxSlideWidth$.value = rect.width;
       }
     };
 

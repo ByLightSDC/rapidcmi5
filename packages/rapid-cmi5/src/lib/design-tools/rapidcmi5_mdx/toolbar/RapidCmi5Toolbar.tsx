@@ -39,6 +39,7 @@ import {
   CONTENT_UPDATED_COMMAND,
   dividerColor,
   toolbarRect$,
+  maxSlideWidth$,
 } from '@rapid-cmi5/ui';
 
 import { displayData } from '../../../redux/courseBuilderReducer';
@@ -76,7 +77,7 @@ import { UndoRedo } from './components/UndoRedo';
  * Layout Constants
  *
  */
-const leftToolWidthContainer = 582; 
+const leftToolWidthContainer = 582;
 const rightToolWidthContainer = 131;
 const toolIconWidth = 32.0;
 const rightToolbarMargin = 24;
@@ -178,7 +179,13 @@ export const RapidCmi5Toolbar: React.FC = () => {
         setLeftToolbarPos(left + rightToolbarMargin);
 
         //set width in css so we can tell activities to ignore content width settings
-        document.documentElement.style.setProperty('--panel-width', `${rect.left}px`);
+        document.documentElement.style.setProperty(
+          '--panel-width',
+          `${rect.left}px`,
+        );
+
+        //max slide width
+        maxSlideWidth$.value = window.innerWidth - rect.left;
       }
     };
 
