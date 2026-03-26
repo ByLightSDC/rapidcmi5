@@ -25,6 +25,7 @@ import {
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 import { maxFormWidths, useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
 import { useContext } from 'react';
+import { SxProps } from '@mui/system';
 
 export const JobeForm = ({
   crudType,
@@ -153,7 +154,7 @@ export const JobeForm = ({
         formSxProps={{
           flexGrow: 1,
           maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
-        }}
+        } as SxProps}
         getFormFields={getFormFields}
         loadingButtonText="Saving"
         shouldAutoSave={true}

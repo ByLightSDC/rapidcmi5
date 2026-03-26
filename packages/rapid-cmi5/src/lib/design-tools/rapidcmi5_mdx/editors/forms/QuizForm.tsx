@@ -1,4 +1,4 @@
-import { MenuItem } from '@mui/material';
+import { MenuItem, SxProps } from '@mui/material';
 import { UseFormReturn } from 'react-hook-form';
 
 /* MUI */
@@ -38,7 +38,10 @@ import {
 } from '@rapid-cmi5/ui';
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 import { useContext } from 'react';
-import { maxFormWidths, useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
+import {
+  maxFormWidths,
+  useLessonThemeStyles,
+} from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
 
 export const QuizForm = ({
   activityKind,
@@ -281,10 +284,12 @@ export const QuizForm = ({
         doAction={onSaveAction}
         formTitle={activityKind === RC5ActivityTypeEnum.quiz ? 'Quiz' : 'CTF'}
         formWidth={null}
-        formSxProps={{
-          flexGrow: 1,
-          maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
-        }}
+        formSxProps={
+          {
+            flexGrow: 1,
+            maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
+          } as SxProps
+        }
         getFormFields={getFormFields}
         loadingButtonText="Saving"
         shouldAutoSave={true}

@@ -10,7 +10,7 @@ import {
   REQUIRED_ENTRY,
   UUID_GROUP,
 } from '@rapid-cmi5/ui';
-import { Alert, MenuItem, Typography } from '@mui/material';
+import { Alert, MenuItem, SxProps, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import * as yup from 'yup';
@@ -179,7 +179,7 @@ export const TeamConsolesForm = ({
         formSxProps={{
           flexGrow: 1,
           maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
-        }}
+        } as SxProps}
         getFormFields={getFormFields}
         loadingButtonText="Saving"
         shouldAutoSave={true}

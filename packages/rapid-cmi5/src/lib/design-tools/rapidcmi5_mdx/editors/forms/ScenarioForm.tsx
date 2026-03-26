@@ -19,6 +19,7 @@ import {
   alpha,
   Box,
   MenuItem,
+  SxProps,
   Typography,
   useTheme,
 } from '@mui/material';
@@ -35,7 +36,10 @@ import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import LrsHeaderWithDetails from './LrsStatementHelper';
 import { useContext } from 'react';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
-import { maxFormWidths, useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
+import {
+  maxFormWidths,
+  useLessonThemeStyles,
+} from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
 
 export const ScenarioForm = ({
   crudType,
@@ -305,10 +309,12 @@ export const ScenarioForm = ({
         doAction={onSaveAction}
         formTitle="Individual Training Scenario"
         formWidth={null}
-        formSxProps={{
-          flexGrow: 1,
-          maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
-        }}
+        formSxProps={
+          {
+            flexGrow: 1,
+            maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
+          } as SxProps
+        }
         getFormFields={getFormFields}
         loadingButtonText="Saving"
         shouldAutoSave={true}

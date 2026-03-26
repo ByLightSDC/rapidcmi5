@@ -1,5 +1,5 @@
 import { Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Box, SxProps } from '@mui/system';
 import {
   DownloadFilesContent,
   RC5ActivityTypeEnum,
@@ -21,7 +21,10 @@ import { GitContext } from '../../../course-builder/GitViewer/session/GitContext
 import { useImageFile } from '../../data-hooks/useImageFile';
 import * as yup from 'yup';
 import { currentAuPath } from '@rapid-cmi5/react-editor';
-import { maxFormWidths, useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
+import {
+  maxFormWidths,
+  useLessonThemeStyles,
+} from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
 
 /**
  * Form course creators can use to attack files to a Lesson AU
@@ -141,10 +144,12 @@ export const DownloadFilesForm = ({
             doAction={onSaveAction}
             formTitle={formHeadTitle}
             formWidth={null}
-            formSxProps={{
-              flexGrow: 1,
-              maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
-            }}
+            formSxProps={
+              {
+                flexGrow: 1,
+                maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
+              } as SxProps
+            }
             getFormFields={getFormFields}
             loadingButtonText="Saving"
             shouldAutoSave={crudType === FormCrudType.edit}
