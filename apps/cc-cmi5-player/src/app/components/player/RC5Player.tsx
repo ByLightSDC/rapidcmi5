@@ -13,6 +13,7 @@ import {
   quotePlugin,
 } from '@mdxeditor/editor';
 import { imagePlayerPlugin } from './plugins/image-player/';
+import { ariaOverridePlugin } from './plugins/aria-override/ariaOverridePlugin';
 import {
   animationPlayerPlugin,
   parseFrontmatterAnimations,
@@ -90,21 +91,15 @@ function RC5Player() {
 
   const slideContentRef = useRef<HTMLDivElement>(null);
 
-  // MDXEditor hardcodes role="textbox" aria-label="editable markdown" on its contentEditable div.
-  // We patch it to role="region" so NVDA treats it as a landmark and browses through it automatically,
-  // without requiring the user to manually "enter" the content.
-  // We also move focus to it so NVDA starts reading from the top when a slide changes.
+  // Move focus into the slide region so NVDA starts reading from the top when a slide changes.
+  // ARIA attributes (role="region", aria-label, tabindex) are set by ariaOverridePlugin via
+  // registerRootListener, which fires synchronously when Lexical mounts the root element.
   useEffect(() => {
     const id = setTimeout(() => {
-      const el = slideContentRef.current?.querySelector<HTMLElement>('[data-lexical-editor="true"]');
-      if (el) {
-        el.setAttribute('role', 'region');
-        el.setAttribute('aria-label', 'Slide content');
-        // tabindex="-1" is required to programmatically focus a non-interactive element
-        // (readOnly MDXEditor sets contenteditable="false", so focus() alone won't work)
-        el.setAttribute('tabindex', '-1');
-        el.focus({ preventScroll: true });
-      }
+      const el = slideContentRef.current?.querySelector<HTMLElement>(
+        '[data-lexical-editor="true"]',
+      );
+      el?.focus({ preventScroll: true });
     }, 150);
     return () => clearTimeout(id);
   }, [activeTab]);
@@ -158,6 +153,7 @@ function RC5Player() {
       htmlPlugin(),
       imagePlayerPlugin(),
       animationPlayerPlugin(),
+      ariaOverridePlugin(),
       listsPlugin(),
       linkPlugin(),
       linkDialogPlugin({
@@ -364,7 +360,11 @@ function RC5Player() {
           <LessonThemeContext.Provider
             value={{ lessonTheme: currentLessonTheme }}
           >
-            <div role="tabpanel" aria-label="Slide content" ref={slideContentRef}>
+            <div
+              role="tabpanel"
+              aria-label="Slide content"
+              ref={slideContentRef}
+            >
               <div id="toc-portal-target" />
               <MDXEditor
                 className={mdxTheme}
@@ -379,7 +379,8 @@ function RC5Player() {
         )}
       </Box>
       {fullScreenImage && (
-        <div role='dialog'
+        <div
+          role="dialog"
           onClick={(e: React.MouseEvent<HTMLDivElement>) => {
             e.stopPropagation();
             setFullScreenImage('');
