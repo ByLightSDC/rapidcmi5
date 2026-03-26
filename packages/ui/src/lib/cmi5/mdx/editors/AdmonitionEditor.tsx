@@ -51,9 +51,9 @@ import { editorInPlayback$ } from '../state/vars';
 import { convertMarkdownToMdast, convertMdastToMarkdown } from '../util/conversion';
 import { LessonThemeContext } from '../contexts/LessonThemeContext';
 import { resolveLessonThemeCSS } from '../../../styles/lessonThemeStyles';
+import { useGutterRight } from '../plugins/shared/useGutterRight';
 import { ColorSelectionPopover } from '../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../constants/colors';
-import { RC5NestedLexicalEditor } from '../plugins/shared/RC5NestedLexicalEditor';
 
 export declare interface AdmonitionDirectiveEditorProps<
   T extends Directives = Directives,
@@ -124,8 +124,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   );
   const pendingColorRef = useRef(pendingColor);
   const skipNextCloseRebuildRef = useRef(false);
-  const gutterRef = useRef<HTMLDivElement>(null);
-  const [gutterRight, setGutterRight] = useState('-100px');
+  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
 
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const [adColor, setAdColor] = useState<
@@ -348,15 +347,6 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
     setPendingColor(bgColor);
   }, [mdastNode]);
 
-  // Measure gutter button group width after mount so right offset is exact.
-  useEffect(() => {
-    if (gutterRef.current) {
-      const w = gutterRef.current.offsetWidth;
-      setGutterRight(`-${w + 15}px`);
-    }
-  }, []);
-
-  const hasGutter = !!resolvedThemeCSS?.maxWidth && resolvedThemeCSS.maxWidth !== '100%';
 
   const outerSx: SxProps = backgroundColor
     ? {
@@ -445,7 +435,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
                 '--basePageBg': 'transparent',
               }}
             >
-              <RC5NestedLexicalEditor<Paragraph>
+              <NestedLexicalEditor<Paragraph>
                 getContent={(node) => {
                   const theNode = convertMarkdownToMdast(
                     getTitle(mdastNode.attributes),
@@ -490,7 +480,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
               borderWidth: '1px',
             }}
           >
-            <RC5NestedLexicalEditor<ContainerDirective>
+            <NestedLexicalEditor<ContainerDirective>
               block={true}
               getContent={(node) => {
                 return node.children;
@@ -514,7 +504,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
             display: 'flex',
             position: 'absolute',
             top: backgroundColor ? blockPadding : 0,
-            right: hasGutter ? gutterRight : 0,
+            right: gutterRight,
           }}
         >
           <Tooltip title="Background Color">

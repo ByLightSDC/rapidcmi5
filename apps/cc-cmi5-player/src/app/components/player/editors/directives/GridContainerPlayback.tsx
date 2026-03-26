@@ -25,8 +25,15 @@ export const GridContainerPlayback: React.FC<
       Object.assign(styles, parseStyleString(styleAttr));
     }
 
+    const bgColor = mdastNode.attributes?.backgroundColor as string | undefined;
+    if (bgColor) {
+      styles.backgroundColor = bgColor;
+      (styles as any).boxShadow = `0 0 0 100vmax ${bgColor}`;
+      (styles as any).clipPath = 'inset(0 -100vmax 0)';
+    }
+
     return styles;
-  }, [mdastNode.attributes?.style]);
+  }, [mdastNode.attributes?.style, mdastNode.attributes?.backgroundColor]);
 
   return (
     <div
