@@ -59,6 +59,7 @@ export interface DynamicModalProps<T> {
     isSelected: boolean,
     isExpanded: boolean,
     onToggleExpand: (e: React.MouseEvent) => void,
+    onDelete?: (id: string) => Promise<void>,
   ) => ReactNode;
 
   // --- Text / labels ---
@@ -88,6 +89,9 @@ export interface DynamicModalProps<T> {
   open?: boolean;
   /** Called when the dialog should close (required when `open` is provided) */
   onClose?: () => void;
+
+  /** Called when the user is allowed to delete an item **/
+  onDelete?: (id: string) => Promise<void>;
 }
 
 interface SelectionFormData {
@@ -113,6 +117,7 @@ export function DynamicModal<T>({
   onMultiSelect,
   open: controlledOpen,
   onClose: controlledOnClose,
+  onDelete,
 }: DynamicModalProps<T>) {
   const theme = useTheme();
   const isControlled = controlledOpen !== undefined;
@@ -136,7 +141,9 @@ export function DynamicModal<T>({
   const [totalPages, setTotalPages] = useState(0);
 
   // --- Selection ---
-  const [multiSelectedIds, setMultiSelectedIds] = useState<Set<string>>(new Set());
+  const [multiSelectedIds, setMultiSelectedIds] = useState<Set<string>>(
+    new Set(),
+  );
 
   // --- Expand ---
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -153,6 +160,14 @@ export function DynamicModal<T>({
     formState: { errors },
   } = useForm<SelectionFormData>({ defaultValues: { selectedId: '' } });
   const selectedId = watch('selectedId');
+
+  const handleDeleteItem = onDelete
+    ? async (id: string) => {
+        await onDelete(id);
+        setItems((prev) => prev.filter((item) => getItemId(item) !== id));
+        setTotalCount((prev) => prev - 1);
+      }
+    : undefined;
 
   const colors = {
     background: theme.palette.background.default,
@@ -232,7 +247,9 @@ export function DynamicModal<T>({
 
   const onMultiSubmit = () => {
     if (!onMultiSelect) return;
-    const chosen = items.filter((item) => multiSelectedIds.has(getItemId(item)));
+    const chosen = items.filter((item) =>
+      multiSelectedIds.has(getItemId(item)),
+    );
     onMultiSelect(chosen);
     handleClose();
   };
@@ -263,13 +280,24 @@ export function DynamicModal<T>({
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalCount);
   const pluralLabel = `${itemLabel}${totalCount !== 1 ? 's' : ''}`;
-  const selectionCount = multiSelect ? multiSelectedIds.size : selectedId ? 1 : 0;
+  const selectionCount = multiSelect
+    ? multiSelectedIds.size
+    : selectedId
+      ? 1
+      : 0;
 
   return (
     <Box sx={{ my: isControlled ? 0 : 1 }}>
       {/* Trigger button — only in uncontrolled mode */}
       {!isControlled && (
-        <Box sx={{ display: 'flex', alignItems: 'stretch', gap: 1.5, width: '100%' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'stretch',
+            gap: 1.5,
+            width: '100%',
+          }}
+        >
           <ButtonMinorUi
             onClick={() => setInternalOpen(true)}
             sx={{ height: ROW_HEIGHT, flexShrink: 0, boxSizing: 'border-box' }}
@@ -330,7 +358,10 @@ export function DynamicModal<T>({
             <IconButton
               aria-label="Close"
               onClick={handleClose}
-              sx={{ color: colors.textSecondary, '&:hover': { bgcolor: colors.surfaceHover } }}
+              sx={{
+                color: colors.textSecondary,
+                '&:hover': { bgcolor: colors.surfaceHover },
+              }}
             >
               <CloseIcon fontSize="small" />
             </IconButton>
@@ -346,7 +377,9 @@ export function DynamicModal<T>({
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon sx={{ color: colors.textTertiary, fontSize: 20 }} />
+                    <SearchIcon
+                      sx={{ color: colors.textTertiary, fontSize: 20 }}
+                    />
                   </InputAdornment>
                 ),
                 endAdornment: isLoading && searchQuery && (
@@ -362,7 +395,10 @@ export function DynamicModal<T>({
                   fontSize: '0.9375rem',
                   '& fieldset': { borderColor: colors.border },
                   '&:hover fieldset': { borderColor: colors.borderHover },
-                  '&.Mui-focused fieldset': { borderColor: colors.borderSelected, borderWidth: 1 },
+                  '&.Mui-focused fieldset': {
+                    borderColor: colors.borderSelected,
+                    borderWidth: 1,
+                  },
                 },
                 '& .MuiInputBase-input': {
                   py: 1.25,
@@ -407,7 +443,11 @@ export function DynamicModal<T>({
             >
               <Typography
                 variant="caption"
-                sx={{ color: colors.textSecondary, fontWeight: 500, letterSpacing: '0.02em' }}
+                sx={{
+                  color: colors.textSecondary,
+                  fontWeight: 500,
+                  letterSpacing: '0.02em',
+                }}
               >
                 {debouncedSearch
                   ? `${totalCount} result${totalCount !== 1 ? 's' : ''} for "${debouncedSearch}"`
@@ -439,15 +479,40 @@ export function DynamicModal<T>({
                 {[...Array(5)].map((_, i) => (
                   <Box
                     key={i}
-                    sx={{ p: 2.5, borderRadius: 2, bgcolor: colors.surface, border: `1px solid ${colors.border}` }}
+                    sx={{
+                      p: 2.5,
+                      borderRadius: 2,
+                      bgcolor: colors.surface,
+                      border: `1px solid ${colors.border}`,
+                    }}
                   >
                     <Stack spacing={1.5}>
-                      <Skeleton variant="text" width="60%" height={24} sx={{ bgcolor: colors.surfaceHover }} />
+                      <Skeleton
+                        variant="text"
+                        width="60%"
+                        height={24}
+                        sx={{ bgcolor: colors.surfaceHover }}
+                      />
                       <Stack direction="row" spacing={2}>
-                        <Skeleton variant="text" width={100} height={16} sx={{ bgcolor: colors.surfaceHover }} />
-                        <Skeleton variant="text" width={80} height={16} sx={{ bgcolor: colors.surfaceHover }} />
+                        <Skeleton
+                          variant="text"
+                          width={100}
+                          height={16}
+                          sx={{ bgcolor: colors.surfaceHover }}
+                        />
+                        <Skeleton
+                          variant="text"
+                          width={80}
+                          height={16}
+                          sx={{ bgcolor: colors.surfaceHover }}
+                        />
                       </Stack>
-                      <Skeleton variant="text" width="90%" height={16} sx={{ bgcolor: colors.surfaceHover }} />
+                      <Skeleton
+                        variant="text"
+                        width="90%"
+                        height={16}
+                        sx={{ bgcolor: colors.surfaceHover }}
+                      />
                     </Stack>
                   </Box>
                 ))}
@@ -476,13 +541,24 @@ export function DynamicModal<T>({
                   mb: 3,
                 }}
               >
-                <FolderOpenIcon sx={{ fontSize: 36, color: colors.textTertiary }} />
+                <FolderOpenIcon
+                  sx={{ fontSize: 36, color: colors.textTertiary }}
+                />
               </Box>
-              <Typography variant="h6" fontWeight={600} sx={{ color: colors.textPrimary, mb: 1 }}>
+              <Typography
+                variant="h6"
+                fontWeight={600}
+                sx={{ color: colors.textPrimary, mb: 1 }}
+              >
                 {debouncedSearch ? 'No results found' : emptyTitle}
               </Typography>
-              <Typography variant="body2" sx={{ color: colors.textSecondary, textAlign: 'center' }}>
-                {debouncedSearch ? 'Try adjusting your search terms' : emptyDescription}
+              <Typography
+                variant="body2"
+                sx={{ color: colors.textSecondary, textAlign: 'center' }}
+              >
+                {debouncedSearch
+                  ? 'Try adjusting your search terms'
+                  : emptyDescription}
               </Typography>
             </Box>
           ) : multiSelect ? (
@@ -499,15 +575,23 @@ export function DynamicModal<T>({
                         sx={{
                           position: 'relative',
                           border: '1px solid',
-                          borderColor: isSelected ? colors.borderSelected : colors.border,
+                          borderColor: isSelected
+                            ? colors.borderSelected
+                            : colors.border,
                           borderRadius: 2,
-                          bgcolor: isSelected ? colors.surfaceSelected : colors.surface,
+                          bgcolor: isSelected
+                            ? colors.surfaceSelected
+                            : colors.surface,
                           cursor: 'pointer',
                           transition: 'all 0.15s ease',
                           overflow: 'hidden',
                           '&:hover': {
-                            borderColor: isSelected ? colors.borderSelected : colors.borderHover,
-                            bgcolor: isSelected ? colors.surfaceSelected : colors.surfaceHover,
+                            borderColor: isSelected
+                              ? colors.borderSelected
+                              : colors.borderHover,
+                            bgcolor: isSelected
+                              ? colors.surfaceSelected
+                              : colors.surfaceHover,
                             transform: 'translateY(-1px)',
                             boxShadow: isSelected
                               ? `0 4px 12px ${alpha(theme.palette.primary.main, 0.15)}`
@@ -517,9 +601,9 @@ export function DynamicModal<T>({
                         }}
                         onClick={() => handleMultiToggle(id)}
                       >
-                        <Box sx={{ p: 2, pl: isSelected ? 2.5 : 2 }}>
-                          {renderItem(item, isSelected, isExpanded, (e) => handleToggleExpand(id, e))}
-                        </Box>
+                        {renderItem(item, isSelected, isExpanded, (e) =>
+                          handleToggleExpand(id, e), handleDeleteItem,
+                        )}
                       </Box>
                     </Grow>
                   );
@@ -547,15 +631,23 @@ export function DynamicModal<T>({
                                 sx={{
                                   position: 'relative',
                                   border: '1px solid',
-                                  borderColor: isSelected ? colors.borderSelected : colors.border,
+                                  borderColor: isSelected
+                                    ? colors.borderSelected
+                                    : colors.border,
                                   borderRadius: 2,
-                                  bgcolor: isSelected ? colors.surfaceSelected : colors.surface,
+                                  bgcolor: isSelected
+                                    ? colors.surfaceSelected
+                                    : colors.surface,
                                   cursor: 'pointer',
                                   transition: 'all 0.15s ease',
                                   overflow: 'hidden',
                                   '&:hover': {
-                                    borderColor: isSelected ? colors.borderSelected : colors.borderHover,
-                                    bgcolor: isSelected ? colors.surfaceSelected : colors.surfaceHover,
+                                    borderColor: isSelected
+                                      ? colors.borderSelected
+                                      : colors.borderHover,
+                                    bgcolor: isSelected
+                                      ? colors.surfaceSelected
+                                      : colors.surfaceHover,
                                     transform: 'translateY(-1px)',
                                     boxShadow: isSelected
                                       ? `0 4px 12px ${alpha(theme.palette.primary.main, 0.15)}`
@@ -569,11 +661,13 @@ export function DynamicModal<T>({
                                   value={id}
                                   control={<Radio sx={{ display: 'none' }} />}
                                   sx={{ m: 0, width: '100%' }}
-                                  label={
-                                    <Box sx={{ p: 2, pl: isSelected ? 2.5 : 2 }}>
-                                      {renderItem(item, isSelected, isExpanded, (e) => handleToggleExpand(id, e))}
-                                    </Box>
-                                  }
+                                  label={renderItem(
+                                    item,
+                                    isSelected,
+                                    isExpanded,
+                                    (e) => handleToggleExpand(id, e),
+                                    handleDeleteItem,
+                                  )}
                                 />
                               </Box>
                             </Grow>
@@ -584,7 +678,11 @@ export function DynamicModal<T>({
                   )}
                 />
                 {!!errors.selectedId?.message && (
-                  <Typography variant="caption" color="error" sx={{ mt: 2, display: 'block' }}>
+                  <Typography
+                    variant="caption"
+                    color="error"
+                    sx={{ mt: 2, display: 'block' }}
+                  >
                     {errors.selectedId.message}
                   </Typography>
                 )}
@@ -607,7 +705,10 @@ export function DynamicModal<T>({
           {/* Pagination — only shown in single-select / paginated mode */}
           {totalPages > 1 ? (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="caption" sx={{ color: colors.textSecondary, mr: 1 }}>
+              <Typography
+                variant="caption"
+                sx={{ color: colors.textSecondary, mr: 1 }}
+              >
                 {startItem}–{endItem} of {totalCount}
               </Typography>
               <IconButton
@@ -615,7 +716,11 @@ export function DynamicModal<T>({
                 size="small"
                 onClick={() => handlePageChange(1)}
                 disabled={currentPage === 1 || isLoading}
-                sx={{ color: colors.textSecondary, '&:hover': { bgcolor: colors.surfaceHover }, '&.Mui-disabled': { color: colors.textTertiary } }}
+                sx={{
+                  color: colors.textSecondary,
+                  '&:hover': { bgcolor: colors.surfaceHover },
+                  '&.Mui-disabled': { color: colors.textTertiary },
+                }}
               >
                 <FirstPageIcon fontSize="small" />
               </IconButton>
@@ -624,12 +729,29 @@ export function DynamicModal<T>({
                 size="small"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1 || isLoading}
-                sx={{ color: colors.textSecondary, '&:hover': { bgcolor: colors.surfaceHover }, '&.Mui-disabled': { color: colors.textTertiary } }}
+                sx={{
+                  color: colors.textSecondary,
+                  '&:hover': { bgcolor: colors.surfaceHover },
+                  '&.Mui-disabled': { color: colors.textTertiary },
+                }}
               >
                 <KeyboardArrowLeftIcon fontSize="small" />
               </IconButton>
-              <Box sx={{ px: 1.5, py: 0.5, borderRadius: 1, bgcolor: colors.background, minWidth: 60, textAlign: 'center' }}>
-                <Typography variant="caption" fontWeight={600} sx={{ color: colors.textPrimary }}>
+              <Box
+                sx={{
+                  px: 1.5,
+                  py: 0.5,
+                  borderRadius: 1,
+                  bgcolor: colors.background,
+                  minWidth: 60,
+                  textAlign: 'center',
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  fontWeight={600}
+                  sx={{ color: colors.textPrimary }}
+                >
                   {currentPage} / {totalPages}
                 </Typography>
               </Box>
@@ -638,7 +760,11 @@ export function DynamicModal<T>({
                 size="small"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages || isLoading}
-                sx={{ color: colors.textSecondary, '&:hover': { bgcolor: colors.surfaceHover }, '&.Mui-disabled': { color: colors.textTertiary } }}
+                sx={{
+                  color: colors.textSecondary,
+                  '&:hover': { bgcolor: colors.surfaceHover },
+                  '&.Mui-disabled': { color: colors.textTertiary },
+                }}
               >
                 <KeyboardArrowRightIcon fontSize="small" />
               </IconButton>
@@ -647,7 +773,11 @@ export function DynamicModal<T>({
                 size="small"
                 onClick={() => handlePageChange(totalPages)}
                 disabled={currentPage === totalPages || isLoading}
-                sx={{ color: colors.textSecondary, '&:hover': { bgcolor: colors.surfaceHover }, '&.Mui-disabled': { color: colors.textTertiary } }}
+                sx={{
+                  color: colors.textSecondary,
+                  '&:hover': { bgcolor: colors.surfaceHover },
+                  '&.Mui-disabled': { color: colors.textTertiary },
+                }}
               >
                 <LastPageIcon fontSize="small" />
               </IconButton>
@@ -683,11 +813,17 @@ export function DynamicModal<T>({
                   fontWeight: 600,
                   px: 3,
                   boxShadow: 'none',
-                  '&:hover': { boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}` },
-                  '&:disabled': { bgcolor: colors.surfaceHover, color: colors.textTertiary },
+                  '&:hover': {
+                    boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                  },
+                  '&:disabled': {
+                    bgcolor: colors.surfaceHover,
+                    color: colors.textTertiary,
+                  },
                 }}
               >
-                Add {multiSelectedIds.size} {itemLabel}{multiSelectedIds.size !== 1 ? 's' : ''}
+                Add {multiSelectedIds.size} {itemLabel}
+                {multiSelectedIds.size !== 1 ? 's' : ''}
               </Button>
             ) : (
               <Button
@@ -700,8 +836,13 @@ export function DynamicModal<T>({
                   fontWeight: 600,
                   px: 3,
                   boxShadow: 'none',
-                  '&:hover': { boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}` },
-                  '&:disabled': { bgcolor: colors.surfaceHover, color: colors.textTertiary },
+                  '&:hover': {
+                    boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                  },
+                  '&:disabled': {
+                    bgcolor: colors.surfaceHover,
+                    color: colors.textTertiary,
+                  },
                 }}
               >
                 {triggerLabel}

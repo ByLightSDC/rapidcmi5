@@ -1,9 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
-import { Box, Button, MenuItem, Tooltip } from '@mui/material';
+import { Box, MenuItem, Tooltip } from '@mui/material';
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import {
   SlideTypeEnum,
@@ -20,13 +19,7 @@ import {
   FormControlCheckboxField,
   FormFieldArray,
   ButtonModalMinorUi,
-  useToaster,
 } from '@rapid-cmi5/ui';
-import AddToQuizBankForm from './modals/quizBank/AddToQuizBankForm';
-import {
-  QuestionBankApiCreate,
-  QuizBankContext,
-} from '../../contexts/QuizBankContext';
 
 /**
  * @interface fieldGroupProps
@@ -38,6 +31,7 @@ interface fieldGroupProps {
   crudType: FormCrudType;
   formErrors?: any;
   formProps: tFormFieldRendererProps;
+  onAddToBank?: (question: any) => void;
   rowIndex?: number;
   slideType: SlideTypeEnum;
 }
@@ -48,15 +42,11 @@ interface fieldGroupProps {
  * @returns
  */
 export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
-  const { crudType, formProps, slideType } = props;
-  const { addToQuizBank } = useContext(QuizBankContext);
-  const displayToaster = useToaster();
+  const { crudType, formProps, slideType, onAddToBank } = props;
 
   const { formMethods, indexedArrayField, indexedErrors, isFocused } =
     formProps;
   const { control, getValues, setValue, trigger, watch } = formMethods;
-
-  const [isAddQuestionBankOpen, setIsAddQuestionBankOpen] = useState(false);
 
   const watchQuestionType = watch(`${indexedArrayField}.type`);
   const watchQuestion = watch(`${indexedArrayField}.question`);
@@ -123,32 +113,6 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
     }
   }, [watchQuestionType]);
 
-  const handleAddToQuizBank = addToQuizBank
-    ? (q: QuestionBankApiCreate) => {
-        try {
-          addToQuizBank(q);
-          setIsAddQuestionBankOpen(false);
-
-          displayToaster({
-            message: 'Added Question to Bank.',
-            severity: 'success',
-            autoHideDuration: 3000,
-          });
-        } catch (e: unknown) {
-          const msg =
-            e instanceof Error
-              ? e.message
-              : 'Failed to add question to the bank. Please try again.';
-
-          displayToaster({
-            message: `Add Question to Bank Failed: ${msg}`,
-            severity: 'error',
-            autoHideDuration: 8000,
-          });
-        }
-      }
-    : undefined;
-
   return (
     <Grid
       container
@@ -156,14 +120,6 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
       sx={{ marginLeft: '12px', width: '100%' }}
       id={indexedArrayField} // this is used for scrolling when new array entry added
     >
-      {handleAddToQuizBank && isAddQuestionBankOpen && (
-        <AddToQuizBankForm
-          handleCloseModal={() => setIsAddQuestionBankOpen(false)}
-          handleModalAction={handleAddToQuizBank}
-          question={getValues(indexedArrayField)}
-        />
-      )}
-
       <Grid size={4}>
         <FormControlSelectField
           control={control}
@@ -334,14 +290,15 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           />
         </Box>
       )}
-      {addToQuizBank && isQuestionValid && (
+      {onAddToBank && (
         <Tooltip title="Save this question to the quiz bank">
           <ButtonModalMinorUi
             aria-label="search-question-bank"
             id="search-question-bank-button"
             size="small"
-            onClick={() => setIsAddQuestionBankOpen(true)}
+            onClick={() => onAddToBank(getValues(indexedArrayField))}
             startIcon={<BookmarkAddIcon fontSize="small" />}
+            disabled={!isQuestionValid}
           >
             Add to Quiz Bank
           </ButtonModalMinorUi>

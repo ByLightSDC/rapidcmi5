@@ -1,12 +1,6 @@
 import { useCallback } from 'react';
 import axios from 'axios';
-import {
-  Typography,
-  Stack,
-  Box,
-  alpha,
-  useTheme,
-} from '@mui/material';
+import { Typography, Stack, Box, alpha, useTheme } from '@mui/material';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -68,60 +62,76 @@ function ScenarioCard({
   const textTertiary = alpha(theme.palette.text.secondary, 0.7);
 
   return (
-    <Stack spacing={1.25}>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          gap: 2,
-        }}
-      >
-        <Typography
-          variant="body1"
-          fontWeight={600}
-          sx={{ color: textPrimary, lineHeight: 1.4, letterSpacing: '-0.01em' }}
-        >
-          {scenario.name}
-        </Typography>
-        {isSelected && (
-          <CheckCircleIcon
-            sx={{ fontSize: 20, color: theme.palette.primary.main, flexShrink: 0 }}
-          />
-        )}
-      </Box>
-
-      <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 1 }}>
-        <Stack direction="row" spacing={0.5} alignItems="center">
-          <PersonOutlineIcon sx={{ fontSize: 15, color: textTertiary }} />
-          <Typography variant="caption" sx={{ color: textSecondary, fontWeight: 500 }}>
-            {scenario.author}
-          </Typography>
-        </Stack>
-        <Stack direction="row" spacing={0.5} alignItems="center">
-          <AccessTimeIcon sx={{ fontSize: 15, color: textTertiary }} />
-          <Typography variant="caption" sx={{ color: textSecondary, fontWeight: 500 }}>
-            {formatDate(scenario.dateEdited)}
-          </Typography>
-        </Stack>
-      </Stack>
-
-      {scenario.description && (
-        <Typography
-          variant="body2"
+    <Box sx={{ p: 2, pl: isSelected ? 2.5 : 2 }}>
+      <Stack spacing={1.25}>
+        <Box
           sx={{
-            color: textSecondary,
-            lineHeight: 1.5,
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 2,
           }}
         >
-          {scenario.description}
-        </Typography>
-      )}
-    </Stack>
+          <Typography
+            variant="body1"
+            fontWeight={600}
+            sx={{
+              color: textPrimary,
+              lineHeight: 1.4,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            {scenario.name}
+          </Typography>
+          {isSelected && (
+            <CheckCircleIcon
+              sx={{
+                fontSize: 20,
+                color: theme.palette.primary.main,
+                flexShrink: 0,
+              }}
+            />
+          )}
+        </Box>
+
+        <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 1 }}>
+          <Stack direction="row" spacing={0.5} alignItems="center">
+            <PersonOutlineIcon sx={{ fontSize: 15, color: textTertiary }} />
+            <Typography
+              variant="caption"
+              sx={{ color: textSecondary, fontWeight: 500 }}
+            >
+              {scenario.author}
+            </Typography>
+          </Stack>
+          <Stack direction="row" spacing={0.5} alignItems="center">
+            <AccessTimeIcon sx={{ fontSize: 15, color: textTertiary }} />
+            <Typography
+              variant="caption"
+              sx={{ color: textSecondary, fontWeight: 500 }}
+            >
+              {formatDate(scenario.dateEdited)}
+            </Typography>
+          </Stack>
+        </Stack>
+
+        {scenario.description && (
+          <Typography
+            variant="body2"
+            sx={{
+              color: textSecondary,
+              lineHeight: 1.5,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
+            {scenario.description}
+          </Typography>
+        )}
+      </Stack>
+    </Box>
   );
 }
 
@@ -165,7 +175,9 @@ export function ScenarioSelectionForm({
       itemsPerPage={ITEMS_PER_PAGE}
       fetchItems={fetchItems}
       getItemId={(s) => s.uuid}
-      renderItem={(s, isSelected) => <ScenarioCard scenario={s} isSelected={isSelected} />}
+      renderItem={(s, isSelected) => (
+        <ScenarioCard scenario={s} isSelected={isSelected} />
+      )}
       onSelect={submitForm}
     />
   );

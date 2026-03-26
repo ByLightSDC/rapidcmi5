@@ -8,7 +8,9 @@ import {
   IconButton,
   Collapse,
   Divider,
+  Tooltip,
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Box, Stack } from '@mui/system';
 import { QuestionBankApi } from 'packages/rapid-cmi5/src/lib/contexts/QuizBankContext';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -284,6 +286,8 @@ export default function QuestionCard({
   multiSelect,
   toggleExpand,
   handleSelect,
+  currentUser,
+  onDelete,
 }: {
   q: QuestionBankApi;
   isSelected: boolean;
@@ -291,13 +295,15 @@ export default function QuestionCard({
   multiSelect: boolean;
   toggleExpand: (id: string, e: React.MouseEvent) => void;
   handleSelect: (q: QuestionBankApi) => void;
+  currentUser?: string;
+  onDelete?: (uuid: string) => void;
 }) {
   const typeAccent =
     TYPE_CONFIG[q.quizQuestion?.type]?.accent ?? 'transparent';
 
   return (
     <Card
-      key={q.id}
+      key={q.uuid}
       variant="outlined"
       sx={{
         position: 'relative',
@@ -407,10 +413,26 @@ export default function QuestionCard({
               </Box>
             </Box>
 
+            {/* Delete button — only for the question's author */}
+            {onDelete && q.author === currentUser && (
+              <Tooltip title="Delete from bank">
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(q.uuid);
+                  }}
+                  sx={{ p: 0.25, mt: 0.15, flexShrink: 0, color: 'error.main' }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+
             {/* Expand toggle */}
             <IconButton
               size="small"
-              onClick={(e) => toggleExpand(q.id, e)}
+              onClick={(e) => toggleExpand(q.uuid, e)}
               sx={{ p: 0.25, mt: 0.15, flexShrink: 0 }}
             >
               {isExpanded ? (

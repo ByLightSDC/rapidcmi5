@@ -36,17 +36,19 @@ import {
   FormStateType,
   MiniForm,
   tFormFieldRendererProps,
-  modal,
   ButtonModalMinorUi,
+  useToaster,
 } from '@rapid-cmi5/ui';
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 
 import { useContext, useState } from 'react';
 import {
-  QuestionBankApi,
   QuizBankContext,
-} from 'packages/rapid-cmi5/src/lib/contexts/QuizBankContext';
-import QuizBankSearchForm from '../../../course-builder/modals/quizBank/QuizBankSearchForm';
+  QuestionBankApi,
+  QuestionBankApiCreate,
+} from '../../../../contexts/QuizBankContext';
+import QuizBankSearchForm from '../../../course-builder/modals/QuizBank/QuizBankSearchForm';
+import AddToQuizBankForm from '../../../course-builder/modals/QuizBank/AddToQuizBankForm';
 
 export function requireField<T>(value: T | undefined | null, field: string): T {
   if (value === undefined || value === null) {
@@ -69,14 +71,44 @@ export const QuizForm = ({
   handleCloseModal?: () => void;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const { searchQuizBank } = useContext(QuizBankContext);
+  const { searchQuizBank, addToQuizBank } = useContext(QuizBankContext);
 
   const slideType =
     activityKind === RC5ActivityTypeEnum.quiz
       ? SlideTypeEnum.Quiz
       : SlideTypeEnum.CTF;
 
+  const handleSearchQuizBank = async (query: string) => {
+    if (!searchQuizBank) return [];
+    return await searchQuizBank(query, activityKind);
+  };
+
   const [isSearchBankOpen, setIsSearchBankOpen] = useState(false);
+  const [bankQuestion, setBankQuestion] = useState<any>(null);
+  const displayToaster = useToaster();
+
+  const handleAddToQuizBank = async (q: QuestionBankApiCreate) => {
+    if (!addToQuizBank) return;
+    try {
+      await addToQuizBank(q);
+      setBankQuestion(null);
+      displayToaster({
+        message: 'Added Question to Bank.',
+        severity: 'success',
+        autoHideDuration: 3000,
+      });
+    } catch (e: unknown) {
+      const msg =
+        e instanceof Error
+          ? e.message
+          : 'Failed to add question to the bank. Please try again.';
+      displayToaster({
+        message: `Add Question to Bank Failed: ${msg}`,
+        severity: 'error',
+        autoHideDuration: 8000,
+      });
+    }
+  };
 
   const validationSchema = yup.object().shape({
     //cmi5QuizId: read-only field auto populated/updated
@@ -195,7 +227,6 @@ export const QuizForm = ({
 
       setIsSearchBankOpen(false);
     };
-
     return (
       <>
         <Grid size={3}>
@@ -255,11 +286,10 @@ export const QuizForm = ({
           <QuizBankSearchForm
             handleCloseModal={() => setIsSearchBankOpen(false)}
             handleModalAction={handleModalResponse}
-            onSearch={searchQuizBank}
+            onSearch={handleSearchQuizBank}
             multiSelect={true}
           />
         )}
-
         <Grid size={11}>
           <FormFieldArray
             errors={errors?.questions}
@@ -283,6 +313,9 @@ export const QuizForm = ({
                   crudType={crudType}
                   formProps={props}
                   slideType={slideType}
+                  onAddToBank={
+                    addToQuizBank ? (q) => setBankQuestion(q) : undefined
+                  }
                 />
               );
             }}
@@ -318,22 +351,31 @@ export const QuizForm = ({
   };
 
   return (
-    <FormControlUIProvider>
-      <MiniForm
-        dataCache={defaultFormData}
-        titleEndChildren={deleteButton}
-        doAction={onSaveAction}
-        formTitle={activityKind === RC5ActivityTypeEnum.quiz ? 'Quiz' : 'CTF'}
-        formWidth="800px"
-        getFormFields={getFormFields}
-        loadingButtonText="Saving"
-        shouldAutoSave={true}
-        shouldCheckIsDirty={true}
-        shouldDisplaySave={false}
-        showPaper={true}
-        submitButtonText="Save"
-        validationSchema={validationSchema}
-      />
-    </FormControlUIProvider>
+    <>
+      {bankQuestion && (
+        <AddToQuizBankForm
+          handleCloseModal={() => setBankQuestion(null)}
+          handleModalAction={handleAddToQuizBank}
+          question={bankQuestion}
+        />
+      )}
+      <FormControlUIProvider>
+        <MiniForm
+          dataCache={defaultFormData}
+          titleEndChildren={deleteButton}
+          doAction={onSaveAction}
+          formTitle={activityKind === RC5ActivityTypeEnum.quiz ? 'Quiz' : 'CTF'}
+          formWidth="800px"
+          getFormFields={getFormFields}
+          loadingButtonText="Saving"
+          shouldAutoSave={true}
+          shouldCheckIsDirty={true}
+          shouldDisplaySave={false}
+          showPaper={true}
+          submitButtonText="Save"
+          validationSchema={validationSchema}
+        />
+      </FormControlUIProvider>
+    </>
   );
 };

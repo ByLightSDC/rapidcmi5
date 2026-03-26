@@ -8,6 +8,7 @@ import {
   Credentials,
   generateAuId,
   GitUserConfig,
+  RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 import { RapidCmi5, GetScenarioFormProps } from '@rapid-cmi5/react-editor';
 import { debugLogError } from '@rapid-cmi5/ui';
@@ -93,6 +94,17 @@ export function RapidCmi5Wrapper() {
   };
 
   const quizBankContextProps: IQuizBankContext = {
+    deleteFromQuizBank: async (uuid: string) => {
+      try {
+        await apiClient.delete(`/v1/quiz-bank/question-bank/${uuid}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch (error) {
+        console.error('Failed to delete question from quiz bank', error);
+        throw error;
+      }
+    },
+
     addToQuizBank: async (question: QuestionBankApiCreate) => {
       try {
         console.log('data', question);
@@ -110,14 +122,22 @@ export function RapidCmi5Wrapper() {
         throw error;
       }
     },
-    searchQuizBank: async (query: string) => {
+
+    searchQuizBank: async (
+      query: string,
+      activityKind: RC5ActivityTypeEnum,
+    ) => {
       try {
-        const params: Record<string, string | number> = {
+        const params: Record<string, string | number | undefined> = {
           offset: 0,
           limit: 20,
           sortBy: 'dateEdited',
           sort: 'desc',
           search: query.trim(),
+          questionType:
+            activityKind === RC5ActivityTypeEnum.ctf
+              ? 'freeResponse'
+              : undefined,
         };
 
         const response = await apiClient.get('/v1/quiz-bank/question-bank', {
@@ -143,6 +163,7 @@ export function RapidCmi5Wrapper() {
         userEmail: userEmail,
         userName: userFullName,
         gitCredentials,
+        apiUser: parsedUserToken?.email?.toLowerCase(),
       }}
       downloadCmi5Player={async () => {
         const response = await fetch('/assets/cc-cmi5-player.zip');

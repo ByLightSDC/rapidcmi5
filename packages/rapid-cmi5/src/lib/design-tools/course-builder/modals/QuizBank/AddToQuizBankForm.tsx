@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-useless-fragment */
 import {
   FormControlCheckboxField,
   FormControlTextField,
@@ -35,8 +34,11 @@ export function AddToQuizBankForm({
   });
 
   const doAction = async (data: any) => {
+
+    if (!question.type) throw Error("Question type not defined");
     const newQuestion: QuestionBankApiCreate = {
       public: data.public ?? true,
+      questionType: question.type,
       question: question.question,
       quizQuestion: question,
       rc5Version: '1',

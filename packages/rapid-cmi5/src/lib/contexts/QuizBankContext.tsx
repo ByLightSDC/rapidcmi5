@@ -1,8 +1,9 @@
+import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { createContext } from 'react';
 
 // The full API response shape (GET)
 export interface QuestionBankApi {
-  id: string;
+  uuid: string;
   author: string;
   dateCreated: string;
   dateEdited: string;
@@ -11,24 +12,29 @@ export interface QuestionBankApi {
   tags: string[];
   rc5Version: string;
   public: boolean;
+  questionType: string;
 }
 
 // POST — only the fields the client controls
 export type QuestionBankApiCreate = Pick<
   QuestionBankApi,
-  'question' | 'quizQuestion' | 'tags' | 'rc5Version' | 'public'
+  'question' | 'quizQuestion' | 'tags' | 'rc5Version' | 'public' | 'questionType'
 >;
 // PUT/PATCH — same fields as create, all optional
 export type QuestionBankApiUpdate = Partial<QuestionBankApiCreate>;
 
 export interface IQuizBankContext {
-  searchQuizBank?: (query: string) => Promise<QuestionBankApi[]>;
+  searchQuizBank?: (query: string, activityKind: RC5ActivityTypeEnum) => Promise<QuestionBankApi[]>;
   addToQuizBank?: (question: QuestionBankApiCreate) => Promise<void>;
+  updateInQuizBank?: (uuid: string, question: QuestionBankApiUpdate) => Promise<void>;
+  deleteFromQuizBank?: (uuid: string) => Promise<void>;
 }
 
 export const QuizBankContext = createContext<IQuizBankContext>({
   searchQuizBank: async () => [],
   addToQuizBank: async () => {},
+  updateInQuizBank: async () => {},
+  deleteFromQuizBank: async () => {},
 });
 
 interface QuizBankProviderProps {
@@ -41,9 +47,9 @@ export function QuizBankProvider({
   quizBankProps,
 }: QuizBankProviderProps) {
   if (!quizBankProps) return children;
-  const { addToQuizBank, searchQuizBank } = quizBankProps;
+  const { addToQuizBank, updateInQuizBank, searchQuizBank, deleteFromQuizBank } = quizBankProps;
   return (
-    <QuizBankContext.Provider value={{ searchQuizBank, addToQuizBank }}>
+    <QuizBankContext.Provider value={{ searchQuizBank, addToQuizBank, updateInQuizBank, deleteFromQuizBank }}>
       {children}
     </QuizBankContext.Provider>
   );

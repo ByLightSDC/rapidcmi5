@@ -60,6 +60,7 @@ export type UserAuth = {
   userName: string;
   userEmail: string;
   gitCredentials?: Credentials;
+  apiUser?: string;
 };
 
 export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {
