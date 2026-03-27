@@ -4,17 +4,15 @@ import {
   DirectiveDescriptor,
   DirectiveEditorProps,
   editorInFocus$,
-  insertMarkdown$,
   NestedLexicalEditor,
   syntaxExtensions$,
   useCellValues,
   useLexicalNodeRemove,
   useMdastNodeUpdater,
-  usePublisher,
 } from '@mdxeditor/editor';
 import { LexicalEditor } from 'lexical';
 import { ContainerDirective, Directives } from 'mdast-util-directive';
-import type { Paragraph, RootContent } from 'mdast';
+import type { Paragraph } from 'mdast';
 
 import {
   Accordion,
@@ -48,7 +46,7 @@ import { AdmonitionTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { SelectorMainUi } from '../../../inputs/selectors/selectors';
 import { debugLogError } from '../../../utility/logger';
 import { editorInPlayback$ } from '../state/vars';
-import { convertMarkdownToMdast, convertMdastToMarkdown } from '../util/conversion';
+import { convertMarkdownToMdast } from '../util/conversion';
 import { LessonThemeContext } from '../contexts/LessonThemeContext';
 import { resolveLessonThemeCSS } from '../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../plugins/shared/useGutterRight';
@@ -98,8 +96,6 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   >(undefined);
   const removeNode = useLexicalNodeRemove();
   const updateMdastNode = useMdastNodeUpdater();
-  const insertMarkdown = usePublisher(insertMarkdown$);
-  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
   const [isCollapsible, setIsCollapsible] = useState(false);
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [isFocused, setIsFocused] = useState(false); //editor focused
@@ -230,45 +226,6 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   /**
    * Rebuilds the admonition node with a new background color.
    */
-  const rebuildNode = useCallback(
-    async (bgColor: string) => {
-      if (!parentEditor) return;
-
-      parentEditor.update(() => {
-        const nextSibling = lexicalNode.getNextSibling();
-        if (nextSibling) {
-          nextSibling.selectStart();
-        } else {
-          lexicalNode.selectEnd();
-        }
-      });
-
-      await delay(50);
-
-      parentEditor.update(() => {
-        const attributes: Record<string, string> = {};
-        if (attCollapse) attributes['collapse'] = attCollapse;
-        if (bgColor) attributes['backgroundColor'] = bgColor;
-
-        const mdast: ContainerDirective = {
-          type: 'containerDirective',
-          name: mdastNode.name,
-          attributes,
-          children: [...mdastNode.children] as ContainerDirective['children'],
-        };
-
-        insertMarkdown(convertMdastToMarkdown(mdast as RootContent));
-      });
-
-      await delay(50);
-
-      parentEditor.update(() => {
-        lexicalNode.remove();
-      });
-    },
-    [attCollapse, insertMarkdown, lexicalNode, mdastNode, parentEditor],
-  );
-
   /**
    * Sets local state from mdast attributes
    */
@@ -540,7 +497,15 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
           const latest = pendingColorRef.current;
           if (latest !== backgroundColor) {
             setBackgroundColor(latest);
-            rebuildNode(latest);
+            parentEditor.update(() => {
+              const attrs = { ...(mdastNode.attributes as Record<string, string>) };
+              if (latest) {
+                attrs['backgroundColor'] = latest;
+              } else {
+                delete attrs['backgroundColor'];
+              }
+              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+            }, { discrete: true });
           }
         }}
         lastColor={pendingColor}
@@ -555,7 +520,11 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
           skipNextCloseRebuildRef.current = true;
           setPendingColor('');
           setBackgroundColor('');
-          rebuildNode('');
+          parentEditor.update(() => {
+            const attrs = { ...(mdastNode.attributes as Record<string, string>) };
+            delete attrs['backgroundColor'];
+            lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+          }, { discrete: true });
         }}
         noneLabel="No background"
       />

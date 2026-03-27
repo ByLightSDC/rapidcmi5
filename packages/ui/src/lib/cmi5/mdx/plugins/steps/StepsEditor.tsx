@@ -258,50 +258,18 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
     });
   }, [insertMarkdown, formData, backgroundColor, lexicalNode, parentEditor]);
 
-  const rebuildNode = useCallback(
-    async (children: StepContentDirectiveNode[], bgColor: string) => {
-      if (!parentEditor) return;
-
-      parentEditor.update(() => {
-        const nextSibling = lexicalNode.getNextSibling();
-        if (nextSibling) {
-          nextSibling.selectStart();
-        } else {
-          lexicalNode.selectEnd();
-        }
-      });
-
-      await delay(50);
-
-      parentEditor.update(() => {
-        const attributes: Record<string, string> = { color: 'transparent' };
-        if (bgColor) attributes['backgroundColor'] = bgColor;
-        const mdast: ContainerDirective = {
-          type: 'containerDirective',
-          name: 'steps',
-          attributes,
-          children: [...children],
-        };
-        insertMarkdown(convertMdastToMarkdown(mdast as Mdast.RootContent));
-      });
-
-      await delay(50);
-
-      parentEditor.update(() => {
-        lexicalNode.remove();
-      });
-    },
-    [insertMarkdown, lexicalNode, parentEditor],
-  );
-
-  const handleClearColor = useCallback(async () => {
+  const handleClearColor = useCallback(() => {
     setColorPickerAnchor(null);
     pendingColorRef.current = '';
     skipNextCloseRebuildRef.current = true;
     setPendingColor('');
     setBackgroundColor('');
-    await rebuildNode(formData, '');
-  }, [rebuildNode, formData]);
+    parentEditor.update(() => {
+      const attrs = { ...mdastNode.attributes };
+      delete attrs.backgroundColor;
+      lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+    }, { discrete: true });
+  }, [lexicalNode, mdastNode, parentEditor]);
 
   /**
    * Handle Next Step
@@ -650,7 +618,15 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
           const latest = pendingColorRef.current;
           if (latest !== backgroundColor) {
             setBackgroundColor(latest);
-            rebuildNode(formData, latest);
+            parentEditor.update(() => {
+              const attrs = { ...mdastNode.attributes };
+              if (latest) {
+                attrs.backgroundColor = latest;
+              } else {
+                delete attrs.backgroundColor;
+              }
+              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+            }, { discrete: true });
           }
         }}
         lastColor={pendingColor}
