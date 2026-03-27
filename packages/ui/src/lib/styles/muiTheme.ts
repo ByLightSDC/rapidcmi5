@@ -148,13 +148,13 @@ export const lightTheme = createTheme({
           },
           '*::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb': {
             borderRadius: '4px',
-            backgroundColor: '#3C59A2',
+            backgroundColor: '#6dea3f',//'#3C59A2',
             border: '2px solid #dd6fff00', //inset thumb on track background color
             minHeight: '48px',
           },
           '*::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover':
             {
-              backgroundColor: '#5871AF',
+              backgroundColor: '#c61895',//'#5871AF',
               borderLeft: '4px solid #f8f8f8',
               cursor: 'pointer',
             },
@@ -310,9 +310,6 @@ export const lightTheme = createTheme({
             backgroundColor: '#7f8cb9',
             color: 'white',
             '&:hover': {
-              //border: '0px solid #07128590',
-              //backgroundColor: '#07128590',
-              //color: '#FFFFFF',
               border: '0px solid #07128590',
               backgroundColor: '#7f8cb9',
               color: 'white',
