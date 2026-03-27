@@ -23,7 +23,7 @@ import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 
-import { Box, Switch, Tooltip, Typography, useTheme } from '@mui/material';
+import { alpha, Box, Switch, Tooltip, Typography, useTheme } from '@mui/material';
 import { auJsonSel, classIdSel, studentIdSel } from '../redux/auReducer';
 import { activeTabSel } from '../redux/navigationReducer';
 import { useDispatch, useSelector } from 'react-redux';
@@ -209,7 +209,9 @@ export default function MenuLayout() {
               sx={{
                 position: 'absolute',
                 zIndex: (theme) => theme.zIndex.appBar + 1,
-                //backgroundColor: leave blank so it matches presentation background
+                backgroundColor: alpha(palette.background.paper, 0.9),
+                borderRadius: '6px',
+                width: '100%',
               }}
             >
               <Tooltip

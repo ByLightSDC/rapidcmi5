@@ -87,114 +87,117 @@ export const TOCComponent = ({
 
   const toc = (
     <nav aria-label="Table of Contents">
-    <Accordion
-      slots={{ heading: 'div' }}
-      expanded={isExpanded}
-      onChange={toggleExpanded}
-      key="TOC"
-      variant="outlined"
-      sx={{
-        zIndex: 999,
-        height: isExpanded ? '80%' : undefined, //fixes inf rendering issue in authoring mode
-        overflow: 'auto',
-        position: 'absolute',
-        right: 24,
-        top: topPosition,
-        maxWidth: '320px',
-        backgroundColor: isExpanded ? 'background.default' : 'transparent',
-        borderStyle: 'none',
-        minHeight: 0,
-        padding: '4px',
-        margin: 0,
-        marginTop: isExpanded ? 0 : 2,
-      }}
-    >
-      <AccordionSummary
-        aria-label={isExpanded ? 'Table of Contents' : 'Open Table of Contents'}
+      <Accordion
+        slots={{ heading: 'div' }}
+        expanded={isExpanded}
+        onChange={toggleExpanded}
+        key="TOC"
+        variant="outlined"
         sx={{
-          padding: 0,
-          margin: 0,
+          zIndex: (theme) => theme.zIndex.appBar + 2,
+          height: isExpanded ? '80%' : undefined, //fixes inf rendering issue in authoring mode
+          overflow: 'auto',
+          position: 'absolute',
+          right: 24,
+          top: topPosition,
+          maxWidth: '320px',
+          backgroundColor: isExpanded ? 'background.default' : 'transparent',
+          borderStyle: 'none',
           minHeight: 0,
-          maxHeight: '32px',
-          borderRadius: isExpanded ? 0 : 8, //hack to avoid extra vertical space below Table of Contents
+          padding: '4px',
+          margin: 0,
+          marginTop: isExpanded ? 0 : 2,
         }}
-        expandIcon={
-          isExpanded ? null : (
-            <Tooltip title="Table of Contents: Click to expand, then click on a heading to jump to its location in the slide.">
-              <span>
-                <Box
-                  aria-hidden="true"
-                  sx={{
-                    backgroundColor: 'primary.main',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    padding: '2px',
-                    borderRadius: 8,
-                    '&:hover': {
-                      bgcolor: alpha(theme.palette.primary.main, 0.3),
-                    },
-                    fontSize: '24px',
-                    width: '32px',
-                    height: '32px',
-                  }}
-                > 
-                  <TocIcon
-                    color="action"
-                    fontSize="inherit"
-                    sx={{
-                      color: 'white',
-                    }}
-                  />
-                </Box>
-              </span>
-            </Tooltip>
-          )
-        }
       >
-        {isExpanded && (
-          <Stack
-            direction="row"
-            sx={{
-              marginLeft: '12px',
-              marginRight: '12px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <Typography
-              variant="h5"
-              component="span"
-              align="center"
-              color="primary.main"
-              sx={{
-                width: '100%',
-                fontWeight: 500,
-              }}
-            >
-              Table of Contents
-            </Typography>
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsExpanded(false);
-              }}
-              aria-label="Close Table of Contents"
-            >
-              <CloseIcon />
-            </IconButton>
-          </Stack>
-        )}
-      </AccordionSummary>
-      {isExpanded && (
-        <AccordionDetails
+        <AccordionSummary
+          aria-label={
+            isExpanded ? 'Table of Contents' : 'Open Table of Contents'
+          }
           sx={{
+            zIndex: (theme) => theme.zIndex.appBar + 2,
             padding: 0,
             margin: 0,
-            marginTop: -2,
+            minHeight: 0,
+            maxHeight: '32px',
+            borderRadius: isExpanded ? 0 : 8, //hack to avoid extra vertical space below Table of Contents
           }}
+          expandIcon={
+            isExpanded ? null : (
+              <Tooltip title="Table of Contents: Click to expand, then click on a heading to jump to its location in the slide.">
+                <span>
+                  <Box
+                    aria-hidden="true"
+                    sx={{
+                      backgroundColor: 'primary.main',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      padding: '2px',
+                      borderRadius: 8,
+                      '&:hover': {
+                        bgcolor: alpha(theme.palette.primary.main, 0.3),
+                      },
+                      fontSize: '24px',
+                      width: '32px',
+                      height: '32px',
+                    }}
+                  >
+                    <TocIcon
+                      color="action"
+                      fontSize="inherit"
+                      sx={{
+                        color: 'white',
+                      }}
+                    />
+                  </Box>
+                </span>
+              </Tooltip>
+            )
+          }
         >
+          {isExpanded && (
+            <Stack
+              direction="row"
+              sx={{
+                marginLeft: '12px',
+                marginRight: '12px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <Typography
+                variant="h5"
+                component="span"
+                align="center"
+                color="primary.main"
+                sx={{
+                  width: '100%',
+                  fontWeight: 500,
+                }}
+              >
+                Table of Contents
+              </Typography>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsExpanded(false);
+                }}
+                aria-label="Close Table of Contents"
+              >
+                <CloseIcon />
+              </IconButton>
+            </Stack>
+          )}
+        </AccordionSummary>
+        {isExpanded && (
+          <AccordionDetails
+            sx={{
+              padding: 0,
+              margin: 0,
+              marginTop: -2,
+            }}
+          >
             <ul
               role="list"
               style={{
@@ -228,9 +231,9 @@ export const TOCComponent = ({
                 </li>
               ))}
             </ul>
-        </AccordionDetails>
-      )}
-    </Accordion>
+          </AccordionDetails>
+        )}
+      </Accordion>
     </nav>
   );
 
