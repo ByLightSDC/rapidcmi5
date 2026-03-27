@@ -176,7 +176,6 @@ export function QuestionInput({
               questionIndex === numQuestions - 1 ||
               selectionStart !== selectionEnd
             ) {
-              console.log('return', questionIndex);
               return;
             }
             if (selectionStart === 0 || selectionStart === value.length) {
@@ -186,7 +185,6 @@ export function QuestionInput({
             }
           } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
             if (questionIndex === 0 || selectionStart !== selectionEnd) {
-              console.log('return', questionIndex);
               return;
             }
             if (selectionStart === 0 || selectionStart === value.length) {

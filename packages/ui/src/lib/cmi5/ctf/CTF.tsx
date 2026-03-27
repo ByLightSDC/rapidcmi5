@@ -51,7 +51,7 @@ import ScoreLabel from './ScoreLabel';
 import QuestionInput from './QuestionInput';
 import { useSignalEffect } from '@preact/signals-react';
 import { isAnswerInputEnabled$, shouldCheckAnswer$ } from './vars';
-import { FlagPositiveEffect } from './FlagPositiveEffect';
+import { FlagEffect } from './FlagEffect';
 import { FlagNegativeEffect } from './FlagNegativeEffect';
 import { useToaster } from '../../utility/useToaster';
 import { submitScoreMessage } from './constants';
@@ -589,8 +589,8 @@ export function AuCTF({
                                 {option.title}
                               </Typography>
                             )}
-                            {grade === 0 && <FlagNegativeEffect />}
-                            {grade === 1 && <FlagPositiveEffect />}
+                            {grade === 0 && <FlagEffect isSuccess={false} />}
+                            {grade === 1 && <FlagEffect />}
                           </div>
                           <Typography
                             variant="h6"
@@ -621,8 +621,8 @@ export function AuCTF({
                           >
                             {option.question}
                           </Typography>
-                          {grade === 0 && <FlagNegativeEffect />}
-                          {grade === 1 && <FlagPositiveEffect />}
+                          {grade === 0 && <FlagEffect isSuccess={false} />}
+                          {grade === 1 && <FlagEffect />}
                         </>
                       )}
                     </Grid>
