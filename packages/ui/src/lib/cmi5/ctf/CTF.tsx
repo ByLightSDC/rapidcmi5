@@ -52,7 +52,6 @@ import QuestionInput from './QuestionInput';
 import { useSignalEffect } from '@preact/signals-react';
 import { isAnswerInputEnabled$, shouldCheckAnswer$ } from './vars';
 import { FlagEffect } from './FlagEffect';
-import { FlagNegativeEffect } from './FlagNegativeEffect';
 import { useToaster } from '../../utility/useToaster';
 import { submitScoreMessage } from './constants';
 
@@ -282,7 +281,6 @@ export function AuCTF({
 
   useEffect(() => {
     if (ctfContent?.cmi5QuizId) {
-      //console.log('trigger reset from cmi5QuizId');
       handleReset();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
