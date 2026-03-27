@@ -89,26 +89,6 @@ kbd {
     0 -0.1rem 0.2rem hsla(225deg, 15%, 90%, 0.2) inset;
 }
 
-/*REF  Scrollbar Styles
-Moved to theme
-*/
-
-/*::-webkit-scrollbar {
-
-}
-
-::-webkit-scrollbar-track {
-
-}
-
-::-webkit-scrollbar-thumb {
-
-}
-
-::-webkit-scrollbar-corner {
-	background-color: transparent;
-}
-*/
 
 .sb-main-padded {
   padding: 0;
