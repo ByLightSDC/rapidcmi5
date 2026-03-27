@@ -246,11 +246,9 @@ export function ButtonMainUi(props: BrandedButtonProps) {
       type="button"
       variant="contained"
       sx={{
-        //border: '2px solid',
         borderStyle: 'solid',
-        borderWidth: '1px', //MG
+        borderWidth: '1px',
         borderColor: 'primary.light',
-        //backgroundColor: 'primary.main',
         background: 'linear-gradient(180deg, #405CA7 0%, #2C4B93 100%)', //mico to-do
         color: 'common.white',
         //Recent fix to make button fit child text
@@ -275,10 +273,13 @@ export function ButtonMainUi(props: BrandedButtonProps) {
           cursor: 'pointer',
         },
         '&:disabled': {
+          background: 'none', //mico to-do
+          borderColor: (theme: any) => `${theme.button.disabledColor}`,
+          borderStyle: 'none',
           boxShadow: 2,
           backgroundColor: (theme: any) =>
             `${theme.button.disabledBackgroundColor}`,
-          color: (theme: any) => `${theme.button.disabledColor}`,
+          color: '#FFFFFFB3',
         },
         ...props?.sxProps,
       }}

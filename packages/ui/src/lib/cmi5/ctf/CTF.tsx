@@ -3,7 +3,6 @@ import {
   AnswerType,
   AuContextProps,
   CTFContent,
-  CTFDisplay,
   CTFQuestion,
   QuizCompletionEnum,
   RC5ActivityTypeEnum,
@@ -11,49 +10,60 @@ import {
 
 import Grid from '@mui/material/Grid2';
 
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { debugLog } from '../../utility/logger';
 import { useDisplayFocus } from '../../hooks/useDisplayFocus';
 import useCTFGrader from './useCTFGrader';
 
-import { Alert, Paper, TextField, Typography } from '@mui/material';
+import { Alert, alpha, Paper, Typography, useTheme } from '@mui/material';
 
 /* Icons */
+import UploadIcon from '@mui/icons-material/Upload';
+import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import InfoIcon from '@mui/icons-material/Info';
 import OutlinedFlagIcon from '@mui/icons-material/OutlinedFlag';
-import ErrorIcon from '@mui/icons-material/Error';
 import SportsScoreIcon from '@mui/icons-material/SportsScore';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import ReportIcon from '@mui/icons-material/Report';
 
 import {
-  getCurrentCTFAnswer as getCurrentAnswer,
   getCTFGrades as getGrades,
   getCTFSubmitted as getSubmitted,
-  getCurrentCTFQuestion as getCurrentQuestion,
   setCurrentCTFQuestion as setCurrentQuestion,
   resetCTFActivity as resetActivity,
   setCTFScore as setScore,
   setCurrentCTFAnswer as setCurrentAnswer,
   getAllCTFAnswers as getAllAnswers,
+  currentAnswers,
+  getCurrentQuestion,
 } from './ctfReducer';
-import { Box, Stack, SxProps } from '@mui/system';
-import {
-  ButtonInfoField,
-  ButtonMainUi,
-  ButtonMinorUi,
-} from '../../utility/buttons';
+import { Box, Stack } from '@mui/material';
+import { ButtonInfoField, ButtonMainUi } from '../../utility/buttons';
 import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
 import {
   maxFormWidths,
   useLessonThemeStyles,
 } from '../../hooks/useLessonThemeStyles';
 
+import ScoreLabel from './ScoreLabel';
+import QuestionInput from './QuestionInput';
+import { useSignalEffect } from '@preact/signals-react';
+import { isAnswerInputEnabled$, shouldCheckAnswer$ } from './vars';
+import { FlagEffect } from './FlagEffect';
+import { useToaster } from '../../utility/useToaster';
+import { submitScoreMessage } from './constants';
+
 const answerBoxGridSize = 3.8;
 const attemptedLabel = '#Attempted';
 const accuracyLabel = 'Flags';
+const ctfButtonProps = {
+  minWidth: 140,
+  '&.Mui-disabled': {
+    boxShadow: 0,
+  },
+};
 
 /** Capture the Flag Activity
  * @param param0
@@ -68,11 +78,10 @@ export function AuCTF({
 }) {
   const { setProgress, submitScore } = auProps;
   const ctfContent = content;
-
   const dispatch = useDispatch();
+  const currentAnswersSel = useSelector(currentAnswers);
 
   //grader
-  const currentAnswer = useSelector(getCurrentAnswer);
   const currentGrades = useSelector(getGrades);
   const currentQuestionIndex = useSelector(getCurrentQuestion);
   const allAnswers = useSelector(getAllAnswers);
@@ -90,8 +99,10 @@ export function AuCTF({
   } = useCTFGrader(ctfContent);
 
   const [isFocused, setIsFocused] = useState(currentQuestionIndex >= 0);
+  const [focused, setFocused] = useState<Element | null>(null);
   const focusHelper = useDisplayFocus();
-  const countRef = useRef(currentQuestionIndex); //for tabbing
+  const [isInputEnabled, setIsInputEnabled] = useState(false);
+  const displayToaster = useToaster();
 
   /* Constants */
   const noneFound = 'No Questions Found';
@@ -99,8 +110,15 @@ export function AuCTF({
 
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
-  const { outerActivitySxFullWidth, outerActivitySxWithConstrainedWidthForm, outerActivitySxWithConstrainedWidth } =
-    useLessonThemeStyles(lessonTheme, maxFormWidths.ctfPlayback);
+  const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
+    lessonTheme,
+    maxFormWidths.ctfPlayback,
+  );
+
+  const theme = useTheme();
+  const { palette } = theme;
+  const defaultHighContrastColor =
+    theme.palette.mode === 'light' ? 'common.white' : 'common.black';
 
   /**
    * Selects question if it is available (no grade or bad grade)
@@ -109,15 +127,18 @@ export function AuCTF({
    */
   const isAvailable = useCallback(
     (questionIndex: number) => {
+      debugLog(`check available ${questionIndex}`);
       if (Object.prototype.hasOwnProperty.call(currentGrades, questionIndex)) {
         if (currentGrades[questionIndex] === 0) {
           //bad grade
+          debugLog(`found next incorrect question ${questionIndex}`);
           dispatch(setCurrentQuestion(questionIndex));
           setIsFocused(true);
           return true;
         }
       } else {
         //no grade
+        debugLog(`found next question ${questionIndex}`);
         dispatch(setCurrentQuestion(questionIndex));
         setIsFocused(true);
         return true;
@@ -147,6 +168,7 @@ export function AuCTF({
     if (startQuestionIndex > 0) {
       for (let i = 0; i < startQuestionIndex; i++) {
         jumpTo = i;
+        console.log('jj', jumpTo);
         if (isAvailable(jumpTo)) {
           return;
         }
@@ -184,28 +206,13 @@ export function AuCTF({
     debugLog('no available question found');
   };
 
-  /**
-   * KeyDown handlers allows user to use arrow keys to cycle through questions
-   */
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      //REF stale console.log(currentQuestionIndex, countRef.current);
-      if (event.key === 'ArrowDown') {
-        event.stopPropagation();
-        gotoNextAvailable(countRef.current);
-      } else if (event.key === 'ArrowUp') {
-        event.stopPropagation();
-        gotoPrevAvailable(countRef.current);
-      } else if (event.key === 'ArrowRight') {
-        event.stopPropagation();
-        gotoNextAvailable(countRef.current);
-      } else if (event.key === 'ArrowLeft') {
-        event.stopPropagation();
-        gotoPrevAvailable(countRef.current);
-      }
-    },
-    [currentQuestionIndex],
-  );
+  const handleNextQuestion = useCallback(() => {
+    gotoNextAvailable(currentQuestionIndex);
+  }, [currentQuestionIndex]);
+
+  const handlePreviousQuestion = useCallback(() => {
+    gotoPrevAvailable(currentQuestionIndex);
+  }, [currentQuestionIndex]);
 
   /**
    * Reset Activity
@@ -213,7 +220,7 @@ export function AuCTF({
   const handleReset = useCallback(() => {
     debugLog('[CTF Activity] reset');
     setIsFocused(true);
-    focusHelper.focusOnElementById('me');
+    focusHelper.focusOnElementById('ctf-answer');
     resetGrader();
     dispatch(resetActivity());
   }, [dispatch, focusHelper, resetGrader, setIsFocused]);
@@ -232,11 +239,11 @@ export function AuCTF({
    * @param {AnswerType} input
    */
   const handleSubmitAnswer = (input: AnswerType) => {
-    //grade here
+    debugLog('[CTF] Submit Answer');
     dispatch(setCurrentAnswer(input));
     gradeAnswer(input, currentQuestionIndex);
     setIsFocused(false);
-    //REF maybe go to next available here?
+    handleNextQuestion();
   };
 
   /**
@@ -263,6 +270,11 @@ export function AuCTF({
 
       submitScore(scoreData);
     }
+
+    displayToaster({
+      message: submitScoreMessage,
+      severity: 'success',
+    });
   };
 
   //#region UE
@@ -275,30 +287,11 @@ export function AuCTF({
   }, [ctfContent?.cmi5QuizId]);
 
   /**
-   * Logs answer change
-   */
-  useEffect(() => {
-    //console.log('change answer', currentAnswer);
-  }, [currentAnswer]);
-
-  /**
-   * Listens for arrow key events
-   */
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [handleKeyDown]);
-
-  /**
    * UI triggers focus on input element when question index changes
    * Updates question index ref used in key event handlers
    */
   useEffect(() => {
-    debugLog('UE currentQuestionIndex', currentQuestionIndex);
-    focusHelper.focusOnElementById('me');
-    countRef.current = currentQuestionIndex;
+    focusHelper.focusOnElementById('ctf-answer');
   }, [currentQuestionIndex]);
 
   /**
@@ -320,6 +313,14 @@ export function AuCTF({
       setAccuracy(0);
     }
   }, [currentGrades]);
+
+  /**
+   * UE Logs Question Box Focus
+   */
+  useEffect(() => {
+    //console.log('UE isFocused', isFocused);
+  }, [isFocused]);
+
   //#endregion
 
   const infoTag = (
@@ -338,9 +339,17 @@ export function AuCTF({
     />
   );
 
+  /**
+   * Listen for input enabled
+   */
+  useSignalEffect(() => {
+    setIsInputEnabled(isAnswerInputEnabled$.value);
+  });
+
   return (
     ctfContent.questions && (
       <Paper
+        id="ctf-activity"
         className="paper-activity"
         variant="outlined"
         sx={{
@@ -398,51 +407,104 @@ export function AuCTF({
                         color="success"
                         sx={{ marginLeft: '8px' }}
                       />
-                      <Typography color="success" variant="h5">
+                      <Typography color="success" variant="h6">
                         Pass
                       </Typography>
                     </>
                   ) : numAttempted === ctfContent.questions.length ? (
                     <>
                       <ReportIcon color="error" sx={{ marginLeft: '8px' }} />
-                      <Typography color="error" variant="h5">
+                      <Typography color="error" variant="h6">
                         Fail
                       </Typography>
                     </>
-                  ) : undefined}
+                  ) : (
+                    <>
+                      <HourglassBottomIcon
+                        color="info"
+                        sx={{ marginLeft: '8px' }}
+                      />
+                      <Typography
+                        color="info"
+                        variant="h6"
+                        sx={{ lineHeight: 1.1 }}
+                      >
+                        In Progress
+                      </Typography>
+                    </>
+                  )}
                 </>
-              </ScoreLabel>
-              {numAttempted === ctfContent.questions.length && (
-                <ScoreLabel label="" value="" gridSize={2.4}>
-                  <ButtonMainUi
-                    disabled={hasSubmitted}
-                    tabIndex={3}
-                    onClick={submitQuiz}
-                  >
-                    Submit
-                  </ButtonMainUi>
-                </ScoreLabel>
-              )}
-              <ScoreLabel label="" value="" gridSize={2.4}>
-                <ButtonMinorUi
-                  tabIndex={4}
-                  onClick={handleReset}
-                  startIcon={<RestartAltIcon />}
-                >
-                  Reset
-                </ButtonMinorUi>
               </ScoreLabel>
 
               <div style={{ flexGrow: 1 }} />
             </Stack>
-
+            {/* aria-live region */}
+            <div aria-live="polite" className="sr-only">
+              Now answering:
+              {ctfContent.questions[currentQuestionIndex].question}
+            </div>
             <QuestionInput
               display={ctfContent.display}
-              questionIndex={currentQuestionIndex}
-              answer={currentAnswer || ''}
+              answer={currentAnswersSel[currentQuestionIndex] || ''}
+              handleNextQuestion={handleNextQuestion}
+              handlePreviousQuestion={handlePreviousQuestion}
               handleSubmitAnswer={handleSubmitAnswer}
+              numQuestions={ctfContent.questions?.length}
             />
 
+            <Stack
+              spacing={2}
+              direction="row"
+              sx={{
+                margin: 1,
+                flexGrow: 1,
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
+              <ButtonMainUi
+                sxProps={ctfButtonProps}
+                startIcon={<UploadIcon fontSize="small" />}
+                disabled={
+                  numAttempted !== ctfContent.questions.length || hasSubmitted
+                }
+                onClick={submitQuiz}
+              >
+                Submit Score
+              </ButtonMainUi>
+              <ButtonMainUi
+                id="ctf-submit-answer"
+                sxProps={{ ...ctfButtonProps, minWidth: 140 }}
+                startIcon={null}
+                disabled={!isInputEnabled}
+                onClick={() => {
+                  shouldCheckAnswer$.value = true;
+                }}
+              >
+                Score Answer
+              </ButtonMainUi>
+              <ButtonMainUi
+                id="ctf-reset"
+                sxProps={{ ...ctfButtonProps, minWidth: 100 }}
+                onClick={handleReset}
+                startIcon={<RestartAltIcon />}
+              >
+                Reset All
+              </ButtonMainUi>
+            </Stack>
+            <Typography
+              variant="caption"
+              id="keyboard-hint"
+              sx={{
+                margin: 1,
+                display: 'flex',
+                justifyContent: 'center',
+                flexGrow: 1,
+              }}
+            >
+              Use arrow keys at the start or end of your answer to switch
+              questions.
+            </Typography>
             <Grid
               container
               rowSpacing={0}
@@ -452,37 +514,53 @@ export function AuCTF({
               {ctfContent.questions.map(
                 (option: CTFQuestion, index: number) => {
                   let grade: undefined | 0 | 1 = undefined;
-                  let defaultColor = undefined;
+
                   if (
                     Object.prototype.hasOwnProperty.call(currentGrades, index)
                   ) {
                     grade = currentGrades[index];
-                    defaultColor = grade === 0 ? 'darkRed' : 'darkGreen';
                   }
-                  //REF let theAnswer = option.typeAttributes.correctAnswer;
 
                   return (
                     <Grid
-                      className={
-                        currentQuestionIndex === index && isFocused
-                          ? 'btn-rangeos'
-                          : 'bg-zinc'
-                      }
+                      aria-pressed={currentQuestionIndex === index}
                       key={`q${index}`}
                       size={answerBoxGridSize}
                       sx={{
-                        borderColor:
-                          currentQuestionIndex === index && isFocused
-                            ? 'white'
-                            : defaultColor,
-                        borderRadius: '6px',
-                        borderStyle: 'solid',
-                        borderWidth:
-                          currentQuestionIndex === index ? '2px' : '2px',
                         display: 'flex',
                         alignItems: 'flex-start',
                         margin: '4px',
                         padding: '8px',
+
+                        borderRadius: 2,
+                        background:
+                          currentQuestionIndex === index && isFocused
+                            ? alpha(palette.primary.main, 0.5)
+                            : undefined,
+                        backgroundColor:
+                          currentQuestionIndex === index && isFocused
+                            ? undefined
+                            : defaultHighContrastColor,
+                        border:
+                          currentQuestionIndex === index && isFocused
+                            ? `2px solid ${alpha(palette.primary.main, 0.8)}`
+                            : `2px solid ${alpha(palette.primary.main, 0.4)}`,
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        color:
+                          currentQuestionIndex === index && isFocused
+                            ? 'common.white'
+                            : 'text.primaryContrast',
+                        '&:disabled': {
+                          backgroundColor: 'pink',
+                          background: 'none',
+                        },
+                        '&:hover': {
+                          background: alpha(palette.primary.main, 0.17),
+                          borderColor: alpha(palette.primary.main, 0.3),
+                          transform: 'translateY(-2px)',
+                          boxShadow: alpha(palette.primary.main, 0.3),
+                          cursor: 'pointer',
+                        },
                       }}
                       onClick={() => handleSelectQuestion(index)}
                     >
@@ -509,10 +587,8 @@ export function AuCTF({
                                 {option.title}
                               </Typography>
                             )}
-                            {grade === 0 && <ErrorIcon color="error" />}
-                            {grade === 1 && (
-                              <OutlinedFlagIcon color="success" />
-                            )}
+                            {grade === 0 && <FlagEffect isSuccess={false} />}
+                            {grade === 1 && <FlagEffect />}
                           </div>
                           <Typography
                             variant="h6"
@@ -543,8 +619,8 @@ export function AuCTF({
                           >
                             {option.question}
                           </Typography>
-                          {grade === 0 && <ErrorIcon color="error" />}
-                          {grade === 1 && <OutlinedFlagIcon color="success" />}
+                          {grade === 0 && <FlagEffect isSuccess={false} />}
+                          {grade === 1 && <FlagEffect />}
                         </>
                       )}
                     </Grid>
@@ -567,159 +643,3 @@ export function AuCTF({
 }
 
 export default AuCTF;
-
-//TODO components
-
-function QuestionInput({
-  questionIndex,
-  answer = '',
-  display,
-  grade = -1,
-  handleSubmitAnswer,
-}: {
-  grade?: number;
-  questionIndex: number;
-  answer?: AnswerType;
-  handleSubmitAnswer: (input: AnswerType) => void;
-  display?: CTFDisplay;
-}) {
-  const [theAnswer, setTheAnswer] = useState<AnswerType>(answer);
-  const [isEnabled, setIsEnabled] = useState(false);
-  const currentGrades = useSelector(getGrades);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    let grade: undefined | 0 | 1 = undefined;
-
-    if (Object.prototype.hasOwnProperty.call(currentGrades, questionIndex)) {
-      grade = currentGrades[questionIndex];
-      setIsEnabled(grade !== 1); //dont let them write over correct
-      // if (inputRef.current) {
-      //   inputRef.current.selectionEnd = inputRef.current.selectionStart;
-      // }
-    } else {
-      setIsEnabled(true);
-    }
-  }, [questionIndex, currentGrades]);
-
-  /**
-   * UE selects text when answer is populated for a new question
-   */
-  useEffect(() => {
-    setTheAnswer(answer);
-
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.select();
-      }
-    }, 100);
-  }, [answer]);
-
-  return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <TextField
-        inputRef={inputRef}
-        sx={{ position: 'relative', maxWidth: '480px', marginRight: '8px' }}
-        fullWidth={true}
-        id="me"
-        name=""
-        margin="dense"
-        variant="outlined"
-        label={
-          display?.shouldNumberQuestions
-            ? `Answer #${questionIndex + 1} `
-            : 'Answer'
-        }
-        rows={2}
-        multiline={true}
-        placeholder="Type Here"
-        value={theAnswer}
-        size="small"
-        disabled={!isEnabled}
-        slotProps={{
-          inputLabel: { shrink: true }, // always put label above box even if empty
-          input: {
-            readOnly: false, //TODO !isEnabled,
-            inputProps: { tabIndex: 1 },
-          },
-        }}
-        onChange={(event) => {
-          setTheAnswer(event.target.value);
-        }}
-        onFocus={(event) => {
-          if (inputRef.current && theAnswer) {
-            inputRef.current.select();
-          }
-        }}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter') {
-            event.stopPropagation();
-            event.preventDefault();
-            handleSubmitAnswer(theAnswer);
-          }
-        }}
-      />
-      <ButtonMainUi
-        id="enter-button"
-        startIcon={undefined}
-        tabIndex={2}
-        disabled={!isEnabled}
-        onClick={() => {
-          handleSubmitAnswer(theAnswer);
-        }}
-        className="btn-rangeos"
-      >
-        Enter
-      </ButtonMainUi>
-      {/* <button
-        id="enter-button"
-        tabIndex={2}
-        disabled={!isEnabled}
-        onClick={() => {
-          handleSubmitAnswer(theAnswer);
-        }}
-        className="btn-rangeos"
-      >
-        Enter
-      </button> */}
-    </div>
-  );
-}
-
-function ScoreLabel({
-  children,
-  label,
-  value,
-  startIconDisplay,
-  gridSize = 2.4,
-}: {
-  children?: JSX.Element;
-  label: string;
-  value: string;
-  startIconDisplay?: JSX.Element;
-  gridSize?: number;
-}) {
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        alignContent: 'center',
-        height: '40px',
-      }}
-    >
-      {label && value && <h5>{label}</h5>}
-      {startIconDisplay}
-      {label && value && <h5 style={{ marginLeft: '1px' }}>{`:`}</h5>}
-      {value && <h5 style={{ marginLeft: '4px' }}>{`${value}`}</h5>}
-      {children}
-    </Box>
-  );
-}
