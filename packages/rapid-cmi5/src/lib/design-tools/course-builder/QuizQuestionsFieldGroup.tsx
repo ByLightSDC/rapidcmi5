@@ -50,7 +50,6 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
 
   const watchQuestionType = watch(`${indexedArrayField}.type`);
   const watchQuestion = watch(`${indexedArrayField}.question`);
-  const watchGrading = watch(`${indexedArrayField}.typeAttributes.grading`);
   const watchCorrectAnswer = watch(
     `${indexedArrayField}.typeAttributes.correctAnswer`,
   );
@@ -58,33 +57,30 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
   const watchMatching = watch(`${indexedArrayField}.typeAttributes.matching`);
 
   const isQuestionValid = useMemo(() => {
-    if (!watchQuestion?.trim() || !watchQuestionType || !watchGrading)
-      return false;
+    if (!watchQuestion?.trim() || !watchQuestionType) return false;
     if (
       watchQuestionType === QuestionResponse.MultipleChoice ||
       watchQuestionType === QuestionResponse.SelectAll
     ) {
-      return (
-        Array.isArray(watchOptions) &&
-        watchOptions.length > 0 &&
-        watchOptions.every((o: any) => o.text?.trim())
-      );
+      if (!Array.isArray(watchOptions)) return false;
+      if (watchOptions.length <= 0) return false;
+      const allOptionsSet = watchOptions.every((o: any) => o.text?.trim());
+      return allOptionsSet;
     }
     if (watchQuestionType === QuestionResponse.TrueFalse) {
+      // Ensures that it is not null or undefined
       return !!watchCorrectAnswer;
     }
     if (watchQuestionType === QuestionResponse.Matching) {
-      return (
-        Array.isArray(watchMatching) &&
-        watchMatching.length > 0 &&
-        watchMatching.every((m: any) => m.option?.trim() && m.response?.trim())
-      );
+      if (!Array.isArray(watchMatching)) return false;
+      if (watchMatching.length <= 0) return false;
+      const allOptionsSet = watchMatching.every((o: any) => o.text?.trim());
+      return allOptionsSet;
     }
     return !!watchCorrectAnswer?.toString().trim();
   }, [
     watchQuestion,
     watchQuestionType,
-    watchGrading,
     watchCorrectAnswer,
     watchOptions,
     watchMatching,
