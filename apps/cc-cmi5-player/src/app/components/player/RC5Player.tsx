@@ -92,19 +92,21 @@ function RC5Player() {
   const slideContentRef = useRef<HTMLDivElement>(null);
 
   // Move focus into the slide region so NVDA starts reading from the top when a slide changes.
-  // ARIA attributes (role="region", aria-label, tabindex) are set by ariaOverridePlugin via
-  // registerRootListener, which fires synchronously when Lexical mounts the root element.
   // useEffect listens for activeTab, only fires when the active slide changes.
   useEffect(() => {
     // Wait for the new slide's editor to finish mounting before focusing
     const id = setTimeout(() => {
-      // Find the Lexical editor element — this is the element ariaOverridePlugin patches to role="region".
+      // Find the Lexical editor element (root of tabpanel).
       const el = slideContentRef.current?.querySelector<HTMLElement>(
         '[data-lexical-editor="true"]',
       );
-      // Focus it so NVDA reads from the top of the new slide.
-      // preventScroll stops the page from jumping visually when focus moves.
-      el?.focus({ preventScroll: true });
+      if (el) {
+        // tabindex="-1" is required to programmatically focus contenteditable="false"
+        el.setAttribute('tabindex', '-1');
+        // Focus so NVDA reads from the top of the new slide.
+        // preventScroll stops the page from jumping visually when focus moves.
+        el.focus({ preventScroll: true });
+      }
     }, 150);
     // Cleanup — if the user switches slides before 150ms is up, cancel the previous timeout.
     return () => clearTimeout(id);
