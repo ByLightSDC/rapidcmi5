@@ -43,6 +43,7 @@ export * from './lib/inputs/file-upload/FileUpload';
 export * from './lib/layout/SizingContext';
 export * from './lib/modals/CrudModals';
 export * from './lib/modals/ModalDialog';
+export * from './lib/modals/DynamicModal';
 export * from './lib/navigation/appHeader/AppHeaderDashboardMenu';
 export * from './lib/navigation/bookmark/Bookmarks';
 export * from './lib/navigation/bookmark/BookmarksContext';

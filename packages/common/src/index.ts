@@ -34,3 +34,5 @@ export * from './lib/types/teamConsoles';
 export * from './lib/types/projects';
 export * from './lib/types/user';
 export * from './lib/utils/dateAndTime';
+export * from './lib/types/api';
+

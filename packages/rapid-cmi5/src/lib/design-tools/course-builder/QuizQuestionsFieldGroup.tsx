@@ -1,13 +1,25 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
-import { Box, MenuItem } from '@mui/material';
-import { SlideTypeEnum, QuestionResponse, responseOptions, gradingOptions } from '@rapid-cmi5/cmi5-build-common';
-import { FormCrudType, tFormFieldRendererProps, useDisplayFocus, FormControlSelectField, FormControlTextField, FormControlCheckboxField, FormFieldArray } from '@rapid-cmi5/ui';
-
-
+import { Box, MenuItem, Tooltip } from '@mui/material';
+import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
+import {
+  SlideTypeEnum,
+  QuestionResponse,
+  responseOptions,
+  gradingOptions,
+} from '@rapid-cmi5/cmi5-build-common';
+import {
+  FormCrudType,
+  tFormFieldRendererProps,
+  useDisplayFocus,
+  FormControlSelectField,
+  FormControlTextField,
+  FormControlCheckboxField,
+  FormFieldArray,
+  ButtonModalMinorUi,
+} from '@rapid-cmi5/ui';
 
 /**
  * @interface fieldGroupProps
@@ -19,6 +31,7 @@ interface fieldGroupProps {
   crudType: FormCrudType;
   formErrors?: any;
   formProps: tFormFieldRendererProps;
+  onAddToBank?: (question: any) => void;
   rowIndex?: number;
   slideType: SlideTypeEnum;
 }
@@ -29,11 +42,53 @@ interface fieldGroupProps {
  * @returns
  */
 export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
-  const { crudType, formProps, slideType } = props;
+  const { crudType, formProps, slideType, onAddToBank } = props;
+
   const { formMethods, indexedArrayField, indexedErrors, isFocused } =
     formProps;
   const { control, getValues, setValue, trigger, watch } = formMethods;
+
   const watchQuestionType = watch(`${indexedArrayField}.type`);
+  const watchQuestion = watch(`${indexedArrayField}.question`);
+  const watchGrading = watch(`${indexedArrayField}.typeAttributes.grading`);
+  const watchCorrectAnswer = watch(
+    `${indexedArrayField}.typeAttributes.correctAnswer`,
+  );
+  const watchOptions = watch(`${indexedArrayField}.typeAttributes.options`);
+  const watchMatching = watch(`${indexedArrayField}.typeAttributes.matching`);
+
+  const isQuestionValid = useMemo(() => {
+    if (!watchQuestion?.trim() || !watchQuestionType || !watchGrading)
+      return false;
+    if (
+      watchQuestionType === QuestionResponse.MultipleChoice ||
+      watchQuestionType === QuestionResponse.SelectAll
+    ) {
+      return (
+        Array.isArray(watchOptions) &&
+        watchOptions.length > 0 &&
+        watchOptions.every((o: any) => o.text?.trim())
+      );
+    }
+    if (watchQuestionType === QuestionResponse.TrueFalse) {
+      return !!watchCorrectAnswer;
+    }
+    if (watchQuestionType === QuestionResponse.Matching) {
+      return (
+        Array.isArray(watchMatching) &&
+        watchMatching.length > 0 &&
+        watchMatching.every((m: any) => m.option?.trim() && m.response?.trim())
+      );
+    }
+    return !!watchCorrectAnswer?.toString().trim();
+  }, [
+    watchQuestion,
+    watchQuestionType,
+    watchGrading,
+    watchCorrectAnswer,
+    watchOptions,
+    watchMatching,
+  ]);
 
   const focusHelper = useDisplayFocus();
   // this effect is for focusing on question field when added as row to array
@@ -57,6 +112,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
       }
     }
   }, [watchQuestionType]);
+
   return (
     <Grid
       container
@@ -234,6 +290,20 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           />
         </Box>
       )}
+      {onAddToBank && (
+        <Tooltip title="Save this question to the quiz bank">
+          <ButtonModalMinorUi
+            aria-label="search-question-bank"
+            id="search-question-bank-button"
+            size="small"
+            onClick={() => onAddToBank(getValues(indexedArrayField))}
+            startIcon={<BookmarkAddIcon fontSize="small" />}
+            disabled={!isQuestionValid}
+          >
+            Add to Quiz Bank
+          </ButtonModalMinorUi>
+        </Tooltip>
+      )}
     </Grid>
   );
 }
@@ -242,11 +312,12 @@ interface optionFieldGroupProps extends fieldGroupProps {
   questionField: string;
   questionType: QuestionResponse;
 }
+
 function QuestionOptionsFieldGroup(props: optionFieldGroupProps) {
   const { crudType, formProps, questionField, questionType } = props;
   const { formMethods, indexedArrayField, indexedErrors, isFocused, rowIndex } =
     formProps;
-  const { control, getValues, setValue, watch } = formMethods;
+  const { control, getValues, setValue } = formMethods;
 
   const focusHelper = useDisplayFocus();
   // this effect is for focusing on text field when added as row to array
@@ -309,8 +380,7 @@ function QuestionOptionsFieldGroup(props: optionFieldGroupProps) {
 
 function QuestionMatchingFieldGroup(props: fieldGroupProps) {
   const { crudType, formProps } = props;
-  const { formMethods, indexedArrayField, indexedErrors, isFocused, rowIndex } =
-    formProps;
+  const { formMethods, indexedArrayField, indexedErrors } = formProps;
   const { control } = formMethods;
 
   return (

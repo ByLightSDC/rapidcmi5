@@ -9,17 +9,36 @@ import {
   generateAuId,
   GitUserConfig,
 } from '@rapid-cmi5/cmi5-build-common';
-import { RapidCmi5, GetScenarioFormProps } from '@rapid-cmi5/react-editor';
+import {
+  RapidCmi5,
+  GetScenarioFormProps,
+  GetQuizBankAddModalProps,
+  GetQuizBankSearchModalProps,
+} from '@rapid-cmi5/react-editor';
 import { debugLogError } from '@rapid-cmi5/ui';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useMemo } from 'react';
 import { ScenarioSelectionForm } from './shared/modals/ScenarioSelectionModal';
 import { UserConfigContext } from './contexts/UserConfigContext';
 import { AuthContext } from './contexts/AuthContext';
+import AddToQuizBankForm from './shared/modals/quizBank/AddToQuizBankForm';
+import QuizBankSearchForm from './shared/modals/quizBank/QuizBankSearchForm';
+import axios from 'axios';
 
 export function RapidCmi5Wrapper() {
   const { token, parsedUserToken } = useContext(AuthContext);
   const { gitUser, gitCredentials, ssoConfig, setGitCredentials, setGitUser } =
     useContext(UserConfigContext);
+
+  const quizBankURL = ssoConfig?.quizBankApiUrl;
+  const quizBankApiClient = useMemo(() => {
+    return axios.create({
+      baseURL: quizBankURL,
+      timeout: 10000,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }, [quizBankURL]);
 
   const handleOverrideGlobalGitConfig = (
     config?: GitUserConfig,
@@ -90,6 +109,7 @@ export function RapidCmi5Wrapper() {
         userEmail: userEmail,
         userName: userFullName,
         gitCredentials,
+        apiUser: parsedUserToken?.email?.toLowerCase(),
       }}
       downloadCmi5Player={async () => {
         const response = await fetch('/assets/cc-cmi5-player.zip');
@@ -170,6 +190,36 @@ export function RapidCmi5Wrapper() {
               />
             )
           : undefined
+      }
+      QuizBankAddModal={(props: GetQuizBankAddModalProps) =>
+        token && parsedUserToken?.email?.toLowerCase() ? (
+          <AddToQuizBankForm
+            token={token}
+            closeModal={props.closeModal}
+            formType={props.formType}
+            errors={props.errors}
+            formMethods={props.formMethods}
+            url={ssoConfig?.quizBankApiUrl}
+            question={props.question}
+            apiClient={quizBankApiClient}
+          />
+        ) : undefined
+      }
+      QuizBankSearchModal={(props: GetQuizBankSearchModalProps) =>
+        token ? (
+          <QuizBankSearchForm
+            token={token}
+            submitForm={props.submitForm}
+            formType={props.formType}
+            errors={props.errors}
+            formMethods={props.formMethods}
+            url={ssoConfig?.quizBankApiUrl}
+            closeModal={props.closeModal}
+            currentUserEmail={parsedUserToken?.email?.toLowerCase()}
+            activityType={props.activityType}
+            apiClient={quizBankApiClient}
+          />
+        ) : undefined
       }
     />
   );

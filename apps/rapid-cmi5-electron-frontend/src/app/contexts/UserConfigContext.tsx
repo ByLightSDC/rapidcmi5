@@ -69,6 +69,7 @@ function getWebSSOConfig(): SSOConfig {
     keycloakScope: config.KEYCLOAK_SCOPE || '',
     keycloakUrl: config.KEYCLOAK_URL || '',
     rangeRestApiUrl: config.DEVOPS_API_URL || '',
+    quizBankApiUrl: config.QUIZBANK_API_URL || '',
     ssoEnabled: config.KEYCLOAK_URL ? true : false,
   };
 }
@@ -93,6 +94,7 @@ export default function UserConfig({ children }: UserConfigProps) {
       keycloakScope: '',
       keycloakUrl: '',
       rangeRestApiUrl: '',
+      quizBankApiUrl: '',
       ssoEnabled: false,
     };
   });
