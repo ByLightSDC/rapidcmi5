@@ -191,35 +191,39 @@ export function RapidCmi5Wrapper() {
             )
           : undefined
       }
-      QuizBankAddModal={(props: GetQuizBankAddModalProps) =>
-        token && parsedUserToken?.email?.toLowerCase() ? (
-          <AddToQuizBankForm
-            token={token}
-            closeModal={props.closeModal}
-            formType={props.formType}
-            errors={props.errors}
-            formMethods={props.formMethods}
-            url={ssoConfig?.quizBankApiUrl}
-            question={props.question}
-            apiClient={quizBankApiClient}
-          />
-        ) : undefined
+      QuizBankAddModal={
+        token && quizBankURL && parsedUserToken?.email?.toLowerCase()
+          ? (props: GetQuizBankAddModalProps) => (
+              <AddToQuizBankForm
+                token={token}
+                closeModal={props.closeModal}
+                formType={props.formType}
+                errors={props.errors}
+                formMethods={props.formMethods}
+                url={ssoConfig?.quizBankApiUrl}
+                question={props.question}
+                apiClient={quizBankApiClient}
+              />
+            )
+          : undefined
       }
-      QuizBankSearchModal={(props: GetQuizBankSearchModalProps) =>
-        token ? (
-          <QuizBankSearchForm
-            token={token}
-            submitForm={props.submitForm}
-            formType={props.formType}
-            errors={props.errors}
-            formMethods={props.formMethods}
-            url={ssoConfig?.quizBankApiUrl}
-            closeModal={props.closeModal}
-            currentUserEmail={parsedUserToken?.email?.toLowerCase()}
-            activityType={props.activityType}
-            apiClient={quizBankApiClient}
-          />
-        ) : undefined
+      QuizBankSearchModal={
+        token && quizBankURL
+          ? (props: GetQuizBankSearchModalProps) => (
+              <QuizBankSearchForm
+                token={token}
+                submitForm={props.submitForm}
+                formType={props.formType}
+                errors={props.errors}
+                formMethods={props.formMethods}
+                url={ssoConfig?.quizBankApiUrl}
+                closeModal={props.closeModal}
+                currentUserEmail={parsedUserToken?.email?.toLowerCase()}
+                activityType={props.activityType}
+                apiClient={quizBankApiClient}
+              />
+            )
+          : undefined
       }
     />
   );

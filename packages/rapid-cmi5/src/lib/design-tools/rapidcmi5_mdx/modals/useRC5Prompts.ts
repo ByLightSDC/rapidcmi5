@@ -12,7 +12,6 @@ import {
   gitPushModalId,
   importRepoZipModalId,
   publishPcteModalId,
-  quizBankSearchModalId,
   remindFileSystem,
   revertCommitModalId,
   saveCourseFileBeforeModalId,
@@ -199,20 +198,6 @@ export const useRC5Prompts = () => {
     );
   };
 
-  const promptSearchQuizBank = (
-  ) => {
-    dispatch(
-      setModal({
-        type: quizBankSearchModalId,
-        id: null,
-        name: null,
-        meta: {
-          title: 'Select Question',
-        },
-      }),
-    );
-  };
-
   const promptDeleteCourse = (courseName: string, coursePath: string) => {
     dispatch(
       setModal({
@@ -360,6 +345,5 @@ export const useRC5Prompts = () => {
     promptNavAway,
     promptPublishPcteModal,
     promptSaveCourseFile,
-    promptSearchQuizBank
   };
 };
