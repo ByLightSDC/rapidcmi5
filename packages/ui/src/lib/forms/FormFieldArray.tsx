@@ -49,8 +49,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import MultiSelectButton, { MultiSelectButtonProps } from './MultiSelectButton';
 import { SingleSelectButtonProps, AddButton } from './AddButton';
 import { message, expanded, setExpanded } from '../redux/commonAppReducer';
-import { ButtonIcon, ButtonInfoField, ButtonInfoFormHeaderLayout } from '../utility/buttons';
-
+import {
+  ButtonIcon,
+  ButtonInfoField,
+  ButtonInfoFormHeaderLayout,
+} from '../utility/buttons';
 
 /* Style to deliminate between items */
 export enum DelimStyle {
@@ -303,8 +306,9 @@ export function FormFieldArray({
   const [shouldReorderRefresh, setShouldReorderRefresh] = useState(false); //if alt field name, update after a reorder
   const [rowFocused, setRowFocused] = useState(-1);
   const [lastEl, setLastEl] = useState<string | null>(null);
-  const [dragIndex, setDragIndex] = useState<number>(-1);
+  const [dragOverRow, setDragOverRow] = useState<number>(-1);
   const startIndex = useRef<number>(-1);
+  const insertIndexRef = useRef<number>(-1);
 
   // array may or may not be nested, in either case
   // the error is the "last" slice of the field name (e.g., certificates.usages => usages or tags => tags)
@@ -545,6 +549,7 @@ export function FormFieldArray({
    * @param {number} index
    */
   const handleDragStart = (event: DragEvent, key: string, index: number) => {
+    event.dataTransfer?.setData('text/plain', String(index));
     startIndex.current = index;
   };
 
@@ -557,11 +562,17 @@ export function FormFieldArray({
   const handleDragOver = (event: any, key: string, index: number) => {
     event.stopPropagation();
     event.preventDefault();
-    const dim = event.target.getBoundingClientRect();
-    const cy = event.clientY - dim.top;
-    const insertIndex = Math.min(cy >= 14 ? index + 1 : index, fields.length);
 
-    setDragIndex(insertIndex);
+    // Use drag direction to determine insert position:
+    // dragging down → insert after this row (index + 1), dragging up → insert before (index)
+    const draggingDown = startIndex.current < index;
+    const insertIndex = Math.min(
+      draggingDown ? index + 1 : index,
+      fields.length,
+    );
+
+    insertIndexRef.current = insertIndex;
+    setDragOverRow(index);
   };
 
   /**
@@ -571,7 +582,11 @@ export function FormFieldArray({
    * @param {number} index
    */
   const handleDragLeave = (event: DragEvent, key: string, index: number) => {
-    setDragIndex(-1);
+    // Only clear visual highlight if leaving to an element outside this row's container.
+    // Do NOT clear insertIndexRef here — it will be updated by the next dragOver or cleared by dragEnd.
+    if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+      setDragOverRow(-1);
+    }
   };
 
   /**
@@ -581,13 +596,16 @@ export function FormFieldArray({
    * @param {number} index
    */
   const handleDrop = (event: DragEvent, key: string, index: number) => {
-    if (dragIndex < 0 || startIndex.current === dragIndex) {
-      //do nothing
+    const resolvedInsertIndex = insertIndexRef.current;
+
+    if (resolvedInsertIndex < 0 || startIndex.current === resolvedInsertIndex) {
+      insertIndexRef.current = -1;
+      setDragOverRow(-1);
     } else {
       //insert
       const startField = `${arrayFieldName}[${startIndex.current}]`;
       const startData = getValues(startField);
-      const insertIndex = dragIndex;
+      const insertIndex = resolvedInsertIndex;
       const removeIndex =
         insertIndex < startIndex.current
           ? startIndex.current + 1
@@ -604,7 +622,8 @@ export function FormFieldArray({
       if (onReorderEntry) {
         onReorderEntry();
       }
-      setDragIndex(-1);
+      insertIndexRef.current = -1;
+      setDragOverRow(-1);
     }
   };
   //#endregion
@@ -919,15 +938,11 @@ export function FormFieldArray({
                           padding: '8px 0px 4px',
                           backgroundColor: (theme) =>
                             `${
-                              dragIndex === index
+                              dragOverRow === index
                                 ? theme.palette.background.paper
                                 : 'none'
                             }`,
                         }}
-                        draggable
-                        onDragStart={(event) =>
-                          handleDragStart(event, localId, index)
-                        }
                         onDragOver={(event) =>
                           handleDragOver(event, localId, index)
                         }
@@ -936,7 +951,23 @@ export function FormFieldArray({
                         }
                         onDrop={(event) => handleDrop(event, localId, index)}
                       >
-                        <DragIndicatorIcon color="primary" />
+                        <Box
+                          draggable
+                          onDragStart={(event) =>
+                            handleDragStart(event, localId, index)
+                          }
+                          onDragEnd={(event) => {
+                            insertIndexRef.current = -1;
+                            setDragOverRow(-1);
+                          }}
+                          sx={{
+                            cursor: 'grab',
+                            display: 'flex',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <DragIndicatorIcon color="primary" />
+                        </Box>
                         <ItemDisplay
                           delimStyle={delimStyle}
                           renderItem={renderItem}
@@ -983,7 +1014,7 @@ export function FormFieldArray({
                             {isListView && (
                               <Box
                                 sx={{
-                                  minWidth: 'auto',
+                                  minWidth: '2em',
                                   height: 'auto',
                                   borderStyle: 'solid',
                                   borderColor: (theme: any) =>

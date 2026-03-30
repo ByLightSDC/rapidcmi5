@@ -84,7 +84,6 @@ export const useLessonThemeStyles = (
    */
   useSignalEffect(() => {
     if (maxSlideWidth$.value) {
-      console.log('SIGNAL slide width changed', maxSlideWidth$.value);
       setMaxSlideWidth(maxSlideWidth$.value);
     }
   });

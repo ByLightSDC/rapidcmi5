@@ -139,7 +139,7 @@ export const QuizForm = ({
     formMethods: UseFormReturn,
     formState: FormStateType,
   ): JSX.Element => {
-    const { control, getValues } = formMethods;
+    const { control, getValues, setValue } = formMethods;
     const { errors } = formState;
 
     /**
@@ -147,8 +147,8 @@ export const QuizForm = ({
      */
     const handleReorderQuestions = () => {
       const questions = getValues('questions');
-      questions.forEach((question: any, index: number) => {
-        question.cmi5QuestionId = `q${index + 1}`;
+      questions.forEach((_question: any, index: number) => {
+        setValue(`questions[${index}].cmi5QuestionId`, `q${index + 1}`);
       });
     };
 
