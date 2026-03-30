@@ -15,6 +15,7 @@ import { useContext, useEffect } from 'react';
 import { ScenarioSelectionForm } from './shared/modals/ScenarioSelectionModal';
 import { UserConfigContext } from './contexts/UserConfigContext';
 import { AuthContext } from './contexts/AuthContext';
+import axios from 'axios';
 
 export function RapidCmi5Wrapper() {
   const { token, parsedUserToken } = useContext(AuthContext);
@@ -171,6 +172,29 @@ export function RapidCmi5Wrapper() {
             )
           : undefined
       }
+      codeRunnerOps={{
+        executeCode: async (content: string) => {
+          const response = await axios.get(
+            `http://localhost:8080/v1/cmi5/code-runner/languages`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
+          console.log('data', response);
+
+          return { stderr: 'failed', stdout: '' };
+        },
+        listRuntimes: async () => {
+          const response = await axios.get(
+            `http://localhost:8080/v1/cmi5/code-runner/languages`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
+          console.log('data', response);
+          return response.data;
+        },
+      }}
     />
   );
 }

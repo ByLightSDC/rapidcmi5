@@ -76,10 +76,10 @@ export const InsertActivities = () => {
           if (option.indexOf('Download') >= 0) {
             return null;
           }
-          //skip jobe
-          if (option.indexOf('Jobe') >= 0) {
-            return null;
-          }
+          // //skip jobe
+          // if (option.indexOf('Jobe') >= 0) {
+          //   return null;
+          // }
           const isDisabled = disabledActivities.includes(option);
 
           return (

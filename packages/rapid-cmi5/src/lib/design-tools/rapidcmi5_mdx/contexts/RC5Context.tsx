@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { MDXEditorMethods } from '@mdxeditor/editor';
 
-import React, {
+import {
   createContext,
   RefObject,
   useCallback,
@@ -26,7 +26,6 @@ import {
   MoveOnCriteriaEnum,
   Operation,
   CourseAU,
-  CourseBlock,
   LessonTheme,
   CourseData,
 } from '@rapid-cmi5/cmi5-build-common';

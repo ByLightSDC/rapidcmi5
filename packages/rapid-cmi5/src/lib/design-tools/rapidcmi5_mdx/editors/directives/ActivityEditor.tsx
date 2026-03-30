@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import {
   DirectiveEditorProps,
   useCellValue,
@@ -40,6 +40,7 @@ import {
 } from '@rapid-cmi5/ui';
 import { updateScenario, updateTeamScenario } from '@rapid-cmi5/react-editor';
 import ScenarioMock from './ScenarioMock';
+import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 
 /**
  * MDX Editor for Activities
@@ -63,6 +64,7 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
   const isPlayback = useCellValue(editorInPlayback$);
   const auProps = useAuContext();
   const themedDividerColor = useSelector(dividerColor);
+  const { codeRunnerOps } = useRapidCmi5Opts();
 
   // style for playback boxes
   const staticStyle = useMemo(() => {
@@ -307,8 +309,12 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
       )}
       {name === 'jobe' && fromJson && (
         <>
-          {isPlayback && (
-            <JobeInTheBox auProps={auProps} content={fromJson as JobeContent} />
+          {isPlayback && codeRunnerOps && (
+            <JobeInTheBox
+              auProps={auProps}
+              content={fromJson as JobeContent}
+              submitCode={codeRunnerOps?.executeCode}
+            />
           )}
           {!isPlayback && (
             <JobeForm

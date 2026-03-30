@@ -14,6 +14,7 @@ import {
 } from '@rapid-cmi5/ui';
 import { useContext, useEffect, useState } from 'react';
 import { GitContext } from '../GitViewer/session/GitContext';
+import { useRapidCmi5Opts } from '../GitViewer/session/RapidCmi5OptsContext';
 import DirectoryTreeView from '../GitViewer/Components/SelectedRepo/DirectoryTree';
 import CourseSelector from '../selectors/CourseSelector';
 import { Box, Stack } from '@mui/system';
@@ -74,8 +75,8 @@ export function SelectGitDialogs() {
     directoryTree,
     handleGitCommitReset,
     isElectron,
-    currentAuth,
   } = useContext(GitContext);
+  const { userAuth: currentAuth } = useRapidCmi5Opts();
 
   const { sendMessage } = useContext(RC5Context);
 

@@ -1,4 +1,5 @@
 import { GitContextProvider } from '../course-builder/GitViewer/session/GitContext';
+import { RapidCmi5OptsProvider } from '../course-builder/GitViewer/session/RapidCmi5OptsContext';
 import { RC5ContextProvider } from './contexts/RC5Context';
 import RC5Modals from './modals/RC5Modals';
 import Landing from './Landing';
@@ -36,6 +37,16 @@ export interface GetScenarioFormProps {
   errors: any;
 }
 
+export interface RuntimeCollection {
+  languageName: string;
+  versions: string[];
+}
+
+export interface CodeRunnerOps {
+  listRuntimes: () => Promise<RuntimeCollection[]>;
+  executeCode: (code: string) => Promise<{ stdout: string; stderr: string }>;
+}
+
 export interface RapidCmi5Opts {
   userAuth?: UserAuth;
   downloadCmi5Player?: () => Promise<any>;
@@ -48,6 +59,7 @@ export interface RapidCmi5Opts {
     config?: GitUserConfig,
     creds?: Credentials,
   ) => void;
+  codeRunnerOps?: CodeRunnerOps;
 }
 
 export type UserAuth = {
@@ -61,12 +73,14 @@ export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <GitContextProvider rapidCmi5Opts={rapidCmi5Opts}>
-          <RC5ContextProvider>
-            <RC5Modals />
-            <Landing showHomeButton={rapidCmi5Opts.showHomeButton} />
-          </RC5ContextProvider>
-        </GitContextProvider>
+        <RapidCmi5OptsProvider opts={rapidCmi5Opts}>
+          <GitContextProvider>
+            <RC5ContextProvider>
+              <RC5Modals />
+              <Landing showHomeButton={rapidCmi5Opts.showHomeButton} />
+            </RC5ContextProvider>
+          </GitContextProvider>
+        </RapidCmi5OptsProvider>
       </PersistGate>
     </Provider>
   );

@@ -21,11 +21,13 @@ import {
   FormControlUIProvider,
   MiniForm,
   LessonThemeContext,
-   maxFormWidths, useLessonThemeStyles
+  maxFormWidths,
+  useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { SxProps } from '@mui/system';
+import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 
 export const JobeForm = ({
   crudType,
@@ -42,6 +44,7 @@ export const JobeForm = ({
   // Get the unique rc5id from the form data for scoping ksats to individual activity
   const rc5id = defaultFormData?.rc5id;
 
+  const { codeRunnerOps } = useRapidCmi5Opts();
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
   const { outerActivitySxWithConstrainedWidthForm } = useLessonThemeStyles(
@@ -75,8 +78,42 @@ export const JobeForm = ({
     formMethods: UseFormReturn,
     formState: FormStateType,
   ): JSX.Element => {
-    const { control, setValue, trigger } = formMethods;
+    const { control, setValue, getValues, watch } = formMethods;
     const { errors } = formState;
+    const selectedLanguage = watch('programmingLanguage');
+
+    const handleLanguageChange = (language: string) => {
+      const versions = runtimeMap[language] ?? [];
+      setVersionOptions(versions);
+      setValue('languageVersion', versions[0] ?? '');
+    };
+
+    const [runtimeMap, setRuntimeMap] = useState<Record<string, string[]>>({});
+    const [programmingLanguageOptions, setProgrammingLanguageOptions] =
+      useState<string[]>([]);
+    const [versionOptions, setVersionOptions] = useState<string[]>([]);
+    const [useRuntimeDropdowns, setUseRuntimeDropdowns] = useState(false);
+
+    useEffect(() => {
+      const fetchRuntimes = async () => {
+        const runtimes = (await codeRunnerOps?.listRuntimes()) as unknown as
+          | Record<string, string[]>
+          | undefined;
+        if (!runtimes || !Object.keys(runtimes).length) return;
+        setRuntimeMap(runtimes);
+        setProgrammingLanguageOptions(Object.keys(runtimes));
+        setUseRuntimeDropdowns(true);
+
+        if (!getValues('programmingLanguage')) {
+          const firstLanguage = Object.keys(runtimes)[0];
+          const firstVersions = runtimes[firstLanguage] ?? [];
+          setVersionOptions(firstVersions);
+          setValue('programmingLanguage', firstLanguage);
+          setValue('languageVersion', firstVersions[0] ?? '');
+        }
+      };
+      fetchRuntimes();
+    }, [codeRunnerOps]);
 
     return (
       <>
@@ -106,6 +143,70 @@ export const JobeForm = ({
             ))}
           </FormControlSelectField>
         </Grid>
+
+        {useRuntimeDropdowns ? (
+          <>
+            <Grid size={5.5}>
+              <FormControlSelectField
+                control={control}
+                name={'programmingLanguage'}
+                label="Programming Language"
+                error={Boolean(errors?.programmingLanguage)}
+                helperText={errors?.programmingLanguage?.message}
+                readOnly={crudType === FormCrudType.view}
+                onSelect={handleLanguageChange}
+              >
+                {programmingLanguageOptions.map((item) => (
+                  <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </FormControlSelectField>
+            </Grid>
+
+            <Grid size={5.5}>
+              <FormControlSelectField
+                control={control}
+                name={'languageVersion'}
+                label="Version"
+                error={Boolean(errors?.languageVersion)}
+                helperText={errors?.languageVersion?.message}
+                readOnly={crudType === FormCrudType.view}
+                shouldDisableSelection={!selectedLanguage}
+              >
+                {versionOptions.map((item) => (
+                  <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>
+                ))}
+              </FormControlSelectField>
+            </Grid>
+          </>
+        ) : (
+          <>
+            <Grid size={5.5}>
+              <FormControlTextField
+                control={control}
+                name={'programmingLanguage'}
+                label="Programming Language"
+                error={Boolean(errors?.programmingLanguage)}
+                helperText={errors?.programmingLanguage?.message}
+                readOnly={crudType === FormCrudType.view}
+              />
+            </Grid>
+            <Grid size={5.5}>
+              <FormControlTextField
+                control={control}
+                name={'languageVersion'}
+                label="Version"
+                error={Boolean(errors?.languageVersion)}
+                helperText={errors?.languageVersion?.message}
+                readOnly={crudType === FormCrudType.view}
+              />
+            </Grid>
+          </>
+        )}
+
         <Grid size={11.5}>
           <FormControlTextField
             control={control}
@@ -151,10 +252,12 @@ export const JobeForm = ({
         doAction={onSaveAction}
         formTitle="Jobe In The Box"
         formWidth={null}
-        formSxProps={{
-          flexGrow: 1,
-          maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
-        } as SxProps}
+        formSxProps={
+          {
+            flexGrow: 1,
+            maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
+          } as SxProps
+        }
         getFormFields={getFormFields}
         loadingButtonText="Saving"
         shouldAutoSave={true}

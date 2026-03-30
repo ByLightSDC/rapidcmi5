@@ -16,6 +16,7 @@ import { useContext, useEffect, useMemo, useState } from 'react';
 import { Alert, Box, TextField, Typography } from '@mui/material';
 import SelectGitDialogs from '../../course-builder/modals/SelectGitDialogs';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
+import { useRapidCmi5Opts } from '../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 
 import { RootState } from '../../../redux/store';
 import { RepoState } from '../../../redux/repoManagerReducer';
@@ -26,8 +27,9 @@ export default function RC5Modals() {
   const modalObj = useSelector(modal);
   const dispatch = useDispatch();
   const { deleteLesson, sendMessage } = useContext(RC5Context);
-  const { currentGitConfig, handleDeleteCourse, handleDeleteCurrentRepo, currentAuth } =
+  const { currentGitConfig, handleDeleteCourse, handleDeleteCurrentRepo } =
     useContext(GitContext);
+  const { userAuth: currentAuth } = useRapidCmi5Opts();
 
   const { currentBranch }: RepoState = useSelector(
     (state: RootState) => state.repoManager,

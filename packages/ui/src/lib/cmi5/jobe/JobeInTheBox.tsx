@@ -15,7 +15,6 @@ import {
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 
-import useJobeGrader from './useJobeGrader';
 import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
@@ -35,14 +34,15 @@ import {
 export function JobeInTheBox({
   auProps,
   content,
+  submitCode,
 }: {
   auProps: Partial<AuContextProps>;
   content: JobeContent;
+  submitCode: (content: string) => Promise<any>;
 }) {
   const { setProgress, submitScore } = auProps;
 
   const jobeContent = content;
-  const { submitCode } = useJobeGrader(jobeContent);
   const themedDividerColor = useSelector(dividerColor);
 
   // state
@@ -54,11 +54,12 @@ export function JobeInTheBox({
   const { lessonTheme } = useContext(LessonThemeContext);
   const { blockPadding, outerActivitySxWithConstrainedWidthForm } =
     useLessonThemeStyles(lessonTheme, maxFormWidths.jobePlayback);
+    
 
   const handleSubmit = async () => {
     setSuccessStr('');
     setErrorStr('');
-    const response = await submitCode(submissionStr, jobeContent.evaluator);
+    const response = await submitCode(submissionStr + jobeContent.evaluator);
     if (response.isSuccess) {
       setSuccessStr(response.message);
       setErrorStr('');
