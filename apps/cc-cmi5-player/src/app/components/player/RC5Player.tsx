@@ -102,11 +102,11 @@ function RC5Player() {
         '[data-lexical-editor="true"]',
       );
       if (el) {
-        //       // tabindex="-1" is required to programmatically focus contenteditable="false"
-        el.setAttribute('tabindex', '-1'); // shouldnt need, literally 0 in code now
-        //       // Focus so NVDA reads from the top of the new slide.
-        //       // preventScroll stops the page from jumping visually when focus moves.
-        el.focus({ preventScroll: true }); // put this on slide content container even on tab button.
+        // tabindex="-1" is required to programmatically focus contenteditable="false"
+        el.setAttribute('tabindex', '-1');
+        // Focus so NVDA reads from the top of the new slide.
+        // preventScroll stops the page from jumping visually when focus moves.
+        el.focus({ preventScroll: true });
       }
     }, 150);
     //   // Cleanup — if the user switches slides before 150ms is up, cancel the previous timeout.
