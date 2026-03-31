@@ -94,21 +94,21 @@ function RC5Player() {
   // Move focus into the slide region so NVDA starts reading from the top when a slide changes.
   // useEffect listens for activeTab, only fires when the active slide changes.
   useEffect(() => {
-    // Wait for the new slide's editor to finish mounting before focusing
+    //   // Wait for the new slide's editor to finish mounting before focusing
     const id = setTimeout(() => {
-      // Find the Lexical editor element (root of tabpanel).
+      //     // Find the root Lexical editor element (first match = outermost = root editor)
       const el = slideContentRef.current?.querySelector<HTMLElement>(
         '[data-lexical-editor="true"]',
       );
       if (el) {
-        // tabindex="-1" is required to programmatically focus contenteditable="false"
-        el.setAttribute('tabindex', '-1');
-        // Focus so NVDA reads from the top of the new slide.
-        // preventScroll stops the page from jumping visually when focus moves.
-        el.focus({ preventScroll: true });
+        //       // tabindex="-1" is required to programmatically focus contenteditable="false"
+        el.setAttribute('tabindex', '-1'); // shouldnt need, literally 0 in code now
+        //       // Focus so NVDA reads from the top of the new slide.
+        //       // preventScroll stops the page from jumping visually when focus moves.
+        el.focus({ preventScroll: true }); // put this on slide content container even on tab button.
       }
     }, 150);
-    // Cleanup — if the user switches slides before 150ms is up, cancel the previous timeout.
+    //   // Cleanup — if the user switches slides before 150ms is up, cancel the previous timeout.
     return () => clearTimeout(id);
   }, [activeTab]);
 
@@ -371,6 +371,7 @@ function RC5Player() {
             <div
               role="tabpanel"
               aria-label="Slide content"
+              tabIndex={0}
               ref={slideContentRef}
             >
               <div id="toc-portal-target" />
