@@ -26,7 +26,7 @@ import SecurityIcon from '@mui/icons-material/Security';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import KeyIcon from '@mui/icons-material/Key';
 
-import { useContext, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 
 import CertificateManagerModal, {
   configureCertsModalId,
@@ -43,6 +43,12 @@ import ConfigureSSOForm, {
 import { AuthContext } from '../../contexts/AuthContext';
 import { UserConfigContext } from '../../contexts/UserConfigContext';
 import { configureSSOCredsModalId } from '../modals/ElectronLoginModal';
+import { useTheme } from '@emotion/react';
+import {
+  getSvgStyleIcon,
+  StyleIconTypeEnum,
+} from 'packages/rapid-cmi5/src/lib/design-tools/rapidcmi5_mdx/styles/styleSvgConstants';
+import { CustomTheme } from '../../styles/createPalette';
 
 interface UserInfoBoxProps {
   anchorEl: HTMLElement | null;
@@ -58,7 +64,7 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
   const dispatch: AppDispatch = useDispatch();
   const appThemeColor = useSelector(themeColor);
   const modalObj = useSelector(modal);
-  const { gitIcon } = useMDStyleIcons();
+
   const { logout, token } = useContext(AuthContext);
   const {
     setGitUser,
@@ -71,6 +77,14 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
 
   const [playerConfigContents, setPlayerConfigContents] = useState('');
   const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
+  const theme: CustomTheme = useTheme();
+
+  const gitIcon = useMemo(() => {
+    return getSvgStyleIcon(StyleIconTypeEnum.GIT, {
+      color: theme.palette.primary.main,
+      fontSize: 'inherit',
+    });
+  }, [theme.palette.primary.main]);
 
   // ── Modal helpers ──
 

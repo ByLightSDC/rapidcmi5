@@ -160,7 +160,8 @@ export default function CourseModals() {
             }}
             dialogContentProps={{
               sx: {
-                padding: '0px',
+                padding: '8px',
+                margin:'8px'
               },
             }}
           >

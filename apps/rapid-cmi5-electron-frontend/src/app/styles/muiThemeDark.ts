@@ -152,22 +152,23 @@ export const darkTheme = createTheme({
       styleOverrides: {
         body: {
           '*::-webkit-scrollbar-track': {
-            backgroundColor: 'transparent',
+            backgroundColor: '#212124',
           },
           '*::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb': {
-            borderRadius: '4px',
+            borderRadius: '8px',
             backgroundColor: '#808080b0',
-            borderLeft: '4px solid #2d2d2d',
+            border: '2px solid #212124',
             minHeight: '48px',
+            maxHeight: '120px',
           },
           '*::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover':
             {
-              backgroundColor: '#808080d0',
-              borderLeft: '4px solid #2d2d2d',
+              backgroundColor: '#6F96FF80',
               cursor: 'pointer',
             },
-          '*::-webkit-scrollbar, & *::-webkit-scrollbar': {
-            width: '14px',
+          '*::-webkit-scrollbar': {
+            width: '12px',
+            height: '8px',
           },
           '*::-webkit-scrollbar-corner, & *::-webkit-scrollbar-corner': {
             backgroundColor: '#transparent',

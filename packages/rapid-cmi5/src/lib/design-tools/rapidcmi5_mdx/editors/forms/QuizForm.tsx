@@ -1,6 +1,5 @@
-import { MenuItem } from '@mui/material';
+import { MenuItem, SxProps } from '@mui/material';
 import { UseFormReturn } from 'react-hook-form';
-
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
@@ -10,9 +9,37 @@ import * as yup from 'yup';
 import { QuizQuestionsFieldGroup } from '../../../course-builder/QuizQuestionsFieldGroup';
 import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
 import LrsHeaderWithDetails from './LrsStatementHelper';
-import { RC5ActivityTypeEnum, QuizContent, SlideTypeEnum, QuizCompletionEnum, MoveOnCriteriaEnum, QuestionResponse, QuestionGrading, moveOnCriteriaOptions } from '@rapid-cmi5/cmi5-build-common';
-import { ENUM_GROUP, REQUIRED_ERROR, REQUIRED_ENTRY, SPECIFY_AT_LEAST_ONE_ERROR, defaultQuestion, FormControlIntegerField, FormControlSelectField, FormControlTextField, FormControlUIProvider, FormCrudType, FormFieldArray, FormStateType, MiniForm, tFormFieldRendererProps } from '@rapid-cmi5/ui';
+import {
+  RC5ActivityTypeEnum,
+  QuizContent,
+  SlideTypeEnum,
+  QuizCompletionEnum,
+  MoveOnCriteriaEnum,
+  QuestionResponse,
+  QuestionGrading,
+  moveOnCriteriaOptions,
+} from '@rapid-cmi5/cmi5-build-common';
+import {
+  ENUM_GROUP,
+  REQUIRED_ERROR,
+  REQUIRED_ENTRY,
+  SPECIFY_AT_LEAST_ONE_ERROR,
+  defaultQuestion,
+  FormControlIntegerField,
+  FormControlSelectField,
+  FormControlTextField,
+  FormControlUIProvider,
+  FormCrudType,
+  FormFieldArray,
+  FormStateType,
+  MiniForm,
+  tFormFieldRendererProps,
+  LessonThemeContext,
+    maxFormWidths,
+  useLessonThemeStyles,
+} from '@rapid-cmi5/ui';
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
+import { useContext } from 'react';
 
 export const QuizForm = ({
   activityKind,
@@ -35,6 +62,13 @@ export const QuizForm = ({
 
   // Get the unique rc5id from the form data for scoping ksats to individual activity
   const rc5id = defaultFormData?.rc5id;
+
+  /* Lesson Theme */
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const { outerActivitySxWithConstrainedWidthForm } = useLessonThemeStyles(
+    lessonTheme,
+    maxFormWidths.quizEditor,
+  );
 
   const validationSchema = yup.object().shape({
     //cmi5QuizId: read-only field auto populated/updated
@@ -241,17 +275,25 @@ export const QuizForm = ({
   return (
     <FormControlUIProvider>
       <MiniForm
+        className="paper-activity"
+        outerSx={outerActivitySxWithConstrainedWidthForm}
         dataCache={defaultFormData}
         titleEndChildren={deleteButton}
         doAction={onSaveAction}
         formTitle={activityKind === RC5ActivityTypeEnum.quiz ? 'Quiz' : 'CTF'}
-        formWidth="800px"
+        formWidth={null}
+        formSxProps={
+          {
+            flexGrow: 1,
+            maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
+          } as SxProps
+        }
         getFormFields={getFormFields}
         loadingButtonText="Saving"
         shouldAutoSave={true}
         shouldCheckIsDirty={true}
         shouldDisplaySave={false}
-        showPaper={true}
+        showPaper={false}
         submitButtonText="Save"
         validationSchema={validationSchema}
       />

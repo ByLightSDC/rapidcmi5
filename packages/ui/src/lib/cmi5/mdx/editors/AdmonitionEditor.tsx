@@ -4,17 +4,15 @@ import {
   DirectiveDescriptor,
   DirectiveEditorProps,
   editorInFocus$,
-  insertMarkdown$,
   NestedLexicalEditor,
   syntaxExtensions$,
   useCellValues,
   useLexicalNodeRemove,
   useMdastNodeUpdater,
-  usePublisher,
 } from '@mdxeditor/editor';
 import { LexicalEditor } from 'lexical';
 import { ContainerDirective, Directives } from 'mdast-util-directive';
-import type { Paragraph, RootContent } from 'mdast';
+import type { Paragraph } from 'mdast';
 
 import {
   Accordion,
@@ -48,16 +46,12 @@ import { AdmonitionTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { SelectorMainUi } from '../../../inputs/selectors/selectors';
 import { debugLogError } from '../../../utility/logger';
 import { editorInPlayback$ } from '../state/vars';
-import { convertMarkdownToMdast, convertMdastToMarkdown } from '../util/conversion';
+import { convertMarkdownToMdast } from '../util/conversion';
 import { LessonThemeContext } from '../contexts/LessonThemeContext';
 import { resolveLessonThemeCSS } from '../../../styles/lessonThemeStyles';
-import {
-  DIRECTIVE_GUTTER_GAP,
-  DIRECTIVE_GUTTER_PADDING_RIGHT,
-} from '../constants/directiveLayout';
+import { useGutterRight } from '../plugins/shared/useGutterRight';
 import { ColorSelectionPopover } from '../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../constants/colors';
-import { RC5NestedLexicalEditor } from '../plugins/shared/RC5NestedLexicalEditor';
 
 export declare interface AdmonitionDirectiveEditorProps<
   T extends Directives = Directives,
@@ -102,8 +96,6 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   >(undefined);
   const removeNode = useLexicalNodeRemove();
   const updateMdastNode = useMdastNodeUpdater();
-  const insertMarkdown = usePublisher(insertMarkdown$);
-  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
   const [isCollapsible, setIsCollapsible] = useState(false);
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [isFocused, setIsFocused] = useState(false); //editor focused
@@ -128,6 +120,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   );
   const pendingColorRef = useRef(pendingColor);
   const skipNextCloseRebuildRef = useRef(false);
+  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
 
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const [adColor, setAdColor] = useState<
@@ -233,45 +226,6 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   /**
    * Rebuilds the admonition node with a new background color.
    */
-  const rebuildNode = useCallback(
-    async (bgColor: string) => {
-      if (!parentEditor) return;
-
-      parentEditor.update(() => {
-        const nextSibling = lexicalNode.getNextSibling();
-        if (nextSibling) {
-          nextSibling.selectStart();
-        } else {
-          lexicalNode.selectEnd();
-        }
-      });
-
-      await delay(50);
-
-      parentEditor.update(() => {
-        const attributes: Record<string, string> = {};
-        if (attCollapse) attributes['collapse'] = attCollapse;
-        if (bgColor) attributes['backgroundColor'] = bgColor;
-
-        const mdast: ContainerDirective = {
-          type: 'containerDirective',
-          name: mdastNode.name,
-          attributes,
-          children: [...mdastNode.children] as ContainerDirective['children'],
-        };
-
-        insertMarkdown(convertMdastToMarkdown(mdast as RootContent));
-      });
-
-      await delay(50);
-
-      parentEditor.update(() => {
-        lexicalNode.remove();
-      });
-    },
-    [attCollapse, insertMarkdown, lexicalNode, mdastNode, parentEditor],
-  );
-
   /**
    * Sets local state from mdast attributes
    */
@@ -350,6 +304,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
     setPendingColor(bgColor);
   }, [mdastNode]);
 
+
   const outerSx: SxProps = backgroundColor
     ? {
         boxShadow: `0 0 0 100vmax ${backgroundColor}`,
@@ -381,15 +336,11 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
       sx={{
         margin: 0,
         padding: 0,
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: isPlayback ? 0 : DIRECTIVE_GUTTER_GAP,
-        paddingRight: isPlayback ? 0 : DIRECTIVE_GUTTER_PADDING_RIGHT,
+        position: 'relative',
         ...outerSx,
       }}
     >
-      {/* Inner content box — flex:1 fills all space left of the gutter */}
-      <Box sx={{ flex: 1, minWidth: 0 }}>
+      <Box sx={{ width: '100%' }}>
         {isConfiguring && !isPlayback && (
           <SelectorMainUi
             defaultValue={defaultCollapseSel}
@@ -441,7 +392,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
                 '--basePageBg': 'transparent',
               }}
             >
-              <RC5NestedLexicalEditor<Paragraph>
+              <NestedLexicalEditor<Paragraph>
                 getContent={(node) => {
                   const theNode = convertMarkdownToMdast(
                     getTitle(mdastNode.attributes),
@@ -486,7 +437,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
               borderWidth: '1px',
             }}
           >
-            <RC5NestedLexicalEditor<ContainerDirective>
+            <NestedLexicalEditor<ContainerDirective>
               block={true}
               getContent={(node) => {
                 return node.children;
@@ -500,15 +451,17 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
         </Accordion>
       </Box>
 
-      {/* Gutter buttons — flex sibling, sits to the right of the inner box */}
+      {/* Gutter buttons — absolutely positioned outside decorator at S/M, inside at L/None */}
       {!isPlayback && (
         <Box
+          ref={gutterRef as any}
           sx={{
             backgroundColor:
               muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
             display: 'flex',
-            flexShrink: 0,
-            alignSelf: 'flex-start',
+            position: 'absolute',
+            top: backgroundColor ? blockPadding : 0,
+            right: gutterRight,
           }}
         >
           <Tooltip title="Background Color">
@@ -544,7 +497,15 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
           const latest = pendingColorRef.current;
           if (latest !== backgroundColor) {
             setBackgroundColor(latest);
-            rebuildNode(latest);
+            parentEditor.update(() => {
+              const attrs = { ...(mdastNode.attributes as Record<string, string>) };
+              if (latest) {
+                attrs['backgroundColor'] = latest;
+              } else {
+                delete attrs['backgroundColor'];
+              }
+              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+            }, { discrete: true });
           }
         }}
         lastColor={pendingColor}
@@ -559,7 +520,11 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
           skipNextCloseRebuildRef.current = true;
           setPendingColor('');
           setBackgroundColor('');
-          rebuildNode('');
+          parentEditor.update(() => {
+            const attrs = { ...(mdastNode.attributes as Record<string, string>) };
+            delete attrs['backgroundColor'];
+            lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+          }, { discrete: true });
         }}
         noneLabel="No background"
       />

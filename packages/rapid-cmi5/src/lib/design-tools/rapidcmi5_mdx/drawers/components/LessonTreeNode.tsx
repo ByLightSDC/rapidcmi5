@@ -475,6 +475,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                     marginRight:-1,
                   }}
                   onClick={(event) => {
+                    event.stopPropagation();
                     if (onAction) {
                       onAction(event, element, LessonNodeActionEnum.AddSlide);
                     }

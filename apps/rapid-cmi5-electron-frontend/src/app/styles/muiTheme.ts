@@ -145,22 +145,22 @@ export const lightTheme = createTheme({
       styleOverrides: {
         body: {
           '*::-webkit-scrollbar-track': {
-            backgroundColor: 'transparent',
+            backgroundColor: '#B7B7B7',
           },
           '*::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb': {
-            borderRadius: '4px',
-            backgroundColor: '#3C59A2',
-            border: '2px solid #dd6fff00', //inset thumb on track background color
+            borderRadius: '8px',
+            backgroundColor: '#e2e2e2',
+            border: '2px solid #B7B7B7', //inset thumb on track background color
             minHeight: '48px',
           },
           '*::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover':
             {
-              backgroundColor: '#5871AF',
-              borderLeft: '4px solid #f8f8f8',
+              backgroundColor: '#3C59A2CC',
               cursor: 'pointer',
             },
-          '*::-webkit-scrollbar, & *::-webkit-scrollbar': {
-            width: '16px',
+          '*::-webkit-scrollbar': {
+            width: '12px',
+            height: '8px',
           },
           '*::-webkit-scrollbar-corner, & *::-webkit-scrollbar-corner': {
             backgroundColor: '#transparent',

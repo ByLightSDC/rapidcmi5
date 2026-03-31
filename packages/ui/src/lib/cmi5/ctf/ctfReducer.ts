@@ -69,9 +69,6 @@ export const ctfSlice = createSlice({
   },
 });
 
-export function getCurrentCTFQuestion(state: State): number {
-  return state.auCTF.currentQuestion;
-}
 
 export function getCurrentCTFAnswer(state: State): AnswerType {
   const questionIndex = state.auCTF.currentQuestion;
@@ -112,5 +109,9 @@ export const {
   setCTFScore,
   resetCTFActivity,
 } = ctfSlice.actions;
+
+export const currentAnswers = (state: State) => state.auCTF.currentAnswers;
+export const getCurrentQuestion = (state: State): number => state.auCTF.currentQuestion;
+
 
 export const ctfReducer = ctfSlice.reducer;

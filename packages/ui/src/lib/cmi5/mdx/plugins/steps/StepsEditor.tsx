@@ -11,7 +11,7 @@ import * as Mdast from 'mdast';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { toMarkdown } from 'mdast-util-to-markdown';
 import { $getRoot } from 'lexical';
 
@@ -45,6 +45,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
+import PaletteIcon from '@mui/icons-material/Palette';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
@@ -65,6 +66,10 @@ import {
   convertMarkdownToMdast,
   convertMdastToMarkdown,
 } from '../../util/conversion';
+import { LessonThemeContext } from '../../contexts/LessonThemeContext';
+import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
+import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 
 /**
  * Steps Editor for steps directive
@@ -91,6 +96,30 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   const [title, setTitle] = useState('');
 
   const [isPlayback, readOnly] = useCellValues(editorInPlayback$, readOnly$);
+
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  const blockPadding = resolvedThemeCSS ? (resolvedThemeCSS.blockPadding ?? '0px') : '32px';
+  const hasGutter = !!resolvedThemeCSS?.maxWidth && resolvedThemeCSS.maxWidth !== '100%';
+
+  const gutterRef = useRef<HTMLDivElement>(null);
+  const [gutterRight, setGutterRight] = useState('-100px');
+  const [backgroundColor, setBackgroundColor] = useState<string>(
+    mdastNode?.attributes?.backgroundColor ?? '',
+  );
+  const [colorPickerAnchor, setColorPickerAnchor] = useState<HTMLButtonElement | null>(null);
+  const [pendingColor, setPendingColor] = useState<string>(
+    mdastNode?.attributes?.backgroundColor ?? '',
+  );
+  const pendingColorRef = useRef(pendingColor);
+  const skipNextCloseRebuildRef = useRef(false);
+
+  useEffect(() => {
+    if (gutterRef.current) {
+      const w = gutterRef.current.offsetWidth;
+      setGutterRight(`-${w + 15}px`);
+    }
+  }, []);
 
   const a11yStepProps = (index: number) => ({
     id: `step-${index}`,
@@ -191,28 +220,12 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
     setIsConfiguring(false);
     if (!parentEditor) return;
 
-    // first select AFTER the current tab
     parentEditor.update(() => {
       const nextSibling = lexicalNode.getNextSibling();
       if (nextSibling) {
         nextSibling.selectStart();
       } else {
-        const root = $getRoot();
-        const lastChild = root.getChildren().at(-1);
-        if (lastChild) {
-          // If it's a text container (like paragraph), move cursor to end
-          if ($isElementNode(lastChild)) {
-            const lastText = lastChild.getLastDescendant();
-            if (lastText) {
-              lastText.selectEnd();
-            } else {
-              lastChild.selectEnd();
-            }
-          } else {
-            // If it's just a text node
-            lastChild.selectEnd();
-          }
-        }
+        lexicalNode.selectEnd();
       }
     });
     //selection is not immediate
@@ -223,19 +236,19 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
     // tried hard to find an alternate solution that would allow me to simply update existing mdastnode, but no solution found
     // since position data is generated from markdown and mdast utilities during parsing
     parentEditor.update(() => {
+      const attributes: Record<string, string> = { color: 'transparent' };
+      if (backgroundColor) attributes['backgroundColor'] = backgroundColor;
       const mdast: ContainerDirective = {
         type: 'containerDirective',
         name: 'steps',
-        attributes: {
-          color: 'transparent',
-        },
+        attributes,
         children: [...formData],
       };
 
       const childMarkdown = convertMdastToMarkdown(mdast as Mdast.RootContent);
-
       insertMarkdown(childMarkdown);
     });
+
     //selection is not immediate
     await delay(50);
 
@@ -243,7 +256,20 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
     parentEditor.update(() => {
       lexicalNode.remove();
     });
-  }, [insertMarkdown, formData, lexicalNode, parentEditor]);
+  }, [insertMarkdown, formData, backgroundColor, lexicalNode, parentEditor]);
+
+  const handleClearColor = useCallback(() => {
+    setColorPickerAnchor(null);
+    pendingColorRef.current = '';
+    skipNextCloseRebuildRef.current = true;
+    setPendingColor('');
+    setBackgroundColor('');
+    parentEditor.update(() => {
+      const attrs = { ...mdastNode.attributes };
+      delete attrs.backgroundColor;
+      lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+    }, { discrete: true });
+  }, [lexicalNode, mdastNode, parentEditor]);
 
   /**
    * Handle Next Step
@@ -354,16 +380,36 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
     setStepCount(maxSteps);
   }, [mdastNode?.children?.length]);
 
+  // Sync backgroundColor from mdastNode
+  useEffect(() => {
+    const bgColor = mdastNode?.attributes?.backgroundColor ?? '';
+    setBackgroundColor(bgColor);
+    pendingColorRef.current = bgColor;
+    setPendingColor(bgColor);
+  }, [mdastNode]);
+
+  const outerSx: SxProps = backgroundColor
+    ? {
+        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+        clipPath: `inset(0 -100vmax 0)`,
+        backgroundColor,
+        paddingTop: blockPadding,
+        paddingBottom: blockPadding,
+      }
+    : {};
+
   /**
-   * Render Tabs and Nested Content
+   * Render Steps and Nested Content
    */
   return (
     <>
       <Box
+        {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         sx={{
           margin: 0,
           padding: 0,
           position: 'relative',
+          ...outerSx,
           ...sxProps,
         }}
       >
@@ -407,6 +453,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
               <div>
                 {!isPlayback && (
                   <Box
+                    ref={gutterRef as any}
                     sx={{
                       backgroundColor:
                         muiTheme.palette.mode === 'dark'
@@ -414,9 +461,22 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                           : '#EEEEEEe6',
                       position: 'absolute',
                       display: 'flex',
-                      right: -8,
+                      top: backgroundColor ? blockPadding : 0,
+                      right: hasGutter ? gutterRight : 0,
                     }}
                   >
+                    <Tooltip title="Background Color">
+                      <IconButton
+                        onClick={(e) => {
+                          pendingColorRef.current = backgroundColor;
+                          setPendingColor(backgroundColor);
+                          setColorPickerAnchor(e.currentTarget);
+                        }}
+                        size="small"
+                      >
+                        <PaletteIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
                     <Tooltip title="Edit Steps Settings">
                       <IconButton onClick={handleConfigure}>
                         <EditIcon />
@@ -447,6 +507,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                   borderColor: (theme: any) => `${theme.palette.divider}`,
                   borderStyle: 'solid',
                   borderWidth: '1px',
+                  backgroundColor: (theme: any) => theme.palette.background.paper,
                 }}
               >
                 <Box
@@ -473,50 +534,50 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                     'aria-label': title ? `${title} step content` : 'Step content',
                   }}
                 />
-              </Stack>
-            </StepsContext.Provider>
-            <Stack
-              direction="row"
-              spacing={1}
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignContent: 'center',
-                alignItems: 'center',
-                padding: 2,
-              }}
-            >
-              {Array.from({ length: stepCount }).map((_, index) => (
-                <ButtonIcon
-                  {...a11yStepProps(index)}
-                  name="reset-step"
-                  tooltip={`Step ${index + 1}`}
-                  props={{
-                    onClick: () => handleStepChange(index),
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignContent: 'center',
+                    alignItems: 'center',
+                    paddingTop: 2,
                   }}
-                  sxProps={{ minWidth: '32px' }}
                 >
-                  <Typography
-                    sx={{
-                      textDecoration: index === step ? 'underline' : undefined,
+                  {Array.from({ length: stepCount }).map((_, index) => (
+                    <ButtonIcon
+                      {...a11yStepProps(index)}
+                      name="reset-step"
+                      tooltip={`Step ${index + 1}`}
+                      props={{
+                        onClick: () => handleStepChange(index),
+                      }}
+                      sxProps={{ minWidth: '32px' }}
+                    >
+                      <Typography
+                        sx={{
+                          textDecoration: index === step ? 'underline' : undefined,
+                        }}
+                      >
+                        {index + 1}
+                      </Typography>
+                    </ButtonIcon>
+                  ))}
+                  <ButtonIcon
+                    id="reset-step"
+                    name="reset-step"
+                    tooltip="Start Again"
+                    props={{
+                      disabled: step === 0,
+                      onClick: handleReset,
                     }}
                   >
-                    {index + 1}
-                  </Typography>
-                </ButtonIcon>
-              ))}
-              <ButtonIcon
-                id="reset-step"
-                name="reset-step"
-                tooltip="Start Again"
-                props={{
-                  disabled: step === 0,
-                  onClick: handleReset,
-                }}
-              >
-                <RefreshIcon fontSize="medium" />
-              </ButtonIcon>
-            </Stack>
+                    <RefreshIcon fontSize="medium" />
+                  </ButtonIcon>
+                </Stack>
+              </Stack>
+            </StepsContext.Provider>
           </Stack>
 
           <ButtonIcon
@@ -545,6 +606,39 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
           </ButtonIcon>
         </Stack>
       </Box>
+
+      <ColorSelectionPopover
+        anchorEl={colorPickerAnchor}
+        onClose={() => {
+          setColorPickerAnchor(null);
+          if (skipNextCloseRebuildRef.current) {
+            skipNextCloseRebuildRef.current = false;
+            return;
+          }
+          const latest = pendingColorRef.current;
+          if (latest !== backgroundColor) {
+            setBackgroundColor(latest);
+            parentEditor.update(() => {
+              const attrs = { ...mdastNode.attributes };
+              if (latest) {
+                attrs.backgroundColor = latest;
+              } else {
+                delete attrs.backgroundColor;
+              }
+              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+            }, { discrete: true });
+          }
+        }}
+        lastColor={pendingColor}
+        palette={SHAPE_PRESET_COLORS}
+        onPickColor={(color) => {
+          pendingColorRef.current = color;
+          setPendingColor(color);
+        }}
+        onClear={handleClearColor}
+        noneLabel="No background"
+      />
+
       {isConfiguring && (
         <ModalDialog
           maxWidth="md"

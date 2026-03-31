@@ -67,7 +67,7 @@ import { GridCellDirectiveDescriptor } from './editors/directives/GridCellDirect
 import { mediaEventManager } from '../../utils/MediaEventManager';
 import { logger } from '../../debug';
 import { useSelector } from 'react-redux';
-import { auJsonSel } from '../../redux/auReducer';
+import { auJsonSel, slideWidth } from '../../redux/auReducer';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -83,6 +83,7 @@ function RC5Player() {
     `${themeSel}-theme ${themeSel}-editor nested-editable-${themeSel}`,
   );
   const [slideAnimations, setSlideAnimations] = useState<AnimationConfig[]>([]);
+  const slideWidthSel = useSelector(slideWidth);
   const auJson = useSelector(auJsonSel);
   const currentLessonTheme = auJson?.lessonTheme;
   const themeClass = useRef(
@@ -247,6 +248,18 @@ function RC5Player() {
   };
 
   /**
+   * create lesson css
+   */
+  const lessonStyleCss = useMemo(() => {
+    const css = generateLessonThemeStyleTag(
+      themeClass,
+      currentLessonTheme,
+      slideWidthSel,
+    );
+    return css;
+  }, [themeClass, currentLessonTheme, slideWidthSel]);
+
+  /**
    * Set up an event listener for the ESC key.
    * Clean up the event listener properly on unmount.
    */
@@ -359,11 +372,7 @@ function RC5Player() {
         onClick={onClickSlide}
         ref={editorContainerRef}
       >
-        {currentLessonTheme && (
-          <style>
-            {generateLessonThemeStyleTag(themeClass, currentLessonTheme)}
-          </style>
-        )}
+        {currentLessonTheme && <style>{lessonStyleCss}</style>}
         {thePlugins && thePlugins.length > 0 && (
           <LessonThemeContext.Provider
             value={{ lessonTheme: currentLessonTheme }}

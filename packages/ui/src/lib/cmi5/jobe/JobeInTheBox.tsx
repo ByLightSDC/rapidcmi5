@@ -1,4 +1,3 @@
-
 import Editor from 'react-simple-code-editor';
 // @ts-expect-error - prismjs types are not fully compatible
 import { highlight, languages } from 'prismjs/components/prism-core';
@@ -6,15 +5,32 @@ import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/themes/prism.css'; //Example style, you can use another
 
-import { Alert, AlertTitle, Box, Paper, Typography } from '@mui/material';
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  Paper,
+  SxProps,
+  Typography,
+} from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 
 import useJobeGrader from './useJobeGrader';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { AuContextProps, JobeContent, ActivityScore, RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import {
+  AuContextProps,
+  JobeContent,
+  ActivityScore,
+  RC5ActivityTypeEnum,
+} from '@rapid-cmi5/cmi5-build-common';
 import { dividerColor } from '../../redux/commonAppReducer';
 import { ButtonMainUi } from '../../utility/buttons';
+import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
+import {
+  maxFormWidths,
+  useLessonThemeStyles,
+} from '../../hooks/useLessonThemeStyles';
 
 export function JobeInTheBox({
   auProps,
@@ -33,6 +49,11 @@ export function JobeInTheBox({
   const [submissionStr, setSubmissionStr] = useState<string>('');
   const [successStr, setSuccessStr] = useState<string>('');
   const [errorStr, setErrorStr] = useState<string>('');
+
+  /* Lesson Theme */
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const { blockPadding, outerActivitySxWithConstrainedWidthForm } =
+    useLessonThemeStyles(lessonTheme, maxFormWidths.jobePlayback);
 
   const handleSubmit = async () => {
     setSuccessStr('');
@@ -130,18 +151,14 @@ export function JobeInTheBox({
     setSubmissionStr(jobeContent.student);
   }, [jobeContent]);
 
-  //REF TODO className="hover:prose-a:text-blue-500"
   return (
     <Paper
       className="paper-activity"
       variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        minWidth: '320px',
-        maxWidth: '1152px',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        marginBottom: '12px',
+        ...outerActivitySxWithConstrainedWidthForm,
+        padding: blockPadding,
       }}
     >
       {jobeContent.title && (
@@ -157,23 +174,38 @@ export function JobeInTheBox({
           {jobeContent.title}
         </Typography>
       )}
-      <Editor
-        value={submissionStr}
-        onValueChange={(code) => setSubmissionStr(code)}
-        highlight={(code) => highlight(code, languages.js)}
-        padding={10}
-        style={{
-          borderRadius: '6px',
-          borderColor: themedDividerColor,
-          borderStyle: 'solid',
-          borderWidth: '2px',
-          fontFamily: '"Fira code", "Fira Mono", monospace',
-          fontSize: 15,
-          width: '100%',
-          minHeight: '120px',
-          margin: '4px',
-        }}
-      />
+      {jobeContent.evaluator && (
+        <Editor
+          value={submissionStr}
+          onValueChange={(code) => setSubmissionStr(code)}
+          highlight={(code) => highlight(code, languages.js)}
+          padding={10}
+          style={{
+            borderRadius: '6px',
+            borderColor: themedDividerColor,
+            borderStyle: 'solid',
+            borderWidth: '2px',
+            fontFamily: '"Fira code", "Fira Mono", monospace',
+            fontSize: 15,
+            width: '100%',
+            minHeight: '120px',
+            margin: '4px',
+          }}
+        />
+      )}
+      {!jobeContent.evaluator && (
+        <Alert
+          severity="error"
+          sx={{
+            maxWidth: '480px',
+            margin: '12px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+        >
+          Jobe In The Box is missing an evaluation script.
+        </Alert>
+      )}
       {successStr && (
         <Alert
           sx={{ margin: '12px' }}
@@ -187,19 +219,17 @@ export function JobeInTheBox({
       )}
       {errorStr && (
         <Alert sx={{ margin: '12px' }} severity="error">
-          <AlertTitle>BadRequest</AlertTitle>
+          <AlertTitle>Bad Request</AlertTitle>
           {errorStr}
         </Alert>
       )}
-      <Box sx={{ margin: '4px', marginTop: '12px' }}>
-        <ButtonMainUi
-          //sx={{ margin: '4px' }}
-          disabled={false}
-          onClick={handleSubmit}
-        >
-          Submit
-        </ButtonMainUi>
-      </Box>
+      {jobeContent.evaluator && (
+        <Box sx={{ margin: '4px', marginTop: '12px' }}>
+          <ButtonMainUi disabled={false} onClick={handleSubmit}>
+            Submit
+          </ButtonMainUi>
+        </Box>
+      )}
     </Paper>
   );
 }

@@ -12,9 +12,8 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import {
-  $getRoot,
-} from 'lexical';
+
+import { $getRoot } from 'lexical';
 
 import {
   Box,
@@ -39,6 +38,7 @@ import DeleteIconButton from '../../components/DeleteIconButton';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PaletteIcon from '@mui/icons-material/Palette';
+import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
@@ -56,12 +56,11 @@ import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { useGutterRight } from '../shared/useGutterRight';
 import { getDirectiveBlockShadow } from '../../../../styles/directiveStyles';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import {
-  DIRECTIVE_GUTTER_GAP,
-  DIRECTIVE_GUTTER_PADDING_RIGHT,
   DIRECTIVE_INNER_BOX_SHADOW,
 } from '../../constants/directiveLayout';
 
@@ -106,6 +105,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   );
   // Ref so onClose always sees the latest pendingColor regardless of closure staleness.
   const pendingColorRef = useRef(pendingColor);
+  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
   // Set to true when handleClearColor already rebuilt, so onClose skips its rebuild.
   const skipNextCloseRebuildRef = useRef(false);
   const colorPickerOpen = Boolean(colorPickerAnchor);
@@ -272,14 +272,18 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   /**
    * Clears the background color
    */
-  const handleClearColor = useCallback(async () => {
+  const handleClearColor = useCallback(() => {
     setColorPickerAnchor(null);
     pendingColorRef.current = '';
     skipNextCloseRebuildRef.current = true;
     setPendingColor('');
     setBackgroundColor('');
-    await rebuildNode(formData, '');
-  }, [rebuildNode, formData]);
+    parentEditor.update(() => {
+      const attrs = { ...mdastNode.attributes };
+      delete attrs.backgroundColor;
+      lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+    }, { discrete: true });
+  }, [lexicalNode, mdastNode, parentEditor]);
 
   /**
    * Handle Change Tab
@@ -335,6 +339,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     setPendingColor(bgColor);
   }, [tab, mdastNode]);
 
+
   const dropShadow = getDirectiveBlockShadow(muiTheme);
 
   // Outer box: full-width background color band when backgroundColor is set.
@@ -363,30 +368,23 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
         boxShadow: dropShadow,
       };
 
-
   /**
    * Render Tabs and Nested Content
    */
   return (
     <>
-      {/* Outer box is a flex row: inner content expands, gutter sits to its right.
-          paddingRight: 20px keeps the gutter 20px from the right edge of the content area
-          (which equals the viewport right edge at L content width). */}
       <Box
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         sx={{
           margin: 0,
           padding: 0,
-          display: 'flex',
-          alignItems: 'center',
-          gap: isPlayback ? 0 : DIRECTIVE_GUTTER_GAP,
-          paddingRight: isPlayback ? 0 : DIRECTIVE_GUTTER_PADDING_RIGHT,
+          position: 'relative',
           ...outerSx,
           ...sxProps,
         }}
       >
-        {/* Inner content box — flex:1 fills all space left of the gutter */}
-        <Box sx={{ flex: 1, minWidth: 0, ...innerSx }}>
+        {/* Inner content box — at L/None width, paddingRight reserves space for the inside-positioned buttons */}
+        <Box sx={{ width: '100%', ...innerSx }}>
           <Tabs
             variant="fullWidth"
             sx={{ width: '100%' }}
@@ -427,9 +425,10 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
               getContent={(node) => {
                 return node.children;
               }}
-              getUpdatedMdastNode={(node, children: any) => {
-                return { ...node, children };
-              }}
+              getUpdatedMdastNode={(node, children: any) => ({
+                ...node,
+                children,
+              })}
               contentEditableProps={{
                 'aria-label': 'Tabs content',
               }}
@@ -437,15 +436,17 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
           </TabsContext.Provider>
         </Box>
 
-        {/* Gutter buttons — flex sibling, sits in the colored band to the right of the inner box */}
+        {/* Gutter buttons — absolutely positioned to the right of the decorator */}
         {!isPlayback && (
           <Box
+            ref={gutterRef as any}
             sx={{
               backgroundColor:
                 muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
               display: 'flex',
-              flexShrink: 0,
-              alignSelf: 'flex-start',
+              position: 'absolute',
+              top: backgroundColor ? blockPadding : 0,
+              right: gutterRight,
             }}
           >
             <Tooltip title="Background Color">
@@ -502,7 +503,15 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
           const latest = pendingColorRef.current;
           if (latest !== backgroundColor) {
             setBackgroundColor(latest);
-            rebuildNode(formData, latest);
+            parentEditor.update(() => {
+              const attrs = { ...mdastNode.attributes };
+              if (latest) {
+                attrs.backgroundColor = latest;
+              } else {
+                delete attrs.backgroundColor;
+              }
+              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+            }, { discrete: true });
           }
         }}
         lastColor={pendingColor}

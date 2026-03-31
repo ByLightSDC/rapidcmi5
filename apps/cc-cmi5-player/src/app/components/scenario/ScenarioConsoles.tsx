@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   rangeConsoleDataAttemptsSel,
@@ -8,23 +8,19 @@ import {
   setRangeConsoleData,
   setRangeDataAttempts,
 } from '../../redux/auReducer';
-
-// Console
-
 import { ScenarioUpdatesContext } from './ScenarioUpdatesContext';
-
-
-
 
 /* MUI */
 import {
   Alert,
   AlertTitle,
   Box,
+  Divider,
   IconButton,
   ListItemIcon,
   Paper,
   Stack,
+  SxProps,
   Tabs,
   Tooltip,
   Typography,
@@ -39,6 +35,8 @@ import TerminalIcon from '@mui/icons-material/Terminal';
 
 import {
   confirmDeleteButtonText,
+  debugRangeId,
+  debugScenarioId,
   deletePrompt,
   deleteTitle,
 } from './constants';
@@ -50,10 +48,27 @@ import { classChangeModalId } from '../CourseModals';
 import ScenarioProgress from './ScenarioProgress';
 import { useAutoGraderProgress } from './hooks/useAutoGraderProgress';
 import AutoGraderSubscription from './graph/AutoGraderSubscription';
-import { DeployedScenario, DeployedScenarioDetailStatusEnum } from '@rangeos-nx/frontend/clients/devops-api';
-import { queryKeyRangeResourceContainers, getScenarioStatusIcon, Topic, AutoGraderEvent } from '@rangeos-nx/frontend/clients/hooks';
+import {
+  DeployedScenario,
+  DeployedScenarioDetailStatusEnum,
+} from '@rangeos-nx/frontend/clients/devops-api';
+import {
+  queryKeyRangeResourceContainers,
+  getScenarioStatusIcon,
+  Topic,
+  AutoGraderEvent,
+} from '@rangeos-nx/frontend/clients/hooks';
 import { AuContextProps, ScenarioContent } from '@rapid-cmi5/cmi5-build-common';
-import { ButtonMainUi, setModal, ButtonMinorUi, OverflowTypography, TabMainUi } from '@rapid-cmi5/ui';
+import {
+  ButtonMainUi,
+  setModal,
+  ButtonMinorUi,
+  OverflowTypography,
+  TabMainUi,
+  LessonThemeContext,  maxFormWidths,
+  useLessonThemeStyles,
+} from '@rapid-cmi5/ui';
+
 
 /**
  * Slide that displays a Deployed Scenario status, VMs, Containers, and provides Consoles access
@@ -76,11 +91,22 @@ function ScenarioConsoles({
 
   const { rangeId, scenarioId } = useContext(ScenarioUpdatesContext);
 
-  // /**
-  //  * REF UE debug
-  //  */
+  //REF debug scnearioId
+  // const rangeId = debugRangeId;
+  // const scenarioId = debugScenarioId;
+
+  /* Lesson Theme */
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
+    lessonTheme,
+    maxFormWidths.scenarioPlayback,
+  );
+
+  /**
+   * REF UE debug
+   */
   // useEffect(() => {
-  //   console.log('ScenarioConsoles', scenarioId);
+  //   console.log('scenarioId', scenarioId);
   //   console.log('rangeDataError', rangeDataError);
   //   console.log('numRangeDataAttempts', '' + numRangeDataAttempts + '/5');
   //   console.log('rangeConsoleDataError', rangeConsoleDataError);
@@ -125,13 +151,11 @@ function ScenarioConsoles({
 
   return (
     <Paper
-      className="paper-activity hover:prose-a:text-blue-500 prose prose-invert"
+      className="paper-activity"
       variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        minWidth: '320px',
-        maxWidth: '1440px',
-        marginBottom: '12px',
+        ...outerActivitySxWithConstrainedWidth,
       }}
     >
       {content.introTitle && (
@@ -148,6 +172,8 @@ function ScenarioConsoles({
         </Typography>
       )}
       {content.introContent && <p>{content.introContent}</p>}
+      <Typography variant="caption">Scenario</Typography>
+
       {(!rangeDataError || numRangeDataAttempts < numRetries) &&
         (!rangeConsoleDataError || numRangeConsoleDataAttempts < numRetries) &&
         !scenarioId && <p>Loading...</p>}
@@ -216,6 +242,7 @@ function ScenarioConsoles({
             handleChangeTab={handleChangeTab}
             slideContent={content}
           />
+          <Divider sx={{ margin: 1, marginLeft: 0 }} />
           {currentTab === 0 && (
             <>
               <RangeResources />
@@ -226,7 +253,6 @@ function ScenarioConsoles({
               />
             </>
           )}
-
           {currentTab === 1 && autoGraders.length > 0 && (
             <ScenarioProgress
               autoGraders={autoGraders}
@@ -244,7 +270,7 @@ function ScenarioConsoles({
                 height: '48px',
               }}
             >
-              No AutoGraders found for this Scenario
+              No AutoGraders Found
             </Alert>
           )}
         </>
@@ -284,10 +310,15 @@ function ScenarioStatus({
   };
 
   const getScenarioStatusChild = useMemo(() => {
-    const scenarios = Object.values(getUpdates(Topic.ResourceScenario));
+    let scenarioWithStatus: Partial<DeployedScenario | null> = null;
 
-    const scenarioWithStatus: Partial<DeployedScenario> =
-      scenarios.length > 0 ? scenarios[0] : null;
+    if (debugRangeId && debugScenarioId) {
+      console.log('Debugging');
+      scenarioWithStatus = { status: 'Creating', message: 'Creating' };
+    } else {
+      const scenarios = Object.values(getUpdates(Topic.ResourceScenario));
+      scenarioWithStatus = scenarios.length > 0 ? scenarios[0] : null;
+    }
 
     // don't want to display icon when Running
     if (scenarioWithStatus) {
@@ -302,6 +333,7 @@ function ScenarioStatus({
           direction="row"
           sx={{
             padding: 0,
+            position: 'relative',
           }}
         >
           <OverflowTypography
@@ -317,7 +349,6 @@ function ScenarioStatus({
             DeployedScenarioDetailStatusEnum.Ready && (
             <ListItemIcon
               sx={{
-                marginLeft: '4px',
                 padding: 0,
                 margin: 0,
                 height: '32px',
@@ -327,36 +358,14 @@ function ScenarioStatus({
               {rowStatus.icon}
             </ListItemIcon>
           )}
-          <Box
+          <Stack
+            direction="row"
             sx={{
-              marginLeft: '0px',
-              height: '32px',
               display: 'flex',
-              flexGrow: 1,
-              justifyContent: 'flex-end',
+              alignItems: 'center',
+              minWidth: '132px',
             }}
           >
-            <Tabs
-              orientation="horizontal"
-              aria-label="Scenario Tabs"
-              sx={{ marginTop: 0 }}
-              value={currentTab}
-              onChange={handleChangeTab}
-            >
-              <TabMainUi
-                icon={<TerminalIcon color="inherit" fontSize="small" />}
-                iconPosition="start"
-                label="Consoles"
-                style={{ marginBottom: 0 }}
-              />
-              <TabMainUi
-                icon={<AutoModeIcon color="inherit" fontSize="small" />}
-                iconPosition="start"
-                label="AutoGraders"
-                style={{ marginBottom: 0 }}
-              />
-            </Tabs>
-
             <IconButton aria-label="toggle-clock" onClick={toggleClock}>
               <Tooltip
                 arrow
@@ -371,6 +380,46 @@ function ScenarioStatus({
             {isClockShowing && (
               <TimeClock startDateStr={scenarioWithStatus?.dateCreated || ''} />
             )}
+          </Stack>
+          <Box
+            sx={{
+              height: '30px',
+              display: 'flex',
+              flexGrow: 1,
+              justifyContent: 'flex-end',
+              marginLeft: '12px',
+            }}
+          >
+            <Tabs
+              orientation="horizontal"
+              aria-label="Scenario Tabs"
+              sx={{ marginTop: 0 }}
+              value={currentTab}
+              onChange={handleChangeTab}
+              slotProps={{
+                indicator: {
+                  sx: {
+                    height: 4,
+                    margin: '12px',
+                    marginLeft: '0px',
+                    marginBottom: 1,
+                  },
+                },
+              }}
+            >
+              <TabMainUi
+                icon={<TerminalIcon color="inherit" fontSize="small" />}
+                iconPosition="start"
+                label="Consoles"
+                style={{ marginBottom: 0 }}
+              />
+              <TabMainUi
+                icon={<AutoModeIcon color="inherit" fontSize="small" />}
+                iconPosition="start"
+                label="AutoGraders"
+                style={{ marginBottom: 0 }}
+              />
+            </Tabs>
           </Box>
 
           <ScenarioModals

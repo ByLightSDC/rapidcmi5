@@ -51,13 +51,9 @@ import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { useGutterRight } from '../shared/useGutterRight';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
-import {
-  DIRECTIVE_GUTTER_GAP,
-  DIRECTIVE_GUTTER_PADDING_RIGHT,
-} from '../../constants/directiveLayout';
-
 /**
  * Accordion Editor for accordion directives
  * @param param0
@@ -91,6 +87,7 @@ export const AccordionEditor: React.FC<
   );
   const pendingColorRef = useRef(pendingColor);
   const skipNextCloseRebuildRef = useRef(false);
+  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
   const colorPickerOpen = Boolean(colorPickerAnchor);
   const [isPlayback, readOnly, syntaxExtensions] = useCellValues(
     editorInPlayback$,
@@ -241,14 +238,18 @@ export const AccordionEditor: React.FC<
   /**
    * Clears the background color
    */
-  const handleClearColor = useCallback(async () => {
+  const handleClearColor = useCallback(() => {
     setColorPickerAnchor(null);
     pendingColorRef.current = '';
     skipNextCloseRebuildRef.current = true;
     setPendingColor('');
     setBackgroundColor('');
-    await rebuildNode(formData, '');
-  }, [rebuildNode, formData]);
+    parentEditor.update(() => {
+      const attrs = { ...mdastNode.attributes };
+      delete attrs.backgroundColor;
+      lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+    }, { discrete: true });
+  }, [lexicalNode, mdastNode, parentEditor]);
 
   /**
    * Updates accordion title text
@@ -300,6 +301,7 @@ export const AccordionEditor: React.FC<
     setPendingColor(bgColor);
   }, [mdastNode]);
 
+
   // Outer box: full-width background color band when backgroundColor is set.
   const outerSx: SxProps = backgroundColor
     ? {
@@ -318,22 +320,17 @@ export const AccordionEditor: React.FC<
    */
   return (
     <>
-      {/* Outer box is a flex row: inner content expands, gutter sits to its right. */}
       <Box
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         sx={{
           margin: 0,
           padding: 0,
-          display: 'flex',
-          alignItems: 'center',
-          gap: isPlayback ? 0 : DIRECTIVE_GUTTER_GAP,
-          paddingRight: isPlayback ? 0 : DIRECTIVE_GUTTER_PADDING_RIGHT,
+          position: 'relative',
           ...outerSx,
           ...sxProps,
         }}
       >
-        {/* Inner content box — flex:1 fills all space left of the gutter */}
-        <Box sx={{ flex: 1, minWidth: 0, ...innerSx }}>
+        <Box sx={{ width: '100%', ...innerSx }}>
           <NestedLexicalEditor<ContainerDirective>
             block={true}
             getContent={(node) => {
@@ -347,15 +344,17 @@ export const AccordionEditor: React.FC<
           />
         </Box>
 
-        {/* Gutter buttons — flex sibling, sits to the right of the inner box */}
+        {/* Gutter buttons — absolutely positioned outside decorator at S/M, inside at L/None */}
         {!isPlayback && (
           <Box
+            ref={gutterRef as any}
             sx={{
               backgroundColor:
                 muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
               display: 'flex',
-              flexShrink: 0,
-              alignSelf: 'flex-start',
+              position: 'absolute',
+              top: backgroundColor ? blockPadding : 0,
+              right: gutterRight,
             }}
           >
             <Tooltip title="Background Color">
@@ -408,7 +407,15 @@ export const AccordionEditor: React.FC<
           const latest = pendingColorRef.current;
           if (latest !== backgroundColor) {
             setBackgroundColor(latest);
-            rebuildNode(formData, latest);
+            parentEditor.update(() => {
+              const attrs = { ...mdastNode.attributes };
+              if (latest) {
+                attrs.backgroundColor = latest;
+              } else {
+                delete attrs.backgroundColor;
+              }
+              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+            }, { discrete: true });
           }
         }}
         lastColor={pendingColor}

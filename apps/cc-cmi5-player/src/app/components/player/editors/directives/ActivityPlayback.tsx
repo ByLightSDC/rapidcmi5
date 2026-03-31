@@ -1,17 +1,34 @@
 import React, { useState } from 'react';
 import { DirectiveEditorProps, useCellValues } from '@mdxeditor/editor';
 
-
-
 import ScenarioConsoles from '../../../scenario/ScenarioConsoles';
 import TeamScenarioExercise from '../../../team-consoles/TeamScenarioExercise';
 import { useSelector } from 'react-redux';
 import { activeTabSel } from '../../../../redux/navigationReducer';
 import { useCMI5Session } from '../../../../hooks/useCMI5Session';
+import { SlideActivityType } from '../../../../../app/types/SlideActivityStatusState';
 import { Box } from '@mui/material';
-import { AuContextProps, RC5ScenarioContent, ScenarioContent, QuizContent, CTFContent, JobeContent, TeamConsolesContent, DownloadFileData } from '@rapid-cmi5/cmi5-build-common';
-import { setProgress$, submitScore$, getActivityCache$, setActivityCache$, debugLogError, AuQuiz, AuCTF, JobeInTheBox, FileDownloadLink } from '@rapid-cmi5/ui';
-import { SlideActivityType } from 'apps/cc-cmi5-player/src/app/types/SlideActivityStatusState';
+import {
+  AuContextProps,
+  RC5ScenarioContent,
+  ScenarioContent,
+  QuizContent,
+  CTFContent,
+  JobeContent,
+  TeamConsolesContent,
+  DownloadFileData,
+} from '@rapid-cmi5/cmi5-build-common';
+import {
+  setProgress$,
+  submitScore$,
+  getActivityCache$,
+  setActivityCache$,
+  debugLogError,
+  AuQuiz,
+  AuCTF,
+  JobeInTheBox,
+  FileDownloadLink,
+} from '@rapid-cmi5/ui';
 
 /**
  * Non editable Activity View
@@ -107,10 +124,17 @@ export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
         <JobeInTheBox auProps={auProps} content={fromJson as JobeContent} />
       )}
       {name === SlideActivityType.CONSOLES && fromJson && (
-        <TeamScenarioExercise
-          auProps={auProps}
-          content={fromJson as TeamConsolesContent}
-        />
+        <>
+          <TeamScenarioExercise
+            auProps={auProps}
+            content={fromJson as TeamConsolesContent}
+          />
+          {/* REF keep for testing individual scenario UI with a deployed scenario requires ScenarioWrapper, debugRangeId, debugScenarioId
+           <ScenarioConsoles
+            auProps={auProps}
+            content={fromJson as TeamConsolesContent}
+          /> */}
+        </>
       )}
       {name === 'download' && fromJson && (
         <Box>
@@ -120,7 +144,6 @@ export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
                 fileData={fileData}
                 auDir=""
                 filePath={`./Assets/Downloads/${fileData.path}`}
-                //getLinkUrl={getLocalFileBlobUrl}
               />
             );
           })}

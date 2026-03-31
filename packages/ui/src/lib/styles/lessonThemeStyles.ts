@@ -1,4 +1,3 @@
-
 import {
   BlockPaddingEnum,
   ContentWidthEnum,
@@ -42,6 +41,7 @@ export const DEFAULT_LESSON_THEME = {
   contentWidth: ContentWidthEnum.None,
   blockPadding: BlockPaddingEnum.None,
   defaultAlignment: DefaultAlignmentEnum.Left,
+  defaultActivityAlignment: DefaultAlignmentEnum.Center,
 };
 
 /**
@@ -87,30 +87,53 @@ export function resolveLessonThemeCSS(theme?: LessonTheme): {
 export function generateLessonThemeStyleTag(
   scopedClass: string,
   theme?: LessonTheme,
+  slideWidth?: number,
 ): string {
   const css = resolveLessonThemeCSS(theme);
-  if (!css) return '';
+
+
+  // Always emit --content-margin so directive calc() expressions resolve even when no theme is set.
+  if (!css) return `.${scopedClass} { --content-margin: 0px; }`;
 
   const widthRule = css.maxWidth
     ? `
-    .${scopedClass} .mdxeditor-root-contenteditable {
-      max-width: ${css.maxWidth};
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] {
-      max-width: ${css.maxWidth};
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] [data-lexical-decorator] {
-      max-width: none;
-      margin-left: unset;
-      margin-right: unset;
-    }`
-    : '';
+  .${scopedClass} {
+    --content-margin: calc((100% - ${css.maxWidth}) / 2);
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable {
+    max-width: ${css.maxWidth};
+    margin-left: auto;
+    margin-right: auto;
+    overflow: visible;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:not(:has(.paper-activity)) {
+    max-width: ${css.maxWidth};
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:has(.paper-activity) {
+    width: calc(98vw - var(--panel-width));
+    max-width: calc(98vw - var(--panel-width));
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    overflow: visible;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] [data-lexical-decorator]:not(:has(.paper-activity)) {
+    max-width: none;
+    margin-left: unset;
+    margin-right: unset;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] {
+      --content-margin: 0px;
+  }`
+    : `
+  .${scopedClass} {
+      --content-margin: 0px;
+  }`;
 
-  const alignmentRule = `
+  const alignmentRule = css.textAlign
+    ? `
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > p,
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-paragraph="true"],
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > ul,
@@ -123,7 +146,8 @@ export function generateLessonThemeStyleTag(
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > h5,
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > h6 {
       text-align: ${css.textAlign};
-    }`;
+    }`
+    : '';
 
   // Zero margin-top on colored decorators (they carry data-bgcolor on their inner Box)
   // so the full-width band starts flush — no gap above the color. The band's own
@@ -148,5 +172,5 @@ export function generateLessonThemeStyleTag(
     }`
     : '';
 
-  return widthRule + alignmentRule + blockPaddingRule + blockBaseRule;
+  return alignmentRule + widthRule + blockPaddingRule + blockBaseRule;
 }

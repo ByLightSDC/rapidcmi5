@@ -48,7 +48,6 @@ import { RC5Context } from '../../contexts/RC5Context';
 import { ILessonNode } from '../../drawers/components/LessonTreeNode';
 import { currentAu } from '@rapid-cmi5/react-editor';
 
-
 /**
  * LessonStyle
  * Apply styles globally
@@ -73,6 +72,9 @@ export function LessonStyleDrawer() {
   const [defaultAlignment, setDefaultAlignment] =
     useState<DefaultAlignmentEnum>(DefaultAlignmentEnum.Left);
 
+  const [defaultActivityAlignment, setDefaultActivityAlignment] =
+    useState<DefaultAlignmentEnum>(DefaultAlignmentEnum.Center);
+
   const isOpen = useMemo(() => {
     return drawerMode === DRAWER_TYPE.STYLES;
   }, [drawerMode]);
@@ -83,8 +85,14 @@ export function LessonStyleDrawer() {
     changeViewMode(DRAWER_TYPE.NONE);
   }, [changeViewMode]);
 
-  const { autoHide, toggleAutoHide, handleMouseEnter, handleMouseLeave, effectiveOpen, getDrawerSx } =
-    useDrawerAutoHide('styles', isOpen, showSeq);
+  const {
+    autoHide,
+    toggleAutoHide,
+    handleMouseEnter,
+    handleMouseLeave,
+    effectiveOpen,
+    getDrawerSx,
+  } = useDrawerAutoHide('styles', isOpen, showSeq);
 
   /**
    * apply content width changes
@@ -151,6 +159,22 @@ export function LessonStyleDrawer() {
   );
 
   /**
+   * apply default alignment changes
+   */
+  const handleSetDefaultActivityAlignment = useCallback(
+    (val: DefaultAlignmentEnum) => {
+      setDefaultActivityAlignment(val);
+      if (currentLessonNode) {
+        changeLessonTheme(
+          { ...au?.lessonTheme, defaultActivityAlignment: val },
+          currentLessonNode,
+        );
+      }
+    },
+    [currentLessonNode, au],
+  );
+
+  /**
    * UE set default values from persisted lesson
    */
   useEffect(() => {
@@ -160,6 +184,9 @@ export function LessonStyleDrawer() {
       setCustomPadding(au?.lessonTheme.blockPaddingCustomValue ?? 16);
       setDefaultAlignment(
         au?.lessonTheme.defaultAlignment || DefaultAlignmentEnum.Left,
+      );
+      setDefaultActivityAlignment(
+        au?.lessonTheme.defaultActivityAlignment || DefaultAlignmentEnum.Center,
       );
     }
   }, [au, au?.lessonTheme]);
@@ -222,14 +249,24 @@ export function LessonStyleDrawer() {
           >
             Lesson Appearance
           </Typography>
-          <Tooltip title={autoHide ? 'Auto-hide on (click to pin)' : 'Auto-hide off (click to enable)'}>
+          <Tooltip
+            title={
+              autoHide
+                ? 'Auto-hide on (click to pin)'
+                : 'Auto-hide off (click to enable)'
+            }
+          >
             <IconButton
               onClick={toggleAutoHide}
               aria-label={autoHide ? 'Disable auto-hide' : 'Enable auto-hide'}
               size="small"
               sx={{ color: autoHide ? 'primary.main' : 'text.disabled' }}
             >
-              {autoHide ? <PushPinOutlinedIcon fontSize="small" /> : <PushPinIcon fontSize="small" />}
+              {autoHide ? (
+                <PushPinOutlinedIcon fontSize="small" />
+              ) : (
+                <PushPinIcon fontSize="small" />
+              )}
             </IconButton>
           </Tooltip>
           <IconButton
@@ -348,6 +385,35 @@ export function LessonStyleDrawer() {
             <Typography variant="body2" sx={{ mt: 0.5 }}>
               {defaultAlignmentLabels.get(defaultAlignment) ?? 'Left'} align
               text
+            </Typography>
+          </Grid>
+          {/* Default Activity Alignment */}
+          <Grid size={11.5} sx={{ mt: 2.5 }}>
+            <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
+              Activity Alignment
+            </Typography>
+            <ToggleButtonGroup
+              value={defaultActivityAlignment}
+              exclusive
+              onChange={(_, val) => {
+                handleSetDefaultActivityAlignment(val as DefaultAlignmentEnum);
+              }}
+              size="small"
+              fullWidth
+            >
+              <ToggleButton value={DefaultAlignmentEnum.Left}>
+                Left
+              </ToggleButton>
+              <ToggleButton value={DefaultAlignmentEnum.Center}>
+                Center
+              </ToggleButton>
+              <ToggleButton value={DefaultAlignmentEnum.Right}>
+                Right
+              </ToggleButton>
+            </ToggleButtonGroup>
+            <Typography variant="body2" sx={{ mt: 0.5 }}>
+              {defaultAlignmentLabels.get(defaultActivityAlignment) ?? 'Center'}{' '}
+              align activities
             </Typography>
           </Grid>
         </Grid>

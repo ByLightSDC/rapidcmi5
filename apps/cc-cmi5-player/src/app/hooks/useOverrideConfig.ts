@@ -128,14 +128,6 @@ export const useOverrideConfigs = () => {
               (config as any)[propToOverride] = cfg[propToOverride];
             }
 
-            logger.debug(
-              'Overrode config property',
-              {
-                property: propToOverride,
-                value: cfg[propToOverride],
-              },
-              'auManager',
-            );
           }
         }
 
@@ -144,17 +136,6 @@ export const useOverrideConfigs = () => {
             'locations'
           ] as DeploymentLocation[];
           // find this deployment in locations
-          logger.debug(
-            'Looking for deployment location',
-            {
-              currentOrigin: window.location.origin,
-              availableDeployments: deployments.map((d) => ({
-                name: d.name,
-                url: d.url,
-              })),
-            },
-            'auManager',
-          );
 
           for (let k = 0; k < deployments.length; k++) {
             if (deployments[k].url === window.location.origin) {
@@ -263,19 +244,14 @@ export const useOverrideConfigs = () => {
       logger.debug('Config after overrides', config, 'auManager');
 
       overrideDevOpsApiClient(config.DEVOPS_API_URL);
-      logger.debug(
-        'DevOps API client overridden',
-        {
-          url: config.DEVOPS_API_URL,
-        },
-        'auManager',
-      );
       dispatch(
         setAuLogo({
           dark: config.THEME.LOGO_DARK,
           light: config.THEME.LOGO_LIGHT,
         }),
       );
+
+      logger.debug('Config Success', config, 'auth');
       setIsOverridesLoaded(true);
 
       // CRITICAL FIX: Refresh logging config after overrides are loaded
@@ -292,23 +268,13 @@ export const useOverrideConfigs = () => {
       }
       // overwrite config
     } catch (e) {
-      logger.warn(
-        'Exception loading override configs',
-        { error: e, path },
-        'auManager',
-      );
-      console.log(e);
-      logger.debug(
-        'No overrides found, using defaults',
-        undefined,
-        'auManager',
-      );
       dispatch(
         setAuLogo({
           dark: config.THEME.LOGO_DARK,
           light: config.THEME.LOGO_LIGHT,
         }),
       );
+      logger.debug('Config Fail', config, 'auth');
       setIsOverridesLoaded(true);
     }
   };
