@@ -95,9 +95,9 @@ function RC5Player() {
   // Move focus into the slide region so NVDA starts reading from the top when a slide changes.
   // useEffect listens for activeTab, only fires when the active slide changes.
   useEffect(() => {
-    //   // Wait for the new slide's editor to finish mounting before focusing
+    // Wait for the new slide's editor to finish mounting before focusing
     const id = setTimeout(() => {
-      //     // Find the root Lexical editor element (first match = outermost = root editor)
+      // Find the root Lexical editor element (first match = outermost = root editor)
       const el = slideContentRef.current?.querySelector<HTMLElement>(
         '[data-lexical-editor="true"]',
       );
