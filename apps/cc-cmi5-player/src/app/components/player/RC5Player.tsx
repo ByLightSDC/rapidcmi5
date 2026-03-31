@@ -380,7 +380,6 @@ function RC5Player() {
             <div
               role="tabpanel"
               aria-label="Slide content"
-              tabIndex={0}
               ref={slideContentRef}
             >
               <div id="toc-portal-target" />
