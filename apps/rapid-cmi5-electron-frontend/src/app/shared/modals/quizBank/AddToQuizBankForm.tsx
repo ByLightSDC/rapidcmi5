@@ -15,15 +15,77 @@ import Typography from '@mui/material/Typography';
 import { Stack } from '@mui/system';
 import Grid from '@mui/material/Grid2';
 import LabelIcon from '@mui/icons-material/Label';
-import { useMemo, useState } from 'react';
-import { UseFormReturn } from 'react-hook-form';
+import { useState } from 'react';
+import { Control, FieldValues, UseFormReturn, UseFormSetValue, useWatch } from 'react-hook-form';
 import { QuizBankAddModalProps } from '@rapid-cmi5/react-editor';
-import axios from 'axios';
-import {
-  currentQuizBankApiVersion,
-  QuestionBankApiCreate,
-} from '@rapid-cmi5/cmi5-build-common';
+import { currentQuizBankApiVersion, QuestionBankApiCreate } from '@rapid-cmi5/cmi5-build-common';
 import { FormatQuestionOptions, QuestionTypeChip } from './QuestionCard';
+import { useQuizBankApi } from './useQuizBankApi';
+
+function TagInput({
+  control,
+  setValue,
+}: {
+  control: Control;
+  setValue: UseFormSetValue<FieldValues>;
+}) {
+  const tags = (useWatch({ control, name: 'tags' }) as string[]) ?? [];
+  const [tagInput, setTagInput] = useState('');
+
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if ((e.key === 'Enter' || e.key === ',') && tagInput.trim()) {
+      e.preventDefault();
+      const newTag = tagInput.trim().replace(/,$/, '');
+      if (newTag && !tags.includes(newTag)) {
+        setValue('tags', [...tags, newTag], { shouldValidate: true });
+      }
+      setTagInput('');
+    }
+  };
+
+  const handleRemoveTag = (tag: string) => {
+    setValue(
+      'tags',
+      tags.filter((t) => t !== tag),
+      { shouldValidate: true },
+    );
+  };
+
+  return (
+    <>
+      <TextField
+        fullWidth
+        size="small"
+        label="Tags — press Enter to add"
+        placeholder="Add tag..."
+        value={tagInput}
+        onChange={(e) => setTagInput(e.target.value)}
+        onKeyDown={handleTagKeyDown}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <LabelIcon fontSize="small" />
+            </InputAdornment>
+          ),
+        }}
+      />
+      {tags.length > 0 && (
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
+          {tags.map((tag) => (
+            <Chip
+              key={tag}
+              label={tag}
+              size="small"
+              color="primary"
+              variant="outlined"
+              onDelete={() => handleRemoveTag(tag)}
+            />
+          ))}
+        </Box>
+      )}
+    </>
+  );
+}
 
 export function AddToQuizBankForm({
   url,
@@ -31,41 +93,22 @@ export function AddToQuizBankForm({
   question,
   closeModal,
 }: QuizBankAddModalProps) {
-  const apiClient = useMemo(() => {
-    return axios.create({
-      baseURL: url,
-      timeout: 10000,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  }, [url]);
-
-  const addToQuizBank = async (question: QuestionBankApiCreate) => {
-    try {
-      const response = await apiClient.post(
-        '/v1/quiz-bank/question-bank',
-        { ...question },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-
-      return response.data;
-    } catch (error) {
-      console.error('Failed to add question to quiz bank', error);
-      throw error;
-    }
-  };
-
-  const [tagInput, setTagInput] = useState('');
-  const [tags, setTags] = useState<string[]>(question.tags ?? []);
+  const { addQuestion } = useQuizBankApi(url, token);
 
   const validationSchema = yup.object().shape({
     public: yup.boolean(),
+    tags: yup
+      .array()
+      .of(
+        yup
+          .string()
+          .trim()
+          .max(50, 'Each tag must be 50 characters or less'),
+      )
+      .max(20, 'You can add up to 20 tags'),
   });
 
-  const doAction = async (data: { public: boolean }) => {
+  const doAction = async (data: { public: boolean; tags: string[] }) => {
     if (!question.type) throw Error('Question type not defined');
     const newQuestion: QuestionBankApiCreate = {
       publicQuestion: data.public ?? true,
@@ -78,32 +121,17 @@ export function AddToQuizBankForm({
       matching: question.typeAttributes.matching ?? undefined,
       shuffleAnswers: question.typeAttributes.shuffleAnswers ?? undefined,
       rc5QuizBankApiVersion: currentQuizBankApiVersion,
-      tags,
+      tags: data.tags,
     };
-    await addToQuizBank(newQuestion);
+    await addQuestion(newQuestion);
     closeModal();
   };
 
   const getFormFields = (
     formMethods: UseFormReturn,
-    formState: FormStateType,
+    _formState: FormStateType,
   ): JSX.Element => {
-    const { control } = formMethods;
-
-    const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if ((e.key === 'Enter' || e.key === ',') && tagInput.trim()) {
-        e.preventDefault();
-        const newTag = tagInput.trim().replace(/,$/, '');
-        if (newTag && !tags.includes(newTag)) {
-          setTags((prev) => [...prev, newTag]);
-        }
-        setTagInput('');
-      }
-    };
-
-    const handleRemoveTag = (tag: string) => {
-      setTags((prev) => prev.filter((t) => t !== tag));
-    };
+    const { control, setValue } = formMethods;
 
     return (
       <>
@@ -129,36 +157,7 @@ export function AddToQuizBankForm({
         </Grid>
 
         <Grid size={12} sx={{ paddingTop: 1 }}>
-          <TextField
-            fullWidth
-            size="small"
-            label="Tags — press Enter to add"
-            placeholder="Add tag..."
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={handleTagKeyDown}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <LabelIcon fontSize="small" />
-                </InputAdornment>
-              ),
-            }}
-          />
-          {tags.length > 0 && (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
-              {tags.map((tag) => (
-                <Chip
-                  key={tag}
-                  label={tag}
-                  size="small"
-                  color="primary"
-                  variant="outlined"
-                  onDelete={() => handleRemoveTag(tag)}
-                />
-              ))}
-            </Box>
-          )}
+          <TagInput control={control} setValue={setValue} />
         </Grid>
 
         <Grid size={12}>
@@ -177,7 +176,6 @@ export function AddToQuizBankForm({
       <FormControlUIProvider>
         <MiniForm
           dataCache={{
-            question: question.question,
             public: true,
             tags: question.tags ?? [],
           }}

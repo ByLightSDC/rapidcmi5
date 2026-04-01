@@ -21,7 +21,7 @@ import { ScenarioSelectionForm } from './shared/modals/ScenarioSelectionModal';
 import { UserConfigContext } from './contexts/UserConfigContext';
 import { AuthContext } from './contexts/AuthContext';
 import AddToQuizBankForm from './shared/modals/quizBank/AddToQuizBankForm';
-import QuizBankSearchForm from './shared/modals/quizBank/QuizBankSearchForm';
+import QuizBankSearchForm from './shared/modals/quizBank/SearchQuizBankForm';
 import axios from 'axios';
 
 export function RapidCmi5Wrapper() {
