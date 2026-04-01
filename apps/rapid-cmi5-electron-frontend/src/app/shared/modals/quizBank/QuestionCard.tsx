@@ -9,17 +9,8 @@ import {
   Collapse,
   Divider,
   Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Alert,
-  CircularProgress,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Box, Stack } from '@mui/system';
 import { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -34,6 +25,7 @@ import {
   QuestionResponse,
   QuizQuestion,
 } from '@rapid-cmi5/cmi5-build-common';
+import { DeleteDialog } from '@rapid-cmi5/ui';
 
 const TYPE_CONFIG: Record<
   string,
@@ -290,13 +282,11 @@ export default function QuestionCard({
   onDelete?: (uuid: string) => Promise<void>;
 }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [confirmText, setConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const openConfirm = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setConfirmText('');
     setDeleteError(null);
     setConfirmOpen(true);
   };
@@ -304,7 +294,6 @@ export default function QuestionCard({
   const closeConfirm = () => {
     if (isDeleting) return;
     setConfirmOpen(false);
-    setConfirmText('');
     setDeleteError(null);
   };
 
@@ -322,107 +311,19 @@ export default function QuestionCard({
     }
   };
 
-  const canSubmit = confirmText.toLowerCase() === CONFIRM_WORD && !isDeleting;
-
   return (
     <>
-      {/* Delete confirmation dialog */}
       {onDelete && q.author === currentUser && (
-        <Dialog
-          open={confirmOpen}
-          onClose={closeConfirm}
-          maxWidth="xs"
-          fullWidth
-          onClick={(e) => e.stopPropagation()}
-        >
-          <DialogTitle
-            sx={{ display: 'flex', alignItems: 'center', gap: 1, pb: 1 }}
-          >
-            <WarningAmberIcon color="error" fontSize="small" />
-            Delete Question
-          </DialogTitle>
-          <DialogContent sx={{ pt: 0 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-              You are about to permanently delete:
-            </Typography>
-            <Box
-              sx={{
-                px: 1.5,
-                py: 1,
-                mb: 2,
-                borderRadius: 1,
-                bgcolor: 'action.hover',
-                border: '1px solid',
-                borderColor: 'divider',
-              }}
-            >
-              <Typography
-                variant="body2"
-                fontWeight={600}
-                sx={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 3,
-                  WebkitBoxOrient: 'vertical',
-                }}
-              >
-                {q.question}
-              </Typography>
-            </Box>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              Type <strong>{CONFIRM_WORD}</strong> to confirm:
-            </Typography>
-            <TextField
-              autoFocus
-              autoComplete="off"
-              size="small"
-              fullWidth
-              placeholder={`Type "${CONFIRM_WORD}" to confirm`}
-              value={confirmText}
-              onChange={(e) => setConfirmText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && canSubmit) handleConfirmDelete();
-                if (e.key === 'Escape') closeConfirm();
-              }}
-              error={
-                confirmText.length > 0 &&
-                confirmText.toLowerCase() !== CONFIRM_WORD
-              }
-              sx={{ mb: 2 }}
-              inputProps={{
-                'data-testid': 'delete-confirm-input',
-                spellCheck: false,
-              }}
-            />
-            <Alert severity="warning">
-              This action is permanent and cannot be undone.
-            </Alert>
-            {deleteError && (
-              <Alert severity="error" sx={{ mt: 1 }}>
-                {deleteError}
-              </Alert>
-            )}
-          </DialogContent>
-          <DialogActions sx={{ px: 3, pb: 2 }}>
-            <Button onClick={closeConfirm} disabled={isDeleting}>
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              disabled={!canSubmit}
-              onClick={handleConfirmDelete}
-              startIcon={
-                isDeleting ? (
-                  <CircularProgress size={14} color="inherit" />
-                ) : undefined
-              }
-            >
-              {isDeleting ? 'Deleting…' : 'Delete'}
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <DeleteDialog
+          confirmOpen={confirmOpen}
+          closeConfirm={closeConfirm}
+          objectType="Question"
+          confirmWord={CONFIRM_WORD}
+          itemLabel={q.question}
+          onConfirm={handleConfirmDelete}
+          isDeleting={isDeleting}
+          error={deleteError ?? undefined}
+        />
       )}
 
       <Card

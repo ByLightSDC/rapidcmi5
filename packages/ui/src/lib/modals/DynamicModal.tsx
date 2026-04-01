@@ -1,3 +1,7 @@
+/*
+  This modal is for using with dynamic search data, most likely interacting with an API
+*/
+
 import { useForm, Controller } from 'react-hook-form';
 import { useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 /* MUI */
@@ -601,8 +605,12 @@ export function DynamicModal<T>({
                         }}
                         onClick={() => handleMultiToggle(id)}
                       >
-                        {renderItem(item, isSelected, isExpanded, (e) =>
-                          handleToggleExpand(id, e), handleDeleteItem,
+                        {renderItem(
+                          item,
+                          isSelected,
+                          isExpanded,
+                          (e) => handleToggleExpand(id, e),
+                          handleDeleteItem,
                         )}
                       </Box>
                     </Grow>
