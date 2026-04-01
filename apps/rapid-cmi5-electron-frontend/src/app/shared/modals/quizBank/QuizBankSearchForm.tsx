@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { DynamicModal } from '@rapid-cmi5/ui';
-import QuestionCard from './Question';
+import QuestionCard from './QuestionCard';
 import {
   QuestionBankApi,
   RC5ActivityTypeEnum,

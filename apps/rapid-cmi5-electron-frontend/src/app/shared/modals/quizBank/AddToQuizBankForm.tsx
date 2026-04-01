@@ -23,7 +23,7 @@ import {
   currentQuizBankApiVersion,
   QuestionBankApiCreate,
 } from '@rapid-cmi5/cmi5-build-common';
-import { FormatQuestionOptions, QuestionTypeChip } from './Question';
+import { FormatQuestionOptions, QuestionTypeChip } from './QuestionCard';
 
 export function AddToQuizBankForm({
   url,

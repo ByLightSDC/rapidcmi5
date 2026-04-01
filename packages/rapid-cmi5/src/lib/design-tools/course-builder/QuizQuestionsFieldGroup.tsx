@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from 'react';
+import { useWatch } from 'react-hook-form';
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
@@ -9,6 +10,8 @@ import {
   QuestionResponse,
   responseOptions,
   gradingOptions,
+  QuizOption,
+  MatchingOption,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   FormCrudType,
@@ -46,15 +49,31 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
 
   const { formMethods, indexedArrayField, indexedErrors, isFocused } =
     formProps;
-  const { control, getValues, setValue, trigger, watch } = formMethods;
+  const { control, getValues, setValue, trigger } = formMethods;
 
-  const watchQuestionType = watch(`${indexedArrayField}.type`);
-  const watchQuestion = watch(`${indexedArrayField}.question`);
-  const watchCorrectAnswer = watch(
-    `${indexedArrayField}.typeAttributes.correctAnswer`,
-  );
-  const watchOptions = watch(`${indexedArrayField}.typeAttributes.options`);
-  const watchMatching = watch(`${indexedArrayField}.typeAttributes.matching`);
+  // the watch from form methods do not work very well
+  // using the react hook form method allowed for the form to be much
+  // more reactive
+  const watchQuestionType = useWatch({
+    control,
+    name: `${indexedArrayField}.type`,
+  });
+  const watchQuestion = useWatch({
+    control,
+    name: `${indexedArrayField}.question`,
+  }) as string;
+  const watchCorrectAnswer = useWatch({
+    control,
+    name: `${indexedArrayField}.typeAttributes.correctAnswer`,
+  }) as string;
+  const watchOptions = useWatch({
+    control,
+    name: `${indexedArrayField}.typeAttributes.options`,
+  }) as QuizOption[] | undefined;
+  const watchMatching = useWatch({
+    control,
+    name: `${indexedArrayField}.typeAttributes.matching`,
+  }) as MatchingOption[] | undefined;
 
   const isQuestionValid = useMemo(() => {
     if (!watchQuestion?.trim() || !watchQuestionType) return false;
@@ -64,8 +83,10 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
     ) {
       if (!Array.isArray(watchOptions)) return false;
       if (watchOptions.length <= 0) return false;
-      const allOptionsSet = watchOptions.every((o: any) => o.text?.trim());
-      return allOptionsSet;
+      const allOptionsSet = watchOptions.every((o) => o.text?.trim());
+      const atLeastOneCorrect = watchOptions.some((o) => o.correct);
+
+      return allOptionsSet && atLeastOneCorrect;
     }
     if (watchQuestionType === QuestionResponse.TrueFalse) {
       // Ensures that it is not null or undefined
@@ -74,7 +95,11 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
     if (watchQuestionType === QuestionResponse.Matching) {
       if (!Array.isArray(watchMatching)) return false;
       if (watchMatching.length <= 0) return false;
-      const allOptionsSet = watchMatching.every((o: any) => o.text?.trim());
+
+      const allOptionsSet = watchMatching.every(
+        (o) => o.option?.trim() && o.response?.trim(),
+      );
+
       return allOptionsSet;
     }
     return !!watchCorrectAnswer?.toString().trim();
