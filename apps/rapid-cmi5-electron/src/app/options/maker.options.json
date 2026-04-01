@@ -32,7 +32,7 @@
         ]
       }
     ],
-    "icon": "assets/icon.ico"
+    "icon": "dist/apps/rapid-cmi5-electron/assets/icon.ico"
   },
   "linux": {
     "target": [
@@ -45,7 +45,7 @@
       }
     ],
     "category": "Education",
-    "icon": "assets/icon.png"
+    "icon": "dist/apps/rapid-cmi5-electron/assets/icon.png"
   },
   "mac": {
     "target": [
@@ -58,6 +58,6 @@
       }
     ],
     "category": "public.app-category.education",
-    "icon": "assets/icon.icns"
+    "icon": "dist/apps/rapid-cmi5-electron/assets/icon.icns"
   }
 }
