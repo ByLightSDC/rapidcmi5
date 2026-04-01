@@ -18,7 +18,7 @@ import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import LockIcon from '@mui/icons-material/Lock';
-import { QuestionBankApi, QuestionResponse, QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
+import { convertFromApi, QuestionBankApi, QuestionResponse, QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
 
 /* ------------------------------------------------------------------ */
 /*  Type styling config                                                */
@@ -298,7 +298,7 @@ export default function QuestionCard({
   onDelete?: (uuid: string) => void;
 }) {
   const typeAccent =
-    TYPE_CONFIG[q.quizQuestion?.type]?.accent ?? 'transparent';
+    TYPE_CONFIG[q.questionType]?.accent ?? 'transparent';
 
   return (
     <Card
@@ -382,7 +382,7 @@ export default function QuestionCard({
                 }}
               >
                 {q.author && <AuthorChip author={q.author} />}
-                {q.author && q.quizQuestion?.type && (
+                {q.author && q.questionType && (
                   <Box
                     sx={{
                       width: '1px',
@@ -391,10 +391,10 @@ export default function QuestionCard({
                     }}
                   />
                 )}
-                {q.quizQuestion?.type && (
-                  <QuestionTypeChip type={q.quizQuestion.type} />
+                {q.questionType && (
+                  <QuestionTypeChip type={q.questionType} />
                 )}
-                {!q.public && <PrivateBadge />}
+                {!q.publicQuestion && <PrivateBadge />}
                 {q.tags?.map((tag) => (
                   <Chip
                     key={tag}
@@ -466,14 +466,14 @@ export default function QuestionCard({
                 Edited: {new Date(q.dateEdited).toLocaleDateString()}
               </Typography>
             )}
-            {q.rc5Version && (
+            {q.rc5QuizBankApiVersion && (
               <Typography variant="caption" color="text.secondary">
-                version: {q.rc5Version}
+                version: {q.rc5QuizBankApiVersion}
               </Typography>
             )}
           </Box>
 
-          <FormatQuestionOptions q={q.quizQuestion as QuizQuestion} />
+          <FormatQuestionOptions q={convertFromApi(q)} />
         </Box>
       </Collapse>
     </Card>

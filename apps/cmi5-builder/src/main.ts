@@ -313,7 +313,7 @@ program
 
 program.parse(process.argv);
 
-async function buildCmi5(inputPath: string, outputPath: string, overrideData?: CourseMeta, convert: boolean = false) {
+async function buildCmi5(inputPath: string, outputPath: string, overrideData?: CourseMeta, convert = false) {
   console.log('📁  Course path:', inputPath);
   console.log('▶️  Dist path (Built CMI5 Player):', outputPath);
 

@@ -69,7 +69,7 @@ export function ReviewAnswers({
               <p>You answered: </p>
 
               <div
-                className={`bg-blue-800 px-4 py-1 rounded-xl ${getReviewIndication(
+               className={`bg-blue-800 px-4 py-1 rounded-xl ${getReviewIndication(
                   question,
                   allAnswers[qindex] as number,
                 )}`}

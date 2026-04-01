@@ -21,6 +21,7 @@ import {
   moveOnCriteriaOptions,
   QuizQuestion,
   QuestionBankApi,
+  convertFromApi,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   ENUM_GROUP,
@@ -40,7 +41,7 @@ import {
   ButtonModalMinorUi,
   useToaster,
   LessonThemeContext,
-    maxFormWidths,
+  maxFormWidths,
   useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
@@ -173,14 +174,9 @@ export const QuizForm = ({
       question: QuestionBankApi,
       index: number,
     ): QuizQuestion => {
-      const data = requireField(question.quizQuestion, 'quizQuestion');
-
-      return {
-        question: requireField(data.question, 'question'),
-        type: requireField(data.type, 'type'),
-        typeAttributes: requireField(data.typeAttributes, 'typeAttributes'),
-        cmi5QuestionId: data.cmi5QuestionId ?? `q${index + 1}`,
-      };
+      const converted = convertFromApi(question);
+      converted.cmi5QuestionId = `q${index + 1}`;
+      return converted;
     };
 
     const handleModalResponse = (selectedQuestions: QuestionBankApi[]) => {
@@ -286,17 +282,19 @@ export const QuizForm = ({
             allowSingleItemView={true}
             arrayFieldName={`questions`}
             additionalButtons={[
-              ...(QuizBankSearchModal ? [
-                <ButtonModalMinorUi
-                  aria-label="search-question-bank"
-                  id="search-question-bank-button"
-                  size="small"
-                  onClick={() => setIsSearchBankOpen(true)}
-                  startIcon={<SearchIcon fontSize="small" />}
-                >
-                  Quiz Bank
-                </ButtonModalMinorUi>,
-              ] : []),
+              ...(QuizBankSearchModal
+                ? [
+                    <ButtonModalMinorUi
+                      aria-label="search-question-bank"
+                      id="search-question-bank-button"
+                      size="small"
+                      onClick={() => setIsSearchBankOpen(true)}
+                      startIcon={<SearchIcon fontSize="small" />}
+                    >
+                      Quiz Bank
+                    </ButtonModalMinorUi>,
+                  ]
+                : []),
             ]}
             arrayRenderItem={(props: tFormFieldRendererProps) => {
               return (

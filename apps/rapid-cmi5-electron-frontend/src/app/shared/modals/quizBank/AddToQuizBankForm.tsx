@@ -19,7 +19,10 @@ import { useMemo, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { QuizBankAddModalProps } from '@rapid-cmi5/react-editor';
 import axios from 'axios';
-import { QuestionBankApiCreate } from '@rapid-cmi5/cmi5-build-common';
+import {
+  currentQuizBankApiVersion,
+  QuestionBankApiCreate,
+} from '@rapid-cmi5/cmi5-build-common';
 import { FormatQuestionOptions, QuestionTypeChip } from './Question';
 
 export function AddToQuizBankForm({
@@ -62,14 +65,19 @@ export function AddToQuizBankForm({
     public: yup.boolean(),
   });
 
-  const doAction = async (data: any) => {
+  const doAction = async (data: { public: boolean }) => {
     if (!question.type) throw Error('Question type not defined');
     const newQuestion: QuestionBankApiCreate = {
-      public: data.public ?? true,
+      publicQuestion: data.public ?? true,
       questionType: question.type,
       question: question.question,
-      quizQuestion: question,
-      rc5Version: '1',
+      cmi5QuestionId: question.cmi5QuestionId,
+      correctAnswer: question.typeAttributes.correctAnswer,
+      grading: question.typeAttributes.grading,
+      options: question.typeAttributes.options ?? undefined,
+      matching: question.typeAttributes.matching ?? undefined,
+      shuffleAnswers: question.typeAttributes.shuffleAnswers ?? undefined,
+      rc5QuizBankApiVersion: currentQuizBankApiVersion,
       tags,
     };
     await addToQuizBank(newQuestion);
@@ -120,7 +128,7 @@ export function AddToQuizBankForm({
           </Box>
         </Grid>
 
-        <Grid size={12} sx={{paddingTop: 1}}>
+        <Grid size={12} sx={{ paddingTop: 1 }}>
           <TextField
             fullWidth
             size="small"
