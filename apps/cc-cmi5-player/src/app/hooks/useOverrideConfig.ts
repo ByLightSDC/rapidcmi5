@@ -58,6 +58,7 @@ export const useOverrideConfigs = () => {
     'SLIDE_BACKGROUND',
     'LOGO_DARK',
     'LOGO_LIGHT',
+    'LOGO_WIDTH',
   ];
 
   /**
@@ -127,7 +128,6 @@ export const useOverrideConfigs = () => {
             } else {
               (config as any)[propToOverride] = cfg[propToOverride];
             }
-
           }
         }
 
@@ -248,6 +248,7 @@ export const useOverrideConfigs = () => {
         setAuLogo({
           dark: config.THEME.LOGO_DARK,
           light: config.THEME.LOGO_LIGHT,
+          width: config.THEME.LOGO_WIDTH,
         }),
       );
 
@@ -272,6 +273,7 @@ export const useOverrideConfigs = () => {
         setAuLogo({
           dark: config.THEME.LOGO_DARK,
           light: config.THEME.LOGO_LIGHT,
+          width: config.THEME.LOGO_WIDTH,
         }),
       );
       logger.debug('Config Fail', config, 'auth');
