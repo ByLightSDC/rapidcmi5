@@ -1,35 +1,18 @@
 {
-  "$ref": "#/definitions/DownloadFilesContent",
+  "$ref": "#/definitions/CodeRunnerContent",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "DownloadFileData": {
+    "CodeRunnerContent": {
       "additionalProperties": false,
       "properties": {
-        "name": {
+        "cmi5QuizId": {
           "type": "string"
         },
-        "path": {
+        "description": {
           "type": "string"
         },
-        "type": {
+        "evaluator": {
           "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "path",
-        "type"
-      ],
-      "type": "object"
-    },
-    "DownloadFilesContent": {
-      "additionalProperties": false,
-      "properties": {
-        "files": {
-          "items": {
-            "$ref": "#/definitions/DownloadFileData"
-          },
-          "type": "array"
         },
         "ksats": {
           "items": {
@@ -37,15 +20,33 @@
           },
           "type": "array"
         },
+        "languageVersion": {
+          "type": "string"
+        },
         "moveOnCriteria": {
           "$ref": "#/definitions/MoveOnCriteriaEnum"
         },
+        "programmingLanguage": {
+          "type": "string"
+        },
         "rc5id": {
+          "type": "string"
+        },
+        "student": {
+          "type": "string"
+        },
+        "title": {
           "type": "string"
         }
       },
       "required": [
-        "files"
+        "cmi5QuizId",
+        "description",
+        "evaluator",
+        "languageVersion",
+        "programmingLanguage",
+        "student",
+        "title"
       ],
       "type": "object"
     },
