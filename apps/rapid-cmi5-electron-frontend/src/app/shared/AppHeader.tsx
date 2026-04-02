@@ -49,6 +49,8 @@ export default function AppHeader() {
     return (
       <Stack direction="row" sx={{ paddingLeft: '4px' }}>
         <svg
+          aria-hidden="true"
+          focusable="false"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 210 194"
           height={21.85}
@@ -59,6 +61,8 @@ export default function AppHeader() {
           <polygon points="36.07 112.17 119.08 142.81 191.17 46.48 119.08 154.23 36.07 112.17" />
         </svg>
         <svg
+          aria-hidden="true"
+          focusable="false"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="236 0 716 194"
           height={20}
@@ -104,25 +108,6 @@ export default function AppHeader() {
             }}
           >
             {logoIcon}
-            {/* <AppLogo
-              assetId="rapid-cmi5"
-              isNavOpen={false}
-              appThemeColor={appThemeColor}
-            /> */}
-
-            {/* <Typography
-              variant="body2"
-              sx={{
-                fontWeight: 500,
-                fontSize: '15px',
-                letterSpacing: '0.02em',
-                color: (theme: any) => `${theme.header.buttonColor}`,
-                userSelect: 'none',
-                opacity: 0.9,
-              }}
-            >
-              Rapid CMI5
-            </Typography> */}
           </Box>
 
           {/* Center section - could add breadcrumbs or title here */}
