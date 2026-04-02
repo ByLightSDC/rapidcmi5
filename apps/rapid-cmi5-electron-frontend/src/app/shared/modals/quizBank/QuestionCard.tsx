@@ -100,9 +100,28 @@ function PrivateBadge() {
     />
   );
 }
-
 export function FormatQuestionOptions({ q }: { q: QuizQuestion }) {
   const { type, typeAttributes } = q;
+
+  const renderOptionBadge = (label: string, selected = false) => (
+    <Box
+      sx={{
+        width: 22,
+        height: 22,
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bgcolor: selected ? 'success.main' : 'action.selected',
+        color: selected ? '#fff' : 'text.secondary',
+        fontSize: '0.65rem',
+        fontWeight: 700,
+        flexShrink: 0,
+      }}
+    >
+      {label}
+    </Box>
+  );
 
   if (
     type === QuestionResponse.MultipleChoice ||
@@ -110,55 +129,45 @@ export function FormatQuestionOptions({ q }: { q: QuizQuestion }) {
   ) {
     return (
       <Stack spacing={0.5}>
-        {typeAttributes.options?.map((option, i) => (
-          <Box
-            key={i}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              px: 1,
-              py: 0.5,
-              borderRadius: '8px',
-              bgcolor: option.correct
-                ? 'rgba(34, 197, 94, 0.08)'
-                : 'transparent',
-              border: '1px solid',
-              borderColor: option.correct
-                ? 'rgba(34, 197, 94, 0.2)'
-                : 'transparent',
-              transition: 'all 0.15s ease',
-            }}
-          >
+        {typeAttributes.options?.map((option, i) => {
+          const isCorrect = option.correct;
+
+          return (
             <Box
+              key={i}
               sx={{
-                width: 22,
-                height: 22,
-                borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                bgcolor: option.correct ? 'success.main' : 'action.selected',
-                color: option.correct ? '#fff' : 'text.secondary',
-                fontSize: '0.65rem',
-                fontWeight: 700,
-                flexShrink: 0,
+                gap: 1,
+                px: 1,
+                py: 0.5,
+                borderRadius: '8px',
+                bgcolor: isCorrect ? 'rgba(34, 197, 94, 0.08)' : 'transparent',
+                border: '1px solid',
+                borderColor: isCorrect
+                  ? 'rgba(34, 197, 94, 0.2)'
+                  : 'transparent',
+                transition: 'all 0.15s ease',
               }}
             >
-              {option.correct ? '✓' : String.fromCharCode(65 + i)}
+              {renderOptionBadge(
+                isCorrect ? '✓' : String.fromCharCode(65 + i),
+                isCorrect,
+              )}
+
+              <Typography
+                variant="caption"
+                sx={{
+                  color: isCorrect ? 'text.primary' : 'text.secondary',
+                  fontWeight: isCorrect ? 600 : 400,
+                  lineHeight: 1.4,
+                }}
+              >
+                {option.text}
+              </Typography>
             </Box>
-            <Typography
-              variant="caption"
-              sx={{
-                color: option.correct ? 'text.primary' : 'text.secondary',
-                fontWeight: option.correct ? 600 : 400,
-                lineHeight: 1.4,
-              }}
-            >
-              {option.text}
-            </Typography>
-          </Box>
-        ))}
+          );
+        })}
       </Stack>
     );
   }
@@ -168,6 +177,7 @@ export function FormatQuestionOptions({ q }: { q: QuizQuestion }) {
       <Stack direction="row" spacing={1}>
         {(['True', 'False'] as const).map((val) => {
           const isCorrect = typeAttributes.correctAnswer === val;
+
           return (
             <Chip
               key={val}
@@ -213,6 +223,7 @@ export function FormatQuestionOptions({ q }: { q: QuizQuestion }) {
             <Typography variant="caption" fontWeight={500} color="text.primary">
               {pair.option}
             </Typography>
+
             <ArrowForwardIcon
               sx={{
                 fontSize: '0.7rem',
@@ -220,6 +231,7 @@ export function FormatQuestionOptions({ q }: { q: QuizQuestion }) {
                 flexShrink: 0,
               }}
             />
+
             <Typography variant="caption" color="success.main" fontWeight={600}>
               {pair.response}
             </Typography>
@@ -332,8 +344,6 @@ export default function QuestionCard({
         sx={{
           position: 'relative',
           borderColor: isSelected ? 'primary.main' : 'divider',
-          // borderRadius: '10px',
-          // bgcolor: isSelected ? alpha('background.paper', 0.3) : 'background.paper',
           transition: 'all 0.2s ease',
           overflow: 'hidden',
         }}

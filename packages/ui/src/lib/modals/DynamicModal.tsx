@@ -37,8 +37,7 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
-
-import { ButtonMinorUi } from '@rapid-cmi5/ui';
+import { ButtonMinorUi } from '../utility/buttons';
 
 export interface PagedResult<T> {
   data: T[];
@@ -50,7 +49,11 @@ export interface DynamicModalProps<T> {
   /** Called with the selected item (single-select mode) */
   onSelect: (item: T) => void;
   /** Fetches a page of items — called on open, page change, or search change */
-  fetchItems: (page: number, search: string) => Promise<PagedResult<T>>;
+  fetchItems: (
+    page: number,
+    search: string,
+    itemsPerPage: number,
+  ) => Promise<PagedResult<T>>;
   /** Returns a stable unique ID for each item */
   getItemId: (item: T) => string;
   /**
@@ -190,7 +193,7 @@ export function DynamicModal<T>({
     async (page: number, search: string) => {
       try {
         setIsLoading(true);
-        const result = await fetchItems(page, search);
+        const result = await fetchItems(page, search, itemsPerPage);
         setItems(result.data ?? []);
         setTotalCount(result.totalCount ?? 0);
         setTotalPages(result.totalPages ?? 0);

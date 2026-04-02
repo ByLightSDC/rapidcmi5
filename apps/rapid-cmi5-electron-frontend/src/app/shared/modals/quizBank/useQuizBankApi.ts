@@ -1,76 +1,81 @@
-import { useMemo } from 'react';
-import axios from 'axios';
-import {
-  QuestionBankApiCreate,
-  RC5ActivityTypeEnum,
-} from '@rapid-cmi5/cmi5-build-common';
+import { useCallback, useMemo } from 'react';
+import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import { QuestionBankApiCreate, quizBankContract } from '../../../../../../../packages/common/src/lib/types/apis/quizBankContract';
+import { initClient } from '@ts-rest/core';
 
+// We will attempt to move to Tan stack React Query V5 in the future
 export function useQuizBankApi(url: string, token: string) {
   const apiClient = useMemo(
     () =>
-      axios.create({
-        baseURL: url,
-        timeout: 10000,
-        headers: { 'Content-Type': 'application/json' },
+      initClient(quizBankContract, {
+        baseUrl: url,
+        baseHeaders: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: 'include',
       }),
-    [url],
+    [url, token],
   );
 
-  const authHeaders = useMemo(
-    () => ({ Authorization: `Bearer ${token}` }),
-    [token],
+  const searchQuestions = useCallback(
+    async (
+      query: string,
+      page: number,
+      limit: number,
+      activityType?: RC5ActivityTypeEnum,
+    ) => {
+      const response = await apiClient.getQuestions({
+        query: {
+          offset: (page - 1) * limit,
+          limit: limit,
+          sortBy: 'dateEdited',
+          sort: 'desc',
+          search: query.trim(),
+          questionType:
+            activityType === RC5ActivityTypeEnum.ctf
+              ? 'freeResponse'
+              : undefined,
+        },
+      });
+      if (response.status === 200) {
+        return response.body;
+      }
+      throw new QuizBankApiError('Failed to search questions', response.status);
+    },
+    [apiClient],
   );
 
-  const searchQuestions = async (
-    query: string,
-    activityType?: RC5ActivityTypeEnum,
-  ) => {
-    const params: Record<string, string | number | undefined> = {
-      offset: 0,
-      limit: 20,
-      sortBy: 'dateEdited',
-      sort: 'desc',
-      search: query.trim(),
-      questionType:
-        activityType === RC5ActivityTypeEnum.ctf ? 'freeResponse' : undefined,
-    };
+  const addQuestion = useCallback(
+    async (question: QuestionBankApiCreate) => {
+      const response = await apiClient.createQuestion({ body: question });
+      if (response.status === 200 || response.status === 201) {
+        return response.body;
+      }
+      throw new QuizBankApiError('Failed to add question', response.status);
+    },
+    [apiClient],
+  );
 
-    try {
-      const response = await apiClient.get('/v1/quiz-bank/question-bank', {
-        headers: authHeaders,
-        params,
-      });
-      return response.data.data;
-    } catch (error) {
-      console.error('Failed to search quiz bank', error);
-      throw error;
-    }
-  };
-
-  const addQuestion = async (question: QuestionBankApiCreate) => {
-    try {
-      const response = await apiClient.post(
-        '/v1/quiz-bank/question-bank',
-        question,
-        { headers: authHeaders },
-      );
-      return response.data;
-    } catch (error) {
-      console.error('Failed to add question to quiz bank', error);
-      throw error;
-    }
-  };
-
-  const deleteQuestion = async (uuid: string) => {
-    try {
-      await apiClient.delete(`/v1/quiz-bank/question-bank/${uuid}`, {
-        headers: authHeaders,
-      });
-    } catch (error) {
-      console.error('Failed to delete question from quiz bank', error);
-      throw error;
-    }
-  };
+  const deleteQuestion = useCallback(
+    async (uuid: string) => {
+      const response = await apiClient.deleteQuestion({ params: { uuid } });
+      if (response.status === 200 || response.status === 204) {
+        return;
+      }
+      throw new QuizBankApiError('Failed to delete question', response.status);
+    },
+    [apiClient],
+  );
 
   return { searchQuestions, addQuestion, deleteQuestion };
+}
+
+export class QuizBankApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+  ) {
+    super(`${message} (status: ${status})`);
+    this.name = 'QuizBankApiError';
+  }
 }

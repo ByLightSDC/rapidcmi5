@@ -47,7 +47,6 @@ export interface QuizBankSearchModalProps extends GetQuizBankSearchModalProps {
   token: string;
   url: string;
   currentUserEmail: string;
-  apiClient: AxiosInstance;
 }
 
 export interface GetQuizBankAddModalProps {
@@ -61,7 +60,6 @@ export interface GetQuizBankAddModalProps {
 export interface QuizBankAddModalProps extends GetQuizBankAddModalProps {
   token: string;
   url: string;
-  apiClient: AxiosInstance;
 }
 
 export interface RapidCmi5Opts {

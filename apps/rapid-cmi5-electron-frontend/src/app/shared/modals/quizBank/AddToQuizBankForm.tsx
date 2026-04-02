@@ -16,9 +16,17 @@ import { Stack } from '@mui/system';
 import Grid from '@mui/material/Grid2';
 import LabelIcon from '@mui/icons-material/Label';
 import { useState } from 'react';
-import { Control, FieldValues, UseFormReturn, UseFormSetValue, useWatch } from 'react-hook-form';
+import {
+  Control,
+  FieldValues,
+  UseFormReturn,
+  UseFormSetValue,
+  useWatch,
+} from 'react-hook-form';
 import { QuizBankAddModalProps } from '@rapid-cmi5/react-editor';
-import { currentQuizBankApiVersion, QuestionBankApiCreate } from '@rapid-cmi5/cmi5-build-common';
+import {
+  currentQuizBankApiVersion
+} from '@rapid-cmi5/cmi5-build-common';
 import { FormatQuestionOptions, QuestionTypeChip } from './QuestionCard';
 import { useQuizBankApi } from './useQuizBankApi';
 
@@ -99,18 +107,14 @@ export function AddToQuizBankForm({
     public: yup.boolean(),
     tags: yup
       .array()
-      .of(
-        yup
-          .string()
-          .trim()
-          .max(50, 'Each tag must be 50 characters or less'),
-      )
+      .of(yup.string().trim().max(50, 'Each tag must be 50 characters or less'))
       .max(20, 'You can add up to 20 tags'),
   });
 
   const doAction = async (data: { public: boolean; tags: string[] }) => {
     if (!question.type) throw Error('Question type not defined');
-    const newQuestion: QuestionBankApiCreate = {
+
+    await addQuestion({
       publicQuestion: data.public ?? true,
       questionType: question.type,
       question: question.question,
@@ -122,8 +126,7 @@ export function AddToQuizBankForm({
       shuffleAnswers: question.typeAttributes.shuffleAnswers ?? undefined,
       rc5QuizBankApiVersion: currentQuizBankApiVersion,
       tags: data.tags,
-    };
-    await addQuestion(newQuestion);
+    });
     closeModal();
   };
 
@@ -160,6 +163,7 @@ export function AddToQuizBankForm({
           <TagInput control={control} setValue={setValue} />
         </Grid>
 
+        {/* Whether to show question to all users*/}
         <Grid size={12}>
           <FormControlCheckboxField
             control={control}

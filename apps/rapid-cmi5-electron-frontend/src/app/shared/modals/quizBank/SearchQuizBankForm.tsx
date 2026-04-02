@@ -21,12 +21,12 @@ export function QuizBankSearchForm({
   );
 
   const fetchItems = useCallback(
-    async (_page: number, query: string) => {
-      const data = await searchQuestions(query, activityType);
+    async (page: number, query: string, limit: number) => {
+      const data = await searchQuestions(query, page, limit, activityType);
       return {
-        data: data ?? [],
-        totalCount: data?.length ?? 0,
-        totalPages: 1,
+        data: data.data ?? [],
+        totalCount: data.totalCount ?? 0,
+        totalPages: data.totalPages,
       };
     },
     [searchQuestions, activityType],
@@ -47,6 +47,7 @@ export function QuizBankSearchForm({
       onMultiSelect={submitForm}
       onDelete={onDelete}
       onClose={closeModal}
+      itemsPerPage={20}
       renderItem={(q, isSelected, isExpanded, onToggleExpand, onDelete) => (
         <QuestionCard
           multiSelect={true}

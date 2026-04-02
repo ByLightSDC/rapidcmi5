@@ -15,8 +15,7 @@ import {
 import { useContext, useEffect, useState } from 'react';
 import { TextField, Alert } from '@mui/material';
 import { Stack, Box } from '@mui/system';
-import { RepoState } from 'packages/rapid-cmi5/src/lib/redux/repoManagerReducer';
-import { RootState } from 'packages/rapid-cmi5/src/lib/redux/store';
+
 import { RC5Context } from '../../../rapidcmi5_mdx/contexts/RC5Context';
 import { useCourseData } from '../../../rapidcmi5_mdx/data-hooks/useCourseData';
 import { createCourseModalId, cloneRepoModalId, createNewLessonModalId, selectRepoModalId, createLocalRepoModalId, importRepoZipModalId, commitChangesModalId, revertCommitModalId, gitPullModalId, downloadCmi5ZipModalId, setGitConfigModalId, gitPushModalId } from '../../../rapidcmi5_mdx/modals/constants';
@@ -33,6 +32,7 @@ import GitConfigForm from './GitConfigForm';
 import PullForm from './PullForm';
 import PushForm from './PushForm';
 import DirectoryTree from '../../GitViewer/Components/SelectedRepo/DirectoryTree';
+import { RepoState, RootState } from '@rapid-cmi5/react-editor';
 
 /**
  * Select Repo, Course, AU

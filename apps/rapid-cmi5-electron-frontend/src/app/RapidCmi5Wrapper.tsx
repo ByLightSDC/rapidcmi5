@@ -16,13 +16,12 @@ import {
   GetQuizBankSearchModalProps,
 } from '@rapid-cmi5/react-editor';
 import { debugLogError } from '@rapid-cmi5/ui';
-import { useContext, useEffect, useMemo } from 'react';
+import { useContext, useEffect } from 'react';
 import { ScenarioSelectionForm } from './shared/modals/ScenarioSelectionModal';
 import { UserConfigContext } from './contexts/UserConfigContext';
 import { AuthContext } from './contexts/AuthContext';
 import AddToQuizBankForm from './shared/modals/quizBank/AddToQuizBankForm';
 import QuizBankSearchForm from './shared/modals/quizBank/SearchQuizBankForm';
-import axios from 'axios';
 
 export function RapidCmi5Wrapper() {
   const { token, parsedUserToken } = useContext(AuthContext);
@@ -30,15 +29,7 @@ export function RapidCmi5Wrapper() {
     useContext(UserConfigContext);
 
   const quizBankURL = ssoConfig?.quizBankApiUrl;
-  const quizBankApiClient = useMemo(() => {
-    return axios.create({
-      baseURL: quizBankURL,
-      timeout: 10000,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  }, [quizBankURL]);
+  const rangeURL = ssoConfig?.rangeRestApiUrl;
 
   const handleOverrideGlobalGitConfig = (
     config?: GitUserConfig,
@@ -178,7 +169,7 @@ export function RapidCmi5Wrapper() {
         }
       }}
       GetScenariosForm={
-        token
+        token && rangeURL
           ? (props: GetScenarioFormProps) => (
               <ScenarioSelectionForm
                 token={token}
@@ -186,7 +177,7 @@ export function RapidCmi5Wrapper() {
                 formType={props.formType}
                 errors={props.errors}
                 formMethods={props.formMethods}
-                url={ssoConfig?.rangeRestApiUrl}
+                url={rangeURL}
               />
             )
           : undefined
@@ -202,7 +193,6 @@ export function RapidCmi5Wrapper() {
                 formMethods={props.formMethods}
                 url={ssoConfig?.quizBankApiUrl}
                 question={props.question}
-                apiClient={quizBankApiClient}
               />
             )
           : undefined
@@ -220,7 +210,6 @@ export function RapidCmi5Wrapper() {
                 closeModal={props.closeModal}
                 currentUserEmail={parsedUserToken?.email?.toLowerCase()}
                 activityType={props.activityType}
-                apiClient={quizBankApiClient}
               />
             )
           : undefined
