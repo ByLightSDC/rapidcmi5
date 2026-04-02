@@ -1,29 +1,17 @@
-import Editor from 'react-simple-code-editor';
-// @ts-expect-error - prismjs types are not fully compatible
-import { highlight, languages } from 'prismjs/components/prism-core';
-import 'prismjs/components/prism-clike';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/themes/prism.css'; //Example style, you can use another
-
-import {
-  Alert,
-  AlertTitle,
-  Box,
-  Paper,
-  SxProps,
-  Typography,
-} from '@mui/material';
+import { Editor } from '@monaco-editor/react';
+import { useTheme } from '@mui/system';
+import { Alert, AlertTitle, Box, Paper, Typography } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 
 import { useContext, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { resolveMonacoLanguage } from '../../forms/FormControlMonacoField';
 import {
   AuContextProps,
-  JobeContent,
   ActivityScore,
   RC5ActivityTypeEnum,
+  CodeRunnerContent,
+  CodeRunnerSubmitResponse,
 } from '@rapid-cmi5/cmi5-build-common';
-import { dividerColor } from '../../redux/commonAppReducer';
 import { ButtonMainUi } from '../../utility/buttons';
 import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
 import {
@@ -31,19 +19,25 @@ import {
   useLessonThemeStyles,
 } from '../../hooks/useLessonThemeStyles';
 
-export function JobeInTheBox({
+export function CodeRunner({
   auProps,
   content,
   submitCode,
 }: {
   auProps: Partial<AuContextProps>;
-  content: JobeContent;
-  submitCode: (content: string) => Promise<any>;
+  content: CodeRunnerContent;
+  submitCode: (
+    code: string,
+    language: string,
+    runtime: string,
+  ) => Promise<{ stdout: string; stderr: string }>;
 }) {
   const { setProgress, submitScore } = auProps;
 
-  const jobeContent = content;
-  const themedDividerColor = useSelector(dividerColor);
+  const codeRunnerContent = content;
+  const theme = useTheme();
+  const monacoTheme = theme.palette.mode === 'light' ? 'light' : 'vs-dark';
+  const monacoLanguage = resolveMonacoLanguage(codeRunnerContent.programmingLanguage ?? 'javascript');
 
   // state
   const [submissionStr, setSubmissionStr] = useState<string>('');
@@ -53,15 +47,18 @@ export function JobeInTheBox({
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
   const { blockPadding, outerActivitySxWithConstrainedWidthForm } =
-    useLessonThemeStyles(lessonTheme, maxFormWidths.jobePlayback);
-    
+    useLessonThemeStyles(lessonTheme, maxFormWidths.codeRunnerPlayback);
 
   const handleSubmit = async () => {
     setSuccessStr('');
     setErrorStr('');
-    const response = await submitCode(submissionStr + jobeContent.evaluator);
-    if (response.isSuccess) {
-      setSuccessStr(response.message);
+    const response = await submitCode(
+      submissionStr + codeRunnerContent.evaluator,
+      content.programmingLanguage,
+      content.languageVersion,
+    );
+    if (response.stderr !== '' || response.stderr !== undefined) {
+      setSuccessStr(response.stderr);
       setErrorStr('');
       if (setProgress) {
         setProgress(true);
@@ -70,7 +67,7 @@ export function JobeInTheBox({
       // Submit score for LRS tracking and slide completion
       if (submitScore) {
         // Ensure cmi5QuizId is set (generate if missing)
-        const activityContent = { ...jobeContent };
+        const activityContent = { ...codeRunnerContent };
         if (!activityContent.cmi5QuizId) {
           // Generate deterministic ID from title or content hash (same logic as parser)
           if (activityContent.title) {
@@ -79,7 +76,7 @@ export function JobeInTheBox({
                 .toLowerCase()
                 .replace(/[^a-z0-9]/g, '-')
                 .replace(/--+/g, '-')
-                .replace(/^-|-$/g, '') + '-jobe';
+                .replace(/^-|-$/g, '') + '-codeRunner';
           } else {
             // Create a simple hash from the evaluator content for consistency
             const contentHash = Math.abs(
@@ -92,26 +89,30 @@ export function JobeInTheBox({
             )
               .toString(36)
               .substr(0, 8);
-            activityContent.cmi5QuizId = 'jobe-activity-' + contentHash;
+            activityContent.cmi5QuizId = 'codeRunner-activity-' + contentHash;
           }
         }
 
+        const codeRunnerResponse: CodeRunnerSubmitResponse = {
+          isSuccess: true,
+          message: response.stdout,
+        };
         const scoreData: ActivityScore = {
-          activityType: RC5ActivityTypeEnum.jobe,
+          activityType: RC5ActivityTypeEnum.codeRunner,
           activityContent: activityContent,
-          scoreData: response, // JobeSubmitResponse
+          scoreData: codeRunnerResponse, // CodeRunnerSubmitResponse
         };
         submitScore(scoreData);
-        console.log('Jobe activity score submitted');
+        console.log('CodeRunner activity score submitted');
       }
     } else {
       setSuccessStr('');
-      setErrorStr(response.message);
+      setErrorStr(response.stdout);
 
       // Also submit score for failed attempts to track activity completion
       if (submitScore) {
         // Ensure cmi5QuizId is set (generate if missing)
-        const activityContent = { ...jobeContent };
+        const activityContent = { ...codeRunnerContent };
         if (!activityContent.cmi5QuizId) {
           // Generate deterministic ID from title or content hash (same logic as parser)
           if (activityContent.title) {
@@ -120,7 +121,7 @@ export function JobeInTheBox({
                 .toLowerCase()
                 .replace(/[^a-z0-9]/g, '-')
                 .replace(/--+/g, '-')
-                .replace(/^-|-$/g, '') + '-jobe';
+                .replace(/^-|-$/g, '') + '-codeRunner';
           } else {
             // Create a simple hash from the evaluator content for consistency
             const contentHash = Math.abs(
@@ -133,24 +134,28 @@ export function JobeInTheBox({
             )
               .toString(36)
               .substr(0, 8);
-            activityContent.cmi5QuizId = 'jobe-activity-' + contentHash;
+            activityContent.cmi5QuizId = 'codeRunner-activity-' + contentHash;
           }
         }
 
+        const codeRunnerResponse: CodeRunnerSubmitResponse = {
+          isSuccess: true,
+          message: response.stdout,
+        };
         const scoreData: ActivityScore = {
-          activityType: RC5ActivityTypeEnum.jobe,
+          activityType: RC5ActivityTypeEnum.codeRunner,
           activityContent: activityContent,
-          scoreData: response, // JobeSubmitResponse with isSuccess: false
+          scoreData: codeRunnerResponse, // CodeRunnerSubmitResponse with isSuccess: false
         };
         submitScore(scoreData);
-        console.log('Jobe activity score submitted (failed attempt)');
+        console.log('CodeRunner activity score submitted (failed attempt)');
       }
     }
   };
 
   useEffect(() => {
-    setSubmissionStr(jobeContent.student);
-  }, [jobeContent]);
+    setSubmissionStr(codeRunnerContent.student);
+  }, [codeRunnerContent]);
 
   return (
     <Paper
@@ -162,7 +167,7 @@ export function JobeInTheBox({
         padding: blockPadding,
       }}
     >
-      {jobeContent.title && (
+      {codeRunnerContent.title && (
         <Typography
           color="text.primary"
           align="center"
@@ -172,29 +177,46 @@ export function JobeInTheBox({
             paddingBottom: '8px',
           }}
         >
-          {jobeContent.title}
+          {codeRunnerContent.title}
         </Typography>
       )}
-      {jobeContent.evaluator && (
-        <Editor
-          value={submissionStr}
-          onValueChange={(code) => setSubmissionStr(code)}
-          highlight={(code) => highlight(code, languages.js)}
-          padding={10}
+
+      {codeRunnerContent.description && (
+        <Typography
+          color="text.primary"
           style={{
-            borderRadius: '6px',
-            borderColor: themedDividerColor,
-            borderStyle: 'solid',
-            borderWidth: '2px',
-            fontFamily: '"Fira code", "Fira Mono", monospace',
-            fontSize: 15,
-            width: '100%',
-            minHeight: '120px',
+            fontWeight: 800,
+            paddingBottom: '8px',
+          }}
+        >
+          {codeRunnerContent.description}
+        </Typography>
+      )}
+      {codeRunnerContent.evaluator && (
+        <Box
+          sx={{
+            overflow: 'hidden',
             margin: '4px',
           }}
-        />
+        >
+          <Editor
+            height={200}
+            language={monacoLanguage}
+            theme={monacoTheme}
+            value={submissionStr}
+            onChange={(value) => setSubmissionStr(value ?? '')}
+            options={{
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              wordWrap: 'on',
+              fontSize: 13,
+              lineNumbers: 'on',
+              tabSize: 2,
+            }}
+          />
+        </Box>
       )}
-      {!jobeContent.evaluator && (
+      {!codeRunnerContent.evaluator && (
         <Alert
           severity="error"
           sx={{
@@ -204,14 +226,13 @@ export function JobeInTheBox({
             marginRight: 'auto',
           }}
         >
-          Jobe In The Box is missing an evaluation script.
+          CodeRunner In The Box is missing an evaluation script.
         </Alert>
       )}
       {successStr && (
         <Alert
           sx={{ margin: '12px' }}
           icon={<CheckIcon fontSize="inherit" />}
-          // sx={{ position: "relative", left: 100, top:0 }}
           severity="success"
         >
           <AlertTitle>Success</AlertTitle>
@@ -224,7 +245,7 @@ export function JobeInTheBox({
           {errorStr}
         </Alert>
       )}
-      {jobeContent.evaluator && (
+      {codeRunnerContent.evaluator && (
         <Box sx={{ margin: '4px', marginTop: '12px' }}>
           <ButtonMainUi disabled={false} onClick={handleSubmit}>
             Submit
@@ -235,4 +256,4 @@ export function JobeInTheBox({
   );
 }
 
-export default JobeInTheBox;
+export default CodeRunner;

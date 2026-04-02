@@ -9,7 +9,7 @@ import {
 import { Stack, Typography } from '@mui/material';
 
 import { ScenarioForm } from '../forms/ScenarioForm';
-import { JobeForm } from '../forms/JobeForm';
+import { CodeRunnerForm } from '../forms/CodeRunnerForm';
 
 import { QuizForm } from '../forms/QuizForm';
 import { useAuContext } from '../../data-hooks/useAuContext';
@@ -24,7 +24,7 @@ import {
   ActivityJsonNode,
   QuizContent,
   CTFContent,
-  JobeContent,
+  CodeRunnerContent,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   useTimeStampUUID,
@@ -36,7 +36,7 @@ import {
   FormCrudType,
   AuQuiz,
   AuCTF,
-  JobeInTheBox,
+  CodeRunner,
 } from '@rapid-cmi5/ui';
 import { updateScenario, updateTeamScenario } from '@rapid-cmi5/react-editor';
 import ScenarioMock from './ScenarioMock';
@@ -307,17 +307,17 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
           )}
         </>
       )}
-      {name === 'jobe' && fromJson && (
+      {name === 'codeRunner' && fromJson && (
         <>
           {isPlayback && codeRunnerOps && (
-            <JobeInTheBox
+            <CodeRunner
               auProps={auProps}
-              content={fromJson as JobeContent}
+              content={fromJson as CodeRunnerContent}
               submitCode={codeRunnerOps?.executeCode}
             />
           )}
           {!isPlayback && (
-            <JobeForm
+            <CodeRunnerForm
               crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
               defaultFormData={fromJson}
               deleteButton={

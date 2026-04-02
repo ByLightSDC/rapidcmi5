@@ -14,9 +14,9 @@ import {
   ScenarioContent,
   QuizContent,
   CTFContent,
-  JobeContent,
   TeamConsolesContent,
   DownloadFileData,
+  CodeRunnerContent,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   setProgress$,
@@ -26,8 +26,8 @@ import {
   debugLogError,
   AuQuiz,
   AuCTF,
-  JobeInTheBox,
   FileDownloadLink,
+  CodeRunner,
 } from '@rapid-cmi5/ui';
 
 /**
@@ -120,8 +120,8 @@ export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
       {name === SlideActivityType.CTF && fromJson && (
         <AuCTF auProps={auProps} content={fromJson as CTFContent} />
       )}
-      {name === SlideActivityType.JOBE && fromJson && (
-        <JobeInTheBox auProps={auProps} content={fromJson as JobeContent} />
+      {name === SlideActivityType. && fromJson && (
+        <CodeRunner auProps={auProps} content={fromJson as CodeRunnerContent} submitCode={() => {return {} as any} }/>
       )}
       {name === SlideActivityType.CONSOLES && fromJson && (
         <>

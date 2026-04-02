@@ -44,7 +44,11 @@ export interface RuntimeCollection {
 
 export interface CodeRunnerOps {
   listRuntimes: () => Promise<RuntimeCollection[]>;
-  executeCode: (code: string) => Promise<{ stdout: string; stderr: string }>;
+  executeCode: (
+    code: string,
+    language: string,
+    runtime: string,
+  ) => Promise<{ stdout: string; stderr: string }>;
 }
 
 export interface RapidCmi5Opts {

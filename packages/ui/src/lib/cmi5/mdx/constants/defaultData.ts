@@ -1,4 +1,4 @@
-import { SlideTypeEnum, CourseAU, JobeContent, MoveOnCriteriaEnum, QuestionResponse, QuestionGrading, ScenarioContent, CourseData, QuizContent, QuizCompletionEnum, CTFContent, DownloadFilesContent, RC5ScenarioContent, TeamConsolesContent, RC5ActivityTypeEnum } from "@rapid-cmi5/cmi5-build-common";
+import { SlideTypeEnum, CourseAU, CodeRunnerContent, MoveOnCriteriaEnum, QuestionResponse, QuestionGrading, ScenarioContent, CourseData, QuizContent, QuizCompletionEnum, CTFContent, DownloadFilesContent, RC5ScenarioContent, TeamConsolesContent, RC5ActivityTypeEnum } from "@rapid-cmi5/cmi5-build-common";
 
 
 export const jsonFormatSpaces = 1;
@@ -79,13 +79,15 @@ export const defaultAUData: CourseAU = {
   dirPath: '',
 };
 
-export const defaultJobeContent: JobeContent = {
-  title: 'Jobe In The Box',
+export const defaultCodeRunnerContent: CodeRunnerContent = {
+  title: 'Code Runner',
   description: '',
   evaluator: '',
   student: '',
-  cmi5QuizId: 'jobe-activity-1',
+  cmi5QuizId: 'code-runner-activity-1',
   moveOnCriteria: MoveOnCriteriaEnum.Completed,
+  languageVersion: '3.12.3',
+  programmingLanguage: 'python3'
 };
 
 export const defaultQuestion = {
@@ -202,8 +204,8 @@ export const defaulDownloadFileContentStr = JSON.stringify(
   jsonFormatSpaces,
 );
 
-export const defaultJobeContentStr = JSON.stringify(
-  defaultJobeContent,
+export const defaultCodeRunnerContentStr = JSON.stringify(
+  defaultCodeRunnerContent,
   null,
   jsonFormatSpaces,
 );
@@ -224,8 +226,8 @@ export const getDefaultData = (activity: RC5ActivityTypeEnum) => {
       return defaultCTFContentStr;
     case RC5ActivityTypeEnum.download:
       return defaulDownloadFileContentStr;
-    case RC5ActivityTypeEnum.jobe:
-      return defaultJobeContentStr;
+    case RC5ActivityTypeEnum.codeRunner:
+      return defaultCodeRunnerContent;
   }
   return null;
 };

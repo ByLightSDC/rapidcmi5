@@ -8,7 +8,7 @@ export * from './lib/codeValidators/markdownValidator';
 
 import ctfSchema from './lib/schemas/CTFContent.schema.json';
 import downloadFilesSchema from './lib/schemas/DownloadFilesContent.schema.json';
-import jobeSchema from './lib/schemas/JobeContent.schema.json';
+import codeRunnerSchema from './lib/schemas/CodeRunnerContent.schema.json';
 import quizSchema from './lib/schemas/QuizContent.schema.json';
 import scenarioSchema from './lib/schemas/RC5ScenarioContent.schema.json';
 import teamConsolesSchema from './lib/schemas/RC5ScenarioContent.schema.json';
@@ -18,14 +18,14 @@ export const QuizContentSchema = quizSchema;
 export const ScenarioContentSchema = scenarioSchema;
 export const TeamConsolesContentSchema = teamConsolesSchema;
 export const CTFContentSchema = ctfSchema;
-export const JobeContentSchema = jobeSchema;
+export const CodeRunnerContentSchema = codeRunnerSchema;
 
 export * from './lib/types/activity';
 export * from './lib/types/admonition';
 export * from './lib/types/course';
 export * from './lib/types/ctf';
 export * from './lib/types/download';
-export * from './lib/types/jobe';
+export * from './lib/types/codeRunner';
 export * from './lib/types/player';
 export * from './lib/types/score';
 export * from './lib/types/quiz';

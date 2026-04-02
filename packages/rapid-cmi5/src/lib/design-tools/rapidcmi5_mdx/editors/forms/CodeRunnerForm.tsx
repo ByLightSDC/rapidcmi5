@@ -8,7 +8,7 @@ import * as yup from 'yup';
 
 import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
 import {
-  JobeContent,
+  CodeRunnerContent,
   moveOnCriteriaOptions,
   RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
@@ -17,6 +17,7 @@ import {
   REQUIRED_ENTRY,
   FormStateType,
   FormControlTextField,
+  FormControlMonacoField,
   FormControlSelectField,
   FormControlUIProvider,
   MiniForm,
@@ -29,14 +30,14 @@ import { useContext, useEffect, useState } from 'react';
 import { SxProps } from '@mui/system';
 import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 
-export const JobeForm = ({
+export const CodeRunnerForm = ({
   crudType,
   defaultFormData,
   deleteButton,
   onSave,
 }: {
   crudType: FormCrudType;
-  defaultFormData: JobeContent;
+  defaultFormData: CodeRunnerContent;
   deleteButton?: JSX.Element;
   handleCloseModal?: () => void;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
@@ -49,7 +50,7 @@ export const JobeForm = ({
   const { lessonTheme } = useContext(LessonThemeContext);
   const { outerActivitySxWithConstrainedWidthForm } = useLessonThemeStyles(
     lessonTheme,
-    maxFormWidths.jobeEditor,
+    maxFormWidths.codeRunnerEditor,
   );
 
   const validationSchema = yup.object().shape({
@@ -64,7 +65,7 @@ export const JobeForm = ({
 
   const onSaveAction = (data: any) => {
     if (onSave) {
-      onSave(RC5ActivityTypeEnum.jobe, data as JobeContent);
+      onSave(RC5ActivityTypeEnum.codeRunner, data as CodeRunnerContent);
     }
   };
 
@@ -210,27 +211,34 @@ export const JobeForm = ({
         <Grid size={11.5}>
           <FormControlTextField
             control={control}
-            name={`student`}
+            name={`description`}
             minRows={4}
             maxRows={12}
             //required
-            label="Student Code"
+            label="Description"
             readOnly={crudType === FormCrudType.view}
             multiline={true}
             sxProps={{ height: '30%' }}
           />
         </Grid>
         <Grid size={11.5}>
-          <FormControlTextField
+          <FormControlMonacoField
+            control={control}
+            name={`student`}
+            label="Student Code"
+            language={selectedLanguage ?? 'javascript'}
+            height={200}
+            readOnly={crudType === FormCrudType.view}
+          />
+        </Grid>
+        <Grid size={11.5}>
+          <FormControlMonacoField
             control={control}
             name={`evaluator`}
-            minRows={4}
-            maxRows={12}
-            //required
             label="Evaluator"
+            language={selectedLanguage ?? 'javascript'}
+            height={200}
             readOnly={crudType === FormCrudType.view}
-            multiline={true}
-            sxProps={{ height: '30%' }}
           />
         </Grid>
         {featureFlagShouldShowKSATs && (
@@ -250,7 +258,7 @@ export const JobeForm = ({
         dataCache={defaultFormData}
         titleEndChildren={deleteButton}
         doAction={onSaveAction}
-        formTitle="Jobe In The Box"
+        formTitle="Code Runner"
         formWidth={null}
         formSxProps={
           {

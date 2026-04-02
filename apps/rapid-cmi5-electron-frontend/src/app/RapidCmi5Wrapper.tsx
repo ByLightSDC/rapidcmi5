@@ -173,9 +173,17 @@ export function RapidCmi5Wrapper() {
           : undefined
       }
       codeRunnerOps={{
-        executeCode: async (content: string) => {
-          const response = await axios.get(
-            `http://localhost:8080/v1/cmi5/code-runner/languages`,
+        executeCode: async (
+          content: string,
+          language: string,
+          runtime: string,
+        ) => {
+          const response = await axios.post(
+            `http://localhost:8080/v1/cmi5/code-runner/execute`,
+            {
+              submissionContent: content,
+              runtime: language,
+            },
             {
               headers: { Authorization: `Bearer ${token}` },
             },
