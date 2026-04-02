@@ -12,7 +12,6 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
-  CircularProgress,
   Radio,
   RadioGroup,
   FormControlLabel,
@@ -20,8 +19,6 @@ import {
   Typography,
   Stack,
   Box,
-  TextField,
-  InputAdornment,
   Chip,
   Skeleton,
   Fade,
@@ -30,8 +27,8 @@ import {
   useTheme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import SearchIcon from '@mui/icons-material/Search';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { SearchBar } from '../inputs/SearchBar';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -376,43 +373,14 @@ export function DynamicModal<T>({
 
           {/* Search Bar */}
           <Box sx={{ px: 3, pb: 2 }}>
-            <TextField
+            <SearchBar
+              searchQuery={searchQuery}
+              isDisabled={isLoading}
+              isLoading={isLoading}
               fullWidth
               placeholder={searchPlaceholder}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon
-                      sx={{ color: colors.textTertiary, fontSize: 20 }}
-                    />
-                  </InputAdornment>
-                ),
-                endAdornment: isLoading && searchQuery && (
-                  <InputAdornment position="end">
-                    <CircularProgress size={16} />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2.5,
-                  bgcolor: colors.background,
-                  fontSize: '0.9375rem',
-                  '& fieldset': { borderColor: colors.border },
-                  '&:hover fieldset': { borderColor: colors.borderHover },
-                  '&.Mui-focused fieldset': {
-                    borderColor: colors.borderSelected,
-                    borderWidth: 1,
-                  },
-                },
-                '& .MuiInputBase-input': {
-                  py: 1.25,
-                  color: colors.textPrimary,
-                  '&::placeholder': { color: colors.textTertiary, opacity: 1 },
-                },
-              }}
+              handleSearchChange={(e) => setSearchQuery(e.target.value)}
+              handleClearSearch={() => setSearchQuery('')}
             />
           </Box>
         </DialogTitle>

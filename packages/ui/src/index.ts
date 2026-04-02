@@ -32,6 +32,7 @@ export * from './lib/hooks/useNavigateAlias';
 export * from './lib/hooks/useTimeStampUUID';
 export * from './lib/hooks/useVisibility';
 export * from './lib/indicators/Loading';
+export * from './lib/inputs/SearchBar';
 export * from './lib/inputs/selectors/selectors';
 export * from './lib/inputs/tabs/tabs';
 export * from './lib/inputs/textfields/textfields';

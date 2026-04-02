@@ -1,7 +1,3 @@
-/*
- *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
- *   All rights reserved.
- */
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
