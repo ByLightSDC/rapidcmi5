@@ -14,7 +14,7 @@ import Tooltip from '@mui/material/Tooltip';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 import UserInfoBox from './navbar/UserInfoBox';
-import { Stack,  useTheme } from '@mui/material';
+import { Stack } from '@mui/material';
 
 /* app menu icon keys */
 const appsKey = 0;
