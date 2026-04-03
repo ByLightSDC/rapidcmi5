@@ -366,10 +366,18 @@ export default function QuestionCard({
                   size="small"
                   icon={<RadioButtonUncheckedIcon fontSize="small" />}
                   checkedIcon={<CheckCircleIcon fontSize="small" />}
-                  sx={{ p: 0, mt: 0.15 }}
+                  sx={{ p: 0, m: 0 }}
                   tabIndex={-1}
                 />
               )}
+
+              <IconButton
+                size="small"
+                onClick={(e) => toggleExpand(q.uuid, e)}
+                sx={{ p: 0, mt: 0, flexShrink: 0 }}
+              >
+                {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </IconButton>
 
               {/* Content */}
               <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -443,26 +451,13 @@ export default function QuestionCard({
                       p: 0.25,
                       mt: 0.15,
                       flexShrink: 0,
-                      color: 'error.main',
                     }}
                   >
-                    <DeleteIcon fontSize="small" />
+                    <DeleteIcon />
                   </IconButton>
                 </Tooltip>
               )}
 
-              {/* Expand toggle */}
-              <IconButton
-                size="small"
-                onClick={(e) => toggleExpand(q.uuid, e)}
-                sx={{ p: 0.25, mt: 0.15, flexShrink: 0 }}
-              >
-                {isExpanded ? (
-                  <ExpandLessIcon fontSize="small" />
-                ) : (
-                  <ExpandMoreIcon fontSize="small" />
-                )}
-              </IconButton>
             </Box>
           </CardContent>
         </CardActionArea>

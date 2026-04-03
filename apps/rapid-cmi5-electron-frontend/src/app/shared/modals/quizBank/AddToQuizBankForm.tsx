@@ -169,6 +169,7 @@ export function AddToQuizBankForm({
             control={control}
             name="public"
             label="Public"
+            infoText="Public questions can be seen and used by other course authors."
           />
         </Grid>
       </>

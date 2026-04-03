@@ -3,7 +3,7 @@ import { useWatch } from 'react-hook-form';
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
-import { Box, MenuItem, Tooltip } from '@mui/material';
+import { Box, MenuItem, Stack, Tooltip } from '@mui/material';
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import {
   SlideTypeEnum,
@@ -22,6 +22,7 @@ import {
   FormControlCheckboxField,
   FormFieldArray,
   ButtonModalMinorUi,
+  ButtonInfoField,
 } from '@rapid-cmi5/ui';
 
 /**
@@ -141,7 +142,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
       sx={{ marginLeft: '12px', width: '100%' }}
       id={indexedArrayField} // this is used for scrolling when new array entry added
     >
-      <Grid size={4}>
+      {/* <Grid size={4}>
         <FormControlSelectField
           control={control}
           name={`${indexedArrayField}.type`}
@@ -189,7 +190,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           label="Question Id"
           readOnly={true}
         />
-      </Grid>
+      </Grid> */}
       <Grid size={11}>
         <FormControlTextField
           control={control}
@@ -312,19 +313,70 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
         </Box>
       )}
       {onAddToBank && (
-        <Tooltip title="Save this question to the quiz bank">
-          <ButtonModalMinorUi
-            aria-label="search-question-bank"
-            id="search-question-bank-button"
-            size="small"
-            onClick={() => onAddToBank(getValues(indexedArrayField))}
-            startIcon={<BookmarkAddIcon fontSize="small" />}
-            disabled={!isQuestionValid}
-          >
-            Add to Quiz Bank
-          </ButtonModalMinorUi>
-        </Tooltip>
+        <Grid
+          size={5}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignContent: 'center',
+            height: '36px',
+          }}
+        >
+          <Stack direction="row" spacing={1} sx={{ marginTop: 1 }}>
+            <ButtonModalMinorUi
+              aria-label="search-question-bank"
+              id="search-question-bank-button"
+              onClick={() => onAddToBank(getValues(indexedArrayField))}
+              startIcon={<BookmarkAddIcon fontSize="small" />}
+              disabled={!isQuestionValid}
+            >
+              Add to Quiz Bank
+            </ButtonModalMinorUi>
+
+            <ButtonInfoField message="Adding questions to the Quiz Bank allows you to reuse them in future quizzes, lessons, and courses." />
+          </Stack>
+        </Grid>
       )}
+      <Grid size={4}>
+        <FormControlSelectField
+          control={control}
+          name={`${indexedArrayField}.type`}
+          required
+          label="Question Type"
+          error={Boolean(indexedErrors?.type)}
+          helperText={indexedErrors?.type?.message}
+          readOnly={
+            crudType === FormCrudType.view || slideType === SlideTypeEnum.CTF
+          }
+        >
+          {responseOptions.map((item) => (
+            <MenuItem key={item} value={item}>
+              {item}
+            </MenuItem>
+          ))}
+        </FormControlSelectField>
+      </Grid>
+      <Grid size={3}>
+        <FormControlSelectField
+          control={control}
+          name={`${indexedArrayField}.typeAttributes.grading`}
+          required
+          label="Response Type"
+          error={Boolean(indexedErrors?.typeAttributes?.grading)}
+          helperText={indexedErrors?.typeAttributes?.grading?.message}
+          readOnly={
+            crudType === FormCrudType.view ||
+            slideType === SlideTypeEnum.CTF ||
+            watchQuestionType === QuestionResponse.Matching
+          }
+        >
+          {gradingOptions.map((item) => (
+            <MenuItem key={item} value={item}>
+              {item}
+            </MenuItem>
+          ))}
+        </FormControlSelectField>
+      </Grid>
     </Grid>
   );
 }
@@ -367,7 +419,14 @@ function QuestionOptionsFieldGroup(props: optionFieldGroupProps) {
     <Grid
       container
       spacing={0.5}
-      sx={{ marginLeft: '12px', width: '100%' }}
+      sx={{
+        marginLeft: '12px',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignContent: 'center',
+      }}
       id={indexedArrayField} // this is used for scrolling when new array entry added
     >
       <Grid size={9}>
@@ -382,7 +441,7 @@ function QuestionOptionsFieldGroup(props: optionFieldGroupProps) {
           required
         />
       </Grid>
-      <Grid size={3}>
+      <Grid size={3} sx={{ height: '32px' }}>
         <FormControlCheckboxField
           control={control}
           name={`${indexedArrayField}.correct`}
