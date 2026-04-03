@@ -7,6 +7,9 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, IconButton, Tooltip, useTheme } from '@mui/material';
 import { useGutterRight } from '../shared/useGutterRight';
+import { useFocusWithin } from '../shared/useFocusWithin';
+import { useScopedAlignmentStyles, TextAlign } from '../shared/useScopedAlignmentStyles';
+import { AlignmentToolbarControls } from '../../components/AlignmentToolbarControls';
 import DeleteIconButton from '../../components/DeleteIconButton';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 import {
@@ -600,11 +603,18 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                         // --- 3. Shadow is handled by underlay ---
                       }
 
+                      const rawTextAlign = (mdastCell.data?.hProperties as any)?.['data-text-align'];
+                      const cellTextAlign: TextAlign =
+                        rawTextAlign === 'center' || rawTextAlign === 'right'
+                          ? rawTextAlign
+                          : 'left';
+
                       return (
                         <Cell
                           align={mdastNode.align?.[colIndex]}
+                          textAlign={cellTextAlign}
                           cellBackgroundColor={dynamicColor}
-                          perimeterStyle={perimeterStyle} // Pass style
+                          perimeterStyle={perimeterStyle}
                           key={getCellKey(mdastCell)}
                           contents={mdastCell.children}
                           setActiveCell={setActiveCellWithBoundaries}
@@ -657,6 +667,7 @@ export interface CellProps {
   colIndex: number;
   rowIndex: number;
   align?: Mdast.AlignType;
+  textAlign: TextAlign;
   activeCell: [number, number] | null;
   setActiveCell: (cell: [number, number] | null) => void;
   focus: boolean;
@@ -669,6 +680,10 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
       activeCell[0] === props.colIndex &&
       activeCell[1] === props.rowIndex,
   );
+
+  const [readOnly] = useCellValues(readOnly$);
+  const muiTheme = useTheme();
+  const { isFocused, ref: focusRef } = useFocusWithin<HTMLElement>();
 
   const className = AlignToTailwindClassMap[align ?? 'left'];
   const [currentColor, setColor] = useState<string>(
@@ -683,25 +698,52 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
 
   const onPickBgColor = React.useCallback(
     (color: string | null) => {
-      console.log('CellElement', CellElement);
-      console.log('pick bg color', color);
-      console.log('props', props);
       if (color) {
         setColor(color);
       }
     },
-    [setColor, CellElement, props],
+    [setColor],
+  );
+
+  const handleAlignmentChange = React.useCallback(
+    (value: 'left' | 'center' | 'right') => {
+      props.parentEditor.update(() => {
+        props.lexicalTable.updateCellTextAlign(props.colIndex, props.rowIndex, value);
+      }, { discrete: true });
+    },
+    [props.parentEditor, props.lexicalTable, props.colIndex, props.rowIndex],
   );
 
   return (
     <CellElement
+      ref={focusRef as any}
       className={className}
       data-active={isActive}
-      style={{ backgroundColor: currentColor, ...props.perimeterStyle }}
+      style={{ position: 'relative', backgroundColor: currentColor, ...props.perimeterStyle }}
       onClick={() => {
         setActiveCell([props.colIndex, props.rowIndex]);
       }}
     >
+      {isFocused && !readOnly && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: -34,
+            right: 0,
+            zIndex: 10,
+            display: 'flex',
+            backgroundColor:
+              muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
+            borderRadius: 1,
+            p: 0.25,
+          }}
+        >
+          <AlignmentToolbarControls
+            currentAlignment={props.textAlign}
+            onAlignmentChange={handleAlignmentChange}
+          />
+        </Box>
+      )}
       <CellEditor
         {...props}
         focus={isActive}
@@ -721,6 +763,7 @@ const CellEditor: React.FC<CellProps> = ({
   contents,
   colIndex,
   rowIndex,
+  textAlign,
 }) => {
   const [
     importVisitors,
@@ -893,10 +936,16 @@ const CellEditor: React.FC<CellProps> = ({
     changeColor(cellBackgroundColor);
   }, [cellBackgroundColor]);
 
+  const { scopedClass, alignmentStyles } = useScopedAlignmentStyles(
+    textAlign,
+    `table-cell-${rowIndex}-${colIndex}`,
+  );
+
   return (
     <LexicalNestedComposer initialEditor={editor}>
+      {alignmentStyles}
       <RichTextPlugin
-        contentEditable={<ContentEditable />}
+        contentEditable={<ContentEditable className={scopedClass} />}
         placeholder={<div></div>}
         ErrorBoundary={LexicalErrorBoundary}
       />
