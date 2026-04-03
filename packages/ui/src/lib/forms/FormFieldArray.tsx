@@ -1,7 +1,3 @@
-/*
- *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
- *   All rights reserved.
- */
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -165,6 +161,7 @@ type tFormFieldArrayProps = {
   itemNumberPosition?: ItemNumberPosition;
   maxArrayLength?: number;
   noneFoundMessage?: string;
+  additionalButtons?: JSX.Element[];
   multiSelectButtonProps?: MultiSelectButtonProps;
   singleSelectButtonProps?: SingleSelectButtonProps;
   title?: string;
@@ -249,6 +246,7 @@ export function FormFieldArray({
   itemDeletePosition = ItemDeletePosition.RightCenter,
   itemNumberPosition = ItemNumberPosition.LeftCenter,
   maxArrayLength = 50,
+  additionalButtons,
   multiSelectButtonProps,
   noneFoundMessage = 'No items found',
   singleSelectButtonProps,
@@ -714,6 +712,9 @@ export function FormFieldArray({
                       {...singleProps}
                     />
                   )}
+                  {additionalButtons?.map((btn, i) => (
+                    <React.Fragment key={i}>{btn}</React.Fragment>
+                  ))}
                 </>
               )}
               {allowSingleItemView && fields.length > 1 && (

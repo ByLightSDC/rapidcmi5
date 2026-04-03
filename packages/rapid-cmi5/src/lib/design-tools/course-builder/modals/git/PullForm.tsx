@@ -1,41 +1,36 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 import {
+  CommonAppModalState,
+  FormControlCheckboxField,
   FormControlPassword,
   FormControlTextField,
   FormControlUIProvider,
   FormStateType,
   MiniForm,
   ModalDialog,
+  NAME_GROUP_OPT,
 } from '@rapid-cmi5/ui';
 import * as yup from 'yup';
 
-import {
-  commitChangesModalId,
-} from '../../rapidcmi5_mdx/modals/constants';
-import { CommonAppModalState } from '@rapid-cmi5/ui';
 
-import { Box } from '@mui/material';
 import Grid from '@mui/material/Grid2';
+
+import { Typography } from '@mui/material';
+
 import { UseFormReturn } from 'react-hook-form';
-
-import {
-  DESCRIPTION_GROUP,
-  EMAIL_BASE,
-  EMAIL_GROUP,
-  NAME_GROUP,
-  NAME_GROUP_OPT,
-} from '@rapid-cmi5/ui';
-import { CreateCommitType } from '../CourseBuilderApiTypes';
 import { useContext } from 'react';
-import { GitContext } from '../GitViewer/session/GitContext';
+import { gitPullModalId } from '../../../rapidcmi5_mdx/modals/constants';
+import { PullType } from '../../CourseBuilderApiTypes';
+import { GitContext } from '../../GitViewer/session/GitContext';
 
-export function CommitForm({
+
+export function PullForm({
   defaultData,
   modalObj,
   handleCloseModal,
   handleModalAction,
 }: {
-  defaultData: CreateCommitType;
+  defaultData: PullType;
   modalObj: CommonAppModalState;
   handleCloseModal: () => void;
   handleModalAction: (
@@ -44,12 +39,10 @@ export function CommitForm({
     data?: any,
   ) => void;
 }) {
-  const { handleCommit } = useContext(GitContext);
+  const { handlePull } = useContext(GitContext);
 
   const validationSchema = yup.object().shape({
-    commitMessage: DESCRIPTION_GROUP,
-    authorName: NAME_GROUP_OPT,
-    authorEmail: yup.string().matches(EMAIL_BASE.regex, EMAIL_BASE.regexError),
+    username: NAME_GROUP_OPT,
   });
 
   const onCancel = () => {
@@ -72,44 +65,48 @@ export function CommitForm({
    * @param {FormStateType} formState React hook form state fields (ex. errors, isValid)
    * @return {JSX.Element} Render elements
    */
-  const getFormFields = (
+  const pullFormFields = (
     formMethods: UseFormReturn,
     formState: FormStateType,
   ): JSX.Element => {
-    const { control, getValues, setValue, trigger } = formMethods;
-    const { errors, isValid } = formState;
+    const { control } = formMethods;
+    const { errors } = formState;
     return (
       <>
-        <Grid size={11.5}>
-          <FormControlTextField
-            control={control}
-            error={Boolean(errors?.commitMessage)}
-            helperText={errors?.commitMessage?.message}
-            name="commitMessage"
-            required
-            label="Commit Message"
-            readOnly={false}
-          />
-        </Grid>
-
-        <Grid size={9}>
-          <FormControlTextField
-            control={control}
-            error={Boolean(errors?.authorEmail)}
-            helperText={errors?.authorEmail?.message}
-            name="authorEmail"
-            label="Email"
-            readOnly={false}
-          />
+        <Grid size={11}>
+          <Typography>
+            Staged changes will be commited before the repo is pulled.
+          </Typography>
         </Grid>
         <Grid size={6}>
           <FormControlTextField
             control={control}
-            error={Boolean(errors?.authorName)}
-            helperText={errors?.authorName?.message}
-            name="authorName"
-            label="Author Name"
+            error={Boolean(errors?.repoUsername)}
+            helperText={errors?.repoUsername?.message}
+            name="repoUsername"
+            required
+            label="User Name"
             readOnly={false}
+          />
+        </Grid>
+        <Grid size={6}>
+          <FormControlPassword
+            control={control}
+            error={Boolean(errors?.repoPassword)}
+            helperText={errors?.repoPassword?.message}
+            name="repoPassword"
+            required
+            label="Password"
+            readOnly={false}
+          />
+        </Grid>
+
+        <Grid size={6}>
+          <FormControlCheckboxField
+            control={control}
+            error={errors?.allowConflicts}
+            label="Attempt Merge with Conflicts"
+            name="allowConflicts"
           />
         </Grid>
         <Grid size={6}>
@@ -128,22 +125,22 @@ export function CommitForm({
 
   return (
     <ModalDialog
-      testId={commitChangesModalId}
+      testId={gitPullModalId}
       buttons={[]}
       dialogProps={{
-        open: modalObj.type === commitChangesModalId,
+        open: modalObj.type === gitPullModalId,
       }}
       maxWidth="sm"
     >
       <FormControlUIProvider>
         <MiniForm
           dataCache={defaultData}
-          doAction={handleCommit}
-          formTitle="Commit Staged Changes"
-          getFormFields={getFormFields}
+          doAction={handlePull}
+          formTitle="Pull Git Repo"
+          getFormFields={pullFormFields}
           instructions=""
-          submitButtonText="Commit"
-          successToasterMessage="Changes Committed Successfully"
+          submitButtonText="Pull"
+          successToasterMessage="Pulled Successfully"
           onClose={onClose}
           onCancel={onCancel}
           onResponse={onResponse}
@@ -154,4 +151,4 @@ export function CommitForm({
   );
 }
 
-export default CommitForm;
+export default PullForm;

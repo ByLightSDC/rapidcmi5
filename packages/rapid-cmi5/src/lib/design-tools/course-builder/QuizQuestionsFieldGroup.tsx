@@ -1,13 +1,29 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useWatch } from 'react-hook-form';
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
-import { Box, MenuItem } from '@mui/material';
-import { SlideTypeEnum, QuestionResponse, responseOptions, gradingOptions } from '@rapid-cmi5/cmi5-build-common';
-import { FormCrudType, tFormFieldRendererProps, useDisplayFocus, FormControlSelectField, FormControlTextField, FormControlCheckboxField, FormFieldArray } from '@rapid-cmi5/ui';
-
-
+import { Box, MenuItem, Stack, Tooltip } from '@mui/material';
+import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
+import {
+  SlideTypeEnum,
+  QuestionResponse,
+  responseOptions,
+  gradingOptions,
+  QuizOption,
+  MatchingOption,
+} from '@rapid-cmi5/cmi5-build-common';
+import {
+  FormCrudType,
+  tFormFieldRendererProps,
+  useDisplayFocus,
+  FormControlSelectField,
+  FormControlTextField,
+  FormControlCheckboxField,
+  FormFieldArray,
+  ButtonModalMinorUi,
+  ButtonInfoField,
+} from '@rapid-cmi5/ui';
 
 /**
  * @interface fieldGroupProps
@@ -19,6 +35,7 @@ interface fieldGroupProps {
   crudType: FormCrudType;
   formErrors?: any;
   formProps: tFormFieldRendererProps;
+  onAddToBank?: (question: any) => void;
   rowIndex?: number;
   slideType: SlideTypeEnum;
 }
@@ -29,11 +46,71 @@ interface fieldGroupProps {
  * @returns
  */
 export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
-  const { crudType, formProps, slideType } = props;
+  const { crudType, formProps, slideType, onAddToBank } = props;
+
   const { formMethods, indexedArrayField, indexedErrors, isFocused } =
     formProps;
-  const { control, getValues, setValue, trigger, watch } = formMethods;
-  const watchQuestionType = watch(`${indexedArrayField}.type`);
+  const { control, getValues, setValue, trigger } = formMethods;
+
+  // the watch from form methods do not work very well
+  // using the react hook form method allowed for the form to be much
+  // more reactive
+  const watchQuestionType = useWatch({
+    control,
+    name: `${indexedArrayField}.type`,
+  });
+  const watchQuestion = useWatch({
+    control,
+    name: `${indexedArrayField}.question`,
+  }) as string;
+  const watchCorrectAnswer = useWatch({
+    control,
+    name: `${indexedArrayField}.typeAttributes.correctAnswer`,
+  }) as string;
+  const watchOptions = useWatch({
+    control,
+    name: `${indexedArrayField}.typeAttributes.options`,
+  }) as QuizOption[] | undefined;
+  const watchMatching = useWatch({
+    control,
+    name: `${indexedArrayField}.typeAttributes.matching`,
+  }) as MatchingOption[] | undefined;
+
+  const isQuestionValid = useMemo(() => {
+    if (!watchQuestion?.trim() || !watchQuestionType) return false;
+    if (
+      watchQuestionType === QuestionResponse.MultipleChoice ||
+      watchQuestionType === QuestionResponse.SelectAll
+    ) {
+      if (!Array.isArray(watchOptions)) return false;
+      if (watchOptions.length <= 0) return false;
+      const allOptionsSet = watchOptions.every((o) => o.text?.trim());
+      const atLeastOneCorrect = watchOptions.some((o) => o.correct);
+
+      return allOptionsSet && atLeastOneCorrect;
+    }
+    if (watchQuestionType === QuestionResponse.TrueFalse) {
+      // Ensures that it is not null or undefined
+      return !!watchCorrectAnswer;
+    }
+    if (watchQuestionType === QuestionResponse.Matching) {
+      if (!Array.isArray(watchMatching)) return false;
+      if (watchMatching.length <= 0) return false;
+
+      const allOptionsSet = watchMatching.every(
+        (o) => o.option?.trim() && o.response?.trim(),
+      );
+
+      return allOptionsSet;
+    }
+    return !!watchCorrectAnswer?.toString().trim();
+  }, [
+    watchQuestion,
+    watchQuestionType,
+    watchCorrectAnswer,
+    watchOptions,
+    watchMatching,
+  ]);
 
   const focusHelper = useDisplayFocus();
   // this effect is for focusing on question field when added as row to array
@@ -57,6 +134,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
       }
     }
   }, [watchQuestionType]);
+
   return (
     <Grid
       container
@@ -64,56 +142,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
       sx={{ marginLeft: '12px', width: '100%' }}
       id={indexedArrayField} // this is used for scrolling when new array entry added
     >
-      <Grid size={4}>
-        <FormControlSelectField
-          control={control}
-          name={`${indexedArrayField}.type`}
-          required
-          label="Question Type"
-          error={Boolean(indexedErrors?.type)}
-          helperText={indexedErrors?.type?.message}
-          readOnly={
-            crudType === FormCrudType.view || slideType === SlideTypeEnum.CTF
-          }
-        >
-          {responseOptions.map((item) => (
-            <MenuItem key={item} value={item}>
-              {item}
-            </MenuItem>
-          ))}
-        </FormControlSelectField>
-      </Grid>
-      <Grid size={4}>
-        <FormControlSelectField
-          control={control}
-          name={`${indexedArrayField}.typeAttributes.grading`}
-          required
-          label="Response Type"
-          error={Boolean(indexedErrors?.typeAttributes?.grading)}
-          helperText={indexedErrors?.typeAttributes?.grading?.message}
-          readOnly={
-            crudType === FormCrudType.view ||
-            slideType === SlideTypeEnum.CTF ||
-            watchQuestionType === QuestionResponse.Matching
-          }
-        >
-          {gradingOptions.map((item) => (
-            <MenuItem key={item} value={item}>
-              {item}
-            </MenuItem>
-          ))}
-        </FormControlSelectField>
-      </Grid>
-      <Grid size={4}>
-        <FormControlTextField
-          control={control}
-          placeholder="Question Id"
-          name={`${indexedArrayField}.cmi5QuestionId`}
-          label="Question Id"
-          readOnly={true}
-        />
-      </Grid>
-      <Grid size={11}>
+      <Grid size={12}>
         <FormControlTextField
           control={control}
           placeholder="Question"
@@ -234,6 +263,71 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           />
         </Box>
       )}
+      {onAddToBank && (
+        <Grid
+          size={5}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignContent: 'center',
+            height: '36px',
+          }}
+        >
+          <Stack direction="row" spacing={1} sx={{ marginTop: 1 }}>
+            <ButtonModalMinorUi
+              aria-label="search-question-bank"
+              id="search-question-bank-button"
+              onClick={() => onAddToBank(getValues(indexedArrayField))}
+              startIcon={<BookmarkAddIcon fontSize="small" />}
+              disabled={!isQuestionValid}
+            >
+              Add to Quiz Bank
+            </ButtonModalMinorUi>
+
+            <ButtonInfoField message="Adding questions to the Quiz Bank allows you to reuse them in future quizzes, lessons, and courses." />
+          </Stack>
+        </Grid>
+      )}
+      <Grid size={4}>
+        <FormControlSelectField
+          control={control}
+          name={`${indexedArrayField}.type`}
+          required
+          label="Question Type"
+          error={Boolean(indexedErrors?.type)}
+          helperText={indexedErrors?.type?.message}
+          readOnly={
+            crudType === FormCrudType.view || slideType === SlideTypeEnum.CTF
+          }
+        >
+          {responseOptions.map((item) => (
+            <MenuItem key={item} value={item}>
+              {item}
+            </MenuItem>
+          ))}
+        </FormControlSelectField>
+      </Grid>
+      <Grid size={3}>
+        <FormControlSelectField
+          control={control}
+          name={`${indexedArrayField}.typeAttributes.grading`}
+          required
+          label="Response Type"
+          error={Boolean(indexedErrors?.typeAttributes?.grading)}
+          helperText={indexedErrors?.typeAttributes?.grading?.message}
+          readOnly={
+            crudType === FormCrudType.view ||
+            slideType === SlideTypeEnum.CTF ||
+            watchQuestionType === QuestionResponse.Matching
+          }
+        >
+          {gradingOptions.map((item) => (
+            <MenuItem key={item} value={item}>
+              {item}
+            </MenuItem>
+          ))}
+        </FormControlSelectField>
+      </Grid>
     </Grid>
   );
 }
@@ -242,11 +336,12 @@ interface optionFieldGroupProps extends fieldGroupProps {
   questionField: string;
   questionType: QuestionResponse;
 }
+
 function QuestionOptionsFieldGroup(props: optionFieldGroupProps) {
   const { crudType, formProps, questionField, questionType } = props;
   const { formMethods, indexedArrayField, indexedErrors, isFocused, rowIndex } =
     formProps;
-  const { control, getValues, setValue, watch } = formMethods;
+  const { control, getValues, setValue } = formMethods;
 
   const focusHelper = useDisplayFocus();
   // this effect is for focusing on text field when added as row to array
@@ -275,7 +370,14 @@ function QuestionOptionsFieldGroup(props: optionFieldGroupProps) {
     <Grid
       container
       spacing={0.5}
-      sx={{ marginLeft: '12px', width: '100%' }}
+      sx={{
+        marginLeft: '12px',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignContent: 'center',
+      }}
       id={indexedArrayField} // this is used for scrolling when new array entry added
     >
       <Grid size={9}>
@@ -290,7 +392,7 @@ function QuestionOptionsFieldGroup(props: optionFieldGroupProps) {
           required
         />
       </Grid>
-      <Grid size={3}>
+      <Grid size={3} sx={{ height: '32px' }}>
         <FormControlCheckboxField
           control={control}
           name={`${indexedArrayField}.correct`}
@@ -309,8 +411,7 @@ function QuestionOptionsFieldGroup(props: optionFieldGroupProps) {
 
 function QuestionMatchingFieldGroup(props: fieldGroupProps) {
   const { crudType, formProps } = props;
-  const { formMethods, indexedArrayField, indexedErrors, isFocused, rowIndex } =
-    formProps;
+  const { formMethods, indexedArrayField, indexedErrors } = formProps;
   const { control } = formMethods;
 
   return (

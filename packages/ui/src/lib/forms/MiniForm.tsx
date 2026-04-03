@@ -202,13 +202,13 @@ export function MiniForm({
             await doAction(data);
           }
 
+          if (successToasterMessage) {
+            displayToaster({
+              message: successToasterMessage,
+              severity: 'success',
+            });
+          }
           if (onResponse) {
-            if (successToasterMessage) {
-              displayToaster({
-                message: successToasterMessage,
-                severity: 'success',
-              });
-            }
             onResponse(true, data, '');
           }
 
@@ -218,43 +218,31 @@ export function MiniForm({
 
           setIsSubmitting(false);
         } catch (error: any) {
+          let errorMessage = '';
+
+          if (error instanceof AxiosError && error.response?.data?.message) {
+            errorMessage = error.response.data.message;
+          } else if (error.message) {
+            errorMessage = error.message;
+          } else if (failToasterMessage) {
+            errorMessage = failToasterMessage;
+          } else {
+            errorMessage = JSON.stringify(error);
+          }
+
+          setSubmitError(errorMessage);
+
+          if (failToasterMessage) {
+            displayToaster({
+              message: errorMessage,
+              severity: 'error',
+            });
+          }
+
           if (onResponse) {
-            if (error instanceof AxiosError) {
-              if (error.response?.data?.message) {
-                setSubmitError(error.response.data.message);
-                if (failToasterMessage) {
-                  displayToaster({
-                    message: error.response.data.message,
-                    severity: 'error',
-                  });
-                }
-                setIsSubmitting(false);
-                return;
-              }
-            }
-
-            if (error.message) {
-              setSubmitError(error.message);
-              if (failToasterMessage) {
-                displayToaster({
-                  message: error.message,
-                  severity: 'error',
-                });
-              }
-            } else {
-              if (failToasterMessage) {
-                setSubmitError(failToasterMessage);
-                displayToaster({
-                  message: failToasterMessage,
-                  severity: 'error',
-                });
-              } else {
-                setSubmitError(JSON.stringify(error));
-              }
-            }
-
             onResponse(false, data, '');
           }
+
           setIsSubmitting(false);
         }
       }

@@ -94,7 +94,10 @@ export function FormControlCheckboxField(props: tFieldProps) {
                 {...checkboxProps}
                 required={false} //Force required to false to avoid native validation message on hover
               />
-              <Typography variant="body1" sx={{ lineHeight: 1.1 }}>
+              <Typography
+                variant="body1"
+                sx={{ lineHeight: 1.1, marginRight: '4px' }}
+              >
                 {isRequired ? label + requiredDecorator : label}
               </Typography>
 

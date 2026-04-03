@@ -1,5 +1,5 @@
 {
-  "name": "rapid-cmi5",
+  "name": "rapid-cmi5-editor",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/rapid-cmi5/src",
   "projectType": "library",

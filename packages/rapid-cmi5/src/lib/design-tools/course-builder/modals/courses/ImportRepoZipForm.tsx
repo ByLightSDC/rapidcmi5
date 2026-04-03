@@ -9,7 +9,7 @@ import {
 } from '@rapid-cmi5/ui';
 import * as yup from 'yup';
 
-import { importRepoZipModalId } from '../../rapidcmi5_mdx/modals/constants';
+import { importRepoZipModalId } from '../../../rapidcmi5_mdx/modals/constants';
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
 import { Alert, Typography } from '@mui/material';
@@ -18,9 +18,9 @@ import Grid from '@mui/material/Grid2';
 import { UseFormReturn } from 'react-hook-form';
 
 import { NAME_GROUP } from '@rapid-cmi5/ui';
-import { ImportRepoZipType } from '../CourseBuilderApiTypes';
+import { ImportRepoZipType } from '../../CourseBuilderApiTypes';
 import { useContext, useState } from 'react';
-import { GitContext } from '../GitViewer/session/GitContext';
+import { GitContext } from '../../GitViewer/session/GitContext';
 
 export function ImportRepoZipForm({
   defaultData,

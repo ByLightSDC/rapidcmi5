@@ -5,6 +5,7 @@ export interface SSOConfig {
   keycloakClientId: string;
   keycloakScope: string;
   rangeRestApiUrl: string;
+  quizBankApiUrl: string;
 }
 
 export interface Credentials {
