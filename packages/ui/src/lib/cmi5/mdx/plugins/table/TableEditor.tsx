@@ -4,6 +4,11 @@ import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import * as RadixPopover from '@radix-ui/react-popover';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import EditIcon from '@mui/icons-material/Edit';
+import { Box, IconButton, Tooltip, useTheme } from '@mui/material';
+import { useGutterRight } from '../shared/useGutterRight';
+import DeleteIconButton from '../../components/DeleteIconButton';
+import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 import {
   $createParagraphNode,
   $getRoot,
@@ -20,11 +25,14 @@ import {
 import * as Mdast from 'mdast';
 import React, {
   ElementType,
+  useContext,
   useEffect,
   useState,
   useRef,
   useLayoutEffect,
 } from 'react';
+import { LessonThemeContext } from '../../contexts/LessonThemeContext';
+import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
 import { TableNode } from './TableNode';
 
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -167,6 +175,14 @@ export const TableEditor: React.FC<TableEditorProps> = ({
     readOnly$,
   );
 
+  const muiTheme = useTheme();
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  const blockPadding = resolvedThemeCSS
+    ? (resolvedThemeCSS.blockPadding ?? '0px')
+    : '32px';
+  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
+
   const getCellKey = React.useMemo(() => {
     return (cell: Mdast.TableCell & { __cacheKey?: string }) => {
       if (!cell.__cacheKey) {
@@ -302,8 +318,6 @@ export const TableEditor: React.FC<TableEditorProps> = ({
     [],
   );
 
-  const t = useTranslation();
-
   useEffect(() => {
     console.log('TableEditor');
     console.log('mdastNode', mdastNode);
@@ -402,6 +416,32 @@ export const TableEditor: React.FC<TableEditorProps> = ({
 
   // remove tool cols in readOnly mode
   return (
+    <div style={{ paddingTop: blockPadding, paddingBottom: blockPadding, position: 'relative' }}>
+      {!readOnly && (
+        <Box
+          ref={gutterRef as any}
+          sx={{
+            backgroundColor:
+              muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
+            display: 'flex',
+            position: 'absolute',
+            top: 0,
+            right: gutterRight,
+            zIndex: 1,
+          }}
+        >
+          <TableSettingsButton parentEditor={parentEditor} lexicalTable={lexicalTable} />
+          <InsertLineReturnButton parentEditor={parentEditor} lexicalNode={lexicalTable} />
+          <DeleteIconButton
+            onDelete={() => {
+              parentEditor.update(() => {
+                lexicalTable.selectNext();
+                lexicalTable.remove();
+              });
+            }}
+          />
+        </Box>
+      )}
     <div style={readOnly ? undefined : { border: '1px dashed var(--baseBgActive, #ccc)', borderRadius: '4px', padding: '2px' }}>
     <div style={{ position: 'relative' }}>
       {/* Shadow Underlay - Only in Edit Mode */}
@@ -446,7 +486,6 @@ export const TableEditor: React.FC<TableEditorProps> = ({
               )}
 
               {readOnly ? null : <col />}
-              {readOnly ? null : <col />}
             </colgroup>
 
             {readOnly || (
@@ -482,35 +521,6 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                     >
                       {iconComponentFor('add_column')}
                     </button>
-                  </th>
-                  <th className={styles['tableToolsColumn']} data-tool-cell={true}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '4px',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <TableSettingsButton
-                        parentEditor={parentEditor}
-                        lexicalTable={lexicalTable}
-                      />
-                      <button
-                        className={styles['iconButton']}
-                        type="button"
-                        title={t('table.deleteTable', 'Delete table')}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          parentEditor.update(() => {
-                            lexicalTable.selectNext();
-                            lexicalTable.remove();
-                          });
-                        }}
-                      >
-                        {iconComponentFor('delete_small')}
-                      </button>
-                    </div>
                   </th>
                 </tr>
               </thead>
@@ -626,13 +636,13 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                     </button>
                   </th>
                   <th></th>
-                  <th></th>
                 </tr>
               </tfoot>
             )}
           </>
         )}
       </table>
+    </div>
     </div>
     </div>
   );
@@ -1121,7 +1131,6 @@ const TableSettingsButton: React.FC<{
   parentEditor: LexicalEditor;
   lexicalTable: TableNode;
 }> = ({ parentEditor, lexicalTable }) => {
-  const [iconComponentFor] = useCellValues(iconComponentFor$);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentStyle, setCurrentStyle] = useState('');
 
@@ -1144,14 +1153,11 @@ const TableSettingsButton: React.FC<{
 
   return (
     <>
-      <button
-        type="button"
-        className={styles['iconButton']}
-        title="Table Settings"
-        onClick={openDialog}
-      >
-        {iconComponentFor('settings')}
-      </button>
+      <Tooltip title="Table Settings">
+        <IconButton size="small" onClick={openDialog}>
+          <EditIcon />
+        </IconButton>
+      </Tooltip>
 
       {isDialogOpen && (
         <TableStyleDialog
