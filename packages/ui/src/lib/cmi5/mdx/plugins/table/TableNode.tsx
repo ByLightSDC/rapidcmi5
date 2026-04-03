@@ -182,6 +182,37 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     console.log('the table', table);
   }
 
+  updateCellTextAlign(
+    colIndex: number,
+    rowIndex: number,
+    align: 'left' | 'center' | 'right',
+  ): void {
+    const self = this.getWritable();
+    const table = self.__mdastNode;
+    const row = table.children[rowIndex];
+    const cells = row.children;
+    const cell = cells[colIndex];
+    const cellsClone = Array.from(cells);
+    const cellClone = {
+      ...cell,
+      data: {
+        ...cell.data,
+        hProperties: {
+          ...cell.data?.hProperties,
+          ...(align === 'left'
+            ? { 'data-text-align': undefined }
+            : { 'data-text-align': align }),
+        },
+      },
+    };
+    if (align === 'left' && cellClone.data?.hProperties) {
+      delete (cellClone.data.hProperties as any)['data-text-align'];
+    }
+    const rowClone = { ...row, children: cellsClone };
+    cellsClone[colIndex] = cellClone;
+    table.children[rowIndex] = rowClone;
+  }
+
   /**
    * Sets the full style string for the table.
    * Used by the TableStyleDialog to apply complex border styles.

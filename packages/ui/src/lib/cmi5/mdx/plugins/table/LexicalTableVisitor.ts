@@ -18,11 +18,19 @@ function rowToHast(
     tagName: 'tr',
     properties: {},
     children: row.children.map((cell) => {
-      // 1. Extract style from our custom data storage
+      // 1. Extract style and text-align from our custom data storage
       const style = cell.data?.hProperties?.['style'];
+      const textAlign = (cell.data?.hProperties as any)?.['data-text-align'] as string | undefined;
       const properties: any = {};
-      if (style) {
-        properties.style = style;
+
+      // Merge text-align into the style string so it round-trips through HTML
+      const styleWithAlign = [
+        style,
+        textAlign && textAlign !== 'left' ? `text-align: ${textAlign}` : undefined,
+      ].filter(Boolean).join('; ');
+
+      if (styleWithAlign) {
+        properties.style = styleWithAlign;
       }
 
       // 2. Convert cell content to HAST
