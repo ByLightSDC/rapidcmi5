@@ -44,7 +44,6 @@ export const GridContainerPlayback: React.FC<
     >
       <style>{`
         .${containerClass} > [data-lexical-editor="true"],
-        .${containerClass} > [role="textbox"],
         .${containerClass} > div[class*="nestedEditor"] {
           display: grid;
           grid-template-columns: repeat(${columnCount}, 1fr);
@@ -59,6 +58,7 @@ export const GridContainerPlayback: React.FC<
           ...node,
           children,
         })}
+        contentEditableProps={{ role: 'none' }}
       />
     </div>
   );

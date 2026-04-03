@@ -228,11 +228,14 @@ export const GridContainerEditor: React.FC<
     skipNextCloseRebuildRef.current = true;
     setPendingColor('');
     setBackgroundColor('');
-    parentEditor.update(() => {
-      const attrs = { ...mdastNode.attributes };
-      delete attrs.backgroundColor;
-      lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-    }, { discrete: true });
+    parentEditor.update(
+      () => {
+        const attrs = { ...mdastNode.attributes };
+        delete attrs.backgroundColor;
+        lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+      },
+      { discrete: true },
+    );
   }, [lexicalNode, mdastNode, parentEditor]);
 
   /**
@@ -400,15 +403,18 @@ export const GridContainerEditor: React.FC<
           const latest = pendingColorRef.current;
           if (latest !== backgroundColor) {
             setBackgroundColor(latest);
-            parentEditor.update(() => {
-              const attrs = { ...mdastNode.attributes };
-              if (latest) {
-                attrs.backgroundColor = latest;
-              } else {
-                delete attrs.backgroundColor;
-              }
-              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-            }, { discrete: true });
+            parentEditor.update(
+              () => {
+                const attrs = { ...mdastNode.attributes };
+                if (latest) {
+                  attrs.backgroundColor = latest;
+                } else {
+                  delete attrs.backgroundColor;
+                }
+                lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+              },
+              { discrete: true },
+            );
           }
         }}
         lastColor={pendingColor}
