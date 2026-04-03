@@ -55,7 +55,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 import { currentRepoAccessObjectSel } from '../../../../redux/repoManagerReducer';
 import { slugifyPath } from '../../../course-builder/GitViewer/utils/useCourseOperationsUtils';
-import { ButtonMinorUi, useToaster } from '@rapid-cmi5/ui';
+import { appHeaderVisible, ButtonMinorUi, useToaster } from '@rapid-cmi5/ui';
 import { Divider } from '@mui/material';
 import { Box, minWidth } from '@mui/system';
 
@@ -98,7 +98,7 @@ function LessonTree({
     changeLessonTheme,
   } = useContext(RC5Context);
   const repoAccessObject = useSelector(currentRepoAccessObjectSel);
-
+  const isAppHeaderShowing = useSelector(appHeaderVisible);
   const dispatch = useDispatch<AppDispatch>();
   const displayToaster = useToaster();
   const [treeData, setTreeData] = useState<INode<IFlatMetadata>[]>([]);
@@ -442,7 +442,7 @@ function LessonTree({
           sx={{
             minHeight: 0, // IMPORTANT for overflow in flex children
             overflow: 'auto',
-            height: '80%',  // IMPORTANT: parent must have a height
+            height: `calc(100vh - ${isAppHeaderShowing ? 220 : 186}px)`,
           }}
         >
           {/* only show the tree when there is data to show to prevent errors while in process of switching repos - tree not yet filled in */}

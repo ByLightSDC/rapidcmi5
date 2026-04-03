@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="./documents/RapidCMI5.png" alt="RapidCMI5 Logo" width="820">
+    <img src="./documents/RapidCMI5.png" alt="RapidCMI5 Logo" >
 </p>
 <p align="center">
   <img src="https://img.shields.io/badge/status-active-brightgreen" alt="Status: Active">

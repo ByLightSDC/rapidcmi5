@@ -14,9 +14,9 @@ import { CommonAppModalState } from '@rapid-cmi5/ui';
 import Grid from '@mui/material/Grid2';
 import { UseFormReturn } from 'react-hook-form';
 
-import { CreateLessonType } from '../CourseBuilderApiTypes';
+import { CreateLessonType } from '../../CourseBuilderApiTypes';
 import { NAME_GROUP } from '@rapid-cmi5/ui';
-import { createNewLessonModalId } from '../../rapidcmi5_mdx/modals/constants';
+import { createNewLessonModalId } from '../../../rapidcmi5_mdx/modals/constants';
 
 export function CreateLessonForm({
   defaultData,

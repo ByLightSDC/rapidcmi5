@@ -38,3 +38,6 @@ export * from './lib/types/apis/useCodeRunnerApi';
 
 
 export * from './lib/utils/dateAndTime';
+export * from './lib/types/apis/quizBankContract';
+
+

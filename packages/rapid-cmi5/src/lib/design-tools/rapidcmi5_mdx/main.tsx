@@ -16,6 +16,7 @@ import {
   ExecuteCodeResponseApi,
   GitUserConfig,
   LanguagesResponseApi,
+  RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 
 export type SubmitScenarioFormFn<T = any> = (item: T) => void;
@@ -24,13 +25,9 @@ export type SubmitScenarioFormFn<T = any> = (item: T) => void;
 // this prevents needing to pass the token into the package part of the application
 // we only need to pass the function for on click
 
-export interface ScenarioFormProps {
-  submitForm: SubmitScenarioFormFn;
+export interface ScenarioFormProps extends GetScenarioFormProps {
   token: string;
   url?: string;
-  formMethods: UseFormReturn;
-  formType: FormCrudType;
-  errors: any;
 }
 
 export interface GetScenarioFormProps {
@@ -46,12 +43,41 @@ export interface CodeRunnerOps {
     body: ExecuteCodeBodyApi
   ) => Promise<ExecuteCodeResponseApi>;
 }
+export interface GetQuizBankSearchModalProps {
+  submitForm: SubmitScenarioFormFn;
+  closeModal: () => void;
+  formMethods: UseFormReturn;
+  formType: FormCrudType;
+  activityType: RC5ActivityTypeEnum;
+  errors: any;
+}
+
+export interface QuizBankSearchModalProps extends GetQuizBankSearchModalProps {
+  token: string;
+  url: string;
+  currentUserEmail: string;
+}
+
+export interface GetQuizBankAddModalProps {
+  closeModal: () => void;
+  formMethods: UseFormReturn;
+  formType: FormCrudType;
+  errors: any;
+  question: any;
+}
+
+export interface QuizBankAddModalProps extends GetQuizBankAddModalProps {
+  token: string;
+  url: string;
+}
 
 export interface RapidCmi5Opts {
   userAuth?: UserAuth;
   downloadCmi5Player?: () => Promise<any>;
   processAu?: (au: CourseAU, blockId: string) => Promise<void>;
   GetScenariosForm?: React.ComponentType<GetScenarioFormProps>;
+  QuizBankSearchModal?: React.ComponentType<GetQuizBankSearchModalProps>;
+  QuizBankAddModal?: React.ComponentType<GetQuizBankAddModalProps>;
   clearData?: () => void;
   showHomeButton?: boolean;
   clearCache?: () => void;
@@ -67,6 +93,7 @@ export type UserAuth = {
   userName: string;
   userEmail: string;
   gitCredentials?: Credentials;
+  apiUser?: string;
 };
 
 export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {

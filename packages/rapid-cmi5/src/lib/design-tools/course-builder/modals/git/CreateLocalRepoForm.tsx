@@ -10,7 +10,6 @@ import {
 } from '@rapid-cmi5/ui';
 import * as yup from 'yup';
 
-import { createLocalRepoModalId } from '../../rapidcmi5_mdx/modals/constants';
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
 import Grid from '@mui/material/Grid2';
@@ -18,14 +17,14 @@ import Grid from '@mui/material/Grid2';
 import { UseFormReturn } from 'react-hook-form';
 
 import { GIT_URL_GROUP, NAME_GROUP } from '@rapid-cmi5/ui';
-import { CreateCloneType } from '../CourseBuilderApiTypes';
 import { useContext, useEffect, useMemo } from 'react';
-import { GitContext } from '../GitViewer/session/GitContext';
 import { Alert, Typography } from '@mui/material';
 
 import CheckIcon from '@mui/icons-material/Check';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
-import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
+import { createLocalRepoModalId } from '../../../rapidcmi5_mdx/modals/constants';
+import { CreateCloneType } from '../../CourseBuilderApiTypes';
+import { GitContext } from '../../GitViewer/session/GitContext';
 
 export function CreateLocalRepoForm({
   defaultData,

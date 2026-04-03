@@ -47,7 +47,7 @@ import { usePublishActions } from './usePublishActions';
 import { useImageCache } from './useImageCache';
 import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 import { INode } from 'react-accessible-treeview';
-import { FileContent, getRepoPath, GitFS } from '../utils/fileSystem';
+import { FileContent, getRepoPath } from '../utils/fileSystem';
 import { GitOperations } from '../utils/gitOperations';
 import JSZip from 'jszip';
 import { FolderStruct } from '@rapid-cmi5/cmi5-build-common';
@@ -84,6 +84,8 @@ import {
   slugifyPath,
 } from '../utils/useCourseOperationsUtils';
 import {
+  GetQuizBankAddModalProps,
+  GetQuizBankSearchModalProps,
   GetScenarioFormProps,
   UserAuth,
 } from '../../../rapidcmi5_mdx/main';

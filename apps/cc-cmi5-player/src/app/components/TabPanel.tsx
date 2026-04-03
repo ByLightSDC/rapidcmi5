@@ -8,6 +8,7 @@ import {
   auJsonSel,
   auLogoDarkSel,
   auLogoLightSel,
+  auLogoWidthSel,
   courseAUProgressSel,
 } from '../redux/auReducer';
 import { activeTabSel, setActiveTab } from '../redux/navigationReducer';
@@ -18,6 +19,8 @@ export default function TabPanel() {
   const auJson = useSelector(auJsonSel);
   const auLogoDark = useSelector(auLogoDarkSel);
   const auLogoLight = useSelector(auLogoLightSel);
+  const auLogoWidth = useSelector(auLogoWidthSel);
+
   const dispatch = useDispatch();
   const activeTab = useSelector(activeTabSel);
   const courseAUProgress = useSelector(courseAUProgressSel);
@@ -29,7 +32,6 @@ export default function TabPanel() {
     }
     return auLogoDark;
   }, [currentTheme.palette.mode, auLogoDark, auLogoLight]);
-
 
   const tabClicked = (_: React.SyntheticEvent, newValue: number) => {
     dispatch(setActiveTab(newValue));
@@ -179,10 +181,10 @@ export default function TabPanel() {
         {currentLogo && (
           <img
             alt="Course or Logo"
-            width="200px"
+            width={auLogoWidth}
             style={{
               padding: '16px',
-              paddingBottom: 0,
+              paddingBottom: '0px',
             }}
             src={currentLogo}
           />
