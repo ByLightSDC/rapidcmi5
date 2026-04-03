@@ -12,7 +12,10 @@ import { FormCrudType } from '@rapid-cmi5/ui';
 import {
   CourseAU,
   Credentials,
+  ExecuteCodeBodyApi,
+  ExecuteCodeResponseApi,
   GitUserConfig,
+  LanguagesResponseApi,
 } from '@rapid-cmi5/cmi5-build-common';
 
 export type SubmitScenarioFormFn<T = any> = (item: T) => void;
@@ -37,18 +40,11 @@ export interface GetScenarioFormProps {
   errors: any;
 }
 
-export interface RuntimeCollection {
-  languageName: string;
-  versions: string[];
-}
-
 export interface CodeRunnerOps {
-  listRuntimes: () => Promise<RuntimeCollection[]>;
+  listRuntimes: () => Promise<LanguagesResponseApi>;
   executeCode: (
-    code: string,
-    language: string,
-    runtime: string,
-  ) => Promise<{ stdout: string; stderr: string }>;
+    body: ExecuteCodeBodyApi
+  ) => Promise<ExecuteCodeResponseApi>;
 }
 
 export interface RapidCmi5Opts {

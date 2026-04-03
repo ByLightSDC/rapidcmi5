@@ -6,8 +6,10 @@ import {
   CourseAU,
   createAuMappingNameWithAuId,
   Credentials,
+  ExecuteCodeBodyApi,
   generateAuId,
   GitUserConfig,
+  useCodeRunnerApi,
 } from '@rapid-cmi5/cmi5-build-common';
 import { RapidCmi5, GetScenarioFormProps } from '@rapid-cmi5/react-editor';
 import { debugLogError } from '@rapid-cmi5/ui';
@@ -81,6 +83,12 @@ export function RapidCmi5Wrapper() {
     }
     return scenarioUUID;
   };
+
+  const { executeCode, getLanguages } = useCodeRunnerApi(
+    ssoConfig?.rangeRestApiUrl || '',
+    token || '',
+    'Bearer',
+  );
 
   return (
     <RapidCmi5
@@ -172,37 +180,25 @@ export function RapidCmi5Wrapper() {
             )
           : undefined
       }
-      codeRunnerOps={{
-        executeCode: async (
-          content: string,
-          language: string,
-          runtime: string,
-        ) => {
-          const response = await axios.post(
-            `http://localhost:8080/v1/cmi5/code-runner/execute`,
-            {
-              submissionContent: content,
-              runtime: language,
-            },
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            },
-          );
-          console.log('data', response);
+      codeRunnerOps={
+        token && ssoConfig?.rangeRestApiUrl
+          ? {
+              executeCode: async (body: ExecuteCodeBodyApi) => {
+                const response = await executeCode({
+                  submissionContent: body.submissionContent,
+                  language: body.language,
+                  languageVersion: body.languageVersion,
+                });
 
-          return { stderr: 'failed', stdout: '' };
-        },
-        listRuntimes: async () => {
-          const response = await axios.get(
-            `http://localhost:8080/v1/cmi5/code-runner/languages`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            },
-          );
-          console.log('data', response);
-          return response.data;
-        },
-      }}
+                return response;
+              },
+              listRuntimes: async () => {
+                const response = await getLanguages();
+                return response;
+              },
+            }
+          : undefined
+      }
     />
   );
 }

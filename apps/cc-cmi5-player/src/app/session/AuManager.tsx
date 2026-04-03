@@ -26,7 +26,7 @@ import {
   AuManagerState,
   QuizState,
   RC5ActivityTypeEnum,
-  SlideType,
+  useCodeRunnerApi,
 } from '@rapid-cmi5/cmi5-build-common';
 import MenuLayout from '../components/MenuLayout';
 
@@ -92,6 +92,7 @@ function AuManager() {
     cmi5ErrorMessage,
     isInitSessionCmi5Complete,
   } = useCMI5Session();
+
 
   const {
     handleGetQuizProgress,

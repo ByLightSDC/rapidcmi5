@@ -1,14 +1,15 @@
 import { UseFormReturn } from 'react-hook-form';
-
-/* MUI */
 import Grid from '@mui/material/Grid2';
 import MenuItem from '@mui/material/MenuItem';
-
 import * as yup from 'yup';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { SxProps } from '@mui/system';
 
+import { Alert } from '@mui/material';
 import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
 import {
   CodeRunnerContent,
+  LanguagesResponseApi,
   moveOnCriteriaOptions,
   RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
@@ -26,8 +27,6 @@ import {
   useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
-import { useContext, useEffect, useState } from 'react';
-import { SxProps } from '@mui/system';
 import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 
 export const CodeRunnerForm = ({
@@ -42,20 +41,25 @@ export const CodeRunnerForm = ({
   handleCloseModal?: () => void;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  // Get the unique rc5id from the form data for scoping ksats to individual activity
   const rc5id = defaultFormData?.rc5id;
-
   const { codeRunnerOps } = useRapidCmi5Opts();
-  /* Lesson Theme */
+
   const { lessonTheme } = useContext(LessonThemeContext);
   const { outerActivitySxWithConstrainedWidthForm } = useLessonThemeStyles(
     lessonTheme,
     maxFormWidths.codeRunnerEditor,
   );
 
+  const [runtimeMap, setRuntimeMap] = useState<LanguagesResponseApi>({});
+  const [useRuntimeDropdowns, setUseRuntimeDropdowns] = useState(false);
+  const [runtimeError, setRuntimeError] = useState('');
+
+  const programmingLanguageOptions = useMemo(
+    () => Object.keys(runtimeMap),
+    [runtimeMap],
+  );
+
   const validationSchema = yup.object().shape({
-    // student: DESCRIPTION_GROUP,
-    // evaluator: DESCRIPTION_GROUP,
     ksats: yup.array().of(
       yup.object().optional().shape({
         element_identifier: REQUIRED_ENTRY,
@@ -63,58 +67,88 @@ export const CodeRunnerForm = ({
     ),
   });
 
+  useEffect(() => {
+    const fetchRuntimes = async () => {
+      if (!codeRunnerOps?.listRuntimes) return;
+
+      try {
+        const runtimes = await codeRunnerOps.listRuntimes();
+
+        if (!Object.keys(runtimes).length) {
+          setRuntimeMap({});
+          setUseRuntimeDropdowns(false);
+          return;
+        }
+
+        setRuntimeMap(runtimes);
+        setUseRuntimeDropdowns(true);
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'An unexpected error occurred.';
+        setRuntimeError(message);
+      }
+    };
+    fetchRuntimes();
+  }, [codeRunnerOps]);
+
   const onSaveAction = (data: any) => {
     if (onSave) {
       onSave(RC5ActivityTypeEnum.codeRunner, data as CodeRunnerContent);
     }
   };
 
-  /**
-   * Returns form fields unique to this form
-   * @param {UseFormReturn} formMethods React hook form methods
-   * @param {FormStateType} formState React hook form state fields (ex. errors, isValid)
-   * @return {JSX.Element} Render elements
-   */
   const getFormFields = (
     formMethods: UseFormReturn,
     formState: FormStateType,
   ): JSX.Element => {
     const { control, setValue, getValues, watch } = formMethods;
     const { errors } = formState;
+
     const selectedLanguage = watch('programmingLanguage');
+
+    const versionOptions = runtimeMap[selectedLanguage];
 
     const handleLanguageChange = (language: string) => {
       const versions = runtimeMap[language] ?? [];
-      setVersionOptions(versions);
+
+      setValue('programmingLanguage', language);
       setValue('languageVersion', versions[0] ?? '');
     };
 
-    const [runtimeMap, setRuntimeMap] = useState<Record<string, string[]>>({});
-    const [programmingLanguageOptions, setProgrammingLanguageOptions] =
-      useState<string[]>([]);
-    const [versionOptions, setVersionOptions] = useState<string[]>([]);
-    const [useRuntimeDropdowns, setUseRuntimeDropdowns] = useState(false);
-
     useEffect(() => {
-      const fetchRuntimes = async () => {
-        const runtimes = (await codeRunnerOps?.listRuntimes()) as unknown as
-          | Record<string, string[]>
-          | undefined;
-        if (!runtimes || !Object.keys(runtimes).length) return;
-        setRuntimeMap(runtimes);
-        setProgrammingLanguageOptions(Object.keys(runtimes));
-        setUseRuntimeDropdowns(true);
+      if (!useRuntimeDropdowns || !runtimeMap.length) return;
 
-        if (!getValues('programmingLanguage')) {
-          const firstLanguage = Object.keys(runtimes)[0];
-          const firstVersions = runtimes[firstLanguage] ?? [];
-          setVersionOptions(firstVersions);
-          setValue('programmingLanguage', firstLanguage);
-          setValue('languageVersion', firstVersions[0] ?? '');
-        }
-      };
-      fetchRuntimes();
-    }, [codeRunnerOps]);
+      const currentLanguage = getValues('programmingLanguage');
+      const currentVersion = getValues('languageVersion');
+
+      if (!currentLanguage) {
+        const firstLanguage = runtimeMap[0];
+        const firstVersion = runtimeMap[0][0] ?? '';
+
+        setValue('programmingLanguage', firstLanguage);
+        setValue('languageVersion', firstVersion);
+        return;
+      }
+
+      const matchingRuntime = runtimeMap[currentLanguage];
+
+      if (!matchingRuntime) {
+        const firstLanguage = runtimeMap[0];
+        const firstVersion = runtimeMap[0][0] ?? '';
+
+        setValue('programmingLanguage', firstLanguage);
+        setValue('languageVersion', firstVersion);
+        return;
+      }
+
+      if (currentVersion && matchingRuntime.includes(currentVersion)) {
+        return;
+      }
+
+      setValue('languageVersion', matchingRuntime[0] ?? '');
+    }, [getValues, runtimeMap, setValue]);
 
     return (
       <>
@@ -127,6 +161,7 @@ export const CodeRunnerForm = ({
             sxProps={{ height: '30%' }}
           />
         </Grid>
+
         <Grid size={5.5}>
           <FormControlSelectField
             control={control}
@@ -144,6 +179,12 @@ export const CodeRunnerForm = ({
             ))}
           </FormControlSelectField>
         </Grid>
+
+        {runtimeError && (
+          <Grid size={11.5}>
+            <Alert severity="error">{runtimeError}</Alert>
+          </Grid>
+        )}
 
         {useRuntimeDropdowns ? (
           <>
@@ -195,6 +236,7 @@ export const CodeRunnerForm = ({
                 readOnly={crudType === FormCrudType.view}
               />
             </Grid>
+
             <Grid size={5.5}>
               <FormControlTextField
                 control={control}
@@ -214,33 +256,35 @@ export const CodeRunnerForm = ({
             name={`description`}
             minRows={4}
             maxRows={12}
-            //required
             label="Description"
             readOnly={crudType === FormCrudType.view}
             multiline={true}
             sxProps={{ height: '30%' }}
           />
         </Grid>
+
         <Grid size={11.5}>
           <FormControlMonacoField
             control={control}
             name={`student`}
             label="Student Code"
             language={selectedLanguage ?? 'javascript'}
-            height={200}
+            height={300}
             readOnly={crudType === FormCrudType.view}
           />
         </Grid>
+
         <Grid size={11.5}>
           <FormControlMonacoField
             control={control}
             name={`evaluator`}
             label="Evaluator"
             language={selectedLanguage ?? 'javascript'}
-            height={200}
+            height={300}
             readOnly={crudType === FormCrudType.view}
           />
         </Grid>
+
         {featureFlagShouldShowKSATs && (
           <Grid size={11.5}>
             <KSATsFieldGroup formMethods={formMethods} crudType={crudType} />

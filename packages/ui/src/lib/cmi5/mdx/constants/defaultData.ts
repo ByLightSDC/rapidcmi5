@@ -227,7 +227,7 @@ export const getDefaultData = (activity: RC5ActivityTypeEnum) => {
     case RC5ActivityTypeEnum.download:
       return defaulDownloadFileContentStr;
     case RC5ActivityTypeEnum.codeRunner:
-      return defaultCodeRunnerContent;
+      return defaultCodeRunnerContentStr;
   }
   return null;
 };
