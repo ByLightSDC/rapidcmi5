@@ -3,6 +3,7 @@ import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import * as RadixPopover from '@radix-ui/react-popover';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import {
   $createParagraphNode,
   $getRoot,
@@ -36,7 +37,6 @@ import styles from './styles/table.module.css';
 import { v4 as uuidv4 } from 'uuid';
 
 import {
-  ButtonWithTooltip,
   NESTED_EDITOR_UPDATED_COMMAND,
   codeBlockEditorDescriptors$,
   directiveDescriptors$,
@@ -268,19 +268,35 @@ export const TableEditor: React.FC<TableEditorProps> = ({
 
         tableCell = tableCell.parentElement;
       }
-      if (tableCell === null) {
+      if (tableCell === null) return;
+
+      // Row gutter cell — show row indicator, clear col
+      const rowTrigger = tableCell.getAttribute('data-row-trigger');
+      if (rowTrigger !== null) {
+        setHighlightedCoordinates([-1, parseInt(rowTrigger, 10)]);
         return;
       }
+
+      // Column trigger cell (thead) — show col indicator, clear row
+      const colTrigger = tableCell.getAttribute('data-col-trigger');
+      if (colTrigger !== null) {
+        setHighlightedCoordinates([parseInt(colTrigger, 10), -1]);
+        return;
+      }
+
+      // Other tool cells (add-col, settings, tfoot) — clear everything
+      if (tableCell.hasAttribute('data-tool-cell')) {
+        setHighlightedCoordinates([-1, -1]);
+        return;
+      }
+
+      // Regular data cell
       const tableRow = tableCell.parentElement!;
       const tableContainer = tableRow.parentElement!;
-      const colIndex =
-        tableContainer.tagName === 'TFOOT'
-          ? -1
-          : Array.from(tableRow.children).indexOf(tableCell);
-      const rowIndex =
-        tableCell.tagName === 'TH'
-          ? -1
-          : Array.from(tableRow.parentElement!.children).indexOf(tableRow);
+      const domColIndex = Array.from(tableRow.children).indexOf(tableCell);
+      // Subtract 1 for the row gutter column
+      const colIndex = tableContainer.tagName === 'TFOOT' ? -1 : domColIndex - 1;
+      const rowIndex = Array.from(tableContainer.children).indexOf(tableRow);
       setHighlightedCoordinates([colIndex, rowIndex]);
     },
     [],
@@ -386,6 +402,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
 
   // remove tool cols in readOnly mode
   return (
+    <div style={readOnly ? undefined : { border: '1px dashed var(--baseBgActive, #ccc)', borderRadius: '4px', padding: '2px' }}>
     <div style={{ position: 'relative' }}>
       {/* Shadow Underlay - Only in Edit Mode */}
       {!readOnly && fullShadowStyle && dataArea && (
@@ -429,6 +446,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
               )}
 
               {readOnly ? null : <col />}
+              {readOnly ? null : <col />}
             </colgroup>
 
             {readOnly || (
@@ -439,12 +457,13 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                     { length: mdastNode.children[0].children.length },
                     (_, colIndex) => {
                       return (
-                        <th key={colIndex} data-tool-cell={true}>
+                        <th key={colIndex} data-col-trigger={colIndex}>
                           <ColumnEditor
                             {...{
                               setActiveCellWithBoundaries,
                               parentEditor,
                               colIndex,
+                              colCount: mdastNode.children[0].children.length,
                               highlightedCoordinates,
                               lexicalTable,
                               align: (mdastNode.align ?? [])[colIndex],
@@ -455,6 +474,15 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                     },
                   )}
 
+                  <th className={styles['tableToolsColumn']} data-tool-cell={true}>
+                    <button
+                      type="button"
+                      className={styles['addColumnButton']}
+                      onClick={addColumnToRight}
+                    >
+                      {iconComponentFor('add_column')}
+                    </button>
+                  </th>
                   <th className={styles['tableToolsColumn']} data-tool-cell={true}>
                     <div
                       style={{
@@ -500,13 +528,14 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                     {readOnly || (
                       <CellElement
                         className={styles['toolCell']}
-                        data-tool-cell={true}
+                        data-row-trigger={rowIndex}
                       >
                         <RowEditor
                           {...{
                             setActiveCellWithBoundaries,
                             parentEditor,
                             rowIndex,
+                            rowCount: mdastNode.children.length,
                             highlightedCoordinates,
                             lexicalTable,
                           }}
@@ -579,21 +608,6 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                         />
                       );
                     })}
-                    {readOnly ||
-                      (rowIndex === 0 && (
-                        <th
-                          rowSpan={lexicalTable.getRowCount()}
-                          data-tool-cell={true}
-                        >
-                          <button
-                            type="button"
-                            className={styles['addColumnButton']}
-                            onClick={addColumnToRight}
-                          >
-                            {iconComponentFor('add_column')}
-                          </button>
-                        </th>
-                      ))}
                   </tr>
                 );
               })}
@@ -612,12 +626,14 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                     </button>
                   </th>
                   <th></th>
+                  <th></th>
                 </tr>
               </tfoot>
             )}
           </>
         )}
       </table>
+    </div>
     </div>
   );
 };
@@ -883,6 +899,7 @@ interface ColumnEditorProps {
   parentEditor: LexicalEditor;
   lexicalTable: TableNode;
   colIndex: number;
+  colCount: number;
   highlightedCoordinates: [number, number];
   setActiveCellWithBoundaries: (cell: [number, number] | null) => void;
   align: Mdast.AlignType;
@@ -894,6 +911,7 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
   align,
   lexicalTable,
   colIndex,
+  colCount,
   setActiveCellWithBoundaries,
 }) => {
   const [editorRootElementRef, iconComponentFor] = useCellValues(
@@ -934,10 +952,10 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
     <RadixPopover.Root>
       <RadixPopover.PopoverTrigger
         className={styles['tableColumnEditorTrigger']}
-        data-active={highlightedCoordinates[0] === colIndex + 1}
+        data-visible={highlightedCoordinates[0] === colIndex || undefined}
         title={t('table.columnMenu', 'Column menu')}
       >
-        {iconComponentFor('more_horiz')}
+        <DragIndicatorIcon sx={{ fontSize: 16, transform: 'rotate(90deg)' }} />
       </RadixPopover.PopoverTrigger>
       <RadixPopover.Portal container={editorRootElementRef?.current}>
         <RadixPopover.PopoverContent
@@ -999,6 +1017,7 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
             <RadixToolbar.Button
               onClick={deleteColumnAt.bind(null, colIndex)}
               title={t('table.deleteColumn', 'Delete this column')}
+              disabled={colCount <= 1}
             >
               {iconComponentFor('delete_small')}
             </RadixToolbar.Button>
@@ -1013,6 +1032,7 @@ interface RowEditorProps {
   parentEditor: LexicalEditor;
   lexicalTable: TableNode;
   rowIndex: number;
+  rowCount: number;
   highlightedCoordinates: [number, number];
   setActiveCellWithBoundaries: (cell: [number, number] | null) => void;
 }
@@ -1022,6 +1042,7 @@ const RowEditor: React.FC<RowEditorProps> = ({
   highlightedCoordinates,
   lexicalTable,
   rowIndex,
+  rowCount,
   setActiveCellWithBoundaries,
 }) => {
   const [editorRootElementRef, iconComponentFor] = useCellValues(
@@ -1053,10 +1074,10 @@ const RowEditor: React.FC<RowEditorProps> = ({
     <RadixPopover.Root>
       <RadixPopover.PopoverTrigger
         className={styles['tableColumnEditorTrigger']}
-        data-active={highlightedCoordinates[1] === rowIndex}
+        data-visible={highlightedCoordinates[1] === rowIndex || undefined}
         title={t('table.rowMenu', 'Row menu')}
       >
-        {iconComponentFor('more_horiz')}
+        <DragIndicatorIcon sx={{ fontSize: 16 }} />
       </RadixPopover.PopoverTrigger>
       <RadixPopover.Portal container={editorRootElementRef?.current}>
         <RadixPopover.PopoverContent
@@ -1083,6 +1104,7 @@ const RowEditor: React.FC<RowEditorProps> = ({
             <RadixToolbar.Button
               onClick={deleteRowAt.bind(null, rowIndex)}
               title={t('table.deleteRow', 'Delete this row')}
+              disabled={rowCount <= 1}
             >
               {iconComponentFor('delete_small')}
             </RadixToolbar.Button>
