@@ -142,56 +142,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
       sx={{ marginLeft: '12px', width: '100%' }}
       id={indexedArrayField} // this is used for scrolling when new array entry added
     >
-      {/* <Grid size={4}>
-        <FormControlSelectField
-          control={control}
-          name={`${indexedArrayField}.type`}
-          required
-          label="Question Type"
-          error={Boolean(indexedErrors?.type)}
-          helperText={indexedErrors?.type?.message}
-          readOnly={
-            crudType === FormCrudType.view || slideType === SlideTypeEnum.CTF
-          }
-        >
-          {responseOptions.map((item) => (
-            <MenuItem key={item} value={item}>
-              {item}
-            </MenuItem>
-          ))}
-        </FormControlSelectField>
-      </Grid>
-      <Grid size={4}>
-        <FormControlSelectField
-          control={control}
-          name={`${indexedArrayField}.typeAttributes.grading`}
-          required
-          label="Response Type"
-          error={Boolean(indexedErrors?.typeAttributes?.grading)}
-          helperText={indexedErrors?.typeAttributes?.grading?.message}
-          readOnly={
-            crudType === FormCrudType.view ||
-            slideType === SlideTypeEnum.CTF ||
-            watchQuestionType === QuestionResponse.Matching
-          }
-        >
-          {gradingOptions.map((item) => (
-            <MenuItem key={item} value={item}>
-              {item}
-            </MenuItem>
-          ))}
-        </FormControlSelectField>
-      </Grid>
-      <Grid size={4}>
-        <FormControlTextField
-          control={control}
-          placeholder="Question Id"
-          name={`${indexedArrayField}.cmi5QuestionId`}
-          label="Question Id"
-          readOnly={true}
-        />
-      </Grid> */}
-      <Grid size={11}>
+      <Grid size={12}>
         <FormControlTextField
           control={control}
           placeholder="Question"

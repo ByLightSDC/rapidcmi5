@@ -274,7 +274,7 @@ export const QuizForm = ({
             activityType={activityKind}
           />
         )}
-        <Grid size={11}>
+        <Grid size={12}>
           <FormFieldArray
             errors={errors?.questions}
             allowReOrder={true}
