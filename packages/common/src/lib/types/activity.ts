@@ -19,7 +19,7 @@ export enum RC5ActivityTypeEnum {
   consoles = 'Team Exercise',
   ctf = 'Capture The Flag',
   download = 'Download File',
-  jobe = 'Jobe In The Box',
+  codeRunner = 'Code Runner',
   quiz = 'Quiz',
   scenario = 'Scenario',
 }

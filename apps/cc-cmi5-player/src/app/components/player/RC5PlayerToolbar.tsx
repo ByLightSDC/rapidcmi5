@@ -1,6 +1,5 @@
 import { useRealm } from '@mdxeditor/editor';
 import {
-  debugLog,
   editorInPlayback$,
   fnUrl$,
   getActivityCache$,

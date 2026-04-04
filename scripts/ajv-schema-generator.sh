@@ -10,8 +10,8 @@ set -e  # Exit on any error
 set -o pipefail
 
 # Define base paths
-TSCONFIG="libs/types/cmi5/tsconfig.lib.json"
-SCHEMA_DIR="libs/types/cmi5/src/schemas"
+TSCONFIG="packages/common/tsconfig.lib.json"
+SCHEMA_DIR="packages/common/src/lib/schemas"
 
 # Define mappings: [filename]="TypeName"
 declare -A TYPE_MAP=(
@@ -19,7 +19,7 @@ declare -A TYPE_MAP=(
   ["quiz.ts"]="QuizContent"
   ["slide.ts"]="RC5ScenarioContent"
   ["ctf.ts"]="CTFContent"
-  ["jobe.ts"]="JobeContent"
+  ["codeRunner.ts"]="CodeRunnerContent"
   ["course.ts"]="CourseData"
 
 )
@@ -28,7 +28,7 @@ echo "🛠  Generating JSON Schemas..."
 
 for FILE in "${!TYPE_MAP[@]}"; do
   TYPE="${TYPE_MAP[$FILE]}"
-  INPUT_PATH="libs/types/cmi5/src/lib/$FILE"
+  INPUT_PATH="packages/common/src/lib/types/$FILE"
   OUTPUT_PATH="$SCHEMA_DIR/${TYPE}.schema.json"
 
   echo "🔄 Generating schema for type '$TYPE' from '$INPUT_PATH'..."

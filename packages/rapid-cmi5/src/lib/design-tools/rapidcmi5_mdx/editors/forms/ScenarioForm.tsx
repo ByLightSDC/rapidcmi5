@@ -36,8 +36,8 @@ import {
 import { getInfoText } from '../../../../utils/infoButtonText';
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import LrsHeaderWithDetails from './LrsStatementHelper';
+import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 import { useContext } from 'react';
-import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 
 export const ScenarioForm = ({
   crudType,
@@ -51,7 +51,7 @@ export const ScenarioForm = ({
   handleCloseModal?: () => void;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const { GetScenariosForm } = useContext(GitContext);
+  const { GetScenariosForm } = useRapidCmi5Opts();
   const theme = useTheme();
 
   /* Lesson Theme */

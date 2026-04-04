@@ -12,7 +12,11 @@
           "type": "string"
         },
         "element_type": {
-          "enum": ["task", "knowledge", "skill"],
+          "enum": [
+            "task",
+            "knowledge",
+            "skill"
+          ],
           "type": "string"
         },
         "text": {
@@ -22,17 +26,15 @@
           "type": "string"
         }
       },
-      "required": [
-        "element_identifier",
-        "element_type",
-        "title",
-        "text",
-        "doc_identifier"
-      ],
       "type": "object"
     },
     "MoveOnCriteriaEnum": {
-      "enum": ["completed", "passed", "completed-and-passed", "not-applicable"],
+      "enum": [
+        "completed",
+        "passed",
+        "completed-and-passed",
+        "not-applicable"
+      ],
       "type": "string"
     },
     "RC5ScenarioContent": {
@@ -40,6 +42,9 @@
       "description": "New data type for RC5 will replace ScenarioContent above",
       "properties": {
         "cmi5QuizId": {
+          "type": "string"
+        },
+        "defaultClassId": {
           "type": "string"
         },
         "ksats": {
@@ -60,14 +65,13 @@
         "rc5id": {
           "type": "string"
         },
-        "defaultClassId": {
-          "type": "string"
-        },
         "uuid": {
           "type": "string"
         }
       },
-      "required": ["uuid"],
+      "required": [
+        "uuid"
+      ],
       "type": "object"
     }
   }

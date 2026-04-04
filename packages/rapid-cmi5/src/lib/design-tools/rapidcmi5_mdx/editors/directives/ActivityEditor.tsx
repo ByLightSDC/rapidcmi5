@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import {
   DirectiveEditorProps,
   useCellValue,
@@ -9,7 +9,7 @@ import {
 import { Stack, Typography } from '@mui/material';
 
 import { ScenarioForm } from '../forms/ScenarioForm';
-import { JobeForm } from '../forms/JobeForm';
+import { CodeRunnerForm } from '../forms/CodeRunnerForm';
 
 import { QuizForm } from '../forms/QuizForm';
 import { useAuContext } from '../../data-hooks/useAuContext';
@@ -24,7 +24,7 @@ import {
   ActivityJsonNode,
   QuizContent,
   CTFContent,
-  JobeContent,
+  CodeRunnerContent,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   useTimeStampUUID,
@@ -36,10 +36,11 @@ import {
   FormCrudType,
   AuQuiz,
   AuCTF,
-  JobeInTheBox,
+  CodeRunner,
 } from '@rapid-cmi5/ui';
 import { updateScenario, updateTeamScenario } from '@rapid-cmi5/react-editor';
 import ScenarioMock from './ScenarioMock';
+import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 
 /**
  * MDX Editor for Activities
@@ -63,6 +64,7 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
   const isPlayback = useCellValue(editorInPlayback$);
   const auProps = useAuContext();
   const themedDividerColor = useSelector(dividerColor);
+  const { codeRunnerOps } = useRapidCmi5Opts();
 
   // style for playback boxes
   const staticStyle = useMemo(() => {
@@ -305,13 +307,17 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
           )}
         </>
       )}
-      {name === 'jobe' && fromJson && (
+      {name === 'codeRunner' && fromJson && (
         <>
-          {isPlayback && (
-            <JobeInTheBox auProps={auProps} content={fromJson as JobeContent} />
+          {isPlayback && codeRunnerOps && (
+            <CodeRunner
+              auProps={auProps}
+              content={fromJson as CodeRunnerContent}
+              submitCode={codeRunnerOps?.executeCode}
+            />
           )}
           {!isPlayback && (
-            <JobeForm
+            <CodeRunnerForm
               crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
               defaultFormData={fromJson}
               deleteButton={

@@ -1,4 +1,5 @@
 import { GitContextProvider } from '../course-builder/GitViewer/session/GitContext';
+import { RapidCmi5OptsProvider } from '../course-builder/GitViewer/session/RapidCmi5OptsContext';
 import { RC5ContextProvider } from './contexts/RC5Context';
 import RC5Modals from './modals/RC5Modals';
 import Landing from './Landing';
@@ -11,10 +12,12 @@ import { FormCrudType } from '@rapid-cmi5/ui';
 import {
   CourseAU,
   Credentials,
+  ExecuteCodeBodyApi,
+  ExecuteCodeResponseApi,
   GitUserConfig,
+  LanguagesResponseApi,
   RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
-import { AxiosInstance } from 'axios';
 
 export type SubmitScenarioFormFn<T = any> = (item: T) => void;
 
@@ -34,6 +37,12 @@ export interface GetScenarioFormProps {
   errors: any;
 }
 
+export interface CodeRunnerOps {
+  getLanguages?: () => Promise<LanguagesResponseApi>;
+  executeCode?: (
+    body: ExecuteCodeBodyApi
+  ) => Promise<ExecuteCodeResponseApi>;
+}
 export interface GetQuizBankSearchModalProps {
   submitForm: SubmitScenarioFormFn;
   closeModal: () => void;
@@ -76,6 +85,7 @@ export interface RapidCmi5Opts {
     config?: GitUserConfig,
     creds?: Credentials,
   ) => void;
+  codeRunnerOps?: CodeRunnerOps;
 }
 
 export type UserAuth = {
@@ -90,12 +100,14 @@ export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <GitContextProvider rapidCmi5Opts={rapidCmi5Opts}>
-          <RC5ContextProvider>
-            <RC5Modals />
-            <Landing showHomeButton={rapidCmi5Opts.showHomeButton} />
-          </RC5ContextProvider>
-        </GitContextProvider>
+        <RapidCmi5OptsProvider opts={rapidCmi5Opts}>
+          <GitContextProvider>
+            <RC5ContextProvider>
+              <RC5Modals />
+              <Landing showHomeButton={rapidCmi5Opts.showHomeButton} />
+            </RC5ContextProvider>
+          </GitContextProvider>
+        </RapidCmi5OptsProvider>
       </PersistGate>
     </Provider>
   );

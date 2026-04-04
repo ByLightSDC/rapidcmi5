@@ -8,6 +8,7 @@ import {
   Credentials,
   generateAuId,
   GitUserConfig,
+  useCodeRunnerApi,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   RapidCmi5,
@@ -90,6 +91,12 @@ export function RapidCmi5Wrapper() {
     }
     return scenarioUUID;
   };
+
+  const { executeCode, getLanguages } = useCodeRunnerApi(
+    'Bearer',
+    ssoConfig?.rangeRestApiUrl,
+    token,
+  );
 
   return (
     <RapidCmi5
@@ -214,6 +221,10 @@ export function RapidCmi5Wrapper() {
             )
           : undefined
       }
+      codeRunnerOps={{
+        executeCode,
+        getLanguages,
+      }}
     />
   );
 }

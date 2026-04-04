@@ -11,12 +11,12 @@ import { Box } from '@mui/material';
 import {
   AuContextProps,
   RC5ScenarioContent,
-  ScenarioContent,
   QuizContent,
   CTFContent,
-  JobeContent,
   TeamConsolesContent,
   DownloadFileData,
+  CodeRunnerContent,
+  useCodeRunnerApi,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   setProgress$,
@@ -26,9 +26,11 @@ import {
   debugLogError,
   AuQuiz,
   AuCTF,
-  JobeInTheBox,
   FileDownloadLink,
+  CodeRunner,
+  config,
 } from '@rapid-cmi5/ui';
+import { cmi5Instance } from '../../../../session/cmi5';
 
 /**
  * Non editable Activity View
@@ -92,6 +94,12 @@ export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
     }
   }, [mdastNode?.children, fromJson]);
 
+  const { executeCode } = useCodeRunnerApi(
+    config.DEVOPS_API_URL,
+    cmi5Instance.getAuthToken(),
+    'Basic',
+  );
+
   return (
     <div
       style={{
@@ -108,7 +116,7 @@ export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
               scenarioName: (fromJson as RC5ScenarioContent).name,
               scenarioUUID: (fromJson as RC5ScenarioContent).uuid,
               promptClassId: (fromJson as RC5ScenarioContent).promptClass,
-            } as ScenarioContent
+            }
           }
         />
       )}
@@ -120,8 +128,12 @@ export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
       {name === SlideActivityType.CTF && fromJson && (
         <AuCTF auProps={auProps} content={fromJson as CTFContent} />
       )}
-      {name === SlideActivityType.JOBE && fromJson && (
-        <JobeInTheBox auProps={auProps} content={fromJson as JobeContent} />
+      {name === SlideActivityType.CODE_RUNNER && fromJson && (
+        <CodeRunner
+          auProps={auProps}
+          content={fromJson as CodeRunnerContent}
+          submitCode={executeCode}
+        />
       )}
       {name === SlideActivityType.CONSOLES && fromJson && (
         <>

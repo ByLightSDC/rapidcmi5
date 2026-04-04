@@ -2,18 +2,13 @@ import { useEffect } from 'react';
 import { BrowserRouter as RouterWrapper } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 
-import {
-  setDividerColor,
-  setIconColor,
-  themeColor,
-} from '@rapid-cmi5/ui';
+import { setDividerColor, setIconColor, themeColor } from '@rapid-cmi5/ui';
 
 /* Shared */
 import AppHeader from './shared/AppHeader';
 
 /* Branded */
 import { SizingContextProvider, TimePickerProvider } from '@rapid-cmi5/ui';
-
 
 /* Material */
 import { NotificationsProvider } from '@toolpad/core';
