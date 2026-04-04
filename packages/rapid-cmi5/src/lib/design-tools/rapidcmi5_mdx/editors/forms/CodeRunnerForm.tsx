@@ -69,10 +69,10 @@ export const CodeRunnerForm = ({
 
   useEffect(() => {
     const fetchRuntimes = async () => {
-      if (!codeRunnerOps?.listRuntimes) return;
+      if (!codeRunnerOps?.getLanguages) return;
 
       try {
-        const runtimes = await codeRunnerOps.listRuntimes();
+        const runtimes = await codeRunnerOps.getLanguages();
 
         if (!Object.keys(runtimes).length) {
           setRuntimeMap({});

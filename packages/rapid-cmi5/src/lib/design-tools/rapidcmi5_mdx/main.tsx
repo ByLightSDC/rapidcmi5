@@ -38,8 +38,8 @@ export interface GetScenarioFormProps {
 }
 
 export interface CodeRunnerOps {
-  listRuntimes: () => Promise<LanguagesResponseApi>;
-  executeCode: (
+  getLanguages?: () => Promise<LanguagesResponseApi>;
+  executeCode?: (
     body: ExecuteCodeBodyApi
   ) => Promise<ExecuteCodeResponseApi>;
 }

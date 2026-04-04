@@ -26,7 +26,6 @@ import {
   AuManagerState,
   QuizState,
   RC5ActivityTypeEnum,
-  useCodeRunnerApi,
 } from '@rapid-cmi5/cmi5-build-common';
 import MenuLayout from '../components/MenuLayout';
 

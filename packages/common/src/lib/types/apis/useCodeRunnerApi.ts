@@ -9,32 +9,42 @@ import {
 
 type AuthType = 'Basic' | 'Bearer';
 // We will attempt to move to Tan stack React Query V5 in the future
-export function useCodeRunnerApi(url: string, token: string, authType: AuthType) {
+export function useCodeRunnerApi(
+  authType: AuthType,
+  url?: string,
+  token?: string,
+) {
   const apiClient = useMemo(
     () =>
-      initClient(codeRunnerContract, {
-        baseUrl: url,
-        baseHeaders: {
-          Authorization: `${authType} ${token}`,
-        },
-      }),
-    [url, token],
+      url && token
+        ? initClient(codeRunnerContract, {
+            baseUrl: url,
+            baseHeaders: {
+              Authorization: `${authType} ${token}`,
+            },
+          })
+        : undefined,
+    [url, token, authType],
   );
 
-  const getLanguages = useCallback(async (): Promise<LanguagesResponseApi> => {
-    const response = await apiClient.listLanguages();
+  const getLanguagesCb =
+    useCallback(async (): Promise<LanguagesResponseApi> => {
+      if (!apiClient) throw Error('API client is not set');
+      const response = await apiClient.listLanguages();
 
-    if (response.status === 200) {
-      const data = response.body;
+      if (response.status === 200) {
+        const data = response.body;
 
-      return data;
-    }
+        return data;
+      }
 
-    throw new CodeRunnerApiError('Failed to get languages', response.status);
-  }, [apiClient]);
+      throw new CodeRunnerApiError('Failed to get languages', response.status);
+    }, [apiClient]);
 
-  const executeCode = useCallback(
+  const executeCodeCb = useCallback(
     async (question: ExecuteCodeBodyApi): Promise<ExecuteCodeResponseApi> => {
+      if (!apiClient) throw Error('API client is not set');
+
       const response = await apiClient.execute({ body: question });
       if (response.status === 200) {
         return response.body;
@@ -43,6 +53,9 @@ export function useCodeRunnerApi(url: string, token: string, authType: AuthType)
     },
     [apiClient],
   );
+
+  const executeCode = apiClient ? executeCodeCb : undefined;
+  const getLanguages = apiClient ? getLanguagesCb : undefined;
 
   return { getLanguages, executeCode };
 }

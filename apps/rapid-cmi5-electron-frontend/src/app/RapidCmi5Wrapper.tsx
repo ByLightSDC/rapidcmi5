@@ -6,7 +6,6 @@ import {
   CourseAU,
   createAuMappingNameWithAuId,
   Credentials,
-  ExecuteCodeBodyApi,
   generateAuId,
   GitUserConfig,
   useCodeRunnerApi,
@@ -94,9 +93,9 @@ export function RapidCmi5Wrapper() {
   };
 
   const { executeCode, getLanguages } = useCodeRunnerApi(
-    ssoConfig?.rangeRestApiUrl || '',
-    token || '',
     'Bearer',
+    ssoConfig?.rangeRestApiUrl,
+    token,
   );
 
   return (
@@ -222,25 +221,10 @@ export function RapidCmi5Wrapper() {
             )
           : undefined
       }
-      codeRunnerOps={
-        token && ssoConfig?.rangeRestApiUrl
-          ? {
-              executeCode: async (body: ExecuteCodeBodyApi) => {
-                const response = await executeCode({
-                  submissionContent: body.submissionContent,
-                  language: body.language,
-                  languageVersion: body.languageVersion,
-                });
-
-                return response;
-              },
-              listRuntimes: async () => {
-                const response = await getLanguages();
-                return response;
-              },
-            }
-          : undefined
-      }
+      codeRunnerOps={{
+        executeCode,
+        getLanguages,
+      }}
     />
   );
 }

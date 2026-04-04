@@ -1,6 +1,13 @@
 import { Editor } from '@monaco-editor/react';
 import { useTheme } from '@mui/system';
-import { Alert, AlertTitle, Box, Paper, Typography } from '@mui/material';
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  CircularProgress,
+  Paper,
+  Typography,
+} from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import { useContext, useEffect, useState } from 'react';
 
@@ -24,7 +31,7 @@ import {
 type CodeRunnerProps = {
   auProps: Partial<AuContextProps>;
   content: CodeRunnerContent;
-  submitCode: (body: ExecuteCodeBodyApi) => Promise<ExecuteCodeResponseApi>;
+  submitCode?: (body: ExecuteCodeBodyApi) => Promise<ExecuteCodeResponseApi>;
 };
 
 function buildCodeRunnerQuizId(content: CodeRunnerContent): string {
@@ -108,6 +115,7 @@ export function CodeRunner({ auProps, content, submitCode }: CodeRunnerProps) {
     setSuccessStr('');
     setErrorStr('');
     setCompileStr('');
+    if (!submitCode) return;
 
     const activityContent = buildActivityContent(content);
 
@@ -162,18 +170,23 @@ export function CodeRunner({ auProps, content, submitCode }: CodeRunnerProps) {
     }
   };
 
-  if (!isAuthenticated && !isTestMode)
+  if (!isTestMode && (!isAuthenticated || !submitCode))
     return (
-      <Alert
-        severity="error"
+      <Box
         sx={{
-          maxWidth: '480px',
-          m: 1.5,
-          mx: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 2,
+          p: 4,
         }}
       >
-        CodeRunner is connecting.
-      </Alert>
+        <CircularProgress />
+        <Typography color="text.secondary">
+          CodeRunner is connecting...
+        </Typography>
+      </Box>
     );
 
   return (
@@ -186,6 +199,12 @@ export function CodeRunner({ auProps, content, submitCode }: CodeRunnerProps) {
         padding: blockPadding,
       }}
     >
+      {isTestMode && !submitCode && (
+        <Alert severity="info" sx={{ mb: 1.5 }}>
+          Test mode active: no submission will be sent.
+        </Alert>
+      )}
+
       {content.title && (
         <Typography
           color="text.primary"
