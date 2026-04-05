@@ -417,6 +417,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
           position: 'relative',
           ...outerSx,
           ...sxProps,
+          ...(blockMaxWidth ? { maxWidth: blockMaxWidth, marginLeft: 'auto', marginRight: 'auto' } : {}),
         }}
       >
         <Stack
@@ -471,11 +472,6 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                       right: gutterRight,
                     }}
                   >
-                    <Tooltip title="Block Appearance">
-                      <IconButton onClick={() => setBlockAppearanceOpen(true)} size="small">
-                        <SettingsIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
                     <Tooltip title="Background Color">
                       <IconButton
                         onClick={(e) => {
@@ -486,6 +482,11 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                         size="small"
                       >
                         <PaletteIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Block Appearance">
+                      <IconButton onClick={() => setBlockAppearanceOpen(true)} size="small">
+                        <SettingsIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Edit Steps Settings">
@@ -520,7 +521,6 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                   borderWidth: '1px',
                   backgroundColor: (theme: any) => theme.palette.background.paper,
                   paddingRight: isPlayback ? 2 : '100px',
-                  ...(blockMaxWidth ? { maxWidth: blockMaxWidth, marginLeft: 'auto', marginRight: 'auto' } : {}),
                 }}
               >
                 <Box
