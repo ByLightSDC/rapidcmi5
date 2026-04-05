@@ -25,6 +25,7 @@ import {
   useTheme,
 } from '@mui/material';
 import PaletteIcon from '@mui/icons-material/Palette';
+import WidthFullIcon from '@mui/icons-material/WidthFull';
 
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -48,8 +49,10 @@ import { debugLogError } from '../../../utility/logger';
 import { editorInPlayback$ } from '../state/vars';
 import { convertMarkdownToMdast } from '../util/conversion';
 import { LessonThemeContext } from '../contexts/LessonThemeContext';
-import { resolveLessonThemeCSS } from '../../../styles/lessonThemeStyles';
+import { resolveLessonThemeCSS, resolveBlockMaxWidth } from '../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../plugins/shared/useGutterRight';
+import { BlockAppearanceForm } from '../plugins/shared/BlockAppearanceForm';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../constants/colors';
 
@@ -120,7 +123,12 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   );
   const pendingColorRef = useRef(pendingColor);
   const skipNextCloseRebuildRef = useRef(false);
-  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
+  const [contentWidth, setContentWidth] = useState<ContentWidthEnum | undefined>(
+    mdastNode?.attributes?.['contentWidth'] as ContentWidthEnum | undefined,
+  );
+  const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
+  const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
+  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
 
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const [adColor, setAdColor] = useState<
@@ -296,12 +304,13 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
     setIsFocused(editorIsFocused);
   }, [editorInFocus, lexicalNode]);
 
-  // Sync backgroundColor from mdastNode
+  // Sync backgroundColor and contentWidth from mdastNode
   useEffect(() => {
     const bgColor = mdastNode?.attributes?.['backgroundColor'] ?? '';
     setBackgroundColor(bgColor);
     pendingColorRef.current = bgColor;
     setPendingColor(bgColor);
+    setContentWidth(mdastNode?.attributes?.['contentWidth'] as ContentWidthEnum | undefined);
   }, [mdastNode]);
 
 
@@ -340,7 +349,10 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
         ...outerSx,
       }}
     >
-      <Box sx={{ width: '100%' }}>
+      <Box sx={{
+        width: '100%',
+        ...(blockMaxWidth ? { maxWidth: blockMaxWidth, marginLeft: 'auto', marginRight: 'auto' } : {}),
+      }}>
         {isConfiguring && !isPlayback && (
           <SelectorMainUi
             defaultValue={defaultCollapseSel}
@@ -476,6 +488,14 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
               <PaletteIcon fontSize="small" />
             </IconButton>
           </Tooltip>
+          <Tooltip title="Block Appearance">
+            <IconButton
+              onClick={() => setBlockAppearanceOpen(true)}
+              size="small"
+            >
+              <WidthFullIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
           <SettingsIconButton onConfigure={onConfigure} />
           <InsertLineReturnButton
             parentEditor={parentEditor}
@@ -527,6 +547,24 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
           }, { discrete: true });
         }}
         noneLabel="No background"
+      />
+
+      <BlockAppearanceForm
+        open={blockAppearanceOpen}
+        currentContentWidth={contentWidth}
+        onClose={() => setBlockAppearanceOpen(false)}
+        onSave={(newContentWidth) => {
+          setContentWidth(newContentWidth);
+          parentEditor.update(() => {
+            const attrs = { ...(mdastNode.attributes as Record<string, string>) };
+            if (newContentWidth) {
+              attrs['contentWidth'] = newContentWidth;
+            } else {
+              delete attrs['contentWidth'];
+            }
+            lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+          }, { discrete: true });
+        }}
       />
     </Box>
   );

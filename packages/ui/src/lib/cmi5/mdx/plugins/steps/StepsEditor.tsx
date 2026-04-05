@@ -67,9 +67,12 @@ import {
   convertMdastToMarkdown,
 } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
-import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { resolveLessonThemeCSS, resolveBlockMaxWidth } from '../../../../styles/lessonThemeStyles';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
+import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
+import { useGutterRight } from '../shared/useGutterRight';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Steps Editor for steps directive
@@ -100,10 +103,14 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   const { lessonTheme } = useContext(LessonThemeContext);
   const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
   const blockPadding = resolvedThemeCSS ? (resolvedThemeCSS.blockPadding ?? '0px') : '32px';
-  const hasGutter = !!resolvedThemeCSS?.maxWidth && resolvedThemeCSS.maxWidth !== '100%';
 
-  const gutterRef = useRef<HTMLDivElement>(null);
-  const [gutterRight, setGutterRight] = useState('-100px');
+  const [contentWidth, setContentWidth] = useState<ContentWidthEnum | undefined>(
+    mdastNode.attributes.contentWidth,
+  );
+  const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
+  const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
+  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
+
   const [backgroundColor, setBackgroundColor] = useState<string>(
     mdastNode?.attributes?.backgroundColor ?? '',
   );
@@ -113,13 +120,6 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   );
   const pendingColorRef = useRef(pendingColor);
   const skipNextCloseRebuildRef = useRef(false);
-
-  useEffect(() => {
-    if (gutterRef.current) {
-      const w = gutterRef.current.offsetWidth;
-      setGutterRight(`-${w + 15}px`);
-    }
-  }, []);
 
   const a11yStepProps = (index: number) => ({
     id: `step-${index}`,
@@ -238,6 +238,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
     parentEditor.update(() => {
       const attributes: Record<string, string> = { color: 'transparent' };
       if (backgroundColor) attributes['backgroundColor'] = backgroundColor;
+      if (contentWidth) attributes['contentWidth'] = contentWidth;
       const mdast: ContainerDirective = {
         type: 'containerDirective',
         name: 'steps',
@@ -256,7 +257,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
     parentEditor.update(() => {
       lexicalNode.remove();
     });
-  }, [insertMarkdown, formData, backgroundColor, lexicalNode, parentEditor]);
+  }, [insertMarkdown, formData, backgroundColor, contentWidth, lexicalNode, parentEditor]);
 
   const handleClearColor = useCallback(() => {
     setColorPickerAnchor(null);
@@ -388,6 +389,11 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
     setPendingColor(bgColor);
   }, [mdastNode]);
 
+  // Sync contentWidth from mdastNode
+  useEffect(() => {
+    setContentWidth(mdastNode.attributes.contentWidth);
+  }, [mdastNode]);
+
   const outerSx: SxProps = backgroundColor
     ? {
         boxShadow: `0 0 0 100vmax ${backgroundColor}`,
@@ -462,9 +468,14 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                       position: 'absolute',
                       display: 'flex',
                       top: backgroundColor ? blockPadding : 0,
-                      right: hasGutter ? gutterRight : 0,
+                      right: gutterRight,
                     }}
                   >
+                    <Tooltip title="Block Appearance">
+                      <IconButton onClick={() => setBlockAppearanceOpen(true)} size="small">
+                        <SettingsIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
                     <Tooltip title="Background Color">
                       <IconButton
                         onClick={(e) => {
@@ -508,6 +519,8 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                   borderStyle: 'solid',
                   borderWidth: '1px',
                   backgroundColor: (theme: any) => theme.palette.background.paper,
+                  paddingRight: isPlayback ? 2 : '100px',
+                  ...(blockMaxWidth ? { maxWidth: blockMaxWidth, marginLeft: 'auto', marginRight: 'auto' } : {}),
                 }}
               >
                 <Box
@@ -606,6 +619,24 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
           </ButtonIcon>
         </Stack>
       </Box>
+
+      <BlockAppearanceForm
+        open={blockAppearanceOpen}
+        currentContentWidth={contentWidth}
+        onClose={() => setBlockAppearanceOpen(false)}
+        onSave={(newContentWidth: ContentWidthEnum | undefined) => {
+          setContentWidth(newContentWidth);
+          parentEditor.update(() => {
+            const attrs = { ...mdastNode.attributes };
+            if (newContentWidth) {
+              attrs.contentWidth = newContentWidth;
+            } else {
+              delete attrs.contentWidth;
+            }
+            lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+          }, { discrete: true });
+        }}
+      />
 
       <ColorSelectionPopover
         anchorEl={colorPickerAnchor}

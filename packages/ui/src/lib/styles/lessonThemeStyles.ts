@@ -45,6 +45,19 @@ export const DEFAULT_LESSON_THEME = {
 };
 
 /**
+ * Resolves the explicit block-level maxWidth CSS value.
+ * Returns the CSS string only when a block-level override is set.
+ * Returns undefined when no override — callers can then fall back to lesson theme.
+ * Returns null when override is ContentWidthEnum.None (unconstrained / no max-width).
+ */
+export function resolveBlockMaxWidth(
+  blockContentWidth: ContentWidthEnum | undefined,
+): string | null | undefined {
+  if (blockContentWidth === undefined) return undefined;
+  return CONTENT_WIDTH_MAP[blockContentWidth] ?? null;
+}
+
+/**
  * Resolves a LessonTheme to concrete CSS values.
  * Returns null if no theme is set (avoids unnecessary style injection).
  */
