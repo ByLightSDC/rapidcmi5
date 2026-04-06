@@ -321,11 +321,6 @@ export const TableEditor: React.FC<TableEditorProps> = ({
     [],
   );
 
-  useEffect(() => {
-    console.log('TableEditor');
-    console.log('mdastNode', mdastNode);
-    console.log('lexicalTable', lexicalTable);
-  }, []);
 
   // get styles to apply to the table
   const tableStyle = mdastNode.data?.hProperties?.['style'] as string | undefined;
