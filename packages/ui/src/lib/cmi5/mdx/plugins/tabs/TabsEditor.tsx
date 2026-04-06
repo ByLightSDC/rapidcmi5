@@ -339,7 +339,6 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     setPendingColor(bgColor);
   }, [tab, mdastNode]);
 
-
   const dropShadow = getDirectiveBlockShadow(muiTheme);
 
   // Outer box: full-width background color band when backgroundColor is set.
@@ -376,11 +375,11 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
       <Box
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         sx={{
-          margin: 0,
           padding: 0,
           position: 'relative',
           ...outerSx,
           ...sxProps,
+          margin: 0,
         }}
       >
         {/* Inner content box — at L/None width, paddingRight reserves space for the inside-positioned buttons */}
