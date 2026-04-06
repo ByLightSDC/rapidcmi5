@@ -2,26 +2,27 @@ import { useCallback } from 'react';
 import { DynamicModal } from '@rapid-cmi5/ui';
 import QuestionCard from './QuestionCard';
 import { QuestionBankApi } from '@rapid-cmi5/cmi5-build-common';
-import { QuizBankSearchModalProps } from '@rapid-cmi5/react-editor';
-import { useQuizBankApi } from './useQuizBankApi';
+import { GetQuizBankSearchModalProps } from '@rapid-cmi5/react-editor';
 
 export function QuizBankSearchForm({
-  url,
-  token,
   closeModal,
   submitForm,
   currentUserEmail,
   activityType,
-}: QuizBankSearchModalProps) {
-  const { searchQuestions, deleteQuestion } = useQuizBankApi(url, token);
-
+  searchQuestions,
+  deleteQuestion,
+}: GetQuizBankSearchModalProps) {
   const onDelete = useCallback(
-    (uuid: string) => deleteQuestion(uuid),
+    (uuid: string) => {
+      if (!deleteQuestion) return Promise.resolve();
+      return deleteQuestion(uuid);
+    },
     [deleteQuestion],
   );
 
   const fetchItems = useCallback(
     async (page: number, query: string, limit: number) => {
+      if (!searchQuestions) return { data: [], totalCount: 0, totalPages: 0 };
       const data = await searchQuestions(query, page, limit, activityType);
       return {
         data: data.data ?? [],

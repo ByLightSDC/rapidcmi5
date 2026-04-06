@@ -95,9 +95,9 @@ export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
   }, [mdastNode?.children, fromJson]);
 
   const { executeCode } = useCodeRunnerApi(
+    'Basic',
     config.DEVOPS_API_URL,
     cmi5Instance.getAuthToken(),
-    'Basic',
   );
 
   return (
@@ -111,13 +111,11 @@ export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
       {name === SlideActivityType.SCENARIO && fromJson && (
         <ScenarioConsoles
           auProps={auProps}
-          content={
-            {
-              scenarioName: (fromJson as RC5ScenarioContent).name,
-              scenarioUUID: (fromJson as RC5ScenarioContent).uuid,
-              promptClassId: (fromJson as RC5ScenarioContent).promptClass,
-            }
-          }
+          content={{
+            scenarioName: (fromJson as RC5ScenarioContent).name,
+            scenarioUUID: (fromJson as RC5ScenarioContent).uuid,
+            promptClassId: (fromJson as RC5ScenarioContent).promptClass,
+          }}
         />
       )}
 

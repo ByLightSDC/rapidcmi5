@@ -1,5 +1,3 @@
-import { Editor } from '@monaco-editor/react';
-import { useTheme } from '@mui/system';
 import {
   Alert,
   AlertTitle,
@@ -11,7 +9,7 @@ import {
 import CheckIcon from '@mui/icons-material/Check';
 import { useContext, useEffect, useState } from 'react';
 
-import { resolveMonacoLanguage } from '../../forms/FormControlMonacoField';
+import { MonacoEditor, resolveMonacoLanguage } from '../../forms/MonacoEditor';
 import {
   AuContextProps,
   ActivityScore,
@@ -72,8 +70,6 @@ export function CodeRunner({ auProps, content, submitCode }: CodeRunnerProps) {
   const { setProgress, submitScore, isAuthenticated, isTestMode } = auProps;
   const { lessonTheme } = useContext(LessonThemeContext);
 
-  const theme = useTheme();
-  const monacoTheme = theme.palette.mode === 'light' ? 'light' : 'vs-dark';
   const monacoLanguage = resolveMonacoLanguage(
     content.programmingLanguage ?? 'javascript',
   );
@@ -223,26 +219,12 @@ export function CodeRunner({ auProps, content, submitCode }: CodeRunnerProps) {
       )}
 
       {content.evaluator ? (
-        <Box
-          sx={{
-            overflow: 'hidden',
-            m: 0.5,
-          }}
-        >
-          <Editor
+        <Box sx={{ overflow: 'hidden', m: 0.5 }}>
+          <MonacoEditor
             height={400}
             language={monacoLanguage}
-            theme={monacoTheme}
             value={submissionStr}
             onChange={(value) => setSubmissionStr(value ?? '')}
-            options={{
-              minimap: { enabled: false },
-              scrollBeyondLastLine: false,
-              wordWrap: 'on',
-              fontSize: 13,
-              lineNumbers: 'on',
-              tabSize: 2,
-            }}
           />
         </Box>
       ) : (
@@ -254,7 +236,7 @@ export function CodeRunner({ auProps, content, submitCode }: CodeRunnerProps) {
             mx: 'auto',
           }}
         >
-          CodeRunner In The Box is missing an evaluation script.
+          CodeRunner is missing an evaluation script.
         </Alert>
       )}
 

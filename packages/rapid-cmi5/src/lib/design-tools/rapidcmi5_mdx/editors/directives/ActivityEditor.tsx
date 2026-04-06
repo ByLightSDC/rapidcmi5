@@ -309,7 +309,7 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
       )}
       {name === 'codeRunner' && fromJson && (
         <>
-          {isPlayback && codeRunnerOps && (
+          {isPlayback && (
             <CodeRunner
               auProps={auProps}
               content={fromJson as CodeRunnerContent}

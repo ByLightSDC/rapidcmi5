@@ -33,11 +33,13 @@ export * from './lib/types/slide';
 export * from './lib/types/teamConsoles';
 export * from './lib/types/projects';
 export * from './lib/types/user';
-export * from './lib/types/apis/codeRunnerContract';
-export * from './lib/types/apis/useCodeRunnerApi';
+export * from './lib/apis/codeRunnerContract';
+export * from './lib/apis/useCodeRunnerApi';
+export * from './lib/apis/useQuizBankApi';
+
 
 
 export * from './lib/utils/dateAndTime';
-export * from './lib/types/apis/quizBankContract';
+export * from './lib/apis/quizBankContract';
 
 

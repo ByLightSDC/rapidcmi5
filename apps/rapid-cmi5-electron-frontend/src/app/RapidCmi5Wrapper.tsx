@@ -9,12 +9,11 @@ import {
   generateAuId,
   GitUserConfig,
   useCodeRunnerApi,
+  useQuizBankApi,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   RapidCmi5,
   GetScenarioFormProps,
-  GetQuizBankAddModalProps,
-  GetQuizBankSearchModalProps,
 } from '@rapid-cmi5/react-editor';
 import { debugLogError } from '@rapid-cmi5/ui';
 import { useContext, useEffect } from 'react';
@@ -95,6 +94,11 @@ export function RapidCmi5Wrapper() {
   const { executeCode, getLanguages } = useCodeRunnerApi(
     'Bearer',
     ssoConfig?.rangeRestApiUrl,
+    token,
+  );
+
+  const { addQuestion, searchQuestions, deleteQuestion } = useQuizBankApi(
+    quizBankURL,
     token,
   );
 
@@ -189,38 +193,9 @@ export function RapidCmi5Wrapper() {
             )
           : undefined
       }
-      QuizBankAddModal={
-        token && quizBankURL && parsedUserToken?.email?.toLowerCase()
-          ? (props: GetQuizBankAddModalProps) => (
-              <AddToQuizBankForm
-                token={token}
-                closeModal={props.closeModal}
-                formType={props.formType}
-                errors={props.errors}
-                formMethods={props.formMethods}
-                url={ssoConfig?.quizBankApiUrl}
-                question={props.question}
-              />
-            )
-          : undefined
-      }
-      QuizBankSearchModal={
-        token && quizBankURL
-          ? (props: GetQuizBankSearchModalProps) => (
-              <QuizBankSearchForm
-                token={token}
-                submitForm={props.submitForm}
-                formType={props.formType}
-                errors={props.errors}
-                formMethods={props.formMethods}
-                url={ssoConfig?.quizBankApiUrl}
-                closeModal={props.closeModal}
-                currentUserEmail={parsedUserToken?.email?.toLowerCase()}
-                activityType={props.activityType}
-              />
-            )
-          : undefined
-      }
+      QuizBankAddModal={quizBankURL && token ? AddToQuizBankForm : undefined}
+      QuizBankSearchModal={quizBankURL && token ? QuizBankSearchForm : undefined}
+      quizBankOps={{ addQuestion, searchQuestions, deleteQuestion }}
       codeRunnerOps={{
         executeCode,
         getLanguages,

@@ -16,6 +16,8 @@ import {
   ExecuteCodeResponseApi,
   GitUserConfig,
   LanguagesResponseApi,
+  QuestionBankApi,
+  QuestionBankApiCreate,
   RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 
@@ -43,6 +45,18 @@ export interface CodeRunnerOps {
     body: ExecuteCodeBodyApi
   ) => Promise<ExecuteCodeResponseApi>;
 }
+
+export interface QuizBankOps {
+  addQuestion?: (question: QuestionBankApiCreate) => Promise<QuestionBankApi | undefined>;
+  searchQuestions?: (
+    query: string,
+    page: number,
+    limit: number,
+    activityType?: RC5ActivityTypeEnum,
+  ) => Promise<{ data: QuestionBankApi[]; totalCount: number; totalPages: number; offset: number; limit: number }>;
+  deleteQuestion?: (uuid: string) => Promise<void>;
+}
+
 export interface GetQuizBankSearchModalProps {
   submitForm: SubmitScenarioFormFn;
   closeModal: () => void;
@@ -50,13 +64,12 @@ export interface GetQuizBankSearchModalProps {
   formType: FormCrudType;
   activityType: RC5ActivityTypeEnum;
   errors: any;
+  searchQuestions?: QuizBankOps['searchQuestions'];
+  deleteQuestion?: QuizBankOps['deleteQuestion'];
+  currentUserEmail?: string;
 }
 
-export interface QuizBankSearchModalProps extends GetQuizBankSearchModalProps {
-  token: string;
-  url: string;
-  currentUserEmail: string;
-}
+export type QuizBankSearchModalProps = GetQuizBankSearchModalProps;
 
 export interface GetQuizBankAddModalProps {
   closeModal: () => void;
@@ -64,12 +77,10 @@ export interface GetQuizBankAddModalProps {
   formType: FormCrudType;
   errors: any;
   question: any;
+  addQuestion?: QuizBankOps['addQuestion'];
 }
 
-export interface QuizBankAddModalProps extends GetQuizBankAddModalProps {
-  token: string;
-  url: string;
-}
+export type QuizBankAddModalProps = GetQuizBankAddModalProps;
 
 export interface RapidCmi5Opts {
   userAuth?: UserAuth;
@@ -86,6 +97,7 @@ export interface RapidCmi5Opts {
     creds?: Credentials,
   ) => void;
   codeRunnerOps?: CodeRunnerOps;
+  quizBankOps?: QuizBankOps;
 }
 
 export type UserAuth = {
