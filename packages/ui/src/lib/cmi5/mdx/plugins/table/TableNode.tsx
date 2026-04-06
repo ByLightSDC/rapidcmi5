@@ -179,7 +179,6 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     const rowClone = { ...row, children: cellsClone };
     cellsClone[colIndex] = cellClone;
     table.children[rowIndex] = rowClone;
-    console.log('the table', table);
   }
 
   updateCellTextAlign(
