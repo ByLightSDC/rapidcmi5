@@ -19,7 +19,6 @@ export default function ColorPickerButton({
   openCallback: (isOpen: boolean) => void;
 }) {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  // const [currentColor, setColor] = useState<string | null>(defaultColor);
 
   const openPicker = useCallback((e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
