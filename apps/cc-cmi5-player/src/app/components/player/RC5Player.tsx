@@ -13,6 +13,7 @@ import {
   quotePlugin,
 } from '@mdxeditor/editor';
 import { imagePlayerPlugin } from './plugins/image-player/';
+import { ariaOverridePlugin } from './plugins/aria-override/ariaOverridePlugin';
 import {
   animationPlayerPlugin,
   parseFrontmatterAnimations,
@@ -89,6 +90,29 @@ function RC5Player() {
     `lesson-theme-${Math.random().toString(36).slice(2, 9)}`,
   ).current;
 
+  const slideContentRef = useRef<HTMLDivElement>(null);
+
+  // Move focus into the slide region so NVDA starts reading from the top when a slide changes.
+  // useEffect listens for activeTab, only fires when the active slide changes.
+  useEffect(() => {
+    // Wait for the new slide's editor to finish mounting before focusing
+    const id = setTimeout(() => {
+      // Find the root Lexical editor element (first match = outermost = root editor)
+      const el = slideContentRef.current?.querySelector<HTMLElement>(
+        '[data-lexical-editor="true"]',
+      );
+      if (el) {
+        // tabindex="-1" is required to programmatically focus contenteditable="false"
+        el.setAttribute('tabindex', '-1');
+        // Focus so NVDA reads from the top of the new slide.
+        // preventScroll stops the page from jumping visually when focus moves.
+        el.focus({ preventScroll: true });
+      }
+    }, 150);
+    // Cleanup — if the user switches slides before 150ms is up, cancel the previous timeout.
+    return () => clearTimeout(id);
+  }, [activeTab]);
+
   const pixelTop = '40px';
 
   const thePlugins = useMemo(() => {
@@ -138,6 +162,7 @@ function RC5Player() {
       htmlPlugin(),
       imagePlayerPlugin(),
       animationPlayerPlugin(),
+      ariaOverridePlugin(),
       listsPlugin(),
       linkPlugin(),
       linkDialogPlugin({
@@ -352,7 +377,11 @@ function RC5Player() {
           <LessonThemeContext.Provider
             value={{ lessonTheme: currentLessonTheme }}
           >
-            <div role="tabpanel" aria-label="slide-content">
+            <div
+              role="tabpanel"
+              aria-label="Slide content"
+              ref={slideContentRef}
+            >
               <div id="toc-portal-target" />
               <MDXEditor
                 className={mdxTheme}
@@ -367,7 +396,8 @@ function RC5Player() {
         )}
       </Box>
       {fullScreenImage && (
-        <div role='dialog'
+        <div
+          role="dialog"
           onClick={(e: React.MouseEvent<HTMLDivElement>) => {
             e.stopPropagation();
             setFullScreenImage('');
