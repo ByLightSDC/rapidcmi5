@@ -7,6 +7,7 @@ declare global {
       NX_PUBLIC_CLIENT_LOG?: boolean;
       NX_PUBLIC_CMI5_SSO_ENABLED?: boolean;
       NX_PUBLIC_DEVOPS_API_URL?: string;
+      NX_PUBLIC_QUIZBANK_API_URL?: string;
       NX_PUBLIC_DEVOPS_GQL_URL?: string;
       NX_PUBLIC_DEVOPS_GQL_SUBSCRIPTIONS_URL?: string;
       NX_PUBLIC_KEYCLOAK_URL?: string;
@@ -49,6 +50,11 @@ let DEVOPS_API_URL =
   window._env_?.NX_PUBLIC_DEVOPS_API_URL ||
   process.env['NX_PUBLIC_DEVOPS_API_URL'];
 DEVOPS_API_URL = checkEnv(DEVOPS_API_URL, 'NX_PUBLIC_DEVOPS_API_URL');
+
+let QUIZBANK_API_URL =
+  window._env_?.NX_PUBLIC_QUIZBANK_API_URL ||
+  process.env['NX_PUBLIC_QUIZBANK_API_URL'];
+QUIZBANK_API_URL = checkEnv(QUIZBANK_API_URL, 'NX_PUBLIC_QUIZBANK_API_URL');
 
 let CLIENT_LOG =
   window._env_?.NX_PUBLIC_CLIENT_LOG ||
@@ -109,6 +115,7 @@ export const config = {
   DEVOPS_API_CONTENT_VERSION,
   DEVOPS_API_DESIGN_VERSION,
   DEVOPS_API_URL,
+  QUIZBANK_API_URL,
   KEYCLOAK_URL,
   KEYCLOAK_REALM,
   KEYCLOAK_CLIENT_ID,
@@ -119,7 +126,8 @@ export const config = {
   MSW_MOCK,
   THEME: {
     SLIDE_BACKGROUND: '',
-    LOGO_DARK: './assets/rapid-cmi5/RapidCMI5.png',
-    LOGO_LIGHT: './assets/rapid-cmi5/RapidCMI5.png',
+    LOGO_DARK: './assets/bylight/RapidCMI5_Logo_Dark.png',
+    LOGO_LIGHT: './assets/bylight/RapidCMI5_Logo_Light.png',
+    LOGO_WIDTH: '140px',
   },
 };

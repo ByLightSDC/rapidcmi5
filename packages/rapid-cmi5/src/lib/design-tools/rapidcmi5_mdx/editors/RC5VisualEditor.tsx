@@ -647,7 +647,7 @@ function RC5VisualEditor() {
     }, 0);
 
     return () => clearTimeout(timeoutId);
-  }, [currentSlideIndex]);
+  }, [content, currentSlideIndex]);
 
   /**
    * UE injects markdown from lesson into editor and resets focus

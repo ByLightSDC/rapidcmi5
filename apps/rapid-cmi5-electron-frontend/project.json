@@ -24,11 +24,6 @@
           "apps/rapid-cmi5-electron-frontend/src/assets",
           "apps/rapid-cmi5-electron-frontend/src/mockServiceWorker.js",
           {
-            "input": "packages/ui/src/assets/rapid-cmi5",
-            "glob": "**/*",
-            "output": "assets/rapid-cmi5"
-          },
-          {
             "input": "apps/rapid-cmi5-electron-frontend/src/assets/fonts",
             "glob": "**/*",
             "output": "assets/fonts"

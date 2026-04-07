@@ -12,9 +12,7 @@
         "KEYCLOAK_CLIENT_ID": "rangeos-dashboard",
         "KEYCLOAK_SCOPE": "profile",
         "THEME": {
-          "SLIDE_BACKGROUND": "",
-          "LOGO_DARK": "./assets/bylight/RangeOS_Logo_Dark.png",
-          "LOGO_LIGHT": "./assets/bylight/RangeOS_Logo_Light.png"
+          "SLIDE_BACKGROUND": ""
         }
       }
     },
@@ -25,7 +23,6 @@
         "DEVOPS_API_URL": "https://rangeos-api.develop-cp.rangeos.engineering",
         "DEVOPS_GQL_URL": "https://rangeos-graphql.develop-cp.rangeos.engineering/",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.develop-cp.rangeos.engineering"
-
       }
     },
     {
@@ -36,9 +33,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.develop-cp.rangeos.engineering/",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.develop-cp.rangeos.engineering",
         "THEME": {
-          "SLIDE_BACKGROUND": "",
-          "LOGO_DARK": "./assets/bylight/RangeOS_Logo_Dark.png",
-          "LOGO_LIGHT": "./assets/bylight/RangeOS_Logo_Light.png"
+          "SLIDE_BACKGROUND": ""
         }
       }
     },
@@ -50,9 +45,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.develop-cp.rangeos.engineering/",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.develop-cp.rangeos.engineering",
         "THEME": {
-          "SLIDE_BACKGROUND": "",
-          "LOGO_DARK": "./assets/bylight/RangeOS_Logo_Dark.png",
-          "LOGO_LIGHT": "./assets/bylight/RangeOS_Logo_Light.png"
+          "SLIDE_BACKGROUND": ""
         }
       }
     },

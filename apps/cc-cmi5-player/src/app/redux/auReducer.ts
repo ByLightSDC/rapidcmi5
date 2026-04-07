@@ -11,6 +11,7 @@ import { logger } from '../debug';
 type tAuState = {
   auLogoDark: string;
   auLogoLight: string;
+  auLogoWidth?: string | number;
   auPath: string;
   auProgress: number;
   auViewedSlides: number[];
@@ -38,6 +39,7 @@ type tAuState = {
 export const initialState: tAuState = {
   auLogoDark: '',
   auLogoLight: '',
+  auLogoWidth: '200px',
   auPath: '',
   auProgress: 0,
   auViewedSlides: [],
@@ -73,9 +75,10 @@ export const auSlice = createSlice({
       state.auJson = action.payload;
     },
     setAuLogo: (state, action) => {
-      const { dark, light } = action.payload;
+      const { dark, light, width } = action.payload;
       state.auLogoDark = dark;
       state.auLogoLight = light;
+      state.auLogoWidth = width;
     },
     setAuProgress: (state, action) => {
       state.auProgress = action.payload;
@@ -236,6 +239,7 @@ export const {
 // in the slice file. For example: `useSelector((state: RootState) => state.counter.value)`
 export const auLogoDarkSel = (state: RootState) => state.au.auLogoDark;
 export const auLogoLightSel = (state: RootState) => state.au.auLogoLight;
+export const auLogoWidthSel = (state: RootState) => state.au.auLogoWidth;
 export const classIdSel = (state: RootState) => state.au.classId;
 export const studentIdSel = (state: RootState) => state.au.studentId;
 export const auPathSel = (state: RootState) => state.au.auPath;

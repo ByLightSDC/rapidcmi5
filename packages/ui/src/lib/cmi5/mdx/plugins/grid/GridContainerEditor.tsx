@@ -292,15 +292,14 @@ export const GridContainerEditor: React.FC<
       <Box
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         sx={{
-          margin: 0,
-          padding: 0,
           position: 'relative',
-
+          padding: 0,
           border: isPlayback ? '1px' : '1px dashed',
           borderColor: 'divider',
           borderRadius: 1,
           ...outerSx,
           ...sxProps,
+          margin: 0,
         }}
         role="grid"
         aria-label="Grid layout container"

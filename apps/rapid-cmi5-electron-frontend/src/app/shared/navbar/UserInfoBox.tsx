@@ -169,6 +169,7 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
                 keycloakScope: '',
                 keycloakUrl: '',
                 rangeRestApiUrl: '',
+                quizBankApiUrl: '',
               }
             }
             modalObj={modalObj}

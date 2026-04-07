@@ -323,11 +323,11 @@ export const AccordionEditor: React.FC<
       <Box
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         sx={{
-          margin: 0,
           padding: 0,
           position: 'relative',
           ...outerSx,
           ...sxProps,
+          margin: 0,
         }}
       >
         <Box sx={{ width: '100%', ...innerSx }}>

@@ -47,7 +47,7 @@ import { usePublishActions } from './usePublishActions';
 import { useImageCache } from './useImageCache';
 import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 import { INode } from 'react-accessible-treeview';
-import { FileContent, getRepoPath, GitFS } from '../utils/fileSystem';
+import { FileContent, getRepoPath } from '../utils/fileSystem';
 import { GitOperations } from '../utils/gitOperations';
 import JSZip from 'jszip';
 import { FolderStruct } from '@rapid-cmi5/cmi5-build-common';
@@ -84,11 +84,14 @@ import {
   slugifyPath,
 } from '../utils/useCourseOperationsUtils';
 import {
+  GetQuizBankAddModalProps,
+  GetQuizBankSearchModalProps,
   GetScenarioFormProps,
+  QuizBankAddModalProps,
+  QuizBankSearchModalProps,
   RapidCmi5Opts,
   UserAuth,
 } from '../../../rapidcmi5_mdx/main';
-import { boolean } from 'yup';
 
 interface IGitContext {
   currentCourse?: Course | null;
@@ -108,6 +111,8 @@ interface IGitContext {
   currentGitConfig: GitConfigType;
   isElectron: boolean;
   GetScenariosForm?: React.ComponentType<GetScenarioFormProps>;
+  QuizBankSearchModal?: React.ComponentType<GetQuizBankSearchModalProps>;
+  QuizBankAddModal?: React.ComponentType<GetQuizBankAddModalProps>;
   currentAuth?: UserAuth;
   handleChangeRepo: (name: string) => void;
   handleChangeFileSystem: (fsType: fsType) => void;
@@ -358,6 +363,8 @@ export const GitContextProvider = (props: tProviderProps) => {
   }: RepoState = useSelector((state: RootState) => state.repoManager);
 
   const GetScenariosForm = rapidCmi5Opts.GetScenariosForm;
+  const QuizBankSearchModal = rapidCmi5Opts.QuizBankSearchModal;
+  const QuizBankAddModal = rapidCmi5Opts.QuizBankAddModal;
 
   const currentAuth: UserAuth | undefined = rapidCmi5Opts.userAuth;
 
@@ -1209,6 +1216,8 @@ export const GitContextProvider = (props: tProviderProps) => {
       value={{
         gettingRepoStatus: gettingRepoStatus || isPerformingOperation,
         GetScenariosForm,
+        QuizBankSearchModal,
+        QuizBankAddModal,
         currentAuth,
         isElectron,
         isFsLoaded,

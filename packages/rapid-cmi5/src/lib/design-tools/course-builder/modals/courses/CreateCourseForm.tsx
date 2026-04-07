@@ -11,7 +11,7 @@ import * as yup from 'yup';
 
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
-import { createCourseModalId } from '../../rapidcmi5_mdx/modals/constants';
+import { createCourseModalId } from '../../../rapidcmi5_mdx/modals/constants';
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
 import { Alert, Box, Button, IconButton, Tooltip } from '@mui/material';
@@ -24,9 +24,9 @@ import {
   NAME_GROUP,
   STARTS_WITH_HTTPS_GROUP,
 } from '@rapid-cmi5/ui';
-import { CreateCourseType } from '../CourseBuilderApiTypes';
+import { CreateCourseType } from '../../CourseBuilderApiTypes';
 import { useContext, useMemo } from 'react';
-import { GitContext } from '../GitViewer/session/GitContext';
+import { GitContext } from '../../GitViewer/session/GitContext';
 
 export function CreateCourseForm({
   defaultData,

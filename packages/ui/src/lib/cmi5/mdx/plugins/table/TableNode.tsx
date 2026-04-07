@@ -66,13 +66,11 @@ export class TableNode extends DecoratorNode<JSX.Element> {
 
   /** @internal */
   static override clone(node: TableNode): TableNode {
-    console.log('TableNode clone');
     return new TableNode(structuredClone(node.__mdastNode), node.__key);
   }
 
   /** @internal */
   static override importJSON(serializedNode: SerializedTableNode): TableNode {
-    console.log('serializedNode.mdastNode', serializedNode.mdastNode);
     return $createTableNode(serializedNode.mdastNode);
   }
 
@@ -90,7 +88,6 @@ export class TableNode extends DecoratorNode<JSX.Element> {
 
   /** @internal */
   override exportJSON(): SerializedTableNode {
-    console.log('TableNode exportJSON');
     return {
       mdastNode: structuredClone(this.__mdastNode),
       type: 'table',
@@ -125,13 +122,11 @@ export class TableNode extends DecoratorNode<JSX.Element> {
    */
   constructor(mdastNode?: Mdast.Table, key?: NodeKey) {
     super(key);
-    console.log('TableNode constructor', mdastNode);
     this.__mdastNode = mdastNode ?? { type: 'table', children: [] };
   }
 
   /** @internal */
   override createDOM(): HTMLElement {
-    console.log('TableNode createDOM div');
     return document.createElement('div');
   }
 
@@ -151,10 +146,6 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     const cells = row.children;
     const cell = cells[colIndex];
     const cellsClone = Array.from(cells);
-
-    console.log('updateCellBg cell', cell); //cell edited
-    console.log('cellsClone', cellsClone); //all cells in the row
-    console.log('cellBgColor', cellBgColor);
 
     // clone the cell and update its data.hProperties.style
     const newStyle = cellBgColor
@@ -179,7 +170,37 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     const rowClone = { ...row, children: cellsClone };
     cellsClone[colIndex] = cellClone;
     table.children[rowIndex] = rowClone;
-    console.log('the table', table);
+  }
+
+  updateCellTextAlign(
+    colIndex: number,
+    rowIndex: number,
+    align: 'left' | 'center' | 'right',
+  ): void {
+    const self = this.getWritable();
+    const table = self.__mdastNode;
+    const row = table.children[rowIndex];
+    const cells = row.children;
+    const cell = cells[colIndex];
+    const cellsClone = Array.from(cells);
+    const cellClone = {
+      ...cell,
+      data: {
+        ...cell.data,
+        hProperties: {
+          ...cell.data?.hProperties,
+          ...(align === 'left'
+            ? { 'data-text-align': undefined }
+            : { 'data-text-align': align }),
+        },
+      },
+    };
+    if (align === 'left' && cellClone.data?.hProperties) {
+      delete (cellClone.data.hProperties as any)['data-text-align'];
+    }
+    const rowClone = { ...row, children: cellsClone };
+    cellsClone[colIndex] = cellClone;
+    table.children[rowIndex] = rowClone;
   }
 
   /**
@@ -332,7 +353,6 @@ export function $isTableNode(
  * @group Table
  */
 export function $createTableNode(mdastNode: Mdast.Table): TableNode {
-  console.log('Table Node2 createTableNode mdastNode', mdastNode);
 
   return new TableNode(mdastNode);
 }
@@ -349,7 +369,6 @@ export function $createTableNode(mdastNode: Mdast.Table): TableNode {
 export function $convertTableElement(
   element: HTMLElement,
 ): DOMConversionOutput {
-  console.log('TableNode convertTableElement', element);
 
   const rows = element.querySelectorAll('tr');
   const children = Array.from(rows).map((row) => {
@@ -374,7 +393,7 @@ export function $convertTableElement(
       }),
     } satisfies TableRow;
   });
-  console.log('children');
+
   return {
     node: new TableNode({
       type: 'table',

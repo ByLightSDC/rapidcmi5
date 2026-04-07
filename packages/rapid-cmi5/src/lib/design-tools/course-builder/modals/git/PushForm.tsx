@@ -16,11 +16,12 @@ import { Typography } from '@mui/material';
 import { UseFormReturn } from 'react-hook-form';
 
 import { NAME_GROUP_OPT } from '@rapid-cmi5/ui';
-import { PushType } from '../CourseBuilderApiTypes';
 import { useContext } from 'react';
-import { GitContext } from '../GitViewer/session/GitContext';
-import { gitPushModalId } from '../../rapidcmi5_mdx/modals/constants';
+
 import Grid from '@mui/material/Grid2';
+import { gitPushModalId } from '../../../rapidcmi5_mdx/modals/constants';
+import { PushType } from '../../CourseBuilderApiTypes';
+import { GitContext } from '../../GitViewer/session/GitContext';
 
 export function PushForm({
   defaultData,

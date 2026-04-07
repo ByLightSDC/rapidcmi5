@@ -34,6 +34,7 @@ export enum QuestionResponse {
   TrueFalse = 'trueFalse',
   SelectAll = 'selectAll',
 }
+
 export const responseOptions = Object.values(QuestionResponse);
 
 export type BasicResponse = {
@@ -67,6 +68,7 @@ export enum QuizCompletionEnum {
   CompletedAndPassed = 'completed-and-passed',
   NotApplicable = 'not-applicable',
 }
+
 export const completionOptions = Object.values(QuizCompletionEnum);
 
 export type AnswerType = number | number[] | string | string[] | null;

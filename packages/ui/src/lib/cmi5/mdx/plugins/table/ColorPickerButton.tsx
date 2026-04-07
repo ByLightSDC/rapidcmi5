@@ -4,25 +4,33 @@ import { useCallback, useState } from 'react';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { HIGHLIGHT_PRESET_COLORS } from '../../constants/colors';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
-import { IconButton } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
+import PaletteIcon from '@mui/icons-material/Palette';
 
 export default function ColorPickerButton({
   onColorPicked,
   defaultColor = '#FFFFFF',
   disabled,
+  openCallback,
 }: {
   onColorPicked?: (color: string | null) => void;
   defaultColor?: string;
   disabled?: boolean;
+  openCallback: (isOpen: boolean) => void;
 }) {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  // const [currentColor, setColor] = useState<string | null>(defaultColor);
 
   const openPicker = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     setAnchorEl(e.currentTarget);
+    openCallback(true);
   }, []);
 
-  const closePicker = useCallback(() => setAnchorEl(null), []);
+  const closePicker = useCallback(() => {
+    setAnchorEl(null);
+    openCallback(false);
+  }, []);
 
   const onPickColor = useCallback(
     (c: string) => {
@@ -57,16 +65,17 @@ export default function ColorPickerButton({
       >
         <ArrowDropDownIcon fontSize="small" />
       </ButtonWithTooltip> */}
-      <IconButton
-        //sx={{ position: 'absolute', right: 0 }}
-        tabIndex={-1}
-        aria-label="split"
-        size={'small'}
-        color="primary"
-        onClick={openPicker}
-      >
-        <ArrowDropDownIcon fontSize="small" />
-      </IconButton>
+      <Tooltip title="Background Color">
+        <IconButton
+          tabIndex={-1}
+          aria-label="split"
+          size={'small'}
+          color="primary"
+          onClick={openPicker}
+        >
+          <PaletteIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
       <ColorSelectionPopover
         anchorEl={anchorEl}
         onClose={closePicker}
@@ -74,7 +83,7 @@ export default function ColorPickerButton({
         palette={HIGHLIGHT_PRESET_COLORS}
         onPickColor={onPickColor}
         onClear={onClear}
-        noneLabel="No highlight"
+        noneLabel="No background color"
       />
     </>
   );
