@@ -17,11 +17,11 @@ import Grid from '@mui/material/Grid2';
 import { UseFormReturn } from 'react-hook-form';
 
 import { NAME_GROUP_OPT } from '@rapid-cmi5/ui';
-import { DownloadCmi5Type } from '../CourseBuilderApiTypes';
+import { DownloadCmi5Type } from '../../CourseBuilderApiTypes';
 import { useContext } from 'react';
-import { GitContext } from '../GitViewer/session/GitContext';
-import { downloadCmi5ZipModalId } from '../../rapidcmi5_mdx/modals/constants';
-import { getInfoText } from '../../../utils/infoButtonText';
+import { GitContext } from '../../GitViewer/session/GitContext';
+import { downloadCmi5ZipModalId } from '../../../rapidcmi5_mdx/modals/constants';
+import { getInfoText } from '../../../../utils/infoButtonText';
 
 export function DownloadCmi5ZipForm({
   defaultData,

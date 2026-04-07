@@ -1,0 +1,495 @@
+import {
+  Card,
+  CardActionArea,
+  CardContent,
+  Checkbox,
+  Typography,
+  Chip,
+  IconButton,
+  Collapse,
+  Divider,
+  Tooltip,
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Box, Stack } from '@mui/system';
+import { useState } from 'react';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import LockIcon from '@mui/icons-material/Lock';
+import {
+  convertFromApi,
+  QuestionBankApi,
+  QuestionResponse,
+  QuizQuestion,
+} from '@rapid-cmi5/cmi5-build-common';
+import { DeleteDialog } from '@rapid-cmi5/ui';
+
+const TYPE_CONFIG: Record<
+  string,
+  {
+    color: 'primary' | 'secondary' | 'success' | 'warning' | 'info' | 'error';
+  }
+> = {
+  multipleChoice: { color: 'primary' },
+  trueFalse: { color: 'success' },
+  freeResponse: { color: 'secondary' },
+  selectAll: { color: 'info' },
+  matching: { color: 'warning' },
+  number: { color: 'error' },
+};
+
+export function QuestionTypeChip({ type }: { type: string }) {
+  const label = type
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/^./, (s) => s.toUpperCase());
+  const config = TYPE_CONFIG[type];
+  return (
+    <Chip
+      label={label}
+      size="small"
+      color={config?.color ?? 'default'}
+      variant="outlined"
+      sx={{
+        fontSize: '0.675rem',
+        fontWeight: 600,
+        height: 22,
+        letterSpacing: '0.02em',
+        borderRadius: '6px',
+      }}
+    />
+  );
+}
+
+function AuthorChip({ author }: { author: string }) {
+  return (
+    <Typography
+      variant="caption"
+      sx={{
+        color: 'text.secondary',
+        fontSize: '0.7rem',
+        fontWeight: 500,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 0.25,
+      }}
+    >
+      {author}
+    </Typography>
+  );
+}
+
+function PrivateBadge() {
+  return (
+    <Chip
+      icon={<LockIcon sx={{ fontSize: '0.75rem !important' }} />}
+      label="Private"
+      size="small"
+      variant="outlined"
+      sx={{
+        fontSize: '0.65rem',
+        fontWeight: 500,
+        height: 20,
+        borderRadius: '6px',
+        color: 'text.secondary',
+        borderColor: 'action.disabled',
+        '& .MuiChip-icon': { color: 'text.disabled' },
+      }}
+    />
+  );
+}
+export function FormatQuestionOptions({ q }: { q: QuizQuestion }) {
+  const { type, typeAttributes } = q;
+
+  const renderOptionBadge = (label: string, selected = false) => (
+    <Box
+      sx={{
+        width: 22,
+        height: 22,
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bgcolor: selected ? 'success.main' : 'action.selected',
+        color: selected ? '#fff' : 'text.secondary',
+        fontSize: '0.65rem',
+        fontWeight: 700,
+        flexShrink: 0,
+      }}
+    >
+      {label}
+    </Box>
+  );
+
+  if (
+    type === QuestionResponse.MultipleChoice ||
+    type === QuestionResponse.SelectAll
+  ) {
+    return (
+      <Stack spacing={0.5}>
+        {typeAttributes.options?.map((option, i) => {
+          const isCorrect = option.correct;
+
+          return (
+            <Box
+              key={i}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                px: 1,
+                py: 0.5,
+                borderRadius: '8px',
+                bgcolor: isCorrect ? 'rgba(34, 197, 94, 0.08)' : 'transparent',
+                border: '1px solid',
+                borderColor: isCorrect
+                  ? 'rgba(34, 197, 94, 0.2)'
+                  : 'transparent',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              {renderOptionBadge(
+                isCorrect ? '✓' : String.fromCharCode(65 + i),
+                isCorrect,
+              )}
+
+              <Typography
+                variant="caption"
+                sx={{
+                  color: isCorrect ? 'text.primary' : 'text.secondary',
+                  fontWeight: isCorrect ? 600 : 400,
+                  lineHeight: 1.4,
+                }}
+              >
+                {option.text}
+              </Typography>
+            </Box>
+          );
+        })}
+      </Stack>
+    );
+  }
+
+  if (type === QuestionResponse.TrueFalse) {
+    return (
+      <Stack direction="row" spacing={1}>
+        {(['True', 'False'] as const).map((val) => {
+          const isCorrect = typeAttributes.correctAnswer === val;
+
+          return (
+            <Chip
+              key={val}
+              label={val}
+              size="small"
+              color={isCorrect ? 'success' : 'default'}
+              variant={isCorrect ? 'filled' : 'outlined'}
+              icon={
+                isCorrect ? (
+                  <CheckCircleIcon sx={{ fontSize: '0.85rem !important' }} />
+                ) : undefined
+              }
+              sx={{
+                fontSize: '0.7rem',
+                fontWeight: isCorrect ? 600 : 400,
+                height: 24,
+                borderRadius: '6px',
+              }}
+            />
+          );
+        })}
+      </Stack>
+    );
+  }
+
+  if (type === QuestionResponse.Matching) {
+    return (
+      <Stack spacing={0.5}>
+        {typeAttributes.matching?.map((pair, i) => (
+          <Box
+            key={i}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              px: 1,
+              py: 0.5,
+              borderRadius: '8px',
+              bgcolor: 'rgba(245, 158, 11, 0.06)',
+              border: '1px solid rgba(245, 158, 11, 0.12)',
+            }}
+          >
+            <Typography variant="caption" fontWeight={500} color="text.primary">
+              {pair.option}
+            </Typography>
+
+            <ArrowForwardIcon
+              sx={{
+                fontSize: '0.7rem',
+                color: 'text.disabled',
+                flexShrink: 0,
+              }}
+            />
+
+            <Typography variant="caption" color="success.main" fontWeight={600}>
+              {pair.response}
+            </Typography>
+          </Box>
+        ))}
+      </Stack>
+    );
+  }
+
+  if (type === QuestionResponse.Number) {
+    return (
+      <Box
+        sx={{
+          display: 'inline-flex',
+          px: 1,
+          py: 0.5,
+          borderRadius: '8px',
+          bgcolor: 'rgba(239, 68, 68, 0.06)',
+          border: '1px solid rgba(239, 68, 68, 0.12)',
+        }}
+      >
+        <Typography variant="caption" color="error.main" fontWeight={600}>
+          Answer: {typeAttributes.correctAnswer}
+        </Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Typography
+      variant="caption"
+      sx={{ fontStyle: 'italic', color: 'text.secondary' }}
+    >
+      {typeAttributes.correctAnswer
+        ? `Answer: ${typeAttributes.correctAnswer}`
+        : '(open-ended)'}
+    </Typography>
+  );
+}
+
+const CONFIRM_WORD = 'delete';
+
+export default function QuestionCard({
+  q,
+  isSelected,
+  isExpanded,
+  multiSelect,
+  toggleExpand,
+  handleSelect,
+  currentUser,
+  onDelete,
+}: {
+  q: QuestionBankApi;
+  isSelected: boolean;
+  isExpanded: boolean;
+  multiSelect: boolean;
+  toggleExpand: (id: string, e: React.MouseEvent) => void;
+  handleSelect: (q: QuestionBankApi) => void;
+  currentUser?: string;
+  onDelete?: (uuid: string) => Promise<void>;
+}) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const openConfirm = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeleteError(null);
+    setConfirmOpen(true);
+  };
+
+  const closeConfirm = () => {
+    if (isDeleting) return;
+    setConfirmOpen(false);
+    setDeleteError(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!onDelete) return;
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      await onDelete(q.uuid);
+      setConfirmOpen(false);
+    } catch {
+      setDeleteError('Failed to delete question. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <>
+      {onDelete && q.author === currentUser && (
+        <DeleteDialog
+          confirmOpen={confirmOpen}
+          closeConfirm={closeConfirm}
+          objectType="Question"
+          confirmWord={CONFIRM_WORD}
+          itemLabel={q.question}
+          onConfirm={handleConfirmDelete}
+          isDeleting={isDeleting}
+          error={deleteError ?? undefined}
+        />
+      )}
+
+      <Card
+        key={q.uuid}
+        variant="outlined"
+        sx={{
+          position: 'relative',
+          borderColor: isSelected ? 'primary.main' : 'divider',
+          transition: 'all 0.2s ease',
+          overflow: 'hidden',
+        }}
+      >
+        <CardActionArea onClick={() => handleSelect(q)} sx={{ p: 0 }}>
+          <CardContent
+            sx={{ py: 1.25, px: 2, pl: 2.5, '&:last-child': { pb: 1.25 } }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 1,
+              }}
+            >
+              {/* Checkbox */}
+              {multiSelect && (
+                <Checkbox
+                  checked={isSelected}
+                  size="small"
+                  icon={<RadioButtonUncheckedIcon fontSize="small" />}
+                  checkedIcon={<CheckCircleIcon fontSize="small" />}
+                  sx={{ p: 0, m: 0 }}
+                  tabIndex={-1}
+                />
+              )}
+
+              <IconButton
+                size="small"
+                onClick={(e) => toggleExpand(q.uuid, e)}
+                sx={{ p: 0, mt: 0, flexShrink: 0 }}
+              >
+                {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </IconButton>
+
+              {/* Content */}
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                {/* Question text */}
+                <Typography
+                  variant="body2"
+                  fontWeight={600}
+                  sx={{
+                    ...(isExpanded
+                      ? {}
+                      : {
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                        }),
+                    lineHeight: 1.5,
+                    color: 'text.primary',
+                    mb: 0.75,
+                  }}
+                >
+                  {q.question}
+                </Typography>
+
+                {/* Meta row */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    alignItems: 'center',
+                    gap: 0.75,
+                  }}
+                >
+                  {q.author && <AuthorChip author={q.author} />}
+                  {q.author && q.questionType && (
+                    <Box
+                      sx={{
+                        width: '1px',
+                        height: 12,
+                        bgcolor: 'divider',
+                      }}
+                    />
+                  )}
+                  {q.questionType && <QuestionTypeChip type={q.questionType} />}
+                  {!q.publicQuestion && <PrivateBadge />}
+                  {q.tags?.map((tag) => (
+                    <Chip
+                      key={tag}
+                      label={tag}
+                      size="small"
+                      variant="filled"
+                      sx={{
+                        fontSize: '0.65rem',
+                        height: 18,
+                        bgcolor: 'action.hover',
+                        borderRadius: '6px',
+                      }}
+                    />
+                  ))}
+                </Box>
+              </Box>
+
+              {/* Delete button — only for the question's author */}
+              {onDelete && q.author === currentUser && (
+                <Tooltip title="Delete from bank">
+                  <IconButton
+                    size="small"
+                    onClick={openConfirm}
+                    sx={{
+                      p: 0.25,
+                      mt: 0.15,
+                      flexShrink: 0,
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+
+            </Box>
+          </CardContent>
+        </CardActionArea>
+
+        {/* Expanded details */}
+        <Collapse in={isExpanded} unmountOnExit>
+          <Divider />
+          <Box sx={{ px: 2, pl: 2.5, py: 1.25, bgcolor: 'action.hover' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 2,
+                mb: 1,
+                flexWrap: 'wrap',
+              }}
+            >
+              {q.dateCreated && (
+                <Typography variant="caption" color="text.secondary">
+                  Created: {new Date(q.dateCreated).toLocaleDateString()}
+                </Typography>
+              )}
+              {q.dateEdited && (
+                <Typography variant="caption" color="text.secondary">
+                  Edited: {new Date(q.dateEdited).toLocaleDateString()}
+                </Typography>
+              )}
+            </Box>
+
+            <FormatQuestionOptions q={convertFromApi(q)} />
+          </Box>
+        </Collapse>
+      </Card>
+    </>
+  );
+}

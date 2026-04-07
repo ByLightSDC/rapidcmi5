@@ -15,6 +15,7 @@ import { GlassCard } from './GlassCard';
 import ThemedOptionCard from './ThemedOption';
 import { DirMeta, formatRelativeTime } from '@rapid-cmi5/cmi5-build-common';
 import { useState, useMemo } from 'react';
+import SearchBar from './SearchBar';
 
 export type RecentProjectSelectionProps = {
   recentProjects: DirMeta[];
@@ -66,54 +67,11 @@ export default function RecentProjectSelection({
       >
         {/* Search Bar */}
         {recentProjects.length > 0 && (
-          <TextField
-            size="small"
-            placeholder="Search projects..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            disabled={isDisabled}
-            sx={{
-              mb: 2,
-              flexShrink: 0,
-              '& .MuiOutlinedInput-root': {
-                fontFamily: '"IBM Plex Sans", sans-serif',
-                fontSize: '0.875rem',
-                backgroundColor: alpha(palette.background.paper, 0.5),
-                backdropFilter: 'blur(10px)',
-                transition: 'all 0.2s ease',
-                '&:hover': {
-                  backgroundColor: alpha(palette.background.paper, 0.7),
-                },
-                '&.Mui-focused': {
-                  backgroundColor: alpha(palette.background.paper, 0.8),
-                  boxShadow: `0 0 0 2px ${alpha(palette.primary.main, 0.2)}`,
-                },
-              },
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search sx={{ fontSize: 18, color: 'text.secondary' }} />
-                </InputAdornment>
-              ),
-              endAdornment: searchQuery && (
-                <InputAdornment position="end">
-                  <IconButton
-                    size="small"
-                    onClick={handleClearSearch}
-                    edge="end"
-                    disabled={isDisabled}
-                    sx={{
-                      width: 24,
-                      height: 24,
-                      '&:hover': { color: 'primary.main' },
-                    }}
-                  >
-                    <Clear sx={{ fontSize: 16 }} />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
+          <SearchBar
+            handleClearSearch={handleClearSearch}
+            handleSearchChange={handleSearchChange}
+            isDisabled={isDisabled}
+            searchQuery={searchQuery}
           />
         )}
 

@@ -5,10 +5,13 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import * as RadixPopover from '@radix-ui/react-popover';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, IconButton, Tooltip, useTheme } from '@mui/material';
+import { Box, Divider, IconButton, Tooltip, useTheme } from '@mui/material';
 import { useGutterRight } from '../shared/useGutterRight';
 import { useFocusWithin } from '../shared/useFocusWithin';
-import { useScopedAlignmentStyles, TextAlign } from '../shared/useScopedAlignmentStyles';
+import {
+  useScopedAlignmentStyles,
+  TextAlign,
+} from '../shared/useScopedAlignmentStyles';
 import { AlignmentToolbarControls } from '../../components/AlignmentToolbarControls';
 import DeleteIconButton from '../../components/DeleteIconButton';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
@@ -33,6 +36,7 @@ import React, {
   useState,
   useRef,
   useLayoutEffect,
+  useMemo,
 } from 'react';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
@@ -49,6 +53,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import {
   NESTED_EDITOR_UPDATED_COMMAND,
+  Separator,
   codeBlockEditorDescriptors$,
   directiveDescriptors$,
   editorRootElementRef$,
@@ -70,6 +75,7 @@ import { useCellValues } from '@mdxeditor/gurx';
 
 import ColorPickerButton from './ColorPickerButton';
 import { TableStyleDialog } from './TableStyleDialog';
+import { editorInPlayback$ } from '../../state/vars';
 
 // helper to extract background color
 const getBackgroundColor = (cell: any): string => {
@@ -173,9 +179,10 @@ export const TableEditor: React.FC<TableEditorProps> = ({
     null,
   );
 
-  const [iconComponentFor, readOnly] = useCellValues(
+  const [iconComponentFor, readOnly, isPlayback] = useCellValues(
     iconComponentFor$,
     readOnly$,
+    editorInPlayback$,
   );
 
   const muiTheme = useTheme();
@@ -185,6 +192,10 @@ export const TableEditor: React.FC<TableEditorProps> = ({
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';
   const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
+
+  const isReadOnly = useMemo(() => {
+    return readOnly || isPlayback;
+  }, [readOnly, isPlayback]);
 
   const getCellKey = React.useMemo(() => {
     return (cell: Mdast.TableCell & { __cacheKey?: string }) => {
@@ -321,11 +332,6 @@ export const TableEditor: React.FC<TableEditorProps> = ({
     [],
   );
 
-  useEffect(() => {
-    console.log('TableEditor');
-    console.log('mdastNode', mdastNode);
-    console.log('lexicalTable', lexicalTable);
-  }, []);
 
   // get styles to apply to the table
   const tableStyle = mdastNode.data?.hProperties?.['style'] as string | undefined;
@@ -342,7 +348,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
   // In Edit mode, we strip border/shadow properties so they don't wrap the tool headers.
   const tableElementStyle = React.useMemo(() => {
     if (!computedTableStyle) return undefined;
-    if (readOnly) return computedTableStyle;
+    if (isReadOnly) return computedTableStyle;
 
     const editModeStyle = { ...computedTableStyle };
     delete editModeStyle.border;
@@ -351,7 +357,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
     delete editModeStyle.borderColor;
     delete editModeStyle.boxShadow;
     return editModeStyle;
-  }, [readOnly, computedTableStyle]);
+  }, [isReadOnly, computedTableStyle]);
 
   // --- Shadow Underlay Logic ---
   const tableRef = useRef<HTMLTableElement>(null);
@@ -363,7 +369,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
   } | null>(null);
 
   useLayoutEffect(() => {
-    if (readOnly || !tableRef.current) return;
+    if (isReadOnly || !tableRef.current) return;
 
     const measure = () => {
       if (!tableRef.current) return;
@@ -415,12 +421,18 @@ export const TableEditor: React.FC<TableEditorProps> = ({
     observer.observe(tableRef.current);
 
     return () => observer.disconnect();
-  }, [readOnly, mdastNode]);
+  }, [isReadOnly, mdastNode]);
 
   // remove tool cols in readOnly mode
   return (
-    <div style={{ paddingTop: blockPadding, paddingBottom: blockPadding, position: 'relative' }}>
-      {!readOnly && (
+    <div
+      style={{
+        paddingTop: blockPadding,
+        paddingBottom: blockPadding,
+        position: 'relative',
+      }}
+    >
+      {!isReadOnly && (
         <Box
           ref={gutterRef as any}
           sx={{
@@ -445,215 +457,237 @@ export const TableEditor: React.FC<TableEditorProps> = ({
           />
         </Box>
       )}
-    <div style={readOnly ? undefined : { border: '1px dashed var(--baseBgActive, #ccc)', borderRadius: '4px', padding: '2px' }}>
-    <div style={{ position: 'relative' }}>
-      {/* Shadow Underlay - Only in Edit Mode */}
-      {!readOnly && fullShadowStyle && dataArea && (
-        <div
-          style={{
-            position: 'absolute',
-            top: dataArea.top,
-            left: dataArea.left,
-            width: dataArea.width,
-            height: dataArea.height,
-            boxShadow: fullShadowStyle,
-            borderRadius: borderRadius,
-            pointerEvents: 'none',
-            zIndex: 0, // Behind the table cells
-          }}
-        />
-      )}
-
-      <table
-        ref={tableRef}
-        className={styles['tableEditor']}
-        style={{ ...tableElementStyle, position: 'relative', zIndex: 1 }}
-        onMouseOver={onTableMouseOver}
-        onMouseLeave={() => {
-          setHighlightedCoordinates([-1, -1]);
-        }}
+      <div
+        style={
+          isReadOnly
+            ? undefined
+            : {
+                border: '1px dashed var(--baseBgActive, #ccc)',
+                borderRadius: '4px',
+                padding: '2px',
+              }
+        }
       >
-        {mdastNode && (
-          <>
-            <colgroup>
-              {readOnly ? null : <col />}
+        <div style={{ position: 'relative' }}>
+          {/* Shadow Underlay - Only in Edit Mode */}
+          {!isReadOnly && fullShadowStyle && dataArea && (
+            <div
+              style={{
+                position: 'absolute',
+                top: dataArea.top,
+                left: dataArea.left,
+                width: dataArea.width,
+                height: dataArea.height,
+                boxShadow: fullShadowStyle,
+                borderRadius: borderRadius,
+                pointerEvents: 'none',
+                zIndex: 0, // Behind the table cells
+              }}
+            />
+          )}
 
-              {Array.from(
-                { length: mdastNode.children[0].children.length },
-                (_, colIndex) => {
-                  const align = mdastNode.align ?? [];
-                  const currentColumnAlign = align[colIndex] ?? 'left';
-                  const className = AlignToTailwindClassMap[currentColumnAlign];
-                  return <col key={colIndex} className={className} />;
-                },
-              )}
+          <table
+            ref={tableRef}
+            className={styles['tableEditor']}
+            style={{ ...tableElementStyle, position: 'relative', zIndex: 1 }}
+            onMouseOver={onTableMouseOver}
+            onMouseLeave={() => {
+              setHighlightedCoordinates([-1, -1]);
+            }}
+          >
+            {mdastNode && (
+              <>
+                <colgroup>
+                  {isReadOnly ? null : <col />}
 
-              {readOnly ? null : <col />}
-            </colgroup>
-
-            {readOnly || (
-              <thead>
-                <tr>
-                  <th className={styles['tableToolsColumn']}></th>
                   {Array.from(
                     { length: mdastNode.children[0].children.length },
                     (_, colIndex) => {
-                      return (
-                        <th key={colIndex} data-col-trigger={colIndex}>
-                          <ColumnEditor
-                            {...{
-                              setActiveCellWithBoundaries,
-                              parentEditor,
-                              colIndex,
-                              colCount: mdastNode.children[0].children.length,
-                              highlightedCoordinates,
-                              lexicalTable,
-                              align: (mdastNode.align ?? [])[colIndex],
-                            }}
-                          />
-                        </th>
-                      );
+                      const align = mdastNode.align ?? [];
+                      const currentColumnAlign = align[colIndex] ?? 'left';
+                      const className =
+                        AlignToTailwindClassMap[currentColumnAlign];
+                      return <col key={colIndex} className={className} />;
                     },
                   )}
 
-                  <th className={styles['tableToolsColumn']} data-tool-cell={true}>
-                    <button
-                      type="button"
-                      className={styles['addColumnButton']}
-                      onClick={addColumnToRight}
-                    >
-                      {iconComponentFor('add_column')}
-                    </button>
-                  </th>
-                </tr>
-              </thead>
-            )}
+                  {isReadOnly ? null : <col />}
+                </colgroup>
 
-            <tbody>
-              {mdastNode.children.map((row, rowIndex) => {
-                const CellElement = getCellType(rowIndex);
-                // Identify row edges for border application
-                const isFirstRow = rowIndex === 0;
-                const isLastRow = rowIndex === mdastNode.children.length - 1;
+                {isReadOnly || (
+                  <thead>
+                    <tr>
+                      <th className={styles['tableToolsColumn']}></th>
+                      {Array.from(
+                        { length: mdastNode.children[0].children.length },
+                        (_, colIndex) => {
+                          return (
+                            <th key={colIndex} data-col-trigger={colIndex}>
+                              <ColumnEditor
+                                {...{
+                                  setActiveCellWithBoundaries,
+                                  parentEditor,
+                                  colIndex,
+                                  colCount:
+                                    mdastNode.children[0].children.length,
+                                  highlightedCoordinates,
+                                  lexicalTable,
+                                  align: (mdastNode.align ?? [])[colIndex],
+                                }}
+                              />
+                            </th>
+                          );
+                        },
+                      )}
 
-                return (
-                  <tr key={rowIndex}>
-                    {readOnly || (
-                      <CellElement
-                        className={styles['toolCell']}
-                        data-row-trigger={rowIndex}
+                      <th
+                        className={styles['tableToolsColumn']}
+                        data-tool-cell={true}
                       >
-                        <RowEditor
-                          {...{
-                            setActiveCellWithBoundaries,
-                            parentEditor,
-                            rowIndex,
-                            rowCount: mdastNode.children.length,
-                            highlightedCoordinates,
-                            lexicalTable,
-                          }}
-                        />
-                      </CellElement>
-                    )}
-                    {row.children.map((mdastCell, colIndex) => {
-                      // Use helper to extract color
-                      const dynamicColor = getBackgroundColor(mdastCell);
+                        <button
+                          type="button"
+                          className={styles['addColumnButton']}
+                          onClick={addColumnToRight}
+                        >
+                          {iconComponentFor('add_column')}
+                        </button>
+                      </th>
+                    </tr>
+                  </thead>
+                )}
 
-                      // Determine if this cell needs perimeter borders (Edit mode only)
-                      const isFirstCol = colIndex === 0;
-                      const isLastCol = colIndex === row.children.length - 1;
+                <tbody>
+                  {mdastNode.children.map((row, rowIndex) => {
+                    const CellElement = getCellType(rowIndex);
+                    // Identify row edges for border application
+                    const isFirstRow = rowIndex === 0;
+                    const isLastRow =
+                      rowIndex === mdastNode.children.length - 1;
 
-                      const perimeterStyle: React.CSSProperties = {};
+                    return (
+                      <tr key={rowIndex}>
+                        {isReadOnly || (
+                          <CellElement
+                            className={styles['toolCell']}
+                            data-row-trigger={rowIndex}
+                          >
+                            <RowEditor
+                              {...{
+                                setActiveCellWithBoundaries,
+                                parentEditor,
+                                rowIndex,
+                                rowCount: mdastNode.children.length,
+                                highlightedCoordinates,
+                                lexicalTable,
+                              }}
+                            />
+                          </CellElement>
+                        )}
+                        {row.children.map((mdastCell, colIndex) => {
+                          // Use helper to extract color
+                          const dynamicColor = getBackgroundColor(mdastCell);
 
-                      // While editing, we simulate the table border by applying borders to the outer cells.
-                      if (!readOnly) {
-                        // --- 1. Borders ---
-                        if (fullBorderStyle) {
-                          if (isFirstRow)
-                            perimeterStyle.borderTop = fullBorderStyle;
-                          if (isLastRow)
-                            perimeterStyle.borderBottom = fullBorderStyle;
-                          if (isFirstCol)
-                            perimeterStyle.borderLeft = fullBorderStyle;
-                          if (isLastCol)
-                            perimeterStyle.borderRight = fullBorderStyle;
-                        }
+                          // Determine if this cell needs perimeter borders (Edit mode only)
+                          const isFirstCol = colIndex === 0;
+                          const isLastCol =
+                            colIndex === row.children.length - 1;
 
-                        // --- 2. Radius ---
-                        if (borderRadius) {
-                          if (isFirstRow && isFirstCol)
-                            perimeterStyle.borderTopLeftRadius = borderRadius;
-                          if (isFirstRow && isLastCol)
-                            perimeterStyle.borderTopRightRadius = borderRadius;
-                          if (isLastRow && isFirstCol)
-                            perimeterStyle.borderBottomLeftRadius =
-                              borderRadius;
-                          if (isLastRow && isLastCol)
-                            perimeterStyle.borderBottomRightRadius =
-                              borderRadius;
+                          const perimeterStyle: React.CSSProperties = {};
 
-                          // Clip background at corners
-                          if (
-                            (isFirstRow || isLastRow) &&
-                            (isFirstCol || isLastCol)
-                          ) {
-                            perimeterStyle.overflow = 'hidden';
+                          // While editing, we simulate the table border by applying borders to the outer cells.
+                          if (!isReadOnly) {
+                            // --- 1. Borders ---
+                            if (fullBorderStyle) {
+                              if (isFirstRow)
+                                perimeterStyle.borderTop = fullBorderStyle;
+                              if (isLastRow)
+                                perimeterStyle.borderBottom = fullBorderStyle;
+                              if (isFirstCol)
+                                perimeterStyle.borderLeft = fullBorderStyle;
+                              if (isLastCol)
+                                perimeterStyle.borderRight = fullBorderStyle;
+                            }
+
+                            // --- 2. Radius ---
+                            if (borderRadius) {
+                              if (isFirstRow && isFirstCol)
+                                perimeterStyle.borderTopLeftRadius =
+                                  borderRadius;
+                              if (isFirstRow && isLastCol)
+                                perimeterStyle.borderTopRightRadius =
+                                  borderRadius;
+                              if (isLastRow && isFirstCol)
+                                perimeterStyle.borderBottomLeftRadius =
+                                  borderRadius;
+                              if (isLastRow && isLastCol)
+                                perimeterStyle.borderBottomRightRadius =
+                                  borderRadius;
+
+                              // Clip background at corners
+                              if (
+                                (isFirstRow || isLastRow) &&
+                                (isFirstCol || isLastCol)
+                              ) {
+                                perimeterStyle.overflow = 'hidden';
+                              }
+                            }
+                            // --- 3. Shadow is handled by underlay ---
                           }
-                        }
-                        // --- 3. Shadow is handled by underlay ---
-                      }
 
-                      const rawTextAlign = (mdastCell.data?.hProperties as any)?.['data-text-align'];
-                      const cellTextAlign: TextAlign =
-                        rawTextAlign === 'center' || rawTextAlign === 'right'
-                          ? rawTextAlign
-                          : 'left';
+                          const rawTextAlign = (
+                            mdastCell.data?.hProperties as any
+                          )?.['data-text-align'];
+                          const cellTextAlign: TextAlign =
+                            rawTextAlign === 'center' ||
+                            rawTextAlign === 'right'
+                              ? rawTextAlign
+                              : 'left';
 
-                      return (
-                        <Cell
-                          align={mdastNode.align?.[colIndex]}
-                          textAlign={cellTextAlign}
-                          cellBackgroundColor={dynamicColor}
-                          perimeterStyle={perimeterStyle}
-                          key={getCellKey(mdastCell)}
-                          contents={mdastCell.children}
-                          setActiveCell={setActiveCellWithBoundaries}
-                          {...{
-                            rowIndex,
-                            colIndex,
-                            lexicalTable,
-                            parentEditor,
-                            activeCell: readOnly ? [-1, -1] : activeCell,
-                          }}
-                        />
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
-            {readOnly || (
-              <tfoot>
-                <tr>
-                  <th></th>
-                  <th colSpan={lexicalTable.getColCount()}>
-                    <button
-                      type="button"
-                      className={styles['addRowButton']}
-                      onClick={addRowToBottom}
-                    >
-                      {iconComponentFor('add_row')}
-                    </button>
-                  </th>
-                  <th></th>
-                </tr>
-              </tfoot>
+                          return (
+                            <Cell
+                              align={mdastNode.align?.[colIndex]}
+                              textAlign={cellTextAlign}
+                              cellBackgroundColor={dynamicColor}
+                              perimeterStyle={perimeterStyle}
+                              key={getCellKey(mdastCell)}
+                              contents={mdastCell.children}
+                              setActiveCell={setActiveCellWithBoundaries}
+                              {...{
+                                rowIndex,
+                                colIndex,
+                                lexicalTable,
+                                parentEditor,
+                                activeCell: isReadOnly ? [-1, -1] : activeCell,
+                              }}
+                            />
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+                {isReadOnly || (
+                  <tfoot>
+                    <tr>
+                      <th></th>
+                      <th colSpan={lexicalTable.getColCount()}>
+                        <button
+                          type="button"
+                          className={styles['addRowButton']}
+                          onClick={addRowToBottom}
+                        >
+                          {iconComponentFor('add_row')}
+                        </button>
+                      </th>
+                      <th></th>
+                    </tr>
+                  </tfoot>
+                )}
+              </>
             )}
-          </>
-        )}
-      </table>
-    </div>
-    </div>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };
@@ -689,6 +723,7 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
   const [currentColor, setColor] = useState<string>(
     props.cellBackgroundColor || 'transparent',
   );
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
 
   useEffect(() => {
     setColor(props.cellBackgroundColor || 'transparent');
@@ -698,9 +733,7 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
 
   const onPickBgColor = React.useCallback(
     (color: string | null) => {
-      if (color) {
-        setColor(color);
-      }
+      setColor(color || 'transparent');
     },
     [setColor],
   );
@@ -724,7 +757,7 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
         setActiveCell([props.colIndex, props.rowIndex]);
       }}
     >
-      {isFocused && !readOnly && (
+      {(isFocused || isPickerOpen) && !readOnly && (
         <Box
           sx={{
             position: 'absolute',
@@ -735,9 +768,14 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
             backgroundColor:
               muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
             borderRadius: 1,
-            p: 0.25,
+            p: 0.5,
           }}
         >
+          <ColorPickerButton
+            onColorPicked={onPickBgColor}
+            openCallback={setIsPickerOpen}
+          />
+          <Divider orientation="vertical" />
           <AlignmentToolbarControls
             currentAlignment={props.textAlign}
             onAlignmentChange={handleAlignmentChange}
@@ -749,7 +787,6 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
         focus={isActive}
         cellBackgroundColor={currentColor}
       />
-      <ColorPickerButton onColorPicked={onPickBgColor} />
     </CellElement>
   );
 };
@@ -932,7 +969,6 @@ const CellEditor: React.FC<CellProps> = ({
   }, [focus, editor]);
 
   React.useEffect(() => {
-    //cellBackgroundColor
     changeColor(cellBackgroundColor);
   }, [cellBackgroundColor]);
 
@@ -1087,6 +1123,7 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
     </RadixPopover.Root>
   );
 };
+
 interface RowEditorProps {
   parentEditor: LexicalEditor;
   lexicalTable: TableNode;

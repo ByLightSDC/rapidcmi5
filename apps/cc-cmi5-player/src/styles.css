@@ -163,7 +163,7 @@ audio::-moz-media-controls {
   padding: 8px 12px;
   word-wrap: break-word; /* Prevents text from pushing columns wide */
   overflow-wrap: break-word;
-  border: 1px solid rgba(255, 255, 255, 0.2); /* Fallback border */
+  border: 1px solid rgba(185, 184, 184, 0.2); /* Fallback border */
 }
 
 /* Ensure alignment classes from your TableEditor.tsx also work here */

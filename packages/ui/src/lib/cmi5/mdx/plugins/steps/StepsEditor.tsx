@@ -67,7 +67,10 @@ import {
   convertMdastToMarkdown,
 } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
-import { resolveLessonThemeCSS, resolveBlockMaxWidth } from '../../../../styles/lessonThemeStyles';
+import {
+  resolveLessonThemeCSS,
+  resolveBlockMaxWidth,
+} from '../../../../styles/lessonThemeStyles';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
@@ -102,19 +105,25 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
 
   const { lessonTheme } = useContext(LessonThemeContext);
   const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
-  const blockPadding = resolvedThemeCSS ? (resolvedThemeCSS.blockPadding ?? '0px') : '32px';
+  const blockPadding = resolvedThemeCSS
+    ? (resolvedThemeCSS.blockPadding ?? '0px')
+    : '32px';
 
-  const [contentWidth, setContentWidth] = useState<ContentWidthEnum | undefined>(
-    mdastNode.attributes.contentWidth,
-  );
+  const [contentWidth, setContentWidth] = useState<
+    ContentWidthEnum | undefined
+  >(mdastNode.attributes.contentWidth);
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
-  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
+  const { gutterRef, gutterRight } = useGutterRight(
+    resolvedThemeCSS,
+    blockMaxWidth,
+  );
 
   const [backgroundColor, setBackgroundColor] = useState<string>(
     mdastNode?.attributes?.backgroundColor ?? '',
   );
-  const [colorPickerAnchor, setColorPickerAnchor] = useState<HTMLButtonElement | null>(null);
+  const [colorPickerAnchor, setColorPickerAnchor] =
+    useState<HTMLButtonElement | null>(null);
   const [pendingColor, setPendingColor] = useState<string>(
     mdastNode?.attributes?.backgroundColor ?? '',
   );
@@ -257,7 +266,14 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
     parentEditor.update(() => {
       lexicalNode.remove();
     });
-  }, [insertMarkdown, formData, backgroundColor, contentWidth, lexicalNode, parentEditor]);
+  }, [
+    insertMarkdown,
+    formData,
+    backgroundColor,
+    contentWidth,
+    lexicalNode,
+    parentEditor,
+  ]);
 
   const handleClearColor = useCallback(() => {
     setColorPickerAnchor(null);
@@ -265,11 +281,14 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
     skipNextCloseRebuildRef.current = true;
     setPendingColor('');
     setBackgroundColor('');
-    parentEditor.update(() => {
-      const attrs = { ...mdastNode.attributes };
-      delete attrs.backgroundColor;
-      lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-    }, { discrete: true });
+    parentEditor.update(
+      () => {
+        const attrs = { ...mdastNode.attributes };
+        delete attrs.backgroundColor;
+        lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+      },
+      { discrete: true },
+    );
   }, [lexicalNode, mdastNode, parentEditor]);
 
   /**
@@ -412,12 +431,19 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
       <Box
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         sx={{
-          margin: 0,
           padding: 0,
           position: 'relative',
           ...outerSx,
           ...sxProps,
-          ...(blockMaxWidth ? { maxWidth: blockMaxWidth, marginLeft: 'auto', marginRight: 'auto' } : {}),
+          ...(blockMaxWidth
+            ? {
+                maxWidth: blockMaxWidth,
+                marginLeft: 'auto',
+                marginRight: 'auto',
+              }
+            : {}),
+          marginTop: 0,
+          marginBottom: 0,
         }}
       >
         <Stack
@@ -485,7 +511,10 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Block Appearance">
-                      <IconButton onClick={() => setBlockAppearanceOpen(true)} size="small">
+                      <IconButton
+                        onClick={() => setBlockAppearanceOpen(true)}
+                        size="small"
+                      >
                         <SettingsIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
@@ -494,7 +523,10 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
-                    <InsertLineReturnButton parentEditor={parentEditor} lexicalNode={lexicalNode} />
+                    <InsertLineReturnButton
+                      parentEditor={parentEditor}
+                      lexicalNode={lexicalNode}
+                    />
                     <DeleteIconButton
                       onDelete={() => {
                         parentEditor.update(() => {
@@ -519,7 +551,8 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                   borderColor: (theme: any) => `${theme.palette.divider}`,
                   borderStyle: 'solid',
                   borderWidth: '1px',
-                  backgroundColor: (theme: any) => theme.palette.background.paper,
+                  backgroundColor: (theme: any) =>
+                    theme.palette.background.paper,
                   paddingRight: isPlayback ? 2 : '100px',
                 }}
               >
@@ -544,7 +577,9 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                     children,
                   })}
                   contentEditableProps={{
-                    'aria-label': title ? `${title} step content` : 'Step content',
+                    'aria-label': title
+                      ? `${title} step content`
+                      : 'Step content',
                   }}
                 />
                 <Stack
@@ -570,7 +605,8 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                     >
                       <Typography
                         sx={{
-                          textDecoration: index === step ? 'underline' : undefined,
+                          textDecoration:
+                            index === step ? 'underline' : undefined,
                         }}
                       >
                         {index + 1}
@@ -626,15 +662,18 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
         onClose={() => setBlockAppearanceOpen(false)}
         onSave={(newContentWidth: ContentWidthEnum | undefined) => {
           setContentWidth(newContentWidth);
-          parentEditor.update(() => {
-            const attrs = { ...mdastNode.attributes };
-            if (newContentWidth) {
-              attrs.contentWidth = newContentWidth;
-            } else {
-              delete attrs.contentWidth;
-            }
-            lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-          }, { discrete: true });
+          parentEditor.update(
+            () => {
+              const attrs = { ...mdastNode.attributes };
+              if (newContentWidth) {
+                attrs.contentWidth = newContentWidth;
+              } else {
+                delete attrs.contentWidth;
+              }
+              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+            },
+            { discrete: true },
+          );
         }}
       />
 
@@ -649,15 +688,18 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
           const latest = pendingColorRef.current;
           if (latest !== backgroundColor) {
             setBackgroundColor(latest);
-            parentEditor.update(() => {
-              const attrs = { ...mdastNode.attributes };
-              if (latest) {
-                attrs.backgroundColor = latest;
-              } else {
-                delete attrs.backgroundColor;
-              }
-              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-            }, { discrete: true });
+            parentEditor.update(
+              () => {
+                const attrs = { ...mdastNode.attributes };
+                if (latest) {
+                  attrs.backgroundColor = latest;
+                } else {
+                  delete attrs.backgroundColor;
+                }
+                lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+              },
+              { discrete: true },
+            );
           }
         }}
         lastColor={pendingColor}

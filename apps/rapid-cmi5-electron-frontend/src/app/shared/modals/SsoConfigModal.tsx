@@ -38,6 +38,7 @@ const defaultSSOConfig: SSOConfig = {
   keycloakScope: 'profile',
   rangeRestApiUrl: '',
   ssoEnabled: false,
+  quizBankApiUrl: '',
 };
 
 interface FormStatus {
@@ -167,6 +168,16 @@ export function ConfigureSSOForm({
               required
               label="Scope"
               placeholder="profile"
+              readOnly={false}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12 }}>
+            <FormControlTextField
+              control={control}
+              name="quizBankApiUrl"
+              label="Quiz Bank API URL"
+              placeholder="https://quiz-bank-api.example.com"
               readOnly={false}
             />
           </Grid>

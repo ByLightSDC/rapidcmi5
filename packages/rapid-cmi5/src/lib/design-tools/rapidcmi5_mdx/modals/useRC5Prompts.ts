@@ -33,8 +33,6 @@ export const useRC5Prompts = () => {
   const hasFilesToSave = useSelector(isDisplayDirty);
   const { sendMessage } = useContext(RC5Context);
 
-
-
   const promptDeleteAllSlides = () => {
     dispatch(
       setModal({
