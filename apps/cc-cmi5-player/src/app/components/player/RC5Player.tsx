@@ -109,7 +109,7 @@ function RC5Player() {
         el.focus({ preventScroll: true });
       }
     }, 150);
-    //   // Cleanup — if the user switches slides before 150ms is up, cancel the previous timeout.
+    // Cleanup — if the user switches slides before 150ms is up, cancel the previous timeout.
     return () => clearTimeout(id);
   }, [activeTab]);
 

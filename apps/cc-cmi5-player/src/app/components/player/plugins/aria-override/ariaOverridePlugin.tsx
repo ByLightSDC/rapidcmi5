@@ -57,10 +57,6 @@ function AriaCleanupPlugin(): null {
       if (currentLabel === 'editable markdown') {
         rootElement.removeAttribute('aria-label');
       }
-      // Set correct role and label — tells NVDA this is a readable content
-      // region, not an interactive widget
-      //rootElement.setAttribute('role', 'region');
-      // rootElement.setAttribute('aria-label', 'Slide content');
     });
   }, [editor]);
 
