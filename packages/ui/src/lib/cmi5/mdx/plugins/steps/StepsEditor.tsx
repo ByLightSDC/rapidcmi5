@@ -406,11 +406,11 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
       <Box
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         sx={{
-          margin: 0,
           padding: 0,
           position: 'relative',
           ...outerSx,
           ...sxProps,
+          margin: 0,
         }}
       >
         <Stack
