@@ -28,8 +28,6 @@
     }
   }
 
-  .tableColumnEditorTrigger,
-  .tableRowEditorTrigger,
   .addRowButton,
   .addColumnButton,
   .iconButton {
@@ -38,8 +36,6 @@
 
   @media (hover: hover) {
     &:hover {
-      .tableColumnEditorTrigger,
-      .tableRowEditorTrigger,
       .addRowButton,
       .addColumnButton,
       .iconButton {
@@ -55,12 +51,29 @@
 
 
 .tableColumnEditorTrigger {
-  @mixin icon-button;
-  padding: var(--spacing-1);
-  border-radius: var(--radius-full);
-  opacity: 0.2;
-  &[data-active='true'] {
-    opacity: 1 !important;
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 2px;
+  color: inherit;
+  opacity: 0;
+  transition: opacity 0.15s;
+  &:focus-visible {
+    outline: 2px solid currentColor;
+  }
+  &[data-visible='true'] {
+    opacity: 0.5;
+    &:hover {
+      opacity: 1;
+    }
+  }
+  &[data-state='open'] {
+    opacity: 1;
+    outline: 2px solid currentColor;
+    border-radius: 4px;
   }
 }
 
@@ -83,6 +96,41 @@
     margin: auto;
     display: block;
   }
+}
+
+.tableColumnEditorPopoverContent {
+  background-color: var(--basePageBg, #fff);
+  border: 1px solid var(--baseBgActive, #ddd);
+  border-radius: var(--radius-medium, 6px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  padding: 4px;
+  z-index: 100;
+  will-change: transform, opacity;
+}
+
+.popoverArrow {
+  fill: var(--basePageBg, #fff);
+  stroke: var(--baseBgActive, #ddd);
+  stroke-width: 1px;
+}
+
+.toolCell {
+  width: 2rem;
+  padding: 2px;
+  text-align: center;
+}
+
+.addRowButton,
+.addColumnButton {
+  @mixin icon-button;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconButton {
+  @mixin icon-button;
 }
 
 .leftAlignedCell {

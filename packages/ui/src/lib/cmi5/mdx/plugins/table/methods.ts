@@ -106,7 +106,18 @@ function extractRowContent(
         );
 
         if (styleAttr && typeof styleAttr.value === 'string') {
-          data = { hProperties: { style: styleAttr.value } };
+          const styleStr = styleAttr.value;
+          const textAlignMatch = styleStr.match(/text-align:\s*(left|center|right)/i);
+          const textAlign = textAlignMatch ? textAlignMatch[1] : undefined;
+          // Strip text-align from the style string — it lives in data-text-align
+          const strippedStyle = styleStr
+            .replace(/;?\s*text-align:\s*(left|center|right)\s*/i, '')
+            .replace(/^;\s*/, '')
+            .trim();
+          const hProperties: Record<string, string> = {};
+          if (strippedStyle) hProperties['style'] = strippedStyle;
+          if (textAlign && textAlign !== 'left') hProperties['data-text-align'] = textAlign;
+          data = { hProperties };
         }
       }
 
