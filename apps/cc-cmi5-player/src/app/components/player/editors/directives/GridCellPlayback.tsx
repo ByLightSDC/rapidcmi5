@@ -24,7 +24,10 @@ export const GridCellPlayback: React.FC<
   ).current;
 
   return (
-    <div role="gridcell">
+    // Let's try a dirty fix of changingthis to cell instead of gridcell
+    // That SHOULD keep exact same functionality but remove the confusing 'clickable' directive for NVDA
+    //<div role="gridcell">
+    <div role="cell">
       {textAlign !== 'left' && (
         <style>{`
           .${scopedClass} {
