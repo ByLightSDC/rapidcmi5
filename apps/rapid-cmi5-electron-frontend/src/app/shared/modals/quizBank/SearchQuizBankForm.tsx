@@ -14,7 +14,8 @@ export function QuizBankSearchForm({
 }: GetQuizBankSearchModalProps) {
   const onDelete = useCallback(
     (uuid: string) => {
-      if (!deleteQuestion) return Promise.resolve();
+      if (!deleteQuestion) throw Error('Delete question is undefined');
+
       return deleteQuestion(uuid);
     },
     [deleteQuestion],

@@ -83,12 +83,7 @@ import {
   createUniquePath,
   slugifyPath,
 } from '../utils/useCourseOperationsUtils';
-import {
-  GetQuizBankAddModalProps,
-  GetQuizBankSearchModalProps,
-  GetScenarioFormProps,
-  UserAuth,
-} from '../../../rapidcmi5_mdx/main';
+
 import { useRapidCmi5Opts } from './RapidCmi5OptsContext';
 
 interface IGitContext {
