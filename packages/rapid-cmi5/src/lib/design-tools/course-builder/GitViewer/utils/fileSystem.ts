@@ -1,9 +1,7 @@
 import {
-  cleanMkdocs,
   FolderStruct,
   generateCourseJson,
   rc5MetaFilename,
-  CourseData,
   generateCourseDist,
   FsOperations,
   generateCmi5Xml,
@@ -12,7 +10,6 @@ import {
 } from '@rapid-cmi5/cmi5-build-common';
 import JSZip from 'jszip';
 import path, { basename, dirname, join, relative } from 'path-browserify';
-import YAML from 'yaml';
 import { configure, fs as zenFs } from '@zenfs/core';
 import { IndexedDB, WebAccess } from '@zenfs/dom';
 import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
@@ -21,6 +18,12 @@ import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import { electronFs } from './ElectronFsApi';
 import { IFs } from 'memfs';
 import saveAs from 'file-saver';
+import {
+  getRc5Content,
+  isExcludedAuFile,
+  resolveCourseZipPaths,
+  updateCourseData,
+} from './courseImport';
 
 export const getRepoPath = (r: RepoAccessObject) =>
   `/${r.fileSystemType}/${r.repoName}`;
@@ -784,89 +787,50 @@ export class GitFS {
     courseDescription: string,
     courseId: string,
   ) => {
-    const repoPath = getRepoPath(r);
-    const prefix = 'compiled_course/blocks';
-    const filesForRemoval = [
-      'config.json',
-      'cfg.json',
-      'index.html',
-      'favicon.ico',
-    ];
-    const decoder = new TextDecoder('utf-8');
-    const encoder = new TextEncoder();
+    const courseData = await getRc5Content(zip);
 
-    // ensure that the RC5.yaml file exists before importing
-    const rc5Path = Object.keys(zip.files).find((path) =>
-      path.endsWith(rc5MetaFilename),
-    );
-
-    if (!rc5Path) {
-      throw Error('No RC5.yaml file was found in the uploaded zip file');
-    }
-    let content = await zip.files[rc5Path].async('uint8array');
-
-    const contentString = decoder.decode(content);
-    const courseData: CourseData = YAML.parse(contentString);
     if (!courseData.rc5Version) {
-      throw Error(
-        'Cannot upload an RC5 zip file without a version number, aborting',
+      throw new Error(
+        'Cannot upload an RC5 zip file without a version number.\n' +
+          'Add rc5Version: 0.0.1 to the bottom of your RC5.yaml file to override.',
       );
     }
 
-    await Promise.all(
-      Object.keys(zip.files).map(async (relativePath) => {
+    try {
+      const auDirPaths = courseData.blocks.flatMap((b) =>
+        b.aus.map((au) => au.dirPath),
+      );
+      const repoPath = getRepoPath(r);
+
+      for (const relativePath of Object.keys(zip.files)) {
+        const paths = resolveCourseZipPaths(relativePath, courseName);
+        if (!paths) continue;
+
+        const { pathInZip, pathInRepo } = paths;
         const entry = zip.files[relativePath];
 
-        if (!relativePath.startsWith(prefix)) return;
-        let cleanedPath = relativePath.slice(prefix.length + 1);
-        cleanedPath = cleanedPath.includes('/')
-          ? cleanedPath.slice(cleanedPath.indexOf('/'))
-          : cleanedPath;
+        if (isExcludedAuFile(pathInZip, auDirPaths)) continue;
 
-        cleanedPath = join(courseName, cleanedPath);
-
-        if (filesForRemoval.includes(basename(entry.name))) return;
         if (entry.dir) {
-          // Create directory
-          await this.createDirRecursive(`${repoPath}/${cleanedPath}`);
+          await this.createDirRecursive(`${repoPath}/${pathInRepo}`);
         } else {
-          // Create file
-          let content: string | Uint8Array = await entry.async('uint8array');
+          const content =
+            basename(entry.name) === rc5MetaFilename
+              ? await updateCourseData(
+                  courseData,
+                  courseName,
+                  courseId,
+                  courseDescription,
+                )
+              : await entry.async('uint8array');
 
-          if (relativePath.endsWith('.md')) {
-            const contentString = decoder.decode(content);
-
-            content = cleanMkdocs(contentString, entry.name);
-          }
-          // Course rename function for import
-          if (basename(entry.name) === rc5MetaFilename) {
-            courseData.courseId = courseId;
-            courseData.courseDescription = courseDescription;
-            courseData.courseTitle = courseName;
-            for (const block of courseData.blocks) {
-              block.blockName = courseName;
-              for (const au of block.aus) {
-                const index = au.dirPath.indexOf('/');
-                const oldCoursePathRemoved =
-                  index > 0 ? au.dirPath.slice(index) : '';
-
-                au.dirPath = join(courseName, oldCoursePathRemoved);
-                for (const slide of au.slides) {
-                  slide.filepath = join(au.dirPath, basename(slide.filepath));
-                }
-              }
-            }
-
-            content = encoder.encode(YAML.stringify(courseData));
-          }
-
-          await this.createFile(r, cleanedPath, content);
+          await this.createFile(r, pathInRepo, content);
         }
-      }),
-    ).catch((err) => {
-      console.error('Import error:', err);
-      throw err;
-    });
+      }
+    } catch (error) {
+      console.error('Could not import course', error);
+      throw Error('Could not complete the course import process');
+    }
   };
 
   /**

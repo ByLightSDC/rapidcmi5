@@ -526,18 +526,23 @@ export const GitContextProvider = (props: tProviderProps) => {
 
   const handleStageAll = useCallback(
     async (useCache: boolean = false, changedFiles?: string[]) => {
-      const r = getRepoAccess(repoAccessObject);
+      try {
+        const r = getRepoAccess(repoAccessObject);
 
-      // This is required due to timing issues, the exported modified files above is based on state
-      // this is good for eventual consistency in the UI, but to get the most current we need to use
-      // this helper for functions that require real time data
-      const filesForStaging: ModifiedFile[] = useCache
-        ? modifiedFiles
-        : await gitOperator.gitRepoStatus(r, changedFiles);
+        // This is required due to timing issues, the exported modified files above is based on state
+        // this is good for eventual consistency in the UI, but to get the most current we need to use
+        // this helper for functions that require real time data
+        const filesForStaging: ModifiedFile[] = useCache
+          ? modifiedFiles
+          : await gitOperator.gitRepoStatus(r, changedFiles);
 
-      const afterStage = await stageFiles(filesForStaging);
-      await resolveGitRepoStatus(r);
-      setCanCommit(true);
+        await stageFiles(filesForStaging);
+        await resolveGitRepoStatus(r);
+        setCanCommit(true);
+      } catch (error) {
+        debugLogError('Failed to stage all files' + error);
+        throw Error('Could not stage all files');
+      }
     },
     [modifiedFiles, resolveGitRepoStatus, stageFiles],
   );
