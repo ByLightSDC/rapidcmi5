@@ -234,7 +234,7 @@ export const ImageDialog: React.FC = () => {
                     tabIndex={-1}
                     startIcon={<UploadFileIcon />}
                   >
-                    Upload Files
+                    Upload File
                     <VisuallyHiddenInput
                       type="file"
                       accept="image/*" // restrict to image files only
@@ -261,7 +261,7 @@ export const ImageDialog: React.FC = () => {
                           )}
                         </Box>
                       ) : (
-                        'No file(s) chosen'
+                        'No image file chosen'
                       )}
                     </Typography>
                   </Box>

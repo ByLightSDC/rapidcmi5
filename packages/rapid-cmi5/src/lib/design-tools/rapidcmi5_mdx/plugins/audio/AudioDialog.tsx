@@ -214,7 +214,7 @@ export const AudioDialog: React.FC = () => {
                     tabIndex={-1}
                     startIcon={<UploadFileIcon />}
                   >
-                    Upload Files
+                    Upload File
                     <VisuallyHiddenInput
                       type="file"
                       accept="audio/*" // restrict to audio files only
@@ -241,7 +241,7 @@ export const AudioDialog: React.FC = () => {
                           )}
                         </Box>
                       ) : (
-                        'No file(s) chosen'
+                        'No audio file chosen'
                       )}
                     </Typography>
                   </Box>

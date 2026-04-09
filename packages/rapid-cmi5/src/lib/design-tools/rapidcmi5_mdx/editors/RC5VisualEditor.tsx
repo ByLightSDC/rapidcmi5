@@ -68,6 +68,8 @@ import {
   generateLessonThemeStyleTag,
   StepsDirectiveDescriptor,
   StepContentDirectiveDescriptor,
+  QuotesContainerDirectiveDescriptor,
+  QuotesCellDirectiveDescriptor,
 } from '@rapid-cmi5/ui';
 
 import {
@@ -108,6 +110,7 @@ import { LessonThemeContext } from '@rapid-cmi5/ui';
 import { RC5Context } from '../contexts/RC5Context';
 import { RapidCmi5Toolbar } from '../toolbar/RapidCmi5Toolbar';
 import { ErrorBoundary } from './ErrorBoundary';
+import { QuoteCellEditor } from 'packages/ui/src/lib/cmi5/mdx/plugins/quotes/QuoteCellEditor';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -360,6 +363,8 @@ function RC5VisualEditor() {
           InlineAnimDirectiveDescriptor,
           GridContainerDirectiveDescriptor,
           GridCellDirectiveDescriptor,
+          QuotesContainerDirectiveDescriptor,
+          QuotesCellDirectiveDescriptor,
         ],
         escapeUnknownTextDirectives: true,
       }),

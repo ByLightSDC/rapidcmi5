@@ -25,10 +25,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 
 import { drawerMode$, DRAWER_TYPE, blockShowSeq$ } from './drawers';
-import {
-  ButtonInfoField,
-  ViewExpander,
-} from '@rapid-cmi5/ui';
+import { ButtonInfoField, ViewExpander } from '@rapid-cmi5/ui';
 
 import { InsertActivities } from './InsertActivities';
 import { InsertAdmonitions } from './InsertAdmonitions';
@@ -46,6 +43,7 @@ import { InsertSteps } from './InsertSteps';
 import { InsertTabs } from './InsertTabs';
 import WidgetsIcon from '@mui/icons-material/Widgets';
 import { activitiesTable } from '../../constants/toolbar';
+import { InsertQuotes } from './InsertQuotes';
 
 const headerSxProps = {
   cursor: 'pointer',
@@ -72,8 +70,14 @@ export function BlockLibraryDrawer() {
     changeViewMode(DRAWER_TYPE.NONE);
   }, [changeViewMode]);
 
-  const { autoHide, toggleAutoHide, handleMouseEnter, handleMouseLeave, effectiveOpen, getDrawerSx } =
-    useDrawerAutoHide('block', isOpen, showSeq);
+  const {
+    autoHide,
+    toggleAutoHide,
+    handleMouseEnter,
+    handleMouseLeave,
+    effectiveOpen,
+    getDrawerSx,
+  } = useDrawerAutoHide('block', isOpen, showSeq);
 
   return (
     <Drawer
@@ -93,7 +97,10 @@ export function BlockLibraryDrawer() {
           pointerEvents: 'auto',
         },
       })}
-      PaperProps={{ onMouseEnter: handleMouseEnter, onMouseLeave: handleMouseLeave }}
+      PaperProps={{
+        onMouseEnter: handleMouseEnter,
+        onMouseLeave: handleMouseLeave,
+      }}
     >
       <Stack
         id="block-library"
@@ -119,14 +126,24 @@ export function BlockLibraryDrawer() {
           >
             Block Library
           </Typography>
-          <Tooltip title={autoHide ? 'Auto-hide on (click to pin)' : 'Auto-hide off (click to enable)'}>
+          <Tooltip
+            title={
+              autoHide
+                ? 'Auto-hide on (click to pin)'
+                : 'Auto-hide off (click to enable)'
+            }
+          >
             <IconButton
               onClick={toggleAutoHide}
               aria-label={autoHide ? 'Disable auto-hide' : 'Enable auto-hide'}
               size="small"
               sx={{ color: autoHide ? 'primary.main' : 'text.disabled' }}
             >
-              {autoHide ? <PushPinOutlinedIcon fontSize="small" /> : <PushPinIcon fontSize="small" />}
+              {autoHide ? (
+                <PushPinOutlinedIcon fontSize="small" />
+              ) : (
+                <PushPinIcon fontSize="small" />
+              )}
             </IconButton>
           </Tooltip>
           <IconButton onClick={handleClose} aria-label="Close Block Library">
@@ -206,6 +223,7 @@ export function BlockLibraryDrawer() {
                 <InsertAccordion isDrawer={true} />
                 <InsertGrid isDrawer={true} />
                 <InsertSteps isDrawer={true} />
+                <InsertQuotes isDrawer={true} />
                 <InsertTable isDrawer={true} />
                 <InsertTabs isDrawer={true} />
                 <InsertThematicBreak isDrawer={true} />
