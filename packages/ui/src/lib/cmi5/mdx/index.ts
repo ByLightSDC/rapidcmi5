@@ -64,6 +64,8 @@ export * from './plugins/steps/StepsDirectiveDescriptor';
 export * from './plugins/tabs/TabContentDirectiveDescriptor';
 export * from './plugins/tabs/TabsDirectiveDescriptor';
 export * from './plugins/grid/GridCellDirectiveDescriptor';
+export * from './plugins/grid/GridCellEditor';
+export * from './plugins/grid/types';
 export * from './plugins/grid/GridContainerDirectiveDescriptor';
 export * from './plugins/accordion/AccordionContentDirectiveDescriptor';
 export * from './plugins/accordion/AccordionContentEditor';

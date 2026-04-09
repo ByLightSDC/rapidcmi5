@@ -62,7 +62,6 @@ import {
   AccordionContentDirectiveDescriptor,
   ImageLabelDirectiveDescriptor,
   GridContainerDirectiveDescriptor,
-  GridCellDirectiveDescriptor,
   appHeaderVisible,
   ImageTextDirectiveDescriptor,
   generateLessonThemeStyleTag,
@@ -101,6 +100,7 @@ import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { directiveLinter } from './code/codeMirrorUtils';
 
 import { ActivityDirectiveDescriptor } from './directives/ActivityDirectiveDescriptor';
+import { GridCellEditorDescriptor } from './directives/GridCellEditorDescriptor';
 import { LayoutBoxDirectiveDescriptor } from './directives/layout-box/LayoutBoxDirectiveDescriptor';
 
 import { LessonThemeContext } from '@rapid-cmi5/ui';
@@ -359,7 +359,7 @@ function RC5VisualEditor() {
           AnimDirectiveDescriptor,
           InlineAnimDirectiveDescriptor,
           GridContainerDirectiveDescriptor,
-          GridCellDirectiveDescriptor,
+          GridCellEditorDescriptor,
         ],
         escapeUnknownTextDirectives: true,
       }),
