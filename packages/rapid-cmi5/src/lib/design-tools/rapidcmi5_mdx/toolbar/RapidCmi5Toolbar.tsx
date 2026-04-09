@@ -14,7 +14,6 @@ import {
   viewMode$,
   useCellValue,
   useRealm,
-  iconComponentFor$,
   useCellValues,
   useTranslation,
 } from '@mdxeditor/editor';
@@ -25,7 +24,6 @@ import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import ArtTrackIcon from '@mui/icons-material/ArtTrack';
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
-import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
 import { MarkdownIconSvg } from './constants';
 
 import { alpha, Box, Divider, Stack, useTheme } from '@mui/material';

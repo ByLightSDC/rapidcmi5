@@ -45,7 +45,7 @@ export enum SlideActivityType {
   CTF = 'ctf',
   AUTOGRADER = 'autograder',
   SCENARIO = 'scenario',
-  JOBE = 'jobe',
+  CODE_RUNNER = 'codeRunner',
   CONSOLES = 'consoles',
   UNKNOWN = 'unknown',
 }

@@ -349,7 +349,7 @@ function LessonTree({
               (content.indexOf(':::scenario') >= 0 ||
                 content.indexOf(':::quiz') >= 0 ||
                 content.indexOf(':::ctf') >= 0 ||
-                content.indexOf(':::jobe') >= 0);
+                content.indexOf(':::codeRunner') >= 0);
             theSlidesChildren.push(slideId);
             theTreeData.push({
               id: slideId,
