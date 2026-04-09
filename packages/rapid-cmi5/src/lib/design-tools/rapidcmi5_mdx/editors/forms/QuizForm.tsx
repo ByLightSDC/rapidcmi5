@@ -70,7 +70,8 @@ export const QuizForm = ({
   handleCloseModal?: () => void;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const { QuizBankSearchModal, QuizBankAddModal, quizBankOps, userAuth } = useRapidCmi5Opts();
+  const { QuizBankSearchModal, QuizBankAddModal, userAuth } =
+    useRapidCmi5Opts();
   const slideType =
     activityKind === RC5ActivityTypeEnum.quiz
       ? SlideTypeEnum.Quiz
@@ -256,25 +257,15 @@ export const QuizForm = ({
 
         {bankQuestion && QuizBankAddModal && (
           <QuizBankAddModal
-            formType={crudType}
-            errors={errors}
-            formMethods={formMethods}
             closeModal={() => setBankQuestion(null)}
             question={bankQuestion}
-            addQuestion={quizBankOps?.addQuestion}
           />
         )}
         {isSearchBankOpen && QuizBankSearchModal && (
           <QuizBankSearchModal
             submitForm={handleModalResponse}
-            formType={crudType}
-            errors={errors}
-            formMethods={formMethods}
             closeModal={() => setIsSearchBankOpen(false)}
             activityType={activityKind}
-            searchQuestions={quizBankOps?.searchQuestions}
-            deleteQuestion={quizBankOps?.deleteQuestion}
-            currentUserEmail={userAuth?.userEmail}
           />
         )}
         <Grid size={12}>

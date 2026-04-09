@@ -8,12 +8,12 @@ import {
   Credentials,
   generateAuId,
   GitUserConfig,
-  useCodeRunnerApi,
-  useQuizBankApi,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   RapidCmi5,
   GetScenarioFormProps,
+  GetQuizBankAddModalProps,
+  GetQuizBankSearchModalProps,
 } from '@rapid-cmi5/react-editor';
 import { debugLogError } from '@rapid-cmi5/ui';
 import { useContext, useEffect } from 'react';
@@ -90,18 +90,6 @@ export function RapidCmi5Wrapper() {
     }
     return scenarioUUID;
   };
-
-  const { executeCode, getLanguages } = useCodeRunnerApi(
-    'Bearer',
-    ssoConfig?.rangeRestApiUrl,
-    token,
-  );
-
-  const { addQuestion, searchQuestions, deleteQuestion } = useQuizBankApi(
-    quizBankURL,
-    token,
-  );
-
   return (
     <RapidCmi5
       handleOverrideGlobalGitConfig={handleOverrideGlobalGitConfig}
@@ -193,12 +181,35 @@ export function RapidCmi5Wrapper() {
             )
           : undefined
       }
-      QuizBankAddModal={quizBankURL && token ? AddToQuizBankForm : undefined}
-      QuizBankSearchModal={quizBankURL && token ? QuizBankSearchForm : undefined}
-      quizBankOps={{ addQuestion, searchQuestions, deleteQuestion }}
-      codeRunnerOps={{
-        executeCode,
-        getLanguages,
+      QuizBankAddModal={
+        quizBankURL && token
+          ? (props: GetQuizBankAddModalProps) => (
+              <AddToQuizBankForm
+                closeModal={props.closeModal}
+                question={props.question}
+                url={quizBankURL}
+                token={token}
+              />
+            )
+          : undefined
+      }
+      QuizBankSearchModal={
+        quizBankURL && token
+          ? (props: GetQuizBankSearchModalProps) => (
+              <QuizBankSearchForm
+                closeModal={props.closeModal}
+                activityType={props.activityType}
+                submitForm={props.submitForm}
+                currentUserEmail={userEmail}
+                url={quizBankURL}
+                token={token}
+              />
+            )
+          : undefined
+      }
+      apiUrls={{
+        codeRunnerUrl: rangeURL,
+        quizBankUrl: quizBankURL,
       }}
     />
   );

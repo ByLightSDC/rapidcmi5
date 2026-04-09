@@ -16,7 +16,6 @@ import {
   TeamConsolesContent,
   DownloadFileData,
   CodeRunnerContent,
-  useCodeRunnerApi,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   setProgress$,
@@ -94,12 +93,6 @@ export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
     }
   }, [mdastNode?.children, fromJson]);
 
-  const { executeCode } = useCodeRunnerApi(
-    'Basic',
-    config.DEVOPS_API_URL,
-    cmi5Instance.getAuthToken(),
-  );
-
   return (
     <div
       style={{
@@ -130,7 +123,9 @@ export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
         <CodeRunner
           auProps={auProps}
           content={fromJson as CodeRunnerContent}
-          submitCode={executeCode}
+          authType="Basic"
+          url={config.DEVOPS_API_URL}
+          token={cmi5Instance.getAuthToken()}
         />
       )}
       {name === SlideActivityType.CONSOLES && fromJson && (

@@ -12,6 +12,7 @@ import {
   LanguagesResponseApi,
   moveOnCriteriaOptions,
   RC5ActivityTypeEnum,
+  useCodeRunnerApi,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   FormCrudType,
@@ -42,7 +43,12 @@ export const CodeRunnerForm = ({
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
   const rc5id = defaultFormData?.rc5id;
-  const { codeRunnerOps } = useRapidCmi5Opts();
+  const { apiUrls, userAuth } = useRapidCmi5Opts();
+  const { getLanguages } = useCodeRunnerApi(
+    'Bearer',
+    apiUrls?.codeRunnerUrl,
+    userAuth?.token,
+  );
 
   const { lessonTheme } = useContext(LessonThemeContext);
   const { outerActivitySxWithConstrainedWidthForm } = useLessonThemeStyles(
@@ -69,10 +75,10 @@ export const CodeRunnerForm = ({
 
   useEffect(() => {
     const fetchRuntimes = async () => {
-      if (!codeRunnerOps?.getLanguages) return;
+      if (!getLanguages) return;
 
       try {
-        const runtimes = await codeRunnerOps.getLanguages();
+        const runtimes = await getLanguages();
 
         if (!Object.keys(runtimes).length) {
           setRuntimeMap({});
@@ -91,7 +97,7 @@ export const CodeRunnerForm = ({
       }
     };
     fetchRuntimes();
-  }, [codeRunnerOps]);
+  }, [getLanguages]);
 
   const onSaveAction = (data: any) => {
     if (onSave) {

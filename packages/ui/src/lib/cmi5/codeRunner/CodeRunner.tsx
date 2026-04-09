@@ -10,15 +10,16 @@ import CheckIcon from '@mui/icons-material/Check';
 import { useContext, useEffect, useState } from 'react';
 
 import { MonacoEditor, resolveMonacoLanguage } from '../../forms/MonacoEditor';
+
 import {
   AuContextProps,
   ActivityScore,
   RC5ActivityTypeEnum,
   CodeRunnerContent,
   CodeRunnerSubmitResponse,
-  ExecuteCodeBodyApi,
-  ExecuteCodeResponseApi,
+  useCodeRunnerApi,
 } from '@rapid-cmi5/cmi5-build-common';
+
 import { ButtonMainUi } from '../../utility/buttons';
 import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
 import {
@@ -29,7 +30,9 @@ import {
 type CodeRunnerProps = {
   auProps: Partial<AuContextProps>;
   content: CodeRunnerContent;
-  submitCode?: (body: ExecuteCodeBodyApi) => Promise<ExecuteCodeResponseApi>;
+  authType: 'Basic' | 'Bearer';
+  token?: string;
+  url?: string;
 };
 
 function buildCodeRunnerQuizId(content: CodeRunnerContent): string {
@@ -66,9 +69,17 @@ function buildActivityContent(content: CodeRunnerContent): CodeRunnerContent {
   };
 }
 
-export function CodeRunner({ auProps, content, submitCode }: CodeRunnerProps) {
+export function CodeRunner({
+  auProps,
+  content,
+  authType,
+  url,
+  token,
+}: CodeRunnerProps) {
   const { setProgress, submitScore, isAuthenticated, isTestMode } = auProps;
   const { lessonTheme } = useContext(LessonThemeContext);
+
+  const { executeCode } = useCodeRunnerApi(authType, url, token);
 
   const monacoLanguage = resolveMonacoLanguage(
     content.programmingLanguage ?? 'javascript',
@@ -111,12 +122,12 @@ export function CodeRunner({ auProps, content, submitCode }: CodeRunnerProps) {
     setSuccessStr('');
     setErrorStr('');
     setCompileStr('');
-    if (!submitCode) return;
+    if (!executeCode) return;
 
     const activityContent = buildActivityContent(content);
 
     try {
-      const response = await submitCode({
+      const response = await executeCode({
         submissionContent: `${submissionStr}${content.evaluator}`,
         language: content.programmingLanguage,
         languageVersion: content.languageVersion,
@@ -166,7 +177,7 @@ export function CodeRunner({ auProps, content, submitCode }: CodeRunnerProps) {
     }
   };
 
-  if (!isTestMode && (!isAuthenticated || !submitCode))
+  if (!isTestMode && (!isAuthenticated || !executeCode))
     return (
       <Box
         sx={{
@@ -195,7 +206,7 @@ export function CodeRunner({ auProps, content, submitCode }: CodeRunnerProps) {
         padding: blockPadding,
       }}
     >
-      {isTestMode && !submitCode && (
+      {isTestMode && !executeCode && (
         <Alert severity="info" sx={{ mb: 1.5 }}>
           Test mode active: no submission will be sent.
         </Alert>

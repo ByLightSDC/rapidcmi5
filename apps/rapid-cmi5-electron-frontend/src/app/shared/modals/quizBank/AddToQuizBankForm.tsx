@@ -23,8 +23,13 @@ import {
   UseFormSetValue,
   useWatch,
 } from 'react-hook-form';
-import { GetQuizBankAddModalProps } from '@rapid-cmi5/react-editor';
-import { currentQuizBankApiVersion } from '@rapid-cmi5/cmi5-build-common';
+import {
+  QuizBankAddModalProps,
+} from '@rapid-cmi5/react-editor';
+import {
+  currentQuizBankApiVersion,
+  useQuizBankApi,
+} from '@rapid-cmi5/cmi5-build-common';
 import { FormatQuestionOptions, QuestionTypeChip } from './QuestionCard';
 
 function TagInput({
@@ -93,10 +98,12 @@ function TagInput({
 }
 
 export function AddToQuizBankForm({
-  addQuestion,
   question,
   closeModal,
-}: GetQuizBankAddModalProps) {
+  token,
+  url,
+}: QuizBankAddModalProps) {
+  const { addQuestion } = useQuizBankApi(url, token);
 
   const validationSchema = yup.object().shape({
     public: yup.boolean(),
@@ -108,7 +115,7 @@ export function AddToQuizBankForm({
 
   const doAction = async (data: { public: boolean; tags: string[] }) => {
     if (!question.type) throw Error('Question type not defined');
-    if (!addQuestion) throw Error('Add question to quiz bank is undefined')
+    if (!addQuestion) throw Error('Add question to quiz bank is undefined');
     await addQuestion({
       publicQuestion: data.public ?? true,
       questionType: question.type,

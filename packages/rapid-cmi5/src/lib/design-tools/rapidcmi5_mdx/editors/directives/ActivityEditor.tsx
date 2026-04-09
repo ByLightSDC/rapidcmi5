@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   DirectiveEditorProps,
   useCellValue,
@@ -64,7 +64,7 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
   const isPlayback = useCellValue(editorInPlayback$);
   const auProps = useAuContext();
   const themedDividerColor = useSelector(dividerColor);
-  const { codeRunnerOps } = useRapidCmi5Opts();
+  const { userAuth, apiUrls } = useRapidCmi5Opts();
 
   // style for playback boxes
   const staticStyle = useMemo(() => {
@@ -313,7 +313,9 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
             <CodeRunner
               auProps={auProps}
               content={fromJson as CodeRunnerContent}
-              submitCode={codeRunnerOps?.executeCode}
+              authType="Bearer"
+              token={userAuth?.token}
+              url={apiUrls?.codeRunnerUrl}
             />
           )}
           {!isPlayback && (

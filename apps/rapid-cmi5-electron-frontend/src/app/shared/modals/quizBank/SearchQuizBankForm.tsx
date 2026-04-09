@@ -1,17 +1,18 @@
 import { useCallback } from 'react';
 import { DynamicModal } from '@rapid-cmi5/ui';
 import QuestionCard from './QuestionCard';
-import { QuestionBankApi } from '@rapid-cmi5/cmi5-build-common';
-import { GetQuizBankSearchModalProps } from '@rapid-cmi5/react-editor';
+import { QuestionBankApi, useQuizBankApi } from '@rapid-cmi5/cmi5-build-common';
+import { QuizBankSearchModalProps } from '@rapid-cmi5/react-editor';
 
 export function QuizBankSearchForm({
   closeModal,
   submitForm,
   currentUserEmail,
   activityType,
-  searchQuestions,
-  deleteQuestion,
-}: GetQuizBankSearchModalProps) {
+  url,
+  token,
+}: QuizBankSearchModalProps) {
+  const { deleteQuestion, searchQuestions } = useQuizBankApi(url, token);
   const onDelete = useCallback(
     (uuid: string) => {
       if (!deleteQuestion) throw Error('Delete question is undefined');
