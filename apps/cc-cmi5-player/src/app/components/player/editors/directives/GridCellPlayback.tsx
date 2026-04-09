@@ -4,7 +4,8 @@ import React, { useRef } from 'react';
 
 type TextAlign = 'left' | 'center' | 'right';
 
-interface GridCellPlaybackProps extends DirectiveEditorProps<ContainerDirective> {
+interface GridCellPlaybackProps
+  extends DirectiveEditorProps<ContainerDirective> {
   /**
    * ARIA role for the outer cell div.
    *
@@ -43,7 +44,6 @@ export const GridCellPlayback: React.FC<GridCellPlaybackProps> = ({
     // CCUI-2828: default role is "cell" so NVDA does not announce "clickable"
     // in player/playback mode. Pass role="gridcell" when used in the visual
     // editor where the gridcell semantics are intentional.
-    //<div role="gridcell">
     <div role={role}>
       {textAlign !== 'left' && (
         <style>{`
