@@ -22,8 +22,8 @@ import { FormCrudType , useLessonThemeStyles} from '@rapid-cmi5/ui';
 
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import LrsHeaderWithDetails from './LrsStatementHelper';
+import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 import { useContext } from 'react';
-import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 
 export const TeamConsolesForm = ({
   crudType,
@@ -37,7 +37,7 @@ export const TeamConsolesForm = ({
   handleCloseModal?: () => void;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const { GetScenariosForm } = useContext(GitContext);
+  const { GetScenariosForm } = useRapidCmi5Opts();
 
   /* Lesson Theme */
   const formEditorMaxWidth = 800;

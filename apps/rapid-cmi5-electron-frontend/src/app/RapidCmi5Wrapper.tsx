@@ -90,7 +90,6 @@ export function RapidCmi5Wrapper() {
     }
     return scenarioUUID;
   };
-
   return (
     <RapidCmi5
       handleOverrideGlobalGitConfig={handleOverrideGlobalGitConfig}
@@ -183,37 +182,35 @@ export function RapidCmi5Wrapper() {
           : undefined
       }
       QuizBankAddModal={
-        token && quizBankURL && parsedUserToken?.email?.toLowerCase()
+        quizBankURL && token
           ? (props: GetQuizBankAddModalProps) => (
               <AddToQuizBankForm
-                token={token}
                 closeModal={props.closeModal}
-                formType={props.formType}
-                errors={props.errors}
-                formMethods={props.formMethods}
-                url={ssoConfig?.quizBankApiUrl}
                 question={props.question}
+                url={quizBankURL}
+                token={token}
               />
             )
           : undefined
       }
       QuizBankSearchModal={
-        token && quizBankURL
+        quizBankURL && token
           ? (props: GetQuizBankSearchModalProps) => (
               <QuizBankSearchForm
-                token={token}
-                submitForm={props.submitForm}
-                formType={props.formType}
-                errors={props.errors}
-                formMethods={props.formMethods}
-                url={ssoConfig?.quizBankApiUrl}
                 closeModal={props.closeModal}
-                currentUserEmail={parsedUserToken?.email?.toLowerCase()}
                 activityType={props.activityType}
+                submitForm={props.submitForm}
+                currentUserEmail={userEmail}
+                url={quizBankURL}
+                token={token}
               />
             )
           : undefined
       }
+      apiUrls={{
+        codeRunnerUrl: rangeURL,
+        quizBankUrl: quizBankURL,
+      }}
     />
   );
 }

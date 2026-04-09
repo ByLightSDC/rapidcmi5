@@ -101,12 +101,12 @@ export const useLessonThemeStyles = (
  * max widths for forms and playback views
  */
 export const maxFormWidths = {
-  jobeEditor: 1024,
+  codeRunnerEditor: 1024,
   quizEditor: 800,
   scenarioEditor: 800,
   downloadsEditor: 640,
   ctfPlayback: 1024,
-  jobePlayback: 1024,
+  codeRunnerPlayback: 1024,
   quizPlayback: 800,
   scenarioPlayback: 1024,
 };
