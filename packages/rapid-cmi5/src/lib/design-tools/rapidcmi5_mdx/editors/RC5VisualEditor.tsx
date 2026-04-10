@@ -69,7 +69,7 @@ import {
   StepsDirectiveDescriptor,
   StepContentDirectiveDescriptor,
   QuotesContainerDirectiveDescriptor,
-  QuotesCellDirectiveDescriptor,
+  QuotesContentDirectiveDescriptor,
 } from '@rapid-cmi5/ui';
 
 import {
@@ -264,20 +264,19 @@ function RC5VisualEditor() {
   const imagePreviewHandler = useCallback(
     async (imageSrc: string) => {
       if (!isFsLoaded || !currentRepoAccessObject) {
-        console.log('Cant return blob A');
-        console.log('isFsLoaded', isFsLoaded);
-        console.log('currentRepoAccessObject', currentRepoAccessObject);
+        debugLogError('Cant return image');
+        debugLog('isFsLoaded', isFsLoaded);
+        debugLog('currentRepoAccessObject', currentRepoAccessObject);
         return imageSrc;
       }
 
       if (!imageSrc.startsWith('./')) {
-        console.log('Cant return blob B', imageSrc);
+        debugLog('Cant return blob, check url', imageSrc);
         return imageSrc;
       }
 
       const fullPath = `${currentAuPathSel}/${imageSrc.slice(2)}`;
 
-      console.log('fullPath', fullPath);
       const blob = await handleBlobImageFile(
         currentRepoAccessObject,
         fullPath,
@@ -287,7 +286,7 @@ function RC5VisualEditor() {
       if (blob) {
         return URL.createObjectURL(blob);
       }
-      console.log('No blob available');
+      debugLog('No blob found');
       return imageSrc;
     },
     [currentRepoAccessObject, currentAuPathSel],
@@ -375,7 +374,7 @@ function RC5VisualEditor() {
           GridContainerDirectiveDescriptor,
           GridCellDirectiveDescriptor,
           QuotesContainerDirectiveDescriptor,
-          QuotesCellDirectiveDescriptor,
+          QuotesContentDirectiveDescriptor,
         ],
         escapeUnknownTextDirectives: true,
       }),

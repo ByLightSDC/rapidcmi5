@@ -32,10 +32,10 @@ export interface QuotesContainerDirectiveNode extends ContainerDirective {
     [key: string]: string | undefined;
   };
 
-  children: QuoteCellDirectiveNode[];
+  children: QuoteContentDirectiveNode[];
 }
 
-export interface QuoteCellDirectiveNode extends ContainerDirective {
+export interface QuoteContentDirectiveNode extends ContainerDirective {
   /**
    * The directive name used in markdown (e.g. :::grid).
    */

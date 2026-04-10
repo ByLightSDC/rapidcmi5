@@ -61,7 +61,7 @@ export * from './plugins/math/MathParsers';
 export * from './plugins/math/MdastBlockMathVisitor';
 export * from './plugins/math/MdastInlineMathVisitor';
 export * from './plugins/quotes/constants';
-export * from './plugins/quotes/QuotesCellDirectiveDescriptor';
+export * from './plugins/quotes/QuotesContentDirectiveDescriptor';
 export * from './plugins/quotes/QuotesContainerDirectiveDescriptor';
 export * from './plugins/quotes/QuotesSettings';
 export * from './plugins/quotes/types';

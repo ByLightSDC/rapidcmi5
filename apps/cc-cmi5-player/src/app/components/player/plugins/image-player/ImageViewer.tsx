@@ -7,15 +7,10 @@ import {
   MdxJsxAttributeValueExpression,
 } from 'mdast-util-mdx-jsx';
 
-import {
-  imagePlaceholder$ as imagePlaceholderComponent$,
-
-} from './index';
+import { imagePlaceholder$ as imagePlaceholderComponent$ } from './index';
 import styles from './styles/image-plugin.module.css';
 import { imagePreviewHandler$ } from 'packages/ui/src/lib/cmi5/mdx/plugins/image/methods';
-import { BROKEN_IMG_URI, imgCache, parseCssString } from '@rapid-cmi5/ui';
-
-
+import { imgCache, parseCssString } from '@rapid-cmi5/ui';
 
 export interface ImageViewerProps {
   nodeKey: string;
@@ -78,7 +73,6 @@ export function ImageViewer({
   href,
   id,
 }: ImageViewerProps): JSX.Element | null {
- 
   const [ImagePlaceholderComponent, imagePreviewHandler] = useCellValues(
     imagePlaceholderComponent$,
     imagePreviewHandler$,

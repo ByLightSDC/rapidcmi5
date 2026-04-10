@@ -12,7 +12,7 @@ import {
   useState,
 } from 'react';
 import { ContainerDirective } from 'mdast-util-directive';
-import { QuoteCellDirectiveNode } from './types';
+import { QuoteContentDirectiveNode } from './types';
 import { Box, Stack } from '@mui/material';
 import type { Paragraph } from 'mdast';
 import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
@@ -29,7 +29,7 @@ import { fontPresets } from './constants';
  * Renders a single quote within a quotes container with a nested editor.
  */
 export const QuoteContentEditor: React.FC<
-  DirectiveEditorProps<QuoteCellDirectiveNode>
+  DirectiveEditorProps<QuoteContentDirectiveNode>
 > = ({ lexicalNode, mdastNode, parentEditor }) => {
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const [cellIndex, setCellIndex] = useState(-1);

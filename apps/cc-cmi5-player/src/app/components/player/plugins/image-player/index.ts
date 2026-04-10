@@ -9,7 +9,6 @@ import { Cell } from '@mdxeditor/gurx';
 import { ImageNode } from './ImageNode';
 import { LexicalImageVisitor } from './LexicalImageVisitor';
 import {
-  MdastHtmlImageVisitor,
   MdastImageVisitor,
   MdastJsxImageVisitor,
 } from './MdastImageVisitor';

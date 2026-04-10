@@ -1,12 +1,12 @@
 import { DirectiveDescriptor } from '@mdxeditor/editor';
-import { QuoteCellDirectiveNode } from './types';
+import { QuoteContentDirectiveNode } from './types';
 import { QuoteContentEditor } from './QuoteContentEditor';
 
 /**
  * Quote Content Directive Descriptor
  * Represents a single quote block
  */
-export const QuotesCellDirectiveDescriptor: DirectiveDescriptor<QuoteCellDirectiveNode> =
+export const QuotesContentDirectiveDescriptor: DirectiveDescriptor<QuoteContentDirectiveNode> =
   {
     name: 'quoteContent',
     type: 'containerDirective',
