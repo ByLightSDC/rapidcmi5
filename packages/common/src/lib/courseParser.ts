@@ -1,4 +1,3 @@
-
 import { mdxJsxFromMarkdown, mdxJsxToMarkdown } from 'mdast-util-mdx-jsx';
 
 import {
@@ -33,8 +32,16 @@ import { fromMarkdown } from 'mdast-util-from-markdown';
 import { directive } from 'micromark-extension-directive';
 import { SKIP, visit } from 'unist-util-visit';
 import { AdmonitionTypeEnum } from './types/admonition';
-import { QuizQuestion, QuizOption, QuestionResponse, QuestionGrading, BasicResponse, QuizCompletionEnum, QuizContent } from './types/quiz';
-export const rc5MetaFilename = 'RC5.yaml';
+import {
+  QuizQuestion,
+  QuizOption,
+  QuestionResponse,
+  QuestionGrading,
+  BasicResponse,
+  QuizCompletionEnum,
+  QuizContent,
+} from './types/quiz';
+export const RC5_FILENAME = 'RC5.yaml';
 
 function getTagName(value: string) {
   return value

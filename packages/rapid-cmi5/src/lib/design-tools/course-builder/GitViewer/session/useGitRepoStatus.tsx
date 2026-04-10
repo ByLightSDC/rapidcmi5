@@ -225,6 +225,7 @@ export function useGitRepoStatus(
           setIsInMerge(false);
         }
       } catch (error: any) {
+        debugLogError('Failed to get repo status: ' + error);
         throw error;
       } finally {
         inFlightRef.current = false;
