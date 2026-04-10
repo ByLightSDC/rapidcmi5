@@ -1,7 +1,7 @@
 import {
   FolderStruct,
   generateCourseJson,
-  rc5MetaFilename,
+  RC5_FILENAME,
   generateCourseDist,
   FsOperations,
   generateCmi5Xml,
@@ -814,8 +814,9 @@ export class GitFS {
         if (entry.dir) {
           await this.createDirRecursive(`${repoPath}/${pathInRepo}`);
         } else {
+          // We need to regenerate the RC5.yaml file to reflect the new name, course id, and description
           const content =
-            basename(entry.name) === rc5MetaFilename
+            basename(entry.name) === RC5_FILENAME
               ? await updateCourseData(
                   courseData,
                   courseName,

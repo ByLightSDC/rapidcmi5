@@ -1,15 +1,21 @@
 import JSZip from 'jszip';
 import YAML from 'yaml';
-import { CourseData, SlideTypeEnum } from '@rapid-cmi5/cmi5-build-common';
-import { resolveCourseZipPaths, isExcludedAuFile, getRc5Content, updateCourseData } from './courseImport';
-
+import {
+  CourseData,
+  RC5_FILENAME,
+  SlideTypeEnum,
+} from '@rapid-cmi5/cmi5-build-common';
+import {
+  resolveCourseZipPaths,
+  isExcludedAuFile,
+  getRc5Content,
+  updateCourseData,
+  COMPILED_COURSE_PREFIX,
+} from './courseImport';
 
 // ============================================================================
 // Test Fixtures
 // ============================================================================
-
-const RC5_FILENAME = 'RC5.yaml';
-const COMPILED_COURSE_PREFIX = 'compiled_course/blocks';
 
 function makeCourseData(overrides: Partial<CourseData> = {}): CourseData {
   return {
