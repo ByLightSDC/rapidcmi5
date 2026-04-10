@@ -9,6 +9,7 @@ import { Typography, Stack, Box, alpha, useTheme } from '@mui/material';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 
 import { DynamicModal } from '@rapid-cmi5/ui';
 import { ScenarioFormProps } from '@rapid-cmi5/react-editor';
@@ -183,6 +184,8 @@ export function ScenarioSelectionForm({
       renderItem={(s, isSelected) => (
         <ScenarioCard scenario={s} isSelected={isSelected} />
       )}
+      triggerLabel="Select Scenario"
+      triggerStartIcon={<ManageSearchIcon />}
       onSelect={submitForm}
     />
   );

@@ -57,8 +57,7 @@ import {
   setIsLessonMounted,
   changeViewMode,
 } from '../../../redux/courseBuilderReducer';
-import { slugifyPath } from '../../course-builder/GitViewer/utils/useCourseOperationsUtils';
-import path, { join } from 'path-browserify';
+import { useCourseData } from '../data-hooks/useCourseData';
 
 interface tProviderProps {
   isEnabled?: boolean;
@@ -70,6 +69,7 @@ interface IRC5Context {
   lessonSlides: SlideType[];
   addEditor: (ref: RefObject<MDXEditorMethods>) => void;
   removeEditor: () => void;
+  changeCourseId: (newId: string) => void;
   changeCourseName: (newName: string) => void;
   changeLessonMoveOn: (
     moveOn: MoveOnCriteriaEnum,
@@ -96,6 +96,7 @@ export const RC5Context = createContext<IRC5Context>({
   lessonSlides: [],
   addEditor: (editorRef: RefObject<MDXEditorMethods>) => {},
   removeEditor: () => {},
+  changeCourseId: (newId: string) => {},
   changeCourseName: (newName: string) => {},
   changeLessonMoveOn: (moveOn: MoveOnCriteriaEnum, element: ILessonNode) => {},
   changeLessonTheme: (theme: LessonTheme, element: ILessonNode) => {},
@@ -471,6 +472,21 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
     return changedFiles;
   }, [courseData, dispatch, syncCurrentCourseWithGit]);
 
+  const onUpdateCourseId = useCallback(
+    async (newCourseId: string) => {
+      const newCourseData: CourseData = {
+        ...courseData,
+      };
+      newCourseData.courseId = newCourseId;
+
+      await syncCurrentCourseWithGit(newCourseData);
+      dispatch(updateDirtyDisplay({ counter: 0 }));
+      dispatch(updateDirtyDisplay({ reason: 'change course id' }));
+      dispatch(updateCourseData(newCourseData));
+    },
+    [courseData, dispatch, syncCurrentCourseWithGit],
+  );
+
   //#region Message Bus
   /**
    * Message Bus for communicating between context and drawing canvas
@@ -539,6 +555,7 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
         lessonSlides,
         addEditor: onAddEditor,
         changeCourseName: onChangeCourseName,
+        changeCourseId: onUpdateCourseId,
         changeLessonMoveOn: onChangeLessonMoveOn,
         changeLessonTheme: onChangeLessonTheme,
         changeLessonName: onChangeLessonName,

@@ -18,12 +18,13 @@ import {
   moveOnCriteriaOptions,
   TeamConsolesContent,
 } from '@rapid-cmi5/cmi5-build-common';
-import { FormCrudType , useLessonThemeStyles} from '@rapid-cmi5/ui';
+import { FormCrudType, useLessonThemeStyles } from '@rapid-cmi5/ui';
 
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
-import LrsHeaderWithDetails from './LrsStatementHelper';
-import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
+
 import { useContext } from 'react';
+import LrsHeaderWithDetails from '../LrsStatementHelper';
+import { useRapidCmi5Opts } from '../../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 
 export const TeamConsolesForm = ({
   crudType,
@@ -175,10 +176,12 @@ export const TeamConsolesForm = ({
         doAction={onSaveAction}
         formTitle="Team Exercise Scenario"
         formWidth={null}
-        formSxProps={{
-          flexGrow: 1,
-          maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
-        } as SxProps}
+        formSxProps={
+          {
+            flexGrow: 1,
+            maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
+          } as SxProps
+        }
         getFormFields={getFormFields}
         loadingButtonText="Saving"
         shouldAutoSave={true}

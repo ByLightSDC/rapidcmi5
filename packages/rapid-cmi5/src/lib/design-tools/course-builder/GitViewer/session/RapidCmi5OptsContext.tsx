@@ -8,6 +8,7 @@ import {
   GitUserConfig,
   Credentials,
 } from '@rapid-cmi5/cmi5-build-common';
+import { Scenario } from '@rapid-cmi5/react-editor';
 import { FormCrudType } from '@rapid-cmi5/ui';
 import { createContext, useContext } from 'react';
 import { UseFormReturn } from 'react-hook-form';
@@ -69,6 +70,7 @@ export interface RapidCmi5Opts {
   downloadCmi5Player?: () => Promise<any>;
   processAu?: (au: CourseAU, blockId: string) => Promise<void>;
   GetScenariosForm?: React.ComponentType<GetScenarioFormProps>;
+  fetchScenario?: (uuid: string) => Promise<Scenario>;
   QuizBankSearchModal?: React.ComponentType<GetQuizBankSearchModalProps>;
   QuizBankAddModal?: React.ComponentType<GetQuizBankAddModalProps>;
   clearData?: () => void;

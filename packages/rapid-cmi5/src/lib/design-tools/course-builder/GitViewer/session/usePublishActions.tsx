@@ -1,7 +1,6 @@
 // hooks/usePublishActions.ts
 import { useCallback } from 'react';
-import axios, { AxiosResponse } from 'axios';
-import { saveAs } from 'file-saver';
+import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { config } from '@rapid-cmi5/ui';
 import { debugLog } from '@rapid-cmi5/ui';
@@ -34,10 +33,13 @@ export const usePublishActions = (
 
   const handleDownloadCmi5Zip = async (req: DownloadCmi5Type) => {
     const r = getRepoAccess(repoAccessObject);
-    if (!currentBranch || !currentCourse) return null;
+    if (!currentBranch || !currentCourse) {
+      throw Error(
+        `current branch : ${currentBranch} or current course : ${currentCourse} have not been set`,
+      );
+    }
 
     try {
-      let res = null;
       const repoPath = getRepoPath(r);
 
       const folderStructure = await fsInstance.getFolderStructure(
@@ -55,7 +57,6 @@ export const usePublishActions = (
           join(r.fileSystemType, r.repoName),
           currentCourse.basePath,
           req.zipName,
-          req.createAuMappings,
         );
       } else {
         if (!downloadCmi5Zip) throw Error('Download cmi5 zip is not defined');
