@@ -2,7 +2,6 @@ import { QuotePreset } from './types';
 
 /**
  * Available quotes layout presets.
- * Each preset uses equal-width columns.
  */
 export const QUOTE_PRESETS: QuotePreset[] = [
   {
