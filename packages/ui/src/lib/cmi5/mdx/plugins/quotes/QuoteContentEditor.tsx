@@ -1,13 +1,10 @@
 import {
   DirectiveEditorProps,
-  readOnly$,
   syntaxExtensions$,
   useCellValues,
 } from '@mdxeditor/editor';
 import {
-  useCallback,
   useContext,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -32,10 +29,7 @@ import { fontPresets } from './constants';
 export const QuoteContentEditor: React.FC<
   DirectiveEditorProps<QuoteContentDirectiveNode>
 > = ({ lexicalNode, mdastNode, parentEditor }) => {
-  const [readOnly, syntaxExtensions] = useCellValues(
-    readOnly$,
-    syntaxExtensions$,
-  );
+  const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const [cellIndex, setCellIndex] = useState(-1);
   const { avatar, carouselIndex, imageSource, preset } =
     useContext(QuotesContext);
@@ -75,20 +69,6 @@ export const QuoteContentEditor: React.FC<
 
   //#endregion
 
-  const updateAvatar = useCallback(
-    (newAvatar?: string) => {
-      const theAttributes = { ...mdastNode.attributes };
-      theAttributes['avatar'] = newAvatar;
-      parentEditor.update(
-        () => {
-          lexicalNode.setMdastNode({ ...mdastNode, attributes: theAttributes });
-          lexicalNode.markDirty();
-        },
-        { discrete: true },
-      );
-    },
-    [lexicalNode, mdastNode, parentEditor],
-  );
 
   const avatarImage = useMemo(() => {
     let imageDim = '72px';
@@ -179,15 +159,6 @@ export const QuoteContentEditor: React.FC<
       }
     });
   }, [lexicalNode, parentEditor]);
-
-  /**
-   * UE updates mdast node when avatar is updated in the context
-   */
-  useEffect(() => {
-    if (carouselIndex === cellIndex) {
-      updateAvatar(avatar);
-    }
-  }, [avatar, carouselIndex, cellIndex]);
 
   return (
     <Box

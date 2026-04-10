@@ -38,8 +38,6 @@ import { findMatchingQuotePreset } from './methods';
 import { QuotesContextProvider } from './QuotesContext';
 import { useFocusWithin } from '../shared/useFocusWithin';
 import QuotesSettings from './QuotesSettings';
-import { debuglog } from 'util';
-import { debugLog } from 'packages/ui/src/lib/utility/logger';
 
 /**
  * Quotes Container Editor for grid layout directive.
@@ -101,7 +99,6 @@ export const QuotesContainerEditor: React.FC<
       mdastNode.children.length > 0 &&
       mdastNode.children[0].name === 'quoteContent'
     ) {
-      console.log('update current', mdastNode.children[0].attributes.avatar);
       return mdastNode.children[0].attributes.avatar;
     }
     return undefined;
@@ -129,16 +126,26 @@ export const QuotesContainerEditor: React.FC<
     async (newPreset: QuotePreset, newAvatar: string) => {
       await new Promise((resolve) => setTimeout(resolve, 500));
       setIsConfiguring(false);
-      debugLog('update parent mdast-----');
+
+
+      // Update preset AND write avatar into child node atomically
+      // Problems arise when you attempt to edit parent and then sequentially update child
+      // Particularly when using nested lexical editors
       updateMdastNode({
         ...mdastNode,
         attributes: {
           ...mdastNode.attributes,
           preset: newPreset.id,
         },
+        children: mdastNode.children.map((child, i) =>
+          i === carouselIndex
+            ? {
+                ...child,
+                attributes: { ...child.attributes, avatar: newAvatar },
+              }
+            : child,
+        ) as any,
       });
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      console.log('update selected-----', newAvatar);
       setSelectedAvatar(newAvatar);
     },
     [mdastNode, updateMdastNode],

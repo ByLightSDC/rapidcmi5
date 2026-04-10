@@ -6,21 +6,8 @@ import { ButtonModalMainUi } from 'packages/ui/src/lib/inputs/buttons/buttonsmod
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useImageDialog } from '../image/useImageDialog';
 import { useCellValue } from '@mdxeditor/editor';
-import { debugLog, QUOTE_PRESETS, QuotePreset } from '@rapid-cmi5/ui';
+import { QUOTE_PRESETS, QuotePreset } from '@rapid-cmi5/ui';
 import { imageUploadHandler$ } from '../image/methods';
-
-// used for uploading files
-const VisuallyHiddenInput = styled('input')({
-  clip: 'rect(0 0 0 0)',
-  clipPath: 'inset(50%)',
-  height: 1,
-  overflow: 'hidden',
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-  whiteSpace: 'nowrap',
-  width: 1,
-});
 
 /**
  * Modal dialog for configuring a quotes block.
@@ -59,7 +46,6 @@ export const QuotesSettings = ({
   const handleApply = useCallback(() => {
     if (selectedFiles && selectedFiles.length > 0) {
       if (imageUploadHandler) {
-        debugLog('upload image', src);
         imageUploadHandler(selectedFiles[0]);
       }
     }

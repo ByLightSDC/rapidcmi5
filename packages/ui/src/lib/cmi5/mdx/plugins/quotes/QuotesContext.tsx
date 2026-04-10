@@ -1,8 +1,7 @@
 import { useCellValues } from '@mdxeditor/editor';
-//import { imagePreviewHandler$ } from 'packages/rapid-cmi5/src/lib/design-tools/rapidcmi5_mdx/plugins/image';
 import React, { createContext, useCallback, useEffect, useState } from 'react';
 import { imagePreviewHandler$ } from '../image/methods';
-import { debugLog } from 'packages/ui/src/lib/utility/logger';
+
 
 /**
  * Shape of the quotes context value shared across nested quote components.
@@ -77,22 +76,18 @@ export function QuotesContextProvider({
   const [imageSource, setImageSource] = useState<string | undefined>(undefined);
 
   const resolveAvatarPath = useCallback(
-    (avatar: string) => {
-      setUnresolvedSource(avatar);
+    (newAvatar: string) => {
+      setUnresolvedSource(newAvatar);
 
-      console.log('avatar', avatar);
       if (imagePreviewHandler) {
-        console.log('found resolution handler');
         const callPreviewHandler = async () => {
           if (!initialImagePath) {
-            setInitialImagePath(avatar);
+            setInitialImagePath(newAvatar);
           }
-          if (avatar) {
-            const updatedSrc = await imagePreviewHandler(avatar);
-            console.log('updatedSrc', updatedSrc);
+          if (newAvatar) {
+            const updatedSrc = await imagePreviewHandler(newAvatar);
             setImageSource(updatedSrc);
           } else {
-            console.log('undefined updatedSrc');
             setImageSource(undefined);
           }
         };
@@ -100,8 +95,7 @@ export function QuotesContextProvider({
           console.error(e);
         });
       } else {
-        console.log('missing imagePreviewHandler');
-        setImageSource(avatar);
+        setImageSource(newAvatar);
       }
     },
     [
@@ -116,7 +110,6 @@ export function QuotesContextProvider({
    * Resolves url => blob when avatar changes
    */
   useEffect(() => {
-    console.log('Context updated avatar', avatar);
     if (avatar) {
       resolveAvatarPath(avatar);
     }

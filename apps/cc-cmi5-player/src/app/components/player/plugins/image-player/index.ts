@@ -33,7 +33,7 @@ export const imagePlayerPlugin = realmPlugin<{
     realm.pubIn({
       [addImportVisitor$]: [
         MdastImageVisitor,
-        // MdastHtmlImageVisitor,
+        //REF MdastHtmlImageVisitor,
         MdastJsxImageVisitor,
       ],
       [addLexicalNode$]: ImageNode,
