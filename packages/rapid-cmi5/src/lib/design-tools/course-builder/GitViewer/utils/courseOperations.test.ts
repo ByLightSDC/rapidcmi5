@@ -2,11 +2,22 @@ import { vol } from 'memfs';
 import { createFsFromVolume } from 'memfs';
 import { GitOperations } from './gitOperations';
 import { Operation } from '@rapid-cmi5/cmi5-build-common';
-import { computeCourseFromJsonFs, createCourseInFs, createLesson, getCourseDataInFs, slugifyPath } from './useCourseOperationsUtils';
+import {
+  computeCourseFromJsonFs,
+  createCourseInFs,
+  createLesson,
+  getCourseDataInFs,
+  slugifyPath,
+} from './useCourseOperationsUtils';
 
 import { GitFS } from './fileSystem';
 import { createNewFsInstance } from './gitFsInstance';
-import { FileState, fsType, initFileState, RepoAccessObject } from '../../../../redux/repoManagerReducer';
+import {
+  FileState,
+  fsType,
+  initFileState,
+  RepoAccessObject,
+} from '../../../../redux/repoManagerReducer';
 
 // ============================================================================
 // Test Fixtures and Types
@@ -32,15 +43,15 @@ const DEFAULT_REPO: RepoAccessObject = {
 
 async function setupTestContext(): Promise<TestContext> {
   vol.reset();
-  
+
   const instance = createNewFsInstance(false);
   instance.fs = memfs;
-  
+
   const r = { ...DEFAULT_REPO };
-  
+
   const gitOps = new GitOperations(instance);
   await gitOps.initGitRepo(r, 'main');
-  
+
   return {
     instance,
     r,
@@ -63,7 +74,7 @@ export async function createTestCourse(
     courseId?: string;
     courseDescription?: string;
     courseAu?: string;
-  }
+  },
 ) {
   const defaults = {
     courseTitle: 'test',
@@ -91,7 +102,7 @@ export async function createTestCourse(
 export async function verifyCourseStructure(
   ctx: TestContext,
   coursePath: string,
-  expectedTitle: string
+  expectedTitle: string,
 ) {
   const courseData = await getCourseDataInFs({
     r: ctx.r,
@@ -116,7 +127,7 @@ export async function createAndVerifyLesson(
   coursePath: string,
   courseData: any,
   lessonName: string,
-  blockIndex: number = 0
+  blockIndex: number = 0,
 ) {
   const updatedCourseData = await createLesson({
     auName: lessonName,
@@ -140,7 +151,7 @@ export async function syncCourseToFs(
   ctx: TestContext,
   coursePath: string,
   courseData: any,
-  operations: Record<string, Operation>
+  operations: Record<string, Operation>,
 ) {
   await computeCourseFromJsonFs({
     course: { basePath: coursePath, courseData },
@@ -202,7 +213,7 @@ describe('Course Operations', () => {
       const courseData = await verifyCourseStructure(
         ctx,
         expectedPath,
-        courseTitle
+        courseTitle,
       );
       expect(courseData.courseTitle).toBe(courseTitle);
     });
@@ -233,7 +244,7 @@ describe('Course Operations', () => {
       const courseData = await verifyCourseStructure(
         ctx,
         course.basePath,
-        courseTitle
+        courseTitle,
       );
       expect(courseData.courseTitle).toBe(courseTitle);
     });
@@ -246,7 +257,11 @@ describe('Course Operations', () => {
   describe('Lesson Management', () => {
     it('should add a single lesson to a course', async () => {
       const course = await createTestCourse(ctx);
-      const courseData = await verifyCourseStructure(ctx, course.basePath, 'test');
+      const courseData = await verifyCourseStructure(
+        ctx,
+        course.basePath,
+        'test',
+      );
 
       const initialLessonCount = courseData.blocks[0].aus.length;
 
@@ -254,18 +269,24 @@ describe('Course Operations', () => {
         ctx,
         course.basePath,
         courseData,
-        'New Lesson'
+        'New Lesson',
       );
 
-      expect(updatedCourseData.blocks[0].aus.length).toBe(initialLessonCount + 1);
+      expect(updatedCourseData.blocks[0].aus.length).toBe(
+        initialLessonCount + 1,
+      );
       expect(updatedCourseData.blocks[0].aus[initialLessonCount].auName).toBe(
-        'New Lesson'
+        'New Lesson',
       );
     });
 
     it('should add multiple lessons to a course', async () => {
       const course = await createTestCourse(ctx);
-      let courseData = await verifyCourseStructure(ctx, course.basePath, 'test');
+      let courseData = await verifyCourseStructure(
+        ctx,
+        course.basePath,
+        'test',
+      );
 
       const lessonsToAdd = ['Lesson 1', 'Lesson 2', 'Lesson 3'];
 
@@ -274,12 +295,12 @@ describe('Course Operations', () => {
           ctx,
           course.basePath,
           courseData,
-          lessonName
+          lessonName,
         );
       }
 
       expect(courseData.blocks[0].aus.length).toBeGreaterThanOrEqual(
-        lessonsToAdd.length
+        lessonsToAdd.length,
       );
 
       const lessonNames = courseData.blocks[0].aus.map((au: any) => au.auName);
@@ -290,18 +311,21 @@ describe('Course Operations', () => {
 
     it('should sync lesson changes to filesystem', async () => {
       const course = await createTestCourse(ctx);
-      const courseData = await verifyCourseStructure(ctx, course.basePath, 'test');
+      const courseData = await verifyCourseStructure(
+        ctx,
+        course.basePath,
+        'test',
+      );
 
       const newCourseData = await createAndVerifyLesson(
         ctx,
         course.basePath,
         courseData,
-        'Synced Lesson'
+        'Synced Lesson',
       );
 
-      const newLesson = newCourseData.blocks[0].aus[
-        newCourseData.blocks[0].aus.length - 1
-      ];
+      const newLesson =
+        newCourseData.blocks[0].aus[newCourseData.blocks[0].aus.length - 1];
       const filepath = newLesson.slides[0].filepath;
 
       const operations: Record<string, Operation> = {
@@ -312,16 +336,16 @@ describe('Course Operations', () => {
         ctx,
         course.basePath,
         newCourseData,
-        operations
+        operations,
       );
 
       expect(syncedCourseData).toBeTruthy();
       expect(syncedCourseData!.blocks[0].aus.length).toBe(
-        newCourseData.blocks[0].aus.length
+        newCourseData.blocks[0].aus.length,
       );
 
       const syncedLesson = syncedCourseData!.blocks[0].aus.find(
-        (au: any) => au.auName === 'Synced Lesson'
+        (au: any) => au.auName === 'Synced Lesson',
       );
       expect(syncedLesson).toBeDefined();
     });
@@ -345,7 +369,11 @@ describe('Course Operations', () => {
 
     it('should handle invalid block index when creating lesson', async () => {
       const course = await createTestCourse(ctx);
-      const courseData = await verifyCourseStructure(ctx, course.basePath, 'test');
+      const courseData = await verifyCourseStructure(
+        ctx,
+        course.basePath,
+        'test',
+      );
 
       await expect(async () => {
         await createLesson({
@@ -373,7 +401,7 @@ describe('Course Operations', () => {
       let courseData = await verifyCourseStructure(
         ctx,
         course.basePath,
-        'Complete Course'
+        'Complete Course',
       );
 
       // 2. Add lessons
@@ -383,7 +411,7 @@ describe('Course Operations', () => {
           ctx,
           course.basePath,
           courseData,
-          lessonName
+          lessonName,
         );
       }
 
@@ -399,18 +427,18 @@ describe('Course Operations', () => {
         ctx,
         course.basePath,
         courseData,
-        operations
+        operations,
       );
 
       // 4. Verify final state
       expect(syncedData).toBeTruthy();
       expect(syncedData!.blocks[0].aus.length).toBeGreaterThanOrEqual(
-        lessons.length
+        lessons.length,
       );
-      
+
       lessons.forEach((lessonName) => {
         const lesson = syncedData!.blocks[0].aus.find(
-          (au: any) => au.auName === lessonName
+          (au: any) => au.auName === lessonName,
         );
         expect(lesson).toBeDefined();
       });

@@ -194,6 +194,9 @@ export const useGitOperations = (
         setIsPerformingOperation(true);
         const r: RepoAccessObject = getRepoAccess(repoAccessObject);
         return await gitOperator.gitAddAllModified(r, modifiedFiles);
+      } catch (error) {
+        debugLogError('Could not stage files: ' + error);
+        throw error;
       } finally {
         setIsPerformingOperation(false);
       }

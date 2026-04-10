@@ -20,7 +20,7 @@ import {
   flattenFolders,
   generateCourseJson,
   getScenarioDirectives,
-  rc5MetaFilename,
+  RC5_FILENAME,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   debugLog,
@@ -151,7 +151,7 @@ export const createNewCourseInFs = async ({
 
     await fsInstance.createFile(
       r,
-      join(coursePath, rc5MetaFilename),
+      join(coursePath, RC5_FILENAME),
       YAML.stringify(courseDataFileContent),
     );
 
@@ -252,7 +252,7 @@ export const findAllCourses = async ({
   const folderStructure = await fsInstance.getFolderStructure(repoPath, '');
   const flatFolder = flattenFolders(folderStructure);
 
-  const rc5Nodes = flatFolder.filter((n) => n.name === rc5MetaFilename);
+  const rc5Nodes = flatFolder.filter((n) => n.name === RC5_FILENAME);
 
   const courses = await Promise.all(
     rc5Nodes.map(async (node) => {
@@ -629,7 +629,7 @@ export const computeCourseFromJsonFs = async ({
   let rc5Meta = await readRC5Meta(
     r,
     fsInstance,
-    join(course.basePath, rc5MetaFilename),
+    join(course.basePath, RC5_FILENAME),
   );
 
   if (!rc5Meta) throw Error('RC5 file is empty');
@@ -699,15 +699,15 @@ export const computeCourseFromJsonFs = async ({
     // update the file system
     await fsInstance.updateFile(
       r,
-      `${course.basePath}/${rc5MetaFilename}`,
+      `${course.basePath}/${RC5_FILENAME}`,
       YAML.stringify(stripSlideContent(editableCourseData)),
     );
     // update our current course data in visual designer
     // const changedFiles = [
     //   ...courseOperationsList.map((file) => file.filepath),
-    //   `${course.basePath}/${rc5MetaFilename}`,
+    //   `${course.basePath}/${RC5_FILENAME}`,
     // ];
-    changedFiles.push(`${course.basePath}/${rc5MetaFilename}`);
+    changedFiles.push(`${course.basePath}/${RC5_FILENAME}`);
 
     return {
       changedFiles: [...new Set(changedFiles)],
@@ -813,7 +813,7 @@ export const renameCourseInFs = async ({
     courseData.courseTitle = newCourseTitle;
     await fsInstance.updateFile(
       r,
-      `${oldCoursePath}/${rc5MetaFilename}`,
+      `${oldCoursePath}/${RC5_FILENAME}`,
       YAML.stringify(stripSlideContent(courseData)),
     );
 
@@ -856,7 +856,7 @@ export const renameCourseInFs = async ({
   // Update the RC5.yaml with new paths and title
   await fsInstance.updateFile(
     r,
-    `${cleanedCourseName}/${rc5MetaFilename}`,
+    `${cleanedCourseName}/${RC5_FILENAME}`,
     YAML.stringify(stripSlideContent(courseData)),
   );
 
