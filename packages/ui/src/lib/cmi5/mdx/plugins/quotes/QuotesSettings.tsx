@@ -6,7 +6,7 @@ import { ButtonModalMainUi } from 'packages/ui/src/lib/inputs/buttons/buttonsmod
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useImageDialog } from '../image/useImageDialog';
 import { useCellValue } from '@mdxeditor/editor';
-import { QUOTE_PRESETS, QuotePreset } from '@rapid-cmi5/ui';
+import { debugLog, QUOTE_PRESETS, QuotePreset } from '@rapid-cmi5/ui';
 import { imageUploadHandler$ } from '../image/methods';
 
 // used for uploading files
@@ -59,6 +59,7 @@ export const QuotesSettings = ({
   const handleApply = useCallback(() => {
     if (selectedFiles && selectedFiles.length > 0) {
       if (imageUploadHandler) {
+        debugLog('upload image', src);
         imageUploadHandler(selectedFiles[0]);
       }
     }

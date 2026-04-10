@@ -1,5 +1,6 @@
 import {
   DirectiveEditorProps,
+  readOnly$,
   syntaxExtensions$,
   useCellValues,
 } from '@mdxeditor/editor';
@@ -31,7 +32,10 @@ import { fontPresets } from './constants';
 export const QuoteContentEditor: React.FC<
   DirectiveEditorProps<QuoteContentDirectiveNode>
 > = ({ lexicalNode, mdastNode, parentEditor }) => {
-  const [syntaxExtensions] = useCellValues(syntaxExtensions$);
+  const [readOnly, syntaxExtensions] = useCellValues(
+    readOnly$,
+    syntaxExtensions$,
+  );
   const [cellIndex, setCellIndex] = useState(-1);
   const { avatar, carouselIndex, imageSource, preset } =
     useContext(QuotesContext);
@@ -70,7 +74,6 @@ export const QuoteContentEditor: React.FC<
   }, [preset]);
 
   //#endregion
-
 
   const updateAvatar = useCallback(
     (newAvatar?: string) => {

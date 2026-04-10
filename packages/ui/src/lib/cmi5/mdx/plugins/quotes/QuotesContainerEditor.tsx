@@ -38,6 +38,8 @@ import { findMatchingQuotePreset } from './methods';
 import { QuotesContextProvider } from './QuotesContext';
 import { useFocusWithin } from '../shared/useFocusWithin';
 import QuotesSettings from './QuotesSettings';
+import { debuglog } from 'util';
+import { debugLog } from 'packages/ui/src/lib/utility/logger';
 
 /**
  * Quotes Container Editor for grid layout directive.
@@ -99,10 +101,12 @@ export const QuotesContainerEditor: React.FC<
       mdastNode.children.length > 0 &&
       mdastNode.children[0].name === 'quoteContent'
     ) {
+      console.log('update current', mdastNode.children[0].attributes.avatar);
       return mdastNode.children[0].attributes.avatar;
     }
     return undefined;
   }, [mdastNode.children[0].attributes.avatar]);
+  const [selectedAvatar, setSelectedAvatar] = useState(currentAvatar);
 
   /** Carousel index
    * FUTURE handle multiple quotes in the container
@@ -125,6 +129,7 @@ export const QuotesContainerEditor: React.FC<
     async (newPreset: QuotePreset, newAvatar: string) => {
       await new Promise((resolve) => setTimeout(resolve, 500));
       setIsConfiguring(false);
+      debugLog('update parent mdast-----');
       updateMdastNode({
         ...mdastNode,
         attributes: {
@@ -132,6 +137,9 @@ export const QuotesContainerEditor: React.FC<
           preset: newPreset.id,
         },
       });
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      console.log('update selected-----', newAvatar);
+      setSelectedAvatar(newAvatar);
     },
     [mdastNode, updateMdastNode],
   );
@@ -211,7 +219,7 @@ export const QuotesContainerEditor: React.FC<
           <QuotesContextProvider
             carouselIndex={carouselIndex}
             preset={currentPreset.id}
-            avatar={currentAvatar}
+            avatar={selectedAvatar}
           >
             <NestedLexicalEditor<ContainerDirective>
               block={true}
@@ -313,7 +321,7 @@ export const QuotesContainerEditor: React.FC<
 
       {isConfiguring && (
         <QuotesSettings
-          currentAvatar={currentAvatar}
+          currentAvatar={selectedAvatar || currentAvatar}
           currentPreset={currentPreset}
           handleCancel={handleCancel}
           handleSubmit={handleApply}

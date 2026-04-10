@@ -79,6 +79,8 @@ export function QuotesContextProvider({
   const resolveAvatarPath = useCallback(
     (avatar: string) => {
       setUnresolvedSource(avatar);
+
+      console.log('avatar', avatar);
       if (imagePreviewHandler) {
         console.log('found resolution handler');
         const callPreviewHandler = async () => {
@@ -98,7 +100,7 @@ export function QuotesContextProvider({
           console.error(e);
         });
       } else {
-         console.log('missing imagePreviewHandler');
+        console.log('missing imagePreviewHandler');
         setImageSource(avatar);
       }
     },
