@@ -4,7 +4,7 @@ import { imagePreviewHandler$ } from '../image/methods';
 
 
 /**
- * Shape of the quotes context value shared across nested quote components.
+ * Quotes context for sharing carousel state & resolved image path
  */
 export interface IQuotesContext {
   /** Raw avatar path or URL from the mdast node attributes. */

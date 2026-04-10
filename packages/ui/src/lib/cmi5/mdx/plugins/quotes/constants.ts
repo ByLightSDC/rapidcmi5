@@ -22,7 +22,11 @@ export const QUOTE_PRESETS: QuotePreset[] = [
   },
 ];
 
+/**
+ * Placeholder avatar image
+ */
 export const placeholderAvatar = '/assets/images/quoteAuthorPlaceholder.png';
+
 /** The first line return is REQUIRED!!!! */
 export const DEFAULT_QUOTES = `
 :::quoteContent{author="Alex Mercer, Senior Threat Intelligence Analyst" avatar="${placeholderAvatar}"}
@@ -30,6 +34,9 @@ export const DEFAULT_QUOTES = `
 :::
 `;
 
+/**
+ * Font styles for each quote layout preset
+ */
 export const fontPresets = {
   '1': {
     fontSize: '14px',

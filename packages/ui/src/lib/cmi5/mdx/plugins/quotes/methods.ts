@@ -2,7 +2,7 @@ import { QUOTE_PRESETS } from './constants';
 import { QuotePreset } from './types';
 
 /**
- * Finds the preset that matches the current grid configuration.
+ * Finds the preset that matches the current quote configuration.
  */
 export const findMatchingQuotePreset = (
   presetId: string,
