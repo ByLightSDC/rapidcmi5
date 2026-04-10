@@ -37,6 +37,7 @@ import Grid from '@mui/material/Grid2';
 import DeleteIconButton from '../../components/DeleteIconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import PaletteIcon from '@mui/icons-material/Palette';
+import SettingsIcon from '@mui/icons-material/Settings';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
 import {
@@ -47,8 +48,10 @@ import {
 import { createGridCell, findMatchingPreset, GRID_PRESETS } from './constants';
 import { GridContextProvider } from './GridContext';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
-import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { resolveLessonThemeCSS, resolveBlockMaxWidth } from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
+import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 
@@ -68,7 +71,12 @@ export const GridContainerEditor: React.FC<
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';
-  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
+  const [contentWidth, setContentWidth] = useState<ContentWidthEnum | undefined>(
+    mdastNode?.attributes?.contentWidth,
+  );
+  const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
+  const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
+  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
 
   const [sxProps, setSxProps] = useState<SxProps>({});
   const [formData, setFormData] = useState<Array<GridCellDirectiveNode>>(
@@ -152,7 +160,7 @@ export const GridContainerEditor: React.FC<
    * Used by both handleSubmit (layout changes) and color picker.
    */
   const rebuildNode = useCallback(
-    async (cells: GridCellDirectiveNode[], bgColor: string) => {
+    async (cells: GridCellDirectiveNode[], bgColor: string, blockContentWidth?: ContentWidthEnum) => {
       if (!parentEditor) return;
 
       parentEditor.update(() => {
@@ -183,6 +191,7 @@ export const GridContainerEditor: React.FC<
         if (mdastNode.attributes?.style)
           attributes['style'] = mdastNode.attributes.style;
         if (bgColor) attributes['backgroundColor'] = bgColor;
+        if (blockContentWidth) attributes['contentWidth'] = blockContentWidth;
 
         const mdast: ContainerDirective = {
           type: 'containerDirective',
@@ -216,8 +225,8 @@ export const GridContainerEditor: React.FC<
   const handleSubmit = useCallback(async () => {
     setIsConfiguring(false);
     const newCells = migrateContent(formData, selectedPreset);
-    await rebuildNode(newCells, backgroundColor);
-  }, [rebuildNode, migrateContent, formData, selectedPreset, backgroundColor]);
+    await rebuildNode(newCells, backgroundColor, contentWidth);
+  }, [rebuildNode, migrateContent, formData, selectedPreset, backgroundColor, contentWidth]);
 
   /**
    * Clears the background color
@@ -264,6 +273,7 @@ export const GridContainerEditor: React.FC<
     setBackgroundColor(bgColor);
     pendingColorRef.current = bgColor;
     setPendingColor(bgColor);
+    setContentWidth(mdastNode?.attributes?.contentWidth);
   }, [mdastNode]);
 
   /**
@@ -313,6 +323,7 @@ export const GridContainerEditor: React.FC<
             borderColor: 'divider',
             borderRadius: 1,
             backgroundColor: (theme) => theme.palette.background.paper,
+            ...(blockMaxWidth ? { maxWidth: blockMaxWidth, marginLeft: 'auto', marginRight: 'auto' } : {}),
           }}
         >
           {/* Grid layout using CSS Grid - equal-width columns based on cell count */}
@@ -363,6 +374,14 @@ export const GridContainerEditor: React.FC<
                 size="small"
               >
                 <PaletteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Block Appearance">
+              <IconButton
+                onClick={() => setBlockAppearanceOpen(true)}
+                size="small"
+              >
+                <SettingsIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <Tooltip title="Edit Grid Layout">
@@ -424,6 +443,24 @@ export const GridContainerEditor: React.FC<
         }}
         onClear={handleClearColor}
         noneLabel="No background"
+      />
+
+      <BlockAppearanceForm
+        open={blockAppearanceOpen}
+        currentContentWidth={contentWidth}
+        onClose={() => setBlockAppearanceOpen(false)}
+        onSave={(newContentWidth) => {
+          setContentWidth(newContentWidth);
+          parentEditor.update(() => {
+            const attrs = { ...mdastNode.attributes } as Record<string, string>;
+            if (newContentWidth) {
+              attrs['contentWidth'] = newContentWidth;
+            } else {
+              delete attrs['contentWidth'];
+            }
+            lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+          }, { discrete: true });
+        }}
       />
 
       {isConfiguring && (

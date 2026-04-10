@@ -55,8 +55,10 @@ import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
-import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { resolveLessonThemeCSS, resolveBlockMaxWidth } from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
+import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { getDirectiveBlockShadow } from '../../../../styles/directiveStyles';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
@@ -103,9 +105,14 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   const [pendingColor, setPendingColor] = useState<string>(
     mdastNode?.attributes.backgroundColor ?? '',
   );
+  const [contentWidth, setContentWidth] = useState<ContentWidthEnum | undefined>(
+    mdastNode?.attributes.contentWidth,
+  );
+  const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   // Ref so onClose always sees the latest pendingColor regardless of closure staleness.
   const pendingColorRef = useRef(pendingColor);
-  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
+  const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
+  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
   // Set to true when handleClearColor already rebuilt, so onClose skips its rebuild.
   const skipNextCloseRebuildRef = useRef(false);
   const colorPickerOpen = Boolean(colorPickerAnchor);
@@ -205,7 +212,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
    * Used by both handleSubmit (tab management) and handleApplyColor.
    */
   const rebuildNode = useCallback(
-    async (children: TabContentDirectiveNode[], bgColor: string) => {
+    async (children: TabContentDirectiveNode[], bgColor: string, blockContentWidth?: ContentWidthEnum) => {
       if (!parentEditor) return;
 
       // select AFTER the current tab first
@@ -238,6 +245,9 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
         if (bgColor) {
           attributes['backgroundColor'] = bgColor;
         }
+        if (blockContentWidth) {
+          attributes['contentWidth'] = blockContentWidth;
+        }
 
         const mdast: ContainerDirective = {
           type: 'containerDirective',
@@ -266,8 +276,8 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
    */
   const handleSubmit = useCallback(async () => {
     setIsConfiguring(false);
-    await rebuildNode(formData, backgroundColor);
-  }, [rebuildNode, formData, backgroundColor]);
+    await rebuildNode(formData, backgroundColor, contentWidth);
+  }, [rebuildNode, formData, backgroundColor, contentWidth]);
 
   /**
    * Clears the background color
@@ -337,6 +347,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     setBackgroundColor(bgColor);
     pendingColorRef.current = bgColor;
     setPendingColor(bgColor);
+    setContentWidth(mdastNode.attributes.contentWidth);
   }, [tab, mdastNode]);
 
   const dropShadow = getDirectiveBlockShadow(muiTheme);
@@ -358,13 +369,20 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   // Inner box: fills all available width (lesson content width applies to text
   // inside via lesson theme CSS, not to this container). Page background color
   // creates the visual separation from the outer colored band.
+  // When a block-level contentWidth is explicitly set, apply it here so the content
+  // is narrowed while the outer color band still spans full width.
+  const widthOverrideSx: SxProps = blockMaxWidth
+    ? { maxWidth: blockMaxWidth, marginLeft: 'auto', marginRight: 'auto' }
+    : {};
   const innerSx: SxProps = backgroundColor
     ? {
         backgroundColor: muiTheme.palette.background.paper,
         boxShadow: DIRECTIVE_INNER_BOX_SHADOW,
+        ...widthOverrideSx,
       }
     : {
         boxShadow: dropShadow,
+        ...widthOverrideSx,
       };
 
   /**
@@ -461,6 +479,15 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
               </IconButton>
             </Tooltip>
 
+            <Tooltip title="Block Appearance">
+              <IconButton
+                onClick={() => setBlockAppearanceOpen(true)}
+                size="small"
+              >
+                <SettingsIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+
             <Tooltip title="Edit Tabs Settings">
               <IconButton onClick={handleConfigure}>
                 <EditIcon />
@@ -523,6 +550,24 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
         }}
         onClear={handleClearColor}
         noneLabel="No background"
+      />
+
+      <BlockAppearanceForm
+        open={blockAppearanceOpen}
+        currentContentWidth={contentWidth}
+        onClose={() => setBlockAppearanceOpen(false)}
+        onSave={(newContentWidth) => {
+          setContentWidth(newContentWidth);
+          parentEditor.update(() => {
+            const attrs = { ...mdastNode.attributes } as Record<string, string>;
+            if (newContentWidth) {
+              attrs['contentWidth'] = newContentWidth;
+            } else {
+              delete attrs['contentWidth'];
+            }
+            lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+          }, { discrete: true });
+        }}
       />
 
       {isConfiguring && (
