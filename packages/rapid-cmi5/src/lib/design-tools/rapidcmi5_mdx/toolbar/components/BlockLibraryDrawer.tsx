@@ -205,7 +205,7 @@ export function BlockLibraryDrawer() {
             </ViewExpander>
             <ViewExpander
               title="Layout"
-              defaultIsExpanded={false}
+              defaultIsExpanded={true}
               headerSxProps={headerSxProps}
               shouldEndWithDivider={true}
             >

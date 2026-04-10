@@ -1,6 +1,6 @@
 import { Box, Paper, Stack, styled, Typography } from '@mui/material';
 import ModalDialog from 'packages/ui/src/lib/modals/ModalDialog';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Grid from '@mui/material/Grid2';
 import { ButtonModalMainUi } from 'packages/ui/src/lib/inputs/buttons/buttonsmodal';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
@@ -49,20 +49,36 @@ export const QuotesSettings = ({
     currentPreset || QUOTE_PRESETS[0],
   );
 
+  // Avatar File Selection
   const { handleFileSelected, selectedFiles, src } = useImageDialog({
     defaultSrc: currentAvatar,
   });
   const imageUploadHandler = useCellValue(imageUploadHandler$);
 
+  // Upload Image
   const handleApply = useCallback(() => {
     if (selectedFiles && selectedFiles.length > 0) {
-      console.log('upload file here-------------', selectedFiles);
       if (imageUploadHandler) {
         imageUploadHandler(selectedFiles[0]);
       }
     }
     handleSubmit(selectedPreset, src);
   }, [selectedPreset, src]);
+
+  // Upload Image Input
+  const VisuallyHiddenInput = useMemo(() => {
+    return styled('input')({
+      clip: 'rect(0 0 0 0)',
+      clipPath: 'inset(50%)',
+      height: 1,
+      overflow: 'hidden',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      whiteSpace: 'nowrap',
+      width: 1,
+    });
+  }, []);
 
   return (
     <ModalDialog

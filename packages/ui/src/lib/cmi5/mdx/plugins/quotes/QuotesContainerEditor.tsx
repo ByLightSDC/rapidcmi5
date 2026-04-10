@@ -40,8 +40,8 @@ import { useFocusWithin } from '../shared/useFocusWithin';
 import QuotesSettings from './QuotesSettings';
 
 /**
- * Grid Container Editor for grid layout directive.
- * Renders a grid container with settings modal for layout preset selection.
+ * Quotes Container Editor for grid layout directive.
+ * Renders a quotes container with settings modal for layout preset selection.
  * Supports backgroundColor band (box-shadow/clip-path) and gutter context buttons.
  */
 export const QuotesContainerEditor: React.FC<
@@ -84,7 +84,7 @@ export const QuotesContainerEditor: React.FC<
   //#endregion
 
   /**
-   * Determine the current preset
+   * Current preset
    */
   const currentPreset = useMemo(() => {
     return mdastNode?.attributes?.preset
@@ -93,15 +93,7 @@ export const QuotesContainerEditor: React.FC<
       : QUOTE_PRESETS[0];
   }, [mdastNode?.attributes?.preset]);
 
-  // const [selectedPreset, setSelectedPreset] =
-  //   useState<QuotePreset>(currentPreset);
-
-  /** Carousel index
-   * FUTURE handle multiple quotes in the container
-   */
-  const [carouselIndex, setCarouselIndex] = useState<number>(0);
-
-  /** Avatar */
+  /** Current Avatar */
   const currentAvatar = useMemo(() => {
     if (
       mdastNode.children.length > 0 &&
@@ -112,7 +104,10 @@ export const QuotesContainerEditor: React.FC<
     return undefined;
   }, [mdastNode.children[0].attributes.avatar]);
 
-
+  /** Carousel index
+   * FUTURE handle multiple quotes in the container
+   */
+  const [carouselIndex, setCarouselIndex] = useState<number>(0);
 
   /**
    * Reverts changes and closes modal
@@ -129,8 +124,6 @@ export const QuotesContainerEditor: React.FC<
   const handleApply = useCallback(
     async (newPreset: QuotePreset, newAvatar: string) => {
       await new Promise((resolve) => setTimeout(resolve, 500));
-
-      console.log('update parent node with preset:' + newPreset.id, newAvatar);
       setIsConfiguring(false);
       updateMdastNode({
         ...mdastNode,
@@ -139,7 +132,6 @@ export const QuotesContainerEditor: React.FC<
           preset: newPreset.id,
         },
       });
-
     },
     [mdastNode, updateMdastNode],
   );
@@ -189,10 +181,6 @@ export const QuotesContainerEditor: React.FC<
     setPendingColor(bgColor);
   }, [mdastNode]);
 
-  // useEffect(() => {
-  //   console.log('set new avatar');
-  // }, [selectedAvatar]);
-
   return (
     <>
       <Box
@@ -205,7 +193,7 @@ export const QuotesContainerEditor: React.FC<
           margin: 0,
         }}
         role="quotes"
-        aria-label="Quotes layout container"
+        aria-label="Quotes Container"
       >
         {/* Inner content box */}
         <Box
@@ -262,7 +250,7 @@ export const QuotesContainerEditor: React.FC<
                 <PaletteIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Edit Grid Layout">
+            <Tooltip title="Edit Quotes Layout">
               <IconButton onClick={handleConfigure}>
                 <EditIcon />
               </IconButton>

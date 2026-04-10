@@ -1,10 +1,7 @@
 import {
   DirectiveEditorProps,
-  NestedLexicalEditor,
-  readOnly$,
   syntaxExtensions$,
   useCellValues,
-  useMdastNodeUpdater,
 } from '@mdxeditor/editor';
 import {
   useCallback,
@@ -22,9 +19,10 @@ import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 import { QuotesContext } from './QuotesContext';
 import { convertMarkdownToMdast } from '../../util/conversion';
 import { toMarkdown } from 'mdast-util-to-markdown';
-import { stripLeadingHashes } from './methods';
 import { imgCache } from '../image/constants';
-import { debugLog } from 'packages/ui/src/lib/utility/logger';
+import { LessonThemeContext } from '../../contexts/LessonThemeContext';
+import { useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
+import { fontPresets } from './constants';
 
 /**
  * Quote Content Editor for the Quotes plugin.
@@ -38,39 +36,41 @@ export const QuoteContentEditor: React.FC<
   const { avatar, carouselIndex, imageSource, preset } =
     useContext(QuotesContext);
 
+  //#region Styles
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const { blockPadding } = useLessonThemeStyles(lessonTheme);
+
   const scopedClass = useRef(
-    `quote-cell-${Math.random().toString(36).slice(2, 9)}`,
+    `quote-block-${Math.random().toString(36).slice(2, 9)}`,
+  ).current;
+
+  const scopedAuthorClass = useRef(
+    `quote-author-${Math.random().toString(36).slice(2, 9)}`,
   ).current;
 
   const fontStyles = useMemo(() => {
-    let fontSize = '14px';
-    let fontWeight = 400;
-    if (preset === '2') {
-      fontSize = '32px';
-      fontWeight = 300;
-    }
+    const config = fontPresets[preset as keyof typeof fontPresets];
     return (
       <style>{`
             .${scopedClass} {
-               font-size: ${fontSize};
-               font-weight: ${fontWeight};
+               font-size: ${config.fontSize};
+               font-weight: ${config.fontWeight};
+               line-height:${config.fontLineHeight};
+   
+            }
+            .${scopedClass} p {
+               text-align: ${config.textAlign};
+            }
+            .${scopedAuthorClass} {
+               font-size: ${config.authorFontSize};
+               font-weight: ${config.authorFontWeight};
             }
           `}</style>
     );
   }, [preset]);
 
-  const authorHeader = useMemo(() => {
-    if (mdastNode.attributes.author) {
-      const justAuthor = stripLeadingHashes(mdastNode.attributes.author);
-      switch (preset) {
-        case '1':
-          return `###### ${justAuthor}`;
-        case '2':
-          return `#### ${justAuthor}`;
-      }
-    }
-    return mdastNode.attributes.author || '';
-  }, [preset]);
+  //#endregion
+
 
   const updateAvatar = useCallback(
     (newAvatar?: string) => {
@@ -85,6 +85,81 @@ export const QuoteContentEditor: React.FC<
       );
     },
     [lexicalNode, mdastNode, parentEditor],
+  );
+
+  const avatarImage = useMemo(() => {
+    let imageDim = '72px';
+    let borderRadius = '50%';
+    if (preset === '3') {
+      imageDim = '160px';
+      borderRadius = '';
+    }
+    return (
+      <>
+        {imageSource && (
+          <img
+            style={{
+              width: imageDim,
+              height: imageDim,
+              borderRadius: borderRadius,
+              objectFit: 'cover',
+            }}
+            src={imgCache.read(imageSource)}
+            alt="Author Headshot"
+          />
+        )}
+      </>
+    );
+  }, [imageSource, preset]);
+
+  const quoteBlock = (
+    <RC5NestedLexicalEditor<ContainerDirective>
+      block={true}
+      getContent={(node) => node.children}
+      getUpdatedMdastNode={(node, children: any) => ({
+        ...node,
+        children,
+      })}
+      contentEditableProps={{
+        className: scopedClass,
+        'aria-label': `Quote ${cellIndex + 1} content`,
+      }}
+    />
+  );
+
+  const authorEl = (
+    <RC5NestedLexicalEditor<Paragraph>
+      getContent={(node) => {
+        const theNode = convertMarkdownToMdast(
+          mdastNode.attributes.author || '',
+          syntaxExtensions,
+        );
+        return theNode.children;
+      }}
+      getUpdatedMdastNode={(mdastParagraphNode, paragraphChildren: any) => {
+        if (paragraphChildren.length > 0) {
+          const authorStr = toMarkdown(paragraphChildren[0]);
+          if (authorStr === mdastNode.attributes.author) {
+            return mdastParagraphNode;
+          }
+
+          return {
+            ...mdastParagraphNode,
+            attributes: {
+              ...mdastNode.attributes,
+              author: authorStr,
+              avatar: avatar,
+            },
+          };
+        }
+
+        return mdastParagraphNode;
+      }}
+      contentEditableProps={{
+        className: scopedAuthorClass,
+        'aria-label': 'Author Name',
+      }}
+    />
   );
 
   /**
@@ -103,14 +178,10 @@ export const QuoteContentEditor: React.FC<
   }, [lexicalNode, parentEditor]);
 
   /**
-   * UE updates mdast node when avatar is updated
+   * UE updates mdast node when avatar is updated in the context
    */
   useEffect(() => {
-    console.log('UE' + avatar);
-    console.log(carouselIndex, cellIndex);
-
     if (carouselIndex === cellIndex) {
-      console.log('Content update avatar');
       updateAvatar(avatar);
     }
   }, [avatar, carouselIndex, cellIndex]);
@@ -120,6 +191,8 @@ export const QuoteContentEditor: React.FC<
       sx={{
         position: 'relative',
         minHeight: '60px',
+        marginLeft: blockPadding,
+        marginRight: blockPadding,
       }}
       role="quote"
       aria-label={`Quote ${cellIndex + 1}`}
@@ -138,63 +211,9 @@ export const QuoteContentEditor: React.FC<
             //REF paddingTop: 0, NestedLexicalEditor has overly fat padding, trying to balance top padding against it
           }}
         >
-          {imageSource && (
-            <img
-              style={{
-                width: '72px',
-                height: '72px',
-                borderRadius: '50%',
-                objectFit: 'cover',
-              }}
-              src={imgCache.read(imageSource)}
-              alt="Author"
-            />
-          )}
-          <RC5NestedLexicalEditor<ContainerDirective>
-            block={true}
-            getContent={(node) => node.children}
-            getUpdatedMdastNode={(node, children: any) => ({
-              ...node,
-              children,
-            })}
-            contentEditableProps={{
-              className: scopedClass,
-              'aria-label': `Quote ${cellIndex + 1} content`,
-            }}
-          />
-
-          <RC5NestedLexicalEditor<Paragraph>
-            getContent={(node) => {
-              const theNode = convertMarkdownToMdast(
-                mdastNode.attributes.author || '',
-                syntaxExtensions,
-              );
-              return theNode.children;
-            }}
-            getUpdatedMdastNode={(
-              mdastParagraphNode,
-              paragraphChildren: any,
-            ) => {
-              if (paragraphChildren.length > 0) {
-                const titleStr = toMarkdown(paragraphChildren[0]);
-                if (titleStr === mdastNode.attributes.author) {
-                  return mdastParagraphNode;
-                }
-
-                return {
-                  ...mdastParagraphNode,
-                  attributes: {
-                    ...mdastNode.attributes,
-                    author: titleStr,
-                    avatar: avatar,
-                  },
-                };
-              }
-
-              return mdastParagraphNode;
-            }}
-            contentEditableProps={{ 'aria-label': 'Admonition Title' }}
-          />
+          {avatarImage}
+          {quoteBlock}
+          {authorEl}
         </Stack>
       )}
       {preset === '2' && (
@@ -210,62 +229,49 @@ export const QuoteContentEditor: React.FC<
             paddingTop: 0,
           }}
         >
-          {mdastNode.attributes.avatar && (
-            <img
-              style={{
-                width: '72px',
-                height: '72px',
-                borderRadius: '50%',
-                objectFit: 'cover',
-              }}
-              src={mdastNode.attributes.avatar}
-              alt="Author Headshot"
-            />
-          )}
-          <RC5NestedLexicalEditor<ContainerDirective>
-            block={true}
-            getContent={(node) => node.children}
-            getUpdatedMdastNode={(node, children: any) => ({
-              ...node,
-              children,
-            })}
-            contentEditableProps={{
-              className: scopedClass,
-              'aria-label': `Quote ${cellIndex + 1} content`,
-            }}
-          />
-
-          <NestedLexicalEditor<Paragraph>
-            getContent={(node) => {
-              const theNode = convertMarkdownToMdast(
-                authorHeader,
-                syntaxExtensions,
-              );
-              return theNode.children;
-            }}
-            getUpdatedMdastNode={(
-              mdastParagraphNode,
-              paragraphChildren: any,
-            ) => {
-              if (paragraphChildren.length > 0) {
-                const titleStr = toMarkdown(paragraphChildren[0]);
-                if (titleStr === mdastNode.attributes.author) {
-                  return mdastParagraphNode;
-                }
-
-                return {
-                  ...mdastParagraphNode,
-                  attributes: {
-                    ...mdastNode.attributes,
-                    author: titleStr,
-                  },
-                };
-              }
-
-              return mdastParagraphNode;
-            }}
-            contentEditableProps={{ 'aria-label': 'Admonition Title' }}
-          />
+          {avatarImage}
+          {quoteBlock}
+          {authorEl}
+        </Stack>
+      )}
+      {preset === '3' && (
+        <Stack
+          direction="row"
+          spacing={2}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 2,
+            paddingBottom: 0, //controlled by parent, lesson setting
+            paddingTop: 0,
+          }}
+        >
+          {avatarImage}
+          <Stack direction="column">
+            {quoteBlock}
+            {authorEl}
+          </Stack>
+        </Stack>
+      )}
+      {preset === '4' && (
+        <Stack
+          direction="row"
+          spacing={2}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 2,
+            paddingBottom: 0, //controlled by parent, lesson setting
+            paddingTop: 0,
+          }}
+        >
+          {avatarImage}
+          <Stack direction="column">
+            {quoteBlock}
+            {authorEl}
+          </Stack>
         </Stack>
       )}
     </Box>

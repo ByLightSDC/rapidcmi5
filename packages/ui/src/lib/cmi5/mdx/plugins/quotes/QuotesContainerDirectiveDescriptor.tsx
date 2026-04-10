@@ -3,8 +3,8 @@ import { QuotesContainerDirectiveNode } from './types';
 import { QuotesContainerEditor } from './QuotesContainerEditor';
 
 /**
- * Grid Container Directive Descriptor for the Grid Layout plugin.
- * Represents a container that holds multiple grid cells.
+ * Quotes Container Directive Descriptor
+ * Represents a container that holds one (or FUTURE more) quote blocks
  */
 export const QuotesContainerDirectiveDescriptor: DirectiveDescriptor<QuotesContainerDirectiveNode> =
   {

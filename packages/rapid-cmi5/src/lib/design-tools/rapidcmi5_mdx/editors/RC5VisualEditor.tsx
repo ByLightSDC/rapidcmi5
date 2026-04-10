@@ -263,11 +263,21 @@ function RC5VisualEditor() {
   // Preview handlers convert GitFS paths to blob URLs for browser display
   const imagePreviewHandler = useCallback(
     async (imageSrc: string) => {
-      if (!isFsLoaded || !currentRepoAccessObject) return imageSrc;
+      if (!isFsLoaded || !currentRepoAccessObject) {
+        console.log('Cant return blob A');
+        console.log('isFsLoaded', isFsLoaded);
+        console.log('currentRepoAccessObject', currentRepoAccessObject);
+        return imageSrc;
+      }
 
-      if (!imageSrc.startsWith('./')) return imageSrc;
+      if (!imageSrc.startsWith('./')) {
+        console.log('Cant return blob B', imageSrc);
+        return imageSrc;
+      }
 
       const fullPath = `${currentAuPathSel}/${imageSrc.slice(2)}`;
+
+      console.log('fullPath', fullPath);
       const blob = await handleBlobImageFile(
         currentRepoAccessObject,
         fullPath,
@@ -277,6 +287,7 @@ function RC5VisualEditor() {
       if (blob) {
         return URL.createObjectURL(blob);
       }
+      console.log('No blob available');
       return imageSrc;
     },
     [currentRepoAccessObject, currentAuPathSel],

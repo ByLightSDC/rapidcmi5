@@ -111,7 +111,7 @@ export function QuotesContextProvider({
   );
 
   /**
-   * Resolves url
+   * Resolves url => blob when avatar changes
    */
   useEffect(() => {
     console.log('Context updated avatar', avatar);
