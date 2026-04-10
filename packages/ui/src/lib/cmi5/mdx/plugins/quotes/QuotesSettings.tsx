@@ -1,6 +1,6 @@
-import { Box, Paper, Stack, Typography } from '@mui/material';
+import { Box, Paper, Stack, styled, Typography } from '@mui/material';
 import ModalDialog from 'packages/ui/src/lib/modals/ModalDialog';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import Grid from '@mui/material/Grid2';
 import { ButtonModalMainUi } from 'packages/ui/src/lib/inputs/buttons/buttonsmodal';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
@@ -9,6 +9,19 @@ import { useCellValue } from '@mdxeditor/editor';
 import { QUOTE_PRESETS, QuotePreset } from '@rapid-cmi5/ui';
 import { imageUploadHandler$ } from '../image/methods';
 
+// used for uploading files
+const VisuallyHiddenInput = styled('input')({
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  height: 1,
+  overflow: 'hidden',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  whiteSpace: 'nowrap',
+  width: 1,
+});
+
 /**
  * Modal dialog for configuring a quotes block.
  *
@@ -16,18 +29,18 @@ import { imageUploadHandler$ } from '../image/methods';
  * Calls `imageUploadHandler` when a new file is selected, then passes
  * the resolved src and chosen preset back via `handleSubmit`.
  *
- * @param avatar - Current avatar path or URL pre-populated in the dialog.
+ * @param currentAvatar - Current avatar path or URL pre-populated in the dialog.
  * @param currentPreset - The active preset to pre-select in the layout picker.
  * @param handleCancel - Called when the user dismisses the dialog without saving.
  * @param handleSubmit - Called with the chosen preset and image src on confirm.
  */
 export const QuotesSettings = ({
-  avatar,
+  currentAvatar,
   currentPreset,
   handleCancel,
   handleSubmit,
 }: {
-  avatar?: string;
+  currentAvatar?: string;
   currentPreset?: QuotePreset;
   handleCancel: () => void;
   handleSubmit: (preset: QuotePreset, src: string) => void;
@@ -36,10 +49,20 @@ export const QuotesSettings = ({
     currentPreset || QUOTE_PRESETS[0],
   );
 
-  const { handleFileSelected, selectedFiles, src, VisuallyHiddenInput } =
-    useImageDialog({ defaultSrc: avatar });
+  const { handleFileSelected, selectedFiles, src } = useImageDialog({
+    defaultSrc: currentAvatar,
+  });
   const imageUploadHandler = useCellValue(imageUploadHandler$);
 
+  const handleApply = useCallback(() => {
+    if (selectedFiles && selectedFiles.length > 0) {
+      console.log('upload file here-------------', selectedFiles);
+      if (imageUploadHandler) {
+        imageUploadHandler(selectedFiles[0]);
+      }
+    }
+    handleSubmit(selectedPreset, src);
+  }, [selectedPreset, src]);
 
   return (
     <ModalDialog
@@ -53,12 +76,7 @@ export const QuotesSettings = ({
         if (index === 0) {
           handleCancel();
         } else {
-          if (src !== avatar && selectedFiles && selectedFiles.length > 0) {
-            if (imageUploadHandler) {
-              imageUploadHandler(selectedFiles[0]);
-            }
-          }
-          handleSubmit(selectedPreset, src);
+          handleApply();
         }
       }}
     >
@@ -125,7 +143,6 @@ export const QuotesSettings = ({
                   type="file"
                   accept="image/*"
                   onChange={handleFileSelected}
-                  multiple
                 />
               </ButtonModalMainUi>
               <Box
@@ -147,7 +164,7 @@ export const QuotesSettings = ({
                       )}
                     </Box>
                   ) : (
-                    'No image file chosen'
+                    currentAvatar || 'No image file chosen'
                   )}
                 </Typography>
               </Box>

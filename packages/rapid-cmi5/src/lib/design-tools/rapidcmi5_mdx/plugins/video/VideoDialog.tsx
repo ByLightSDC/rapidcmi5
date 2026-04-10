@@ -226,7 +226,6 @@ export const VideoDialog: React.FC = () => {
                       type="file"
                       accept="video/*" // restrict to video files only
                       onChange={handleFileSelected}
-                      multiple
                     />
                   </ButtonModalMainUi>
                   <Box /* vertically center the text */

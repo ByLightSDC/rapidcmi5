@@ -71,6 +71,16 @@ export const QuotesContainerEditor: React.FC<
   const pendingColorRef = useRef(pendingColor);
   const skipNextCloseRebuildRef = useRef(false);
   const [sxProps, setSxProps] = useState<SxProps>({});
+  // Outer box: full-width background color band when backgroundColor is set.
+  const outerSx: SxProps = backgroundColor
+    ? {
+        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+        clipPath: `inset(0 -100vmax 0)`,
+        backgroundColor,
+        paddingTop: blockPadding,
+        paddingBottom: blockPadding,
+      }
+    : {};
   //#endregion
 
   /**
@@ -83,8 +93,8 @@ export const QuotesContainerEditor: React.FC<
       : QUOTE_PRESETS[0];
   }, [mdastNode?.attributes?.preset]);
 
-  const [selectedPreset, setSelectedPreset] =
-    useState<QuotePreset>(currentPreset);
+  // const [selectedPreset, setSelectedPreset] =
+  //   useState<QuotePreset>(currentPreset);
 
   /** Carousel index
    * FUTURE handle multiple quotes in the container
@@ -100,17 +110,14 @@ export const QuotesContainerEditor: React.FC<
       return mdastNode.children[0].attributes.avatar;
     }
     return undefined;
-  }, []);
-  const [selectedAvatar, setSelectedAvatar] = useState<string | undefined>(
-    currentAvatar,
-  );
+  }, [mdastNode.children[0].attributes.avatar]);
+
+
 
   /**
    * Reverts changes and closes modal
    */
   const handleCancel = () => {
-    setSelectedPreset(currentPreset);
-    setSelectedAvatar(currentAvatar);
     setIsConfiguring(false);
   };
 
@@ -121,8 +128,9 @@ export const QuotesContainerEditor: React.FC<
    */
   const handleApply = useCallback(
     async (newPreset: QuotePreset, newAvatar: string) => {
-      setSelectedPreset(newPreset);
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
+      console.log('update parent node with preset:' + newPreset.id, newAvatar);
       setIsConfiguring(false);
       updateMdastNode({
         ...mdastNode,
@@ -132,8 +140,6 @@ export const QuotesContainerEditor: React.FC<
         },
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setSelectedAvatar(newAvatar);
     },
     [mdastNode, updateMdastNode],
   );
@@ -183,16 +189,9 @@ export const QuotesContainerEditor: React.FC<
     setPendingColor(bgColor);
   }, [mdastNode]);
 
-  // Outer box: full-width background color band when backgroundColor is set.
-  const outerSx: SxProps = backgroundColor
-    ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
-    : {};
+  // useEffect(() => {
+  //   console.log('set new avatar');
+  // }, [selectedAvatar]);
 
   return (
     <>
@@ -223,8 +222,8 @@ export const QuotesContainerEditor: React.FC<
         >
           <QuotesContextProvider
             carouselIndex={carouselIndex}
-            preset={selectedPreset.id}
-            avatar={selectedAvatar}
+            preset={currentPreset.id}
+            avatar={currentAvatar}
           >
             <NestedLexicalEditor<ContainerDirective>
               block={true}
@@ -326,7 +325,7 @@ export const QuotesContainerEditor: React.FC<
 
       {isConfiguring && (
         <QuotesSettings
-          avatar={mdastNode?.attributes?.['avatar']}
+          currentAvatar={currentAvatar}
           currentPreset={currentPreset}
           handleCancel={handleCancel}
           handleSubmit={handleApply}

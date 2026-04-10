@@ -47,7 +47,7 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
    * Inserts default Tabs at the current selection
    * If it is NOT empty, nothing is inserted
    */
-  const insertAtSelection = () => {
+  const insertAtSelection = (preset: string, avatar?: string) => {
     if (!editor) return;
 
     editor.update(() => {
@@ -57,33 +57,38 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
       if (selection.isCollapsed()) {
         //continue
       } else {
-        return; //no applying tab to selection
+        console.log('Cannot insert quotes into selection');
+        return; //no applying quote to selection
       }
 
-      // create children tabs content nodes
+      // create child quotes content
       const theChildMDast = convertMarkdownToMdast(
         DEFAULT_QUOTES,
         syntaxExtensions,
       );
+      // set avatar based on current settings
+      let quoteContent = theChildMDast.children[0] as ContainerDirective;
+      if (avatar) {
+        quoteContent = {
+          ...quoteContent,
+          attributes: { ...quoteContent.attributes, avatar: avatar },
+        };
+      }
 
-      // create tabs node with default style
+      // create quotes node
       const mdastQuotes: ContainerDirective = {
         type: 'containerDirective',
         name: 'quotes',
         attributes: {
-          preset: '1',
+          preset: preset,
           style: 'margin: 4px;',
         },
-        children: (theChildMDast?.children as BlockContent[]) || [],
+        children: [quoteContent],
       };
+
 
       const quotesNode = $createDirectiveNode(mdastQuotes) as DirectiveNode;
       selection.insertNodes([quotesNode]);
-
-      //REF don't do this unless you want to get the cursor eaten
-      //see CCUI-2768, 2779, 2769
-      //const insertedKey = tabsNode.getKey();
-      //placeCaretInsideDirective(editor, insertedKey);
     });
   };
 
@@ -94,8 +99,9 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
   /**
    * Saves changes by inserting new node and removing original.
    */
-  const handleSelect = useCallback((selectedPreset: QuotePreset, imageSrc:string) => {
-    insertAtSelection();
+  const handleSelect = useCallback((preset: QuotePreset, avatar: string) => {
+    console.log('handleSelect', avatar);
+    insertAtSelection(preset.id, avatar);
     setIsConfiguring(false);
   }, []);
 

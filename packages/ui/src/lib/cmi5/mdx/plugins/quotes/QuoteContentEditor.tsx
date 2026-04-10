@@ -24,6 +24,7 @@ import { convertMarkdownToMdast } from '../../util/conversion';
 import { toMarkdown } from 'mdast-util-to-markdown';
 import { stripLeadingHashes } from './methods';
 import { imgCache } from '../image/constants';
+import { debugLog } from 'packages/ui/src/lib/utility/logger';
 
 /**
  * Quote Content Editor for the Quotes plugin.
@@ -75,10 +76,6 @@ export const QuoteContentEditor: React.FC<
     (newAvatar?: string) => {
       const theAttributes = { ...mdastNode.attributes };
       theAttributes['avatar'] = newAvatar;
-      // updateMdastNode({
-      //   ...mdastNode,
-      //   attributes: theAttributes,
-      // });
       parentEditor.update(
         () => {
           lexicalNode.setMdastNode({ ...mdastNode, attributes: theAttributes });
@@ -87,7 +84,7 @@ export const QuoteContentEditor: React.FC<
         { discrete: true },
       );
     },
-    [mdastNode, parentEditor],
+    [lexicalNode, mdastNode, parentEditor],
   );
 
   /**
@@ -109,14 +106,14 @@ export const QuoteContentEditor: React.FC<
    * UE updates mdast node when avatar is updated
    */
   useEffect(() => {
+    console.log('UE' + avatar);
+    console.log(carouselIndex, cellIndex);
+
     if (carouselIndex === cellIndex) {
+      console.log('Content update avatar');
       updateAvatar(avatar);
     }
   }, [avatar, carouselIndex, cellIndex]);
-
-  useEffect(() => {
-    //REF
-  }, [imageSource]);
 
   return (
     <Box

@@ -1,7 +1,8 @@
 import { useCellValues } from '@mdxeditor/editor';
 //import { imagePreviewHandler$ } from 'packages/rapid-cmi5/src/lib/design-tools/rapidcmi5_mdx/plugins/image';
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useEffect, useState } from 'react';
 import { imagePreviewHandler$ } from '../image/methods';
+import { debugLog } from 'packages/ui/src/lib/utility/logger';
 
 /**
  * Shape of the quotes context value shared across nested quote components.
@@ -68,41 +69,65 @@ export function QuotesContextProvider({
   const [initialImagePath, setInitialImagePath] = React.useState<
     string | null | undefined
   >(null);
-  const [imageSource, setImageSource] = React.useState<string | undefined>(
-    undefined,
+
+  const [unresolvedSource, setUnresolvedSource] = useState<string | undefined>(
+    avatar,
   );
 
-  useEffect(() => {
-    //REF
-  }, [avatar]);
+  const [imageSource, setImageSource] = useState<string | undefined>(undefined);
+
+  const resolveAvatarPath = useCallback(
+    (avatar: string) => {
+      setUnresolvedSource(avatar);
+      if (imagePreviewHandler) {
+        console.log('found resolution handler');
+        const callPreviewHandler = async () => {
+          if (!initialImagePath) {
+            setInitialImagePath(avatar);
+          }
+          if (avatar) {
+            const updatedSrc = await imagePreviewHandler(avatar);
+            console.log('updatedSrc', updatedSrc);
+            setImageSource(updatedSrc);
+          } else {
+            console.log('undefined updatedSrc');
+            setImageSource(undefined);
+          }
+        };
+        callPreviewHandler().catch((e: unknown) => {
+          console.error(e);
+        });
+      } else {
+         console.log('missing imagePreviewHandler');
+        setImageSource(avatar);
+      }
+    },
+    [
+      setUnresolvedSource,
+      setImageSource,
+      imagePreviewHandler,
+      initialImagePath,
+    ],
+  );
 
   /**
-   * Resolves url 
+   * Resolves url
    */
   useEffect(() => {
-    if (imagePreviewHandler) {
-      const callPreviewHandler = async () => {
-        if (!initialImagePath) {
-          setInitialImagePath(avatar);
-        }
-        if (avatar) {
-          const updatedSrc = await imagePreviewHandler(avatar);
-          setImageSource(updatedSrc);
-        } else {
-          setImageSource(undefined);
-        }
-      };
-      callPreviewHandler().catch((e: unknown) => {
-        console.error(e);
-      });
-    } else {
-      setImageSource(avatar);
+    console.log('Context updated avatar', avatar);
+    if (avatar) {
+      resolveAvatarPath(avatar);
     }
-  }, [avatar, imagePreviewHandler, initialImagePath]);
+  }, [avatar]);
 
   return (
     <QuotesContext.Provider
-      value={{ avatar, carouselIndex, imageSource, preset }}
+      value={{
+        carouselIndex,
+        imageSource,
+        avatar: unresolvedSource,
+        preset,
+      }}
     >
       {children}
     </QuotesContext.Provider>

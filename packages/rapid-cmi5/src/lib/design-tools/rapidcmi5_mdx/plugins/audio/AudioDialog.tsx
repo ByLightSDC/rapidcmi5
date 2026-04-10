@@ -219,7 +219,6 @@ export const AudioDialog: React.FC = () => {
                       type="file"
                       accept="audio/*" // restrict to audio files only
                       onChange={handleFileSelected}
-                      multiple
                     />
                   </ButtonModalMainUi>
                   <Box /* vertically center the text */
