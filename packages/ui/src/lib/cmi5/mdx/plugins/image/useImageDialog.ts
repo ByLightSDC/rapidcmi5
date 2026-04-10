@@ -2,7 +2,11 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { placeholderAvatar } from '../quotes/constants';
 
 const IMAGE_DIR = './Assets/Images/';
-
+/**
+ * Convenience methods for updating images
+ * @param param0 
+ * @returns 
+ */
 export function useImageDialog({
   defaultSrc = placeholderAvatar,
 }: {
@@ -29,9 +33,6 @@ export function useImageDialog({
   // set the initial values based on if the user is inserting a new image or
   // editing an existing image
   useEffect(() => {
-    //console.log('wipe');
-    //setSrc(defaultSrc);
-
     // clear the file regardless of the editing state
     setSelectedFiles(null);
   }, []);
