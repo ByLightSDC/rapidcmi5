@@ -1,6 +1,6 @@
 import { DirectiveDescriptor } from '@mdxeditor/editor';
 import { QuoteCellDirectiveNode } from './types';
-import { QuoteCellEditor } from './QuoteCellEditor';
+import { QuoteContentEditor } from './QuoteContentEditor';
 
 /**
  * Quote Content Directive Descriptor for the Grid Layout plugin.
@@ -15,5 +15,5 @@ export const QuotesCellDirectiveDescriptor: DirectiveDescriptor<QuoteCellDirecti
     },
     attributes: ['size', 'preset', 'author', 'avatar'],
     hasChildren: true,
-    Editor: QuoteCellEditor,
+    Editor: QuoteContentEditor,
   };

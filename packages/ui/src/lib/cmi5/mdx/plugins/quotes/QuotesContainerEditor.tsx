@@ -1,12 +1,9 @@
 import {
   DirectiveEditorProps,
-  insertMarkdown$,
   NestedLexicalEditor,
   useCellValues,
   useMdastNodeUpdater,
-  usePublisher,
 } from '@mdxeditor/editor';
-import * as Mdast from 'mdast';
 
 import { ContainerDirective } from 'mdast-util-directive';
 import {
@@ -17,34 +14,18 @@ import {
   useRef,
   useState,
 } from 'react';
-import { $getRoot, $isElementNode } from 'lexical';
 
-import { convertMdastToMarkdown } from '../../util/conversion';
 import { editorInPlayback$ } from '../../state/vars';
-import ModalDialog from '../../../../modals/ModalDialog';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 
-import {
-  Box,
-  IconButton,
-  Paper,
-  SxProps,
-  Tooltip,
-  Typography,
-  useTheme,
-} from '@mui/material';
-import Grid from '@mui/material/Grid2';
+import { Box, IconButton, SxProps, Tooltip, useTheme } from '@mui/material';
 
 import DeleteIconButton from '../../components/DeleteIconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import PaletteIcon from '@mui/icons-material/Palette';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
-import {
-  QuoteCellDirectiveNode,
-  QuotePreset,
-  QuotesContainerDirectiveNode,
-} from './types';
+import { QuotePreset, QuotesContainerDirectiveNode } from './types';
 import { QUOTE_PRESETS } from './constants';
 
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
@@ -52,11 +33,11 @@ import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
-import { createQuoteCell, findMatchingQuotePreset } from './methods';
-import { create } from 'lodash';
-import QuotesLayoutSettings from './QuotesLayoutSettings';
+import { findMatchingQuotePreset } from './methods';
+
 import { QuotesContextProvider } from './QuotesContext';
 import { useFocusWithin } from '../shared/useFocusWithin';
+import QuotesSettings from './QuotesSettings';
 
 /**
  * Grid Container Editor for grid layout directive.
@@ -66,8 +47,12 @@ import { useFocusWithin } from '../shared/useFocusWithin';
 export const QuotesContainerEditor: React.FC<
   DirectiveEditorProps<QuotesContainerDirectiveNode>
 > = ({ lexicalNode, mdastNode, parentEditor }) => {
-  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
   const { isFocused, ref: contentRef } = useFocusWithin<HTMLDivElement>();
+  const updateMdastNode = useMdastNodeUpdater();
+  const [isConfiguring, setIsConfiguring] = useState(false);
+  const [isPlayback] = useCellValues(editorInPlayback$);
+
+  //#region lesson style
   const muiTheme = useTheme();
   const { lessonTheme } = useContext(LessonThemeContext);
   const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
@@ -75,16 +60,6 @@ export const QuotesContainerEditor: React.FC<
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';
   const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
-
-  const [sxProps, setSxProps] = useState<SxProps>({});
-  const [formData, setFormData] = useState<Array<QuoteCellDirectiveNode>>(
-    structuredClone(mdastNode.children),
-  );
-  const updateMdastNode = useMdastNodeUpdater();
-  const insertMarkdown = usePublisher(insertMarkdown$);
-  const [isConfiguring, setIsConfiguring] = useState(false);
-  const [isPlayback] = useCellValues(editorInPlayback$);
-
   const [backgroundColor, setBackgroundColor] = useState<string>(
     mdastNode?.attributes?.backgroundColor ?? '',
   );
@@ -95,6 +70,8 @@ export const QuotesContainerEditor: React.FC<
   );
   const pendingColorRef = useRef(pendingColor);
   const skipNextCloseRebuildRef = useRef(false);
+  const [sxProps, setSxProps] = useState<SxProps>({});
+  //#endregion
 
   /**
    * Determine the current preset
@@ -109,11 +86,12 @@ export const QuotesContainerEditor: React.FC<
   const [selectedPreset, setSelectedPreset] =
     useState<QuotePreset>(currentPreset);
 
-  /** Quote Carousel index */
+  /** Carousel index
+   * FUTURE handle multiple quotes in the container
+   */
   const [carouselIndex, setCarouselIndex] = useState<number>(0);
 
-  /** Quote Content Avatar */
-
+  /** Avatar */
   const currentAvatar = useMemo(() => {
     if (
       mdastNode.children.length > 0 &&
@@ -137,14 +115,14 @@ export const QuotesContainerEditor: React.FC<
   };
 
   /**
-   * Saves changes by inserting new node and removing original.
+   * Saves preset to this container node
+   * Sets avatar in the quotes context so the child content can update itself
+   * this is a work around for how nested lexical editors batch & resolves changes
    */
   const handleApply = useCallback(
-    async (newPreset: QuotePreset, imageSrc: string) => {
-
-      console.log('handleApply', imageSrc);
+    async (newPreset: QuotePreset, newAvatar: string) => {
       setSelectedPreset(newPreset);
-      setSelectedAvatar(imageSrc);
+
       setIsConfiguring(false);
       updateMdastNode({
         ...mdastNode,
@@ -153,6 +131,9 @@ export const QuotesContainerEditor: React.FC<
           preset: newPreset.id,
         },
       });
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setSelectedAvatar(newAvatar);
     },
     [mdastNode, updateMdastNode],
   );
@@ -180,18 +161,16 @@ export const QuotesContainerEditor: React.FC<
    * Opens the settings modal
    */
   const handleConfigure = useCallback(() => {
-    setIsConfiguring(!isConfiguring);
+    setIsConfiguring(true);
   }, [isConfiguring]);
 
   /**
-   * Sync form data, styles, and backgroundColor when mdastNode changes
+   * Sync styles and backgroundColor when mdastNode changes
    */
   useEffect(() => {
-    // setFormData(mdastNode.children);
-
-    if (mdastNode.attributes?.style) {
+    if (mdastNode.attributes?.['style']) {
       try {
-        const theSx = parseStyleString(mdastNode.attributes.style);
+        const theSx = parseStyleString(mdastNode.attributes['style']);
         setSxProps(theSx);
       } catch (e) {
         // no styles applied
@@ -203,7 +182,6 @@ export const QuotesContainerEditor: React.FC<
     pendingColorRef.current = bgColor;
     setPendingColor(bgColor);
   }, [mdastNode]);
-
 
   // Outer box: full-width background color band when backgroundColor is set.
   const outerSx: SxProps = backgroundColor
@@ -347,7 +325,7 @@ export const QuotesContainerEditor: React.FC<
       />
 
       {isConfiguring && (
-        <QuotesLayoutSettings
+        <QuotesSettings
           avatar={mdastNode?.attributes?.['avatar']}
           currentPreset={currentPreset}
           handleCancel={handleCancel}

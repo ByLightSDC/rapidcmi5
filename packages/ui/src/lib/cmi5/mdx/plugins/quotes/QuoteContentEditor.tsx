@@ -16,37 +16,26 @@ import {
 } from 'react';
 import { ContainerDirective } from 'mdast-util-directive';
 import { QuoteCellDirectiveNode } from './types';
-import { Box, Stack, Typography, useTheme } from '@mui/material';
-import { editorInPlayback$ } from '../../state/vars';
-import { AlignmentToolbarControls } from '../../components/AlignmentToolbarControls';
+import { Box, Stack } from '@mui/material';
 import type { Paragraph } from 'mdast';
-import {
-  TextAlign,
-  useScopedAlignmentStyles,
-} from '../shared/useScopedAlignmentStyles';
-import { useFocusWithin } from '../shared/useFocusWithin';
 import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 import { QuotesContext } from './QuotesContext';
 import { convertMarkdownToMdast } from '../../util/conversion';
 import { toMarkdown } from 'mdast-util-to-markdown';
 import { stripLeadingHashes } from './methods';
+import { imgCache } from '../image/constants';
 
 /**
- * Quote Cell Editor for the Quotes plugin.
+ * Quote Content Editor for the Quotes plugin.
  * Renders a single quote within a quotes container with a nested editor.
  */
-export const QuoteCellEditor: React.FC<
+export const QuoteContentEditor: React.FC<
   DirectiveEditorProps<QuoteCellDirectiveNode>
 > = ({ lexicalNode, mdastNode, parentEditor }) => {
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const [cellIndex, setCellIndex] = useState(-1);
-  const { isFocused, ref: contentRef } = useFocusWithin<HTMLDivElement>();
-  const muiTheme = useTheme();
-  const updateMdastNode = useMdastNodeUpdater();
-  const [isPlayback, readOnly] = useCellValues(editorInPlayback$, readOnly$);
-  const [author, setAuthor] = useState('');
-
-  const { avatar, carouselIndex, preset } = useContext(QuotesContext);
+  const { avatar, carouselIndex, imageSource, preset } =
+    useContext(QuotesContext);
 
   const scopedClass = useRef(
     `quote-cell-${Math.random().toString(36).slice(2, 9)}`,
@@ -86,17 +75,23 @@ export const QuoteCellEditor: React.FC<
     (newAvatar?: string) => {
       const theAttributes = { ...mdastNode.attributes };
       theAttributes['avatar'] = newAvatar;
-      updateMdastNode({
-        ...mdastNode,
-        attributes: theAttributes,
-      });
-      lexicalNode.markDirty();
+      // updateMdastNode({
+      //   ...mdastNode,
+      //   attributes: theAttributes,
+      // });
+      parentEditor.update(
+        () => {
+          lexicalNode.setMdastNode({ ...mdastNode, attributes: theAttributes });
+          lexicalNode.markDirty();
+        },
+        { discrete: true },
+      );
     },
-    [mdastNode, updateMdastNode],
+    [mdastNode, parentEditor],
   );
 
   /**
-   * Determine cell index for accessibility labels
+   * Determine content index for accessibility labels
    */
   useMemo(() => {
     parentEditor.update(() => {
@@ -110,16 +105,21 @@ export const QuoteCellEditor: React.FC<
     });
   }, [lexicalNode, parentEditor]);
 
+  /**
+   * UE updates mdast node when avatar is updated
+   */
   useEffect(() => {
     if (carouselIndex === cellIndex) {
-      console.log('update the fucking avatar', avatar);
       updateAvatar(avatar);
     }
   }, [avatar, carouselIndex, cellIndex]);
 
+  useEffect(() => {
+    //REF
+  }, [imageSource]);
+
   return (
     <Box
-      ref={contentRef}
       sx={{
         position: 'relative',
         minHeight: '60px',
@@ -138,10 +138,10 @@ export const QuoteCellEditor: React.FC<
             alignItems: 'center',
             padding: 2,
             paddingBottom: 0, //controlled by parent, lesson setting
-            paddingTop: 0,
+            //REF paddingTop: 0, NestedLexicalEditor has overly fat padding, trying to balance top padding against it
           }}
         >
-          {mdastNode.attributes.avatar && (
+          {imageSource && (
             <img
               style={{
                 width: '72px',
@@ -149,8 +149,8 @@ export const QuoteCellEditor: React.FC<
                 borderRadius: '50%',
                 objectFit: 'cover',
               }}
-              src={mdastNode.attributes.avatar}
-              alt="Author Headshot"
+              src={imgCache.read(imageSource)}
+              alt="Author"
             />
           )}
           <RC5NestedLexicalEditor<ContainerDirective>
@@ -166,7 +166,7 @@ export const QuoteCellEditor: React.FC<
             }}
           />
 
-          <NestedLexicalEditor<Paragraph>
+          <RC5NestedLexicalEditor<Paragraph>
             getContent={(node) => {
               const theNode = convertMarkdownToMdast(
                 mdastNode.attributes.author || '',
@@ -184,13 +184,12 @@ export const QuoteCellEditor: React.FC<
                   return mdastParagraphNode;
                 }
 
-                setAuthor(titleStr);
-
                 return {
                   ...mdastParagraphNode,
                   attributes: {
                     ...mdastNode.attributes,
                     author: titleStr,
+                    avatar: avatar,
                   },
                 };
               }
@@ -256,8 +255,6 @@ export const QuoteCellEditor: React.FC<
                 if (titleStr === mdastNode.attributes.author) {
                   return mdastParagraphNode;
                 }
-
-                setAuthor(titleStr);
 
                 return {
                   ...mdastParagraphNode,

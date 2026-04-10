@@ -13,14 +13,8 @@ import {
   MdastImageVisitor,
   MdastJsxImageVisitor,
 } from './MdastImageVisitor';
+import { imagePreviewHandler$ } from 'packages/ui/src/lib/cmi5/mdx/plugins/image/methods';
 
-/**
- * Holds the image preview handler callback.
- * @group ImagePlayer
- */
-export const imagePreviewHandler$ = Cell<
-  ((imageSource: string) => Promise<string>) | null
->(null);
 
 /**
  * Holds the image placeholder.

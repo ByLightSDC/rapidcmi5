@@ -25,8 +25,7 @@ import { useTheme } from '@emotion/react';
 import {
   convertMarkdownToMdast,
   ButtonMinorUi,
-  DEFAULT_TABS,
-  QuotesLayoutSettings,
+  QuotesSettings,
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 import { useCallback, useState } from 'react';
@@ -164,7 +163,7 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
         </MUIButtonWithTooltip>
       )}
       {isConfiguring && (
-        <QuotesLayoutSettings
+        <QuotesSettings
           handleCancel={handleCancel}
           handleSubmit={handleSelect}
         />

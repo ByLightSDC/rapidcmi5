@@ -1,14 +1,27 @@
-import { Box, Paper, Stack, styled, Typography } from '@mui/material';
+import { Box, Paper, Stack, Typography } from '@mui/material';
 import ModalDialog from 'packages/ui/src/lib/modals/ModalDialog';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import Grid from '@mui/material/Grid2';
-import { QUOTE_PRESETS } from './constants';
-import { QuotePreset } from './types';
 import { ButtonModalMainUi } from 'packages/ui/src/lib/inputs/buttons/buttonsmodal';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useImageDialog } from '../image/useImageDialog';
+import { useCellValue } from '@mdxeditor/editor';
+import { QUOTE_PRESETS, QuotePreset } from '@rapid-cmi5/ui';
+import { imageUploadHandler$ } from '../image/methods';
 
-export const QuotesLayoutSettings = ({
+/**
+ * Modal dialog for configuring a quotes block.
+ *
+ * Allows the user to select a layout preset and upload an avatar image.
+ * Calls `imageUploadHandler` when a new file is selected, then passes
+ * the resolved src and chosen preset back via `handleSubmit`.
+ *
+ * @param avatar - Current avatar path or URL pre-populated in the dialog.
+ * @param currentPreset - The active preset to pre-select in the layout picker.
+ * @param handleCancel - Called when the user dismisses the dialog without saving.
+ * @param handleSubmit - Called with the chosen preset and image src on confirm.
+ */
+export const QuotesSettings = ({
   avatar,
   currentPreset,
   handleCancel,
@@ -23,13 +36,10 @@ export const QuotesLayoutSettings = ({
     currentPreset || QUOTE_PRESETS[0],
   );
 
-  const {
-    handleFileSelected,
-    handleSaveImage,
-    selectedFiles,
-    src,
-    VisuallyHiddenInput,
-  } = useImageDialog({ defaultSrc: avatar });
+  const { handleFileSelected, selectedFiles, src, VisuallyHiddenInput } =
+    useImageDialog({ defaultSrc: avatar });
+  const imageUploadHandler = useCellValue(imageUploadHandler$);
+
 
   return (
     <ModalDialog
@@ -44,8 +54,9 @@ export const QuotesLayoutSettings = ({
           handleCancel();
         } else {
           if (src !== avatar && selectedFiles && selectedFiles.length > 0) {
-            console.log('save image', src);
-            handleSaveImage();
+            if (imageUploadHandler) {
+              imageUploadHandler(selectedFiles[0]);
+            }
           }
           handleSubmit(selectedPreset, src);
         }
@@ -112,12 +123,12 @@ export const QuotesLayoutSettings = ({
                 Upload File
                 <VisuallyHiddenInput
                   type="file"
-                  accept="image/*" // restrict to image files only
+                  accept="image/*"
                   onChange={handleFileSelected}
                   multiple
                 />
               </ButtonModalMainUi>
-              <Box /* vertically center the text */
+              <Box
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
@@ -148,4 +159,4 @@ export const QuotesLayoutSettings = ({
   );
 };
 
-export default QuotesLayoutSettings;
+export default QuotesSettings;

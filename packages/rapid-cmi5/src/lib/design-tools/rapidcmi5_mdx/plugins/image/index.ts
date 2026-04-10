@@ -57,6 +57,7 @@ import {
   MdastJsxImageVisitor,
 } from './MdastImageVisitor';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
+import { imagePreviewHandler$, imageUploadHandler$ } from 'packages/ui/src/lib/cmi5/mdx/plugins/image/methods';
 
 
 export const CAN_USE_DOM: boolean =
@@ -207,18 +208,6 @@ export const imageAutocompleteSuggestions$ = Cell<string[]>([]);
  * @group Image
  */
 export const disableImageResize$ = Cell<boolean>(false);
-
-/**
- * Holds the image upload handler callback.
- * @group Image
- */
-export const imageUploadHandler$ = Cell<ImageUploadHandler>(null);
-
-/**
- * Holds the image preview handler callback.
- * @group Image
- */
-export const imagePreviewHandler$ = Cell<ImagePreviewHandler>(null);
 
 /**
  * Holds the image placeholder.
