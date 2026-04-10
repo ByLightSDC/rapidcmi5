@@ -34,12 +34,10 @@ export * from './lib/types/teamConsoles';
 export * from './lib/types/projects';
 export * from './lib/types/user';
 export * from './lib/apis/codeRunnerContract';
-export * from './lib/apis/useCodeRunnerApi';
-export * from './lib/apis/useQuizBankApi';
-
-
+export * from './lib/apis/hooks/useCodeRunnerApi';
+export * from './lib/apis/hooks/useQuizBankApi';
+export * from './lib/apis/hooks/useScenarioApi';
 
 export * from './lib/utils/dateAndTime';
 export * from './lib/apis/quizBankContract';
-
-
+export * from './lib/apis/scenarioContract';

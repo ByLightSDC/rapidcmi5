@@ -1,22 +1,17 @@
-import { overrideDevOpsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
-import {
-  CourseAU,
-  Credentials,
-  GitUserConfig,
-} from '@rapid-cmi5/cmi5-build-common';
+import { Credentials, GitUserConfig } from '@rapid-cmi5/cmi5-build-common';
 import {
   RapidCmi5,
   GetScenarioFormProps,
   GetQuizBankAddModalProps,
   GetQuizBankSearchModalProps,
 } from '@rapid-cmi5/react-editor';
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { ScenarioSelectionForm } from './shared/modals/ScenarioSelectionModal';
 import { UserConfigContext } from './contexts/UserConfigContext';
 import { AuthContext } from './contexts/AuthContext';
 import AddToQuizBankForm from './shared/modals/quizBank/AddToQuizBankForm';
 import QuizBankSearchForm from './shared/modals/quizBank/SearchQuizBankForm';
-import { fetchScenario, processAu } from './utils/scenarioHelpers';
+import { useScenarioApi } from '@rapid-cmi5/cmi5-build-common';
 
 export function RapidCmi5Wrapper() {
   const { token, parsedUserToken } = useContext(AuthContext);
@@ -25,6 +20,8 @@ export function RapidCmi5Wrapper() {
 
   const quizBankURL = ssoConfig?.quizBankApiUrl;
   const rangeURL = ssoConfig?.rangeRestApiUrl;
+
+  const { fetchScenario, processAu } = useScenarioApi(rangeURL, token);
 
   const handleOverrideGlobalGitConfig = (
     config?: GitUserConfig,
@@ -37,10 +34,6 @@ export function RapidCmi5Wrapper() {
       setGitCredentials(creds);
     }
   };
-
-  useEffect(() => {
-    overrideDevOpsApiClient(rangeURL);
-  }, [rangeURL]);
 
   // Git global config overrides the keycloak name and email
   const userFullName =
@@ -63,18 +56,8 @@ export function RapidCmi5Wrapper() {
         const response = await fetch('/assets/cc-cmi5-player.zip');
         return response;
       }}
-      processAu={
-        token && rangeURL
-          ? async (au: CourseAU, blockId: string) => {
-              await processAu(au, blockId, token);
-            }
-          : undefined
-      }
-      fetchScenario={
-        token
-          ? async (uuid: string) => await fetchScenario(uuid, token)
-          : undefined
-      }
+      processAu={processAu}
+      // fetchScenario={fetchScenario}
       GetScenariosForm={
         token && rangeURL
           ? (props: GetScenarioFormProps) => (
