@@ -6,11 +6,11 @@ import { QuotePreset } from './types';
 export const QUOTE_PRESETS: QuotePreset[] = [
   {
     id: '1',
-    name: 'Compact Vertical',
+    name: 'Vertical',
   },
   {
     id: '2',
-    name: 'Vertical',
+    name: 'Compact Vertical',
   },
   {
     id: '3',
@@ -39,19 +39,19 @@ export const DEFAULT_QUOTES = `
  */
 export const fontPresets = {
   '1': {
-    fontSize: '14px',
-    fontWeight: 400,
-    authorFontSize: '14px',
-    authorFontWeight: 400,
-    fontLineHeight: undefined,
-    textAlign: 'center',
-  },
-  '2': {
     fontSize: '32px',
     fontWeight: 200,
     authorFontSize: '16px',
     authorFontWeight: 250,
     fontLineHeight: 1.3,
+    textAlign: 'center',
+  },
+  '2': {
+    fontSize: '14px',
+    fontWeight: 400,
+    authorFontSize: '14px',
+    authorFontWeight: 400,
+    fontLineHeight: undefined,
     textAlign: 'center',
   },
   '3': {

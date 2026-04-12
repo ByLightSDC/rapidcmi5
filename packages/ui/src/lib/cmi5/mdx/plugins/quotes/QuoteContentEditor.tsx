@@ -3,15 +3,10 @@ import {
   syntaxExtensions$,
   useCellValues,
 } from '@mdxeditor/editor';
-import {
-  useContext,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useContext, useMemo, useRef, useState } from 'react';
 import { ContainerDirective } from 'mdast-util-directive';
 import { QuoteContentDirectiveNode } from './types';
-import { Box, Stack } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import type { Paragraph } from 'mdast';
 import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 import { QuotesContext } from './QuotesContext';
@@ -51,6 +46,7 @@ export const QuoteContentEditor: React.FC<
     return (
       <style>{`
             .${scopedClass} {
+               background-color: transparent;
                font-size: ${config.fontSize};
                font-weight: ${config.fontWeight};
                line-height:${config.fontLineHeight};
@@ -60,6 +56,7 @@ export const QuoteContentEditor: React.FC<
                text-align: ${config.textAlign};
             }
             .${scopedAuthorClass} {
+               background-color: transparent;
                font-size: ${config.authorFontSize};
                font-weight: ${config.authorFontWeight};
             }
@@ -68,7 +65,6 @@ export const QuoteContentEditor: React.FC<
   }, [preset]);
 
   //#endregion
-
 
   const avatarImage = useMemo(() => {
     let imageDim = '72px';
@@ -105,7 +101,7 @@ export const QuoteContentEditor: React.FC<
       })}
       contentEditableProps={{
         className: scopedClass,
-        'aria-label': `Quote ${cellIndex + 1} content`,
+        'aria-label': `Quote ${cellIndex + 1}, content`,
       }}
     />
   );
@@ -172,6 +168,7 @@ export const QuoteContentEditor: React.FC<
       aria-label={`Quote ${cellIndex + 1}`}
     >
       {fontStyles}
+
       {preset === '1' && (
         <Stack
           direction="column"
@@ -182,7 +179,7 @@ export const QuoteContentEditor: React.FC<
             alignItems: 'center',
             padding: 2,
             paddingBottom: 0, //controlled by parent, lesson setting
-            //REF paddingTop: 0, NestedLexicalEditor has overly fat padding, trying to balance top padding against it
+            paddingTop: 0,
           }}
         >
           {avatarImage}
@@ -200,7 +197,7 @@ export const QuoteContentEditor: React.FC<
             alignItems: 'center',
             padding: 2,
             paddingBottom: 0, //controlled by parent, lesson setting
-            paddingTop: 0,
+            //REF paddingTop: 0, NestedLexicalEditor has overly fat padding, trying to balance top padding against it
           }}
         >
           {avatarImage}

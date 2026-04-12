@@ -18,7 +18,7 @@ import {
 import { editorInPlayback$ } from '../../state/vars';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 
-import { Box, IconButton, SxProps, Tooltip, useTheme } from '@mui/material';
+import { alpha, Box, IconButton, SxProps, Tooltip, useTheme } from '@mui/material';
 
 import DeleteIconButton from '../../components/DeleteIconButton';
 import EditIcon from '@mui/icons-material/Edit';
@@ -127,7 +127,6 @@ export const QuotesContainerEditor: React.FC<
       await new Promise((resolve) => setTimeout(resolve, 500));
       setIsConfiguring(false);
 
-
       // Update preset AND write avatar into child node atomically
       // Problems arise when you attempt to edit parent and then sequentially update child
       // Particularly when using nested lexical editors
@@ -215,10 +214,11 @@ export const QuotesContainerEditor: React.FC<
           sx={{
             width: '100%',
             border: isFocused ? '1px dashed' : '1px',
-            borderColor: 'divider',
+            borderColor: (theme) => theme.palette.background.paper,
+            borderStyle: 'solid',
             borderRadius: 1,
             boxShadow: 2,
-            backgroundColor: (theme) => theme.palette.background.paper,
+            backgroundColor: (theme) => `${alpha(theme.palette.background.default, muiTheme.palette.mode === 'light' ? 0:0.50)}`,
             paddingTop: blockPadding,
             paddingBottom: blockPadding,
           }}
