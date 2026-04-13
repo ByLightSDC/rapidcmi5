@@ -8,19 +8,8 @@ import {
 import { Cell } from '@mdxeditor/gurx';
 import { ImageNode } from './ImageNode';
 import { LexicalImageVisitor } from './LexicalImageVisitor';
-import {
-  MdastHtmlImageVisitor,
-  MdastImageVisitor,
-  MdastJsxImageVisitor,
-} from './MdastImageVisitor';
-
-/**
- * Holds the image preview handler callback.
- * @group ImagePlayer
- */
-export const imagePreviewHandler$ = Cell<
-  ((imageSource: string) => Promise<string>) | null
->(null);
+import { MdastImageVisitor, MdastJsxImageVisitor } from './MdastImageVisitor';
+import { imagePreviewHandler$ } from '@rapid-cmi5/ui';
 
 /**
  * Holds the image placeholder.
@@ -40,7 +29,7 @@ export const imagePlayerPlugin = realmPlugin<{
     realm.pubIn({
       [addImportVisitor$]: [
         MdastImageVisitor,
-        // MdastHtmlImageVisitor,
+        //REF MdastHtmlImageVisitor,
         MdastJsxImageVisitor,
       ],
       [addLexicalNode$]: ImageNode,

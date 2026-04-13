@@ -71,6 +71,7 @@ import { MUIButtonWithTooltip } from './components/MUIButtonWithTooltip';
 import { BoldItalicUnderlineToggles } from './components/BoldItalicUnderlineToggles';
 import { ListsToggle } from './components/ListsToggle';
 import { UndoRedo } from './components/UndoRedo';
+import { InsertQuotes } from './components/InsertQuotes';
 
 /**
  * Layout Constants
@@ -293,6 +294,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                       <InsertGrid />
                       <InsertLayoutBox />
                       <InsertAccordion />
+                      <InsertQuotes />
                       <InsertSteps />
                       <InsertTable />
                       <InsertTabs />
