@@ -18,3 +18,6 @@ export const insertNoSelectionMessage = `Block elements can't be inserted into s
 
 export const insertNoCursorMessage =
   'Click in the content area to insert a cursor. Then click an item below to add it to the slide';
+
+export const selectionRangeError =
+  'Selection is invalid. Please make sure your cursor is in the content area and try again.';
