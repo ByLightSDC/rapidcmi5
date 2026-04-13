@@ -16,7 +16,7 @@ import { AuContextProps } from '@rapid-cmi5/cmi5-build-common';
  * AU State & Methods
  * @returns AuContextProps
  */
-export const useAuContext = () => {
+export const useAuContext = (): AuContextProps => {
   const currentSlideIndex = useSelector(currentSlideNum);
   const courseData = useSelector(courseDataCache);
   const currentBlockIndex = useSelector(currentBlock);
@@ -54,5 +54,5 @@ export const useAuContext = () => {
     submitScore: null,
     setActivityCache: null,
     getActivityCache: null,
-  } as AuContextProps;
+  };
 };

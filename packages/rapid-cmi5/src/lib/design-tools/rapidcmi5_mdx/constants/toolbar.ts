@@ -61,7 +61,7 @@ export const activitiesTable = `<table style="border-collapse: separate; ">
       <td style="${paddingStyle}${borderStyle}">Participants solve independent challenges across several categories to “capture flags.”</td>
     </tr>
     <tr>
-      <td style="${borderStyle}${borderRightStyle}">${codeSvg}Jobe In The Box</td>
+      <td style="${borderStyle}${borderRightStyle}">${codeSvg}CodeRunner</td>
       <td style="${paddingStyle}${borderStyle}">Hands-on coding and execution environment that allows participants to write and run code inside an isolated sandbox without requiring local setup.</td>
     </tr>
     <tr >

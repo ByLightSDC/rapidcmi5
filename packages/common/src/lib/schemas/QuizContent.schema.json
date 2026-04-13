@@ -25,6 +25,9 @@
             "$ref": "#/definitions/QuizOption"
           },
           "type": "array"
+        },
+        "shuffleAnswers": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -57,13 +60,6 @@
           "type": "string"
         }
       },
-      "required": [
-        "element_identifier",
-        "element_type",
-        "title",
-        "text",
-        "doc_identifier"
-      ],
       "type": "object"
     },
     "MatchingOption": {

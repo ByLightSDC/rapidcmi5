@@ -14,7 +14,6 @@ import { ButtonModalCancelUi } from '@rapid-cmi5/ui';
 /* Icons */
 import { Stack, useTheme } from '@mui/system';
 import path from 'path-browserify';
-import { getMonacoTheme } from '../../utils/monacoEditor';
 import { validateMarkdownDirectives } from '@rapid-cmi5/cmi5-build-common';
 import {
   ConflictBlock,
@@ -33,9 +32,8 @@ export default function ViewFile() {
 
   const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme();
-// const isDark = theme.palette.mode === 'dark';
   const [monacoEditorTheme, setMonacoEditorTheme] = useState(
-    getMonacoTheme(theme.palette.mode),
+    theme.palette.mode === 'light' ? 'light' : 'vs-dark',
   );
 
   const [editorContent, setEditorContent] = useState<string>('');
@@ -59,7 +57,7 @@ export default function ViewFile() {
    * UE sets mdx theme when MUI theme changes
    */
   useEffect(() => {
-    setMonacoEditorTheme(getMonacoTheme(theme.palette.mode));
+    setMonacoEditorTheme(theme.palette.mode === 'light' ? 'light' : 'vs-dark');
   }, [theme]);
 
   useEffect(() => {

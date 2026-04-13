@@ -1,23 +1,10 @@
 import { GitFS } from './fileSystem';
 
 import { MAX_FS_SLUG_LENGTH } from './fileSystem';
-import {
-  CourseAU,
-  CourseData,
-  SlideTypeEnum,
-} from '@rapid-cmi5/cmi5-build-common';
-import {
-  fsType,
-  RepoAccessObject,
-} from '../../../../redux/repoManagerReducer';
+
+import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { createNewFsInstance } from './gitFsInstance';
-import {
-  createUniquePath,
-  slugifyPath,
-  updateAUPath,
-  updatePaths,
-  updateSlidePaths,
-} from './useCourseOperationsUtils';
+import { createUniquePath, slugifyPath } from './useCourseOperationsUtils';
 
 import { vol } from 'memfs';
 import { createFsFromVolume } from 'memfs';
@@ -395,4 +382,3 @@ describe('useCourseLoader utility functions', () => {
   //   });
   // });
 });
-

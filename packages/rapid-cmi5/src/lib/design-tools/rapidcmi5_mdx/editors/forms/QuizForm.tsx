@@ -47,7 +47,7 @@ import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 
 import { useContext, useState } from 'react';
 
-import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
+import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 
 export function requireField<T>(value: T | undefined | null, field: string): T {
   if (value === undefined || value === null) {
@@ -70,8 +70,8 @@ export const QuizForm = ({
   handleCloseModal?: () => void;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const { QuizBankAddModal, QuizBankSearchModal } = useContext(GitContext);
-
+  const { QuizBankSearchModal, QuizBankAddModal, userAuth } =
+    useRapidCmi5Opts();
   const slideType =
     activityKind === RC5ActivityTypeEnum.quiz
       ? SlideTypeEnum.Quiz
@@ -257,9 +257,6 @@ export const QuizForm = ({
 
         {bankQuestion && QuizBankAddModal && (
           <QuizBankAddModal
-            formType={crudType}
-            errors={errors}
-            formMethods={formMethods}
             closeModal={() => setBankQuestion(null)}
             question={bankQuestion}
           />
@@ -267,9 +264,6 @@ export const QuizForm = ({
         {isSearchBankOpen && QuizBankSearchModal && (
           <QuizBankSearchModal
             submitForm={handleModalResponse}
-            formType={crudType}
-            errors={errors}
-            formMethods={formMethods}
             closeModal={() => setIsSearchBankOpen(false)}
             activityType={activityKind}
           />

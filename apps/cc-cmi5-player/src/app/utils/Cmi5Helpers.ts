@@ -91,11 +91,11 @@ export async function submitCmi5ScoreLegacy(data: ActivityScore) {
         data.scoreData as QuizScore,
       );
       break;
-    case RC5ActivityTypeEnum.jobe:
-      // Jobe activities are handled by LmsStatementManager.handleActivityScoring
+    case RC5ActivityTypeEnum.codeRunner:
+      // Code Runner activities are handled by LmsStatementManager.handleActivityScoring
       // No additional LRS submission needed here
       logger.debug(
-        'Jobe activity LRS handling delegated to LmsStatementManager',
+        'Code Runner activity LRS handling delegated to LmsStatementManager',
         { content: data.activityContent, response: data.scoreData },
         'auManager',
       );

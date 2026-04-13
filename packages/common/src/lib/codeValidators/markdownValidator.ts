@@ -9,7 +9,7 @@ import { visit } from 'unist-util-visit';
 import {
   validateCTFContent,
   validateDownloadFilesContent,
-  validateJobeContent,
+  validateCodeRunnerContent,
   validateQuizContent,
   validateScenarioContent,
   validateTeamConsolesContent,
@@ -54,7 +54,7 @@ const directiveValidators: Record<string, ValidatorFn> = {
   scenario: validateScenarioContent,
   ctf: validateCTFContent,
   download: validateDownloadFilesContent,
-  jobe: validateJobeContent,
+  codeRunner: validateCodeRunnerContent,
 };
 
 const directiveKeys = Object.keys(directiveValidators);
