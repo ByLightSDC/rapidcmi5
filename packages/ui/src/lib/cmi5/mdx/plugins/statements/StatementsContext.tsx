@@ -1,7 +1,5 @@
-import { useCellValues } from '@mdxeditor/editor';
-import React, { createContext, useCallback, useEffect, useState } from 'react';
-import { imagePreviewHandler$ } from '../image/methods';
-import { debugLog } from 'packages/ui/src/lib/utility/logger';
+
+import React, { createContext } from 'react';
 
 /**
  * Shape of the statements context value shared across nested statement components.

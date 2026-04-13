@@ -25,11 +25,11 @@ export interface StatementsContainerDirectiveNode extends ContainerDirective {
     [key: string]: string | undefined;
   };
 
-  children: StatementContentDirectiveNode[];
+  children: StatementDirectiveNode[];
 }
 
-export interface StatementContentDirectiveNode extends ContainerDirective {
-  name: 'statementContent';
+export interface StatementDirectiveNode extends ContainerDirective {
+  name: 'statement';
 
   attributes: {
     author?: string;

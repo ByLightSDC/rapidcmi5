@@ -71,7 +71,7 @@ import {
   QuotesContainerDirectiveDescriptor,
   QuotesContentDirectiveDescriptor,
   StatementsContainerDirectiveDescriptor,
-  StatementsContentDirectiveDescriptor,
+  StatementDirectiveDescriptor,
 } from '@rapid-cmi5/ui';
 
 import {
@@ -377,7 +377,7 @@ function RC5VisualEditor() {
           QuotesContainerDirectiveDescriptor,
           QuotesContentDirectiveDescriptor,
           StatementsContainerDirectiveDescriptor,
-          StatementsContentDirectiveDescriptor,
+          StatementDirectiveDescriptor,
         ],
         escapeUnknownTextDirectives: true,
       }),

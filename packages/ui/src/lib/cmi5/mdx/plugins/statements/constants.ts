@@ -24,7 +24,7 @@ export const STATEMENT_PRESETS: StatementPreset[] = [
 
 /** The first line return is REQUIRED!!!! */
 export const DEFAULT_STATEMENTS = `
-:::statementContent
+:::statement
 "Stop chasing every alert in the queue. Step back, breathe, and look at the full picture. The signal is there. The pattern is clear. There's a threat to neutralize."
 :::
 `;

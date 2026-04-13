@@ -6,8 +6,8 @@ import {
 } from '@mdxeditor/editor';
 import { useContext, useMemo, useRef, useState } from 'react';
 import { ContainerDirective } from 'mdast-util-directive';
-import { StatementContentDirectiveNode } from './types';
-import { Box, Divider, Stack } from '@mui/material';
+import { StatementDirectiveNode } from './types';
+import { Box, Stack } from '@mui/material';
 import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 import { StatementsContext } from './StatementsContext';
 
@@ -19,13 +19,10 @@ import { statementFontPresets } from './constants';
  * Statement Content Editor for the Statements plugin.
  * Renders a single statement within a statements container with a nested editor.
  */
-export const StatementContentEditor: React.FC<
-  DirectiveEditorProps<StatementContentDirectiveNode>
-> = ({ lexicalNode, mdastNode, parentEditor }) => {
-  const [readOnly, syntaxExtensions] = useCellValues(
-    readOnly$,
-    syntaxExtensions$,
-  );
+export const StatementEditor: React.FC<
+  DirectiveEditorProps<StatementDirectiveNode>
+> = ({ lexicalNode, parentEditor }) => {
+
   const [cellIndex, setCellIndex] = useState(-1);
   const { preset } = useContext(StatementsContext);
 

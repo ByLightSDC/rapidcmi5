@@ -36,7 +36,6 @@ import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { findMatchingStatementPreset } from './methods';
 
 import { StatementsContextProvider } from './StatementsContext';
-import { useFocusWithin } from '../shared/useFocusWithin';
 import StatementsSettings from './StatementsSettings';
 
 /**
@@ -47,7 +46,6 @@ import StatementsSettings from './StatementsSettings';
 export const StatementsContainerEditor: React.FC<
   DirectiveEditorProps<StatementsContainerDirectiveNode>
 > = ({ lexicalNode, mdastNode, parentEditor }) => {
-  const { isFocused, ref: contentRef } = useFocusWithin<HTMLDivElement>();
   const updateMdastNode = useMdastNodeUpdater();
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [isPlayback] = useCellValues(editorInPlayback$);
@@ -93,14 +91,13 @@ export const StatementsContainerEditor: React.FC<
   const currentAvatar = useMemo(() => {
     if (
       mdastNode.children.length > 0 &&
-      mdastNode.children[0].name === 'statementContent'
+      mdastNode.children[0].name === 'statement'
     ) {
       return mdastNode.children[0].attributes.avatar;
     }
     return undefined;
   }, [mdastNode.children[0].attributes.avatar]);
 
-  const [selectedAvatar, setSelectedAvatar] = useState(currentAvatar);
 
   /**
    * Reverts changes and closes modal
