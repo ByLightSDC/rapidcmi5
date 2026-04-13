@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   alpha,
@@ -22,7 +22,13 @@ import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { useCellValue, usePublisher } from '@mdxeditor/gurx';
+import {
+  SELECTION_CHANGE_COMMAND,
+  COMMAND_PRIORITY_LOW,
+  $getSelection,
+  $isRangeSelection,
+} from 'lexical';
+import { useCellValue, useCellValues, usePublisher } from '@mdxeditor/gurx';
 
 import { drawerMode$, DRAWER_TYPE, blockShowSeq$ } from './drawers';
 import { ButtonInfoField, ViewExpander } from '@rapid-cmi5/ui';
@@ -44,6 +50,13 @@ import { InsertTabs } from './InsertTabs';
 import WidgetsIcon from '@mui/icons-material/Widgets';
 import { activitiesTable } from '../../constants/toolbar';
 import { InsertQuotes } from './InsertQuotes';
+import { activeEditor$, rootEditor$ } from '@mdxeditor/editor';
+import { mergeRegister } from '@lexical/utils';
+import {
+  insertNoCursorMessage,
+  insertNoSelectionMessage,
+  insertSelectionInstructions,
+} from '../constants';
 
 const headerSxProps = {
   cursor: 'pointer',
@@ -56,15 +69,18 @@ const headerSxProps = {
  */
 export function BlockLibraryDrawer() {
   useLexicalComposerContext(); // Ensures we are inside a Lexical editor context
+  const [activeEditor] = useCellValues(activeEditor$);
+  const showSeq = useCellValue(blockShowSeq$);
   const drawerMode = useCellValue(drawerMode$);
   const changeViewMode = usePublisher(drawerMode$);
+  const [isInsertAllowed, setIsInsertAllowed] = useState<boolean>(false);
+  const [insertMessage, setInsertMessage] = useState<string | null>(insertNoCursorMessage);
+
   const theme = useTheme();
 
   const isOpen = useMemo(() => {
     return drawerMode === DRAWER_TYPE.BLOCK;
   }, [drawerMode]);
-
-  const showSeq = useCellValue(blockShowSeq$);
 
   const handleClose = useCallback(() => {
     changeViewMode(DRAWER_TYPE.NONE);
@@ -78,6 +94,43 @@ export function BlockLibraryDrawer() {
     effectiveOpen,
     getDrawerSx,
   } = useDrawerAutoHide('block', isOpen, showSeq);
+
+  useEffect(() => {
+    if (!activeEditor) {
+      return;
+    }
+
+    const unregister = mergeRegister(
+      activeEditor.registerCommand(
+        SELECTION_CHANGE_COMMAND,
+        () => {
+          const selection = $getSelection();
+          if (selection === null) {
+            setInsertMessage('selection is null');
+          }
+          if (!$isRangeSelection(selection)) {
+            setInsertMessage('selection is not a range');
+            setIsInsertAllowed(false);
+            return false;
+          }
+          if (selection.isCollapsed()) {
+            setIsInsertAllowed(true);
+            setInsertMessage(null);
+            return true;
+          } else {
+            setIsInsertAllowed(false);
+            setInsertMessage(insertNoSelectionMessage);
+            return false; //no applying quote to selection
+          }
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+    );
+
+    return () => {
+      unregister();
+    };
+  }, [activeEditor]);
 
   return (
     <Drawer
@@ -160,9 +213,15 @@ export function BlockLibraryDrawer() {
           }}
         >
           <Box>
-            <Alert severity="info" sx={{ margin: 2 }}>
-              Expand a topic and click item to add it to the current slide.
-            </Alert>
+            {!isInsertAllowed ? (
+              <Alert severity="warning" sx={{ margin: 2 }}>
+                {insertMessage}
+              </Alert>
+            ) : (
+              <Alert severity="info" sx={{ margin: 2 }}>
+                {insertSelectionInstructions}
+              </Alert>
+            )}
           </Box>
           <Stack direction="column" spacing={2}>
             <ViewExpander

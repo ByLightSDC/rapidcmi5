@@ -102,16 +102,24 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
     setIsConfiguring(false);
   }, []);
 
+  /**
+   * Set flag for configuring layout
+   * @returns 
+   */
   const selectLayout = () => {
     if (!editor) return;
 
     editor.update(() => {
       const selection = $getSelection();
-      if (!$isRangeSelection(selection)) return;
+      if (!$isRangeSelection(selection)) {
+        setIsConfiguring(false);
+        return;
+      }
 
       if (selection.isCollapsed()) {
         //continue
       } else {
+        setIsConfiguring(false);
         return; //no applying tab to selection
       }
     });
