@@ -61,8 +61,7 @@ export const InsertStatements = ({ isDrawer }: { isDrawer?: boolean }) => {
               {
                 type: 'containerDirective',
                 name: 'statement',
-                attributes: {
-                },
+                attributes: {},
                 children: [
                   {
                     type: 'paragraph',
@@ -78,9 +77,7 @@ export const InsertStatements = ({ isDrawer }: { isDrawer?: boolean }) => {
             ],
           };
 
-          const statementsNode = $createDirectiveNode(
-            mdastStatements,
-          ) as DirectiveNode;
+          const statementsNode = $createDirectiveNode(mdastStatements);
           selection.insertNodes([statementsNode]);
         });
       });
