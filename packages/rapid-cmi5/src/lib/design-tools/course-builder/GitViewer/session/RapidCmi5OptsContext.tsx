@@ -7,6 +7,9 @@ import {
   CourseAU,
   GitUserConfig,
   Credentials,
+  ScenarioApi,
+  ScenarioQuery,
+  PaginatedScenariosResponse,
 } from '@rapid-cmi5/cmi5-build-common';
 import { Scenario } from '@rapid-cmi5/react-editor';
 import { FormCrudType } from '@rapid-cmi5/ui';
@@ -17,8 +20,7 @@ export type SubmitScenarioFormFn<T = any> = (item: T) => void;
 
 // A user can pass in their own scenario search modal
 export interface ScenarioFormProps extends GetScenarioFormProps {
-  token: string;
-  url?: string;
+  listScenarios: (query: ScenarioQuery) => Promise<PaginatedScenariosResponse>;
 }
 
 export interface GetScenarioFormProps {
@@ -70,7 +72,7 @@ export interface RapidCmi5Opts {
   downloadCmi5Player?: () => Promise<any>;
   processAu?: (au: CourseAU, blockId: string) => Promise<void>;
   GetScenariosForm?: React.ComponentType<GetScenarioFormProps>;
-  fetchScenario?: (uuid: string) => Promise<Scenario>;
+  fetchScenario?: (uuid: string) => Promise<ScenarioApi>;
   QuizBankSearchModal?: React.ComponentType<GetQuizBankSearchModalProps>;
   QuizBankAddModal?: React.ComponentType<GetQuizBankAddModalProps>;
   clearData?: () => void;

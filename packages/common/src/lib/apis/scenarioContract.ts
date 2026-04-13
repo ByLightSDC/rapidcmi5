@@ -9,7 +9,7 @@ import { z } from 'zod';
 const c = initContract();
 
 export const ScenarioApiSchema = z.object({
-  uuid: z.string().optional(),
+  uuid: z.string(),
   dateCreated: z.string().optional(),
   dateEdited: z.string().optional(),
   description: z.string().optional(),
@@ -21,13 +21,17 @@ export const ScenarioApiSchema = z.object({
 
 export type ScenarioApi = z.infer<typeof ScenarioApiSchema>;
 
-const PaginatedScenariosResponseSchema = z.object({
+export const PaginatedScenariosResponseSchema = z.object({
   offset: z.number().optional(),
   limit: z.number().optional(),
   totalCount: z.number().optional(),
   totalPages: z.number().optional(),
   data: z.array(ScenarioApiSchema).optional(),
 });
+
+export type PaginatedScenariosResponse = z.infer<
+  typeof PaginatedScenariosResponseSchema
+>;
 
 export const ScenarioQuerySchema = z.object({
   uuid: z.string().optional(),
@@ -41,6 +45,8 @@ export const ScenarioQuerySchema = z.object({
   sortBy: z.enum(['dateCreated', 'dateEdited']).optional(),
   sort: z.enum(['asc', 'desc']).optional(),
 });
+
+export type ScenarioQuery = z.infer<typeof ScenarioQuerySchema>;
 
 export const Cmi5AuMappingApiSchema = z.object({
   auId: z.string(),

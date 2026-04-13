@@ -13,26 +13,7 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 
 import { DynamicModal } from '@rapid-cmi5/ui';
 import { ScenarioFormProps } from '@rapid-cmi5/react-editor';
-
-export interface Scenario {
-  uuid: string;
-  name: string;
-  author: string;
-  dateEdited: string;
-  description: string;
-  dateCreated: string;
-  packages?: string[];
-  drafts?: string[];
-  metadata_tags?: string[];
-}
-
-interface ApiResponse {
-  offset: number;
-  limit: number;
-  totalCount: number;
-  totalPages: number;
-  data: Scenario[];
-}
+import { ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
 
 const ITEMS_PER_PAGE = 50;
 
@@ -59,7 +40,7 @@ function ScenarioCard({
   scenario,
   isSelected,
 }: {
-  scenario: Scenario;
+  scenario: ScenarioApi;
   isSelected: boolean;
 }) {
   const theme = useTheme();
@@ -110,15 +91,17 @@ function ScenarioCard({
               {scenario.author}
             </Typography>
           </Stack>
-          <Stack direction="row" spacing={0.5} alignItems="center">
-            <AccessTimeIcon sx={{ fontSize: 15, color: textTertiary }} />
-            <Typography
-              variant="caption"
-              sx={{ color: textSecondary, fontWeight: 500 }}
-            >
-              {formatDate(scenario.dateEdited)}
-            </Typography>
-          </Stack>
+          {scenario?.dateEdited && (
+            <Stack direction="row" spacing={0.5} alignItems="center">
+              <AccessTimeIcon sx={{ fontSize: 15, color: textTertiary }} />
+              <Typography
+                variant="caption"
+                sx={{ color: textSecondary, fontWeight: 500 }}
+              >
+                {formatDate(scenario?.dateEdited)}
+              </Typography>
+            </Stack>
+          )}
         </Stack>
 
         {scenario.description && (
@@ -143,8 +126,7 @@ function ScenarioCard({
 
 export function ScenarioSelectionForm({
   submitForm,
-  token,
-  url,
+  listScenarios,
 }: ScenarioFormProps) {
   const fetchItems = useCallback(
     async (page: number, search: string) => {
@@ -157,22 +139,24 @@ export function ScenarioSelectionForm({
       };
       if (search.trim()) params.search = search.trim();
 
-      const response = await axios.get<ApiResponse>(
-        `${url}/v1/content/range/scenarios`,
-        { headers: { Authorization: `Bearer ${token}` }, params },
-      );
+      const response = await listScenarios({
+        offset,
+        limit: ITEMS_PER_PAGE,
+        sortBy: 'dateEdited',
+        sort: 'desc',
+      });
 
       return {
-        data: response.data?.data ?? [],
-        totalCount: response.data?.totalCount ?? 0,
-        totalPages: response.data?.totalPages ?? 0,
+        data: response.data ?? [],
+        totalCount: response.totalCount ?? 0,
+        totalPages: response.totalPages ?? 0,
       };
     },
-    [token, url],
+    [listScenarios],
   );
 
   return (
-    <DynamicModal<Scenario>
+    <DynamicModal<ScenarioApi>
       title="Select Scenario"
       itemLabel="scenario"
       searchPlaceholder="Search scenarios..."

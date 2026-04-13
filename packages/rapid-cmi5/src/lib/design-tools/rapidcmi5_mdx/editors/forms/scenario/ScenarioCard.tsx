@@ -12,12 +12,12 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { alpha } from '@mui/material';
-import { Scenario } from '@rapid-cmi5/react-editor';
+import { ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
 
 interface ScenarioCardProps {
   scenarioUUID: string;
   scenarioName: string;
-  fetchScenario?: (uuid: string) => Promise<Scenario>;
+  fetchScenario?: (uuid: string) => Promise<ScenarioApi>;
 }
 
 type ValidationState = 'loading' | 'valid' | 'not-found' | 'not-connected';
@@ -28,7 +28,7 @@ export function ScenarioCard({
   fetchScenario,
 }: ScenarioCardProps) {
   const [state, setState] = useState<ValidationState>('loading');
-  const [scenario, setScenario] = useState<Scenario | null>(null);
+  const [scenario, setScenario] = useState<ScenarioApi | null>(null);
 
   const getAlertMeta = () => {
     switch (state) {

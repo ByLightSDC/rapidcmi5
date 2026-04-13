@@ -21,7 +21,10 @@ export function RapidCmi5Wrapper() {
   const quizBankURL = ssoConfig?.quizBankApiUrl;
   const rangeURL = ssoConfig?.rangeRestApiUrl;
 
-  const { fetchScenario, processAu } = useScenarioApi(rangeURL, token);
+  const { fetchScenario, processAu, listScenarios } = useScenarioApi(
+    rangeURL,
+    token,
+  );
 
   const handleOverrideGlobalGitConfig = (
     config?: GitUserConfig,
@@ -59,15 +62,14 @@ export function RapidCmi5Wrapper() {
       processAu={processAu}
       fetchScenario={fetchScenario}
       GetScenariosForm={
-        token && rangeURL
+        listScenarios
           ? (props: GetScenarioFormProps) => (
               <ScenarioSelectionForm
-                token={token}
                 submitForm={props.submitForm}
                 formType={props.formType}
                 errors={props.errors}
                 formMethods={props.formMethods}
-                url={rangeURL}
+                listScenarios={listScenarios}
               />
             )
           : undefined

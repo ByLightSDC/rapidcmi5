@@ -1,6 +1,11 @@
 import { useCallback, useMemo } from 'react';
 import { initClient } from '@ts-rest/core';
-import { scenarioContract, ScenarioApi } from '../scenarioContract';
+import {
+  scenarioContract,
+  ScenarioApi,
+  ScenarioQuery,
+  PaginatedScenariosResponse,
+} from '../scenarioContract';
 import {
   CourseAU,
   createAuMappingNameWithAuId,
@@ -32,6 +37,18 @@ export function useScenarioApi(url?: string, token?: string) {
       throw new Error(
         `Failed to fetch scenario "${uuid}" (status: ${response.status})`,
       );
+    },
+    [apiClient],
+  );
+
+  const listScenariosCb = useCallback(
+    async (query: ScenarioQuery): Promise<PaginatedScenariosResponse> => {
+      if (!apiClient) throw new Error('API client is not set');
+      const response = await apiClient.listScenarios({ query });
+      if (response.status === 200) {
+        return response.body;
+      }
+      throw new Error(`Failed to list scenarios (status: ${response.status})`);
     },
     [apiClient],
   );
@@ -116,7 +133,8 @@ export function useScenarioApi(url?: string, token?: string) {
   }
 
   const fetchScenario = apiClient ? fetchScenarioCb : undefined;
+  const listScenarios = apiClient ? listScenariosCb : undefined;
   const processAu = apiClient ? processAuCb : undefined;
 
-  return { fetchScenario, processAu };
+  return { fetchScenario, listScenarios, processAu };
 }
