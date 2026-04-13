@@ -201,7 +201,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
             control={control}
             name={`${indexedArrayField}.typeAttributes.correctAnswer`}
             required
-            label="Answer"
+            label="Correct Answer"
             error={Boolean(indexedErrors?.typeAttributes?.correctAnswer)}
             helperText={indexedErrors?.typeAttributes?.correctAnswer?.message}
             readOnly={crudType === FormCrudType.view}
@@ -263,6 +263,51 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           />
         </Box>
       )}
+   
+      <Grid size={3}>
+        <FormControlSelectField
+          control={control}
+          name={`${indexedArrayField}.type`}
+          required
+          label="Question Type"
+          error={Boolean(indexedErrors?.type)}
+          helperText={indexedErrors?.type?.message}
+          readOnly={
+            crudType === FormCrudType.view || slideType === SlideTypeEnum.CTF
+          }
+        >
+          {responseOptions.map((item) => (
+            <MenuItem key={item} value={item}>
+              {item
+                .replace(/([A-Z])/g, ' $1')
+                .replace(/^[a-z]/, (c) => c.toUpperCase())}
+            </MenuItem>
+          ))}
+        </FormControlSelectField>
+      </Grid>
+      <Grid size={3} >
+        <FormControlSelectField
+          control={control}
+          name={`${indexedArrayField}.typeAttributes.grading`}
+          required
+          label="Response Type"
+          error={Boolean(indexedErrors?.typeAttributes?.grading)}
+          helperText={indexedErrors?.typeAttributes?.grading?.message}
+          readOnly={
+            crudType === FormCrudType.view ||
+            slideType === SlideTypeEnum.CTF ||
+            watchQuestionType === QuestionResponse.Matching
+          }
+        >
+          {gradingOptions.map((item) => (
+            <MenuItem key={item} value={item}>
+              {item
+                .replace(/([A-Z])/g, ' $1')
+                .replace(/^[a-z]/, (c) => c.toUpperCase())}
+            </MenuItem>
+          ))}
+        </FormControlSelectField>
+      </Grid>
       {onAddToBank && (
         <Grid
           size={5}
@@ -287,47 +332,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
             <ButtonInfoField message="Adding questions to the Quiz Bank allows you to reuse them in future quizzes, lessons, and courses." />
           </Stack>
         </Grid>
-      )}
-      <Grid size={4}>
-        <FormControlSelectField
-          control={control}
-          name={`${indexedArrayField}.type`}
-          required
-          label="Question Type"
-          error={Boolean(indexedErrors?.type)}
-          helperText={indexedErrors?.type?.message}
-          readOnly={
-            crudType === FormCrudType.view || slideType === SlideTypeEnum.CTF
-          }
-        >
-          {responseOptions.map((item) => (
-            <MenuItem key={item} value={item}>
-              {item}
-            </MenuItem>
-          ))}
-        </FormControlSelectField>
-      </Grid>
-      <Grid size={3}>
-        <FormControlSelectField
-          control={control}
-          name={`${indexedArrayField}.typeAttributes.grading`}
-          required
-          label="Response Type"
-          error={Boolean(indexedErrors?.typeAttributes?.grading)}
-          helperText={indexedErrors?.typeAttributes?.grading?.message}
-          readOnly={
-            crudType === FormCrudType.view ||
-            slideType === SlideTypeEnum.CTF ||
-            watchQuestionType === QuestionResponse.Matching
-          }
-        >
-          {gradingOptions.map((item) => (
-            <MenuItem key={item} value={item}>
-              {item}
-            </MenuItem>
-          ))}
-        </FormControlSelectField>
-      </Grid>
+      )} 
     </Grid>
   );
 }

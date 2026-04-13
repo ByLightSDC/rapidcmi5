@@ -1,4 +1,5 @@
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import { toTitleCase } from './formUtils';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { UseFormReturn } from 'react-hook-form';
@@ -259,7 +260,7 @@ export const ScenarioForm = ({
           >
             {moveOnCriteriaOptions.map((item) => (
               <MenuItem key={item} value={item}>
-                {item}
+                {toTitleCase(item)}
               </MenuItem>
             ))}
           </FormControlSelectField>

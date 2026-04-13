@@ -1,4 +1,5 @@
 import { UseFormReturn } from 'react-hook-form';
+import { toTitleCase } from './formUtils';
 import {
   FormControlSelectField,
   FormControlTextField,
@@ -148,7 +149,7 @@ export const TeamConsolesForm = ({
               >
                 {moveOnCriteriaOptions.map((item) => (
                   <MenuItem key={item} value={item}>
-                    {item}
+                    {toTitleCase(item)}
                   </MenuItem>
                 ))}
               </FormControlSelectField>
