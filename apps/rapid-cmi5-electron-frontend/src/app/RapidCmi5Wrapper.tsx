@@ -57,7 +57,7 @@ export function RapidCmi5Wrapper() {
         return response;
       }}
       processAu={processAu}
-      // fetchScenario={fetchScenario}
+      fetchScenario={fetchScenario}
       GetScenariosForm={
         token && rangeURL
           ? (props: GetScenarioFormProps) => (

@@ -6,7 +6,6 @@ import {
   createAuMappingNameWithAuId,
   generateAuId,
 } from '@rapid-cmi5/cmi5-build-common';
-import { debugLogError } from '@rapid-cmi5/ui';
 
 export function useScenarioApi(url?: string, token?: string) {
   const apiClient = useMemo(
@@ -58,7 +57,7 @@ export function useScenarioApi(url?: string, token?: string) {
           body: { scenarios: [scenarioUUID] },
         });
         if (updateResponse.status !== 200) {
-          debugLogError(`Could not update au mapping for auId: ${auId}`);
+          console.error(`Could not update au mapping for auId: ${auId}`);
           throw updateResponse.body;
         }
       } else if (existingMapping.status === 404) {
@@ -70,7 +69,7 @@ export function useScenarioApi(url?: string, token?: string) {
           },
         });
         if (createResponse.status !== 201) {
-          debugLogError(`Could not create au mapping for auId: ${auId}`);
+          console.error(`Could not create au mapping for auId: ${auId}`);
           throw new Error('Failed to create au');
         }
       } else {
