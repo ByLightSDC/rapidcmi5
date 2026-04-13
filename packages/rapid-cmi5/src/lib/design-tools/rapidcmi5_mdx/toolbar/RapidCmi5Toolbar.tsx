@@ -14,7 +14,6 @@ import {
   viewMode$,
   useCellValue,
   useRealm,
-  iconComponentFor$,
   useCellValues,
   useTranslation,
 } from '@mdxeditor/editor';
@@ -25,7 +24,6 @@ import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import ArtTrackIcon from '@mui/icons-material/ArtTrack';
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
-import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
 import { MarkdownIconSvg } from './constants';
 
 import { alpha, Box, Divider, Stack, useTheme } from '@mui/material';
@@ -73,6 +71,7 @@ import { MUIButtonWithTooltip } from './components/MUIButtonWithTooltip';
 import { BoldItalicUnderlineToggles } from './components/BoldItalicUnderlineToggles';
 import { ListsToggle } from './components/ListsToggle';
 import { UndoRedo } from './components/UndoRedo';
+import { InsertQuotes } from './components/InsertQuotes';
 
 /**
  * Layout Constants
@@ -295,6 +294,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                       <InsertGrid />
                       <InsertLayoutBox />
                       <InsertAccordion />
+                      <InsertQuotes />
                       <InsertSteps />
                       <InsertTable />
                       <InsertTabs />

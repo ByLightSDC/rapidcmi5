@@ -67,6 +67,8 @@ import {
   generateLessonThemeStyleTag,
   StepsDirectiveDescriptor,
   StepContentDirectiveDescriptor,
+  QuotesContainerDirectiveDescriptor,
+  QuotesContentDirectiveDescriptor,
 } from '@rapid-cmi5/ui';
 
 import {
@@ -260,11 +262,20 @@ function RC5VisualEditor() {
   // Preview handlers convert GitFS paths to blob URLs for browser display
   const imagePreviewHandler = useCallback(
     async (imageSrc: string) => {
-      if (!isFsLoaded || !currentRepoAccessObject) return imageSrc;
+      if (!isFsLoaded || !currentRepoAccessObject) {
+        debugLogError('Cant return image');
+        debugLog('isFsLoaded', isFsLoaded);
+        debugLog('currentRepoAccessObject', currentRepoAccessObject);
+        return imageSrc;
+      }
 
-      if (!imageSrc.startsWith('./')) return imageSrc;
+      if (!imageSrc.startsWith('./')) {
+        debugLog('Cant return blob, check url', imageSrc);
+        return imageSrc;
+      }
 
       const fullPath = `${currentAuPathSel}/${imageSrc.slice(2)}`;
+
       const blob = await handleBlobImageFile(
         currentRepoAccessObject,
         fullPath,
@@ -274,6 +285,7 @@ function RC5VisualEditor() {
       if (blob) {
         return URL.createObjectURL(blob);
       }
+      debugLog('No blob found');
       return imageSrc;
     },
     [currentRepoAccessObject, currentAuPathSel],
@@ -359,7 +371,9 @@ function RC5VisualEditor() {
           AnimDirectiveDescriptor,
           InlineAnimDirectiveDescriptor,
           GridContainerDirectiveDescriptor,
-          GridCellEditorDescriptor,
+          GridCellDirectiveDescriptor,
+          QuotesContainerDirectiveDescriptor,
+          QuotesContentDirectiveDescriptor,
         ],
         escapeUnknownTextDirectives: true,
       }),

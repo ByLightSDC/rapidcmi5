@@ -1,0 +1,257 @@
+{
+  "$ref": "#/definitions/CourseData",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "BlockPaddingEnum": {
+      "enum": [
+        "none",
+        "small",
+        "medium",
+        "large",
+        "custom"
+      ],
+      "type": "string"
+    },
+    "ContentWidthEnum": {
+      "enum": [
+        "none",
+        "small",
+        "medium",
+        "large"
+      ],
+      "type": "string"
+    },
+    "CourseAU": {
+      "additionalProperties": false,
+      "properties": {
+        "assetsPath": {
+          "type": "string"
+        },
+        "auName": {
+          "type": "string"
+        },
+        "backgroundImage": {
+          "type": "string"
+        },
+        "defaultClassId": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "dirPath": {
+          "type": "string"
+        },
+        "ksats": {
+          "items": {
+            "$ref": "#/definitions/KSATElement"
+          },
+          "type": "array"
+        },
+        "lessonTheme": {
+          "$ref": "#/definitions/LessonTheme"
+        },
+        "moveOn": {
+          "enum": [
+            "Passed",
+            "Completed",
+            "CompletedAndPassed",
+            "CompletedOrPassed",
+            "NotApplicable"
+          ],
+          "type": "string"
+        },
+        "moveOnCriteria": {
+          "$ref": "#/definitions/MoveOnCriteriaEnum"
+        },
+        "promptClassId": {
+          "type": "boolean"
+        },
+        "rangeosScenarioDraftUUID": {
+          "type": "string"
+        },
+        "rangeosScenarioName": {
+          "type": "string"
+        },
+        "rangeosScenarioUUID": {
+          "type": "string"
+        },
+        "slides": {
+          "items": {
+            "$ref": "#/definitions/SlideType"
+          },
+          "type": "array"
+        },
+        "teamSSOEnabled": {
+          "type": "boolean"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "auName",
+        "slides",
+        "dirPath"
+      ],
+      "type": "object"
+    },
+    "CourseBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "aus": {
+          "items": {
+            "$ref": "#/definitions/CourseAU"
+          },
+          "type": "array"
+        },
+        "blockDescription": {
+          "type": "string"
+        },
+        "blockName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "blockName",
+        "aus"
+      ],
+      "type": "object"
+    },
+    "CourseData": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "type": "string"
+        },
+        "blocks": {
+          "items": {
+            "$ref": "#/definitions/CourseBlock"
+          },
+          "type": "array"
+        },
+        "courseDescription": {
+          "type": "string"
+        },
+        "courseId": {
+          "type": "string"
+        },
+        "courseTitle": {
+          "type": "string"
+        },
+        "designer": {},
+        "rc5Version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "courseTitle",
+        "courseId",
+        "blocks"
+      ],
+      "type": "object"
+    },
+    "DefaultAlignmentEnum": {
+      "enum": [
+        "left",
+        "center",
+        "right"
+      ],
+      "type": "string"
+    },
+    "KSATElement": {
+      "additionalProperties": false,
+      "properties": {
+        "doc_identifier": {
+          "type": "string"
+        },
+        "element_identifier": {
+          "type": "string"
+        },
+        "element_type": {
+          "enum": [
+            "task",
+            "knowledge",
+            "skill"
+          ],
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "LessonTheme": {
+      "additionalProperties": false,
+      "properties": {
+        "blockPadding": {
+          "$ref": "#/definitions/BlockPaddingEnum"
+        },
+        "blockPaddingCustomValue": {
+          "type": "number"
+        },
+        "contentWidth": {
+          "$ref": "#/definitions/ContentWidthEnum"
+        },
+        "defaultActivityAlignment": {
+          "$ref": "#/definitions/DefaultAlignmentEnum"
+        },
+        "defaultAlignment": {
+          "$ref": "#/definitions/DefaultAlignmentEnum"
+        }
+      },
+      "type": "object"
+    },
+    "MoveOnCriteriaEnum": {
+      "enum": [
+        "completed",
+        "passed",
+        "completed-and-passed",
+        "not-applicable"
+      ],
+      "type": "string"
+    },
+    "SlideType": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "display": {
+          "type": "string"
+        },
+        "filepath": {
+          "type": "string"
+        },
+        "slideTitle": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/SlideTypeEnum"
+        }
+      },
+      "required": [
+        "type",
+        "slideTitle",
+        "content",
+        "filepath"
+      ],
+      "type": "object"
+    },
+    "SlideTypeEnum": {
+      "enum": [
+        "ctf",
+        "quiz",
+        "markdown",
+        "rangeosScenario",
+        "sourceDoc",
+        "codeRunner"
+      ],
+      "type": "string"
+    }
+  }
+}

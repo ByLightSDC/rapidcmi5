@@ -447,26 +447,24 @@ export class GitOperations {
     );
 
     const filesToAdd = files.filter((f) => !skipStatuses.includes(f.status));
-    
+
     try {
       if (this.gitFs.isElectron) {
         // Electron path - process in parallel
-        await Promise.all([
-          ...filesToRemove.map((file) =>
-            window.fsApi
-              .gitRemove(dir, file.name)
-              .catch((error) =>
-                debugLogError(`Error removing ${file.name}, ${error}`),
-              ),
-          ),
-          ...filesToAdd.map((file) =>
-            window.fsApi
-              .gitAdd(dir, file.name)
-              .catch((error) =>
-                debugLogError(`Error staging ${file.name}, ${error}`),
-              ),
-          ),
-        ]);
+        for (const file of filesToRemove) {
+          await window.fsApi
+            .gitRemove(dir, file.name)
+            .catch((error) =>
+              debugLogError(`Error removing ${file.name}, ${error}`),
+            );
+        }
+        for (const file of filesToAdd) {
+          await window.fsApi
+            .gitAdd(dir, file.name)
+            .catch((error) =>
+              debugLogError(`Error staging ${file.name}, ${error}`),
+            );
+        }
       } else {
         // Browser path with shared cache
         // Add all files at once (isomorphic-git supports array)
@@ -480,25 +478,24 @@ export class GitOperations {
         }
 
         // Remove files in parallel
-        if (filesToRemove.length > 0) {
-          await Promise.all(
-            filesToRemove.map((file) =>
-              git
-                .remove({
-                  fs: this.gitFs.fs,
-                  dir,
-                  cache: this.cache,
-                  filepath: file.name,
-                })
-                .catch((error) => {
-                  debugLogError(`Error removing ${file.name}, ${error}`);
-                }),
-            ),
-          );
+        // Remove files sequentially - parallel git.remove calls share the index
+        // file and cause read-modify-write races, silently dropping all but one removal
+        for (const file of filesToRemove) {
+          await git
+            .remove({
+              fs: this.gitFs.fs,
+              dir,
+              cache: this.cache,
+              filepath: file.name,
+            })
+            .catch((error) => {
+              debugLogError(`Error removing ${file.name}, ${error}`);
+            });
         }
       }
     } catch (error: any) {
-      throw new Error(`Could not stage files: ${error.message}`);
+      console.error('Could not stage files: ', error);
+      throw new Error(`Could not stage files`);
     }
 
     return await this.gitRepoStatus(
@@ -518,29 +515,27 @@ export class GitOperations {
     try {
       if (this.gitFs.isElectron) {
         // Electron: Process in parallel
-        await Promise.all(
-          files.map((file) =>
-            window.fsApi.gitResetIndex(dir, file.name).catch((error) => {
-              debugLogError(`Error unstaging ${file.name}, ${error}`);
-            }),
-          ),
-        );
+        // Electron: Serialize to avoid .git/index.lock contention
+        for (const file of files) {
+          await window.fsApi.gitResetIndex(dir, file.name).catch((error) => {
+            debugLogError(`Error unstaging ${file.name}, ${error}`);
+          });
+        }
       } else {
-        // Browser: Use shared cache and parallel processing
-        await Promise.all(
-          files.map((file) =>
-            git
-              .resetIndex({
-                fs: this.gitFs.fs,
-                dir,
-                cache: this.cache,
-                filepath: file.name,
-              })
-              .catch((error) => {
-                debugLogError(`Error unstaging ${file.name}, ${error}`);
-              }),
-          ),
-        );
+        // Browser: Serialize resetIndex calls - parallel calls share the index file
+        // and cause read-modify-write races, silently dropping all but one reset
+        for (const file of files) {
+          await git
+            .resetIndex({
+              fs: this.gitFs.fs,
+              dir,
+              cache: this.cache,
+              filepath: file.name,
+            })
+            .catch((error) => {
+              debugLogError(`Error unstaging ${file.name}, ${error}`);
+            });
+        }
       }
 
       return await this.gitRepoStatus(

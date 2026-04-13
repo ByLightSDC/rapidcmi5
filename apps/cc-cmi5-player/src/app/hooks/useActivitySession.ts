@@ -1,10 +1,4 @@
-import { useRef, useState } from 'react';
-import {
-  getAutoGradersProgress,
-  getQuizProgress,
-  setAutoGradersProgress,
-  setQuizProgress,
-} from 'apps/cc-cmi5-player/src/app/utils/Cmi5Helpers';
+
 import { QuizState } from '@rapid-cmi5/cmi5-build-common';
 import { debugLogError } from '../debug';
 import { useDispatch } from 'react-redux';
@@ -16,6 +10,7 @@ import {
   setQuizAnswers,
   setQuizCurrentQuestion,
 } from '../redux/activitySessionReducer';
+import { getQuizProgress, setQuizProgress, getAutoGradersProgress, setAutoGradersProgress } from '../utils/Cmi5Helpers';
 
 /**
  * Allows the caching of activity related information

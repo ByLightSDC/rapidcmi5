@@ -100,7 +100,14 @@
   z-index: 9999;
 }
 
-.imageWrapper img {
+.imageWrapper,
+[data-editor-block-type='image'] {
+  display: inline-block;
+  position: relative;
+}
+
+.imageWrapper img,
+[data-editor-block-type='image'] img {
   max-width: 100%;
   max-height: 100%;
 }

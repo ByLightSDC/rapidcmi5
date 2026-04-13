@@ -6,7 +6,7 @@ export enum RapidIconKey {
   delete,
   configure,
   scenario,
-  jobe,
+  codeRunner,
   ctf,
   quiz,
 }
@@ -14,7 +14,7 @@ export enum RapidIconKey {
 const icons = {
   [RapidIconKey.activity]: <LocalActivity color="primary" />,
   [RapidIconKey.ctf]: <LocalActivity color="primary" />,
-  [RapidIconKey.jobe]: <LocalActivity color="primary" />,
+  [RapidIconKey.codeRunner]: <LocalActivity color="primary" />,
   [RapidIconKey.quiz]: <LocalActivity color="primary" />,
   [RapidIconKey.scenario]: <LocalActivity color="primary" />,
   [RapidIconKey.delete]: <DeleteForever color="primary" />,

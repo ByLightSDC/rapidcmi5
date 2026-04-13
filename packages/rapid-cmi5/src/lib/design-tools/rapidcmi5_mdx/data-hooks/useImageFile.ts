@@ -87,27 +87,31 @@ export const useImageFile = () => {
         const repoPath = getRepoPath(r);
         if (!repoPath || !currentAuPathSel) {
           debugLogError('Throw an error');
-          return Promise.resolve('');
+          return '';
         }
 
         const fileName = image.name;
 
-        if (image) {
+        await new Promise<void>((resolve, reject) => {
           const fileReader = new FileReader();
-          fileReader.onload = async function (event: any) {
-            if (fileReader.result) {
-              const relativePath = join(currentAuPathSel, imagePath, fileName);
-              const imgData = new Uint8Array(fileReader.result as ArrayBuffer);
-              await handleCreateFile(relativePath, false, imgData);
-              await handleStageFile(relativePath);
+          fileReader.onload = async function () {
+            try {
+              if (fileReader.result) {
+                const relativePath = join(currentAuPathSel, imagePath, fileName);
+                const imgData = new Uint8Array(fileReader.result as ArrayBuffer);
+                await handleCreateFile(relativePath, false, imgData);
+                await handleStageFile(relativePath);
+              }
+              resolve();
+            } catch (error) {
+              reject(error);
             }
           };
-
+          fileReader.onerror = () => reject(fileReader.error);
           fileReader.readAsArrayBuffer(image);
-        }
+        });
 
-        const returnFilePath = `./${imagePath}/${fileName}`;
-        return Promise.resolve(returnFilePath);
+        return `./${imagePath}/${fileName}`;
       } catch {
         return '';
       }
@@ -123,29 +127,34 @@ export const useImageFile = () => {
 
         if (!repoPath || !currentAuPathSel) {
           debugLogError('Throw an error');
-          return Promise.resolve('');
+          return '';
         }
 
         const fileName = aFile.name;
 
-        if (aFile) {
+        await new Promise<void>((resolve, reject) => {
           const fileReader = new FileReader();
-          fileReader.onload = async function (event: any) {
-            if (fileReader.result) {
-              const fileData = new Uint8Array(fileReader.result as ArrayBuffer);
-              await handleCreateFile(
-                `${currentAuPathSel}/${defaultDownloadFilePath}/${fileName}`,
-                false,
-                fileData,
-              );
+          fileReader.onload = async function () {
+            try {
+              if (fileReader.result) {
+                const fileData = new Uint8Array(fileReader.result as ArrayBuffer);
+                await handleCreateFile(
+                  `${currentAuPathSel}/${defaultDownloadFilePath}/${fileName}`,
+                  false,
+                  fileData,
+                );
+              }
+              resolve();
+            } catch (error) {
+              reject(error);
             }
           };
-
+          fileReader.onerror = () => reject(fileReader.error);
           fileReader.readAsArrayBuffer(aFile);
-        }
+        });
 
         const returnFilePath = `./${defaultDownloadFilePath}/${fileName}`;
-        return Promise.resolve(returnFilePath);
+        return returnFilePath;
       } catch {
         return '';
       }
@@ -162,23 +171,27 @@ export const useImageFile = () => {
 
       const fileName = video.name;
 
-      if (video) {
+      await new Promise<void>((resolve, reject) => {
         const fileReader = new FileReader();
-        fileReader.onload = async function (event: any) {
-          if (fileReader.result) {
-            const videoData = new Uint8Array(fileReader.result as ArrayBuffer);
-            const relativePath = join(currentAuPathSel, videoPath, fileName);
-
-            await handleCreateFile(relativePath, false, videoData);
-            await handleStageFile(relativePath);
+        fileReader.onload = async function () {
+          try {
+            if (fileReader.result) {
+              const videoData = new Uint8Array(fileReader.result as ArrayBuffer);
+              const relativePath = join(currentAuPathSel, videoPath, fileName);
+              await handleCreateFile(relativePath, false, videoData);
+              await handleStageFile(relativePath);
+            }
+            resolve();
+          } catch (error) {
+            reject(error);
           }
         };
-
+        fileReader.onerror = () => reject(fileReader.error);
         fileReader.readAsArrayBuffer(video);
-      }
+      });
 
       const returnFilePath = `./${videoPath}/${fileName}`;
-      return Promise.resolve(returnFilePath);
+      return returnFilePath;
     },
     [currentRepoAccessObject, currentAuPathSel],
   );

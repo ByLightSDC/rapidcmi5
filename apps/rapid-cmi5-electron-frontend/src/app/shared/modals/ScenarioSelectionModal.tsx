@@ -11,7 +11,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import { DynamicModal } from '@rapid-cmi5/ui';
-import type { ScenarioFormProps } from '@rapid-cmi5/react-editor';
+import { ScenarioFormProps } from '@rapid-cmi5/react-editor';
 
 export interface Scenario {
   uuid: string;

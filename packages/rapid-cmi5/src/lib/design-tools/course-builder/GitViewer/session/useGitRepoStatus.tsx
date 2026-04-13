@@ -148,12 +148,11 @@ export function useGitRepoStatus(
           const allFilePaths = flattenedStruct.map((folder) => folder.id);
 
           // Get untracked files
-          const { untracked, deleted, needsUnstage} =
+          const { untracked, deleted, needsUnstage } =
             await gitOperator.gitGetUntrackedAndDeletedFiles(r, allFilePaths);
 
           const untrackedSet = new Set(untracked);
           const needsUnstageSet = new Set(needsUnstage);
-
 
           // Filter to only tracked files modified after last commit
           const recentlyModified = flattenedStruct
@@ -175,11 +174,14 @@ export function useGitRepoStatus(
           });
 
           // unstage these files
-          const unstageFiles = await gitOperator.gitRepoStatus(r, needsUnstage)
-          const removedFiles = await gitOperator.gitRemoveAllModified(r,unstageFiles);
-          
+          const unstageFiles = await gitOperator.gitRepoStatus(r, needsUnstage);
+          const removedFiles = await gitOperator.gitRemoveAllModified(
+            r,
+            unstageFiles,
+          );
+
           // Only check recently modified tracked files
-          
+
           const combined = [...deleted, ...recentlyModified];
           status =
             combined.length > 0
@@ -223,6 +225,7 @@ export function useGitRepoStatus(
           setIsInMerge(false);
         }
       } catch (error: any) {
+        debugLogError('Failed to get repo status: ' + error);
         throw error;
       } finally {
         inFlightRef.current = false;

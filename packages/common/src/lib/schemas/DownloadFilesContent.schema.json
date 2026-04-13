@@ -73,13 +73,6 @@
           "type": "string"
         }
       },
-      "required": [
-        "element_identifier",
-        "element_type",
-        "title",
-        "text",
-        "doc_identifier"
-      ],
       "type": "object"
     },
     "MoveOnCriteriaEnum": {
