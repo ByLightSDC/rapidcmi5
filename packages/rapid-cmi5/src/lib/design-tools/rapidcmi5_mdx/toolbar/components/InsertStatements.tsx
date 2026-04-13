@@ -17,11 +17,10 @@ import { ContainerDirective } from 'mdast-util-directive';
 import AddIcon from '@mui/icons-material/Add';
 import { useTheme } from '@emotion/react';
 import {
-  convertMarkdownToMdast,
   ButtonMinorUi,
   StatementsSettings,
-  DEFAULT_STATEMENTS,
   StatementPreset,
+  DEFAULT_STATEMENT,
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 import { useCallback, useState } from 'react';
@@ -51,24 +50,32 @@ export const InsertStatements = ({ isDrawer }: { isDrawer?: boolean }) => {
           const selection = $getSelection();
           if (!$isRangeSelection(selection) || !selection.isCollapsed()) return;
 
-          // create child statement content
-          const theChildMDast = convertMarkdownToMdast(
-            DEFAULT_STATEMENTS,
-            syntaxExtensions,
-          );
-          // set avatar based on current settings
-          const statementContent = theChildMDast
-            .children[0] as ContainerDirective;
-
           // create statements node
           const mdastStatements: ContainerDirective = {
             type: 'containerDirective',
             name: 'statements',
             attributes: {
               preset,
-              style: 'margin: 4px;',
             },
-            children: [statementContent],
+            children: [
+              {
+                type: 'containerDirective',
+                name: 'statement',
+                attributes: {
+                },
+                children: [
+                  {
+                    type: 'paragraph',
+                    children: [
+                      {
+                        type: 'text',
+                        value: DEFAULT_STATEMENT,
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
           };
 
           const statementsNode = $createDirectiveNode(

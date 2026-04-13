@@ -13,7 +13,7 @@ export const StatementDirectiveDescriptor: DirectiveDescriptor<StatementDirectiv
     testNode(node) {
       return node.name === 'statement';
     },
-    attributes: ['size', 'preset', 'author', 'avatar'],
+    attributes: [],
     hasChildren: true,
     Editor: StatementEditor,
   };
