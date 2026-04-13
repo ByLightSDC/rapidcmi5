@@ -1,12 +1,15 @@
 import { Box, Paper, Stack, styled, Typography } from '@mui/material';
-import ModalDialog from 'packages/ui/src/lib/modals/ModalDialog';
 import { useCallback, useMemo, useState } from 'react';
 import Grid from '@mui/material/Grid2';
-import { ButtonModalMainUi } from 'packages/ui/src/lib/inputs/buttons/buttonsmodal';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useImageDialog } from '../image/useImageDialog';
 import { useCellValue } from '@mdxeditor/editor';
-import { QUOTE_PRESETS, QuotePreset } from '@rapid-cmi5/ui';
+import {
+  ButtonModalMainUi,
+  ModalDialog,
+  QUOTE_PRESETS,
+  QuotePreset,
+} from '@rapid-cmi5/ui';
 import { imageUploadHandler$ } from '../image/methods';
 
 /**
@@ -42,15 +45,21 @@ export const QuotesSettings = ({
   });
   const imageUploadHandler = useCellValue(imageUploadHandler$);
 
+  const [isUploading, setIsUploading] = useState(false);
+
   // Upload Image
-  const handleApply = useCallback(() => {
-    if (selectedFiles && selectedFiles.length > 0) {
-      if (imageUploadHandler) {
-        imageUploadHandler(selectedFiles[0]);
+  const handleApply = useCallback(async () => {
+    let resolvedSrc = src;
+    if (selectedFiles && selectedFiles.length > 0 && imageUploadHandler) {
+      setIsUploading(true);
+      try {
+        resolvedSrc = await imageUploadHandler(selectedFiles[0]);
+      } finally {
+        setIsUploading(false);
       }
     }
-    handleSubmit(selectedPreset, src);
-  }, [selectedPreset, src]);
+    handleSubmit(selectedPreset, resolvedSrc);
+  }, [selectedPreset, src, selectedFiles, imageUploadHandler, handleSubmit]);
 
   // Upload Image Input
   const VisuallyHiddenInput = useMemo(() => {
@@ -71,7 +80,8 @@ export const QuotesSettings = ({
     <ModalDialog
       maxWidth="sm"
       title="Quotes"
-      buttons={['Cancel', 'Apply']}
+      buttons={['Cancel', isUploading ? 'Uploading...' : 'Apply']}
+      disableSubmit={isUploading}
       dialogProps={{
         open: true,
       }}

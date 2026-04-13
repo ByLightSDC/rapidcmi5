@@ -8,12 +8,8 @@ import {
 import { Cell } from '@mdxeditor/gurx';
 import { ImageNode } from './ImageNode';
 import { LexicalImageVisitor } from './LexicalImageVisitor';
-import {
-  MdastImageVisitor,
-  MdastJsxImageVisitor,
-} from './MdastImageVisitor';
-import { imagePreviewHandler$ } from 'packages/ui/src/lib/cmi5/mdx/plugins/image/methods';
-
+import { MdastImageVisitor, MdastJsxImageVisitor } from './MdastImageVisitor';
+import { imagePreviewHandler$ } from '@rapid-cmi5/ui';
 
 /**
  * Holds the image placeholder.

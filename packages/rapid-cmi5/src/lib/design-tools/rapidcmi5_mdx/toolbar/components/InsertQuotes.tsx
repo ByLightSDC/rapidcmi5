@@ -12,9 +12,7 @@ import type { LexicalEditor } from 'lexical';
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
-import TabIcon from '@mui/icons-material/Tab';
 
-import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 
 /**
@@ -27,11 +25,11 @@ import {
   ButtonMinorUi,
   QuotesSettings,
   debugLogWarning,
+  DEFAULT_QUOTES,
+  QuotePreset,
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 import { useCallback, useState } from 'react';
-import { QuotePreset } from 'packages/ui/src/lib/cmi5/mdx/plugins/quotes/types';
-import { DEFAULT_QUOTES } from 'packages/ui/src/lib/cmi5/mdx/plugins/quotes/constants';
 
 /**
  * A toolbar button component that inserts a quotes into the editor.
@@ -86,7 +84,6 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
         },
         children: [quoteContent],
       };
-
 
       const quotesNode = $createDirectiveNode(mdastQuotes) as DirectiveNode;
       selection.insertNodes([quotesNode]);

@@ -110,7 +110,6 @@ import { LessonThemeContext } from '@rapid-cmi5/ui';
 import { RC5Context } from '../contexts/RC5Context';
 import { RapidCmi5Toolbar } from '../toolbar/RapidCmi5Toolbar';
 import { ErrorBoundary } from './ErrorBoundary';
-import { QuoteContentEditor } from 'packages/ui/src/lib/cmi5/mdx/plugins/quotes/QuoteContentEditor';
 
 /**
  * Rapid CMI5 Visual Editor

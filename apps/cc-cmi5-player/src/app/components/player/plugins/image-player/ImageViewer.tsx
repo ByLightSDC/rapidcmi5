@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useCellValues } from '@mdxeditor/gurx';
 import classNames from 'classnames';
-import {
-  MdxJsxAttribute,
-  MdxJsxExpressionAttribute,
-  MdxJsxAttributeValueExpression,
-} from 'mdast-util-mdx-jsx';
+import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
 import { imagePlaceholder$ as imagePlaceholderComponent$ } from './index';
 import styles from './styles/image-plugin.module.css';
-import { imagePreviewHandler$ } from 'packages/ui/src/lib/cmi5/mdx/plugins/image/methods';
-import { imgCache, parseCssString } from '@rapid-cmi5/ui';
+import { imagePreviewHandler$, imgCache, parseCssString } from '@rapid-cmi5/ui';
 
 export interface ImageViewerProps {
   nodeKey: string;

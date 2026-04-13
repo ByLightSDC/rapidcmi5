@@ -28,10 +28,7 @@ import {
   KEY_ESCAPE_COMMAND,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical';
-import {
-  MdxJsxAttribute,
-  MdxJsxExpressionAttribute,
-} from 'mdast-util-mdx-jsx';
+import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 import type { ContainerDirective } from 'mdast-util-directive';
 import type { BlockContent } from 'mdast';
 import {
@@ -68,11 +65,9 @@ import {
   BROKEN_IMG_URI,
   imgCache,
   parseCssString,
+  imagePreviewHandler$,
 } from '@rapid-cmi5/ui';
 import { currentAuPath } from '@rapid-cmi5/react-editor';
-
-import { imagePreviewHandler$ } from 'packages/ui/src/lib/cmi5/mdx/plugins/image/methods';
-
 
 export interface ImageEditorProps {
   nodeKey: string;
@@ -85,8 +80,6 @@ export interface ImageEditorProps {
   href?: string;
   id?: string; // Unique persistent ID for animation targeting
 }
-
-
 
 /**
  * LazyImage for Editor
@@ -251,7 +244,6 @@ export function ImageEditor({
    * For images with links, flag to show url panel
    */
   const onClickImage = useCallback(() => {
-
     editor.update(() => {
       let node = $getNodeByKey(nodeKey);
 
@@ -552,7 +544,6 @@ export function ImageEditor({
           );
 
           if (hitImage || hitLabels) {
-  
             if (event.shiftKey) {
               setSelected(!isSelected);
             } else {
@@ -579,7 +570,7 @@ export function ImageEditor({
             }
 
             return true;
-          } 
+          }
 
           return false;
         },
@@ -683,22 +674,19 @@ export function ImageEditor({
               onResizeEnd={onResizeEnd}
             />
           )}
-          {!readOnly &&
-            !isPlayback &&
-            (isFocused ||
-              isHovered) && (
-              <EditImageToolbar
-                nodeKey={nodeKey}
-                imageSource={imageSource}
-                initialImagePath={initialImagePath}
-                title={title ?? ''}
-                alt={alt ?? ''}
-                rest={rest ?? []}
-                width={width === 'inherit' ? undefined : width}
-                height={height === 'inherit' ? undefined : height}
-                href={href}
-              />
-            )}
+          {!readOnly && !isPlayback && (isFocused || isHovered) && (
+            <EditImageToolbar
+              nodeKey={nodeKey}
+              imageSource={imageSource}
+              initialImagePath={initialImagePath}
+              title={title ?? ''}
+              alt={alt ?? ''}
+              rest={rest ?? []}
+              width={width === 'inherit' ? undefined : width}
+              height={height === 'inherit' ? undefined : height}
+              href={href}
+            />
+          )}
         </div>
       </div>
       {isUrlShowing && urlRef.current && (

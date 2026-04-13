@@ -1,6 +1,9 @@
 import { useCallback, useMemo } from 'react';
-import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
-import { QuestionBankApiCreate, quizBankContract } from '../../../../../../../packages/common/src/lib/types/apis/quizBankContract';
+import {
+  QuestionBankApiCreate,
+  quizBankContract,
+  RC5ActivityTypeEnum,
+} from '@rapid-cmi5/cmi5-build-common';
 import { initClient } from '@ts-rest/core';
 
 // We will attempt to move to Tan stack React Query V5 in the future

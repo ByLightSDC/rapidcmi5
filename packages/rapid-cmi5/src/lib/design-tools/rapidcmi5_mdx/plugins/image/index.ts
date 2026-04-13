@@ -49,16 +49,9 @@ import {
   ImageNode,
 } from './ImageNode';
 import { LexicalImageVisitor } from './LexicalImageVisitor';
-import {
-  MdastLinkImageVisitor,
-  MdastHtmlLinkedImageVisitor,
-  MdastHtmlImageVisitor,
-  MdastImageVisitor,
-  MdastJsxImageVisitor,
-} from './MdastImageVisitor';
+import { MdastImageVisitor, MdastJsxImageVisitor } from './MdastImageVisitor';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
-import { imagePreviewHandler$, imageUploadHandler$ } from 'packages/ui/src/lib/cmi5/mdx/plugins/image/methods';
-
+import { imagePreviewHandler$, imageUploadHandler$ } from '@rapid-cmi5/ui';
 
 export const CAN_USE_DOM: boolean =
   typeof window !== 'undefined' &&

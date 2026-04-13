@@ -14,8 +14,8 @@ import { convertMarkdownToMdast } from '../../util/conversion';
 import { toMarkdown } from 'mdast-util-to-markdown';
 import { imgCache } from '../image/constants';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
-import { useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
 import { fontPresets } from './constants';
+import { useLessonThemeStyles } from '@rapid-cmi5/ui';
 
 /**
  * Quote Content Editor for the Quotes plugin.
