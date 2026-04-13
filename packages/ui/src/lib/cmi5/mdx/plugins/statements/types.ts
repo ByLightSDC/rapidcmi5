@@ -17,7 +17,6 @@ export interface StatementPreset {
  */
 export interface StatementsContainerDirectiveNode extends ContainerDirective {
   name: 'statements';
-
   attributes: {
     backgroundColor?: string;
     preset?: string;
@@ -30,7 +29,6 @@ export interface StatementsContainerDirectiveNode extends ContainerDirective {
 
 export interface StatementDirectiveNode extends ContainerDirective {
   name: 'statement';
-
   attributes: {
     author?: string;
     avatar?: string;

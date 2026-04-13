@@ -29,8 +29,9 @@ export const StatementsSettings = ({
     currentPreset || STATEMENT_PRESETS[0],
   );
 
-
-
+/**
+ * Submit preset change
+ */
   const handleApply = useCallback(() => {
     handleSubmit(selectedPreset);
   }, [selectedPreset]);
