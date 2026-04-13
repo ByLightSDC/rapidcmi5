@@ -50,12 +50,13 @@ import { InsertTabs } from './InsertTabs';
 import WidgetsIcon from '@mui/icons-material/Widgets';
 import { activitiesTable } from '../../constants/toolbar';
 import { InsertQuotes } from './InsertQuotes';
-import { activeEditor$, rootEditor$ } from '@mdxeditor/editor';
+import { activeEditor$ } from '@mdxeditor/editor';
 import { mergeRegister } from '@lexical/utils';
 import {
   insertNoCursorMessage,
   insertNoSelectionMessage,
   insertSelectionInstructions,
+  selectionRangeError,
 } from '../constants';
 
 const headerSxProps = {
@@ -74,7 +75,9 @@ export function BlockLibraryDrawer() {
   const drawerMode = useCellValue(drawerMode$);
   const changeViewMode = usePublisher(drawerMode$);
   const [isInsertAllowed, setIsInsertAllowed] = useState<boolean>(false);
-  const [insertMessage, setInsertMessage] = useState<string | null>(insertNoCursorMessage);
+  const [insertMessage, setInsertMessage] = useState<string | null>(
+    insertNoCursorMessage,
+  );
 
   const theme = useTheme();
 
@@ -95,6 +98,9 @@ export function BlockLibraryDrawer() {
     getDrawerSx,
   } = useDrawerAutoHide('block', isOpen, showSeq);
 
+  /**
+   * Listen for selection changes to determine if block insertion is allowed and to set appropriate messages.
+   */
   useEffect(() => {
     if (!activeEditor) {
       return;
@@ -106,10 +112,10 @@ export function BlockLibraryDrawer() {
         () => {
           const selection = $getSelection();
           if (selection === null) {
-            setInsertMessage('selection is null');
+            setInsertMessage(insertNoCursorMessage);
           }
           if (!$isRangeSelection(selection)) {
-            setInsertMessage('selection is not a range');
+            setInsertMessage(selectionRangeError);
             setIsInsertAllowed(false);
             return false;
           }
