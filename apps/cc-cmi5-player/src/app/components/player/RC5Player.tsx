@@ -57,6 +57,8 @@ import {
   LessonThemeContext,
   QuotesContainerDirectiveDescriptor,
   QuotesContentDirectiveDescriptor,
+  StatementsContainerDirectiveDescriptor,
+  StatementsContentDirectiveDescriptor,
 } from '@rapid-cmi5/ui';
 
 import { RC5PlayerToolbar } from './RC5PlayerToolbar';
@@ -153,6 +155,8 @@ function RC5Player() {
           ImageTextDirectiveDescriptor,
           QuotesContainerDirectiveDescriptor,
           QuotesContentDirectiveDescriptor,
+          StatementsContainerDirectiveDescriptor,
+          StatementsContentDirectiveDescriptor,
         ],
       }),
       codeMirrorPlugin({
