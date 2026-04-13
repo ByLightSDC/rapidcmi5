@@ -1,5 +1,4 @@
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { UseFormReturn } from 'react-hook-form';
 import {
@@ -16,15 +15,7 @@ import {
   maxFormWidths,
   useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
-import {
-  Alert,
-  alpha,
-  Box,
-  MenuItem,
-  SxProps,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { Alert, MenuItem, SxProps, Typography, useTheme } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import * as yup from 'yup';
@@ -39,6 +30,7 @@ import LrsHeaderWithDetails from '../LrsStatementHelper';
 import { useRapidCmi5Opts } from '../../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 import { useContext } from 'react';
 import { ScenarioCard } from './ScenarioCard';
+import { NoScenarioCard } from './NoScenarioCard';
 
 export const ScenarioForm = ({
   crudType,
@@ -148,34 +140,7 @@ export const ScenarioForm = ({
                 scenarioName={scenarioName}
               />
             ) : (
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1.5,
-                  my: 1,
-                  p: 1,
-                  borderRadius: 2,
-                  border: `1px dashed ${theme.palette.divider}`,
-                  bgcolor: theme.palette.background.paper,
-                }}
-              >
-                <FolderOpenIcon
-                  sx={{
-                    fontSize: 20,
-                    color: alpha(theme.palette.text.secondary, 0.7),
-                    flexShrink: 0,
-                  }}
-                />
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: alpha(theme.palette.text.secondary, 0.7),
-                  }}
-                >
-                  No scenario selected
-                </Typography>
-              </Box>
+              <NoScenarioCard />
             )}
           </Grid>
         ) : (

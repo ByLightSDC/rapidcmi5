@@ -73,6 +73,8 @@ export const usePublishActions = (
         if (!courseData) {
           throw new Error('Course data was null');
         }
+        const failedAus: Array<{ au: CourseAU; blockId: string; error: any }> =
+          [];
         for (const block of courseData.blocks) {
           const blockId = generateBlockId({
             courseId: courseData.courseId,
@@ -80,8 +82,24 @@ export const usePublishActions = (
           });
 
           for (const au of block.aus) {
-            await processAu(au, blockId);
+            try {
+              await processAu(au, blockId);
+            } catch (err) {
+              failedAus.push({ au, blockId, error: err });
+            }
           }
+        }
+        // Attempt to create all au mappings and show the errors after
+        if (failedAus.length > 0) {
+          const auDetails = failedAus
+            .map(
+              (f) =>
+                `"${f.au.auName}" (scenario: ${f.au.rangeosScenarioName ?? 'unknown'}, uuid: ${f.au.rangeosScenarioUUID ?? 'unknown'}): ${f.error}`,
+            )
+            .join('\n');
+          throw new Error(
+            `Failed to create mapping for the following AUs:\n${auDetails}`,
+          );
         }
       }
     } catch (err: any) {
