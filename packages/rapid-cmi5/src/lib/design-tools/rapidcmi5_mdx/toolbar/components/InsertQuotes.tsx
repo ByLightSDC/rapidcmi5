@@ -46,49 +46,49 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
    * Inserts default Quotes at the current selection
    * If it is NOT empty, nothing is inserted
    */
-  const insertAtSelection = (preset: string, avatar?: string) => {
-    if (!editor) return;
+  const insertAtSelection = useCallback(
+    (preset: string, avatar?: string) => {
+      if (!editor) return;
 
-    editor.update(() => {
-      const selection = $getSelection();
-      if (!$isRangeSelection(selection)) return;
+      // Re-focus the editor so Lexical restores its last known selection,
+      // then run the insert inside that callback.
+      editor.focus(() => {
+        editor.update(() => {
+          const selection = $getSelection();
+          if (!$isRangeSelection(selection) || !selection.isCollapsed()) return;
 
-      if (selection.isCollapsed()) {
-        //continue
-      } else {
-        debugLogWarning('Cannot insert quotes into selection');
-        return; //no applying quote to selection
-      }
+          // create child quotes content
+          const theChildMDast = convertMarkdownToMdast(
+            DEFAULT_QUOTES,
+            syntaxExtensions,
+          );
+          // set avatar based on current settings
+          let quoteContent = theChildMDast.children[0] as ContainerDirective;
+          if (avatar) {
+            quoteContent = {
+              ...quoteContent,
+              attributes: { ...quoteContent.attributes, avatar },
+            };
+          }
 
-      // create child quotes content
-      const theChildMDast = convertMarkdownToMdast(
-        DEFAULT_QUOTES,
-        syntaxExtensions,
-      );
-      // set avatar based on current settings
-      let quoteContent = theChildMDast.children[0] as ContainerDirective;
-      if (avatar) {
-        quoteContent = {
-          ...quoteContent,
-          attributes: { ...quoteContent.attributes, avatar: avatar },
-        };
-      }
+          // create quotes node
+          const mdastQuotes: ContainerDirective = {
+            type: 'containerDirective',
+            name: 'quotes',
+            attributes: {
+              preset,
+              style: 'margin: 4px;',
+            },
+            children: [quoteContent],
+          };
 
-      // create quotes node
-      const mdastQuotes: ContainerDirective = {
-        type: 'containerDirective',
-        name: 'quotes',
-        attributes: {
-          preset: preset,
-          style: 'margin: 4px;',
-        },
-        children: [quoteContent],
-      };
-
-      const quotesNode = $createDirectiveNode(mdastQuotes) as DirectiveNode;
-      selection.insertNodes([quotesNode]);
-    });
-  };
+          const quotesNode = $createDirectiveNode(mdastQuotes) as DirectiveNode;
+          selection.insertNodes([quotesNode]);
+        });
+      });
+    },
+    [editor, syntaxExtensions],
+  );
 
   const handleCancel = () => {
     setIsConfiguring(false);
@@ -100,27 +100,20 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
   const handleSelect = useCallback((preset: QuotePreset, avatar: string) => {
     insertAtSelection(preset.id, avatar);
     setIsConfiguring(false);
-  }, []);
+  }, [insertAtSelection]);
 
   /**
    * Set flag for configuring layout
-   * @returns 
+   * @returns
    */
   const selectLayout = () => {
     if (!editor) return;
 
     editor.update(() => {
       const selection = $getSelection();
-      if (!$isRangeSelection(selection)) {
+      if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
         setIsConfiguring(false);
         return;
-      }
-
-      if (selection.isCollapsed()) {
-        //continue
-      } else {
-        setIsConfiguring(false);
-        return; //no applying tab to selection
       }
     });
 
