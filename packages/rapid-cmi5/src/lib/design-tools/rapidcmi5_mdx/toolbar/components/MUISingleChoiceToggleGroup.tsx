@@ -1,5 +1,11 @@
-
-import { alpha, IconButton, Tooltip, useTheme } from '@mui/material';
+import {
+  alpha,
+  Box,
+  IconButton,
+  SxProps,
+  Tooltip,
+  useTheme,
+} from '@mui/material';
 import { tooltipStyle } from '../../styles/styles';
 
 /**
@@ -10,6 +16,7 @@ export const MUISingleChoiceToggleGroup = <T extends string>({
   value,
   onChange,
   items,
+  sxProps,
 }: {
   items: {
     title: string;
@@ -18,10 +25,11 @@ export const MUISingleChoiceToggleGroup = <T extends string>({
   }[];
   onChange: (value: T | '') => void;
   value: T | '';
+  sxProps?: SxProps;
 }) => {
   const theme = useTheme();
   return (
-    <div>
+    <Box sx={sxProps}>
       {items.map((item, index) => {
         const on = item.value === value;
         return (
@@ -37,13 +45,13 @@ export const MUISingleChoiceToggleGroup = <T extends string>({
                 },
               }}
               size={'small'}
-              onClick={() => onChange(on ? '': item.value)}
+              onClick={() => onChange(on ? '' : item.value)}
             >
               {item.contents}
             </IconButton>
           </Tooltip>
         );
       })}
-    </div>
+    </Box>
   );
 };
