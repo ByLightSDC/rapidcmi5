@@ -6,27 +6,27 @@ import { StatementPreset } from './types';
 export const STATEMENT_PRESETS: StatementPreset[] = [
   {
     id: '1',
-    name: 'Centered & Compact',
-    thumbnailHeight: '40px',
-    thumbnailWidth: '60px',
+    name: 'Compact & Centered',
+    thumbnailWidth: '113px',
+    thumbnailHeight: '54px',
   },
   {
     id: '2',
     name: 'Centered',
-    thumbnailHeight: '40px',
-    thumbnailWidth: '80px',
+    thumbnailWidth: '220px',
+    thumbnailHeight: '54px',
   },
   {
     id: '3',
     name: 'Left Aligned',
-    thumbnailHeight: '40px',
-    thumbnailWidth: '80px',
+    thumbnailWidth: '220px',
+    thumbnailHeight: '54px',
   },
   {
     id: '4',
-    name: 'Left Aligned & Compact',
-    thumbnailHeight: '40px',
-    thumbnailWidth: '60px',
+    name: 'Left Aligned & Emphasis',
+    thumbnailWidth: '220px',
+    thumbnailHeight: '54px',
   },
 ];
 
