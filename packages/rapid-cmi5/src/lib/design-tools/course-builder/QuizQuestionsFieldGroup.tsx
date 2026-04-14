@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from 'react';
+import { toTitleCase } from '../rapidcmi5_mdx/editors/forms/formUtils';
 import { useWatch } from 'react-hook-form';
 
 /* MUI */
@@ -278,9 +279,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
         >
           {responseOptions.map((item) => (
             <MenuItem key={item} value={item}>
-              {item
-                .replace(/([A-Z])/g, ' $1')
-                .replace(/^[a-z]/, (c) => c.toUpperCase())}
+              {toTitleCase(item)}
             </MenuItem>
           ))}
         </FormControlSelectField>
@@ -301,9 +300,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
         >
           {gradingOptions.map((item) => (
             <MenuItem key={item} value={item}>
-              {item
-                .replace(/([A-Z])/g, ' $1')
-                .replace(/^[a-z]/, (c) => c.toUpperCase())}
+              {toTitleCase(item)}
             </MenuItem>
           ))}
         </FormControlSelectField>
