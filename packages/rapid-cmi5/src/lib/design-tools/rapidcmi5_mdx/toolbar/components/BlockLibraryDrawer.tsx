@@ -58,6 +58,7 @@ import {
   insertSelectionInstructions,
   selectionRangeError,
 } from '../constants';
+import { InsertStatements } from './InsertStatements';
 
 const headerSxProps = {
   cursor: 'pointer',
@@ -287,8 +288,9 @@ export function BlockLibraryDrawer() {
               >
                 <InsertAccordion isDrawer={true} />
                 <InsertGrid isDrawer={true} />
-                <InsertSteps isDrawer={true} />
                 <InsertQuotes isDrawer={true} />
+                <InsertStatements isDrawer={true} />
+                <InsertSteps isDrawer={true} />
                 <InsertTable isDrawer={true} />
                 <InsertTabs isDrawer={true} />
                 <InsertThematicBreak isDrawer={true} />
