@@ -4,7 +4,6 @@ import { useCallback, useState } from 'react';
 import Grid from '@mui/material/Grid2';
 import { STATEMENT_PRESETS, StatementPreset } from '@rapid-cmi5/ui';
 
-
 /**
  * Modal dialog for configuring a statements block.
  *
@@ -29,9 +28,9 @@ export const StatementsSettings = ({
     currentPreset || STATEMENT_PRESETS[0],
   );
 
-/**
- * Submit preset change
- */
+  /**
+   * Submit preset change
+   */
   const handleApply = useCallback(() => {
     handleSubmit(selectedPreset);
   }, [selectedPreset]);
@@ -92,7 +91,18 @@ export const StatementsSettings = ({
                   >
                     {preset.name}
                   </Typography>
-                  <Box sx={{ display: 'flex', gap: 0.5 }}></Box>
+                  {/* Visual preview: render equal-width mini grid boxes */}
+                  <Box
+                    sx={{ display: 'flex', justifyContent: 'center', gap: 0.5 }}
+                  >
+                    <img
+                      width={preset.thumbnailWidth}
+                      height={preset.thumbnailHeight}
+                      src={`/assets/images/statement_preset_${preset.id}.png`}
+                      alt={`${preset.name} image`}
+                      //style={{ imageRendering: 'crisp-edges' }}
+                    />
+                  </Box>
                 </Paper>
               </Grid>
             ))}

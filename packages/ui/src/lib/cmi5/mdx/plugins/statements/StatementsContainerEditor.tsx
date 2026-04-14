@@ -208,9 +208,6 @@ export const StatementsContainerEditor: React.FC<
         <Box
           sx={{
             width: '100%',
-            // border: isFocused ? '1px dashed' : '1px',
-            // borderColor: 'divider',
-            // borderRadius: 1,
             boxShadow: selectedPreset.id === "3" ? 2 : undefined,
             backgroundColor: (theme) => `${selectedPreset.id === "3" ? theme.palette.background.paper : "transparent"}`,
             paddingTop: blockPadding,

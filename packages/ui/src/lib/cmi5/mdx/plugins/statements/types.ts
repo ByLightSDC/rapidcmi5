@@ -8,6 +8,10 @@ export interface StatementPreset {
   id: string;
   /** Display name shown in the settings modal */
   name: string;
+  /** Thumbnail dimensions for the preset preview image */
+  thumbnailWidth: string;
+  /** Thumbnail dimensions for the preset preview image */
+  thumbnailHeight: string;
 }
 
 /**
