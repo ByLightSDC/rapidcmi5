@@ -29,7 +29,7 @@ export const StatementsSettings = ({
 
   const handleApply = useCallback(() => {
     handleSubmit(selectedPreset);
-  }, [selectedPreset, handleSubmit]);
+  }, [selectedPreset]);
 
   return (
     <ModalDialog
@@ -87,7 +87,17 @@ export const StatementsSettings = ({
                   >
                     {preset.name}
                   </Typography>
-                  <Box sx={{ display: 'flex', gap: 0.5 }}></Box>
+                  {/* Visual preview: render equal-width mini grid boxes */}
+                  <Box
+                    sx={{ display: 'flex', justifyContent: 'center', gap: 0.5 }}
+                  >
+                    <img
+                      width={preset.thumbnailWidth}
+                      height={preset.thumbnailHeight}
+                      src={`/assets/images/statement_preset_${preset.id}.png`}
+                      alt={`${preset.name} image`}
+                    />
+                  </Box>
                 </Paper>
               </Grid>
             ))}
