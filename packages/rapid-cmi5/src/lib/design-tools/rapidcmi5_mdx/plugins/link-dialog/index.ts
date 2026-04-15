@@ -208,13 +208,11 @@ export const linkDialogState$ = Cell<
             () => {
               const linkNode = getLinkNodeInSelection(selection);
               if (!linkNode) {
-                console.log('NEW LINK');
                 const node = $createLinkNode(url, { title });
                 node.append($createTextNode(linkContent));
                 $insertNodes([node]);
                 node.select();
               } else {
-                console.log('EDIT THE LINK', linkNode);
                 linkNode.setURL(url);
                 linkNode.setTitle(title);
 
