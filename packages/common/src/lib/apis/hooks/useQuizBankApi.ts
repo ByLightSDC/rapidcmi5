@@ -1,7 +1,11 @@
 import { useCallback, useMemo } from 'react';
-import { QuestionBankApi, QuestionBankApiCreate, quizBankContract } from './quizBankContract';
+import {
+  QuestionBankApi,
+  QuestionBankApiCreate,
+  quizBankContract,
+} from '../quizBankContract';
 import { initClient } from '@ts-rest/core';
-import { RC5ActivityTypeEnum } from '../types/activity';
+import { RC5ActivityTypeEnum } from '../../types/activity';
 
 // We will attempt to move to Tan stack React Query V5 in the future
 export function useQuizBankApi(url?: string, token?: string) {
@@ -49,7 +53,9 @@ export function useQuizBankApi(url?: string, token?: string) {
   );
 
   const addQuestionCb = useCallback(
-    async (question: QuestionBankApiCreate): Promise<QuestionBankApi | undefined> => {
+    async (
+      question: QuestionBankApiCreate,
+    ): Promise<QuestionBankApi | undefined> => {
       if (!apiClient) throw Error('API client is not set');
       const response = await apiClient.createQuestion({ body: question });
       if (response.status === 200 || response.status === 201) {

@@ -134,7 +134,7 @@ export const QuotesSettings = ({
                     {preset.name}
                   </Typography>
                   {/* Visual preview: render equal-width mini grid boxes */}
-                  <Box sx={{ display: 'flex', gap: 0.5 }}>
+                  <Box sx={{ display: 'flex', justifyContent:'center', gap: 0.5 }}>
                     <img
                       width={220}
                       height={74}

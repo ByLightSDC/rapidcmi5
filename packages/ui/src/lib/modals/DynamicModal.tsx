@@ -79,6 +79,8 @@ export interface DynamicModalProps<T> {
   itemLabel?: string;
   /** Label for the trigger / confirm button (default: "Select") */
   triggerLabel?: string;
+  /** Icon to display at the start of the trigger button */
+  triggerStartIcon?: ReactNode;
   /** Items per page (default: 50) */
   itemsPerPage?: number;
 
@@ -116,6 +118,7 @@ export function DynamicModal<T>({
   emptyDescription = 'No items to display',
   itemLabel = 'item',
   triggerLabel = 'Select',
+  triggerStartIcon,
   itemsPerPage = 50,
   multiSelect = false,
   onMultiSelect,
@@ -304,7 +307,9 @@ export function DynamicModal<T>({
         >
           <ButtonMinorUi
             onClick={() => setInternalOpen(true)}
-            sx={{ height: ROW_HEIGHT, flexShrink: 0, boxSizing: 'border-box' }}
+            fullWidth
+            startIcon={triggerStartIcon}
+            sx={{ height: ROW_HEIGHT, boxSizing: 'border-box' }}
           >
             {triggerLabel}
           </ButtonMinorUi>
