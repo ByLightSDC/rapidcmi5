@@ -1,5 +1,5 @@
 import { UseFormReturn } from 'react-hook-form';
-import { toTitleCase } from './formUtils';
+import { toTitleCase } from '../formUtils';
 import {
   FormControlSelectField,
   FormControlTextField,
@@ -19,12 +19,15 @@ import {
   moveOnCriteriaOptions,
   TeamConsolesContent,
 } from '@rapid-cmi5/cmi5-build-common';
-import { FormCrudType , useLessonThemeStyles} from '@rapid-cmi5/ui';
+import { FormCrudType, useLessonThemeStyles } from '@rapid-cmi5/ui';
 
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
-import LrsHeaderWithDetails from './LrsStatementHelper';
-import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
+
 import { useContext } from 'react';
+import LrsHeaderWithDetails from '../LrsStatementHelper';
+import { useRapidCmi5Opts } from '../../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
+import { NoScenarioCard } from './NoScenarioCard';
+import { ScenarioCard } from './ScenarioCard';
 
 export const TeamConsolesForm = ({
   crudType,
@@ -38,7 +41,7 @@ export const TeamConsolesForm = ({
   handleCloseModal?: () => void;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const { GetScenariosForm } = useRapidCmi5Opts();
+  const { GetScenariosForm, fetchScenario } = useRapidCmi5Opts();
 
   /* Lesson Theme */
   const formEditorMaxWidth = 800;
@@ -74,8 +77,10 @@ export const TeamConsolesForm = ({
     formMethods: UseFormReturn,
     formState: FormStateType,
   ): JSX.Element => {
-    const { control, setValue, trigger } = formMethods;
+    const { control, setValue, trigger, watch } = formMethods;
     const { errors } = formState;
+    const scenarioName = watch('name');
+    const scenarioUuid = watch('uuid');
 
     /**
      *
@@ -105,13 +110,24 @@ export const TeamConsolesForm = ({
           </Alert>
         </Grid>
         {GetScenariosForm ? (
-          <Grid size={6}>
+          <Grid size={11}>
             <GetScenariosForm
               submitForm={onApplyScenario}
-              errors={errors}
               formType={crudType}
+              errors={errors}
               formMethods={formMethods}
             />
+
+            {/* Selected Scenario Display */}
+            {scenarioName ? (
+              <ScenarioCard
+                fetchScenario={fetchScenario}
+                scenarioUUID={scenarioUuid}
+                scenarioName={scenarioName}
+              />
+            ) : (
+              <NoScenarioCard />
+            )}
           </Grid>
         ) : (
           <>
@@ -176,10 +192,12 @@ export const TeamConsolesForm = ({
         doAction={onSaveAction}
         formTitle="Team Exercise Scenario"
         formWidth={null}
-        formSxProps={{
-          flexGrow: 1,
-          maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
-        } as SxProps}
+        formSxProps={
+          {
+            flexGrow: 1,
+            maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
+          } as SxProps
+        }
         getFormFields={getFormFields}
         loadingButtonText="Saving"
         shouldAutoSave={true}

@@ -72,6 +72,7 @@ import { BoldItalicUnderlineToggles } from './components/BoldItalicUnderlineTogg
 import { ListsToggle } from './components/ListsToggle';
 import { UndoRedo } from './components/UndoRedo';
 import { InsertQuotes } from './components/InsertQuotes';
+import { InsertStatements } from './components/InsertStatements';
 
 /**
  * Layout Constants
@@ -295,6 +296,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                       <InsertLayoutBox />
                       <InsertAccordion />
                       <InsertQuotes />
+                      <InsertStatements />
                       <InsertSteps />
                       <InsertTable />
                       <InsertTabs />

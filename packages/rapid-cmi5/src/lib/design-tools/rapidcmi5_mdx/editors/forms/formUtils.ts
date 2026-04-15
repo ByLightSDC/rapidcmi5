@@ -1,11 +1,8 @@
 /**
  * Converts a camelCase or kebab-case string to Title Case for display.
  *
- * Examples:
+ * Example:
  *   freeResponse        → Free Response
- *   multipleChoice      → Multiple Choice
- *   completed-and-passed → Completed And Passed
- *   not-applicable      → Not Applicable
  */
 export const toTitleCase = (str: string): string =>
   str
