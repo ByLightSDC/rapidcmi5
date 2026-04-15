@@ -7,13 +7,12 @@ import { STATEMENT_PRESETS, StatementPreset } from '@rapid-cmi5/ui';
 /**
  * Modal dialog for configuring a statements block.
  *
- * Allows the user to select a layout preset , then passes
- * the chosen preset back via `handleSubmit`.
+ * Allows the user to select a layout preset.
+ * Passes the chosen preset back via `handleSubmit`.
  *
-
  * @param currentPreset - The active preset to pre-select in the layout picker.
  * @param handleCancel - Called when the user dismisses the dialog without saving.
- * @param handleSubmit - Called with the chosen preset and image src on confirm.
+ * @param handleSubmit - Called with the chosen preset on confirm.
  */
 export const StatementsSettings = ({
   currentPreset,
@@ -28,9 +27,6 @@ export const StatementsSettings = ({
     currentPreset || STATEMENT_PRESETS[0],
   );
 
-  /**
-   * Submit preset change
-   */
   const handleApply = useCallback(() => {
     handleSubmit(selectedPreset);
   }, [selectedPreset]);
@@ -100,7 +96,6 @@ export const StatementsSettings = ({
                       height={preset.thumbnailHeight}
                       src={`/assets/images/statement_preset_${preset.id}.png`}
                       alt={`${preset.name} image`}
-                      //style={{ imageRendering: 'crisp-edges' }}
                     />
                   </Box>
                 </Paper>

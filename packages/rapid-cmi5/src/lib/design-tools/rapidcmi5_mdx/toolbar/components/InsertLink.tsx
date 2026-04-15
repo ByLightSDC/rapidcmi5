@@ -1,7 +1,8 @@
 
 import { useCellValue, usePublisher } from '@mdxeditor/gurx'
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip'
-import { iconComponentFor$, openLinkEditDialog$, useTranslation } from '@mdxeditor/editor'
+import { iconComponentFor$, useTranslation } from '@mdxeditor/editor'
+import { openLinkEditDialog$ } from '../../plugins/link-dialog'
 
 /**
  * A toolbar component that opens the link edit dialog.
