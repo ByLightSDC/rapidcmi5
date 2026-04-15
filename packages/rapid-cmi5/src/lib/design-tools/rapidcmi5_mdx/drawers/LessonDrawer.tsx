@@ -20,6 +20,7 @@ import CourseSelector from '../../course-builder/selectors/CourseSelector';
 import LessonTree from './components/LessonTree';
 import {
   courseDataCache,
+  currentAu,
   currentBlock,
 } from '../../../redux/courseBuilderReducer';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
@@ -36,7 +37,6 @@ import FolderZipIcon from '@mui/icons-material/FolderZip';
 import ImportExportIcon from '@mui/icons-material/ImportExport';
 import IosShareIcon from '@mui/icons-material/IosShare';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
-
 
 import { debugLogError, RowAction } from '@rapid-cmi5/ui';
 import { listItemProps } from './components/LessonTreeNode';
@@ -65,6 +65,8 @@ export const LessonDrawer = () => {
 
   const courseData = useSelector(courseDataCache);
   const currentBlockIndex = useSelector(currentBlock);
+  const currentAuIndex = useSelector(currentAu);
+
   const { changeCourseName, saveSlide } = useContext(RC5Context);
   const {
     promptChangeCourse,
@@ -406,6 +408,8 @@ export const LessonDrawer = () => {
           anchorPos={menuAnchorPos}
           element={{
             id: '',
+            block: currentBlockIndex,
+            lesson: currentAuIndex,
             name: courseData?.courseTitle || '',
             parent: '',
             children: [],

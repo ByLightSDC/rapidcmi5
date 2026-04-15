@@ -192,23 +192,34 @@ export const courseBuilderSlice = createSlice({
     resetCourseOperations: (state) => {
       state.courseOperations = {};
     },
-    addASlide: (state, action: PayloadAction<SlideType>) => {
+    addASlide: (
+      state,
+      action: PayloadAction<{
+        slide: SlideType;
+        blockIndex: number;
+        auIndex: number;
+        insertionPoint?: number;
+      }>,
+    ) => {
+      const { insertionPoint, blockIndex, auIndex } = action.payload;
       const newSlide = {
-        ...action.payload,
-      } as SlideType;
+        ...action.payload.slide,
+      };
 
       addSlideOperation(newSlide.filepath, state);
 
       const theSlides = [
-        ...state.courseData.blocks[state.currentBlockIndex].aus[
-          state.currentAuIndex
-        ].slides,
+        ...state.courseData.blocks[blockIndex].aus[auIndex].slides,
       ];
-      theSlides.push(newSlide);
-      state.courseData.blocks[state.currentBlockIndex].aus[
-        state.currentAuIndex
-      ].slides = theSlides;
-      state.currentSlideIndex = theSlides.length - 1;
+      if (insertionPoint) {
+        state.currentSlideIndex = insertionPoint;
+        theSlides.splice(insertionPoint, 0, newSlide);
+      } else {
+        theSlides.push(newSlide);
+        state.currentSlideIndex = theSlides.length - 1;
+      }
+
+      state.courseData.blocks[blockIndex].aus[auIndex].slides = theSlides;
 
       state.dirtyReason = 'add slide';
       state.dirtyDisplay += 1;
@@ -276,31 +287,6 @@ export const courseBuilderSlice = createSlice({
         currentAuIndex,
         newAuIndex,
       );
-    },
-    insertASlide: (
-      state,
-      action: PayloadAction<{ position: number; slide: SlideType }>,
-    ) => {
-      const newSlide = action.payload.slide;
-      addSlideOperation(newSlide.filepath, state);
-
-      const theSlides = [
-        ...state.courseData.blocks[state.currentBlockIndex].aus[
-          state.currentAuIndex
-        ].slides,
-      ];
-      theSlides.splice(action.payload.position, 0, newSlide);
-      state.courseData.blocks[state.currentBlockIndex].aus[
-        state.currentAuIndex
-      ].slides = theSlides;
-      state.currentSlideIndex = Math.min(
-        action.payload.position,
-        theSlides.length - 1,
-      );
-
-      state.dirtyReason = 'insert slide';
-      state.dirtyDisplay += 1;
-      updateLastSlidePath(state);
     },
     deleteASlide: (state, action: PayloadAction<number>) => {
       const theSlides = [
@@ -547,10 +533,7 @@ export const courseBuilderSlice = createSlice({
       const { blockIndex, lessonIndex, au } = action.payload;
       state.courseData.blocks[blockIndex].aus[lessonIndex] = au;
     },
-    setDefaultLessonTheme: (
-      state,
-      action: PayloadAction<LessonTheme>,
-    ) => {
+    setDefaultLessonTheme: (state, action: PayloadAction<LessonTheme>) => {
       state.defaultLessonTheme = action.payload;
     },
     removeCourseAu: (
@@ -908,7 +891,6 @@ export const {
   addASlide,
   cacheSandbox,
   changeViewMode,
-  insertASlide,
   deleteASlide,
   deleteSlide,
   navigateSlide,
