@@ -5,7 +5,7 @@ import {
   ExecuteCodeBodyApi,
   ExecuteCodeResponseApi,
   LanguagesResponseApi,
-} from './codeRunnerContract';
+} from '../codeRunnerContract';
 
 type AuthType = 'Basic' | 'Bearer';
 // We will attempt to move to Tan stack React Query V5 in the future

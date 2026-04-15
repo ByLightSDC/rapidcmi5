@@ -130,7 +130,7 @@ interface IGitContext {
   handleGitStashPopChanges: () => Promise<void>;
   handleGitCommitReset: (commitHash: string) => void;
   handlePull: (req: PullType) => Promise<void>;
-  handleDownloadCmi5Zip: (req: DownloadCmi5Type) => void;
+  handleDownloadCmi5Zip: (req: DownloadCmi5Type) => Promise<void>;
   syncCurrentCourseWithGit: (courseData: CourseData) => Promise<string[]>;
   handleCloneRepo: (req: CreateCloneType) => Promise<void>;
   handleDeleteCurrentRepo: () => Promise<void>;
@@ -243,7 +243,7 @@ const defaultGitContext: IGitContext = {
   handleLoadCourse: () => {},
   handleCheckoutBranch: async () => {},
   handlePull: async (): Promise<void> => {},
-  handleDownloadCmi5Zip: () => {},
+  handleDownloadCmi5Zip: async (): Promise<void> => {},
   handleNavToDesigner: () => {},
   handleNavToGitView: async () => {},
   handleNavToFile: () => {},

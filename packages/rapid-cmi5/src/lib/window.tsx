@@ -5,7 +5,7 @@ import {
   SSOConfig,
   TokenResponse,
   CertInfo,
-  DirMeta
+  DirMeta,
 } from '@rapid-cmi5/cmi5-build-common';
 import { ModifiedFile } from './design-tools/course-builder/GitViewer/Components/GitActions/GitFileStatus';
 import { DirEntry } from './design-tools/course-builder/GitViewer/utils/ElectronFsApi';
@@ -16,7 +16,6 @@ export interface ipc {
     projectPath: string,
     courseFolder: string,
     projectName: string,
-    createAuMappings: boolean,
   ) => Promise<string>;
 }
 

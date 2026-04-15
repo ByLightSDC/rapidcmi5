@@ -6,7 +6,6 @@ import { getRepoPath } from '../design-tools/course-builder/GitViewer/utils/gitO
 import { CourseData } from '@rapid-cmi5/cmi5-build-common';
 import { getFsInstance } from '../design-tools/course-builder/GitViewer/utils/gitFsInstance';
 import { resetPersistance } from '@rapid-cmi5/ui';
-import { Payload } from 'react-rough-notation/dist/RoughNotationGroup/types';
 import { slugifyPath } from '../design-tools/course-builder/GitViewer/utils/useCourseOperationsUtils';
 
 // this pair ensures we always know what file system type and what the repo name is

@@ -171,10 +171,10 @@ export const useCourseOperations = (
     }
 
     // Reset code viewer to blank on switch
-    const newCourse = {
+    const newCourse: Course = {
       basePath: currentCourse.basePath,
       courseData: newCourseData,
-    } as Course;
+    };
 
     const changedFiles = await computeCourseFromJson(r, newCourse);
 

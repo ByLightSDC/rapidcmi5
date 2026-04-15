@@ -1,7 +1,6 @@
 // hooks/usePublishActions.ts
 import { useCallback } from 'react';
-import axios, { AxiosResponse } from 'axios';
-import { saveAs } from 'file-saver';
+import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { config } from '@rapid-cmi5/ui';
 import { debugLog } from '@rapid-cmi5/ui';
@@ -34,10 +33,13 @@ export const usePublishActions = (
 
   const handleDownloadCmi5Zip = async (req: DownloadCmi5Type) => {
     const r = getRepoAccess(repoAccessObject);
-    if (!currentBranch || !currentCourse) return null;
+    if (!currentBranch || !currentCourse) {
+      throw Error(
+        `Current branch : ${currentBranch} or current course : ${currentCourse} have not been set`,
+      );
+    }
 
     try {
-      let res = null;
       const repoPath = getRepoPath(r);
 
       const folderStructure = await fsInstance.getFolderStructure(
@@ -55,7 +57,6 @@ export const usePublishActions = (
           join(r.fileSystemType, r.repoName),
           currentCourse.basePath,
           req.zipName,
-          req.createAuMappings,
         );
       } else {
         if (!downloadCmi5Zip) throw Error('Download cmi5 zip is not defined');
@@ -72,6 +73,8 @@ export const usePublishActions = (
         if (!courseData) {
           throw new Error('Course data was null');
         }
+        const failedAus: Array<{ au: CourseAU; blockId: string; error: any }> =
+          [];
         for (const block of courseData.blocks) {
           const blockId = generateBlockId({
             courseId: courseData.courseId,
@@ -79,8 +82,24 @@ export const usePublishActions = (
           });
 
           for (const au of block.aus) {
-            await processAu(au, blockId);
+            try {
+              await processAu(au, blockId);
+            } catch (err) {
+              failedAus.push({ au, blockId, error: err });
+            }
           }
+        }
+        // Attempt to create all au mappings and show the errors after
+        if (failedAus.length > 0) {
+          const auDetails = failedAus
+            .map(
+              (f) =>
+                `"${f.au.auName}" (scenario: ${f.au.rangeosScenarioName ?? 'unknown'}, uuid: ${f.au.rangeosScenarioUUID ?? 'unknown'}): ${f.error}`,
+            )
+            .join('\n');
+          throw new Error(
+            `Failed to create mapping for the following AUs:\n${auDetails}`,
+          );
         }
       }
     } catch (err: any) {
