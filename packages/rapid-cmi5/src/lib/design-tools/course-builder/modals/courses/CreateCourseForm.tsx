@@ -1,4 +1,3 @@
-
 /* eslint-disable react/jsx-no-useless-fragment */
 import {
   FileUpload,
@@ -26,7 +25,7 @@ import {
   STARTS_WITH_HTTPS_GROUP,
 } from '@rapid-cmi5/ui';
 import { CreateCourseType } from '../../CourseBuilderApiTypes';
-import { useContext, useMemo } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { GitContext } from '../../GitViewer/session/GitContext';
 
 export function CreateCourseForm({
@@ -47,10 +46,11 @@ export function CreateCourseForm({
 }) {
   const { handleCreateCourse } = useContext(GitContext);
 
-  const formMethods = useForm({
-    defaultValues: defaultData,
-    mode: 'onChange',
-  });
+  const createCourseWithUUID = async (req: CreateCourseType) => {
+    const uuid = crypto.randomUUID();
+    req.courseId = `${req.courseId}/${uuid}`;
+    await handleCreateCourse(req);
+  };
 
   const validationSchema = useMemo(() => {
     return yup.object().shape({
@@ -202,7 +202,7 @@ export function CreateCourseForm({
       <FormControlUIProvider>
         <MiniForm
           dataCache={defaultData}
-          doAction={handleCreateCourse}
+          doAction={createCourseWithUUID}
           formTitle="Create Course"
           getFormFields={getFormFields}
           instructions=""
