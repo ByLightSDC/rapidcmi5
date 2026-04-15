@@ -149,8 +149,8 @@ export async function gradeActivity(
             shouldSendGradingVerbs = true;
         }
         break;
-      case SlideActivityType.JOBE:
-        meetsCriteria = passed; // Jobe activities must pass to meet criteria
+      case SlideActivityType.CODE_RUNNER:
+        meetsCriteria = passed; // Code Runner activities must pass to meet criteria
         break;
       case SlideActivityType.AUTOGRADER:
         meetsCriteria = passed;

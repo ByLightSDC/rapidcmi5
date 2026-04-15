@@ -49,15 +49,9 @@ import {
   ImageNode,
 } from './ImageNode';
 import { LexicalImageVisitor } from './LexicalImageVisitor';
-import {
-  MdastLinkImageVisitor,
-  MdastHtmlLinkedImageVisitor,
-  MdastHtmlImageVisitor,
-  MdastImageVisitor,
-  MdastJsxImageVisitor,
-} from './MdastImageVisitor';
+import { MdastImageVisitor, MdastJsxImageVisitor } from './MdastImageVisitor';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
-
+import { imagePreviewHandler$, imageUploadHandler$ } from '@rapid-cmi5/ui';
 
 export const CAN_USE_DOM: boolean =
   typeof window !== 'undefined' &&
@@ -207,18 +201,6 @@ export const imageAutocompleteSuggestions$ = Cell<string[]>([]);
  * @group Image
  */
 export const disableImageResize$ = Cell<boolean>(false);
-
-/**
- * Holds the image upload handler callback.
- * @group Image
- */
-export const imageUploadHandler$ = Cell<ImageUploadHandler>(null);
-
-/**
- * Holds the image preview handler callback.
- * @group Image
- */
-export const imagePreviewHandler$ = Cell<ImagePreviewHandler>(null);
 
 /**
  * Holds the image placeholder.

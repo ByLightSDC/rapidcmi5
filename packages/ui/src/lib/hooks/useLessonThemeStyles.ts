@@ -11,7 +11,7 @@ import { useMemo, useState } from 'react';
 
 export const useLessonThemeStyles = (
   lessonTheme: LessonTheme | undefined,
-  maxWidth: number,
+  maxWidth?: number,
 ) => {
   // useMemo doesnt work with signals, mirror signal with state
   const [maxSlideWidth, setMaxSlideWidth] = useState<number | null>(null);
@@ -43,7 +43,11 @@ export const useLessonThemeStyles = (
       padding: blockPadding,
       marginBottom: blockPadding,
       marginTop: blockPadding,
-      maxWidth: maxSlideWidth ? Math.min(maxSlideWidth, maxWidth) : maxWidth,
+      maxWidth: maxWidth
+        ? maxSlideWidth
+          ? Math.min(maxSlideWidth, maxWidth)
+          : maxWidth
+        : undefined,
       marginLeft:
         activityAlign === DefaultAlignmentEnum.Center
           ? 'auto'
@@ -101,12 +105,12 @@ export const useLessonThemeStyles = (
  * max widths for forms and playback views
  */
 export const maxFormWidths = {
-  jobeEditor: 1024,
+  codeRunnerEditor: 1024,
   quizEditor: 800,
   scenarioEditor: 800,
   downloadsEditor: 640,
   ctfPlayback: 1024,
-  jobePlayback: 1024,
+  codeRunnerPlayback: 1024,
   quizPlayback: 800,
   scenarioPlayback: 1024,
 };

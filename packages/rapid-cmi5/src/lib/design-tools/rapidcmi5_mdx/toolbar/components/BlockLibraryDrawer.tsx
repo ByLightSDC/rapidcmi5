@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   alpha,
@@ -22,13 +22,16 @@ import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { useCellValue, usePublisher } from '@mdxeditor/gurx';
+import {
+  SELECTION_CHANGE_COMMAND,
+  COMMAND_PRIORITY_LOW,
+  $getSelection,
+  $isRangeSelection,
+} from 'lexical';
+import { useCellValue, useCellValues, usePublisher } from '@mdxeditor/gurx';
 
 import { drawerMode$, DRAWER_TYPE, blockShowSeq$ } from './drawers';
-import {
-  ButtonInfoField,
-  ViewExpander,
-} from '@rapid-cmi5/ui';
+import { ButtonInfoField, ViewExpander } from '@rapid-cmi5/ui';
 
 import { InsertActivities } from './InsertActivities';
 import { InsertAdmonitions } from './InsertAdmonitions';
@@ -46,6 +49,16 @@ import { InsertSteps } from './InsertSteps';
 import { InsertTabs } from './InsertTabs';
 import WidgetsIcon from '@mui/icons-material/Widgets';
 import { activitiesTable } from '../../constants/toolbar';
+import { InsertQuotes } from './InsertQuotes';
+import { activeEditor$ } from '@mdxeditor/editor';
+import { mergeRegister } from '@lexical/utils';
+import {
+  insertNoCursorMessage,
+  insertNoSelectionMessage,
+  insertSelectionInstructions,
+  selectionRangeError,
+} from '../constants';
+import { InsertStatements } from './InsertStatements';
 
 const headerSxProps = {
   cursor: 'pointer',
@@ -58,22 +71,73 @@ const headerSxProps = {
  */
 export function BlockLibraryDrawer() {
   useLexicalComposerContext(); // Ensures we are inside a Lexical editor context
+  const [activeEditor] = useCellValues(activeEditor$);
+  const showSeq = useCellValue(blockShowSeq$);
   const drawerMode = useCellValue(drawerMode$);
   const changeViewMode = usePublisher(drawerMode$);
+  const [isInsertAllowed, setIsInsertAllowed] = useState<boolean>(false);
+  const [insertMessage, setInsertMessage] = useState<string | null>(
+    insertNoCursorMessage,
+  );
+
   const theme = useTheme();
 
   const isOpen = useMemo(() => {
     return drawerMode === DRAWER_TYPE.BLOCK;
   }, [drawerMode]);
 
-  const showSeq = useCellValue(blockShowSeq$);
-
   const handleClose = useCallback(() => {
     changeViewMode(DRAWER_TYPE.NONE);
   }, [changeViewMode]);
 
-  const { autoHide, toggleAutoHide, handleMouseEnter, handleMouseLeave, effectiveOpen, getDrawerSx } =
-    useDrawerAutoHide('block', isOpen, showSeq);
+  const {
+    autoHide,
+    toggleAutoHide,
+    handleMouseEnter,
+    handleMouseLeave,
+    effectiveOpen,
+    getDrawerSx,
+  } = useDrawerAutoHide('block', isOpen, showSeq);
+
+  /**
+   * Listen for selection changes to determine if block insertion is allowed and to set appropriate messages.
+   */
+  useEffect(() => {
+    if (!activeEditor) {
+      return;
+    }
+
+    const unregister = mergeRegister(
+      activeEditor.registerCommand(
+        SELECTION_CHANGE_COMMAND,
+        () => {
+          const selection = $getSelection();
+          if (selection === null) {
+            setInsertMessage(insertNoCursorMessage);
+          }
+          if (!$isRangeSelection(selection)) {
+            setInsertMessage(selectionRangeError);
+            setIsInsertAllowed(false);
+            return false;
+          }
+          if (selection.isCollapsed()) {
+            setIsInsertAllowed(true);
+            setInsertMessage(null);
+            return true;
+          } else {
+            setIsInsertAllowed(false);
+            setInsertMessage(insertNoSelectionMessage);
+            return false; //no applying quote to selection
+          }
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+    );
+
+    return () => {
+      unregister();
+    };
+  }, [activeEditor]);
 
   return (
     <Drawer
@@ -93,7 +157,10 @@ export function BlockLibraryDrawer() {
           pointerEvents: 'auto',
         },
       })}
-      PaperProps={{ onMouseEnter: handleMouseEnter, onMouseLeave: handleMouseLeave }}
+      PaperProps={{
+        onMouseEnter: handleMouseEnter,
+        onMouseLeave: handleMouseLeave,
+      }}
     >
       <Stack
         id="block-library"
@@ -119,14 +186,24 @@ export function BlockLibraryDrawer() {
           >
             Block Library
           </Typography>
-          <Tooltip title={autoHide ? 'Auto-hide on (click to pin)' : 'Auto-hide off (click to enable)'}>
+          <Tooltip
+            title={
+              autoHide
+                ? 'Auto-hide on (click to pin)'
+                : 'Auto-hide off (click to enable)'
+            }
+          >
             <IconButton
               onClick={toggleAutoHide}
               aria-label={autoHide ? 'Disable auto-hide' : 'Enable auto-hide'}
               size="small"
               sx={{ color: autoHide ? 'primary.main' : 'text.disabled' }}
             >
-              {autoHide ? <PushPinOutlinedIcon fontSize="small" /> : <PushPinIcon fontSize="small" />}
+              {autoHide ? (
+                <PushPinOutlinedIcon fontSize="small" />
+              ) : (
+                <PushPinIcon fontSize="small" />
+              )}
             </IconButton>
           </Tooltip>
           <IconButton onClick={handleClose} aria-label="Close Block Library">
@@ -143,9 +220,15 @@ export function BlockLibraryDrawer() {
           }}
         >
           <Box>
-            <Alert severity="info" sx={{ margin: 2 }}>
-              Expand a topic and click item to add it to the current slide.
-            </Alert>
+            {!isInsertAllowed ? (
+              <Alert severity="warning" sx={{ margin: 2 }}>
+                {insertMessage}
+              </Alert>
+            ) : (
+              <Alert severity="info" sx={{ margin: 2 }}>
+                {insertSelectionInstructions}
+              </Alert>
+            )}
           </Box>
           <Stack direction="column" spacing={2}>
             <ViewExpander
@@ -188,7 +271,7 @@ export function BlockLibraryDrawer() {
             </ViewExpander>
             <ViewExpander
               title="Layout"
-              defaultIsExpanded={false}
+              defaultIsExpanded={true}
               headerSxProps={headerSxProps}
               shouldEndWithDivider={true}
             >
@@ -205,6 +288,8 @@ export function BlockLibraryDrawer() {
               >
                 <InsertAccordion isDrawer={true} />
                 <InsertGrid isDrawer={true} />
+                <InsertQuotes isDrawer={true} />
+                <InsertStatements isDrawer={true} />
                 <InsertSteps isDrawer={true} />
                 <InsertTable isDrawer={true} />
                 <InsertTabs isDrawer={true} />

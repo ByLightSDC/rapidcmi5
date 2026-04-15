@@ -8,8 +8,8 @@ import {
 
 import { Stack, Typography } from '@mui/material';
 
-import { ScenarioForm } from '../forms/ScenarioForm';
-import { JobeForm } from '../forms/JobeForm';
+import { ScenarioForm } from '../forms/scenario/ScenarioForm';
+import { CodeRunnerForm } from '../forms/CodeRunnerForm';
 
 import { QuizForm } from '../forms/QuizForm';
 import { useAuContext } from '../../data-hooks/useAuContext';
@@ -17,14 +17,13 @@ import DeleteIconButton from '../components/DeleteIconButton';
 import RightMenuContainer from '../components/RightMenuContainer';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { TeamConsolesForm } from '../forms/TeamConsolesForm';
 import { DownloadFilesForm } from './DownloadFilesForm';
 import {
   RC5ActivityTypeEnum,
   ActivityJsonNode,
   QuizContent,
   CTFContent,
-  JobeContent,
+  CodeRunnerContent,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   useTimeStampUUID,
@@ -36,10 +35,12 @@ import {
   FormCrudType,
   AuQuiz,
   AuCTF,
-  JobeInTheBox,
+  CodeRunner,
 } from '@rapid-cmi5/ui';
 import { updateScenario, updateTeamScenario } from '@rapid-cmi5/react-editor';
 import ScenarioMock from './ScenarioMock';
+import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
+import { TeamConsolesForm } from '../forms/scenario/TeamConsolesForm';
 
 /**
  * MDX Editor for Activities
@@ -63,6 +64,7 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
   const isPlayback = useCellValue(editorInPlayback$);
   const auProps = useAuContext();
   const themedDividerColor = useSelector(dividerColor);
+  const { userAuth, apiUrls } = useRapidCmi5Opts();
 
   // style for playback boxes
   const staticStyle = useMemo(() => {
@@ -305,13 +307,19 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
           )}
         </>
       )}
-      {name === 'jobe' && fromJson && (
+      {name === 'codeRunner' && fromJson && (
         <>
           {isPlayback && (
-            <JobeInTheBox auProps={auProps} content={fromJson as JobeContent} />
+            <CodeRunner
+              auProps={auProps}
+              content={fromJson as CodeRunnerContent}
+              authType="Bearer"
+              token={userAuth?.token}
+              url={apiUrls?.codeRunnerUrl}
+            />
           )}
           {!isPlayback && (
-            <JobeForm
+            <CodeRunnerForm
               crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
               defaultFormData={fromJson}
               deleteButton={

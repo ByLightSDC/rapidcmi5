@@ -55,6 +55,10 @@ import {
   StepsDirectiveDescriptor,
   StepContentDirectiveDescriptor,
   LessonThemeContext,
+  QuotesContainerDirectiveDescriptor,
+  QuotesContentDirectiveDescriptor,
+  StatementsContainerDirectiveDescriptor,
+  StatementDirectiveDescriptor,
 } from '@rapid-cmi5/ui';
 
 import { RC5PlayerToolbar } from './RC5PlayerToolbar';
@@ -148,6 +152,10 @@ function RC5Player() {
           TabContentDirectiveDescriptor,
           ImageLabelDirectiveDescriptor,
           ImageTextDirectiveDescriptor,
+          QuotesContainerDirectiveDescriptor,
+          QuotesContentDirectiveDescriptor,
+          StatementsContainerDirectiveDescriptor,
+          StatementDirectiveDescriptor,
         ],
       }),
       codeMirrorPlugin({
@@ -403,6 +411,7 @@ function RC5Player() {
           }}
           id="full screen"
           style={{
+            backgroundColor: '#000000',
             position: 'absolute',
             zIndex: 9999,
             width: '100vw',
@@ -429,7 +438,7 @@ function RC5Player() {
           />
           <Typography
             variant="caption"
-            color="text.secondary"
+            color="common.white"
             sx={{ padding: '6px', position: 'absolute', left: 0, bottom: 0 }}
           >
             Click Anywhere to Close

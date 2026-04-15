@@ -83,15 +83,8 @@ import {
   createUniquePath,
   slugifyPath,
 } from '../utils/useCourseOperationsUtils';
-import {
-  GetQuizBankAddModalProps,
-  GetQuizBankSearchModalProps,
-  GetScenarioFormProps,
-  QuizBankAddModalProps,
-  QuizBankSearchModalProps,
-  RapidCmi5Opts,
-  UserAuth,
-} from '../../../rapidcmi5_mdx/main';
+
+import { useRapidCmi5Opts } from './RapidCmi5OptsContext';
 
 interface IGitContext {
   currentCourse?: Course | null;
@@ -110,10 +103,6 @@ interface IGitContext {
   isRepoConnectedToRemote: boolean;
   currentGitConfig: GitConfigType;
   isElectron: boolean;
-  GetScenariosForm?: React.ComponentType<GetScenarioFormProps>;
-  QuizBankSearchModal?: React.ComponentType<GetQuizBankSearchModalProps>;
-  QuizBankAddModal?: React.ComponentType<GetQuizBankAddModalProps>;
-  currentAuth?: UserAuth;
   handleChangeRepo: (name: string) => void;
   handleChangeFileSystem: (fsType: fsType) => void;
   handleChangeRepoName: (name: string) => void;
@@ -141,7 +130,7 @@ interface IGitContext {
   handleGitStashPopChanges: () => Promise<void>;
   handleGitCommitReset: (commitHash: string) => void;
   handlePull: (req: PullType) => Promise<void>;
-  handleDownloadCmi5Zip: (req: DownloadCmi5Type) => void;
+  handleDownloadCmi5Zip: (req: DownloadCmi5Type) => Promise<void>;
   syncCurrentCourseWithGit: (courseData: CourseData) => Promise<string[]>;
   handleCloneRepo: (req: CreateCloneType) => Promise<void>;
   handleDeleteCurrentRepo: () => Promise<void>;
@@ -213,7 +202,6 @@ interface IGitContext {
 interface tProviderProps {
   isEnabled?: boolean;
   children?: JSX.Element;
-  rapidCmi5Opts: RapidCmi5Opts;
 }
 
 /**
@@ -237,8 +225,6 @@ const defaultGitContext: IGitContext = {
   isRepoConnectedToRemote: false,
   currentGitConfig: {} as GitConfigType,
   gitRepoCommits: [],
-  GetScenariosForm: undefined,
-  currentAuth: undefined,
   handlePathExists: async () => false,
   handleBlobImageFile: async (r, filePath, fileType) => null,
   handleGetFolderStructure: async () => [],
@@ -257,7 +243,7 @@ const defaultGitContext: IGitContext = {
   handleLoadCourse: () => {},
   handleCheckoutBranch: async () => {},
   handlePull: async (): Promise<void> => {},
-  handleDownloadCmi5Zip: () => {},
+  handleDownloadCmi5Zip: async (): Promise<void> => {},
   handleNavToDesigner: () => {},
   handleNavToGitView: async () => {},
   handleNavToFile: () => {},
@@ -345,7 +331,8 @@ export const getRepoAccess = (repoAccessObject: RepoAccessObject | null) => {
 // Simple functions should stay in their own hooks, functions which need data from other hooks should be created
 // in this context
 export const GitContextProvider = (props: tProviderProps) => {
-  const { children, rapidCmi5Opts } = props;
+  const { children } = props;
+  const rapidCmi5Opts = useRapidCmi5Opts();
   const gitFs = getFsInstance();
   const isElectron = gitFs.isElectron;
 
@@ -361,12 +348,6 @@ export const GitContextProvider = (props: tProviderProps) => {
     currentBranch,
     fileSystemType,
   }: RepoState = useSelector((state: RootState) => state.repoManager);
-
-  const GetScenariosForm = rapidCmi5Opts.GetScenariosForm;
-  const QuizBankSearchModal = rapidCmi5Opts.QuizBankSearchModal;
-  const QuizBankAddModal = rapidCmi5Opts.QuizBankAddModal;
-
-  const currentAuth: UserAuth | undefined = rapidCmi5Opts.userAuth;
 
   const availableCourses = fileState?.availableCourses ?? [];
   const currentCourse = fileState.selectedCourse;
@@ -526,18 +507,23 @@ export const GitContextProvider = (props: tProviderProps) => {
 
   const handleStageAll = useCallback(
     async (useCache: boolean = false, changedFiles?: string[]) => {
-      const r = getRepoAccess(repoAccessObject);
+      try {
+        const r = getRepoAccess(repoAccessObject);
 
-      // This is required due to timing issues, the exported modified files above is based on state
-      // this is good for eventual consistency in the UI, but to get the most current we need to use
-      // this helper for functions that require real time data
-      const filesForStaging: ModifiedFile[] = useCache
-        ? modifiedFiles
-        : await gitOperator.gitRepoStatus(r, changedFiles);
+        // This is required due to timing issues, the exported modified files above is based on state
+        // this is good for eventual consistency in the UI, but to get the most current we need to use
+        // this helper for functions that require real time data
+        const filesForStaging: ModifiedFile[] = useCache
+          ? modifiedFiles
+          : await gitOperator.gitRepoStatus(r, changedFiles);
 
-      const afterStage = await stageFiles(filesForStaging);
-      await resolveGitRepoStatus(r);
-      setCanCommit(true);
+        await stageFiles(filesForStaging);
+        await resolveGitRepoStatus(r);
+        setCanCommit(true);
+      } catch (error) {
+        debugLogError('Failed to stage all files' + error);
+        throw Error('Could not stage all files');
+      }
     },
     [modifiedFiles, resolveGitRepoStatus, stageFiles],
   );
@@ -1215,10 +1201,6 @@ export const GitContextProvider = (props: tProviderProps) => {
     <GitContext.Provider
       value={{
         gettingRepoStatus: gettingRepoStatus || isPerformingOperation,
-        GetScenariosForm,
-        QuizBankSearchModal,
-        QuizBankAddModal,
-        currentAuth,
         isElectron,
         isFsLoaded,
         isGitLoaded,

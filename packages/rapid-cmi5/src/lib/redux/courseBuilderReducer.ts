@@ -5,10 +5,10 @@ import {
   SlideType,
   SlideTypeEnum,
   CTFContent,
-  JobeContent,
   Operation,
   CourseAU,
   LessonTheme,
+  CodeRunnerContent,
 } from '@rapid-cmi5/cmi5-build-common';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './store';
@@ -442,7 +442,7 @@ export const courseBuilderSlice = createSlice({
           | ScenarioContent
           | QuizContent
           | CTFContent
-          | JobeContent;
+          | CodeRunnerContent;
         display?: string;
         skipShouldDirty?: boolean;
       }>,

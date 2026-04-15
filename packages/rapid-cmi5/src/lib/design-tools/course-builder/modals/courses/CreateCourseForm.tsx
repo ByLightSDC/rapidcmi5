@@ -14,7 +14,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { createCourseModalId } from '../../../rapidcmi5_mdx/modals/constants';
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
-import { Alert, Box, Button, IconButton, Tooltip } from '@mui/material';
+import { Alert, Box, IconButton, Tooltip } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import { useForm, UseFormReturn } from 'react-hook-form';
@@ -25,7 +25,7 @@ import {
   STARTS_WITH_HTTPS_GROUP,
 } from '@rapid-cmi5/ui';
 import { CreateCourseType } from '../../CourseBuilderApiTypes';
-import { useContext, useMemo } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { GitContext } from '../../GitViewer/session/GitContext';
 
 export function CreateCourseForm({
@@ -46,10 +46,11 @@ export function CreateCourseForm({
 }) {
   const { handleCreateCourse } = useContext(GitContext);
 
-  const formMethods = useForm({
-    defaultValues: defaultData,
-    mode: 'onChange',
-  });
+  const createCourseWithUUID = async (req: CreateCourseType) => {
+    const uuid = crypto.randomUUID();
+    req.courseId = `${req.courseId}/${uuid}`;
+    await handleCreateCourse(req);
+  };
 
   const validationSchema = useMemo(() => {
     return yup.object().shape({
@@ -96,7 +97,7 @@ export function CreateCourseForm({
     formMethods: UseFormReturn,
     formState: FormStateType,
   ): JSX.Element => {
-    const { control, watch } = formMethods;
+    const { control, watch, setValue, trigger } = formMethods;
     const { errors } = formState;
     const isUploading = watch('zipFile');
 
@@ -114,34 +115,34 @@ export function CreateCourseForm({
       </Grid>
     );
 
-    //REF const zipUploadField = (
-    //   <Grid size={12}>
-    //     <Tooltip title="Upload an existing CMI5 course zip file into the repo. Must have a valid RC5 version.">
-    //       <IconButton size="small">
-    //         <InfoOutlinedIcon fontSize="small" />
-    //       </IconButton>
-    //     </Tooltip>
-    //     <FileUpload
-    //       buttonEmphasis={false}
-    //       buttonTitle="Import..."
-    //       dataCache={[]}
-    //       fileTypes=".zip"
-    //       isUploading={false}
-    //       noFileSelectedMessage="Import from CMI5 zip"
-    //       onFileSelected={async (file: File, selected: boolean) => {
-    //         if (selected && file instanceof File) {
-    //           setValue('zipFile', file, { shouldValidate: true });
-    //         } else {
-    //           setValue('zipFile', undefined, { shouldValidate: true });
-    //         }
-    //         trigger('zipFile');
-    //       }}
-    //     />
-    //     {errors?.zipFile && (
-    //       <Alert severity="error">{errors.zipFile.message}</Alert>
-    //     )}
-    //   </Grid>
-    // );
+    const zipUploadField = (
+      <Grid size={12}>
+        <Tooltip title="Upload an existing CMI5 course zip file into the repo. Must have a valid RC5 version.">
+          <IconButton size="small">
+            <InfoOutlinedIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+        <FileUpload
+          buttonEmphasis={false}
+          buttonTitle="Import..."
+          dataCache={[]}
+          fileTypes=".zip"
+          isUploading={false}
+          noFileSelectedMessage="Import from CMI5 zip"
+          onFileSelected={async (file: File, selected: boolean) => {
+            if (selected && file instanceof File) {
+              setValue('zipFile', file, { shouldValidate: true });
+            } else {
+              setValue('zipFile', undefined, { shouldValidate: true });
+            }
+            trigger('zipFile');
+          }}
+        />
+        {errors?.zipFile && (
+          <Alert severity="error">{errors.zipFile.message}</Alert>
+        )}
+      </Grid>
+    );
 
     return (
       <>
@@ -184,7 +185,7 @@ export function CreateCourseForm({
           />
         </Grid>
         {defaultLessonField}
-        {/* {zipUploadField} */}
+        {zipUploadField}
       </>
     );
   };
@@ -201,7 +202,7 @@ export function CreateCourseForm({
       <FormControlUIProvider>
         <MiniForm
           dataCache={defaultData}
-          doAction={handleCreateCourse}
+          doAction={createCourseWithUUID}
           formTitle="Create Course"
           getFormFields={getFormFields}
           instructions=""

@@ -26,7 +26,6 @@ import {
   AuManagerState,
   QuizState,
   RC5ActivityTypeEnum,
-  SlideType,
 } from '@rapid-cmi5/cmi5-build-common';
 import MenuLayout from '../components/MenuLayout';
 
@@ -93,6 +92,7 @@ function AuManager() {
     isInitSessionCmi5Complete,
   } = useCMI5Session();
 
+
   const {
     handleGetQuizProgress,
     handleSetQuizProgress,
@@ -119,9 +119,9 @@ function AuManager() {
         undefined,
         'auManager',
       );
-    } else if (atype === RC5ActivityTypeEnum.jobe) {
+    } else if (atype === RC5ActivityTypeEnum.codeRunner) {
       logger.debug(
-        'Jobe Cache has not been implemented yet',
+        'Code Runner Cache has not been implemented yet',
         undefined,
         'auManager',
       );
@@ -142,9 +142,9 @@ function AuManager() {
         undefined,
         'auManager',
       );
-    } else if (atype === RC5ActivityTypeEnum.jobe) {
+    } else if (atype === RC5ActivityTypeEnum.codeRunner) {
       logger.debug(
-        'Jobe Cache has not been implemented yet',
+        'Code Runner Cache has not been implemented yet',
         undefined,
         'auManager',
       );
@@ -449,7 +449,7 @@ function AuManager() {
           if (
             content.indexOf(':::quiz') >= 0 ||
             content.indexOf(':::ctf') >= 0 ||
-            content.indexOf(':::jobe') >= 0 ||
+            content.indexOf(':::codeRunner') >= 0 ||
             content.indexOf(':::consoles') >= 0 ||
             content.indexOf(':::scenario') >= 0
           ) {

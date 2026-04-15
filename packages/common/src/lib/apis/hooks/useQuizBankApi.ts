@@ -1,29 +1,36 @@
 import { useCallback, useMemo } from 'react';
-import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
-import { QuestionBankApiCreate, quizBankContract } from '../../../../../../../packages/common/src/lib/types/apis/quizBankContract';
+import {
+  QuestionBankApi,
+  QuestionBankApiCreate,
+  quizBankContract,
+} from '../quizBankContract';
 import { initClient } from '@ts-rest/core';
+import { RC5ActivityTypeEnum } from '../../types/activity';
 
 // We will attempt to move to Tan stack React Query V5 in the future
-export function useQuizBankApi(url: string, token: string) {
+export function useQuizBankApi(url?: string, token?: string) {
   const apiClient = useMemo(
     () =>
-      initClient(quizBankContract, {
-        baseUrl: url,
-        baseHeaders: {
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: 'include',
-      }),
+      url && token
+        ? initClient(quizBankContract, {
+            baseUrl: url,
+            baseHeaders: {
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: 'include',
+          })
+        : undefined,
     [url, token],
   );
 
-  const searchQuestions = useCallback(
+  const searchQuestionsCb = useCallback(
     async (
       query: string,
       page: number,
       limit: number,
       activityType?: RC5ActivityTypeEnum,
     ) => {
+      if (!apiClient) throw Error('API client is not set');
       const response = await apiClient.getQuestions({
         query: {
           offset: (page - 1) * limit,
@@ -45,19 +52,23 @@ export function useQuizBankApi(url: string, token: string) {
     [apiClient],
   );
 
-  const addQuestion = useCallback(
-    async (question: QuestionBankApiCreate) => {
+  const addQuestionCb = useCallback(
+    async (
+      question: QuestionBankApiCreate,
+    ): Promise<QuestionBankApi | undefined> => {
+      if (!apiClient) throw Error('API client is not set');
       const response = await apiClient.createQuestion({ body: question });
       if (response.status === 200 || response.status === 201) {
-        return response.body;
+        return response.body as QuestionBankApi;
       }
       throw new QuizBankApiError('Failed to add question', response.status);
     },
     [apiClient],
   );
 
-  const deleteQuestion = useCallback(
+  const deleteQuestionCb = useCallback(
     async (uuid: string) => {
+      if (!apiClient) throw Error('API client is not set');
       const response = await apiClient.deleteQuestion({ params: { uuid } });
       if (response.status === 200 || response.status === 204) {
         return;
@@ -66,6 +77,10 @@ export function useQuizBankApi(url: string, token: string) {
     },
     [apiClient],
   );
+
+  const searchQuestions = apiClient ? searchQuestionsCb : undefined;
+  const addQuestion = apiClient ? addQuestionCb : undefined;
+  const deleteQuestion = apiClient ? deleteQuestionCb : undefined;
 
   return { searchQuestions, addQuestion, deleteQuestion };
 }

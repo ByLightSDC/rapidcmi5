@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   rangeConsoleDataAttemptsSel,

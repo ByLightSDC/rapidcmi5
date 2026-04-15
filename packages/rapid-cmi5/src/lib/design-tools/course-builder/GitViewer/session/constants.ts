@@ -1,3 +1,5 @@
+import { version } from '../../../../../../package.json';
+
 export const sandBoxName = 'sandbox';
 
 export const noRepoAvailable = 'No repository could be found.';
@@ -14,4 +16,4 @@ export const deleteCourseFailMessage = 'Could not delete this course';
 export const oneCourseRequiredMessage = 'Must have at least one course!';
 export const repoNameInUseMessage =
   'The directory name chosen is already in use.';
-export const RC5_VERSION = "0.0.1"
+export const RC5_VERSION = version;
