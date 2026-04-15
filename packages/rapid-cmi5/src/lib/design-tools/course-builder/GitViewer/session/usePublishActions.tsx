@@ -35,7 +35,7 @@ export const usePublishActions = (
     const r = getRepoAccess(repoAccessObject);
     if (!currentBranch || !currentCourse) {
       throw Error(
-        `current branch : ${currentBranch} or current course : ${currentCourse} have not been set`,
+        `Current branch : ${currentBranch} or current course : ${currentCourse} have not been set`,
       );
     }
 

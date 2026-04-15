@@ -78,10 +78,10 @@ export function DownloadCmi5ZipForm({
   };
 
   useEffect(() => {
-    const courseId = courseData?.courseId ?? '';
+    const courseId = courseData.courseId;
     setCurrentCourseId(courseId);
     setCourseHasUUID(containsUuid(courseId));
-  }, [courseData]);
+  }, [courseData.courseId]);
 
   /**
    * Returns form fields unique to this form
@@ -102,7 +102,7 @@ export function DownloadCmi5ZipForm({
           <Grid size={12}>
             <Stack spacing={2} sx={{ mt: 1, mb: 1 }}>
               <Alert severity="warning">
-                This course ID does not have a valid UUID at the end.This means
+                This course ID does not have a valid UUID at the end. This means
                 it was likely created with an older version of Rapid CMI5. It is
                 recommended to use a UUID before downloading the CMI5 zip.
               </Alert>
