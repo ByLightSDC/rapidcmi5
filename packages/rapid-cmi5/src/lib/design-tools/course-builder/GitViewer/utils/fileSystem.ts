@@ -24,7 +24,6 @@ import {
   resolveCourseZipPaths,
   updateCourseData,
 } from './courseImport';
-import { fi } from 'date-fns/locale';
 
 export const getRepoPath = (r: RepoAccessObject) =>
   `/${r.fileSystemType}/${r.repoName}`;

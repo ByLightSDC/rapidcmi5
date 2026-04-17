@@ -414,7 +414,6 @@ export const LessonDrawer = () => {
       )}
       {courseData?.courseTitle ? (
         <>
-          <Typography>{courseData.courseTitle}</Typography>
           <LessonTree courseData={courseData} onCreateLesson={onCreateLesson} />
         </>
       ) : (
