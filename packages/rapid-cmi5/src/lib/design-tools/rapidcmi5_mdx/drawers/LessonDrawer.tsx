@@ -37,7 +37,6 @@ import ImportExportIcon from '@mui/icons-material/ImportExport';
 import IosShareIcon from '@mui/icons-material/IosShare';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 
-
 import { debugLogError, RowAction } from '@rapid-cmi5/ui';
 import { listItemProps } from './components/LessonTreeNode';
 import { useSelector } from 'react-redux';
@@ -192,7 +191,6 @@ export const LessonDrawer = () => {
       >
         VISUAL DESIGNER
       </Typography>
-
       <Grid container wrap="wrap">
         <Grid
           size={{ xs: 12, sm: 8, md: 8 }}
@@ -416,6 +414,7 @@ export const LessonDrawer = () => {
       )}
       {courseData?.courseTitle ? (
         <>
+          <Typography>{courseData.courseTitle}</Typography>
           <LessonTree courseData={courseData} onCreateLesson={onCreateLesson} />
         </>
       ) : (

@@ -24,6 +24,7 @@ import {
   resolveCourseZipPaths,
   updateCourseData,
 } from './courseImport';
+import { fi } from 'date-fns/locale';
 
 export const getRepoPath = (r: RepoAccessObject) =>
   `/${r.fileSystemType}/${r.repoName}`;
@@ -1342,10 +1343,18 @@ export class GitFS {
       const fullNewPath = join('/', parentDir, newName);
 
       // Ensure the old file/folder exists
-      await this.fs.promises.stat(fullOldPath);
+      const resp = await this.fs.promises.stat(fullOldPath);
 
       // Perform the rename (move)
-      await this.fs.promises.rename(fullOldPath, fullNewPath);
+      if (resp.isFile()) {
+        const content = await this.fs.promises.readFile(fullOldPath);
+        await this.fs.promises.writeFile(fullNewPath, content);
+        await this.fs.promises.rm(fullOldPath);
+      } else {
+        await this.copyRecursive(fullOldPath, fullNewPath);
+        await this.clearDirectory(fullOldPath);
+        await this.fs.promises.rmdir(fullOldPath);
+      }
     } catch (error) {
       console.error('Error renaming file or folder:', error);
     }

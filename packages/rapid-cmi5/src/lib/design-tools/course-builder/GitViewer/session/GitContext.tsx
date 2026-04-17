@@ -879,7 +879,7 @@ export const GitContextProvider = (props: tProviderProps) => {
     const repoPath = getRepoPath(r);
 
     return await createUniquePath({
-      name: slugifyPath(slideTitle),
+      name: slideTitle,
       basePath: currentAuDir,
       repoPath,
       isFile: true,
