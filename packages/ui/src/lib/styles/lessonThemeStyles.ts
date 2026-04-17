@@ -114,13 +114,15 @@ export function generateLessonThemeStyleTag(
     --content-margin: calc((100% - ${css.maxWidth}) / 2);
   }
   .${scopedClass} .mdxeditor-root-contenteditable {
-    max-width: ${css.maxWidth};
-    margin-left: auto;
-    margin-right: auto;
     overflow: visible;
   }
   .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:not(:has(.paper-activity)) {
     max-width: ${css.maxWidth};
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:has([data-block-override]) {
+    max-width: var(--block-max-width) !important;
     margin-left: auto;
     margin-right: auto;
   }
@@ -132,12 +134,12 @@ export function generateLessonThemeStyleTag(
     transform: translateX(-50%);
     overflow: visible;
   }
-  .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] [data-lexical-decorator]:not(:has(.paper-activity)) {
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] [data-lexical-editor="true"] [data-lexical-decorator]:not(:has(.paper-activity)) {
     max-width: none;
     margin-left: unset;
     margin-right: unset;
   }
-  .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] {
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] [data-lexical-editor="true"] {
       --content-margin: 0px;
   }`
     : `

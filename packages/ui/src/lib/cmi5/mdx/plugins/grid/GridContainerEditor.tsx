@@ -9,6 +9,7 @@ import * as Mdast from 'mdast';
 
 import { ContainerDirective } from 'mdast-util-directive';
 import {
+  CSSProperties,
   useCallback,
   useContext,
   useEffect,
@@ -298,6 +299,8 @@ export const GridContainerEditor: React.FC<
     <>
       <Box
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
+        {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
+        {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as CSSProperties } : {})}
         sx={{
           position: 'relative',
           padding: 0,

@@ -342,6 +342,8 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   return (
     <Box
       {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
+      {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
+      {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as React.CSSProperties } : {})}
       sx={{
         margin: 0,
         padding: 0,

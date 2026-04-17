@@ -11,7 +11,7 @@ import * as Mdast from 'mdast';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { CSSProperties, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { toMarkdown } from 'mdast-util-to-markdown';
 import { $getRoot } from 'lexical';
 
@@ -430,6 +430,8 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
     <>
       <Box
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
+        {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
+        {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as CSSProperties } : {})}
         sx={{
           padding: 0,
           position: 'relative',
