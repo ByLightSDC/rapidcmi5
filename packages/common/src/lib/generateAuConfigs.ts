@@ -163,7 +163,13 @@ export async function generateCourseDist(
       const auPathJson = pathJoin(auPath, 'config.json');
 
       await fs.mkdir(auPath, { recursive: true });
-
+      au.metadata = {
+        buildTime: courseData.buildTime,
+        commitHash: courseData.commitHash,
+        gitBranch: courseData.gitBranch,
+        rc5Version: courseData.rc5Version,
+        remoteGitUrl: courseData.remoteGitUrl,
+      };
       await fs.writeFile(auPathJson, JSON.stringify(au, null, 2), 'utf-8');
       await copyIndexFile(distPath, auPath, fs, pathJoin, pathRelative);
     }

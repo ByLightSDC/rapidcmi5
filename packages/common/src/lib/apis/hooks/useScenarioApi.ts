@@ -64,9 +64,14 @@ export function useScenarioApi(url?: string, token?: string) {
       // ts-rest does not encodeURIComponent path params; auId can be a URL with
       // slashes that would break server-side path routing if not encoded first.
       const encodedAuId = encodeURIComponent(auId);
-      const existingMapping = await apiClient.getAuMapping({
-        params: { auId: encodedAuId },
-      });
+      let existingMapping: Awaited<ReturnType<typeof apiClient.getAuMapping>>;
+      try {
+        existingMapping = await apiClient.getAuMapping({
+          params: { auId: encodedAuId },
+        });
+      } catch {
+        existingMapping = { status: 404, body: null } as any;
+      }
 
       if (existingMapping.status === 200) {
         const updateResponse = await apiClient.updateAuMapping({
@@ -85,7 +90,7 @@ export function useScenarioApi(url?: string, token?: string) {
             name: createAuMappingNameWithAuId(auId),
           },
         });
-        if (createResponse.status !== 201) {
+        if (!(createResponse.status == 201 || createResponse.status == 200)) {
           console.error(`Could not create au mapping for auId: ${auId}`);
           throw new Error('Failed to create au');
         }

@@ -1,5 +1,6 @@
 // hooks/useGitOperations.ts
 import { useCallback, useState } from 'react';
+import YAML from 'yaml';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import {
   CreateCloneType,
@@ -38,7 +39,8 @@ import JSZip from 'jszip';
 import { getRepoAccess } from './GitContext';
 import { GitOperations } from '../utils/gitOperations';
 import { GitFS } from '../utils/fileSystem';
-import { slugifyPath } from '../utils/useCourseOperationsUtils';
+import { readRC5Meta, slugifyPath } from '../utils/useCourseOperationsUtils';
+import { RC5_FILENAME } from '@rapid-cmi5/cmi5-build-common';
 
 export const useGitOperations = (
   fsInstance: GitFS,
@@ -233,8 +235,21 @@ export const useGitOperations = (
         req.authorEmail,
         req.authorName,
       );
+
+      const meta = await readRC5Meta(r, fsInstance, RC5_FILENAME);
+
+      if (meta !== null) {
+        const branch = await gitOperator.getCurrentGitBranch(r);
+        const commits = await gitOperator.gitCommits(r);
+
+        meta.remoteGitUrl = currentGitConfig.remoteRepoUrl;
+        meta.gitBranch = branch ?? undefined;
+        meta.commitHash = commits[0]?.oid;
+
+        await fsInstance.updateFile(r, RC5_FILENAME, YAML.stringify(meta));
+      }
     },
-    [repoAccessObject, currentGitConfig],
+    [repoAccessObject, fsInstance, currentGitConfig, gitOperator],
   );
 
   const stashChanges = useCallback(async () => {

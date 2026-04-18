@@ -22,8 +22,9 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
-import { alpha, Box, Switch, Tooltip, Typography, useTheme } from '@mui/material';
+import { alpha, Box, Divider, Popover, Switch, Tooltip, Typography, useTheme } from '@mui/material';
 import { auJsonSel, classIdSel, studentIdSel } from '../redux/auReducer';
 import { activeTabSel } from '../redux/navigationReducer';
 import { useDispatch, useSelector } from 'react-redux';
@@ -73,6 +74,7 @@ export default function MenuLayout() {
 
   const [password, setPassword] = useState('');
   const [clearUserName, setCleanUserName] = useState('');
+  const [buildInfoAnchor, setBuildInfoAnchor] = useState<HTMLButtonElement | null>(null);
   const slideRef = useRef<HTMLDivElement>(null);
 
   const userName = cmi5Instance.getLaunchParameters().actor?.account?.name;
@@ -393,6 +395,80 @@ export default function MenuLayout() {
                   props={{ sx: ButtonInfoFormHeaderLayout }}
                   triggerOnClick={true}
                 />
+              )}
+
+              {auJson?.metadata && (
+                <>
+                  <Tooltip title="Build Information">
+                    <IconButton
+                      aria-label="Build Information"
+                      color="primary"
+                      size="small"
+                      onClick={(e) => setBuildInfoAnchor(e.currentTarget)}
+                    >
+                      <InfoOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Popover
+                    open={Boolean(buildInfoAnchor)}
+                    anchorEl={buildInfoAnchor}
+                    onClose={() => setBuildInfoAnchor(null)}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                    transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                    slotProps={{
+                      paper: {
+                        sx: {
+                          mt: 0.5,
+                          minWidth: 320,
+                          maxWidth: 480,
+                          borderRadius: 2,
+                          border: '1px solid',
+                          borderColor: 'divider',
+                        },
+                      },
+                    }}
+                  >
+                    <Box sx={{ px: 2.5, pt: 2, pb: 0.5 }}>
+                      <Typography
+                        variant="overline"
+                        sx={{ letterSpacing: 1.5, color: 'text.secondary', fontWeight: 600 }}
+                      >
+                        Build Information
+                      </Typography>
+                    </Box>
+                    <Divider />
+                    <Stack direction="column" spacing={1.5} sx={{ px: 2.5, py: 2 }}>
+                      {[
+                        { label: 'RC5 Version', value: auJson.metadata.rc5Version },
+                        { label: 'Branch', value: auJson.metadata.gitBranch },
+                        { label: 'Commit', value: auJson.metadata.commitHash },
+                        { label: 'Remote', value: auJson.metadata.remoteGitUrl },
+                        { label: 'Build Time', value: auJson.metadata.buildTime ? new Date(auJson.metadata.buildTime).toLocaleString() : undefined },
+                      ]
+                        .filter((row) => Boolean(row.value))
+                        .map(({ label, value }) => (
+                          <Stack key={label} direction="row" spacing={1} alignItems="flex-start">
+                            <Typography
+                              variant="caption"
+                              sx={{ color: 'text.secondary', minWidth: 80, pt: '1px', fontWeight: 600 }}
+                            >
+                              {label}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                fontFamily: 'monospace',
+                                wordBreak: 'break-all',
+                                color: 'text.primary',
+                              }}
+                            >
+                              {value}
+                            </Typography>
+                          </Stack>
+                        ))}
+                    </Stack>
+                  </Popover>
+                </>
               )}
 
               {!featureFlagChangeClassRoom && (
