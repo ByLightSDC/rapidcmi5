@@ -90,7 +90,6 @@ export type CourseAU = {
 export type AuMetaData = {
   buildTime?: string;
   remoteGitUrl?: string;
-  commitHash?: string;
   gitBranch?: string;
   rc5Version?: string;
 };
@@ -123,8 +122,6 @@ export type CourseData = {
   rc5Version?: string;
   // used to track origin of the package
   remoteGitUrl?: string;
-  // last commit hash
-  commitHash?: string;
   // the branch which this course was made from
   gitBranch?: string;
   buildTime?: string;

@@ -705,14 +705,11 @@ export const computeCourseFromJsonFs = async ({
 
     const branch = await gitOps.getCurrentGitBranch(r);
 
-    const commits = await gitOps.gitCommits(r);
-
     editableCourseData.remoteGitUrl = remotes.find(
       (rem) => rem.remote === 'origin',
     )?.url;
 
     editableCourseData.gitBranch = branch ?? undefined;
-    editableCourseData.commitHash = commits[0]?.oid;
 
     editableCourseData.buildTime = new Date().toISOString();
 

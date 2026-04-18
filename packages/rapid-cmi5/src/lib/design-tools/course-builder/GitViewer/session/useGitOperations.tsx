@@ -235,21 +235,8 @@ export const useGitOperations = (
         req.authorEmail,
         req.authorName,
       );
-
-      const meta = await readRC5Meta(r, fsInstance, RC5_FILENAME);
-
-      if (meta !== null) {
-        const branch = await gitOperator.getCurrentGitBranch(r);
-        const commits = await gitOperator.gitCommits(r);
-
-        meta.remoteGitUrl = currentGitConfig.remoteRepoUrl;
-        meta.gitBranch = branch ?? undefined;
-        meta.commitHash = commits[0]?.oid;
-
-        await fsInstance.updateFile(r, RC5_FILENAME, YAML.stringify(meta));
-      }
     },
-    [repoAccessObject, fsInstance, currentGitConfig, gitOperator],
+    [repoAccessObject, currentGitConfig, gitOperator],
   );
 
   const stashChanges = useCallback(async () => {

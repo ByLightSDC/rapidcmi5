@@ -165,7 +165,6 @@ export async function generateCourseDist(
       await fs.mkdir(auPath, { recursive: true });
       au.metadata = {
         buildTime: courseData.buildTime,
-        commitHash: courseData.commitHash,
         gitBranch: courseData.gitBranch,
         rc5Version: courseData.rc5Version,
         remoteGitUrl: courseData.remoteGitUrl,
