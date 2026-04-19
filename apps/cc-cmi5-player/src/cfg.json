@@ -12,7 +12,9 @@
         "KEYCLOAK_CLIENT_ID": "rangeos-dashboard",
         "KEYCLOAK_SCOPE": "profile",
         "THEME": {
-          "SLIDE_BACKGROUND": ""
+          "SLIDE_BACKGROUND": "",
+          "LOGO_DARK": "./assets/bylight/RangeOS_Logo_Dark.png",
+          "LOGO_LIGHT": "./assets/bylight/RangeOS_Logo_Light.png"
         }
       }
     },
