@@ -119,7 +119,7 @@ export function useScenarioApi(url?: string, token?: string) {
 
     if (au.rangeosScenarioName) {
       const response = await apiClient.listScenarios({
-        query: { name: au.rangeosScenarioName },
+        query: { search: au.rangeosScenarioName },
       });
       if (
         response.status !== 200 ||
