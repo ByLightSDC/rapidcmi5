@@ -17,6 +17,7 @@ import {
   saveCourseFileBeforeModalId,
   saveCourseFileModalId,
   setGitConfigModalId,
+  testInPlayerModalId,
 } from './constants';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -262,6 +263,27 @@ export const useRC5Prompts = () => {
     }
   };
 
+  const promptTestInPlayer = () => {
+    if (hasFilesToSave) {
+      promptSaveCourseFile(
+        'Save Changes First?',
+        remindFileSystem,
+        {
+          notify: MessageType.testInPlayer,
+        },
+        saveCourseFileBeforeModalId,
+      );
+    } else {
+      dispatch(
+        setModal({
+          type: testInPlayerModalId,
+          id: null,
+          name: null,
+        }),
+      );
+    }
+  };
+
   const promptGitConfig = () => {
     dispatch(
       setModal({
@@ -342,6 +364,7 @@ export const useRC5Prompts = () => {
     promptDeleteLesson,
     promptDeleteRepo,
     promptDownloadCourseCMI5Zip,
+    promptTestInPlayer,
     promptNavAway,
     promptPublishPcteModal,
     promptSaveCourseFile,
