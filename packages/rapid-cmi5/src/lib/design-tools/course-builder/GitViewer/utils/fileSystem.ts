@@ -7,6 +7,7 @@ import {
   generateCmi5Xml,
   DirMeta,
   sortProjectMetas,
+  RC5_VERSION,
 } from '@rapid-cmi5/cmi5-build-common';
 import JSZip from 'jszip';
 import path, { basename, dirname, join, relative } from 'path-browserify';
@@ -185,6 +186,17 @@ export class GitFS {
       const cmi5Path = path.join(cmi5BuildCache, 'cmi5.xml');
 
       await this.fs.promises.writeFile(cmi5Path, cmi5Xml.trim());
+
+      const playerManifestPath = path.join(cmi5BuildCache, 'cmi5.xml');
+
+      const playerManifest = {
+        playerVersion: RC5_VERSION,
+      };
+
+      await this.fs.promises.writeFile(
+        playerManifestPath,
+        JSON.stringify(playerManifest, null, 2),
+      );
 
       const builtZip = await this.generateZip(cmi5BuildCache, '');
 
