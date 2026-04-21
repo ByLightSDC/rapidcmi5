@@ -126,6 +126,18 @@ export function generateLessonThemeStyleTag(
     margin-left: auto;
     margin-right: auto;
   }
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > [data-lexical-decorator] {
+    display: block;
+    max-width: ${css.maxWidth};
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] {
+    max-width: 100%;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] img {
+    max-width: 100%;
+  }
   .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:has(.paper-activity) {
     width: calc(98vw - var(--panel-width));
     max-width: calc(98vw - var(--panel-width));
