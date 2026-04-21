@@ -1,6 +1,4 @@
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { UseFormReturn } from 'react-hook-form';
 import {
   FormControlCheckboxField,
@@ -16,15 +14,7 @@ import {
   maxFormWidths,
   useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
-import {
-  Alert,
-  alpha,
-  Box,
-  MenuItem,
-  SxProps,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { Alert, MenuItem, SxProps, Typography, useTheme } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import * as yup from 'yup';
@@ -33,11 +23,14 @@ import {
   RC5ScenarioContent,
 } from '@rapid-cmi5/cmi5-build-common';
 
-import { getInfoText } from '../../../../utils/infoButtonText';
+import { getInfoText } from '../../../../../utils/infoButtonText';
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
-import LrsHeaderWithDetails from './LrsStatementHelper';
+import LrsHeaderWithDetails from '../LrsStatementHelper';
+import { useRapidCmi5Opts } from '../../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 import { useContext } from 'react';
-import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
+import { ScenarioCard } from './ScenarioCard';
+import { NoScenarioCard } from './NoScenarioCard';
+import { toTitleCase } from '../formUtils';
 
 export const ScenarioForm = ({
   crudType,
@@ -51,7 +44,7 @@ export const ScenarioForm = ({
   handleCloseModal?: () => void;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const { GetScenariosForm } = useContext(GitContext);
+  const { GetScenariosForm, fetchScenario } = useRapidCmi5Opts();
   const theme = useTheme();
 
   /* Lesson Theme */
@@ -131,7 +124,7 @@ export const ScenarioForm = ({
           </Alert>
         </Grid>
         {GetScenariosForm ? (
-          <Grid size={7.5}>
+          <Grid size={11}>
             <GetScenariosForm
               submitForm={onApplyScenario}
               formType={crudType}
@@ -141,83 +134,13 @@ export const ScenarioForm = ({
 
             {/* Selected Scenario Display */}
             {scenarioName ? (
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1.5,
-                  my: 1.5,
-                  p: 1,
-                  borderRadius: 2,
-                  border: `1px solid ${theme.palette.primary.main}`,
-                  bgcolor: alpha(theme.palette.primary.main, 0.08),
-                }}
-              >
-                <CheckCircleIcon
-                  sx={{
-                    fontSize: 20,
-                    color: theme.palette.primary.main,
-                    flexShrink: 0,
-                  }}
-                />
-                <Box sx={{ minWidth: 0, flex: 1 }}>
-                  <Typography
-                    variant="body2"
-                    fontWeight={600}
-                    sx={{
-                      color: theme.palette.text.primary,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {scenarioName}
-                  </Typography>
-                  {scenarioUuid && (
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: theme.palette.text.secondary,
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        display: 'block',
-                      }}
-                    >
-                      {scenarioUuid}
-                    </Typography>
-                  )}
-                </Box>
-              </Box>
+              <ScenarioCard
+                fetchScenario={fetchScenario}
+                scenarioUUID={scenarioUuid}
+                scenarioName={scenarioName}
+              />
             ) : (
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1.5,
-                  my: 1,
-                  p: 1,
-                  borderRadius: 2,
-                  border: `1px dashed ${theme.palette.divider}`,
-                  bgcolor: theme.palette.background.paper,
-                }}
-              >
-                <FolderOpenIcon
-                  sx={{
-                    fontSize: 20,
-                    color: alpha(theme.palette.text.secondary, 0.7),
-                    flexShrink: 0,
-                  }}
-                />
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: alpha(theme.palette.text.secondary, 0.7),
-                  }}
-                >
-                  No scenario selected
-                </Typography>
-              </Box>
+              <NoScenarioCard />
             )}
           </Grid>
         ) : (
@@ -259,7 +182,7 @@ export const ScenarioForm = ({
           >
             {moveOnCriteriaOptions.map((item) => (
               <MenuItem key={item} value={item}>
-                {item}
+                {toTitleCase(item)}
               </MenuItem>
             ))}
           </FormControlSelectField>

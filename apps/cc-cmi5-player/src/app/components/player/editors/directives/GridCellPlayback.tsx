@@ -1,6 +1,11 @@
-import { DirectiveEditorProps, NestedLexicalEditor } from '@mdxeditor/editor';
+import {
+  DirectiveEditorProps,
+  NestedLexicalEditor,
+  useCellValue,
+} from '@mdxeditor/editor';
 import { ContainerDirective } from 'mdast-util-directive';
 import React, { useRef } from 'react';
+import { editorInPlayback$ } from '@rapid-cmi5/ui';
 
 type TextAlign = 'left' | 'center' | 'right';
 
@@ -23,8 +28,12 @@ export const GridCellPlayback: React.FC<
     `grid-cell-${Math.random().toString(36).slice(2, 9)}`,
   ).current;
 
+  // CCUI-2828: use "cell" in playback mode so NVDA does not announce "clickable"
+  // on every grid cell. In edit mode, "gridcell" is semantically correct.
+  const isPlayback = useCellValue(editorInPlayback$);
+
   return (
-    <div role="gridcell">
+    <div role={isPlayback ? 'cell' : 'gridcell'}>
       {textAlign !== 'left' && (
         <style>{`
           .${scopedClass} {
@@ -78,6 +87,7 @@ export const GridCellPlayback: React.FC<
         })}
         contentEditableProps={{
           className: scopedClass,
+          role: 'none',
         }}
       />
     </div>

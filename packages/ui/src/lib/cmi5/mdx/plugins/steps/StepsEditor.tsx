@@ -553,6 +553,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                   borderColor: (theme: any) => `${theme.palette.divider}`,
                   borderStyle: 'solid',
                   borderWidth: '1px',
+                  borderRadius: 1,
                   backgroundColor: (theme: any) =>
                     theme.palette.background.paper,
                   paddingRight: isPlayback ? 2 : '100px',

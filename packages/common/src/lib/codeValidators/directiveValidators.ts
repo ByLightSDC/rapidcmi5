@@ -1,10 +1,10 @@
 
 import Ajv, { ErrorObject } from 'ajv';
 import { ScenarioContent } from '../types/slide';
-import { DownloadFilesSchema, QuizContentSchema, ScenarioContentSchema, TeamConsolesContentSchema, CTFContentSchema, JobeContentSchema } from '../..';
+import { DownloadFilesSchema, QuizContentSchema, ScenarioContentSchema, TeamConsolesContentSchema, CTFContentSchema, CodeRunnerContentSchema } from '../..';
 import { CTFContent } from '../types/ctf';
 import { DownloadFilesContent } from '../types/download';
-import { JobeContent } from '../types/jobe';
+import { CodeRunnerContent } from '../types/codeRunner';
 import { QuizContent } from '../types/quiz';
 import { TeamConsolesContent } from '../types/teamConsoles';
 
@@ -65,5 +65,5 @@ export const validateTeamConsolesContent = (data: unknown) =>
 export const validateCTFContent = (data: unknown) =>
   validateContent<CTFContent>(data, CTFContentSchema);
 
-export const validateJobeContent = (data: unknown) =>
-  validateContent<JobeContent>(data, JobeContentSchema);
+export const validateCodeRunnerContent = (data: unknown) =>
+  validateContent<CodeRunnerContent>(data, CodeRunnerContentSchema);

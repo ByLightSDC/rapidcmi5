@@ -59,7 +59,6 @@ export type PullType = {
 };
 
 export type DownloadCmi5Type = {
-  createAuMappings: boolean;
   zipName: string;
 };
 

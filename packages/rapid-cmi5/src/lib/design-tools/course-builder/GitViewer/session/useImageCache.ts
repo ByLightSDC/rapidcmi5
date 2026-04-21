@@ -1,11 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { getRepoPath, GitFS } from '../utils/fileSystem';
-import {
-  Course,
-  RepoAccessObject,
-} from '../../../../redux/repoManagerReducer';
+import { Course, RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import path from 'path-browserify';
 import { getRepoAccess } from './GitContext';
+import { debugLog } from '@rapid-cmi5/ui';
 
 export const useImageCache = (
   repoAccessObject: RepoAccessObject | null,
@@ -85,6 +83,7 @@ export const useImageCache = (
       return;
     }
     // Cleanup image blob URLs to avoid memory leaks
+    debugLog('clean up image cache');
     imageCache.current.forEach((url) => URL.revokeObjectURL(url));
     imageCache.current = new Map();
 

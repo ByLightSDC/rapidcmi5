@@ -1342,25 +1342,25 @@ export async function handleActivityScoring(
 
     let passingScore: number;
 
-    if (activityType === SlideActivityType.JOBE) {
-      // For Jobe activities, the scoring is binary (pass/fail based on success)
-      const jobeResponse = activityData.scoreData as {
+    if (activityType === SlideActivityType.CODE_RUNNER) {
+      // For Code Runner activities, the scoring is binary (pass/fail based on success)
+      const codeRunnerResponse = activityData.scoreData as {
         isSuccess: boolean;
         message: string;
       };
-      const isSuccess = jobeResponse?.isSuccess || false;
+      const isSuccess = codeRunnerResponse?.isSuccess || false;
 
       calculatedScore = createSlideActivityScore(isSuccess ? 100 : 0, 0, 100);
 
-      // Jobe activities pass if they succeed (no configurable passing score)
+      // CodeRunner activities pass if they succeed (no configurable passing score)
       passingScore = 100; // Must be 100% successful to pass
 
       logger.debug(
-        'Jobe activity scoring',
+        'CodeRunner activity scoring',
         {
           isSuccess,
           calculatedScore,
-          jobeResponse,
+          codeRunnerResponse,
         },
         'lms',
       );
@@ -1471,8 +1471,8 @@ export async function handleActivityScoring(
     // Run async LMS/LRS operations
     // TODO: this is essentially blocking main thread while these are sent. Either we put up some display to user like
     // 'Saving User Interactions' or move this to be async and non-blocking.
-    if (activityType === SlideActivityType.JOBE) {
-      await handleJobeInteractionStatements(
+    if (activityType === SlideActivityType.CODE_RUNNER) {
+      await handleCodeRunnerInteractionStatements(
         activityData,
         slideGuid,
         slideIndex,
@@ -1766,9 +1766,9 @@ async function handleQuizInteractionStatements(
 }
 
 /**
- * Run async operations for Jobe activity scoring (sequential)
+ * Run async operations for codeRunnerResponse activity scoring (sequential)
  */
-async function handleJobeInteractionStatements(
+async function handleCodeRunnerInteractionStatements(
   activityData: ActivityScore,
   slideGuid: string,
   slideIndex: number,
@@ -1783,32 +1783,32 @@ async function handleJobeInteractionStatements(
     // Skip async operations in dev mode
     if (checkForDevMode()) {
       logger.debug(
-        'Dev mode: Skipping async Jobe activity scoring operations',
+        'Dev mode: Skipping async Code Runner activity scoring operations',
         undefined,
         'lms',
       );
       return;
     }
 
-    // For Jobe activities, we don't have detailed interaction statements like quiz questions
+    // For Code Runner activities, we don't have detailed interaction statements like quiz questions
     // Instead, we can log the submission and result
     logger.debug(
-      'Jobe activity scoring async operations completed',
+      'Code Runner activity scoring async operations completed',
       {
         activityId: getActivityId(activityData.activityContent),
         slideGuid,
         slideIndex,
         passed: result.passed,
         score: result.score || { raw: 0, min: 0, max: 100, scaled: 0 },
-        jobeResponse: activityData.scoreData,
+        codeRunnerResponse: activityData.scoreData,
       },
       'lms',
     );
 
-    // Additional Jobe-specific LRS operations can be added here if needed
+    // Additional CodeRunner-specific LRS operations can be added here if needed
     // For example: logging code submission, execution results, etc.
   } catch (error) {
-    logger.error('Error in Jobe activity scored LMS operations', error, 'lms');
+    logger.error('Error in CodeRunner activity scored LMS operations', error, 'lms');
   }
 }
 

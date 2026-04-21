@@ -13,14 +13,25 @@ import {
   ViewExpander,
 } from '@rapid-cmi5/ui';
 import { useContext, useEffect, useState } from 'react';
+import { Box, Stack } from '@mui/system';
 import { TextField, Alert } from '@mui/material';
-import { Stack, Box } from '@mui/system';
 
 import { RC5Context } from '../../../rapidcmi5_mdx/contexts/RC5Context';
 import { useCourseData } from '../../../rapidcmi5_mdx/data-hooks/useCourseData';
-import { createCourseModalId, cloneRepoModalId, createNewLessonModalId, selectRepoModalId, createLocalRepoModalId, importRepoZipModalId, commitChangesModalId, revertCommitModalId, gitPullModalId, downloadCmi5ZipModalId, setGitConfigModalId, gitPushModalId } from '../../../rapidcmi5_mdx/modals/constants';
-import { GitContext } from '../../GitViewer/session/GitContext';
-import CourseSelector from '../../selectors/CourseSelector';
+import {
+  createCourseModalId,
+  cloneRepoModalId,
+  createNewLessonModalId,
+  selectRepoModalId,
+  createLocalRepoModalId,
+  importRepoZipModalId,
+  commitChangesModalId,
+  revertCommitModalId,
+  gitPullModalId,
+  downloadCmi5ZipModalId,
+  setGitConfigModalId,
+  gitPushModalId,
+} from '../../../rapidcmi5_mdx/modals/constants';
 import CreateCourseForm from '../courses/CreateCourseForm';
 import CreateLessonForm from '../courses/CreateLessonForm';
 import DownloadCmi5ZipForm from '../courses/DownloadCmi5ZipForm';
@@ -33,6 +44,9 @@ import PullForm from './PullForm';
 import PushForm from './PushForm';
 import DirectoryTree from '../../GitViewer/Components/SelectedRepo/DirectoryTree';
 import { RepoState, RootState } from '@rapid-cmi5/react-editor';
+import { GitContext } from '../../GitViewer/session/GitContext';
+import { useRapidCmi5Opts } from '../../GitViewer/session/RapidCmi5OptsContext';
+import CourseSelector from '../../selectors/CourseSelector';
 
 /**
  * Select Repo, Course, AU
@@ -58,9 +72,8 @@ export function SelectGitDialogs() {
     currentGitConfig,
     directoryTree,
     handleGitCommitReset,
-    isElectron,
-    currentAuth,
   } = useContext(GitContext);
+  const { userAuth: currentAuth } = useRapidCmi5Opts();
 
   const { sendMessage } = useContext(RC5Context);
 
@@ -372,9 +385,7 @@ export function SelectGitDialogs() {
       )}
       {modalObj.type === downloadCmi5ZipModalId && (
         <DownloadCmi5ZipForm
-          isElectron={isElectron}
           defaultData={{
-            createAuMappings: true,
             zipName: `${currentCourse?.basePath || 'cmi5 '}.zip`,
           }}
           modalObj={modalObj}

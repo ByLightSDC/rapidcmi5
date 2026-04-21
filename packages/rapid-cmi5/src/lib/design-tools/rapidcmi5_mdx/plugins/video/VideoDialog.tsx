@@ -221,12 +221,11 @@ export const VideoDialog: React.FC = () => {
                     tabIndex={-1}
                     startIcon={<UploadFileIcon />}
                   >
-                    Upload Files
+                    Upload File
                     <VisuallyHiddenInput
                       type="file"
                       accept="video/*" // restrict to video files only
                       onChange={handleFileSelected}
-                      multiple
                     />
                   </ButtonModalMainUi>
                   <Box /* vertically center the text */
@@ -248,7 +247,7 @@ export const VideoDialog: React.FC = () => {
                           )}
                         </Box>
                       ) : (
-                        'No file(s) chosen'
+                        'No video file chosen'
                       )}
                     </Typography>
                   </Box>

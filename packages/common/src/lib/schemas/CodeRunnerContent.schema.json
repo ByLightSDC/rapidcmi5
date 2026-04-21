@@ -1,8 +1,8 @@
 {
-  "$ref": "#/definitions/JobeContent",
+  "$ref": "#/definitions/CodeRunnerContent",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "JobeContent": {
+    "CodeRunnerContent": {
       "additionalProperties": false,
       "properties": {
         "cmi5QuizId": {
@@ -20,8 +20,14 @@
           },
           "type": "array"
         },
+        "languageVersion": {
+          "type": "string"
+        },
         "moveOnCriteria": {
           "$ref": "#/definitions/MoveOnCriteriaEnum"
+        },
+        "programmingLanguage": {
+          "type": "string"
         },
         "rc5id": {
           "type": "string"
@@ -37,6 +43,8 @@
         "cmi5QuizId",
         "description",
         "evaluator",
+        "languageVersion",
+        "programmingLanguage",
         "student",
         "title"
       ],
@@ -66,13 +74,6 @@
           "type": "string"
         }
       },
-      "required": [
-        "element_identifier",
-        "element_type",
-        "title",
-        "text",
-        "doc_identifier"
-      ],
       "type": "object"
     },
     "MoveOnCriteriaEnum": {

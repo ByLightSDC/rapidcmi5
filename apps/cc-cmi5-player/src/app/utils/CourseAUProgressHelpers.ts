@@ -84,7 +84,7 @@ function parseActivityMetadata(slideContent: string): {
       contentLength: slideContent.length,
       hasQuizBlocks: slideContent.includes(':::quiz'),
       hasCtfBlocks: slideContent.includes(':::ctf'),
-      hasJobeBlocks: slideContent.includes(':::jobe'),
+      hasCodeRunnerBlocks: slideContent.includes(':::codeRunner'),
       hasScenarioBlocks: slideContent.includes(':::scenario'),
       hasConsoleBlocks: slideContent.includes(':::consoles'),
     },
@@ -169,67 +169,67 @@ function parseActivityMetadata(slideContent: string): {
     }
   }
 
-  // Parse Jobe blocks
-  const jobeBlockRegex = /:::jobe\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
-  let jobeMatch;
+  // Parse Code Runner blocks
+  const codeRunnerBlockRegex = /:::codeRunner\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
+  let codeRunnerMatch;
 
-  while ((jobeMatch = jobeBlockRegex.exec(slideContent)) !== null) {
+  while ((codeRunnerMatch = codeRunnerBlockRegex.exec(slideContent)) !== null) {
     try {
-      const jobeData = JSON.parse(jobeMatch[1]);
-      logger.debug('Parsed Jobe data from markdown', jobeData, 'auManager');
+      const codeRunnerData = JSON.parse(codeRunnerMatch[1]);
+      logger.debug('Parsed Code Runner data from markdown', codeRunnerData, 'auManager');
 
       // Generate cmi5QuizId if not provided (use title or fallback)
-      // TODO: don't like either of these... alsothis should be done in the JobeInTheBox component automatically during export/packaging (guid etc) remove this when that's working
-      let activityId = jobeData.cmi5QuizId;
+      // TODO: don't like either of these... alsothis should be done in the CodeRunner component automatically during export/packaging (guid etc) remove this when that's working
+      let activityId = codeRunnerData.cmi5QuizId;
       if (!activityId) {
         // Generate deterministic ID from title or content hash
-        if (jobeData.title) {
+        if (codeRunnerData.title) {
           activityId =
-            jobeData.title
+            codeRunnerData.title
               .toLowerCase()
               .replace(/[^a-z0-9]/g, '-')
               .replace(/--+/g, '-')
-              .replace(/^-|-$/g, '') + '-jobe';
+              .replace(/^-|-$/g, '') + '-codeRunner';
         } else {
           // Create a simple hash from the evaluator content for consistency
           const contentHash = Math.abs(
-            jobeData.evaluator?.split('').reduce((a: number, b: string) => {
+            codeRunnerData.evaluator?.split('').reduce((a: number, b: string) => {
               a = (a << 5) - a + b.charCodeAt(0);
               return a & a;
             }, 0) || 0,
           )
             .toString(36)
             .substr(0, 8);
-          activityId = 'jobe-activity-' + contentHash;
+          activityId = 'code-runner-activity-' + contentHash;
         }
       }
 
       const activityMetadata = {
-        type: SlideActivityType.JOBE,
-        completionRequired: jobeData.completionRequired || 'passed', // Jobe activities should require passing (successful execution)
-        passingScore: 100, // Jobe is binary - 100% success or failure
-        questions: [], // Jobe doesn't have questions like quizzes
-        ksats: jobeData.ksats || [],
+        type: SlideActivityType.CODE_RUNNER,
+        completionRequired: codeRunnerData.completionRequired || 'passed', // Code Runner activities should require passing (successful execution)
+        passingScore: 100, // CodeRunner is binary - 100% success or failure
+        questions: [], // CodeRunner doesn't have questions like quizzes
+        ksats: codeRunnerData.ksats || [],
       };
       activities[activityId] = activityMetadata;
 
       logger.debug(
-        'Parsed Jobe activity metadata',
+        'Parsed Code Runner activity metadata',
         {
           activityId: activityId,
           type: activityMetadata.type,
           completionRequired: activityMetadata.completionRequired,
           passingScore: activityMetadata.passingScore,
-          title: jobeData.title,
-          wasGenerated: !jobeData.cmi5QuizId,
+          title: codeRunnerData.title,
+          wasGenerated: !codeRunnerData.cmi5QuizId,
           ksats: activityMetadata.ksats,
         },
         'auManager',
       );
     } catch (error) {
       logger.warn(
-        'Failed to parse Jobe data from markdown',
-        { error, match: jobeMatch[1] },
+        'Failed to parse Code Runner data from markdown',
+        { error, match: codeRunnerMatch[1] },
         'auManager',
       );
     }
@@ -471,10 +471,10 @@ export function initializeCourseAUProgress(
         // Gradable activities are:
         // - Quiz activities with 'attempted' or 'passed' criteria
         // - CTF activities with 'attempted' or 'passed' criteria
-        // - All Jobe activities (regardless of criteria)
+        // - All Code Runner activities (regardless of criteria)
         // TODO: cleanup to just use activity.type and completionRequired
         if (
-          activity.type === SlideActivityType.JOBE ||
+          activity.type === SlideActivityType.CODE_RUNNER ||
           activity.type === SlideActivityType.SCENARIO ||
           activity.type === SlideActivityType.CONSOLES
         ) {
@@ -507,7 +507,7 @@ export function initializeCourseAUProgress(
           slideGuid,
           gradableActivities: Object.entries(activities)
             .filter(([, activity]) => {
-              if (activity.type === SlideActivityType.JOBE) return true;
+              if (activity.type === SlideActivityType.CODE_RUNNER) return true;
               if (
                 (activity.type === SlideActivityType.QUIZ ||
                   activity.type === SlideActivityType.CTF) &&
