@@ -1342,10 +1342,25 @@ export class GitFS {
       const fullNewPath = join('/', parentDir, newName);
 
       // Ensure the old file/folder exists
-      await this.fs.promises.stat(fullOldPath);
+      const resp = await this.fs.promises.stat(fullOldPath);
+
+      // Needed for windows who does not care about caps
+      const isCaseOnlyRename =
+        fullOldPath.toLowerCase() === fullNewPath.toLowerCase() &&
+        fullOldPath !== fullNewPath;
 
       // Perform the rename (move)
-      await this.fs.promises.rename(fullOldPath, fullNewPath);
+      if (resp.isFile()) {
+        const content = await this.fs.promises.readFile(fullOldPath);
+        await this.fs.promises.writeFile(fullNewPath, content);
+        if (!isCaseOnlyRename) await this.fs.promises.rm(fullOldPath);
+      } else {
+        await this.copyRecursive(fullOldPath, fullNewPath);
+        if (!isCaseOnlyRename) {
+          await this.clearDirectory(fullOldPath);
+          await this.fs.promises.rmdir(fullOldPath);
+        }
+      }
     } catch (error) {
       console.error('Error renaming file or folder:', error);
     }
