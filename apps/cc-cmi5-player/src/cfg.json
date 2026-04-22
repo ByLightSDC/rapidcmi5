@@ -1,6 +1,22 @@
 {
   "locations": [
     {
+      "name": "default",
+      "url": "*",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.develop-cp.rangeos.engineering",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.develop-cp.rangeos.engineering/",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.develop-cp.rangeos.engineering",
+        "KEYCLOAK_URL": "https://keycloak.global.cloudcents.bylight.com/auth/",
+        "KEYCLOAK_REALM": "cloudcents",
+        "KEYCLOAK_CLIENT_ID": "rangeos-dashboard",
+        "KEYCLOAK_SCOPE": "profile",
+        "THEME": {
+          "SLIDE_BACKGROUND": ""
+        }
+      }
+    },
+    {
       "name": "test",
       "url": "http://localhost:4200",
       "config": {
