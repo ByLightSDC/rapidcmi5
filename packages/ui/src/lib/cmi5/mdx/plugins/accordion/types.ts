@@ -1,4 +1,5 @@
 import { ContainerDirective } from 'mdast-util-directive';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Represents a container directive node for an accordion group.
@@ -19,6 +20,7 @@ export interface AccordionDirectiveNode extends ContainerDirective {
   attributes: {
     style?: string;
     backgroundColor?: string;
+    contentWidth?: ContentWidthEnum;
   };
 
   children: AccordionContentDirectiveNode[];
