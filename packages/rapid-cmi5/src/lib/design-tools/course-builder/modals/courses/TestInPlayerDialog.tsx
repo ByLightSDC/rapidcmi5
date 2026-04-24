@@ -51,7 +51,10 @@ async function loadLessonViaZip(
   }
 }
 
-async function writeConfigViaHttp(playerUrl: string, auJson: string): Promise<void> {
+async function writeConfigViaHttp(
+  playerUrl: string,
+  auJson: string,
+): Promise<void> {
   const endpoint = `${playerUrl.replace(/\/$/, '')}/test-config`;
   const res = await fetch(endpoint, {
     method: 'POST',
@@ -73,7 +76,11 @@ async function writeConfigViaIpc(
   playerUrl: string,
   configPath: string,
 ): Promise<void> {
-  const result = await (window as any).ipc.testInPlayer(auJson, playerUrl, configPath);
+  const result = await (window as any).ipc.testInPlayer(
+    auJson,
+    playerUrl,
+    configPath,
+  );
   if (!result?.success) {
     throw new Error(result?.error ?? 'IPC call returned success:false');
   }
@@ -178,13 +185,20 @@ export function TestInPlayerDialog() {
       <>
         <DialogTitle>Test In Player</DialogTitle>
         <DialogContent>
-          <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+          <Typography
+            variant="body2"
+            sx={{ mb: '4px', color: 'text.secondary' }}
+          >
             Publishes the current lesson (including assets) to the player dev
             server and opens it in a new tab. Make sure{' '}
             <code>nx serve cc-cmi5-player</code> is running.
           </Typography>
 
-          <Typography variant="caption" display="block" sx={{ mb: 0.5, fontWeight: 'bold' }}>
+          <Typography
+            variant="caption"
+            display="block"
+            sx={{ paddingTop: '8px', mb: 0.5, fontWeight: 'bold' }}
+          >
             Lesson
           </Typography>
           <Typography
@@ -203,7 +217,12 @@ export function TestInPlayerDialog() {
           </Typography>
 
           <Box
-            sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mb: 1 }}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              cursor: 'pointer',
+              mb: 1,
+            }}
             onClick={() => setShowAdvanced((v) => !v)}
           >
             <Typography variant="caption" sx={{ fontWeight: 'bold', mr: 0.5 }}>
@@ -217,9 +236,16 @@ export function TestInPlayerDialog() {
           </Box>
 
           <Collapse in={showAdvanced}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mt: 0.5 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1.5,
+                mt: 0.5,
+              }}
+            >
               <TextField
-                label="Player URL"
+                label="CMI5 Player URL"
                 value={playerUrl}
                 onChange={(e) => setPlayerUrl(e.target.value)}
                 size="small"
@@ -246,10 +272,20 @@ export function TestInPlayerDialog() {
                 }
                 label={
                   <Box>
-                    <Typography variant="caption">Use player zip asset</Typography>
-                    <Typography variant="caption" display="block" color="text.secondary">
-                      Off: fetch index.html/cfg.json directly from the dev server (works after a fresh clone).
-                      On: use the pre-built <code>cc-cmi5-player.zip</code> from assets (run <code>npm run build:player-for-editor</code> if stale).
+                    <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
+                      Use player zip asset
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      display="block"
+                      color="text.secondary"
+                    >
+                      Off: Fetch index.html/cfg.json directly from the dev
+                      server (works after a fresh clone).
+                      <br />
+                      On: Use the pre-built <code>cc-cmi5-player.zip</code> from
+                      assets (run <code>npm run build:player-for-editor</code>{' '}
+                      if stale).
                     </Typography>
                   </Box>
                 }

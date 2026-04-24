@@ -321,38 +321,6 @@ export const LessonDrawer = () => {
               </span>
             </Tooltip>
 
-            {process.env['NODE_ENV'] === 'development' && (
-              <Tooltip title="Test Current Lesson In Player">
-                <span>
-                  <IconButton
-                    aria-label="test in player"
-                    id="test-in-player"
-                    data-testid="test-in-player"
-                    disabled={!currentRepo || !currentCourse?.basePath}
-                    onClick={() => {
-                      saveSlide();
-                      promptTestInPlayer();
-                    }}
-                    size="small"
-                    sx={(theme) => ({
-                      borderRadius: 1,
-                      border: `1px solid ${theme.palette.success.main}`,
-                      color: 'success.main',
-                      transition:
-                        'transform 120ms ease, background-color 120ms ease',
-                      '&:hover': {
-                        bgcolor: alpha(theme.palette.success.main, 0.15),
-                        transform: 'translateY(-1px)',
-                      },
-                      '&.Mui-disabled': { opacity: 0.45 },
-                    })}
-                  >
-                    <PlayCircleOutlineIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            )}
-
             <ButtonOptions
               optionButton={(handleClick: any) => (
                 <Tooltip title="Course Options">
