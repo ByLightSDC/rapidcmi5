@@ -197,6 +197,7 @@ interface IGitContext {
   deleteRecentProject: (id: string) => Promise<void>;
   getDirHandle: () => Promise<FileSystemDirectoryHandle | null>;
   gettingRepoStatus: boolean;
+  downloadCmi5Player?: () => Promise<any>;
 }
 
 interface tProviderProps {
@@ -1275,6 +1276,7 @@ export const GitContextProvider = (props: tProviderProps) => {
         openLocalRepo,
         deleteRecentProject,
         getDirHandle,
+        downloadCmi5Player: rapidCmi5Opts.downloadCmi5Player,
       }}
     >
       {children}

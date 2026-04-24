@@ -36,6 +36,7 @@ import FolderZipIcon from '@mui/icons-material/FolderZip';
 import ImportExportIcon from '@mui/icons-material/ImportExport';
 import IosShareIcon from '@mui/icons-material/IosShare';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 
 import { debugLogError, RowAction } from '@rapid-cmi5/ui';
 import { listItemProps } from './components/LessonTreeNode';
@@ -71,6 +72,7 @@ export const LessonDrawer = () => {
     promptCreateLesson,
     promptDeleteCourse,
     promptDownloadCourseCMI5Zip,
+    promptTestInPlayer,
   } = useRC5Prompts();
 
   const [menuAnchor, setMenuAnchor] = useState<any>(null);
