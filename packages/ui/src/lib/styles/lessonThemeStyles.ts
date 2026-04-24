@@ -135,12 +135,6 @@ export function generateLessonThemeStyleTag(
   .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] {
     max-width: 100%;
   }
-  .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-block-override] {
-    max-width: var(--block-max-width) !important;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-  }
   .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] img {
     max-width: 100%;
   }
@@ -164,6 +158,25 @@ export function generateLessonThemeStyleTag(
   .${scopedClass} {
       --content-margin: 0px;
   }`;
+
+  const paragraphWidthRule = css.maxWidth
+    ? `
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-paragraph="true"],
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > ul,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > ol,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > blockquote,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h1,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h2,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h3,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h4,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h5,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h6 {
+      max-width: ${css.maxWidth};
+      margin-left: auto;
+      margin-right: auto;
+    }`
+    : '';
 
   const alignmentRule = css.textAlign
     ? `
@@ -205,5 +218,5 @@ export function generateLessonThemeStyleTag(
     }`
     : '';
 
-  return alignmentRule + widthRule + blockPaddingRule + blockBaseRule;
+  return paragraphWidthRule + alignmentRule + widthRule + blockPaddingRule + blockBaseRule;
 }
