@@ -31,10 +31,14 @@ import {
   downloadCmi5ZipModalId,
   setGitConfigModalId,
   gitPushModalId,
+  testInPlayerModalId,
 } from '../../../rapidcmi5_mdx/modals/constants';
+import { GitContext } from '../../GitViewer/session/GitContext';
+import CourseSelector from '../../selectors/CourseSelector';
 import CreateCourseForm from '../courses/CreateCourseForm';
 import CreateLessonForm from '../courses/CreateLessonForm';
 import DownloadCmi5ZipForm from '../courses/DownloadCmi5ZipForm';
+import TestInPlayerDialog from '../courses/TestInPlayerDialog';
 import ImportRepoZipForm from '../courses/ImportRepoZipForm';
 import CloneRepoForm from './CloneRepoForm';
 import CommitForm from './CommitForm';
@@ -44,9 +48,7 @@ import PullForm from './PullForm';
 import PushForm from './PushForm';
 import DirectoryTree from '../../GitViewer/Components/SelectedRepo/DirectoryTree';
 import { RepoState, RootState } from '@rapid-cmi5/react-editor';
-import { GitContext } from '../../GitViewer/session/GitContext';
 import { useRapidCmi5Opts } from '../../GitViewer/session/RapidCmi5OptsContext';
-import CourseSelector from '../../selectors/CourseSelector';
 
 /**
  * Select Repo, Course, AU
@@ -393,6 +395,7 @@ export function SelectGitDialogs() {
           handleModalAction={handleModalResponse}
         />
       )}
+      {modalObj.type === testInPlayerModalId && <TestInPlayerDialog />}
       {/* prompt set config */}
       {modalObj.type === setGitConfigModalId && (
         <GitConfigForm

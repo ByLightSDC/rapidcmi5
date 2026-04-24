@@ -25,6 +25,7 @@ import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import ArtTrackIcon from '@mui/icons-material/ArtTrack';
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import { MarkdownIconSvg } from './constants';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 
 import { alpha, Box, Divider, Stack, useTheme } from '@mui/material';
 import { useSelector } from 'react-redux';
@@ -73,6 +74,7 @@ import { ListsToggle } from './components/ListsToggle';
 import { UndoRedo } from './components/UndoRedo';
 import { InsertQuotes } from './components/InsertQuotes';
 import { InsertStatements } from './components/InsertStatements';
+import { useRC5Prompts } from '../modals/useRC5Prompts';
 
 /**
  * Layout Constants
@@ -113,6 +115,8 @@ export const RapidCmi5Toolbar: React.FC = () => {
 
   const disabledIconColor = alpha((theme as any).palette.divider, 0.25);
   const activeIconColor = theme.palette.text.primary; //REFtheme.palette.primary.main;
+
+  const { promptTestInPlayer } = useRC5Prompts();
 
   /**
    * themed icon
@@ -434,6 +438,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                     }}
                   />
                 </MUIButtonWithTooltip>
+
                 <Divider
                   orientation="vertical"
                   color="divider"
@@ -449,6 +454,27 @@ export const RapidCmi5Toolbar: React.FC = () => {
                 >
                   {markDownIcon}
                 </MUIButtonWithTooltip>
+                <Divider
+                  orientation="vertical"
+                  color="divider"
+                  flexItem
+                  sx={{ mx: 0 }}
+                />
+                {process.env['NODE_ENV'] === 'development' && (
+                  <MUIButtonWithTooltip
+                    title="Launch CMI5 Player"
+                    onClick={() => {
+                      promptTestInPlayer();
+                    }}
+                  >
+                    <RocketLaunchIcon
+                      sx={{
+                        color: activeIconColor,
+                        fill: activeIconColor,
+                      }}
+                    />
+                  </MUIButtonWithTooltip>
+                )}
               </Stack>
             </Stack>
           </Stack>
