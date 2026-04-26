@@ -33,6 +33,11 @@
       "executor": "nx-electron:execute",
       "options": {
         "buildTarget": "rapid-cmi5-electron:build"
+      },
+      "configurations": {
+        "debug": {
+          "inspect": "inspect"
+        }
       }
     },
     "package": {
