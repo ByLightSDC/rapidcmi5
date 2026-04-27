@@ -25,4 +25,5 @@ export const saveCourseFileModalId = 'saveCourseFileModalId';
 export const saveCourseFileBeforeModalId = 'saveCourseFileBeforeModalId';
 export const selectRepoModalId = 'selectRepoModalId';
 export const setGitConfigModalId = 'setGitConfigModalId';
+export const testInPlayerModalId = 'testInPlayerModalId';
 export const warningModalId = 'warning';

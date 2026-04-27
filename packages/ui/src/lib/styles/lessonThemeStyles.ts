@@ -135,6 +135,12 @@ export function generateLessonThemeStyleTag(
   .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] {
     max-width: 100%;
   }
+  .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-block-override] {
+    max-width: var(--block-max-width) !important;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
   .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] img {
     max-width: 100%;
   }

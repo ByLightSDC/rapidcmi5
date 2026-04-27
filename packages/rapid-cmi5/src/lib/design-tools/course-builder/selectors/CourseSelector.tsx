@@ -30,6 +30,7 @@ export default function CourseSelector({
 }) {
   const noneFound = 'No Courses Found';
   const noRepoSel = 'No Repo Selected';
+
   const handleSelect = (coursePath: string) => {
     if (onSelect) {
       onSelect(coursePath);
@@ -49,18 +50,13 @@ export default function CourseSelector({
     //console.log('[Course Selector] availableCourses', availableCourses);
   }, [currentCoursePath, availableCourses]);
 
-  useEffect(() => {
-    //REF
-    //console.log('[Course Selector] hasNoCourse', hasNoCourse);
-  }, [hasNoCourse]);
-
   return (
     <AnySelector
       id="courses"
       data-testid="course-selector"
       theValue={currentCoursePath || ''}
       onChange={handleSelect}
-      topicLabel="Course"
+      topicLabel="Course Directory"
       hasNoOptions={hasNoCourse}
       noOptionsPlaceholder={hasNoRepo ? noRepoSel : noneFound}
       optionsPlaceholder="Select Course"

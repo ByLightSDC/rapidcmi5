@@ -18,6 +18,7 @@ import {
   createCourseModalId,
   downloadCmi5ZipModalId,
   saveCourseFileModalId,
+  testInPlayerModalId,
   warningModalId,
 } from '../modals/constants';
 import { ILessonNode } from '../drawers/components/LessonTreeNode';
@@ -524,6 +525,15 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
             meta: {
               title: 'Download Course Zip',
             },
+          }),
+        );
+        break;
+      case MessageType.testInPlayer:
+        dispatch(
+          setModal({
+            type: testInPlayerModalId,
+            id: null,
+            name: null,
           }),
         );
         break;
