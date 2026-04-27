@@ -29,7 +29,7 @@ export default function LessonToolbar({
   onSplitOff,
 }: LessonToolbarProps) {
   const dispatch = useDispatch();
-  const theColor = useSelector(themeColor);
+  const currentTheme = useSelector(themeColor);
   const { palette } = useTheme();
 
   return (
@@ -88,15 +88,17 @@ export default function LessonToolbar({
 
       <Tooltip
         title={
-          theColor === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'
+          currentTheme === 'dark'
+            ? 'Switch to Light Mode'
+            : 'Switch to Dark Mode'
         }
       >
         <Switch
-          checked={theColor === 'dark'}
+          checked={currentTheme === 'dark'}
           slotProps={{
             input: {
               'aria-label':
-                theColor === 'dark'
+                currentTheme === 'dark'
                   ? 'Switch to Light Mode'
                   : 'Switch to Dark Mode',
               role: 'switch',

@@ -1,6 +1,5 @@
 // hooks/useGitOperations.ts
 import { useCallback, useState } from 'react';
-import YAML from 'yaml';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import {
   CreateCloneType,
@@ -39,8 +38,7 @@ import JSZip from 'jszip';
 import { getRepoAccess } from './GitContext';
 import { GitOperations } from '../utils/gitOperations';
 import { GitFS } from '../utils/fileSystem';
-import { readRC5Meta, slugifyPath } from '../utils/useCourseOperationsUtils';
-import { RC5_FILENAME } from '@rapid-cmi5/cmi5-build-common';
+import { slugifyPath } from '../utils/useCourseOperationsUtils';
 
 export const useGitOperations = (
   fsInstance: GitFS,

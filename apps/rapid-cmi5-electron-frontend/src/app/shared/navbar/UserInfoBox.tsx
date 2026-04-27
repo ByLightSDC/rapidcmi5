@@ -1,4 +1,4 @@
-import { AppDispatch, useMDStyleIcons } from '@rapid-cmi5/react-editor';
+import { AppDispatch } from '@rapid-cmi5/react-editor';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import {
@@ -22,7 +22,6 @@ import ListIcon from '@mui/icons-material/List';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import Brightness6Icon from '@mui/icons-material/Brightness6';
 import InfoIcon from '@mui/icons-material/Info';
-
 import SecurityIcon from '@mui/icons-material/Security';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import KeyIcon from '@mui/icons-material/Key';
@@ -161,8 +160,27 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
             testId={showVersionModalId}
             buttons={['OK']}
             dialogProps={{ open: true }}
-            title="Rapid CMI5 Version"
-            message={`Version: ${RC5_VERSION}`}
+            message={
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 1,
+                }}
+              >
+                <img
+                  width={220}
+                  src={
+                    appThemeColor === 'light'
+                      ? '/assets/images/RapidCMI5_Logo_Light.png'
+                      : '/assets/images/RapidCMI5_Logo_Dark.png'
+                  }
+                  alt="Rapid CMI5 Logo"
+                />
+                Version: {RC5_VERSION}
+              </Box>
+            }
             maxWidth="xs"
             handleAction={() => handleCloseModal()}
           />

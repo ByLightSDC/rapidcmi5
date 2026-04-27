@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-useless-fragment */
 import { DRAWER_WIDTH } from '../ContentLayout';
 import TabPanel from '../TabPanel';
 import Drawer from '@mui/material/Drawer';
@@ -64,7 +63,10 @@ export default function MenuLayout() {
     const measure = () => {
       if (slideRef.current) {
         const rect = slideRef.current.getBoundingClientRect();
-        document.documentElement.style.setProperty('--panel-width', `${rect.left}px`);
+        document.documentElement.style.setProperty(
+          '--panel-width',
+          `${rect.left}px`,
+        );
         maxSlideWidth$.value = rect.width;
       }
     };
@@ -116,24 +118,24 @@ export default function MenuLayout() {
               onSplitOff={handleSplitOff}
             />
 
-            <>
-              {isExitSlide && <ExitSlide />}
-              {!isExitSlide && !config.CMI5_SSO_ENABLED && (
-                <ScenarioWrapper>
-                  <RC5Player />
-                </ScenarioWrapper>
-              )}
-              {!isExitSlide && config.CMI5_SSO_ENABLED && (
-                <TeamScenarioContextProvider isEnabled={true}>
-                  <RC5Player />
-                </TeamScenarioContextProvider>
-              )}
-            </>
+            {isExitSlide ? (
+              <ExitSlide />
+            ) : !config.CMI5_SSO_ENABLED ? (
+              <ScenarioWrapper>
+                <RC5Player />
+              </ScenarioWrapper>
+            ) : (
+              <TeamScenarioContextProvider isEnabled={true}>
+                <RC5Player />
+              </TeamScenarioContextProvider>
+            )}
           </Box>
         </Panel>
         {isSplitPanelShown && (
           <>
-            <PanelResizeHandle style={{ width: 4, backgroundColor: themedDividerColor }} />
+            <PanelResizeHandle
+              style={{ width: 4, backgroundColor: themedDividerColor }}
+            />
             <Panel />
           </>
         )}

@@ -12,6 +12,11 @@ import {
 import { useSelector } from 'react-redux';
 import { auJsonSel } from '../../redux/auReducer';
 
+/*
+  This allows course managers and developers to debug issues in their course.
+  By adding in a simple way to check where a course came from and what version of 
+  rapid cmi5 it is running we can quickly see if there is a version mismatch.
+*/
 export default function BuildInfoButton() {
   const auJson = useSelector(auJsonSel);
   const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);
@@ -96,7 +101,6 @@ export default function BuildInfoButton() {
               <Typography
                 variant="caption"
                 sx={{
-                  fontFamily: 'monospace',
                   wordBreak: 'break-all',
                   color: 'text.primary',
                 }}

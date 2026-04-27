@@ -35,14 +35,17 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
     type: 'asset/resource',
   });
 
-  // Your existing MDX rule
+  // MDX rule — swc-loader handles JSX output from @mdx-js/loader
   config.module.rules.push({
     test: /\.mdx?$/,
     use: [
       {
-        loader: 'babel-loader',
+        loader: 'swc-loader',
         options: {
-          presets: ['@babel/preset-env', '@babel/preset-react'],
+          jsc: {
+            parser: { syntax: 'ecmascript', jsx: true },
+            transform: { react: { runtime: 'automatic' } },
+          },
         },
       },
       {
@@ -61,6 +64,9 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
   };
 
   const theConfig = merge(config, {
+    cache: {
+      type: 'filesystem',
+    },
     ignoreWarnings: [/Failed to parse source map/],
     devServer: {
       client: {

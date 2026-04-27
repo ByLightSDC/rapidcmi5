@@ -1,6 +1,42 @@
 const { merge } = require('webpack-merge');
 const { composePlugins, withNx } = require('@nx/webpack');
 const { withReact } = require('@nx/react');
+const fs = require('fs');
+const path = require('path');
+
+const { version: rc5Version } = require('../../packages/common/package.json');
+
+/*
+  This is a manifest just for the player. It supports swapping out the player in the Moodle 
+  plugin. 
+*/
+class PlayerManifestPlugin {
+  apply(compiler) {
+    compiler.hooks.afterEmit.tapAsync(
+      'PlayerManifestPlugin',
+      (compilation, callback) => {
+        const outputPath = compilation.outputOptions.path;
+        const manifest = {
+          playerVersion: rc5Version,
+          buildTimestamp: Math.floor(Date.now() / 1000),
+          files: [
+            'index.html',
+            'cfg.json',
+            'favicon.ico',
+            'env-config.js',
+            '3rdpartylicenses.txt',
+          ],
+        };
+        fs.writeFile(
+          path.join(outputPath, 'player-manifest.json'),
+          JSON.stringify(manifest, null, 2),
+          'utf-8',
+          callback,
+        );
+      },
+    );
+  }
+}
 
 // Nx plugins for webpack.
 module.exports = composePlugins(withNx(), withReact(), (config) => {
@@ -33,6 +69,9 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
     test: /\.(woff|woff2|eot|ttf|otf)$/i,
     type: 'asset/resource',
   });
+
+  config.plugins = config.plugins || [];
+  config.plugins.push(new PlayerManifestPlugin());
 
   const theConfig = merge(config, {
     ignoreWarnings: [/Failed to parse source map/],
