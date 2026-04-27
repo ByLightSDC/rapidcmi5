@@ -188,18 +188,15 @@ export const useCourseOperations = (
     const { courseName, courseDescription, firstAuName, courseId, zipFile } =
       req;
 
-    const cleanedCourseName = slugifyPath(courseName);
-    const cleanedAuName = slugifyPath(firstAuName);
-
     const course = await createCourseInFs({
       availableCourses,
-      courseTitle: cleanedCourseName,
+      courseTitle: courseName,
       zipFile,
       fsInstance,
       r,
       courseDescription,
       courseId,
-      courseAu: cleanedAuName,
+      courseAu: firstAuName,
     });
 
     dispatch(selectCourse(course));

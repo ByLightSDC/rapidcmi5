@@ -118,8 +118,9 @@ export const createNewCourseInFs = async ({
 }: CreateNewCourseInFsOptions) => {
   try {
     await fsInstance.createDir(r, coursePath);
+    const sluggedAu = slugifyPath(courseAu);
 
-    const auDirPath = join(coursePath, courseAu);
+    const auDirPath = join(coursePath, sluggedAu);
     const sluggedFilename = slugifyPath(baseSlideTitle);
     const firstSlidePath = join(auDirPath, sluggedFilename + '.md');
 
@@ -193,6 +194,7 @@ export const createCourseInFs = async ({
   courseAu,
 }: CreateCourseInFsOptions) => {
   // Ensure this is a valid course name
+
   const coursePath = slugifyPath(courseTitle);
 
   if (availableCourses.find((course) => course.basePath === coursePath)) {
