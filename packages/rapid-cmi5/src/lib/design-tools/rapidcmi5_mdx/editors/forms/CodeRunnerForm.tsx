@@ -1,4 +1,5 @@
 import { UseFormReturn } from 'react-hook-form';
+import { toTitleCase } from './formUtils';
 import Grid from '@mui/material/Grid2';
 import MenuItem from '@mui/material/MenuItem';
 import * as yup from 'yup';
@@ -180,7 +181,7 @@ export const CodeRunnerForm = ({
           >
             {moveOnCriteriaOptions.map((item) => (
               <MenuItem key={item} value={item}>
-                {item}
+                {toTitleCase(item)}
               </MenuItem>
             ))}
           </FormControlSelectField>

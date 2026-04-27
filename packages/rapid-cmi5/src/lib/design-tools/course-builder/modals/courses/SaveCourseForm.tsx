@@ -12,7 +12,7 @@ import {
 } from '@rapid-cmi5/ui';
 import Grid from '@mui/material/Grid2';
 
-import { Alert, Typography } from '@mui/material';
+import { Alert } from '@mui/material';
 import * as yup from 'yup';
 
 import { UseFormReturn } from 'react-hook-form';

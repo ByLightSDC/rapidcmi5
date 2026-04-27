@@ -6,6 +6,7 @@ import { $getNodeByKey } from 'lexical';
 // MUI
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
@@ -26,7 +27,12 @@ import {
   clickPosition$,
   isLabelDropping$,
   isTextDropping$,
+  BlockAppearanceForm,
+  AlignmentToolbarControls,
 } from '@rapid-cmi5/ui';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { MdxJsxAttribute } from 'mdast-util-mdx-jsx';
+import { $isImageNode } from './ImageNode';
 
 import { StyleDialog } from './StyleDialog';
 import { useImageStyle } from './useImageStyle';
@@ -41,6 +47,8 @@ export interface EditImageToolbarProps {
   width?: number;
   height?: number;
   href?: string;
+  contentWidth?: ContentWidthEnum;
+  textAlign?: 'left' | 'center' | 'right';
 }
 
 /**
@@ -63,6 +71,8 @@ export function EditImageToolbar({
   width,
   height,
   href,
+  contentWidth,
+  textAlign,
 }: EditImageToolbarProps): JSX.Element {
   const [readOnly] = useCellValues(readOnly$);
   const [editor] = useLexicalComposerContext();
@@ -76,6 +86,7 @@ export function EditImageToolbar({
   // For letting style dialogue work outside of image dialog.
   const { imageStyle, setImageStyle } = useImageStyle(nodeKey);
   const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
+  const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
 
   /**
    * Set marker position to follow mouse
@@ -186,6 +197,16 @@ export function EditImageToolbar({
           <PaletteIcon />
         </IconButton>
 
+        <Tooltip title="Block Appearance">
+          <IconButton
+            aria-label="block appearance"
+            disabled={readOnly}
+            onClick={() => setBlockAppearanceOpen(true)}
+          >
+            <SettingsIcon />
+          </IconButton>
+        </Tooltip>
+
         <IconButton
           aria-label="Add Label"
           disabled={readOnly}
@@ -246,12 +267,75 @@ export function EditImageToolbar({
         </IconButton>
       </Stack>
 
+      {/* Second-row alignment toolbar — sits below the main toolbar */}
+      <Stack
+        direction="row"
+        spacing={0}
+        sx={{
+          backgroundColor:
+            muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
+          position: 'absolute',
+          right: 0,
+          top: 36,
+          display: 'flex',
+          zIndex: 1,
+        }}
+      >
+        <AlignmentToolbarControls
+          currentAlignment={textAlign ?? 'left'}
+          onAlignmentChange={(value) => {
+            editor.update(() => {
+              const node = $getNodeByKey(nodeKey);
+              if ($isImageNode(node)) {
+                const filteredRest = (rest ?? []).filter(
+                  (a: MdxJsxAttribute) => a.name !== 'textAlign',
+                );
+                if (value !== 'left') {
+                  filteredRest.push({
+                    type: 'mdxJsxAttribute',
+                    name: 'textAlign',
+                    value,
+                  } as MdxJsxAttribute);
+                }
+                node.setRest(filteredRest);
+              }
+            });
+          }}
+          disabled={readOnly}
+        />
+      </Stack>
+
       {/* Style Dialog lives OUTSIDE the button, but inside the toolbar component */}
       <StyleDialog
         isOpen={isStyleDialogOpen}
         style={imageStyle}
         setImageStyle={setImageStyle}
         setIsStyleDialogOpen={setIsStyleDialogOpen}
+      />
+
+      {/* Block Appearance dialog — controls content width override */}
+      <BlockAppearanceForm
+        open={blockAppearanceOpen}
+        currentContentWidth={contentWidth}
+        onClose={() => setBlockAppearanceOpen(false)}
+        onSave={(newContentWidth) => {
+          editor.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            if ($isImageNode(node)) {
+              const filteredRest = (rest ?? []).filter(
+                (a: MdxJsxAttribute) => a.name !== 'contentWidth',
+              );
+              if (newContentWidth !== undefined) {
+                filteredRest.push({
+                  type: 'mdxJsxAttribute',
+                  name: 'contentWidth',
+                  value: newContentWidth,
+                } as MdxJsxAttribute);
+              }
+              node.setRest(filteredRest);
+            }
+          });
+        }}
       />
     </>
   );

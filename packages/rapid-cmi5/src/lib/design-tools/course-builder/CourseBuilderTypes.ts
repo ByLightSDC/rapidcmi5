@@ -18,6 +18,7 @@ export enum MessageType {
   changeLesson = 'changeLesson',
   createCourse = 'createCourse',
   downloadCourseZip = 'downloadCourseZip',
+  testInPlayer = 'testInPlayer',
   remountLesson = 'remountLesson',
   changeCourseSettings = 'changeCourseSettings',
 }
