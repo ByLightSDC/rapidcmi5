@@ -105,8 +105,41 @@ export function generateLessonThemeStyleTag(
   const css = resolveLessonThemeCSS(theme);
 
 
+  // Always-emitted rules — must fire regardless of lesson theme settings.
+  // Image block overrides must work even when no lesson content width is set.
+  const imageBaseRule = `
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > [data-lexical-decorator] {
+      display: block;
+      width: 100%;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > [data-lexical-decorator] > div {
+      width: 100%;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] {
+      max-width: 100%;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-block-override] {
+      max-width: var(--block-max-width) !important;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] img {
+      max-width: 100%;
+      height: auto;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-block-expand] img {
+      display: block;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-image-align="center"] img {
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-image-align="right"] img {
+      margin-left: auto;
+      margin-right: 0;
+    }
+  `;
+
   // Always emit --content-margin so directive calc() expressions resolve even when no theme is set.
-  if (!css) return `.${scopedClass} { --content-margin: 0px; }`;
+  if (!css) return `.${scopedClass} { --content-margin: 0px; }` + imageBaseRule;
 
   const widthRule = css.maxWidth
     ? `
@@ -125,16 +158,6 @@ export function generateLessonThemeStyleTag(
     max-width: var(--block-max-width) !important;
     margin-left: auto;
     margin-right: auto;
-  }
-  .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > [data-lexical-decorator] {
-    display: block;
-  }
-  .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] {
-    max-width: 100%;
-  }
-  .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] img {
-    max-width: 100%;
-    height: auto;
   }
   .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:has(.paper-activity) {
     width: calc(98vw - var(--panel-width));
@@ -159,7 +182,7 @@ export function generateLessonThemeStyleTag(
 
   const paragraphWidthRule = css.maxWidth
     ? `
-    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p:not(:has([data-block-expand])),
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-paragraph="true"],
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > ul,
     .${scopedClass} .mdxeditor-root-contenteditable > div > div > ol,
@@ -216,5 +239,5 @@ export function generateLessonThemeStyleTag(
     }`
     : '';
 
-  return paragraphWidthRule + alignmentRule + widthRule + blockPaddingRule + blockBaseRule;
+  return imageBaseRule + paragraphWidthRule + alignmentRule + widthRule + blockPaddingRule + blockBaseRule;
 }

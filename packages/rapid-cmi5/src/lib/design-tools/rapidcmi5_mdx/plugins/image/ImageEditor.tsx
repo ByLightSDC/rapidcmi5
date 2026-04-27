@@ -676,6 +676,8 @@ export function ImageEditor({
           className={styles['imageWrapper']}
           data-editor-block-type="image"
           {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
+          {...(blockMaxWidth === null ? { 'data-block-expand': 'true' } : {})}
+          {...(blockMaxWidth === null && imageTextAlign ? { 'data-image-align': imageTextAlign } : {})}
           {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as React.CSSProperties } : {})}
         >
           <div
