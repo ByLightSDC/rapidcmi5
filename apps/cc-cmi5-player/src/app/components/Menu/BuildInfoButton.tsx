@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { auJsonSel } from '../../redux/auReducer';
+import { TOOLTIP_ENTER_DELAY, TOOLTIP_ENTER_NEXT_DELAY } from './shared';
 
 /*
   This allows course managers and developers to debug issues in their course.
@@ -20,7 +21,6 @@ import { auJsonSel } from '../../redux/auReducer';
 export default function BuildInfoButton() {
   const auJson = useSelector(auJsonSel);
   const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);
-
   if (!auJson?.metadata) return null;
 
   const rows = [
@@ -37,7 +37,11 @@ export default function BuildInfoButton() {
 
   return (
     <>
-      <Tooltip title="Build Information">
+      <Tooltip
+        title="Build Information"
+        enterDelay={TOOLTIP_ENTER_DELAY}
+        enterNextDelay={TOOLTIP_ENTER_NEXT_DELAY}
+      >
         <IconButton
           aria-label="Build Information"
           color="primary"

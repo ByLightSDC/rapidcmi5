@@ -14,6 +14,7 @@ import {
   setModal,
 } from '@rapid-cmi5/ui';
 import { CustomTheme } from '../../styles/createPalette';
+import { TOOLTIP_ENTER_DELAY, TOOLTIP_ENTER_NEXT_DELAY } from './shared';
 
 const featureFlagChangeClassRoom = false;
 
@@ -50,9 +51,7 @@ export default function StudentInfoButton() {
         <Typography variant="caption">Student Id:{studentId}</Typography>
       )}
       <Typography variant="caption">Registration Id:{regId}</Typography>
-      {classId && (
-        <Typography variant="caption">Class Id:{classId}</Typography>
-      )}
+      {classId && <Typography variant="caption">Class Id:{classId}</Typography>}
       <Typography variant="caption">User Name:{clearUserName}</Typography>
       {password && (
         <Typography variant="caption">Password:{password}</Typography>
@@ -89,7 +88,9 @@ export default function StudentInfoButton() {
                 <ButtonMainUi
                   startIcon={<AssignmentIndIcon />}
                   onClick={() => {
-                    dispatch(setModal({ type: classChangeModalId, id: '', name: '' }));
+                    dispatch(
+                      setModal({ type: classChangeModalId, id: '', name: '' }),
+                    );
                   }}
                 >
                   Change ClassRoom
@@ -107,12 +108,10 @@ export default function StudentInfoButton() {
   return (
     <IconButton aria-label="Student Information" color="primary">
       <Tooltip
-        arrow
-        enterDelay={500}
-        enterNextDelay={500}
+        enterDelay={TOOLTIP_ENTER_DELAY}
+        enterNextDelay={TOOLTIP_ENTER_NEXT_DELAY}
         sx={{ maxWidth: '480px' }}
         title={infoRows}
-        placement="bottom"
       >
         <AccountCircleIcon />
       </Tooltip>

@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setTheme, themeColor } from '@rapid-cmi5/ui';
 import StudentInfoButton from './StudentInfoButton';
 import BuildInfoButton from './BuildInfoButton';
+import { TOOLTIP_ENTER_DELAY, TOOLTIP_ENTER_NEXT_DELAY } from './shared';
 
 interface LessonToolbarProps {
   isMenuDrawerOpen: boolean;
@@ -47,6 +48,8 @@ export default function LessonToolbar({
     >
       <Tooltip
         title={isMenuDrawerOpen ? 'Collapse Navigation' : 'Open Navigation'}
+        enterDelay={TOOLTIP_ENTER_DELAY}
+        enterNextDelay={TOOLTIP_ENTER_NEXT_DELAY}
       >
         <IconButton
           aria-label={
@@ -64,7 +67,11 @@ export default function LessonToolbar({
         </IconButton>
       </Tooltip>
 
-      <Tooltip title="Turn Split Screen On">
+      <Tooltip
+        title="Turn Split Screen On"
+        enterDelay={TOOLTIP_ENTER_DELAY}
+        enterNextDelay={TOOLTIP_ENTER_NEXT_DELAY}
+      >
         <IconButton
           aria-label="Turn Split Screen On"
           color="primary"
@@ -75,7 +82,11 @@ export default function LessonToolbar({
         </IconButton>
       </Tooltip>
 
-      <Tooltip title="Turn Split Screen Off">
+      <Tooltip
+        title="Turn Split Screen Off"
+        enterDelay={TOOLTIP_ENTER_DELAY}
+        enterNextDelay={TOOLTIP_ENTER_NEXT_DELAY}
+      >
         <IconButton
           aria-label="Turn Split Screen Off"
           color="primary"
@@ -92,6 +103,8 @@ export default function LessonToolbar({
             ? 'Switch to Light Mode'
             : 'Switch to Dark Mode'
         }
+        enterDelay={TOOLTIP_ENTER_DELAY}
+        enterNextDelay={TOOLTIP_ENTER_NEXT_DELAY}
       >
         <Switch
           checked={currentTheme === 'dark'}
