@@ -1,9 +1,4 @@
-import {
-  DirectiveEditorProps,
-  readOnly$,
-  syntaxExtensions$,
-  useCellValues,
-} from '@mdxeditor/editor';
+import { DirectiveEditorProps } from '@mdxeditor/editor';
 import { useContext, useMemo, useRef, useState } from 'react';
 import { ContainerDirective } from 'mdast-util-directive';
 import { StatementDirectiveNode } from './types';
@@ -12,8 +7,8 @@ import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 import { StatementsContext } from './StatementsContext';
 
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
-import { useLessonThemeStyles } from 'packages/ui/src/lib/hooks/useLessonThemeStyles';
 import { statementFontPresets } from './constants';
+import { useLessonThemeStyles } from '../../../../hooks/useLessonThemeStyles';
 
 /**
  * Statement Content Editor for the Statements plugin.
@@ -22,7 +17,6 @@ import { statementFontPresets } from './constants';
 export const StatementEditor: React.FC<
   DirectiveEditorProps<StatementDirectiveNode>
 > = ({ lexicalNode, parentEditor }) => {
-
   const [cellIndex, setCellIndex] = useState(-1);
   const { preset } = useContext(StatementsContext);
 

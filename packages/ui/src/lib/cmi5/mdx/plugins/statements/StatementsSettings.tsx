@@ -1,5 +1,5 @@
 import { Box, Paper, Stack, Typography } from '@mui/material';
-import ModalDialog from 'packages/ui/src/lib/modals/ModalDialog';
+import ModalDialog from '../../../../modals/ModalDialog';
 import { useCallback, useState } from 'react';
 import Grid from '@mui/material/Grid2';
 import { STATEMENT_PRESETS, StatementPreset } from '@rapid-cmi5/ui';
