@@ -46,7 +46,8 @@ export default function ExitSlide() {
     // Return user to launcher if applicable.
     const returnURL = cmi5Instance.getLaunchData().returnURL;
     if (returnURL) {
-      window.location.href = returnURL;
+      const target = window.top || window;
+      target.location.href = returnURL;
     } else {
       logger.warn('No returnURL in CMI5 launch data', undefined, 'lms');
       setIsExiting(false);
