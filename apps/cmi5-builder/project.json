@@ -7,12 +7,16 @@
   "targets": {
     "build": {
       "executor": "@nx/esbuild:esbuild",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
         "outputPath": "dist/apps/cmi5-builder",
-        "format": ["cjs"],
+        "format": [
+          "cjs"
+        ],
         "bundle": false,
         "main": "apps/cmi5-builder/src/main.ts",
         "tsConfig": "apps/cmi5-builder/tsconfig.app.json",
@@ -20,8 +24,8 @@
           "apps/cmi5-builder/src/assets",
           {
             "glob": "**/*.json",
-            "input": "libs/types/cmi5/src/schemas",
-            "output": "libs/types/cmi5/src/schemas"
+            "input": "packages/common/src",
+            "output": "packages/common/src"
           }
         ],
         "generatePackageJson": true,
@@ -50,7 +54,9 @@
     "serve": {
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "options": {
         "buildTarget": "cmi5-builder:build",
         "runBuildTargetDependencies": false
@@ -69,7 +75,9 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
       "options": {
         "jestConfig": "apps/cmi5-builder/jest.config.ts"
       }

@@ -35,6 +35,7 @@ import {
   generateCourseJson,
 } from '@rapid-cmi5/cmi5-build-common';
 import { getFolderStructureBackend } from './fileSystem/fileSystem';
+import { MoodleUploadServiceV2 } from './services/moodle/moodleUploadServiceV2';
 
 export interface CourseMeta {
   courseName?: string;
@@ -276,35 +277,9 @@ program
     '--apply-au-mappings <endpoint>',
     'Create AU mappings Specific to Opendash Format (AU ID -> Scenario) at endpoint',
   )
-  .option(
-    '--course-meta <yamlPath>',
-    'Path to optional YAML file to override course metadata',
-  )
   .option('--zip <path>', 'Create a ZIP of the output directory')
-  .option('--moodle-course-name <name>', 'The Moodle course fullname')
-  .option('--moodle-course-id <id>', 'The Moodle course id')
-  .option('--moodle-section-id <id>', 'The Moodle course section id')
-  .option('--convert', 'convert from mkdocs')
-
   .action(async (coursePath, distPath, endpoint, options) => {
     console.log(`Uploading to moodle at ${endpoint}...`);
-
-    const hasName = !!options.moodleCourseName;
-    const hasId = !!options.moodleCourseId;
-
-    if (hasName && hasId) {
-      console.error(
-        '❌ Please provide either --moodle-course-name or --moodle-course-id, not both.',
-      );
-      process.exit(1);
-    }
-
-    if (!hasName && !hasId) {
-      console.error(
-        '❌ You must provide either --moodle-course-name or --moodle-course-id.',
-      );
-      process.exit(1);
-    }
 
     const inputPath = path.resolve(coursePath);
     const outputPath = path.resolve(distPath);
@@ -338,35 +313,23 @@ program
 
     zipCmi5(outputPath, zipPath);
 
-    const jwtDevopsApi = process.env['JWT_DEVOPS_API'];
     const moodleWsToken = process.env['MOODLE_WS_TOKEN'];
 
-    if (jwtDevopsApi && moodleWsToken) {
+    if (moodleWsToken) {
       console.log('📊  Uploading zip to moodle...');
-      const mappingEndpoint = options.applyAuMappings;
-
-      const auMappingService = new AuMappingService({
-        baseUrl: mappingEndpoint,
-        jwt: jwtDevopsApi,
-      });
-
-      const uploader = new MoodleUploadService({
+      const uploader = new MoodleUploadServiceV2({
         baseUrl: endpoint,
         wstoken: moodleWsToken,
       });
 
-      await uploader.uploadCourse(
-        courseData,
-        auMappingService,
+      await uploader.uploadCourse({
+        projectIdentifier: courseData.courseId,
+        projectName: courseData.courseTitle,
         zipPath,
-        options.applyAuMappings,
-        options.moodleSectionId,
-        options.moodleCourseId,
-        options.moodleCourseName,
-      );
+      });
     } else {
       console.log(
-        `❌  No TOKEN was provided for moodleWsToken ${moodleWsToken ? 'true' : 'false'} or ros ${jwtDevopsApi ? 'true' : 'false'}`,
+        `❌  No TOKEN was provided for moodleWsToken ${moodleWsToken}`,
       );
     }
   });
