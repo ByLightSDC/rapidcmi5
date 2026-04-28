@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
+import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
 
 import {
   closeImageDialog$,
@@ -10,11 +10,11 @@ import {
 import { useCellValues, usePublisher } from '@mdxeditor/gurx';
 
 // MUI
-import { Box, Paper, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import Grid from '@mui/material/Grid2';
-import EditIcon from '@mui/icons-material/Edit';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
+import LockIcon from '@mui/icons-material/Lock';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 
 import {
   ButtonModalMainUi,
@@ -59,6 +59,9 @@ export const ImageDialog: React.FC = () => {
   const [fileOptions, setFileOptions] = useState<string[]>([]);
   const [width, setWidth] = useState<string>('');
   const [height, setHeight] = useState<string>('');
+  const [aspectLocked, setAspectLocked] = useState<boolean>(true);
+  // natural dims of the current image — loaded from the resolved blob URL
+  const naturalDimsRef = useRef<{ width: number; height: number } | null>(null);
 
   const { isFsLoaded, handleGetFolderStructure, handlePathExists } =
     useContext(GitContext);
@@ -81,8 +84,12 @@ export const ImageDialog: React.FC = () => {
       setLinkUrl(state.initialValues.href ?? '');
 
       setImageStyle('');
-      setWidth(state.initialValues.width?.toString() ?? '');
-      setHeight(state.initialValues.height?.toString() ?? '');
+      // If the image has no stored px dimensions, we'll populate from natural dims
+      // once the image loads (see effect below). Set empty for now.
+      const storedWidth = typeof state.initialValues.width === 'number' ? state.initialValues.width.toString() : '';
+      const storedHeight = typeof state.initialValues.height === 'number' ? state.initialValues.height.toString() : '';
+      setWidth(storedWidth);
+      setHeight(storedHeight);
       if (state.initialValues.rest) {
         const styleAttribute = state.initialValues.rest.find(
           //@ts-ignore
@@ -105,6 +112,29 @@ export const ImageDialog: React.FC = () => {
 
     // clear the file regardless of the editing state
     setSelectedFiles(null);
+
+    // reset lock and natural dims so stale ratios don't carry over
+    naturalDimsRef.current = null;
+    setAspectLocked(true);
+  }, [state]);
+
+  // Load natural dims from the resolved blob URL when the dialog opens.
+  // If no stored px dims, also pre-populate the width/height fields.
+  useEffect(() => {
+    if (state.type !== 'editing') return;
+    const urlToLoad = state.initialValues.resolvedSrc ?? state.initialValues.src;
+    if (!urlToLoad) return;
+    const img = new Image();
+    img.onload = () => {
+      naturalDimsRef.current = { width: img.naturalWidth, height: img.naturalHeight };
+      // Pre-populate fields only when image has no stored dimensions
+      const hasStoredDims = typeof state.initialValues.width === 'number' || typeof state.initialValues.height === 'number';
+      if (!hasStoredDims) {
+        setWidth(String(img.naturalWidth));
+        setHeight(String(img.naturalHeight));
+      }
+    };
+    img.src = urlToLoad;
   }, [state]);
 
   // set up publishers, etc.
@@ -207,6 +237,7 @@ export const ImageDialog: React.FC = () => {
         buttons={['Cancel', state.type === 'editing' ? 'apply' : 'insert']}
         dialogProps={{
           open: true,
+          fullWidth: true,
         }}
         handleAction={(index: number) => {
           if (index === 0) {
@@ -329,8 +360,8 @@ export const ImageDialog: React.FC = () => {
             />
 
             {/* Width/Height section */}
-            <Grid container alignItems="center" sx={{ width: '100%' }}>
-              <Grid size={6}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Box sx={{ flex: '1 1 0', minWidth: 0 }}>
                 <TextFieldMainUi
                   margin="dense"
                   label="Width (px)"
@@ -338,11 +369,29 @@ export const ImageDialog: React.FC = () => {
                   type="number"
                   fullWidth
                   value={width}
-                  onChange={(textValue: string) => setWidth(textValue)}
+                  onChange={(textValue: string) => {
+                    setWidth(textValue);
+                    if (aspectLocked && naturalDimsRef.current && textValue !== '') {
+                      const ratio = naturalDimsRef.current.height / naturalDimsRef.current.width;
+                      const computed = Math.round(parseInt(textValue, 10) * ratio);
+                      setHeight(isNaN(computed) ? '' : String(computed));
+                    }
+                  }}
                   infoText={'Optional image width in pixels'}
                 />
-              </Grid>
-              <Grid size={6}>
+              </Box>
+              <Tooltip title={aspectLocked ? 'Unlock aspect ratio' : 'Lock aspect ratio'}>
+                <IconButton
+                  size="small"
+                  onClick={() => setAspectLocked((prev) => !prev)}
+                  color={aspectLocked ? 'primary' : 'default'}
+                  aria-label={aspectLocked ? 'Unlock aspect ratio' : 'Lock aspect ratio'}
+                  sx={{ mt: '4px', flexShrink: 0 }}
+                >
+                  {aspectLocked ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />}
+                </IconButton>
+              </Tooltip>
+              <Box sx={{ flex: '1 1 0', minWidth: 0 }}>
                 <TextFieldMainUi
                   margin="dense"
                   label="Height (px)"
@@ -350,11 +399,18 @@ export const ImageDialog: React.FC = () => {
                   type="number"
                   fullWidth
                   value={height}
-                  onChange={(textValue: string) => setHeight(textValue)}
+                  onChange={(textValue: string) => {
+                    setHeight(textValue);
+                    if (aspectLocked && naturalDimsRef.current && textValue !== '') {
+                      const ratio = naturalDimsRef.current.width / naturalDimsRef.current.height;
+                      const computed = Math.round(parseInt(textValue, 10) * ratio);
+                      setWidth(isNaN(computed) ? '' : String(computed));
+                    }
+                  }}
                   infoText={'Optional image height in pixels'}
                 />
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
           </Stack>
         </>
       </ModalDialog>
