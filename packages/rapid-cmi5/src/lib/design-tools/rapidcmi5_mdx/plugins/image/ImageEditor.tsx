@@ -241,16 +241,6 @@ export function ImageEditor({
     }
   }
 
-  // Dedicated textAlign attribute (separate from the CSS style string)
-  const textAlignAttr = rest?.find(
-    (item): item is MdxJsxAttribute =>
-      item.type === 'mdxJsxAttribute' && item.name === 'textAlign',
-  );
-  const imageTextAlign = textAlignAttr?.value as 'left' | 'center' | 'right' | undefined;
-  if (imageTextAlign) {
-    wrapperStyle.textAlign = imageTextAlign;
-  }
-
   // Block-level content width override (same pattern as Tabs/Accordion/Grid)
   const contentWidthAttr = rest?.find(
     (item): item is MdxJsxAttribute =>
@@ -677,7 +667,6 @@ export function ImageEditor({
           data-editor-block-type="image"
           {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
           {...(blockMaxWidth === null ? { 'data-block-expand': 'true' } : {})}
-          {...(blockMaxWidth === null && imageTextAlign ? { 'data-image-align': imageTextAlign } : {})}
           {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as React.CSSProperties } : {})}
         >
           <div
@@ -713,7 +702,6 @@ export function ImageEditor({
               height={height === 'inherit' ? undefined : height}
               href={href}
               contentWidth={contentWidth}
-              textAlign={imageTextAlign}
             />
           )}
         </div>

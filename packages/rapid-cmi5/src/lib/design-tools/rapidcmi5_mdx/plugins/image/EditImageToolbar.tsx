@@ -28,7 +28,6 @@ import {
   isLabelDropping$,
   isTextDropping$,
   BlockAppearanceForm,
-  AlignmentToolbarControls,
 } from '@rapid-cmi5/ui';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { MdxJsxAttribute } from 'mdast-util-mdx-jsx';
@@ -48,7 +47,6 @@ export interface EditImageToolbarProps {
   height?: number;
   href?: string;
   contentWidth?: ContentWidthEnum;
-  textAlign?: 'left' | 'center' | 'right';
 }
 
 /**
@@ -72,7 +70,6 @@ export function EditImageToolbar({
   height,
   href,
   contentWidth,
-  textAlign,
 }: EditImageToolbarProps): JSX.Element {
   const [readOnly] = useCellValues(readOnly$);
   const [editor] = useLexicalComposerContext();
@@ -265,44 +262,6 @@ export function EditImageToolbar({
         >
           <DeleteForeverIcon />
         </IconButton>
-      </Stack>
-
-      {/* Second-row alignment toolbar — sits below the main toolbar */}
-      <Stack
-        direction="row"
-        spacing={0}
-        sx={{
-          backgroundColor:
-            muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
-          position: 'absolute',
-          right: 0,
-          top: 36,
-          display: 'flex',
-          zIndex: 1,
-        }}
-      >
-        <AlignmentToolbarControls
-          currentAlignment={textAlign ?? 'left'}
-          onAlignmentChange={(value) => {
-            editor.update(() => {
-              const node = $getNodeByKey(nodeKey);
-              if ($isImageNode(node)) {
-                const filteredRest = (rest ?? []).filter(
-                  (a: MdxJsxAttribute) => a.name !== 'textAlign',
-                );
-                if (value !== 'left') {
-                  filteredRest.push({
-                    type: 'mdxJsxAttribute',
-                    name: 'textAlign',
-                    value,
-                  } as MdxJsxAttribute);
-                }
-                node.setRest(filteredRest);
-              }
-            });
-          }}
-          disabled={readOnly}
-        />
       </Stack>
 
       {/* Style Dialog lives OUTSIDE the button, but inside the toolbar component */}
