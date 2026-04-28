@@ -1,3 +1,7 @@
+## 0.12.4 (2026-04-28)
+
+This was a version bump only, there were no code changes.
+
 ## 0.12.3 (2026-04-28)
 
 This was a version bump only, there were no code changes.
