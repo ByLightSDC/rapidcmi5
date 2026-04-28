@@ -23,11 +23,7 @@ import {
   getScenarioDirectives,
   RC5_FILENAME,
 } from '@rapid-cmi5/cmi5-build-common';
-import {
-  debugLog,
-  debugLogError,
-  defaultEmptySlide,
-} from '@rapid-cmi5/ui';
+import { debugLog, debugLogError, defaultEmptySlide } from '@rapid-cmi5/ui';
 import { basename, dirname, join, normalize } from 'path-browserify';
 import JSZip from 'jszip';
 import { getRepoPath, GitOperations } from './gitOperations';
@@ -126,11 +122,9 @@ export const createNewCourseInFs = async ({
     const gitOps = new GitOperations(fsInstance);
     const remotes = await gitOps.listRepoRemotes(r);
 
-    const gitBranch = await gitOps.getCurrentGitBranch(r) ?? undefined;
+    const gitBranch = (await gitOps.getCurrentGitBranch(r)) ?? undefined;
     const buildTime = new Date().toISOString();
-    const remoteGitUrl = remotes.find(
-      (rem) => rem.remote === 'origin',
-    )?.url;
+    const remoteGitUrl = remotes.find((rem) => rem.remote === 'origin')?.url;
 
     // Create the course meta file
     const courseDataFileContent: CourseData = {
@@ -145,7 +139,7 @@ export const createNewCourseInFs = async ({
                 {
                   slideTitle: baseSlideTitle,
                   type: SlideTypeEnum.Markdown,
-                  filepath: firstSlidePath
+                  filepath: firstSlidePath,
                 },
               ],
             },
@@ -748,35 +742,35 @@ export const computeCourseFromJsonFs = async ({
   }
 };
 
-export // We do not want contents of files to be put into RC5.yaml
-  const stripSlideContent = (course: CourseData): CourseData => ({
-    ...course,
-    blocks: course.blocks.map((block) => ({
-      ...block,
-      aus: block.aus.map((au) => {
-        // Extract KSATs from all slides in this AU
-        const allKsats: KSATElement[] = [];
-        au.slides.forEach((slide) => {
-          if (slide.content && typeof slide.content === 'string') {
-            const slideKsats = extractKsatsFromSlide(slide.content);
-            allKsats.push(...slideKsats);
-          }
-        });
+// We do not want contents of files to be put into RC5.yaml
+const stripSlideContent = (course: CourseData): CourseData => ({
+  ...course,
+  blocks: course.blocks.map((block) => ({
+    ...block,
+    aus: block.aus.map((au) => {
+      // Extract KSATs from all slides in this AU
+      const allKsats: KSATElement[] = [];
+      au.slides.forEach((slide) => {
+        if (slide.content && typeof slide.content === 'string') {
+          const slideKsats = extractKsatsFromSlide(slide.content);
+          allKsats.push(...slideKsats);
+        }
+      });
 
-        // Remove duplicates and map to structured format
-        const uniqueKsats = [...new Set(allKsats)];
+      // Remove duplicates and map to structured format
+      const uniqueKsats = [...new Set(allKsats)];
 
-        const auClean: CourseAU = {
-          ...au,
-          slides: au.slides.map(({ content, ...rest }) => {
-            return { ...rest, content: '' };
-          }),
-          ksats: uniqueKsats,
-        };
-        return auClean;
-      }),
-    })),
-  });
+      const auClean: CourseAU = {
+        ...au,
+        slides: au.slides.map(({ content, ...rest }) => {
+          return { ...rest, content: '' };
+        }),
+        ksats: uniqueKsats,
+      };
+      return auClean;
+    }),
+  })),
+});
 
 // Extract KSAT data from slide content
 const extractKsatsFromSlide = (slideContent: string): KSATElement[] => {
