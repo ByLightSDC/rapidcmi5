@@ -4,6 +4,7 @@ import { getScenarioDirectives } from './codeValidators/markdownValidator';
 import { CourseData } from './types/course';
 import { RC5ScenarioContent, SlideTypeEnum } from './types/slide';
 import { TeamConsolesContent } from './types/teamConsoles';
+import { RC5_VERSION } from './versions';
 
 export interface FolderStruct {
   id: string;
@@ -12,8 +13,6 @@ export interface FolderStruct {
   content?: string | Uint8Array;
   isBranch: boolean;
 }
-
-export const RC5_VERSION = '0.0.1';
 
 export const generateCourseJson = (folderStructure: FolderStruct[]) => {
   // We are just doing one block for now
@@ -37,7 +36,10 @@ export const generateCourseJson = (folderStructure: FolderStruct[]) => {
   } else if (typeof metaFile.content === 'string') {
     content = metaFile.content;
   } else {
-    console.error('metaFile.content is neither Buffer nor string', metaFile.content);
+    console.error(
+      'metaFile.content is neither Buffer nor string',
+      metaFile.content,
+    );
     return null;
   }
 
@@ -50,9 +52,13 @@ export const generateCourseJson = (folderStructure: FolderStruct[]) => {
 function contentToString(content: unknown): string {
   if (!content) return '';
   if (Buffer.isBuffer(content)) return content.toString('utf8');
-  if (content instanceof Uint8Array) return Buffer.from(content).toString('utf8');
+  if (content instanceof Uint8Array)
+    return Buffer.from(content).toString('utf8');
   if (typeof content === 'string') return content;
-  if ((content as any)?.type === 'Buffer' && Array.isArray((content as any).data)) {
+  if (
+    (content as any)?.type === 'Buffer' &&
+    Array.isArray((content as any).data)
+  ) {
     return Buffer.from((content as any).data).toString('utf8');
   }
   return '';
@@ -64,14 +70,19 @@ function contentToString(content: unknown): string {
  * @param courseData
  * @returns
  */
-export function generateCourseFromNav(folderStructure: FolderStruct[], courseData: CourseData) {
+export function generateCourseFromNav(
+  folderStructure: FolderStruct[],
+  courseData: CourseData,
+) {
   try {
     // make a flat tree to easily search files
     const flatTree = flattenFolders(folderStructure);
     for (const block of courseData.blocks) {
       for (const au of block.aus) {
         for (const slide of au.slides) {
-          const file = flatTree.find((node) => node.id.endsWith(slide.filepath));
+          const file = flatTree.find((node) =>
+            node.id.endsWith(slide.filepath),
+          );
           if (file) {
             slide.content = contentToString(file.content);
           }
@@ -84,7 +95,9 @@ export function generateCourseFromNav(folderStructure: FolderStruct[], courseDat
           if (slide.type === SlideTypeEnum.Markdown) {
             //find scenarios
             try {
-              scenarios = scenarios.concat(getScenarioDirectives(slide.content as string));
+              scenarios = scenarios.concat(
+                getScenarioDirectives(slide.content as string),
+              );
             } catch {
               scenarios = [];
             }
@@ -92,7 +105,10 @@ export function generateCourseFromNav(folderStructure: FolderStruct[], courseDat
             //find team exercise consoles
             try {
               teamExerciseConsoles = teamExerciseConsoles.concat(
-                getScenarioDirectives(slide.content as string, 'consoles') as TeamConsolesContent[],
+                getScenarioDirectives(
+                  slide.content as string,
+                  'consoles',
+                ) as TeamConsolesContent[],
               );
             } catch {
               teamExerciseConsoles = [];
@@ -102,14 +118,16 @@ export function generateCourseFromNav(folderStructure: FolderStruct[], courseDat
 
         //we only support one scenario
         if (scenarios && scenarios.length > 0) {
-          const { uuid, name, promptClass } = scenarios[0] as RC5ScenarioContent;
+          const { uuid, name, promptClass } =
+            scenarios[0] as RC5ScenarioContent;
           au.rangeosScenarioUUID = uuid;
           au.rangeosScenarioName = name;
           au.promptClassId = promptClass;
         }
 
         //we support multiples, flag sso must be enabled
-        au.teamSSOEnabled = teamExerciseConsoles && teamExerciseConsoles.length > 0;
+        au.teamSSOEnabled =
+          teamExerciseConsoles && teamExerciseConsoles.length > 0;
       }
     }
     return courseData;
