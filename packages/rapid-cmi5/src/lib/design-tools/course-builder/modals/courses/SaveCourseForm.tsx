@@ -24,8 +24,6 @@ import {
 } from '../../../rapidcmi5_mdx/modals/constants';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { GitContext } from '../../GitViewer/session/GitContext';
-import { MessageType } from '../../CourseBuilderTypes';
-import { useRC5Prompts } from '../../../rapidcmi5_mdx/modals/useRC5Prompts';
 import { useDispatch, useSelector } from 'react-redux';
 import { RC5Context } from '../../../rapidcmi5_mdx/contexts/RC5Context';
 import {
@@ -55,7 +53,6 @@ export function SaveCourseForm({
     handleCommit,
     handlePushRepo,
     handleStageAll,
-    currentCourse,
     isRepoConnectedToRemote,
   } = useContext(GitContext);
   const { discardLessonChanges, saveCourseFile, sendMessage } =

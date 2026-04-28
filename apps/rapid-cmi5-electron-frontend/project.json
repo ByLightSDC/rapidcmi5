@@ -13,7 +13,7 @@
       "defaultConfiguration": "production",
       "options": {
         "postcssConfig": "apps/rapid-cmi5-electron-frontend/postcss.config.js",
-        "compiler": "babel",
+        "compiler": "swc",
         "outputPath": "dist/apps/rapid-cmi5-electron-frontend",
         "index": "apps/rapid-cmi5-electron-frontend/src/index.html",
         "main": "apps/rapid-cmi5-electron-frontend/src/main.tsx",
