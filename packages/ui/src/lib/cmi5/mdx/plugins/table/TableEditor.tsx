@@ -333,8 +333,14 @@ export const TableEditor: React.FC<TableEditorProps> = ({
   );
 
 
+  // get striped row settings
+  const tableHProps = (mdastNode.data?.hProperties || {}) as Record<string, any>;
+  const stripedEnabled = tableHProps['data-striped'] === 'true';
+  const stripeOddColor = (tableHProps['data-stripe-odd'] as string) || '#d6e4f7';
+  const stripeEvenColor = (tableHProps['data-stripe-even'] as string) || '#ffffff';
+
   // get styles to apply to the table
-  const tableStyle = mdastNode.data?.hProperties?.['style'] as string | undefined;
+  const tableStyle = tableHProps['style'] as string | undefined;
 
   // Calculate computed styles (including border and radius)
   const computedTableStyle = getTableStyles(tableStyle);
@@ -584,8 +590,16 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                           </CellElement>
                         )}
                         {row.children.map((mdastCell, colIndex) => {
-                          // Use helper to extract color
-                          const dynamicColor = getBackgroundColor(mdastCell);
+                          // Use helper to extract explicit cell color
+                          const explicitColor = getBackgroundColor(mdastCell);
+                          // Apply stripe color to data rows (rowIndex > 0) when no explicit color is set
+                          const stripeColor =
+                            stripedEnabled && rowIndex > 0 && explicitColor === 'transparent'
+                              ? rowIndex % 2 === 1
+                                ? stripeOddColor
+                                : stripeEvenColor
+                              : null;
+                          const dynamicColor = stripeColor ?? explicitColor;
 
                           // Determine if this cell needs perimeter borders (Edit mode only)
                           const isFirstCol = colIndex === 0;
@@ -648,6 +662,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                               align={mdastNode.align?.[colIndex]}
                               textAlign={cellTextAlign}
                               cellBackgroundColor={dynamicColor}
+                              persistedBackgroundColor={explicitColor}
                               perimeterStyle={perimeterStyle}
                               key={getCellKey(mdastCell)}
                               contents={mdastCell.children}
@@ -694,6 +709,8 @@ export const TableEditor: React.FC<TableEditorProps> = ({
 
 export interface CellProps {
   cellBackgroundColor: string;
+  /** The color actually stored in the mdast node (excludes computed stripe colors). Used to persist changes. */
+  persistedBackgroundColor: string;
   perimeterStyle?: React.CSSProperties;
   parentEditor: LexicalEditor;
   lexicalTable: TableNode;
@@ -786,6 +803,7 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
         {...props}
         focus={isActive}
         cellBackgroundColor={currentColor}
+        persistedBackgroundColor={props.persistedBackgroundColor}
       />
     </CellElement>
   );
@@ -793,6 +811,7 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
 
 const CellEditor: React.FC<CellProps> = ({
   cellBackgroundColor = 'transparent',
+  persistedBackgroundColor = 'transparent',
   focus,
   setActiveCell,
   parentEditor,
@@ -968,9 +987,10 @@ const CellEditor: React.FC<CellProps> = ({
     focus && editor.focus();
   }, [focus, editor]);
 
+  // Only persist the color that was explicitly set by the user — not computed stripe colors.
   React.useEffect(() => {
-    changeColor(cellBackgroundColor);
-  }, [cellBackgroundColor]);
+    changeColor(persistedBackgroundColor === 'transparent' ? null : persistedBackgroundColor);
+  }, [persistedBackgroundColor]);
 
   const { scopedClass, alignmentStyles } = useScopedAlignmentStyles(
     textAlign,
@@ -1219,21 +1239,26 @@ const TableSettingsButton: React.FC<{
 }> = ({ parentEditor, lexicalTable }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentStyle, setCurrentStyle] = useState('');
+  const [currentHProperties, setCurrentHProperties] = useState<Record<string, any>>({});
 
   const openDialog = React.useCallback(() => {
     parentEditor.getEditorState().read(() => {
-      const styleStr = lexicalTable.getMdastNode().data?.hProperties?.['style'] as
-        | string
-        | undefined;
-      setCurrentStyle(styleStr || '');
+      const hp = (lexicalTable.getMdastNode().data?.hProperties || {}) as Record<string, any>;
+      setCurrentStyle((hp['style'] as string) || '');
+      setCurrentHProperties(hp);
       setIsDialogOpen(true);
     });
   }, [lexicalTable, parentEditor]);
 
   const handleSetTableStyle = (newStyle: string) => {
     parentEditor.update(() => {
-      // Use the new setTableStyle method we added to TableNode
       lexicalTable.setTableStyle(newStyle);
+    });
+  };
+
+  const handleSetStripedRows = (enabled: boolean, oddColor: string, evenColor: string) => {
+    parentEditor.update(() => {
+      lexicalTable.setStripedRows(enabled, oddColor, evenColor);
     });
   };
 
@@ -1249,7 +1274,9 @@ const TableSettingsButton: React.FC<{
         <TableStyleDialog
           isOpen={isDialogOpen}
           style={currentStyle}
+          tableHProperties={currentHProperties}
           setTableStyle={handleSetTableStyle}
+          setStripedRows={handleSetStripedRows}
           setIsStyleDialogOpen={setIsDialogOpen}
         />
       )}

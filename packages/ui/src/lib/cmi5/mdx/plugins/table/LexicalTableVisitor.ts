@@ -19,9 +19,14 @@ function rowToHast(
     properties: {},
     children: row.children.map((cell) => {
       // 1. Extract style and text-align from our custom data storage
-      const style = cell.data?.hProperties?.['style'];
+      let style = cell.data?.hProperties?.['style'] as string | undefined;
       const textAlign = (cell.data?.hProperties as any)?.['data-text-align'] as string | undefined;
       const properties: any = {};
+
+      // Strip transparent background-color so it doesn't override CSS stripe rules
+      if (style) {
+        style = style.replace(/background-color:\s*transparent\s*;?/i, '').trim().replace(/;$/, '').trim() || undefined;
+      }
 
       // Merge text-align into the style string so it round-trips through HTML
       const styleWithAlign = [
@@ -106,11 +111,21 @@ export const LexicalTableVisitor: LexicalExportVisitor<TableNode, Mdast.HTML> =
       }
 
       // 3. Wrap in Table
+      const tableHProps: any = { ...(mdastNode.data?.hProperties || {}) };
+
+      // If striped rows are enabled, expose colors as CSS custom properties so
+      // the player's :nth-child rules can consume them via var().
+      if (tableHProps['data-striped'] === 'true') {
+        const existingStyle = tableHProps['style'] || '';
+        const stripeVars = `--stripe-odd: ${tableHProps['data-stripe-odd'] || '#d6e4f7'}; --stripe-even: ${tableHProps['data-stripe-even'] || '#ffffff'};`;
+        tableHProps['style'] = existingStyle ? `${existingStyle} ${stripeVars}` : stripeVars;
+      }
+
       const tableHast: Element = {
         type: 'element',
         tagName: 'table',
         properties: {
-          ...mdastNode.data?.hProperties || {},
+          ...tableHProps,
           className: ['rc5-table']
         },
         children: tableChildren,

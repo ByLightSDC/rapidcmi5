@@ -1,12 +1,14 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 // @ts-ignore - inline-style-parser has type declaration issues
 import parse from 'inline-style-parser';
 
 /* MUI */
 import {
+  FormControlLabel,
   Paper,
   Slider,
   Stack,
+  Switch,
   TextField,
   Typography,
   Box,
@@ -21,7 +23,9 @@ import ModalDialog from '../../../../modals/ModalDialog';
 interface TableStyleProps {
   isOpen: boolean;
   style: string;
+  tableHProperties?: Record<string, any>;
   setTableStyle: (style: string) => void;
+  setStripedRows: (enabled: boolean, oddColor: string, evenColor: string) => void;
   setIsStyleDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -53,7 +57,9 @@ const removeUnit = (numberWithUnit: string) => {
 export const TableStyleDialog: React.FC<TableStyleProps> = ({
                                                               isOpen,
                                                               style,
+                                                              tableHProperties,
                                                               setTableStyle,
+                                                              setStripedRows,
                                                               setIsStyleDialogOpen,
                                                             }) => {
   // --- Border State ---
@@ -68,6 +74,11 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
   const [shadowBlur, setShadowBlur] = useState<number>(0);
   const [shadowColor, setShadowColor] = useState<string>('#000000');
 
+  // --- Striped Rows State ---
+  const [stripedEnabled, setStripedEnabled] = useState<boolean>(false);
+  const [stripeOddColor, setStripeOddColor] = useState<string>('#d6e4f7');
+  const [stripeEvenColor, setStripeEvenColor] = useState<string>('#ffffff');
+
   // Parse the style string and populate local state
   useEffect(() => {
     // Reset defaults
@@ -79,6 +90,12 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
     setShadowY(0);
     setShadowBlur(0);
     setShadowColor('#000000');
+
+    // Parse striped rows from hProperties
+    const hp = tableHProperties || {};
+    setStripedEnabled(hp['data-striped'] === 'true');
+    setStripeOddColor(hp['data-stripe-odd'] || '#d6e4f7');
+    setStripeEvenColor(hp['data-stripe-even'] || '#ffffff');
 
     if (!style) return;
 
@@ -128,7 +145,7 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
 
     if (!foundBorder) setBorderWidth(1);
 
-  }, [style]);
+  }, [style, tableHProperties]);
 
   const handleStyleSubmit = () => {
     let styleString = '';
@@ -154,6 +171,7 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
     }
 
     setTableStyle(styleString);
+    setStripedRows(stripedEnabled, stripeOddColor, stripeEvenColor);
     setIsStyleDialogOpen(false);
   };
 
@@ -221,14 +239,22 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
               <table style={previewTableStyle}>
                 <thead>
                 <tr>
-                  <th style={{ backgroundColor: '#ffffd7', padding: '8px', borderBottom: '1px solid #ddd', borderRight: '1px solid #ddd' }}>A</th>
-                  <th style={{ backgroundColor: '#fffc66', padding: '8px', borderBottom: '1px solid #ddd' }}>B</th>
+                  <th style={{ padding: '8px', borderBottom: '1px solid #ddd', borderRight: '1px solid #ddd' }}>Header A</th>
+                  <th style={{ padding: '8px', borderBottom: '1px solid #ddd' }}>Header B</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
-                  <td style={{ backgroundColor: '#cbefff', padding: '8px', borderRight: '1px solid #ddd' }}>1</td>
-                  <td style={{ backgroundColor: '#56c1ff', padding: '8px' }}>2</td>
+                  <td style={{ backgroundColor: stripedEnabled ? stripeOddColor : '#cbefff', padding: '8px', borderRight: '1px solid #ddd' }}>Row 1</td>
+                  <td style={{ backgroundColor: stripedEnabled ? stripeOddColor : '#56c1ff', padding: '8px' }}>Row 1</td>
+                </tr>
+                <tr>
+                  <td style={{ backgroundColor: stripedEnabled ? stripeEvenColor : undefined, padding: '8px', borderRight: '1px solid #ddd' }}>Row 2</td>
+                  <td style={{ backgroundColor: stripedEnabled ? stripeEvenColor : undefined, padding: '8px' }}>Row 2</td>
+                </tr>
+                <tr>
+                  <td style={{ backgroundColor: stripedEnabled ? stripeOddColor : undefined, padding: '8px', borderRight: '1px solid #ddd' }}>Row 3</td>
+                  <td style={{ backgroundColor: stripedEnabled ? stripeOddColor : undefined, padding: '8px' }}>Row 3</td>
                 </tr>
                 </tbody>
               </table>
@@ -334,6 +360,52 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
               </Stack>
             </Paper>
           </Grid>
+
+        {/* --- STRIPED ROWS SECTION --- */}
+        <Grid size={12}>
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Stack spacing={2}>
+              <Typography variant="h6">Alternating Row Colors</Typography>
+
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={stripedEnabled}
+                    onChange={(e) => setStripedEnabled(e.target.checked)}
+                  />
+                }
+                label="Enable alternating row colors"
+              />
+
+              <Grid container spacing={2} sx={{ visibility: stripedEnabled ? 'visible' : 'hidden' }}>
+                <Grid size={6}>
+                  <Stack spacing={1}>
+                    <Typography variant="caption">Odd rows (1st, 3rd…)</Typography>
+                    <MuiColorInput
+                      format="hex"
+                      value={stripeOddColor}
+                      onChange={setStripeOddColor}
+                      isAlphaHidden={true}
+                      fullWidth
+                    />
+                  </Stack>
+                </Grid>
+                <Grid size={6}>
+                  <Stack spacing={1}>
+                    <Typography variant="caption">Even rows (2nd, 4th…)</Typography>
+                    <MuiColorInput
+                      format="hex"
+                      value={stripeEvenColor}
+                      onChange={setStripeEvenColor}
+                      isAlphaHidden={true}
+                      fullWidth
+                    />
+                  </Stack>
+                </Grid>
+              </Grid>
+            </Stack>
+          </Paper>
+        </Grid>
 
         </Grid>
       </div>
