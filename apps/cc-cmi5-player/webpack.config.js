@@ -15,6 +15,7 @@ class PlayerManifestPlugin {
     compiler.hooks.afterEmit.tapAsync(
       'PlayerManifestPlugin',
       (compilation, callback) => {
+        if (compiler.watchMode) return callback();
         const outputPath = compilation.outputOptions.path;
         const manifest = {
           playerVersion: rc5Version,
