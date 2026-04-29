@@ -19,6 +19,7 @@ import {
   QuestionResponse,
   QuizCompletionEnum,
   QuizContent,
+  RC5_VERSION,
   SlideType,
   SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
@@ -32,7 +33,6 @@ import {
   flattenFolders,
   FolderStruct,
   generateCourseJson,
-  RC5_VERSION,
 } from '@rapid-cmi5/cmi5-build-common';
 import { getFolderStructureBackend } from './fileSystem/fileSystem';
 
@@ -55,12 +55,16 @@ const program = new Command();
 
 program
   .name('cmi5-builder')
-  .description('Generate cmi5 content from an mkdocs repo and upload to opendash')
+  .description(
+    'Generate cmi5 content from an mkdocs repo and upload to opendash',
+  )
   .version('1.0.0');
 
 program
   .command('generate-au-terraform')
-  .description('Generate au -> scenario terraform mappings for multiple courses')
+  .description(
+    'Generate au -> scenario terraform mappings for multiple courses',
+  )
   .argument('<coursesPath>', 'Path to the directory containing courses')
   .argument('<outputPath>', 'Path to output the tf.json file')
   .action(async (coursesPath, outputPath) => {
@@ -73,7 +77,8 @@ program
       if (entry.isDirectory()) {
         const courseFolderPath = path.join(basePath, entry.name);
 
-        const folderStructure = await getFolderStructureBackend(courseFolderPath);
+        const folderStructure =
+          await getFolderStructureBackend(courseFolderPath);
         const courseData = generateCourseJson(folderStructure);
 
         if (courseData) {
@@ -87,12 +92,24 @@ program
 program
   .command('build')
   .description('Generate cmi5 content from a course directory')
-  .argument('<coursePath>', 'Path to the course folder, should contain an mkdocs file')
+  .argument(
+    '<coursePath>',
+    'Path to the course folder, should contain an mkdocs file',
+  )
   .argument('<distPath>', 'Path to the cmi5 player dist folder')
-  .option('--generate-tf [path]', 'Create a tf.json file for the course AU mappings (optional output path)')
+  .option(
+    '--generate-tf [path]',
+    'Create a tf.json file for the course AU mappings (optional output path)',
+  )
   .option('--zip [path]', 'Create a ZIP of the output directory')
-  .option('--apply-au-mappings <endpoint>', 'Create AU mappings (AU ID -> Scenario) at endpoint')
-  .option('--course-meta <yamlPath>', 'Path to optional YAML file to override course metadata')
+  .option(
+    '--apply-au-mappings <endpoint>',
+    'Create AU mappings (AU ID -> Scenario) at endpoint',
+  )
+  .option(
+    '--course-meta <yamlPath>',
+    'Path to optional YAML file to override course metadata',
+  )
   .option('--convert', 'convert from mkdocs')
 
   .action(async (coursePath, distPath, options) => {
@@ -112,11 +129,18 @@ program
       }
     }
 
-    const courseData = await buildCmi5(inputPath, outputPath, overrideData, options.convert);
+    const courseData = await buildCmi5(
+      inputPath,
+      outputPath,
+      overrideData,
+      options.convert,
+    );
 
     if (options.zip) {
       const zipPath = path.resolve(
-        typeof options.zip === 'string' ? options.zip : path.join(process.cwd(), 'cmi5-output', 'cmi5.zip'),
+        typeof options.zip === 'string'
+          ? options.zip
+          : path.join(process.cwd(), 'cmi5-output', 'cmi5.zip'),
       );
 
       zipCmi5(outputPath, zipPath);
@@ -153,7 +177,9 @@ program
 
 program
   .command('build-opendash')
-  .description('Build and upload course content to OpenDash and create AU mappings')
+  .description(
+    'Build and upload course content to OpenDash and create AU mappings',
+  )
   .argument('<coursePath>', 'Path to the course folder')
   .argument('<distPath>', 'Path to the output dist folder')
   .argument('<endpoint>', 'opendash endpoint')
@@ -161,8 +187,14 @@ program
     '--apply-au-mappings <endpoint>',
     'Create AU mappings Specific to Opendash Format (AU ID -> Scenario) at endpoint',
   )
-  .option('--course-meta <yamlPath>', 'Path to optional YAML file to override course metadata')
-  .option('--use-real-auid', 'For newer versions of opendash you may use the auid instead of the random uuid generated')
+  .option(
+    '--course-meta <yamlPath>',
+    'Path to optional YAML file to override course metadata',
+  )
+  .option(
+    '--use-real-auid',
+    'For newer versions of opendash you may use the auid instead of the random uuid generated',
+  )
   .option('--zip <path>', 'Create a ZIP of the output directory')
   .option('--convert', 'convert from mkdocs')
 
@@ -184,12 +216,19 @@ program
         process.exit(1);
       }
     }
-    const courseData = await buildCmi5(inputPath, outputPath, overrideData, options.convert);
+    const courseData = await buildCmi5(
+      inputPath,
+      outputPath,
+      overrideData,
+      options.convert,
+    );
 
     if (courseData === null) return;
 
     const zipPath = path.resolve(
-      typeof options.zip === 'string' ? options.zip : path.join(process.cwd(), 'cmi5-output', 'cmi5.zip'),
+      typeof options.zip === 'string'
+        ? options.zip
+        : path.join(process.cwd(), 'cmi5-output', 'cmi5.zip'),
     );
 
     zipCmi5(outputPath, zipPath);
@@ -213,7 +252,12 @@ program
         baseUrl: endpoint,
         useRealAuid: useRealAuid,
       });
-      await uploader.uploadCourse(courseData, auMappingService, zipPath, options.applyAuMappings);
+      await uploader.uploadCourse(
+        courseData,
+        auMappingService,
+        zipPath,
+        options.applyAuMappings,
+      );
     } else {
       console.log(
         `❌  No JWT was provided for either opendash ${jwtOpendash ? 'true' : false} or ros ${jwtDevopsApi ? 'true' : 'false'}`,
@@ -222,7 +266,9 @@ program
   });
 program
   .command('build-moodle')
-  .description('Build and upload course content to Moodle and create AU mappings')
+  .description(
+    'Build and upload course content to Moodle and create AU mappings',
+  )
   .argument('<coursePath>', 'Path to the course folder')
   .argument('<distPath>', 'Path to the output dist folder')
   .argument('<endpoint>', 'moodle endpoint')
@@ -230,7 +276,10 @@ program
     '--apply-au-mappings <endpoint>',
     'Create AU mappings Specific to Opendash Format (AU ID -> Scenario) at endpoint',
   )
-  .option('--course-meta <yamlPath>', 'Path to optional YAML file to override course metadata')
+  .option(
+    '--course-meta <yamlPath>',
+    'Path to optional YAML file to override course metadata',
+  )
   .option('--zip <path>', 'Create a ZIP of the output directory')
   .option('--moodle-course-name <name>', 'The Moodle course fullname')
   .option('--moodle-course-id <id>', 'The Moodle course id')
@@ -244,12 +293,16 @@ program
     const hasId = !!options.moodleCourseId;
 
     if (hasName && hasId) {
-      console.error('❌ Please provide either --moodle-course-name or --moodle-course-id, not both.');
+      console.error(
+        '❌ Please provide either --moodle-course-name or --moodle-course-id, not both.',
+      );
       process.exit(1);
     }
 
     if (!hasName && !hasId) {
-      console.error('❌ You must provide either --moodle-course-name or --moodle-course-id.');
+      console.error(
+        '❌ You must provide either --moodle-course-name or --moodle-course-id.',
+      );
       process.exit(1);
     }
 
@@ -268,12 +321,19 @@ program
         process.exit(1);
       }
     }
-    const courseData = await buildCmi5(inputPath, outputPath, overrideData, options.convert);
+    const courseData = await buildCmi5(
+      inputPath,
+      outputPath,
+      overrideData,
+      options.convert,
+    );
 
     if (courseData === null) return;
 
     const zipPath = path.resolve(
-      typeof options.zip === 'string' ? options.zip : path.join(process.cwd(), 'cmi5-output', 'cmi5.zip'),
+      typeof options.zip === 'string'
+        ? options.zip
+        : path.join(process.cwd(), 'cmi5-output', 'cmi5.zip'),
     );
 
     zipCmi5(outputPath, zipPath);
@@ -313,7 +373,12 @@ program
 
 program.parse(process.argv);
 
-async function buildCmi5(inputPath: string, outputPath: string, overrideData?: CourseMeta, convert = false) {
+async function buildCmi5(
+  inputPath: string,
+  outputPath: string,
+  overrideData?: CourseMeta,
+  convert = false,
+) {
   console.log('📁  Course path:', inputPath);
   console.log('▶️  Dist path (Built CMI5 Player):', outputPath);
 
@@ -354,24 +419,43 @@ async function buildCmi5(inputPath: string, outputPath: string, overrideData?: C
       }
       return content;
     },
-    writeFile: async (path: string, content: string | Uint8Array, encoding?: string) => {
+    writeFile: async (
+      path: string,
+      content: string | Uint8Array,
+      encoding?: string,
+    ) => {
       await fs.writeFile(path, content);
     },
-    deleteFolder: async (path: string, options: { recursive: boolean; force: boolean }) => {
+    deleteFolder: async (
+      path: string,
+      options: { recursive: boolean; force: boolean },
+    ) => {
       try {
         await fs.rm(path, options);
       } catch (err) {
         if (!options.force) throw err;
       }
     },
-    copy: async (src: string, dest: string, options: { recursive: boolean }) => {
-      await fs.cp(src, dest, {recursive: true});
+    copy: async (
+      src: string,
+      dest: string,
+      options: { recursive: boolean },
+    ) => {
+      await fs.cp(src, dest, { recursive: true });
     },
     mkdir: async (path: string, options: { recursive: boolean }) => {
       await fs.mkdir(path, options);
     },
   };
-  await generateCourseDist(distFolderPath, outputPath, courseData, fsOps, join, relative, distFolderName);
+  await generateCourseDist(
+    distFolderPath,
+    outputPath,
+    courseData,
+    fsOps,
+    join,
+    relative,
+    distFolderName,
+  );
 
   const cmi5Xml = generateCmi5Xml(courseData);
   const cmi5Path = path.join(outputPath, 'cmi5.xml');
@@ -389,12 +473,16 @@ function applyOverrides(course: CourseData, o: CourseMeta): CourseData {
 
   const nextBlocks = (course.blocks ?? []).map((block) => {
     const blockName = o.courseName ?? block.blockName ?? courseTitle;
-    const blockDescription = o.courseDescription ?? block.blockDescription ?? courseDescription;
+    const blockDescription =
+      o.courseDescription ?? block.blockDescription ?? courseDescription;
 
     const nextAus = (block.aus ?? []).map((au) => {
-      const rangeosScenarioName = o.scenarioOverride?.name ?? au.rangeosScenarioName;
-      const rangeosScenarioUUID = o.scenarioOverride?.uuid ?? au.rangeosScenarioUUID;
-      const promptClassId = o.scenarioOverride?.promptClassId ?? au.promptClassId;
+      const rangeosScenarioName =
+        o.scenarioOverride?.name ?? au.rangeosScenarioName;
+      const rangeosScenarioUUID =
+        o.scenarioOverride?.uuid ?? au.rangeosScenarioUUID;
+      const promptClassId =
+        o.scenarioOverride?.promptClassId ?? au.promptClassId;
 
       const scenarioSlide = makeScenarioSlide({
         uuid: rangeosScenarioUUID,
@@ -439,8 +527,13 @@ function applyOverrides(course: CourseData, o: CourseMeta): CourseData {
 
 /** ---------- helpers ---------- */
 
-function makeScenarioSlide(args: { uuid?: string; name?: string; promptClassId?: boolean }): SlideType {
-  const promptClass = typeof args.promptClassId === 'number' ? args.promptClassId : false;
+function makeScenarioSlide(args: {
+  uuid?: string;
+  name?: string;
+  promptClassId?: boolean;
+}): SlideType {
+  const promptClass =
+    typeof args.promptClassId === 'number' ? args.promptClassId : false;
 
   const payload = {
     uuid: args.uuid ?? '',
@@ -451,18 +544,29 @@ function makeScenarioSlide(args: { uuid?: string; name?: string; promptClassId?:
   return {
     type: SlideTypeEnum.Markdown,
     slideTitle: 'Lab',
-    content: [':::scenario', '```json', JSON.stringify(payload, null, 2), '```', ':::'].join('\n'),
+    content: [
+      ':::scenario',
+      '```json',
+      JSON.stringify(payload, null, 2),
+      '```',
+      ':::',
+    ].join('\n'),
     filepath: '',
   };
 }
 
 function isScenarioSlide(slide?: SlideType): boolean {
   return (
-    slide?.type === SlideTypeEnum.Markdown && typeof slide.content === 'string' && slide.content.includes(':::scenario')
+    slide?.type === SlideTypeEnum.Markdown &&
+    typeof slide.content === 'string' &&
+    slide.content.includes(':::scenario')
   );
 }
 
-function ensureScenarioFirst(slides: SlideType[], scenario: SlideType): SlideType[] {
+function ensureScenarioFirst(
+  slides: SlideType[],
+  scenario: SlideType,
+): SlideType[] {
   if (slides.length === 0) return [scenario];
   if (isScenarioSlide(slides[0])) return slides; // already first → idempotent
   // remove any existing scenario slide elsewhere to avoid duplicates
@@ -513,14 +617,28 @@ function ensureCompletionExam(course: CourseData): CourseData {
   const completionSlide: SlideType = {
     type: SlideTypeEnum.Markdown,
     slideTitle: 'Course Completion Acknowledgement',
-    content: [':::quiz', '```json', JSON.stringify(completionQuestion, null, 2), '```', ':::'].join('\n'),
+    content: [
+      ':::quiz',
+      '```json',
+      JSON.stringify(completionQuestion, null, 2),
+      '```',
+      ':::',
+    ].join('\n'),
     filepath: '',
   };
 
   const nextAu = { ...lastAu, slides: [...slides, completionSlide] };
-  const nextAus = [...aus.slice(0, lastAuIndex), nextAu, ...aus.slice(lastAuIndex + 1)];
+  const nextAus = [
+    ...aus.slice(0, lastAuIndex),
+    nextAu,
+    ...aus.slice(lastAuIndex + 1),
+  ];
   const nextBlock = { ...lastBlock, aus: nextAus };
-  const nextBlocks = [...blocks.slice(0, lastBlockIndex), nextBlock, ...blocks.slice(lastBlockIndex + 1)];
+  const nextBlocks = [
+    ...blocks.slice(0, lastBlockIndex),
+    nextBlock,
+    ...blocks.slice(lastBlockIndex + 1),
+  ];
 
   return { ...course, blocks: nextBlocks };
 }
@@ -545,7 +663,10 @@ async function generateTfJson(courseData: CourseData, tfJsonPath: string) {
   console.log('✅ Terraform AU mapping file written to:', tfJsonPath);
 }
 
-async function generateAllTfJson(coursesData: CourseData[], tfJsonPath: string) {
+async function generateAllTfJson(
+  coursesData: CourseData[],
+  tfJsonPath: string,
+) {
   console.log('🧱 Generating Terraform JSON AU mapping file...');
 
   const tfJson = generateAllAuMappings(coursesData);
@@ -590,7 +711,10 @@ async function getMkdocsFile(mkdocsFile: FolderStruct) {
     // This is not yaml parasable, needs to be removed
     const cleanedContent = mkdocsFile.content
       .toString()
-      .replaceAll('format: !!python/name:pymdownx.superfences.fence_code_format', '');
+      .replaceAll(
+        'format: !!python/name:pymdownx.superfences.fence_code_format',
+        '',
+      );
     mkdocsConfig = yaml.load(cleanedContent);
   } catch (err) {
     console.error('Failed to parse mkdocs.yaml:', err);
@@ -663,14 +787,19 @@ async function getConvertedFolderStructure(
 
         au.dirPath = dirname(fullSlidePath);
 
-        const foundPath = flattenedStruct.find((node) => node.id.endsWith(fullSlidePath));
+        const foundPath = flattenedStruct.find((node) =>
+          node.id.endsWith(fullSlidePath),
+        );
 
         if (!foundPath) {
           console.warn('Could not find slide:', fullSlidePath);
           continue;
         }
 
-        const cleanedContent = cleanMkdocs((foundPath?.content || '').toString(), path);
+        const cleanedContent = cleanMkdocs(
+          (foundPath?.content || '').toString(),
+          path,
+        );
 
         convertedFolderStructure.push({
           id: fullSlidePath,
@@ -701,7 +830,9 @@ async function getConvertedFolderStructure(
       }
 
       const filePath = join(docsDir, value);
-      const foundPath = flattenedStruct.find((node) => node.id.endsWith(filePath));
+      const foundPath = flattenedStruct.find((node) =>
+        node.id.endsWith(filePath),
+      );
 
       if (!foundPath) {
         console.warn('Could not find slide:', filePath);
@@ -710,7 +841,10 @@ async function getConvertedFolderStructure(
 
       au.dirPath = dirname(filePath);
 
-      const cleanedContent = cleanMkdocs((foundPath?.content || '').toString(), filePath);
+      const cleanedContent = cleanMkdocs(
+        (foundPath?.content || '').toString(),
+        filePath,
+      );
 
       const fullPath = join(docsDir, basename(value));
 
@@ -747,7 +881,9 @@ async function convertFromMkdocs(
   folderStructure: FolderStruct[],
 ): Promise<{ courseData: CourseData; docsDir: string }> {
   folderStructure.find((node) => node.name === 'mkdocs.yaml');
-  const mkdocsFile = folderStructure.find((node) => node.name === 'mkdocs.yaml');
+  const mkdocsFile = folderStructure.find(
+    (node) => node.name === 'mkdocs.yaml',
+  );
   if (!mkdocsFile) {
     throw new Error('mkdocs.yaml not found or missing content');
   }
@@ -759,13 +895,14 @@ async function convertFromMkdocs(
   const courseTitle = mkdocsConfig.site_name ?? 'MKDOCS Course';
   const navObject = await getNavObject(mkdocsConfig);
 
-  const { convertedFolderStructure, rc5File } = await getConvertedFolderStructure(
-    folderStructure,
-    courseTitle,
-    courseId,
-    docsDir,
-    navObject,
-  );
+  const { convertedFolderStructure, rc5File } =
+    await getConvertedFolderStructure(
+      folderStructure,
+      courseTitle,
+      courseId,
+      docsDir,
+      navObject,
+    );
 
   if (!convertedFolderStructure) {
     console.error('❌ Failed to load override file:');

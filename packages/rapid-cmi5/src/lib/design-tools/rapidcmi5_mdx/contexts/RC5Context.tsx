@@ -18,6 +18,7 @@ import {
   createCourseModalId,
   downloadCmi5ZipModalId,
   saveCourseFileModalId,
+  testInPlayerModalId,
   warningModalId,
 } from '../modals/constants';
 import { ILessonNode } from '../drawers/components/LessonTreeNode';
@@ -69,7 +70,6 @@ interface IRC5Context {
   lessonSlides: SlideType[];
   addEditor: (ref: RefObject<MDXEditorMethods>) => void;
   removeEditor: () => void;
-  changeCourseId: (newId: string) => void;
   changeCourseName: (newName: string) => void;
   changeLessonMoveOn: (
     moveOn: MoveOnCriteriaEnum,
@@ -96,7 +96,6 @@ export const RC5Context = createContext<IRC5Context>({
   lessonSlides: [],
   addEditor: (editorRef: RefObject<MDXEditorMethods>) => {},
   removeEditor: () => {},
-  changeCourseId: (newId: string) => {},
   changeCourseName: (newName: string) => {},
   changeLessonMoveOn: (moveOn: MoveOnCriteriaEnum, element: ILessonNode) => {},
   changeLessonTheme: (theme: LessonTheme, element: ILessonNode) => {},
@@ -466,26 +465,35 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
     }
   };
 
+  const containsUuid = (str: string): boolean => {
+    const lastSegment = str.split('/').pop() ?? '';
+
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+    return uuidRegex.test(lastSegment);
+  };
+
+  const generateNewCourseId = async () => {
+    const uuid = crypto.randomUUID();
+    const courseId = courseData?.courseId ?? '';
+    const newCourseId = `${courseId}/${uuid}`;
+    return newCourseId;
+  };
+
   const onSaveCourseFile = useCallback(async () => {
-    const changedFiles = await syncCurrentCourseWithGit(courseData);
+    // correct old courses without uuid
+    const newCourseData: CourseData = {
+      ...courseData,
+    };
+    if (!containsUuid(courseData.courseId)) {
+      newCourseData.courseId = await generateNewCourseId();
+    }
+
+    const changedFiles = await syncCurrentCourseWithGit(newCourseData);
     dispatch(updateDirtyDisplay({ counter: 0 }));
     return changedFiles;
   }, [courseData, dispatch, syncCurrentCourseWithGit]);
-
-  const onUpdateCourseId = useCallback(
-    async (newCourseId: string) => {
-      const newCourseData: CourseData = {
-        ...courseData,
-      };
-      newCourseData.courseId = newCourseId;
-
-      await syncCurrentCourseWithGit(newCourseData);
-      dispatch(updateDirtyDisplay({ counter: 0 }));
-      dispatch(updateDirtyDisplay({ reason: 'change course id' }));
-      dispatch(updateCourseData(newCourseData));
-    },
-    [courseData, dispatch, syncCurrentCourseWithGit],
-  );
 
   //#region Message Bus
   /**
@@ -527,6 +535,15 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
           }),
         );
         break;
+      case MessageType.testInPlayer:
+        dispatch(
+          setModal({
+            type: testInPlayerModalId,
+            id: null,
+            name: null,
+          }),
+        );
+        break;
       case MessageType.navigate:
         if (message?.meta?.meta?.destination) {
           dispatch(changeViewMode(message.meta.meta.destination));
@@ -555,7 +572,6 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
         lessonSlides,
         addEditor: onAddEditor,
         changeCourseName: onChangeCourseName,
-        changeCourseId: onUpdateCourseId,
         changeLessonMoveOn: onChangeLessonMoveOn,
         changeLessonTheme: onChangeLessonTheme,
         changeLessonName: onChangeLessonName,

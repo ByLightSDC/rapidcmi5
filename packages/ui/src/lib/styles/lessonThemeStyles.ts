@@ -45,6 +45,19 @@ export const DEFAULT_LESSON_THEME = {
 };
 
 /**
+ * Resolves the explicit block-level maxWidth CSS value.
+ * Returns the CSS string only when a block-level override is set.
+ * Returns undefined when no override — callers can then fall back to lesson theme.
+ * Returns null when override is ContentWidthEnum.None (unconstrained / no max-width).
+ */
+export function resolveBlockMaxWidth(
+  blockContentWidth: ContentWidthEnum | undefined,
+): string | null | undefined {
+  if (blockContentWidth === undefined) return undefined;
+  return CONTENT_WIDTH_MAP[blockContentWidth] ?? null;
+}
+
+/**
  * Resolves a LessonTheme to concrete CSS values.
  * Returns null if no theme is set (avoids unnecessary style injection).
  */
@@ -101,15 +114,35 @@ export function generateLessonThemeStyleTag(
     --content-margin: calc((100% - ${css.maxWidth}) / 2);
   }
   .${scopedClass} .mdxeditor-root-contenteditable {
-    max-width: ${css.maxWidth};
-    margin-left: auto;
-    margin-right: auto;
     overflow: visible;
   }
   .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:not(:has(.paper-activity)) {
     max-width: ${css.maxWidth};
     margin-left: auto;
     margin-right: auto;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:has([data-block-override]) {
+    max-width: var(--block-max-width) !important;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > [data-lexical-decorator] {
+    display: block;
+    max-width: ${css.maxWidth};
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] {
+    max-width: 100%;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-block-override] {
+    max-width: var(--block-max-width) !important;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] img {
+    max-width: 100%;
   }
   .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:has(.paper-activity) {
     width: calc(98vw - var(--panel-width));
@@ -119,12 +152,12 @@ export function generateLessonThemeStyleTag(
     transform: translateX(-50%);
     overflow: visible;
   }
-  .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] [data-lexical-decorator]:not(:has(.paper-activity)) {
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] [data-lexical-editor="true"] [data-lexical-decorator]:not(:has(.paper-activity)) {
     max-width: none;
     margin-left: unset;
     margin-right: unset;
   }
-  .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] {
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] [data-lexical-editor="true"] {
       --content-margin: 0px;
   }`
     : `

@@ -41,3 +41,4 @@ export * from './lib/apis/hooks/useScenarioApi';
 export * from './lib/utils/dateAndTime';
 export * from './lib/apis/quizBankContract';
 export * from './lib/apis/scenarioContract';
+export * from './lib/versions';

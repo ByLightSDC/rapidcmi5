@@ -13,7 +13,7 @@ export const GridContainerDirectiveDescriptor: DirectiveDescriptor<GridContainer
     testNode(node) {
       return node.name === 'gridContainer';
     },
-    attributes: ['style', 'backgroundColor'],
+    attributes: ['style', 'backgroundColor', 'contentWidth'],
     hasChildren: true,
     Editor: GridContainerEditor,
   };

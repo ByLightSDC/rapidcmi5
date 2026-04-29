@@ -66,8 +66,10 @@ import {
   imgCache,
   parseCssString,
   imagePreviewHandler$,
+  resolveBlockMaxWidth,
 } from '@rapid-cmi5/ui';
 import { currentAuPath } from '@rapid-cmi5/react-editor';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 export interface ImageEditorProps {
   nodeKey: string;
@@ -238,6 +240,24 @@ export function ImageEditor({
       }
     }
   }
+
+  // Dedicated textAlign attribute (separate from the CSS style string)
+  const textAlignAttr = rest?.find(
+    (item): item is MdxJsxAttribute =>
+      item.type === 'mdxJsxAttribute' && item.name === 'textAlign',
+  );
+  const imageTextAlign = textAlignAttr?.value as 'left' | 'center' | 'right' | undefined;
+  if (imageTextAlign) {
+    wrapperStyle.textAlign = imageTextAlign;
+  }
+
+  // Block-level content width override (same pattern as Tabs/Accordion/Grid)
+  const contentWidthAttr = rest?.find(
+    (item): item is MdxJsxAttribute =>
+      item.type === 'mdxJsxAttribute' && item.name === 'contentWidth',
+  );
+  const contentWidth = contentWidthAttr?.value as ContentWidthEnum | undefined;
+  const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
 
   /**
    * Check click outside for Image Label feature
@@ -652,7 +672,12 @@ export function ImageEditor({
         onMouseOver={() => setIsHovered(true)}
         onMouseOut={() => setIsHovered(false)}
       >
-        <div className={styles['imageWrapper']} data-editor-block-type="image">
+        <div
+          className={styles['imageWrapper']}
+          data-editor-block-type="image"
+          {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
+          {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as React.CSSProperties } : {})}
+        >
           <div
             id={`image-labels-${id}`}
             ref={labelsRef}
@@ -685,6 +710,8 @@ export function ImageEditor({
               width={width === 'inherit' ? undefined : width}
               height={height === 'inherit' ? undefined : height}
               href={href}
+              contentWidth={contentWidth}
+              textAlign={imageTextAlign}
             />
           )}
         </div>
