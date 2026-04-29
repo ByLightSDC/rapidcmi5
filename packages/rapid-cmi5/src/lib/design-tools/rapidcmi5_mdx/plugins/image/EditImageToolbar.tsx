@@ -11,6 +11,8 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
 import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
+import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
+import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
 
 /** Icons */
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -216,7 +218,7 @@ export function EditImageToolbar({
             onClick={() => setIsAlignOpen((v) => !v)}
             sx={{ opacity: isAlignOpen ? 1 : 0.5 }}
           >
-            <FormatAlignLeftIcon />
+            {textAlign === 'right' ? <FormatAlignRightIcon /> : textAlign === 'center' ? <FormatAlignCenterIcon /> : <FormatAlignLeftIcon />}
           </IconButton>
         </Tooltip>
 
