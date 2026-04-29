@@ -233,11 +233,8 @@ export function ImageEditor({
 
     if (styleAttribute) {
       style = parseCssString(styleAttribute.value);
-      // the textAlign property is removed here and instead used on a wrapper div
-      if (style.textAlign) {
-        wrapperStyle.textAlign = style.textAlign;
-        delete style.textAlign;
-      }
+      // text-align in the style string is ignored — alignment is handled via the textAlign attribute
+      delete style.textAlign;
     }
   }
 

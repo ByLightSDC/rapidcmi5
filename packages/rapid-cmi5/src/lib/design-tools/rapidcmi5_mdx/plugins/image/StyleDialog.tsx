@@ -104,8 +104,9 @@ export const StyleDialog: React.FC<StyleProps> = ({
         } else if (style.property === 'border-width') {
           const numberValue = parseFloat(removeUnit(style.value));
           setBorderWidth(numberValue);
-        } else if (style.property === 'text-align') {
-          setAlignment(style.value);
+        // text-align is now handled via the textAlign attribute (toolbar controls), not the style string
+        // } else if (style.property === 'text-align') {
+        //   setAlignment(style.value);
         } else if (style.property === 'border-color') {
           setBorderColor(style.value);
         } else if (style.property === 'border-style') {
@@ -248,9 +249,10 @@ export const StyleDialog: React.FC<StyleProps> = ({
       styleString += `filter: drop-shadow(${dropShadowOffsetX}px ${dropShadowOffsetY}px ${dropShadowBlurRadius}px ${dropShadowColor}); `;
     }
 
-    if (alignment !== 'none' && alignment !== '') {
-      styleString += `text-align: ${alignment}; `;
-    }
+    // text-align is now handled via the textAlign attribute (toolbar controls), not the style string
+    // if (alignment !== 'none' && alignment !== '') {
+    //   styleString += `text-align: ${alignment}; `;
+    // }
 
     if (transformValue) {
       styleString += `transform: ${transformValue}; `;
@@ -310,7 +312,8 @@ export const StyleDialog: React.FC<StyleProps> = ({
                   width: '50%',
                 }}
               >
-                <Grid
+                {/* Alignment is now handled via toolbar controls (textAlign attribute), not style string */}
+                {/* <Grid
                   container
                   alignItems="center"
                   spacing={3}
@@ -340,7 +343,7 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       </ToggleButton>
                     </ToggleButtonGroup>
                   </Grid>
-                </Grid>
+                </Grid> */}
 
                 <Grid
                   container
