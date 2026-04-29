@@ -10,6 +10,7 @@ import Tooltip from '@mui/material/Tooltip';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
+import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
 
 /** Icons */
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -87,6 +88,7 @@ export function EditImageToolbar({
   const { imageStyle, setImageStyle } = useImageStyle(nodeKey);
   const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
+  const [isAlignOpen, setIsAlignOpen] = useState(false);
 
   /**
    * Set marker position to follow mouse
@@ -207,6 +209,17 @@ export function EditImageToolbar({
           </IconButton>
         </Tooltip>
 
+        <Tooltip title="Alignment">
+          <IconButton
+            aria-label="toggle alignment"
+            disabled={readOnly}
+            onClick={() => setIsAlignOpen((v) => !v)}
+            sx={{ opacity: isAlignOpen ? 1 : 0.5 }}
+          >
+            <FormatAlignLeftIcon />
+          </IconButton>
+        </Tooltip>
+
         <IconButton
           aria-label="Add Label"
           disabled={readOnly}
@@ -267,8 +280,8 @@ export function EditImageToolbar({
         </IconButton>
       </Stack>
 
-      {/* Second-row alignment toolbar — sits below the main toolbar */}
-      <Stack
+      {/* Second-row alignment toolbar — revealed by toggle button */}
+      {isAlignOpen && <Stack
         direction="row"
         spacing={0}
         sx={{
@@ -303,7 +316,7 @@ export function EditImageToolbar({
           }}
           disabled={readOnly}
         />
-      </Stack>
+      </Stack>}
 
       {/* Style Dialog lives OUTSIDE the button, but inside the toolbar component */}
       <StyleDialog
