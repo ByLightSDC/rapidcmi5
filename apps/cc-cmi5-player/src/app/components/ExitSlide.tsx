@@ -43,13 +43,12 @@ export default function ExitSlide() {
       // Don't block the exit even if the LRS call fails
     }
 
-    // Return user to launcher if applicable.
+    // Return user to launcher if applicable, or close the popup window.
     const returnURL = cmi5Instance.getLaunchData().returnURL;
     if (returnURL) {
-      window.location.href = returnURL;
+      window.parent.location.href = returnURL;
     } else {
-      logger.warn('No returnURL in CMI5 launch data', undefined, 'lms');
-      setIsExiting(false);
+      window.close();
     }
   };
 

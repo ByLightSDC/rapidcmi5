@@ -210,9 +210,10 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
   return (
     <ModalDialog
       title="Edit Table Style"
-      maxWidth="lg"
+      maxWidth="md"
       buttons={['Cancel', 'Apply']}
-      dialogProps={{ open: isOpen }}
+      dialogProps={{ open: isOpen, fullWidth: true }}
+      sxProps={{ overflow: 'auto', maxHeight: '80vh' }}
       handleAction={(index: number) => {
         if (index === 0) handleStyleCancel();
         else handleStyleSubmit();

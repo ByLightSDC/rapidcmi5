@@ -4,6 +4,8 @@ import { LexicalExportVisitor } from '@mdxeditor/editor';
 import { toHast } from 'mdast-util-to-hast';
 import { toHtml } from 'hast-util-to-html';
 import type { Element } from 'hast';
+import { CONTENT_WIDTH_MAP } from '../../../../styles/lessonThemeStyles';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Manually converts a Table Row Mdast node to a HAST <tr> element
@@ -23,7 +25,7 @@ function rowToHast(
       const textAlign = (cell.data?.hProperties as any)?.['data-text-align'] as string | undefined;
       const properties: any = {};
 
-      // Strip transparent background-color so it doesn't override CSS stripe rules
+      // Strip transparent background-color so it doesn't override CSS stripe rules in the player
       if (style) {
         style = style.replace(/background-color:\s*transparent\s*;?/i, '').trim().replace(/;$/, '').trim() || undefined;
       }
@@ -110,31 +112,43 @@ export const LexicalTableVisitor: LexicalExportVisitor<TableNode, Mdast.HTML> =
         });
       }
 
-      // 3. Wrap in Table
-      const tableHProps: any = { ...(mdastNode.data?.hProperties || {}) };
+      // 3. Build hProperties without contentWidth (don't put it on the <table> element)
+      const hProps = { ...(mdastNode.data?.hProperties || {}) } as Record<string, unknown>;
+      const contentWidth = hProps['contentWidth'] as ContentWidthEnum | undefined;
+      delete hProps['contentWidth'];
 
       // If striped rows are enabled, expose colors as CSS custom properties so
       // the player's :nth-child rules can consume them via var().
-      if (tableHProps['data-striped'] === 'true') {
-        const existingStyle = tableHProps['style'] || '';
-        const stripeVars = `--stripe-odd: ${tableHProps['data-stripe-odd'] || '#d6e4f7'}; --stripe-even: ${tableHProps['data-stripe-even'] || '#ffffff'};`;
-        tableHProps['style'] = existingStyle ? `${existingStyle} ${stripeVars}` : stripeVars;
+      if (hProps['data-striped'] === 'true') {
+        const existingStyle = (hProps['style'] as string) || '';
+        const stripeVars = `--stripe-odd: ${hProps['data-stripe-odd'] || '#d6e4f7'}; --stripe-even: ${hProps['data-stripe-even'] || '#ffffff'};`;
+        hProps['style'] = existingStyle ? `${existingStyle} ${stripeVars}` : stripeVars;
       }
 
+      // 4. Wrap in Table
       const tableHast: Element = {
         type: 'element',
         tagName: 'table',
         properties: {
-          ...tableHProps,
-          className: ['rc5-table']
+          ...hProps,
+          className: ['rc5-table'],
         },
         children: tableChildren,
       };
 
-      // 4. Convert HAST to HTML String
-      const htmlString = toHtml(tableHast, { allowDangerousHtml: true });
+      // 5. Convert HAST to HTML String
+      let htmlString = toHtml(tableHast, { allowDangerousHtml: true });
 
-      // 5. Append as an HTML node
+      // 6. Wrap in a constraining div when contentWidth is set
+      if (contentWidth !== undefined) {
+        const maxWidth = CONTENT_WIDTH_MAP[contentWidth];
+        const style = maxWidth
+          ? `max-width: ${maxWidth}; margin-left: auto; margin-right: auto;`
+          : '';
+        htmlString = `<div class="rc5-table-container"${style ? ` style="${style}"` : ''}>${htmlString}</div>`;
+      }
+
+      // 7. Append as an HTML node
       actions.appendToParent(mdastParent, {
         type: 'html',
         value: htmlString,

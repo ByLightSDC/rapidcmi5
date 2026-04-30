@@ -117,7 +117,6 @@ function RC5Player() {
     return () => clearTimeout(id);
   }, [activeTab]);
 
-  const pixelTop = '40px';
 
   const thePlugins = useMemo(() => {
     const initialList = [
@@ -376,7 +375,7 @@ function RC5Player() {
     <>
       <Box
         className={themeClass}
-        sx={{ marginTop: pixelTop, height: `calc(100vh - ${pixelTop})` }}
+        sx={{ height: '100%' }}
         onClick={onClickSlide}
         ref={editorContainerRef}
       >
