@@ -126,7 +126,7 @@ export type SlideType = {
   type: SlideTypeEnum;
   slideTitle: string;
   display?:string;
-  content:string
+  content?:string
   filepath: string;
 };
 

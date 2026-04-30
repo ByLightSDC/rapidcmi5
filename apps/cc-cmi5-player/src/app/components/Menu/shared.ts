@@ -1,0 +1,2 @@
+export const TOOLTIP_ENTER_DELAY = 300;
+export const TOOLTIP_ENTER_NEXT_DELAY = 300;
