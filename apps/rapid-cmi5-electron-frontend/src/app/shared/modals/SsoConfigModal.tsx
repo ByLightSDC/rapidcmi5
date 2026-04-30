@@ -9,11 +9,12 @@ import {
   MiniForm,
   ModalDialog,
 } from '@rapid-cmi5/ui';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import * as yup from 'yup';
 import { SSOConfig } from '@rapid-cmi5/cmi5-build-common';
-import { Alert, Collapse } from '@mui/material';
+import { Alert, Button, Collapse, Tooltip } from '@mui/material';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 
 export const configureSSOPromptModalId = 'configure-sso';
 
@@ -39,6 +40,7 @@ const defaultSSOConfig: SSOConfig = {
   rangeRestApiUrl: '',
   ssoEnabled: false,
   quizBankApiUrl: '',
+  redirectUrl: '',
 };
 
 interface FormStatus {
@@ -64,8 +66,39 @@ export function ConfigureSSOForm({
   handleSaveSSO: (data: SSOConfig) => void;
 }) {
   const [status, setStatus] = useState<FormStatus | null>(null);
+  const [importedData, setImportedData] = useState<SSOConfig | null>(null);
+  const [importKey, setImportKey] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImportJson = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target?.result as string);
+          const merged: SSOConfig = { ...defaultSSOConfig, ...parsed };
+          setImportedData(merged);
+          setImportKey((k) => k + 1);
+          setStatus(null);
+        } catch {
+          setStatus({ type: 'error', message: 'Invalid JSON file.' });
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    },
+    [],
+  );
+
   const onCancel = () => {
     setStatus(null);
+    setImportedData(null);
     handleCloseModal();
   };
 
@@ -108,6 +141,33 @@ export function ConfigureSSOForm({
               label="Enable SSO?"
             />
           </Grid>
+          <Grid
+            size={6}
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+            }}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/json,.json"
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+            />
+            <Tooltip title="Import all fields from a JSON file">
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<UploadFileIcon />}
+                onClick={handleImportJson}
+              >
+                Import JSON
+              </Button>
+            </Tooltip>
+          </Grid>
+
           <Grid size={12}>
             <FormControlTextField
               control={control}
@@ -117,6 +177,17 @@ export function ConfigureSSOForm({
               required
               label="Keycloak URL"
               placeholder="https://keycloak.example.com/auth/"
+              readOnly={false}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12 }}>
+            <FormControlTextField
+              control={control}
+              name="redirectUrl"
+              label="Redirect URL"
+              required
+              placeholder="https://app.example.com/callback"
               readOnly={false}
             />
           </Grid>
@@ -141,7 +212,7 @@ export function ConfigureSSOForm({
               name="keycloakRealm"
               required
               label="Realm"
-              placeholder="cloudcents"
+              placeholder="realm"
               readOnly={false}
             />
           </Grid>
@@ -154,7 +225,7 @@ export function ConfigureSSOForm({
               name="keycloakClientId"
               required
               label="Client ID"
-              placeholder="rangeos-dashboard"
+              placeholder="rangeos"
               readOnly={false}
             />
           </Grid>
@@ -184,7 +255,7 @@ export function ConfigureSSOForm({
         </>
       );
     },
-    [status],
+    [status, fileInputRef, handleFileChange, handleImportJson],
   );
 
   return (
@@ -198,7 +269,8 @@ export function ConfigureSSOForm({
     >
       <FormControlUIProvider>
         <MiniForm
-          dataCache={defaultData}
+          key={importKey}
+          dataCache={importedData ?? defaultData}
           doAction={handleSaveSSO}
           formTitle="Configure SSO"
           getFormFields={getFormFields}

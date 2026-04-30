@@ -10,8 +10,6 @@ import {
   TokenResponse,
 } from '@rapid-cmi5/cmi5-build-common';
 
-const SSO_REDIRECT_URI = '';
-
 interface StoreSchema {
   ssoConfig: SSOConfig | null;
   gitUserConfig: GitUserConfig | null;
@@ -218,9 +216,9 @@ export async function loginSSORedirect(): Promise<TokenResponse> {
   const config: SSOConfig | null = store.get('ssoConfig') as SSOConfig | null;
 
   if (!config) throw new Error('SSO config not found');
+  if (!config.redirectUrl) throw new Error('SSO redirect URL is not configured');
 
-  const redirectUri = SSO_REDIRECT_URI;
-
+  const redirectUri = config.redirectUrl;
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = generateCodeChallenge(codeVerifier);
   const state = crypto.randomBytes(16).toString('base64url');
