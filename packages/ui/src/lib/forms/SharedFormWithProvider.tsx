@@ -3,13 +3,7 @@
  *   All rights reserved.
  */
 
-import {
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
 import { UseFormReturn, useForm, useWatch } from 'react-hook-form';
@@ -43,7 +37,9 @@ import { useNavigateAlias } from '../hooks/useNavigateAlias';
 import { FormStateType } from '../types/form';
 import { iListItemType } from '../dashboards/constants';
 import { debugLog } from '../utility/logger';
-import AuthoringInfoFields, { tAuthoringInfoFieldProps } from './AuthoringInfoFields';
+import AuthoringInfoFields, {
+  tAuthoringInfoFieldProps,
+} from './AuthoringInfoFields';
 import Form from './Form';
 import { modal, setLoader } from '../redux/commonAppReducer';
 import { FormCrudType } from '../redux/utils/types';
@@ -51,6 +47,7 @@ import ErrorMessageDetail from '../validation/ErrorMessageDetail';
 import { sanitizePayload } from '../validation/utility';
 import { ButtonLoadingUi } from '../utility/buttons';
 import { useQueryDetails } from '../utility/useQueryDetails';
+import { Stack } from '@mui/material';
 
 const defaultFormWidth = 800;
 
@@ -907,6 +904,7 @@ export function SharedFormWithProvider<
             titleStartIcon={titleStartIcon}
             formWidth={formWidth} //!isModal ? formWidth : 880}
             sxProps={{
+              padding: 2,
               margin: isModal
                 ? hasStepper && shouldShowStepper
                   ? '12px'
@@ -1037,7 +1035,7 @@ export function SharedFormWithProvider<
                   // eslint-disable-next-line react/jsx-no-useless-fragment
                   <>
                     {crudType !== FormCrudType.view ? (
-                      <>
+                      <Stack direction="row" sx={{ width: '100%', display:'flex', justifyContent:'center', gap:1}}>
                         <ButtonModalCancelUi
                           id="cancel-button"
                           disabled={
@@ -1078,7 +1076,7 @@ export function SharedFormWithProvider<
                         >
                           {submitButtonText}
                         </ButtonLoadingUi>
-                      </>
+                      </Stack>
                     ) : (
                       <>
                         <ButtonModalMainUi
