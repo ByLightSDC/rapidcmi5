@@ -23,13 +23,24 @@ import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
 import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
 import BlockIcon from '@mui/icons-material/Block';
-import { ModalDialog, SelectorMainUi } from '@rapid-cmi5/ui';
+import { BlockWidthValue, BLOCK_WIDTH_INHERIT, ModalDialog, SelectorMainUi } from '@rapid-cmi5/ui';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+
+const blockWidthDescriptions: Record<BlockWidthValue, string> = {
+  [BLOCK_WIDTH_INHERIT]: 'Use lesson-level content width setting',
+  [ContentWidthEnum.None]: 'No width constraint (full editor width)',
+  [ContentWidthEnum.Small]: 'Narrow content area (55% of available width)',
+  [ContentWidthEnum.Medium]: 'Standard content area (75% of available width)',
+  [ContentWidthEnum.Large]: 'Full width content area',
+};
 
 interface StyleProps {
   isOpen: boolean;
   style: string;
   setImageStyle: React.Dispatch<React.SetStateAction<string>>;
   setIsStyleDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  contentWidth?: ContentWidthEnum;
+  onContentWidthSave: (contentWidth: ContentWidthEnum | undefined) => void;
 }
 
 export const BorderStyles: string[] = [
@@ -73,10 +84,15 @@ export const StyleDialog: React.FC<StyleProps> = ({
   style,
   setImageStyle,
   setIsStyleDialogOpen,
+  contentWidth,
+  onContentWidthSave,
 }) => {
   // misc styles
   const [alignment, setAlignment] = useState<string | null>('');
   const [opacity, setOpacity] = useState(1);
+  const [blockWidthValue, setBlockWidthValue] = useState<BlockWidthValue>(
+    contentWidth ?? BLOCK_WIDTH_INHERIT,
+  );
   const [isFlipVertical, setIsFlipVertical] = useState(false);
   const [isFlipHorizontal, setIsFlipHorizontal] = useState(false);
 
@@ -92,6 +108,11 @@ export const StyleDialog: React.FC<StyleProps> = ({
   const [dropShadowBlurRadius, setDropShadowBlurRadius] = useState<number>(0);
   const [dropShadowColor, setDropShadowColor] = useState<string>('#000000');
 
+  // sync block width when dialog opens
+  useEffect(() => {
+    setBlockWidthValue(contentWidth ?? BLOCK_WIDTH_INHERIT);
+  }, [contentWidth, isOpen]);
+
   // parse the style string and set values
   useEffect(() => {
     const styles = parse(style);
@@ -104,8 +125,9 @@ export const StyleDialog: React.FC<StyleProps> = ({
         } else if (style.property === 'border-width') {
           const numberValue = parseFloat(removeUnit(style.value));
           setBorderWidth(numberValue);
-        } else if (style.property === 'text-align') {
-          setAlignment(style.value);
+        // text-align is now handled via the textAlign attribute (toolbar controls), not the style string
+        // } else if (style.property === 'text-align') {
+        //   setAlignment(style.value);
         } else if (style.property === 'border-color') {
           setBorderColor(style.value);
         } else if (style.property === 'border-style') {
@@ -248,15 +270,17 @@ export const StyleDialog: React.FC<StyleProps> = ({
       styleString += `filter: drop-shadow(${dropShadowOffsetX}px ${dropShadowOffsetY}px ${dropShadowBlurRadius}px ${dropShadowColor}); `;
     }
 
-    if (alignment !== 'none' && alignment !== '') {
-      styleString += `text-align: ${alignment}; `;
-    }
+    // text-align is now handled via the textAlign attribute (toolbar controls), not the style string
+    // if (alignment !== 'none' && alignment !== '') {
+    //   styleString += `text-align: ${alignment}; `;
+    // }
 
     if (transformValue) {
       styleString += `transform: ${transformValue}; `;
     }
 
     setImageStyle(styleString);
+    onContentWidthSave(blockWidthValue === BLOCK_WIDTH_INHERIT ? undefined : blockWidthValue);
     setIsStyleDialogOpen(false);
   };
 
@@ -310,7 +334,8 @@ export const StyleDialog: React.FC<StyleProps> = ({
                   width: '50%',
                 }}
               >
-                <Grid
+                {/* Alignment is now handled via toolbar controls (textAlign attribute), not style string */}
+                {/* <Grid
                   container
                   alignItems="center"
                   spacing={3}
@@ -340,7 +365,7 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       </ToggleButton>
                     </ToggleButtonGroup>
                   </Grid>
-                </Grid>
+                </Grid> */}
 
                 <Grid
                   container
@@ -839,6 +864,31 @@ export const StyleDialog: React.FC<StyleProps> = ({
                 </Grid>
               </Paper>
             </Stack>
+
+            {/* Content Width section */}
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Typography variant="body1" sx={{ mb: 1 }}>Content Width</Typography>
+              <Box style={{ display: 'flex', justifyContent: 'center' }}>
+                <ToggleButtonGroup
+                  value={blockWidthValue}
+                  exclusive
+                  onChange={(_, val: BlockWidthValue | null) => {
+                    if (val !== null) setBlockWidthValue(val);
+                  }}
+                  size="small"
+                  style={{ width: '60%' }}
+                >
+                  <ToggleButton value={BLOCK_WIDTH_INHERIT} style={{ flex: 1 }}>Lesson</ToggleButton>
+                  <ToggleButton value={ContentWidthEnum.None} style={{ flex: 1 }}>None</ToggleButton>
+                  <ToggleButton value={ContentWidthEnum.Small} style={{ flex: 1 }}>S</ToggleButton>
+                  <ToggleButton value={ContentWidthEnum.Medium} style={{ flex: 1 }}>M</ToggleButton>
+                  <ToggleButton value={ContentWidthEnum.Large} style={{ flex: 1 }}>L</ToggleButton>
+                </ToggleButtonGroup>
+              </Box>
+              <Typography variant="body2" sx={{ mt: 0.5, textAlign: 'center' }}>
+                {blockWidthDescriptions[blockWidthValue]}
+              </Typography>
+            </Paper>
           </Stack>
         </Box>
       </div>
