@@ -35,6 +35,7 @@ import { RC5Context } from '../contexts/RC5Context';
 
 import {
   editorInPlayback$,
+  lessonTheme$,
   CONTENT_UPDATED_COMMAND,
   dividerColor,
   toolbarRect$,
@@ -92,7 +93,7 @@ const moreTextToolWidth = 100;
  * You'll probably want to create your own toolbar component that includes only the buttons that you need.
  * @group Toolbar Components
  */
-export const RapidCmi5Toolbar: React.FC = () => {
+export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5-build-common').LessonTheme }> = ({ lessonTheme }) => {
   const changeViewMode = usePublisher(viewMode$);
   const { getMarkdownData } = useContext(RC5Context);
   const realm = useRealm();
@@ -135,6 +136,10 @@ export const RapidCmi5Toolbar: React.FC = () => {
     realm.pub(editorInPlayback$, false);
     changeViewMode('rich-text');
   }, []);
+
+  useEffect(() => {
+    realm.pub(lessonTheme$, lessonTheme);
+  }, [lessonTheme]);
 
   useEffect(() => {
     if (getMarkdownData() !== content) {

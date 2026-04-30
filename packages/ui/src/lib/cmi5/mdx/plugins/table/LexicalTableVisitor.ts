@@ -4,6 +4,8 @@ import { LexicalExportVisitor } from '@mdxeditor/editor';
 import { toHast } from 'mdast-util-to-hast';
 import { toHtml } from 'hast-util-to-html';
 import type { Element } from 'hast';
+import { CONTENT_WIDTH_MAP } from '../../../../styles/lessonThemeStyles';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Manually converts a Table Row Mdast node to a HAST <tr> element
@@ -105,21 +107,35 @@ export const LexicalTableVisitor: LexicalExportVisitor<TableNode, Mdast.HTML> =
         });
       }
 
-      // 3. Wrap in Table
+      // 3. Build hProperties without contentWidth (don't put it on the <table> element)
+      const hProps = { ...(mdastNode.data?.hProperties || {}) } as Record<string, unknown>;
+      const contentWidth = hProps['contentWidth'] as ContentWidthEnum | undefined;
+      delete hProps['contentWidth'];
+
+      // 4. Wrap in Table
       const tableHast: Element = {
         type: 'element',
         tagName: 'table',
         properties: {
-          ...mdastNode.data?.hProperties || {},
-          className: ['rc5-table']
+          ...hProps,
+          className: ['rc5-table'],
         },
         children: tableChildren,
       };
 
-      // 4. Convert HAST to HTML String
-      const htmlString = toHtml(tableHast, { allowDangerousHtml: true });
+      // 5. Convert HAST to HTML String
+      let htmlString = toHtml(tableHast, { allowDangerousHtml: true });
 
-      // 5. Append as an HTML node
+      // 6. Wrap in a constraining div when contentWidth is set
+      if (contentWidth !== undefined) {
+        const maxWidth = CONTENT_WIDTH_MAP[contentWidth];
+        const style = maxWidth
+          ? `max-width: ${maxWidth}; margin-left: auto; margin-right: auto;`
+          : '';
+        htmlString = `<div class="rc5-table-container"${style ? ` style="${style}"` : ''}>${htmlString}</div>`;
+      }
+
+      // 7. Append as an HTML node
       actions.appendToParent(mdastParent, {
         type: 'html',
         value: htmlString,
