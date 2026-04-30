@@ -8,11 +8,10 @@ import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
-import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
-import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
-import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
+import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
+import VerticalAlignCenterIcon from '@mui/icons-material/VerticalAlignCenter';
+import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
 
 /** Icons */
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -30,7 +29,6 @@ import {
   clickPosition$,
   isLabelDropping$,
   isTextDropping$,
-  BlockAppearanceForm,
   AlignmentToolbarControls,
 } from '@rapid-cmi5/ui';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
@@ -89,7 +87,6 @@ export function EditImageToolbar({
   // For letting style dialogue work outside of image dialog.
   const { imageStyle, setImageStyle } = useImageStyle(nodeKey);
   const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
-  const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const [isAlignOpen, setIsAlignOpen] = useState(false);
 
   /**
@@ -201,16 +198,6 @@ export function EditImageToolbar({
           <PaletteIcon />
         </IconButton>
 
-        <Tooltip title="Block Appearance">
-          <IconButton
-            aria-label="block appearance"
-            disabled={readOnly}
-            onClick={() => setBlockAppearanceOpen(true)}
-          >
-            <SettingsIcon />
-          </IconButton>
-        </Tooltip>
-
         <Tooltip title="Alignment">
           <IconButton
             aria-label="toggle alignment"
@@ -218,7 +205,7 @@ export function EditImageToolbar({
             onClick={() => setIsAlignOpen((v) => !v)}
             sx={{ opacity: isAlignOpen ? 1 : 0.5 }}
           >
-            {textAlign === 'right' ? <FormatAlignRightIcon /> : textAlign === 'center' ? <FormatAlignCenterIcon /> : <FormatAlignLeftIcon />}
+            {textAlign === 'right' ? <VerticalAlignTopIcon sx={{ transform: 'rotate(90deg)' }} /> : textAlign === 'center' ? <VerticalAlignCenterIcon sx={{ transform: 'rotate(90deg)' }} /> : <VerticalAlignBottomIcon sx={{ transform: 'rotate(90deg)' }} />}
           </IconButton>
         </Tooltip>
 
@@ -320,20 +307,14 @@ export function EditImageToolbar({
         />
       </Stack>}
 
-      {/* Style Dialog lives OUTSIDE the button, but inside the toolbar component */}
+      {/* Style Dialog — includes Content Width (block appearance) */}
       <StyleDialog
         isOpen={isStyleDialogOpen}
         style={imageStyle}
         setImageStyle={setImageStyle}
         setIsStyleDialogOpen={setIsStyleDialogOpen}
-      />
-
-      {/* Block Appearance dialog — controls content width override */}
-      <BlockAppearanceForm
-        open={blockAppearanceOpen}
-        currentContentWidth={contentWidth}
-        onClose={() => setBlockAppearanceOpen(false)}
-        onSave={(newContentWidth) => {
+        contentWidth={contentWidth}
+        onContentWidthSave={(newContentWidth) => {
           editor.update(() => {
             const node = $getNodeByKey(nodeKey);
             if ($isImageNode(node)) {
