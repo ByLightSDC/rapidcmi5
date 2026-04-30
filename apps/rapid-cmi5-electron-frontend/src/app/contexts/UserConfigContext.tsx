@@ -71,6 +71,7 @@ function getWebSSOConfig(): SSOConfig {
     rangeRestApiUrl: config.DEVOPS_API_URL || '',
     quizBankApiUrl: config.QUIZBANK_API_URL || '',
     ssoEnabled: config.KEYCLOAK_URL ? true : false,
+    redirectUrl: '',
   };
 }
 
@@ -96,6 +97,7 @@ export default function UserConfig({ children }: UserConfigProps) {
       rangeRestApiUrl: '',
       quizBankApiUrl: '',
       ssoEnabled: false,
+      redirectUrl: '',
     };
   });
 

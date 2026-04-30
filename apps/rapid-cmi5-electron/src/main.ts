@@ -16,16 +16,31 @@ import {
   Credentials,
   GitUserConfig,
   SSOConfig,
+  ScenarioQuery,
+  CourseAU,
+  ExecuteCodeBodyApi,
+  QuestionBankApiCreate,
+  RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
+import {
+  fetchScenario,
+  listScenarios,
+  processAu,
+  listLanguages,
+  executeCode,
+  searchQuestions,
+  addQuestion,
+  deleteQuestion,
+} from './app/api/rangeApi';
 import {
   decryptCredentials,
   encryptCredentials,
   decryptToken,
   encryptToken,
-  loginSSO,
-  loginWithRefreshOrPassword,
   logoutSSO,
   store,
+  loginWithRefreshOrRedirect,
+  loginSSORedirect,
 } from './app/api/userSettings/sso';
 import {
   applyCustomCerts,
@@ -509,11 +524,11 @@ ipcMain.handle('userSettingsApi:loginSSO', async (_e, refresh = true) => {
   if (refresh) {
     const enc = store.get('refreshToken');
     const storedRefreshToken = enc ? decryptToken(enc) : null;
-    const tokens = await loginWithRefreshOrPassword(storedRefreshToken);
+    const tokens = await loginWithRefreshOrRedirect(storedRefreshToken);
     store.set('refreshToken', encryptToken(tokens.refresh_token));
     return tokens;
   } else {
-    const tokens = await loginSSO();
+    const tokens = await loginSSORedirect();
     return tokens;
   }
 });
@@ -596,18 +611,78 @@ ipcMain.handle('userSettingsApi:removeCert', (_e, id: string) => {
   applyCustomCerts();
 });
 
+// ── Range / Scenario API ──────────────────────────────────────────────────────
+ipcMain.handle(
+  'rangeApi:fetchScenario',
+  (_e, baseUrl: string, token: string, uuid: string) =>
+    fetchScenario(baseUrl, token, uuid),
+);
+
+ipcMain.handle(
+  'rangeApi:listScenarios',
+  (_e, baseUrl: string, token: string, query: ScenarioQuery) =>
+    listScenarios(baseUrl, token, query),
+);
+
+ipcMain.handle(
+  'rangeApi:processAu',
+  (_e, baseUrl: string, token: string, au: CourseAU, blockId: string) =>
+    processAu(baseUrl, token, au, blockId),
+);
+
+// ── Code Runner API ───────────────────────────────────────────────────────────
+ipcMain.handle(
+  'rangeApi:listLanguages',
+  (_e, baseUrl: string, token: string, authType: 'Basic' | 'Bearer') =>
+    listLanguages(baseUrl, token, authType),
+);
+
+ipcMain.handle(
+  'rangeApi:executeCode',
+  (
+    _e,
+    baseUrl: string,
+    token: string,
+    authType: 'Basic' | 'Bearer',
+    body: ExecuteCodeBodyApi,
+  ) => executeCode(baseUrl, token, authType, body),
+);
+
+// ── Quiz Bank API ─────────────────────────────────────────────────────────────
+ipcMain.handle(
+  'rangeApi:searchQuestions',
+  (
+    _e,
+    baseUrl: string,
+    token: string,
+    query: string,
+    page: number,
+    limit: number,
+    activityType?: RC5ActivityTypeEnum,
+  ) => searchQuestions(baseUrl, token, query, page, limit, activityType),
+);
+
+ipcMain.handle(
+  'rangeApi:addQuestion',
+  (_e, baseUrl: string, token: string, body: QuestionBankApiCreate) =>
+    addQuestion(baseUrl, token, body),
+);
+
+ipcMain.handle(
+  'rangeApi:deleteQuestion',
+  (_e, baseUrl: string, token: string, uuid: string) =>
+    deleteQuestion(baseUrl, token, uuid),
+);
+
 // Test In Player Handler — writes config.json directly from in-memory AU data,
 // then opens the player dev server in the default browser. No zip build needed.
 ipcMain.handle(
   'cmi5:testInPlayer',
-  async (
-    _evt,
-    auJson: string,
-    playerUrl: string,
-    configDestPath: string,
-  ) => {
+  async (_evt, auJson: string, playerUrl: string, configDestPath: string) => {
     try {
-      await fs.promises.mkdir(nodePath.dirname(configDestPath), { recursive: true });
+      await fs.promises.mkdir(nodePath.dirname(configDestPath), {
+        recursive: true,
+      });
       await fs.promises.writeFile(configDestPath, auJson, 'utf-8');
       shell.openExternal(playerUrl);
       return { success: true };

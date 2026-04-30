@@ -6,6 +6,7 @@ export interface SSOConfig {
   keycloakScope: string;
   rangeRestApiUrl: string;
   quizBankApiUrl: string;
+  redirectUrl: string;
 }
 
 export interface Credentials {

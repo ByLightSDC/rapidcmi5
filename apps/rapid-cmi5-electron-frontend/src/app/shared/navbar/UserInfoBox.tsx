@@ -42,7 +42,6 @@ import ConfigureSSOForm, {
 } from '../modals/SsoConfigModal';
 import { AuthContext } from '../../contexts/AuthContext';
 import { UserConfigContext } from '../../contexts/UserConfigContext';
-import { configureSSOCredsModalId } from '../modals/ElectronLoginModal';
 import { useTheme } from '@emotion/react';
 import {
   getSvgStyleIcon,
@@ -67,7 +66,7 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
   const appThemeColor = useSelector(themeColor);
   const modalObj = useSelector(modal);
 
-  const { logout, token } = useContext(AuthContext);
+  const { logout, token, loginElectron } = useContext(AuthContext);
   const {
     setGitUser,
     gitUser,
@@ -130,7 +129,7 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
   };
 
   const handleLogin = () => {
-    openModal(configureSSOCredsModalId, 'Login to SSO');
+    loginElectron();
     onClose();
   };
 
@@ -203,6 +202,7 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
                 keycloakUrl: '',
                 rangeRestApiUrl: '',
                 quizBankApiUrl: '',
+                redirectUrl: '',
               }
             }
             modalObj={modalObj}

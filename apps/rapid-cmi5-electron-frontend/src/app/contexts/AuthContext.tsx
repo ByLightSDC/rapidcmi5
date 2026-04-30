@@ -7,12 +7,8 @@ import {
   isAuthenticated,
   KeycloakUi,
   setIsLoggingOut,
-  setAuth,
-  setAuthToken,
-  setAuthIdToken,
-  setIsAuthenticated,
 } from '@rapid-cmi5/keycloak';
-import { modal, resetPersistance, setModal } from '@rapid-cmi5/ui';
+import { resetPersistance, useToaster } from '@rapid-cmi5/ui';
 import {
   createContext,
   ReactNode,
@@ -27,9 +23,6 @@ import { UserConfigContext } from './UserConfigContext';
 import { Credentials } from '@rapid-cmi5/cmi5-build-common';
 
 import { AppDispatch } from '@rapid-cmi5/react-editor';
-import ConfigureSSOCredentialsForm, {
-  configureSSOCredsModalId,
-} from '../shared/modals/ElectronLoginModal';
 
 export interface AuthProps {
   children?: ReactNode;
@@ -82,10 +75,10 @@ function parseJwtPayload(token: string): Record<string, any> | null {
 */
 export default function Auth(props: AuthProps) {
   const isElectron = detectIsElectron();
-  const modalObj = useSelector(modal);
   const dispatch: AppDispatch = useDispatch();
 
   const { ssoConfig } = useContext(UserConfigContext);
+  const toaster = useToaster();
 
   // Electron auth state
   const [electronToken, setElectronToken] = useState<string>();
@@ -168,10 +161,19 @@ export default function Auth(props: AuthProps) {
       try {
         const tokenResponse = await window.userSettingsApi.loginSSO();
         processTokenResponse(tokenResponse);
+        toaster({
+          message: 'SSO Login Success',
+          severity: 'success',
+          autoHideDuration: 4,
+        });
       } catch (err: any) {
         setElectronError({ error: err?.message ?? String(err), id: '0' });
         setElectronIsAuthenticated(false);
-        throw Error(`SSO Login Failed ${err}`);
+        toaster({
+          message: 'SSO Login Failed',
+          severity: 'error',
+          autoHideDuration: 8,
+        });
       }
     } else {
       throw Error('loginElectron called in non-Electron environment');
@@ -203,20 +205,17 @@ export default function Auth(props: AuthProps) {
     [processTokenResponse],
   );
 
-  const handleCloseModal = () => {
-    dispatch(setModal({ type: '', id: null, name: null }));
-  };
-
   // Trigger login when SSO config changes or when SSO is enabled without a valid token.
   // This is only valid for electron applications
   useEffect(() => {
     const attemptLogin = async () => {
       try {
         await loginElectron();
-      } catch {
-        dispatch(
-          setModal({ type: configureSSOCredsModalId, id: null, name: null }),
-        );
+      } catch (err) {
+        toaster({
+          message: 'Could not login via SSO',
+          severity: 'error',
+        });
       }
     };
 
@@ -257,10 +256,8 @@ export default function Auth(props: AuthProps) {
         try {
           const tokenResponse = await window.userSettingsApi.loginSSO(true);
           processTokenResponse(tokenResponse);
-        } catch {
-          dispatch(
-            setModal({ type: configureSSOCredsModalId, id: null, name: null }),
-          );
+        } catch (err) {
+          throw Error(`SSO Login Failed ${err}`);
         }
       }, refreshIn);
 
@@ -292,21 +289,7 @@ export default function Auth(props: AuthProps) {
         parsedUserToken,
       }}
     >
-      {!isElectron ? (
-        <WebAuth>{props.children}</WebAuth>
-      ) : (
-        <>
-          {props.children}
-          {modalObj.type === configureSSOCredsModalId && (
-            <ConfigureSSOCredentialsForm
-              modalObj={modalObj}
-              handleCloseModal={handleCloseModal}
-              handleModalAction={handleCloseModal}
-              handleSaveSSOCreds={handleSaveSSOCredsElectron}
-            />
-          )}
-        </>
-      )}
+      {!isElectron ? <WebAuth>{props.children}</WebAuth> : props.children}
     </AuthContext.Provider>
   );
 }
