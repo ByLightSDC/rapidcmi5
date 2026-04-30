@@ -868,22 +868,24 @@ export const StyleDialog: React.FC<StyleProps> = ({
             {/* Content Width section */}
             <Paper variant="outlined" sx={{ p: 2 }}>
               <Typography variant="body1" sx={{ mb: 1 }}>Content Width</Typography>
-              <ToggleButtonGroup
-                value={blockWidthValue}
-                exclusive
-                onChange={(_, val: BlockWidthValue | null) => {
-                  if (val !== null) setBlockWidthValue(val);
-                }}
-                size="small"
-                fullWidth
-              >
-                <ToggleButton value={BLOCK_WIDTH_INHERIT}>Lesson</ToggleButton>
-                <ToggleButton value={ContentWidthEnum.None}>None</ToggleButton>
-                <ToggleButton value={ContentWidthEnum.Small}>S</ToggleButton>
-                <ToggleButton value={ContentWidthEnum.Medium}>M</ToggleButton>
-                <ToggleButton value={ContentWidthEnum.Large}>L</ToggleButton>
-              </ToggleButtonGroup>
-              <Typography variant="body2" sx={{ mt: 0.5 }}>
+              <Box style={{ display: 'flex', justifyContent: 'center' }}>
+                <ToggleButtonGroup
+                  value={blockWidthValue}
+                  exclusive
+                  onChange={(_, val: BlockWidthValue | null) => {
+                    if (val !== null) setBlockWidthValue(val);
+                  }}
+                  size="small"
+                  style={{ width: '60%' }}
+                >
+                  <ToggleButton value={BLOCK_WIDTH_INHERIT} style={{ flex: 1 }}>Lesson</ToggleButton>
+                  <ToggleButton value={ContentWidthEnum.None} style={{ flex: 1 }}>None</ToggleButton>
+                  <ToggleButton value={ContentWidthEnum.Small} style={{ flex: 1 }}>S</ToggleButton>
+                  <ToggleButton value={ContentWidthEnum.Medium} style={{ flex: 1 }}>M</ToggleButton>
+                  <ToggleButton value={ContentWidthEnum.Large} style={{ flex: 1 }}>L</ToggleButton>
+                </ToggleButtonGroup>
+              </Box>
+              <Typography variant="body2" sx={{ mt: 0.5, textAlign: 'center' }}>
                 {blockWidthDescriptions[blockWidthValue]}
               </Typography>
             </Paper>
