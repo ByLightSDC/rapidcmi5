@@ -465,8 +465,8 @@ export const TableEditor: React.FC<TableEditorProps> = ({
             display: 'flex',
             position: 'absolute',
             top: 0,
-            right: gutterRight,
-            zIndex: 1,
+            right: gutterRight === '0px' ? '2rem' : gutterRight,
+            zIndex: 2,
           }}
         >
           <Tooltip title="Block Appearance">
