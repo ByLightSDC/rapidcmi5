@@ -18,14 +18,16 @@ import { MuiColorInput } from 'mui-color-input';
 import { SelectorMainUi } from '../../../../inputs/selectors/selectors';
 import ModalDialog from '../../../../modals/ModalDialog';
 
-
-
 interface TableStyleProps {
   isOpen: boolean;
   style: string;
   tableHProperties?: Record<string, any>;
   setTableStyle: (style: string) => void;
-  setStripedRows: (enabled: boolean, oddColor: string, evenColor: string) => void;
+  setStripedRows: (
+    enabled: boolean,
+    oddColor: string,
+    evenColor: string,
+  ) => void;
   setIsStyleDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -55,13 +57,13 @@ const removeUnit = (numberWithUnit: string) => {
 };
 
 export const TableStyleDialog: React.FC<TableStyleProps> = ({
-                                                              isOpen,
-                                                              style,
-                                                              tableHProperties,
-                                                              setTableStyle,
-                                                              setStripedRows,
-                                                              setIsStyleDialogOpen,
-                                                            }) => {
+  isOpen,
+  style,
+  tableHProperties,
+  setTableStyle,
+  setStripedRows,
+  setIsStyleDialogOpen,
+}) => {
   // --- Border State ---
   const [borderStyle, setBorderStyle] = useState<string>('solid');
   const [borderWidth, setBorderWidth] = useState<number>(0);
@@ -123,8 +125,10 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
           // Handle shorthand 'border: 1px solid #000'
           const parts = s.value.split(/\s+/);
           parts.forEach((part: string) => {
-            if (part.endsWith('px')) setBorderWidth(parseFloat(removeUnit(part)));
-            else if (part.startsWith('#') || part.startsWith('rgb')) setBorderColor(part);
+            if (part.endsWith('px'))
+              setBorderWidth(parseFloat(removeUnit(part)));
+            else if (part.startsWith('#') || part.startsWith('rgb'))
+              setBorderColor(part);
             else if (BorderStyles.includes(part)) setBorderStyle(part);
           });
           foundBorder = true;
@@ -132,7 +136,9 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
         // --- Shadow Parsing ---
         else if (s.property === 'box-shadow') {
           // Basic parser for "Xpx Ypx Blurpx Color"
-          const parts = s.value.match(/(-?\d+(\.\d+)?)px\s+(-?\d+(\.\d+)?)px\s+(\d+(\.\d+)?)px\s+(.+)/);
+          const parts = s.value.match(
+            /(-?\d+(\.\d+)?)px\s+(-?\d+(\.\d+)?)px\s+(\d+(\.\d+)?)px\s+(.+)/,
+          );
           if (parts) {
             setShadowX(parseFloat(parts[1]));
             setShadowY(parseFloat(parts[3]));
@@ -144,7 +150,6 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
     });
 
     if (!foundBorder) setBorderWidth(1);
-
   }, [style, tableHProperties]);
 
   const handleStyleSubmit = () => {
@@ -180,13 +185,29 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
   };
 
   // Handlers
-  const handleBorderWidthSliderChange = (e: Event, value: number | number[]) => { if (typeof value === 'number') setBorderWidth(value); };
-  const handleBorderRadiusSliderChange = (e: Event, value: number | number[]) => { if (typeof value === 'number') setBorderRadius(value); };
+  const handleBorderWidthSliderChange = (
+    e: Event,
+    value: number | number[],
+  ) => {
+    if (typeof value === 'number') setBorderWidth(value);
+  };
+  const handleBorderRadiusSliderChange = (
+    e: Event,
+    value: number | number[],
+  ) => {
+    if (typeof value === 'number') setBorderRadius(value);
+  };
 
   // Shadow Handlers
-  const handleShadowXChange = (e: Event, value: number | number[]) => { if (typeof value === 'number') setShadowX(value); };
-  const handleShadowYChange = (e: Event, value: number | number[]) => { if (typeof value === 'number') setShadowY(value); };
-  const handleShadowBlurChange = (e: Event, value: number | number[]) => { if (typeof value === 'number') setShadowBlur(value); };
+  const handleShadowXChange = (e: Event, value: number | number[]) => {
+    if (typeof value === 'number') setShadowX(value);
+  };
+  const handleShadowYChange = (e: Event, value: number | number[]) => {
+    if (typeof value === 'number') setShadowY(value);
+  };
+  const handleShadowBlurChange = (e: Event, value: number | number[]) => {
+    if (typeof value === 'number') setShadowBlur(value);
+  };
 
   // Generate dynamic styles for the preview table
   const previewTableStyle: React.CSSProperties = {
@@ -202,9 +223,10 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
     borderSpacing: 0,
     overflow: borderRadius > 0 ? 'hidden' : undefined,
     // Apply Shadow
-    boxShadow: (shadowX !== 0 || shadowY !== 0 || shadowBlur !== 0)
-      ? `${shadowX}px ${shadowY}px ${shadowBlur}px ${shadowColor}`
-      : undefined,
+    boxShadow:
+      shadowX !== 0 || shadowY !== 0 || shadowBlur !== 0
+        ? `${shadowX}px ${shadowY}px ${shadowBlur}px ${shadowColor}`
+        : undefined,
   };
 
   return (
@@ -220,194 +242,416 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
       }}
     >
       <div style={{ margin: 0, width: '100%', padding: '10px' }}>
-
-        {/* --- PREVIEW SECTION --- */}
-        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-          <Stack spacing={2}>
-            <Typography variant="h6">Style Preview</Typography>
-            <Box
-              sx={{
-                width: '100%',
-                bgcolor: '#f5f5f5',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                minHeight: '150px',
-                borderRadius: 1,
-                border: '1px solid #e0e0e0'
-              }}
-            >
-              <table style={previewTableStyle}>
-                <thead>
-                <tr>
-                  <th style={{ padding: '8px', borderBottom: '1px solid #ddd', borderRight: '1px solid #ddd' }}>Header A</th>
-                  <th style={{ padding: '8px', borderBottom: '1px solid #ddd' }}>Header B</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                  <td style={{ backgroundColor: stripedEnabled ? stripeOddColor : '#cbefff', padding: '8px', borderRight: '1px solid #ddd' }}>Row 1</td>
-                  <td style={{ backgroundColor: stripedEnabled ? stripeOddColor : '#56c1ff', padding: '8px' }}>Row 1</td>
-                </tr>
-                <tr>
-                  <td style={{ backgroundColor: stripedEnabled ? stripeEvenColor : undefined, padding: '8px', borderRight: '1px solid #ddd' }}>Row 2</td>
-                  <td style={{ backgroundColor: stripedEnabled ? stripeEvenColor : undefined, padding: '8px' }}>Row 2</td>
-                </tr>
-                <tr>
-                  <td style={{ backgroundColor: stripedEnabled ? stripeOddColor : undefined, padding: '8px', borderRight: '1px solid #ddd' }}>Row 3</td>
-                  <td style={{ backgroundColor: stripedEnabled ? stripeOddColor : undefined, padding: '8px' }}>Row 3</td>
-                </tr>
-                </tbody>
-              </table>
-            </Box>
-          </Stack>
-        </Paper>
-
         <Grid container spacing={2}>
+          {/* --- ROW 1 LEFT: ALTERNATING ROW COLORS --- */}
+          <Grid size={6}>
+            <Paper variant="outlined" sx={{ p: 2, height: '100%' }}>
+              <Stack spacing={2}>
+                <Typography variant="h6">Alternating Row Colors</Typography>
 
-          {/* --- LEFT COLUMN: BORDER --- */}
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={stripedEnabled}
+                      onChange={(e) => setStripedEnabled(e.target.checked)}
+                    />
+                  }
+                  label="Enable alternating row colors"
+                />
+
+                <Box sx={{ visibility: stripedEnabled ? 'visible' : 'hidden' }}>
+                  <Stack spacing={2}>
+                    <Stack spacing={1}>
+                      <Typography variant="caption">
+                        Odd rows (1st, 3rd…)
+                      </Typography>
+                      <MuiColorInput
+                        format="hex"
+                        value={stripeOddColor}
+                        onChange={setStripeOddColor}
+                        isAlphaHidden={true}
+                        fullWidth
+                      />
+                    </Stack>
+                    <Stack spacing={1}>
+                      <Typography variant="caption">
+                        Even rows (2nd, 4th…)
+                      </Typography>
+                      <MuiColorInput
+                        format="hex"
+                        value={stripeEvenColor}
+                        onChange={setStripeEvenColor}
+                        isAlphaHidden={true}
+                        fullWidth
+                      />
+                    </Stack>
+                  </Stack>
+                </Box>
+              </Stack>
+            </Paper>
+          </Grid>
+
+          {/* --- ROW 1 RIGHT: STYLE PREVIEW --- */}
+          <Grid size={6}>
+            <Paper variant="outlined" sx={{ p: 2, height: '100%' }}>
+              <Stack spacing={2}>
+                <Typography variant="h6">Style Preview</Typography>
+                <Box
+                  sx={{
+                    width: '100%',
+                    bgcolor: 'action.hover',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    minHeight: '150px',
+                    borderRadius: 1,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                  }}
+                >
+                  <table style={previewTableStyle}>
+                    <thead>
+                      <tr>
+                        <th
+                          style={{
+                            padding: '8px',
+                            borderBottom: '1px solid #ddd',
+                            borderRight: '1px solid #ddd',
+                          }}
+                        >
+                          Header A
+                        </th>
+                        <th
+                          style={{
+                            padding: '8px',
+                            borderBottom: '1px solid #ddd',
+                          }}
+                        >
+                          Header B
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td
+                          style={{
+                            backgroundColor: stripedEnabled
+                              ? stripeOddColor
+                              : undefined,
+                            padding: '8px',
+                            borderRight: '1px solid #ddd',
+                          }}
+                        >
+                          Row 1
+                        </td>
+                        <td
+                          style={{
+                            backgroundColor: stripedEnabled
+                              ? stripeOddColor
+                              : undefined,
+                            padding: '8px',
+                          }}
+                        >
+                          Row 1
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          style={{
+                            backgroundColor: stripedEnabled
+                              ? stripeEvenColor
+                              : undefined,
+                            padding: '8px',
+                            borderRight: '1px solid #ddd',
+                          }}
+                        >
+                          Row 2
+                        </td>
+                        <td
+                          style={{
+                            backgroundColor: stripedEnabled
+                              ? stripeEvenColor
+                              : undefined,
+                            padding: '8px',
+                          }}
+                        >
+                          Row 2
+                        </td>
+                      </tr>
+                      <tr>
+                        <td
+                          style={{
+                            backgroundColor: stripedEnabled
+                              ? stripeOddColor
+                              : undefined,
+                            padding: '8px',
+                            borderRight: '1px solid #ddd',
+                          }}
+                        >
+                          Row 3
+                        </td>
+                        <td
+                          style={{
+                            backgroundColor: stripedEnabled
+                              ? stripeOddColor
+                              : undefined,
+                            padding: '8px',
+                          }}
+                        >
+                          Row 3
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </Box>
+              </Stack>
+            </Paper>
+          </Grid>
+
+          {/* --- ROW 2 LEFT: BORDER --- */}
           <Grid size={6}>
             <Paper variant="outlined" sx={{ p: 2, height: '100%' }}>
               <Stack spacing={2}>
                 <Typography variant="h6">Border</Typography>
 
                 {/* Border Width */}
-                <Grid container alignItems="center" spacing={2} sx={{ width: '100%' }}>
-                  <Grid size={2}><Typography variant="caption">Width</Typography></Grid>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
+                  <Grid size={2}>
+                    <Typography variant="caption">Width</Typography>
+                  </Grid>
                   <Grid size={6}>
-                    <Slider size={'small'} value={borderWidth} onChange={handleBorderWidthSliderChange} min={0} max={20} step={1} />
+                    <Slider
+                      size={'small'}
+                      value={borderWidth}
+                      onChange={handleBorderWidthSliderChange}
+                      min={0}
+                      max={20}
+                      step={1}
+                    />
                   </Grid>
                   <Grid size={4}>
-                    <TextField margin="dense" type="number" value={borderWidth} fullWidth size="small" slotProps={{ input: { inputProps: { step: 1, min: 0, max: 20 } } }} onChange={(e) => setBorderWidth(Number(e.target.value))} />
+                    <TextField
+                      margin="dense"
+                      type="number"
+                      value={borderWidth}
+                      fullWidth
+                      size="small"
+                      slotProps={{
+                        input: { inputProps: { step: 1, min: 0, max: 20 } },
+                      }}
+                      onChange={(e) => setBorderWidth(Number(e.target.value))}
+                    />
                   </Grid>
                 </Grid>
 
                 {/* Border Color */}
-                <Grid container alignItems="center" spacing={2} sx={{ width: '100%' }}>
-                  <Grid size={2}><Typography variant="caption">Color</Typography></Grid>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
+                  <Grid size={2}>
+                    <Typography variant="caption">Color</Typography>
+                  </Grid>
                   <Grid size={10}>
-                    <MuiColorInput format="hex" value={borderColor} onChange={setBorderColor} isAlphaHidden={true} fullWidth />
+                    <MuiColorInput
+                      format="hex"
+                      value={borderColor}
+                      onChange={setBorderColor}
+                      isAlphaHidden={true}
+                      fullWidth
+                    />
                   </Grid>
                 </Grid>
 
                 {/* Border Style */}
-                <Grid container alignItems="center" spacing={2} sx={{ width: '100%' }}>
-                  <Grid size={2}><Typography variant="caption">Style</Typography></Grid>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
+                  <Grid size={2}>
+                    <Typography variant="caption">Style</Typography>
+                  </Grid>
                   <Grid size={10}>
-                    <SelectorMainUi defaultValue={borderStyle} options={BorderStyles} onSelect={setBorderStyle} />
+                    <SelectorMainUi
+                      defaultValue={borderStyle}
+                      options={BorderStyles}
+                      onSelect={setBorderStyle}
+                    />
                   </Grid>
                 </Grid>
 
                 {/* Border Radius */}
-                <Grid container alignItems="center" spacing={2} sx={{ width: '100%' }}>
-                  <Grid size={2}><Typography variant="caption">Radius</Typography></Grid>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
+                  <Grid size={2}>
+                    <Typography variant="caption">Radius</Typography>
+                  </Grid>
                   <Grid size={6}>
-                    <Slider size={'small'} value={borderRadius} onChange={handleBorderRadiusSliderChange} min={0} max={50} step={1} />
+                    <Slider
+                      size={'small'}
+                      value={borderRadius}
+                      onChange={handleBorderRadiusSliderChange}
+                      min={0}
+                      max={50}
+                      step={1}
+                    />
                   </Grid>
                   <Grid size={4}>
-                    <TextField margin="dense" type="number" value={borderRadius} fullWidth size="small" slotProps={{ input: { inputProps: { step: 1, min: 0, max: 50 } } }} onChange={(e) => setBorderRadius(Number(e.target.value))} />
+                    <TextField
+                      margin="dense"
+                      type="number"
+                      value={borderRadius}
+                      fullWidth
+                      size="small"
+                      slotProps={{
+                        input: { inputProps: { step: 1, min: 0, max: 50 } },
+                      }}
+                      onChange={(e) => setBorderRadius(Number(e.target.value))}
+                    />
                   </Grid>
                 </Grid>
               </Stack>
             </Paper>
           </Grid>
 
-          {/* --- RIGHT COLUMN: DROP SHADOW --- */}
+          {/* --- ROW 2 RIGHT: DROP SHADOW --- */}
           <Grid size={6}>
             <Paper variant="outlined" sx={{ p: 2, height: '100%' }}>
               <Stack spacing={2}>
                 <Typography variant="h6">Drop Shadow</Typography>
 
                 {/* Shadow X */}
-                <Grid container alignItems="center" spacing={2} sx={{ width: '100%' }}>
-                  <Grid size={2}><Typography variant="caption">Offset X</Typography></Grid>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
+                  <Grid size={2}>
+                    <Typography variant="caption">Offset X</Typography>
+                  </Grid>
                   <Grid size={6}>
-                    <Slider size={'small'} value={shadowX} onChange={handleShadowXChange} min={-50} max={50} step={1} />
+                    <Slider
+                      size={'small'}
+                      value={shadowX}
+                      onChange={handleShadowXChange}
+                      min={-50}
+                      max={50}
+                      step={1}
+                    />
                   </Grid>
                   <Grid size={4}>
-                    <TextField margin="dense" type="number" value={shadowX} fullWidth size="small" onChange={(e) => setShadowX(Number(e.target.value))} />
+                    <TextField
+                      margin="dense"
+                      type="number"
+                      value={shadowX}
+                      fullWidth
+                      size="small"
+                      onChange={(e) => setShadowX(Number(e.target.value))}
+                    />
                   </Grid>
                 </Grid>
 
                 {/* Shadow Y */}
-                <Grid container alignItems="center" spacing={2} sx={{ width: '100%' }}>
-                  <Grid size={2}><Typography variant="caption">Offset Y</Typography></Grid>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
+                  <Grid size={2}>
+                    <Typography variant="caption">Offset Y</Typography>
+                  </Grid>
                   <Grid size={6}>
-                    <Slider size={'small'} value={shadowY} onChange={handleShadowYChange} min={-50} max={50} step={1} />
+                    <Slider
+                      size={'small'}
+                      value={shadowY}
+                      onChange={handleShadowYChange}
+                      min={-50}
+                      max={50}
+                      step={1}
+                    />
                   </Grid>
                   <Grid size={4}>
-                    <TextField margin="dense" type="number" value={shadowY} fullWidth size="small" onChange={(e) => setShadowY(Number(e.target.value))} />
+                    <TextField
+                      margin="dense"
+                      type="number"
+                      value={shadowY}
+                      fullWidth
+                      size="small"
+                      onChange={(e) => setShadowY(Number(e.target.value))}
+                    />
                   </Grid>
                 </Grid>
 
                 {/* Shadow Blur */}
-                <Grid container alignItems="center" spacing={2} sx={{ width: '100%' }}>
-                  <Grid size={2}><Typography variant="caption">Blur</Typography></Grid>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
+                  <Grid size={2}>
+                    <Typography variant="caption">Blur</Typography>
+                  </Grid>
                   <Grid size={6}>
-                    <Slider size={'small'} value={shadowBlur} onChange={handleShadowBlurChange} min={0} max={50} step={1} />
+                    <Slider
+                      size={'small'}
+                      value={shadowBlur}
+                      onChange={handleShadowBlurChange}
+                      min={0}
+                      max={50}
+                      step={1}
+                    />
                   </Grid>
                   <Grid size={4}>
-                    <TextField margin="dense" type="number" value={shadowBlur} fullWidth size="small" onChange={(e) => setShadowBlur(Number(e.target.value))} />
+                    <TextField
+                      margin="dense"
+                      type="number"
+                      value={shadowBlur}
+                      fullWidth
+                      size="small"
+                      onChange={(e) => setShadowBlur(Number(e.target.value))}
+                    />
                   </Grid>
                 </Grid>
 
                 {/* Shadow Color */}
-                <Grid container alignItems="center" spacing={2} sx={{ width: '100%' }}>
-                  <Grid size={2}><Typography variant="caption">Color</Typography></Grid>
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: '100%' }}
+                >
+                  <Grid size={2}>
+                    <Typography variant="caption">Color</Typography>
+                  </Grid>
                   <Grid size={10}>
-                    <MuiColorInput format="hex" value={shadowColor} onChange={setShadowColor} isAlphaHidden={true} fullWidth />
+                    <MuiColorInput
+                      format="hex"
+                      value={shadowColor}
+                      onChange={setShadowColor}
+                      isAlphaHidden={true}
+                      fullWidth
+                    />
                   </Grid>
                 </Grid>
               </Stack>
             </Paper>
           </Grid>
-
-        {/* --- STRIPED ROWS SECTION --- */}
-        <Grid size={12}>
-          <Paper variant="outlined" sx={{ p: 2 }}>
-            <Stack spacing={2}>
-              <Typography variant="h6">Alternating Row Colors</Typography>
-
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={stripedEnabled}
-                    onChange={(e) => setStripedEnabled(e.target.checked)}
-                  />
-                }
-                label="Enable alternating row colors"
-              />
-
-              <Grid container spacing={2} sx={{ visibility: stripedEnabled ? 'visible' : 'hidden' }}>
-                <Grid size={6}>
-                  <Stack spacing={1}>
-                    <Typography variant="caption">Odd rows (1st, 3rd…)</Typography>
-                    <MuiColorInput
-                      format="hex"
-                      value={stripeOddColor}
-                      onChange={setStripeOddColor}
-                      isAlphaHidden={true}
-                      fullWidth
-                    />
-                  </Stack>
-                </Grid>
-                <Grid size={6}>
-                  <Stack spacing={1}>
-                    <Typography variant="caption">Even rows (2nd, 4th…)</Typography>
-                    <MuiColorInput
-                      format="hex"
-                      value={stripeEvenColor}
-                      onChange={setStripeEvenColor}
-                      isAlphaHidden={true}
-                      fullWidth
-                    />
-                  </Stack>
-                </Grid>
-              </Grid>
-            </Stack>
-          </Paper>
-        </Grid>
-
         </Grid>
       </div>
     </ModalDialog>
