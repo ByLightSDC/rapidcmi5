@@ -21,11 +21,15 @@ import {
   FormStateType,
   FormControlTextField,
   SharedFormWithProvider,
+  ReadOnlyTextField,
 } from '@rapid-cmi5/ui';
 import {
   Topic,
   usePostInitializeCMI5Scenarios,
 } from '@rangeos-nx/frontend/clients/hooks';
+import { useSelector } from 'react-redux';
+import { auJsonSel } from '../redux/auReducer';
+
 
 /**
  * @typedef {Object} tFormProps
@@ -56,6 +60,7 @@ type tFormProps = {
  */
 export default function ClassPromptForm(props: tFormProps) {
   const { crudType, onResponse } = props;
+  const auJson = useSelector(auJsonSel);
 
   const formTopic = Topic.ClassEntry;
   const validationSchema = yup.object().shape({
@@ -77,17 +82,32 @@ export default function ClassPromptForm(props: tFormProps) {
     const { errors } = formState;
 
     return (
-      <Grid size={6}>
-        <FormControlTextField
-          control={control}
-          error={Boolean(errors?.name)}
-          helperText={errors?.name?.message}
-          name="classId"
-          required
-          label="Class Id"
-          readOnly={crudType === FormCrudType.view}
-        />
-      </Grid>
+      <>
+        <Grid size={12}>
+          <FormControlTextField
+            control={control}
+            error={Boolean(errors?.name)}
+            helperText={errors?.name?.message}
+            name="classId"
+            required
+            label="Class Id"
+            readOnly={crudType === FormCrudType.view}
+          />
+        </Grid>
+        {auJson?.rangeosScenarioName && (
+          <Grid size={12}>
+            <ReadOnlyTextField
+              fieldName="rangeOsScenarioName"
+              fieldLabel="Scenario"
+              fieldValue={auJson?.rangeosScenarioName}
+              props={{
+                disabled: true,
+                fullWidth: true,
+              }}
+            />
+          </Grid>
+        )}
+      </>
     );
   };
 
