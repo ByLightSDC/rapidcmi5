@@ -513,16 +513,14 @@ export const TableEditor: React.FC<TableEditorProps> = ({
               parentEditor={parentEditor}
               lexicalNode={lexicalTable}
             />
-            <Tooltip title="Delete Table">
-              <DeleteIconButton
-                onDelete={() => {
-                  parentEditor.update(() => {
-                    lexicalTable.selectNext();
-                    lexicalTable.remove();
-                  });
-                }}
-              />
-            </Tooltip>
+            <DeleteIconButton
+              onDelete={() => {
+                parentEditor.update(() => {
+                  lexicalTable.selectNext();
+                  lexicalTable.remove();
+                });
+              }}
+            />
           </Box>
         )}
         <div
