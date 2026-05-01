@@ -1,4 +1,4 @@
-import { IconButton } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import { rapidIconFor, RapidIconKey } from '../icons/Icons';
 
 /**
@@ -8,14 +8,17 @@ import { rapidIconFor, RapidIconKey } from '../icons/Icons';
  */
 function DeleteIconButton({ onDelete }: { onDelete: (payload: any) => void }) {
   return (
-    <IconButton
-      aria-label="delete"
-      onClick={() => {
-        onDelete(undefined);
-      }}
-    >
-      {rapidIconFor(RapidIconKey.delete)}
-    </IconButton>
+    <Tooltip title="Delete">
+      <IconButton
+        size="small"
+        aria-label="delete"
+        onClick={() => {
+          onDelete(undefined);
+        }}
+      >
+        {rapidIconFor(RapidIconKey.delete)}
+      </IconButton>
+    </Tooltip>
   );
 }
 export default DeleteIconButton;

@@ -177,6 +177,18 @@ audio::-moz-media-controls {
   text-align: center;
 }
 
+/* Alternating row colors — activated by data-striped="true" on the table */
+.rc5-table[data-striped="true"] tbody tr:nth-child(odd) td {
+  background-color: var(--stripe-odd, #d6e4f7);
+}
+.rc5-table[data-striped="true"] tbody tr:nth-child(even) td {
+  background-color: var(--stripe-even, #ffffff);
+}
+/* Explicit cell background-color (set via inline style) takes precedence */
+.rc5-table[data-striped="true"] tbody td[style*="background-color"] {
+  background-color: revert;
+}
+
 @layer base {
   html,
   body {
