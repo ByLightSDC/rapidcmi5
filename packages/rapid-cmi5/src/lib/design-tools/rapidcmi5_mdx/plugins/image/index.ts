@@ -134,6 +134,7 @@ export interface EditingImageDialogState {
   initialValues: Omit<SaveImageParameters, 'file'> & {
     width?: number | 'inherit';
     height?: number | 'inherit';
+    resolvedSrc?: string; // blob/resolved URL used to load natural dimensions
   };
 }
 

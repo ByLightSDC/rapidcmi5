@@ -175,6 +175,7 @@ export function EditImageToolbar({
               nodeKey: nodeKey,
               initialValues: {
                 src: !initialImagePath ? imageSource : initialImagePath,
+                resolvedSrc: imageSource, // blob/resolved URL for natural dimension loading
                 title,
                 altText: alt,
                 rest: rest,
