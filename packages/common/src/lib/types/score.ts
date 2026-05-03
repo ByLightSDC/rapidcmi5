@@ -1,9 +1,9 @@
-import { RC5ActivityTypeEnum } from './activity';
-import { CodeRunnerContent, CodeRunnerSubmitResponse } from './codeRunner';
-import { CTFContent } from './ctf';
-import { QuizContent, QuizScore } from './quiz';
-import { ScenarioContent, ScenarioSubmitResponse } from './slide';
-import { TeamConsolesContent } from './teamConsoles';
+import { type RC5ActivityTypeEnum } from './activity';
+import { type CodeRunnerContent, type CodeRunnerSubmitResponse } from './codeRunner';
+import { type CTFContent } from './ctf';
+import { type QuizContent, type QuizScore } from './quiz';
+import { type ScenarioContent, type ScenarioSubmitResponse } from './slide';
+import { type TeamConsolesContent } from './teamConsoles';
 
 /**
  * @typedef {Object} SlideType

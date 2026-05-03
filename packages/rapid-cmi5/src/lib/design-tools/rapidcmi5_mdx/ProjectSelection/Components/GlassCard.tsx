@@ -1,7 +1,6 @@
-import { PropsWithChildren, ReactNode } from 'react';
-import { Box, Paper, PaperProps, Typography, useTheme } from '@mui/material';
+import { type ReactNode } from 'react';
+import { Box, Paper, type PaperProps, Typography, useTheme } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { CreateNewFolder } from '@mui/icons-material';
 export interface GlassCardProps extends PaperProps {
   title: string;
   icon: ReactNode;

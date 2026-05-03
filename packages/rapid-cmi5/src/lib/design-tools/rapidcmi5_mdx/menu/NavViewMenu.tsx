@@ -29,7 +29,6 @@ import { RC5Context } from '../contexts/RC5Context';
  * Icons
  */
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import { Home } from '@mui/icons-material';
 
 const navIconStyle = { marginTop: '4px', position: 'relative' };
 

@@ -8,7 +8,7 @@ import {
   useSubscription,
   Topic,
 } from '@rangeos-nx/frontend/clients/hooks';
-import { RangeVM } from '@rangeos-nx/frontend/clients/devops-api';
+import { type RangeVM } from '@rangeos-nx/frontend/clients/devops-api';
 
 /**
  * Queries graph for vm updates

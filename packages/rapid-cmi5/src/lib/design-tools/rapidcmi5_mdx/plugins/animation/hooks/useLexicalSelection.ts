@@ -12,7 +12,7 @@ import {
 import {
   getSelectedElementInfo,
   isNodeAnimatable,
-  SelectedElementInfo,
+  type SelectedElementInfo,
 } from '../utils/lexicalSelection';
 import { highlightAnimatedElement } from '../utils/updateAnimationIndicators';
 import { SelectionValidator } from '../wrapping/SelectionValidator';

@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { MDXEditorMethods } from '@mdxeditor/editor';
+import { type MDXEditorMethods } from '@mdxeditor/editor';
 
 import {
   createContext,
-  RefObject,
+  type RefObject,
   useCallback,
   useContext,
   useMemo,
   useRef,
 } from 'react';
-import { Message, MessageType } from '../../course-builder/CourseBuilderTypes';
+import { type Message, MessageType } from '../../course-builder/CourseBuilderTypes';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
@@ -21,14 +21,14 @@ import {
   testInPlayerModalId,
   warningModalId,
 } from '../modals/constants';
-import { ILessonNode } from '../drawers/components/LessonTreeNode';
+import { type ILessonNode } from '../drawers/components/LessonTreeNode';
 import {
-  SlideType,
-  MoveOnCriteriaEnum,
+  type SlideType,
+  type MoveOnCriteriaEnum,
   Operation,
-  CourseAU,
-  LessonTheme,
-  CourseData,
+  type CourseAU,
+  type LessonTheme,
+  type CourseData,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   debugLog,
@@ -58,7 +58,6 @@ import {
   setIsLessonMounted,
   changeViewMode,
 } from '../../../redux/courseBuilderReducer';
-import { useCourseData } from '../data-hooks/useCourseData';
 
 interface tProviderProps {
   isEnabled?: boolean;
@@ -94,21 +93,21 @@ interface IRC5Context {
 export const RC5Context = createContext<IRC5Context>({
   isEnabled: true,
   lessonSlides: [],
-  addEditor: (editorRef: RefObject<MDXEditorMethods>) => {},
-  removeEditor: () => {},
-  changeCourseName: (newName: string) => {},
-  changeLessonMoveOn: (moveOn: MoveOnCriteriaEnum, element: ILessonNode) => {},
-  changeLessonTheme: (theme: LessonTheme, element: ILessonNode) => {},
-  changeLessonName: (newName: string, element: ILessonNode) => {},
-  changeSlideName: (newName: string, element: ILessonNode) => {},
-  deleteLesson: (lessonIndex: number) => {},
-  discardLessonChanges: () => {},
+  addEditor: (_editorRef: RefObject<MDXEditorMethods>) => { },
+  removeEditor: () => { },
+  changeCourseName: (_newName: string) => { },
+  changeLessonMoveOn: (_moveOn: MoveOnCriteriaEnum, _element: ILessonNode) => { },
+  changeLessonTheme: (_theme: LessonTheme, _element: ILessonNode) => { },
+  changeLessonName: (_newName: string, _element: ILessonNode) => { },
+  changeSlideName: (_newName: string, _element: ILessonNode) => { },
+  deleteLesson: (_lessonIndex: number) => { },
+  discardLessonChanges: () => { },
   saveCourseFile: async () => [],
-  saveSlide: () => {},
+  saveSlide: () => { },
   getMarkdownData: () => {
     return undefined;
   },
-  sendMessage: (message: Message) => {},
+  sendMessage: (_message: Message) => { },
 });
 
 // Project Context Provider
@@ -385,7 +384,7 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
         !courseData.blocks[currentBlockIndex].aus[element.lesson] ||
         !courseData.blocks[currentBlockIndex].aus[element.lesson].slides ||
         !courseData.blocks[currentBlockIndex].aus[element.lesson].slides[
-          element.slide
+        element.slide
         ]
       ) {
         debugLogError(
@@ -396,7 +395,7 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
 
       const slide = {
         ...courseData.blocks[currentBlockIndex].aus[element.lesson].slides[
-          element.slide
+        element.slide
         ],
         slideTitle: newName,
       };

@@ -1,6 +1,6 @@
-import { CourseAU, CourseData } from '@rapid-cmi5/cmi5-build-common';
-import { INode } from 'react-accessible-treeview';
-import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
+import { type CourseAU, type CourseData } from '@rapid-cmi5/cmi5-build-common';
+import { type INode } from 'react-accessible-treeview';
+import { type IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 
 /**
  * Use this to return only nodes within a particular dir path
@@ -21,7 +21,6 @@ export const filterTreePath = (
   });
   return filteredTree;
 };
-
 
 // Currently unused, saved for later filtering enhancements
 
@@ -46,7 +45,6 @@ export const filterTreeHelper = (
     });
 };
 
-
 // sorts the au and returns only nodes within the au
 export const auFilterCourseTreeHelper = (
   coursePath: string,
@@ -54,8 +52,6 @@ export const auFilterCourseTreeHelper = (
   sorter: CourseAU,
 ): INode<IFlatMetadata>[] => {
   const nodeMap = Object.fromEntries(tree.map((node) => [node.id, node]));
-
-  const newList: INode<IFlatMetadata>[] = [];
 
   const slideNodes: INode<IFlatMetadata>[] = sorter.slides
     .map((slide) => nodeMap[slide.filepath])

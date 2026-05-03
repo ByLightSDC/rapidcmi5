@@ -1,5 +1,5 @@
-import { DirectiveDescriptor } from '@mdxeditor/editor';
-import { QuotesContainerDirectiveNode } from './types';
+import { type DirectiveDescriptor } from '@mdxeditor/editor';
+import { type QuotesContainerDirectiveNode } from './types';
 import { QuotesContainerEditor } from './QuotesContainerEditor';
 
 /**

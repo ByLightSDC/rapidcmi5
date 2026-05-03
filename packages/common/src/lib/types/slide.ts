@@ -1,17 +1,12 @@
 // Ensure that whenever the types change ./utils/ajv-schema-generator.sh is ran
 
-import { BaseActivity, KSATElement } from './activity';
-import { SxProps } from '@mui/material';
+import { type BaseActivity, type KSATElement } from './activity';
+import { type SxProps } from '@mui/material';
 
 export const defaultSlideContent = '# Slide'; //TODO focus issues if you try to paste blank
 
 export enum SlideTypeEnum {
-  CTF = 'ctf',
-  Quiz = 'quiz',
   Markdown = 'markdown',
-  Scenario = 'rangeosScenario',
-  SourceDoc = 'sourceDoc',
-  CodeRunner = 'codeRunner',
 }
 
 export const slideOptions = Object.values(SlideTypeEnum);
@@ -125,11 +120,10 @@ export type SourceDocContent = {
 export type SlideType = {
   type: SlideTypeEnum;
   slideTitle: string;
-  display?:string;
-  content?:string
+  display?: string;
+  content?: string;
   filepath: string;
 };
-
 
 /**
 

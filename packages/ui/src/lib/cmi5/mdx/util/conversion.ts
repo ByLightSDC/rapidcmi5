@@ -4,11 +4,10 @@ import {
   gfmStrikethroughToMarkdown,
 } from 'mdast-util-gfm-strikethrough';
 import {
-  frontmatterFromMarkdown,
   frontmatterToMarkdown,
 } from 'mdast-util-frontmatter';
 import { toMarkdown } from 'mdast-util-to-markdown';
-import { Nodes } from 'mdast';
+import { type Nodes } from 'mdast';
 
 /* mdast */
 import {
@@ -22,8 +21,8 @@ import {
 } from 'mdast-util-gfm-task-list-item';
 import { gfmTableFromMarkdown, gfmTableToMarkdown } from 'mdast-util-gfm-table';
 import { gfmStrikethrough } from 'micromark-extension-gfm-strikethrough';
-import { Options, Value, fromMarkdown } from 'mdast-util-from-markdown';
-import { Extension } from 'micromark-util-types';
+import { type Value, fromMarkdown } from 'mdast-util-from-markdown';
+import { type Extension } from 'micromark-util-types';
 
 export const convertMdastToMarkdown = (tree: Nodes) => {
   const childMarkdown = toMarkdown(tree, {

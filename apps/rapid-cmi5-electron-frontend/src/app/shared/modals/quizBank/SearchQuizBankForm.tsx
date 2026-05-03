@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import { DynamicModal } from '@rapid-cmi5/ui';
 import QuestionCard from './QuestionCard';
-import { QuestionBankApi, useQuizBankApi } from '@rapid-cmi5/cmi5-build-common';
-import { QuizBankSearchModalProps } from '@rapid-cmi5/react-editor';
+import { type QuestionBankApi, useQuizBankApi } from '@rapid-cmi5/cmi5-build-common';
+import { type QuizBankSearchModalProps } from '@rapid-cmi5/react-editor';
 
 export function QuizBankSearchForm({
   closeModal,

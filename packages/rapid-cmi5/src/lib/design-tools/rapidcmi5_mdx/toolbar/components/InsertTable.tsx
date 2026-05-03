@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Cell, map, useCellValue, usePublisher } from '@mdxeditor/gurx';
 import {
-  ButtonWithTooltip,
   TableNode,
   activeEditor$,
   iconComponentFor$,
@@ -49,7 +48,7 @@ export const InsertTable = ({ isDrawer }: { isDrawer?: boolean }) => {
   // In a child component
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
-    editor.registerNodeTransform(TableNode, (node) => {
+    editor.registerNodeTransform(TableNode, () => {
       // Validate/transform on create
       //if (node.getType() !== 'table') node.remove();
     });

@@ -1,11 +1,8 @@
-import { LexicalExportVisitor } from '@mdxeditor/editor';
-import * as Mdast from 'mdast';
-import { $isMathNode, MathNode } from './MathNode';
+import { type LexicalExportVisitor } from '@mdxeditor/editor';
+import { $isMathNode, type MathNode } from './MathNode';
 import {
-  InlineMath,
-  Math,
-  mathFromMarkdown,
-  mathToMarkdown,
+  type InlineMath,
+  type Math,
 } from 'mdast-util-math';
 
 /**

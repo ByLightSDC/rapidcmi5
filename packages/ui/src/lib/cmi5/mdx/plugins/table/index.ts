@@ -1,22 +1,16 @@
-import { Signal, map } from '@mdxeditor/gurx';
-import * as Mdast from 'mdast';
 import {
   gfmTableFromMarkdown,
   gfmTableToMarkdown,
-  Options as GfmTableOptions,
+  type Options as GfmTableOptions,
 } from 'mdast-util-gfm-table';
 import { gfmTable } from 'micromark-extension-gfm-table';
 import {
   realmPlugin,
-  activeEditor$,
-  addComposerChild$,
   addExportVisitor$,
   addImportVisitor$,
   addLexicalNode$,
-  createActiveEditorSubscription$,
   addSyntaxExtension$,
   addToMarkdownExtension$,
-  insertDecoratorNode$,
   addActivePlugin$,
 } from '@mdxeditor/editor';
 import { LexicalTableVisitor } from './LexicalTableVisitor';

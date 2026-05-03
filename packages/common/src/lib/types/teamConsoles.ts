@@ -1,4 +1,4 @@
-import { BaseActivity } from './activity';
+import { type BaseActivity } from './activity';
 
 /**
  * Team Exercise Consoles

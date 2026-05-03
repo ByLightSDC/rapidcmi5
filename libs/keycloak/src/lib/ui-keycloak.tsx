@@ -1,5 +1,5 @@
 import Keycloak from 'keycloak-js';
-import { AuthClientError } from '@react-keycloak/core';
+import { type AuthClientError } from '@react-keycloak/core';
 import { ReactKeycloakProvider } from '@react-keycloak/web';
 import { useDispatch } from 'react-redux';
 
@@ -11,7 +11,7 @@ import {
 } from './reducer';
 
 import { Login } from './login';
-import { ReactNode, useRef } from 'react';
+import { type ReactNode, useRef } from 'react';
 
 /* eslint-disable-next-line */
 export interface KeycloakUiProps {

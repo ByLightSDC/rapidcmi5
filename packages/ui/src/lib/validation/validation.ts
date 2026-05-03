@@ -103,7 +103,7 @@ export function NEITHER_OR_BOTH_GROUP(
   return yup
     .string()
     .nullable()
-    .test('neither-or-both', errorMessage, function (code) {
+    .test('neither-or-both', errorMessage, function (_code) {
       const first = this.parent[firstField];
       const second = this.parent[secondField];
       // either second is empty OR both need values
@@ -485,7 +485,7 @@ export function LATITUDE_LONGITUDE_GROUP(
         .test(
           'latitude-longitude-regex',
           isLatitude ? LATITUDE_BASE.regexError : LONGITUDE_BASE.regexError,
-          function (code) {
+          function (_code) {
             return testLatitudeLongitudeRegex(
               this.parent,
               latitudeField,
@@ -500,7 +500,7 @@ export function LATITUDE_LONGITUDE_GROUP(
         .test(
           'latitude-longitude-regex',
           isLatitude ? LATITUDE_BASE.regexError : LONGITUDE_BASE.regexError,
-          function (code) {
+          function (_code) {
             return testLatitudeLongitudeRegex(
               this.parent,
               latitudeField,
@@ -514,7 +514,7 @@ export function LATITUDE_LONGITUDE_GROUP(
           isLatitude
             ? LATITUDE_BASE.dependentError
             : LONGITUDE_BASE.dependentError,
-          function (code) {
+          function (_code) {
             return testLatitudeLongitudeDependency(
               this.parent,
               latitudeField,
@@ -578,7 +578,7 @@ export const OneOfAddressFields = (
   return yup
     .string()
     .nullable()
-    .test('one_of_addresses', oneOfAddressFieldsErrorMessage, function (code) {
+    .test('one_of_addresses', oneOfAddressFieldsErrorMessage, function (_code) {
       return testOneOfAddressFields(
         this.parent,
         addressField,
@@ -608,7 +608,7 @@ export const LatitudeOneOfAddressFields = (
     .string()
     .nullable()
     .matches(LATITUDE_BASE.regex, LATITUDE_BASE.regexError)
-    .test('is-longitude-exists', LATITUDE_BASE.dependentError, function (code) {
+    .test('is-longitude-exists', LATITUDE_BASE.dependentError, function (_code) {
       const latitude = this.parent[latitudeField];
       const longitude = this.parent[longitudeField];
       // either longitude is empty OR both need values
@@ -618,7 +618,7 @@ export const LatitudeOneOfAddressFields = (
         (latitude?.length > 0 && longitude?.length > 0)
       );
     })
-    .test('one_of_addresses', oneOfAddressFieldsErrorMessage, function (code) {
+    .test('one_of_addresses', oneOfAddressFieldsErrorMessage, function (_code) {
       return testOneOfAddressFields(
         this.parent,
         addressField,
@@ -648,7 +648,7 @@ export const LongitudeOneOfAddressFields = (
     .string()
     .nullable()
     .matches(LONGITUDE_BASE.regex, LONGITUDE_BASE.regexError)
-    .test('is-latitude-exists', LONGITUDE_BASE.dependentError, function (code) {
+    .test('is-latitude-exists', LONGITUDE_BASE.dependentError, function (_code) {
       const latitude = this.parent[latitudeField];
       const longitude = this.parent[longitudeField];
       // either latitude is empty OR both need values
@@ -658,7 +658,7 @@ export const LongitudeOneOfAddressFields = (
         (latitude?.length > 0 && longitude?.length > 0)
       );
     })
-    .test('one_of_addresses', oneOfAddressFieldsErrorMessage, function (code) {
+    .test('one_of_addresses', oneOfAddressFieldsErrorMessage, function (_code) {
       return testOneOfAddressFields(
         this.parent,
         addressField,
@@ -786,7 +786,7 @@ export const HHMMSS_TIME_GROUP = (
           isStartField
             ? 'Start Time must be earlier than End Time'
             : 'End Time must be later than Start Time',
-          function (code) {
+          function (_code) {
             return testHHMMSSTimes(this.parent, startField, endField);
           },
         )
@@ -802,7 +802,7 @@ export const HHMMSS_TIME_GROUP = (
                 isStartField
                   ? 'Start Time must be earlier than End Time'
                   : 'End Time must be later than Start Time',
-                function (code) {
+                function (_code) {
                   return testHHMMSSTimes(this.parent, startField, endField);
                 },
               ),
@@ -989,7 +989,7 @@ export const UUID_ONLY_ONE_FROM_GROUP = (
   return yup
     .string()
     .nullable()
-    .test('one_of_test', 'dummy message', function (value, validationContext) {
+    .test('one_of_test', 'dummy message', function (_value, validationContext) {
       const { createError } = validationContext;
 
       const fieldOfInterest = this.parent[uuidField];
@@ -1145,7 +1145,7 @@ export const CONTAINER_TAG_GROUP = yup
     excludeEmptyString: true,
   })
   .trim(NAME_BASE.spacesError)
-  .test('is-unique-tag', 'Tag must be unique for Container', function (code) {
+  .test('is-unique-tag', 'Tag must be unique for Container', function (_code) {
     const containerTags: string[] = this.parent['containerTags']
       ? this.parent['containerTags']
       : [];

@@ -3,7 +3,7 @@
  *   All rights reserved.
  */
 
-import React, { useCallback, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { Button } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { usePublisher, useCellValue, useCellValues } from '@mdxeditor/gurx';

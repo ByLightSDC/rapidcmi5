@@ -2,7 +2,7 @@
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
-import { styled, SxProps } from '@mui/material';
+import { styled, type SxProps } from '@mui/material';
 
 type tLoadingUiProps = {
   message?: string;

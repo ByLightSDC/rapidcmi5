@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 /* MUI */
-import Divider, { DividerProps } from '@mui/material/Divider';
+import Divider, { type DividerProps } from '@mui/material/Divider';
 import Grid from '@mui/material/Grid2';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Typography from '@mui/material/Typography';
-import { Variant } from '@mui/material/styles/createTypography';
+import { type Variant } from '@mui/material/styles/createTypography';
 
 /* Icons */
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { SxProps } from '@mui/system';
+import { type SxProps } from '@mui/system';
 import { ButtonInfoField, ButtonInfoFormHeaderLayout } from '../utility/buttons';
 
 /**

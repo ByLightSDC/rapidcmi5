@@ -2,9 +2,9 @@ import { useCallback, useMemo } from 'react';
 import { initClient } from '@ts-rest/core';
 import {
   codeRunnerContract,
-  ExecuteCodeBodyApi,
-  ExecuteCodeResponseApi,
-  LanguagesResponseApi,
+  type ExecuteCodeBodyApi,
+  type ExecuteCodeResponseApi,
+  type LanguagesResponseApi,
 } from '../codeRunnerContract';
 
 type AuthType = 'Basic' | 'Bearer';

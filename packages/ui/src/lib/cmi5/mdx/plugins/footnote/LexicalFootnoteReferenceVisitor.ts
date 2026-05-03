@@ -1,6 +1,6 @@
-import { LexicalExportVisitor } from '@mdxeditor/editor';
-import * as Mdast from 'mdast';
-import { FootnoteReferenceNode } from './FootnoteReferenceNode';
+import { type LexicalExportVisitor } from '@mdxeditor/editor';
+import type * as Mdast from 'mdast';
+import { type FootnoteReferenceNode } from './FootnoteReferenceNode';
 import { $isFootnoteReferenceNode } from './methods';
 
 /**

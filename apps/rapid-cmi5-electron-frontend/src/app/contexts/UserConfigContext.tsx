@@ -1,15 +1,15 @@
 import {
   createContext,
-  ReactNode,
+  type ReactNode,
   useCallback,
   useEffect,
   useState,
 } from 'react';
 import { detectIsElectron } from '../utils/appType';
 import {
-  Credentials,
-  GitUserConfig,
-  SSOConfig,
+  type Credentials,
+  type GitUserConfig,
+  type SSOConfig,
 } from '@rapid-cmi5/cmi5-build-common';
 import { config } from '@rapid-cmi5/ui';
 

@@ -22,7 +22,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import {
   MessageType,
-  ViewModeEnum,
+  type ViewModeEnum,
 } from '../../course-builder/CourseBuilderTypes';
 
 import { isDisplayDirty } from '../../../redux/courseBuilderReducer';
@@ -53,7 +53,7 @@ export const useRC5Prompts = () => {
    */
   const promptSaveCourseFile = (
     title?: string,
-    message?: string,
+    _message?: string,
     meta?: any,
     modalId?: string,
   ) => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
@@ -19,7 +19,6 @@ export default function AnySelector({
   id,
   children,
   theValue,
-  disabled,
   hasNoOptions,
   noOptionsPlaceholder,
   optionsPlaceholder,
@@ -51,9 +50,9 @@ export default function AnySelector({
 
   /**
    * Handle Selection
-   * @param {*} e
+   * @param {*} _e
    */
-  const handleSelect = (e: any) => {
+  const handleSelect = (_e: any) => {
     setOpen(false);
   };
 

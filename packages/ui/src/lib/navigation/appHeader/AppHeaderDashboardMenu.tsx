@@ -7,8 +7,8 @@ import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { OverridableComponent } from '@mui/material/OverridableComponent';
-import { SvgIconTypeMap } from '@mui/material/SvgIcon';
+import { type OverridableComponent } from '@mui/material/OverridableComponent';
+import { type SvgIconTypeMap } from '@mui/material/SvgIcon';
 import { SizingContext } from '../../layout/SizingContext';
 import { BookmarksContext } from '../bookmark/BookmarksContext';
 import { navBarIndex } from '../../redux/commonAppReducer';
@@ -39,7 +39,6 @@ export type DashboardIcon = {
  * @return {JSX.Element} React component
  */
 export function AppHeaderDashboardMenu({
-  appThemeColor = 'light',
   dashboardIcons,
 }: {
   appThemeColor?: string;
@@ -104,13 +103,11 @@ export function AppHeaderDashboardMenu({
     >
       {dashboardIcons.map(
         ({
-          disabled = false,
           hidden = false,
           name,
           icon,
           menuKey,
           testId,
-          url,
         }: DashboardIcon) => {
           if (!hidden) {
             const ItemIcon = icon;

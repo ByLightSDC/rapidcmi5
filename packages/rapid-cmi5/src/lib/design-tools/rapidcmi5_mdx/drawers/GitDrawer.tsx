@@ -6,8 +6,8 @@ import {
   Tabs,
   Typography,
 } from '@mui/material';
-import { RepoState } from '../../../redux/repoManagerReducer';
-import { RootState } from '../../../redux/store';
+import { type RepoState } from '../../../redux/repoManagerReducer';
+import { type RootState } from '../../../redux/store';
 
 import { TabMainUi } from '@rapid-cmi5/ui';
 
@@ -33,7 +33,7 @@ export const GitDrawer = () => {
   const { gitIcon } = useMDStyleIcons();
   const currentTab = useSelector(gitViewCurrentTab);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     dispatch(setGitViewCurrentTab(newValue));
   };
 
@@ -53,7 +53,7 @@ export const GitDrawer = () => {
         sx={{
           fontFamily: '"IBM Plex Sans", sans-serif',
           fontWeight: 'bold',
-          marginTop:.5
+          marginTop: .5
         }}
       >
         VERSION CONTROL
@@ -64,7 +64,7 @@ export const GitDrawer = () => {
           spacing={1}
           sx={{
             marginTop: '4px',
-            marginBottom:1
+            marginBottom: 1
           }}
         >
           {gitIcon}

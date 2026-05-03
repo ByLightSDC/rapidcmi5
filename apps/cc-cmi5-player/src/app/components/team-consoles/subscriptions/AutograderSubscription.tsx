@@ -7,7 +7,7 @@ import {
   graphqlAutoGraderResultsFields,
   useSubscription,
   Topic,
-  AutoGraderEvent,
+  type AutoGraderEvent,
 } from '@rangeos-nx/frontend/clients/hooks';
 
 /**

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Button, CircularProgress, Typography } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { cmi5Instance } from '../session/cmi5';
 import { sendTerminatedVerb } from '../utils/LmsStatementManager';

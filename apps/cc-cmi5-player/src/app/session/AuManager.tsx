@@ -19,12 +19,12 @@ import { logger, refreshLoggingConfig } from '../debug';
 import { useAuContent } from '../hooks/useAuContent';
 import { Alert, AlertTitle, CircularProgress, Typography } from '@mui/material';
 import {
-  ActivityCacheGetState,
-  ActivityCacheSetState,
-  ActivityScore,
-  AuContextProps,
+  type ActivityCacheGetState,
+  type ActivityCacheSetState,
+  type ActivityScore,
+  type AuContextProps,
   AuManagerState,
-  QuizState,
+  type QuizState,
   RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 import MenuLayout from '../components/Menu/MenuLayout';
@@ -51,10 +51,10 @@ export const AuManagerContext = createContext<AuContextProps>({
   viewedSlides: [],
   scenario: undefined, //TODO scenario, //from redux, may be more up to date than course data
   slides: [],
-  setActiveTab: (tab: number) => {
+  setActiveTab: (_tab: number) => {
     return;
   },
-  setProgress: (makeProgress: boolean) => {
+  setProgress: (_makeProgress: boolean) => {
     return;
   },
   slideData: 'Loading...',

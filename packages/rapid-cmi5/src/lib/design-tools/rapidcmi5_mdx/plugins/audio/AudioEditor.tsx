@@ -10,7 +10,7 @@ import {
   KEY_DELETE_COMMAND,
   KEY_ENTER_COMMAND,
   KEY_ESCAPE_COMMAND,
-  NodeKey,
+  type NodeKey,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -26,7 +26,7 @@ import {
 import { $isAudioNode } from './AudioNode';
 import styles from './styles/audio-plugin.module.css';
 import { useCellValues } from '@mdxeditor/gurx';
-import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
+import { type MdxJsxAttribute, type MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
 interface AudioComponentProps {
   src: string;
@@ -82,7 +82,7 @@ function AudioComponent({
   );
 
   const onEscape = React.useCallback(
-    (event: KeyboardEvent) => {
+    (_event: KeyboardEvent) => {
       if (isSelected) {
         const node = $getNodeByKey(nodeKey);
         if ($isAudioNode(node)) {

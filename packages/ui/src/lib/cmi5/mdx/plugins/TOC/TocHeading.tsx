@@ -1,11 +1,11 @@
-import { HeadingNode, HeadingTagType } from '@lexical/rich-text';
+import { HeadingNode, type HeadingTagType } from '@lexical/rich-text';
 import {
   $applyNodeReplacement,
   $createParagraphNode,
-  EditorConfig,
-  LexicalNode,
-  ParagraphNode,
-  RangeSelection,
+  type EditorConfig,
+  type LexicalNode,
+  type ParagraphNode,
+  type RangeSelection,
   type NodeKey,
 } from 'lexical';
 import { addClassNamesToElement } from '@lexical/utils';

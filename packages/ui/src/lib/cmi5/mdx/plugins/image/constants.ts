@@ -1,4 +1,4 @@
-import { MdxJsxAttributeValueExpression } from 'mdast-util-mdx-jsx';
+import { type MdxJsxAttributeValueExpression } from 'mdast-util-mdx-jsx';
 
 export const BROKEN_IMG_URI =
   'data:image/svg+xml;charset=utf-8,' +

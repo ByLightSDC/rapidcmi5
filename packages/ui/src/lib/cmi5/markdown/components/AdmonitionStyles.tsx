@@ -1,4 +1,3 @@
-import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
 
 //https://squidfunk.github.io/mkdocs-material/reference/admonitions/#+type:info
 import ModeEditIcon from '@mui/icons-material/ModeEdit';

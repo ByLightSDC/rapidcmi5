@@ -1,9 +1,9 @@
 /* MUI */
 
-import Tab, { TabProps } from '@mui/material/Tab';
-import { styled, SxProps } from '@mui/system';
+import Tab, { type TabProps } from '@mui/material/Tab';
+import { styled, type SxProps } from '@mui/system';
 
-const StyledTab = styled(Tab)(({ theme }: { theme: any }) => ({
+const StyledTab = styled(Tab)(({ }: { theme: any }) => ({
   margin: 4, //bw tabs
 }));
 

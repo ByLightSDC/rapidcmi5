@@ -1,4 +1,4 @@
-import { Query, useQueryClient } from 'react-query';
+import { type Query, useQueryClient } from 'react-query';
 
 interface LooseObject {
   [key: string]: any;
@@ -144,7 +144,7 @@ export const useCache = () => {
     // }
 
     //if not found above, check in "pagination" cache
-    let pagedResults: Array<string> = [];
+    const pagedResults: Array<string> = [];
     // The queries are stored in cache as a map by queryKey and reqOptions
     const entries = queryClient
       .getQueryCache()
@@ -230,7 +230,7 @@ export const useCache = () => {
     const queryObj: any = queryClient.getQueryData([queryKey, id]);
 
     if (queryObj) {
-      queryObj.map((obj: any, index: number) => {
+      queryObj.map((obj: any ) => {
         if (obj.uuid === data?.uuid) {
           //queryObj[index] = data;
           Object.entries(data).map(([key, value]) => {

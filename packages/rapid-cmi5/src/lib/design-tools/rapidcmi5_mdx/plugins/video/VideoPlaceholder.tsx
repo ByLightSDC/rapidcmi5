@@ -1,4 +1,3 @@
-import React from 'react';
 
 /**
  * A placeholder component shown while a video is loading.

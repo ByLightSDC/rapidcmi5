@@ -1,6 +1,6 @@
-import * as Mdast from 'mdast';
-import { LexicalExportVisitor } from '@mdxeditor/editor';
-import { VideoNode, $isVideoNode } from './VideoNode';
+import type * as Mdast from 'mdast';
+import { type LexicalExportVisitor } from '@mdxeditor/editor';
+import { type VideoNode, $isVideoNode } from './VideoNode';
 
 /**
  * Exports videos as HTML <video /> elements

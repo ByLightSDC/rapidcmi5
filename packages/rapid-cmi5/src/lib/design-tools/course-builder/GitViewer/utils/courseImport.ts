@@ -1,5 +1,5 @@
-import { CourseData, RC5_FILENAME } from '@rapid-cmi5/cmi5-build-common';
-import JSZip from 'jszip';
+import { type CourseData, RC5_FILENAME } from '@rapid-cmi5/cmi5-build-common';
+import type JSZip from 'jszip';
 import { basename, dirname, join } from 'path-browserify';
 import YAML from 'yaml';
 

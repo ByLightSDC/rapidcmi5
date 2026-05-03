@@ -2,7 +2,7 @@ import {
   ButtonWithTooltip,
   activeEditor$,
   $createDirectiveNode,
-  DirectiveNode,
+  type DirectiveNode,
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
@@ -13,9 +13,8 @@ import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 import TabIcon from '@mui/icons-material/Tab';
 
 import type { BlockContent } from 'mdast';
-import { ContainerDirective } from 'mdast-util-directive';
+import { type ContainerDirective } from 'mdast-util-directive';
 import { DEFAULT_TABS } from './constants';
-import { placeCaretInsideDirective } from '../../util/caret';
 import { convertMarkdownToMdast } from '../../util/conversion';
 import { ButtonMinorUi } from '@rapid-cmi5/ui';
 

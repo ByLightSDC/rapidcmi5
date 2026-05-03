@@ -4,11 +4,11 @@
  */
 /* eslint-disable react/jsx-no-useless-fragment */
 import { useState } from 'react';
-import { Control, Controller } from 'react-hook-form';
+import { type Control, Controller } from 'react-hook-form';
 
 /* MUI */
 import FormControl from '@mui/material/FormControl';
-import TextField, { TextFieldProps } from '@mui/material/TextField';
+import TextField, { type TextFieldProps } from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 
 /*Icons */
@@ -44,7 +44,6 @@ export function FormControlPassword({
   hidden = false,
   infoText = null,
   props = {},
-  onClear,
   onTogglePassword = true,
   readOnly = false,
   label = 'Password',

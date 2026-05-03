@@ -7,7 +7,7 @@ Navigates to path after storing information
 import { useNavigate } from 'react-router';
 import { useDispatch } from 'react-redux';
 import { setCurrentFormCrudType } from '../redux/commonAppReducer';
-import { FormCrudType } from '../redux/utils/types';
+import { type FormCrudType } from '../redux/utils/types';
 
 export const useNavigateAlias = () => {
   const dispatch = useDispatch();
@@ -16,11 +16,11 @@ export const useNavigateAlias = () => {
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const navigateTo = (
     path: string,
-    uuid: string | undefined,
-    alias: string | undefined,
+    _uuid: string | undefined,
+    _alias: string | undefined,
     crudType?: FormCrudType | undefined,
-    meta?: any,
-    shouldOverride = true,
+    _meta?: any,
+    _shouldOverride = true,
   ) => {
     // if (uuid && alias) {
     //   dispatch(

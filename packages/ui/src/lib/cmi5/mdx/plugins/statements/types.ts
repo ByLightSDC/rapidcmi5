@@ -1,4 +1,4 @@
-import { ContainerDirective } from 'mdast-util-directive';
+import { type ContainerDirective } from 'mdast-util-directive';
 
 /**
  * Statement layout preset configuration.

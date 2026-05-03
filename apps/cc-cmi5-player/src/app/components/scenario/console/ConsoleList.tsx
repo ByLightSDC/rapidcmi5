@@ -1,10 +1,9 @@
-/* eslint-disable react/jsx-no-useless-fragment */
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 
-import { DeployedRangeConsole } from '@rangeos-nx/frontend/clients/devops-api';
+import { type DeployedRangeConsole } from '@rangeos-nx/frontend/clients/devops-api';
 import ConsoleButton from './ConsoleButton';
 import { ConsoleContext } from './ConsoleContext';
-import { SxProps } from '@mui/system';
+import { type SxProps } from '@mui/system';
 
 /**
  * Props for ConsoleList

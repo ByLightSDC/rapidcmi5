@@ -1,4 +1,4 @@
-import { AppDispatch } from '@rapid-cmi5/react-editor';
+import { type AppDispatch } from '@rapid-cmi5/react-editor';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import {
@@ -48,7 +48,7 @@ import {
   getSvgStyleIcon,
   StyleIconTypeEnum,
 } from 'packages/rapid-cmi5/src/lib/design-tools/rapidcmi5_mdx/styles/styleSvgConstants';
-import { CustomTheme } from '../../styles/createPalette';
+import { type CustomTheme } from '../../styles/createPalette';
 import { RC5_VERSION } from '@rapid-cmi5/cmi5-build-common';
 
 interface UserInfoBoxProps {

@@ -1,12 +1,12 @@
-import { DragEvent, useEffect } from 'react';
+import { type DragEvent } from 'react';
 
 /** MUI */
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import { FolderOpen, Folder } from '@mui/icons-material';
 import { useContextMenu } from '../../hooks/useContextMenu';
 import FileContextMenu from '../../modals/FileContextMenu';
-import { INode } from 'react-accessible-treeview/dist/TreeView/types';
-import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
+import { type INode } from 'react-accessible-treeview/dist/TreeView/types';
+import { type IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 import { CreateNewFolder, NoteAdd } from '@mui/icons-material';
 import PopupInput from '../../modals/PopupInput';
 import { usePopup } from '../../hooks/usePopup';
@@ -55,7 +55,7 @@ export const TreeFolderIcon: React.FC<FolderIconProps> = ({
     if (files && files.length > 0) {
       for (let i = 0; i < files.length; i++) {
         const fileReader = new FileReader();
-        fileReader.onload = function (event: any) {
+        fileReader.onload = function (_event: any) {
           if (fileReader.result) {
             // console.log('b file', files[i]);
             const imgData = new Uint8Array(fileReader.result as ArrayBuffer);
@@ -139,7 +139,7 @@ export const TreeFolderIcon: React.FC<FolderIconProps> = ({
         <Box sx={{ display: 'flex', gap: 1 }}>
           <IconButton
             sx={{
-              '&:focus': { outline: 'none' }, 
+              '&:focus': { outline: 'none' },
             }}
             size="small"
             onKeyDown={(e) => e.stopPropagation()}

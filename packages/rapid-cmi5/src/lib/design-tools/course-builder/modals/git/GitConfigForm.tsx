@@ -3,23 +3,23 @@ import {
   FormControlPassword,
   FormControlTextField,
   FormControlUIProvider,
-  FormStateType,
+  type FormStateType,
   MiniForm,
   ModalDialog,
 } from '@rapid-cmi5/ui';
 import * as yup from 'yup';
 
-import { CommonAppModalState } from '@rapid-cmi5/ui';
+import { type CommonAppModalState } from '@rapid-cmi5/ui';
 
 import Grid from '@mui/material/Grid2';
 
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 
 import { NAME_GROUP_OPT } from '@rapid-cmi5/ui';
 import { useContext } from 'react';
 import { Alert, Typography } from '@mui/material';
 import { setGitConfigModalId } from '../../../rapidcmi5_mdx/modals/constants';
-import { GitConfigType } from '../../CourseBuilderApiTypes';
+import { type GitConfigType } from '../../CourseBuilderApiTypes';
 import { GitContext } from '../../GitViewer/session/GitContext';
 
 export function GitConfigForm({
@@ -38,7 +38,7 @@ export function GitConfigForm({
   ) => void;
 }) {
   const { handleGitSetConfig } = useContext(GitContext);
-  const { isRepoConnectedToRemote, handleChangeRepoName, currentRepo } =
+  const { isRepoConnectedToRemote } =
     useContext(GitContext);
 
   const validationSchema = yup.object().shape({
@@ -53,7 +53,7 @@ export function GitConfigForm({
     handleCloseModal();
   };
 
-  const onResponse = (isSuccess: boolean, data: any, message: string) => {
+  const onResponse = (isSuccess: boolean, data: any) => {
     if (isSuccess) {
       handleModalAction(modalObj.type, 1, data);
     }
@@ -69,8 +69,8 @@ export function GitConfigForm({
     formMethods: UseFormReturn,
     formState: FormStateType,
   ): JSX.Element => {
-    const { control, getValues, setValue, trigger } = formMethods;
-    const { errors, isValid } = formState;
+    const { control } = formMethods;
+    const { errors } = formState;
     return (
       <>
         <Grid size={12}>

@@ -1,8 +1,8 @@
-import * as Mdast from 'mdast';
-import { MdastImportVisitor } from '@mdxeditor/editor';
+import type * as Mdast from 'mdast';
+import { type MdastImportVisitor } from '@mdxeditor/editor';
 import { $createImageNode } from './ImageNode';
-import { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx';
-import { $createParagraphNode, RootNode } from 'lexical';
+import { type MdxJsxTextElement, type MdxJsxFlowElement } from 'mdast-util-mdx';
+import { $createParagraphNode, type RootNode } from 'lexical';
 
 // data-* HTML attribute names → camelCase rest attr names
 const dataAttrToNameMap: Record<string, string> = {
@@ -150,7 +150,7 @@ export const MdastJsxImageVisitor: MdastImportVisitor<
       height: height ? parseInt(height, 10) : undefined,
       rest,
       href,
-      id, 
+      id,
     });
 
     if (lexicalParent.getType() === 'root') {
@@ -174,7 +174,7 @@ export const MdastLinkImageVisitor: MdastImportVisitor<Mdast.Link> = {
       node.children[0].type === 'image'
     );
   },
-  visitNode({ mdastNode, lexicalParent, actions }) {
+  visitNode({ mdastNode, lexicalParent }) {
     const image = mdastNode.children[0] as Mdast.Image;
     const imageNode = $createImageNode({
       src: image.url,
@@ -217,15 +217,13 @@ export const MdastHtmlLinkedImageVisitor: MdastImportVisitor<Mdast.Html> = {
     const title = img.title ?? '';
     const width = img.width || undefined;
     const height = img.height || undefined;
-    const id = img.getAttribute('id') || undefined; 
+    const id = img.getAttribute('id') || undefined;
 
     // Collect other img attributes as 'rest' (excluding data-image-id)
     const rest = Array.from(img.attributes)
       .filter(
         (attr) =>
-          !['src', 'alt', 'title', 'width', 'height', 'id'].includes(
-            attr.name,
-          ),
+          !['src', 'alt', 'title', 'width', 'height', 'id'].includes(attr.name),
       )
       .map((attr) => ({
         type: 'mdxJsxAttribute' as const,

@@ -8,14 +8,14 @@ import {
   Paper,
   Tooltip,
   tooltipClasses,
-  TooltipProps,
+  type TooltipProps,
   styled,
   Box,
   Typography,
   Button,
 } from '@mui/material';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import { ReadCommitResult } from 'isomorphic-git';
+import { type ReadCommitResult } from 'isomorphic-git';
 import { gitTableCellHeaderStyle } from './GitFileStatus';
 
 const NoMaxWidthTooltip = styled(({ className, ...props }: TooltipProps) => (

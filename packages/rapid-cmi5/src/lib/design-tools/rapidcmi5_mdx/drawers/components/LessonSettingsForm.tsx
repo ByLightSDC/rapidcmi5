@@ -2,12 +2,11 @@
 import { commitChangesModalId } from '../../modals/constants';
 import {
   FormControlUIProvider,
-  FormStateType,
+  type FormStateType,
   MiniForm,
   ModalDialog,
-  AlignmentToolbarControls,
 } from '@rapid-cmi5/ui';
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
@@ -19,14 +18,12 @@ import {
 } from '@mui/material';
 
 import * as yup from 'yup';
-import { useSelector } from 'react-redux';
-import { modal } from '@rapid-cmi5/ui';
 import React, { useState } from 'react';
 import {
   BlockPaddingEnum,
   ContentWidthEnum,
   DefaultAlignmentEnum,
-  LessonTheme,
+  type LessonTheme,
 } from '@rapid-cmi5/cmi5-build-common';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import {
@@ -44,7 +41,6 @@ export function LessonSettingsForm({
   handleModalAction: (theme: LessonTheme) => void;
   currentTheme?: LessonTheme;
 }) {
-  const modalObj = useSelector(modal);
 
   const [contentWidth, setContentWidth] = React.useState<ContentWidthEnum>(
     currentTheme?.contentWidth || ContentWidthEnum.None,
@@ -69,7 +65,7 @@ export function LessonSettingsForm({
   const onClose = () => handleCloseModal();
   const onCancel = () => handleCloseModal();
 
-  const onResponse = (isSuccess: boolean, data: any, message: string) => {
+  const onResponse = (isSuccess: boolean, _data: any, _message: string) => {
     if (isSuccess) {
       const theme: LessonTheme = {
         contentWidth,
@@ -85,8 +81,8 @@ export function LessonSettingsForm({
   };
 
   const getFormFields = (
-    formMethods: UseFormReturn,
-    formState: FormStateType,
+    _formMethods: UseFormReturn,
+    _formState: FormStateType,
   ): JSX.Element => {
     return (
       <>

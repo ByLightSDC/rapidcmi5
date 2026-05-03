@@ -1,9 +1,7 @@
-/* eslint-disable new-cap */
 /* svg formats for Icons */
-import React from 'react';
 
 // Advanced Attack Icon
-export const AttackIconSvg = (aColor?: string) => (
+export const AttackIconSvg = (_aColor?: string) => (
   <svg id="AttackIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <polygon points="20.18 3.86 20.18 8.22 11.99 15.32 10.89 14.23 14.72 10.41 14.44 9.59 13.63 9.31 9.8 13.14 8.71 12.04 15.81 3.86 20.18 3.86" />
     <polygon points="12.53 16.96 10.89 18.6 9.12 16.82 6.25 19.96 5.75 20 4 18.25 4.07 17.78 7.21 14.91 5.44 13.14 7.07 11.5 12.53 16.96" />
@@ -11,14 +9,14 @@ export const AttackIconSvg = (aColor?: string) => (
 );
 
 // Artemis Icon
-export const ArtemisIconSvg = (aColor?: string) => (
+export const ArtemisIconSvg = (_aColor?: string) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 321.55 384">
     <path d="M294.83,93l14.7-46.25-46.92,13.1L268.28,80,264,84.08l-3.91-3.89L240,100.35l3.24,3.23c-7.88,7.34-16.38,15.19-25.27,23.27A262.48,262.48,0,0,0,107.37,0l-3.86,2.54L0,303.23l69.81.1,121.91-127.6A323.36,323.36,0,0,1,199,365,264,264,0,0,0,223.75,142.2l28.39-29.73,2.74,2.73L275,95l-3.16-3.15,4.3-4.49Zm-229,144.21c-4.44-2-2.33-9.36-2.33-9.36L107.07,46.14a312.35,312.35,0,0,1,53.66,64.93,327.65,327.65,0,0,1,23.74,45.74c-51.28,44.84-104.55,86.64-118.64,80.36Z" />
   </svg>
 );
 
 // Copy Content Icon
-export const CopyContentIconSvg = (aColor?: string) => (
+export const CopyContentIconSvg = (_aColor?: string) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M0 0h24v24H0V0z" fill="none" />
     <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
@@ -26,7 +24,7 @@ export const CopyContentIconSvg = (aColor?: string) => (
 );
 
 // Dumb Switch Icon
-export const DumbSwitchIconSvg = (aColor?: string) => (
+export const DumbSwitchIconSvg = (_aColor?: string) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M21,5H3A2,2,0,0,0,1,7V17a2,2,0,0,0,2,2H21a2,2,0,0,0,2-2V7A2,2,0,0,0,21,5Zm0,12H3V7H21Z" />
     <polygon points="10 11 6.93 11 8.05 9.88 6.64 8.46 3.1 12 6.64 15.54 8.05 14.12 6.93 13 10 13 10 11" />
@@ -62,7 +60,7 @@ export const FirewallIconSvg = (aColor?: string) => (
 );
 
 //Gear Add Icon
-export const GearPlusAddIconSvg = (aColor?: string) => (
+export const GearPlusAddIconSvg = (_aColor?: string) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <polygon points="24 3.75 20.25 3.75 20.25 0 17.75 0 17.75 3.75 14 3.75 14 6.25 17.75 6.25 17.75 10 20.25 10 20.25 6.25 24 6.25 24 3.75" />
     <path d="M19.14,12.94A7.42,7.42,0,0,0,19.2,12H15.75V8.25H12V2.4H10.08a.47.47,0,0,0-.47.41L9.25,5.35a7.28,7.28,0,0,0-1.62.94l-2.39-1a.47.47,0,0,0-.59.22L2.74,8.87a.46.46,0,0,0,.12.61l2,1.58a5.65,5.65,0,0,0,0,1.88l-2,1.58a.49.49,0,0,0-.12.61l1.92,3.32a.49.49,0,0,0,.59.22l2.39-1a7.28,7.28,0,0,0,1.62.94l.36,2.54a.49.49,0,0,0,.48.41h3.84a.47.47,0,0,0,.47-.41l.36-2.54a6.72,6.72,0,0,0,1.62-.94l2.39,1a.47.47,0,0,0,.59-.22l1.92-3.32a.47.47,0,0,0-.12-.61ZM12,15.6A3.6,3.6,0,1,1,15.6,12,3.6,3.6,0,0,1,12,15.6Z" />
@@ -70,7 +68,7 @@ export const GearPlusAddIconSvg = (aColor?: string) => (
 );
 
 // ICMP Icon
-export const IcmpIconSvg = (aColor?: string) => (
+export const IcmpIconSvg = (_aColor?: string) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M12,2A6,6,0,0,0,6,8c0,4.5,6,11.14,6,11.14S18,12.5,18,8A6,6,0,0,0,12,2Zm0,8.14A2.14,2.14,0,1,1,14.14,8,2.14,2.14,0,0,1,12,10.14Z" />
     <path d="M16,16.25v1c3.22.44,4.89,1.34,5,1.72-.15.56-3.15,2-9,2s-8.85-1.46-9-2c.11-.41,1.78-1.32,5-1.76v-1c-3.53.46-6,1.52-6,2.75,0,1.66,4.48,3,10,3s10-1.34,10-3C22,17.77,19.53,16.71,16,16.25Z" />
@@ -90,7 +88,7 @@ export const MailServerIconSvg = (aColor?: string) => (
 );
 
 //Microservice Icon
-export const MicroserviceIconSvg = (aColor?: string) => (
+export const MicroserviceIconSvg = (_aColor?: string) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     enableBackground="new 0 0 24 24"
@@ -116,7 +114,7 @@ export const MicroserviceIconSvg = (aColor?: string) => (
 //Package
 //<!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
 
-export const PackageIconSvg = (aColor?: string) => (
+export const PackageIconSvg = (_aColor?: string) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
     <path d="M290.8 48.6l78.4 29.7L288 109.5 206.8 78.3l78.4-29.7c1.8-.7 3.8-.7 5.7 0zM136 92.5V204.7c-1.3 .4-2.6 .8-3.9 1.3l-96 36.4C14.4 250.6 0 271.5 0 294.7V413.9c0 22.2 13.1 42.3 33.5 51.3l96 42.2c14.4 6.3 30.7 6.3 45.1 0L288 457.5l113.5 49.9c14.4 6.3 30.7 6.3 45.1 0l96-42.2c20.3-8.9 33.5-29.1 33.5-51.3V294.7c0-23.3-14.4-44.1-36.1-52.4l-96-36.4c-1.3-.5-2.6-.9-3.9-1.3V92.5c0-23.3-14.4-44.1-36.1-52.4l-96-36.4c-12.8-4.8-26.9-4.8-39.7 0l-96 36.4C150.4 48.4 136 69.3 136 92.5zM392 210.6l-82.4 31.2V152.6L392 121v89.6zM154.8 250.9l78.4 29.7L152 311.7 70.8 280.6l78.4-29.7c1.8-.7 3.8-.7 5.7 0zm18.8 204.4V354.8L256 323.2v95.9l-82.4 36.2zM421.2 250.9c1.8-.7 3.8-.7 5.7 0l78.4 29.7L424 311.7l-81.2-31.1 78.4-29.7zM523.2 421.2l-77.6 34.1V354.8L528 323.2v90.7c0 3.2-1.9 6-4.8 7.3z" />
   </svg>
@@ -145,20 +143,20 @@ export const ProxyIconSvg = (aColor?: string) => (
 );
 
 // Ready Up Icon
-export const ReadyUpIconSvg = (aColor?: string) => (
+export const ReadyUpIconSvg = (_aColor?: string) => (
   <svg id="ReadyUpIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     {/* <rect width="24" height="24" fill="none" opacity="0" /> */}
     {/* <rect width="24" height="24" /> */}
     <path
       d="M22.221,5.215,10.685,16.761,6.4,12.474l1.426-1.426,2.861,2.861L20.8,3.8Zm-2.234,5.1a8.083,8.083,0,1,1-7.876-6.289,8.008,8.008,0,0,1,4.327,1.264L17.894,3.83A10.009,10.009,0,0,0,12.111,2a10.137,10.137,0,1,0,9.5,6.683Z"
       transform="translate(0.022 0.022)"
-      // fill="none"
+    // fill="none"
     />
   </svg>
 );
 
 // RMQ Icon
-export const RmqIconSvg = (aColor?: string) => (
+export const RmqIconSvg = (_aColor?: string) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M20.5,10H13.75V3a1,1,0,0,0-1-1h-2a1,1,0,0,0-1,1v7H6.5V3a1,1,0,0,0-1-1h-2a1,1,0,0,0-1,1V21a1,1,0,0,0,1,1h17a1,1,0,0,0,1-1V11A1,1,0,0,0,20.5,10Zm-2.75,7a1,1,0,0,1-1,1h-2a1,1,0,0,1-1-1V15a1,1,0,0,1,1-1h2a1,1,0,0,1,1,1Z" />
   </svg>
@@ -188,7 +186,7 @@ export const ServerIconSvg = (aColor?: string) => (
 );
 
 // SFTP Icon
-export const SftpIconSvg = (aColor?: string) => (
+export const SftpIconSvg = (_aColor?: string) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M15,9a1.55,1.55,0,0,0-1.55,1.55v1h3.1v-1A1.55,1.55,0,0,0,15,9Z" />
     <circle cx="15" cy="15" r="1" />
@@ -197,7 +195,7 @@ export const SftpIconSvg = (aColor?: string) => (
 );
 
 // Task Icon
-export const TaskIconSvg = (aColor?: string) => (
+export const TaskIconSvg = (_aColor?: string) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M0,0h24v24H0V0z" fill="none" />
     <path d="M14,2H6C4.9,2,4.01,2.9,4.01,4L4,20c0,1.1,0.89,2,1.99,2H18c1.1,0,2-0.9,2-2V8L14,2z M18,20H6V4h7v5h5V20z M8.82,13.05 L7.4,14.46L10.94,18l5.66-5.66l-1.41-1.41l-4.24,4.24L8.82,13.05z" />
@@ -205,7 +203,7 @@ export const TaskIconSvg = (aColor?: string) => (
 );
 
 // Unknown Device
-export const UnknownDeviceIconSvg = (aColor?: string) => (
+export const UnknownDeviceIconSvg = (_aColor?: string) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M12,6A3.92,3.92,0,0,0,8,9.94h2a2,2,0,0,1,4,0c0,2-3,1.79-3,5.06h2c0-2.23,3-2.49,3-5.06A3.91,3.91,0,0,0,12,6Z" />
     <rect x="11" y="16" width="2" height="2" />

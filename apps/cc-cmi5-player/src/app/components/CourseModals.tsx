@@ -75,7 +75,7 @@ export default function CourseModals() {
   const handleSubmitResponse = async (
     isSuccess: boolean,
     data: any,
-    message: string,
+    _message: string,
     payload?: any,
   ) => {
     if (isSuccess) {
@@ -161,7 +161,7 @@ export default function CourseModals() {
             dialogContentProps={{
               sx: {
                 padding: '8px',
-                margin:'8px'
+                margin: '8px'
               },
             }}
           >

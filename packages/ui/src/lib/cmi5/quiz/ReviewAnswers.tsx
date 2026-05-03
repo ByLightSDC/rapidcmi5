@@ -1,7 +1,7 @@
 import {
-  AnswerType,
+  type AnswerType,
   QuestionResponse,
-  QuizContent,
+  type QuizContent,
 } from '@rapid-cmi5/cmi5-build-common';
 
 import ReviewMultipleChoice from './QuestionTypes/MultipleChoice/ReviewMultipleChoice';

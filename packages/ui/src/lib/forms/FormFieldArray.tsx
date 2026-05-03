@@ -7,10 +7,10 @@ import React, {
   useEffect,
   useRef,
   useState,
-  DragEvent,
+  type DragEvent,
   useMemo,
 } from 'react';
-import { UseFormReturn, useFieldArray } from 'react-hook-form';
+import { type UseFormReturn, useFieldArray } from 'react-hook-form';
 
 /* Form */
 import FormControlTextField from './FormControlTextField';
@@ -25,7 +25,7 @@ import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { Variant } from '@mui/material/styles/createTypography';
+import { type Variant } from '@mui/material/styles/createTypography';
 
 /* Icons */
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
@@ -42,8 +42,8 @@ import PlusOneIcon from '@mui/icons-material/PlusOne';
 import { StepperContext } from '../navigation/stepper/StepperContext';
 import ModalDialog from '../modals/ModalDialog';
 import { useDispatch, useSelector } from 'react-redux';
-import MultiSelectButton, { MultiSelectButtonProps } from './MultiSelectButton';
-import { SingleSelectButtonProps, AddButton } from './AddButton';
+import MultiSelectButton, { type MultiSelectButtonProps } from './MultiSelectButton';
+import { type SingleSelectButtonProps, AddButton } from './AddButton';
 import { message, expanded, setExpanded } from '../redux/commonAppReducer';
 import {
   ButtonIcon,
@@ -262,7 +262,7 @@ export function FormFieldArray({
   onWarnDeleteEntry,
 }: tFormFieldArrayProps) {
   const messageObj = useSelector(message);
-  const { control, getValues, setValue, clearErrors, trigger, watch } =
+  const { control, getValues, setValue, clearErrors, trigger } =
     formMethods;
   const { fields, append, insert, remove, replace } = useFieldArray({
     control,
@@ -297,11 +297,10 @@ export function FormFieldArray({
   const [shouldSynch, setShouldSynch] = useState(false);
   const [listCount, setListCount] = useState(fields?.length || 0);
   const [currentItemNumber, setCurrentItemNumber] = useState(0);
-  const [isRemoveItemDisabled, setisRemoveItemDisabled] = useState(readOnly);
+  const isRemoveItemDisabled = readOnly;
   const [isExpanded, setIsExpanded] = useState(defaultExpandOverride);
   const renderItem = arrayRenderItem ? arrayRenderItem : DefaultRenderItem;
   const [isReOrderingEnabled, setIsReOrderingEnabled] = useState(false); //whther drag and drop to reorder is active
-  const [shouldReorderRefresh, setShouldReorderRefresh] = useState(false); //if alt field name, update after a reorder
   const [rowFocused, setRowFocused] = useState(-1);
   const [lastEl, setLastEl] = useState<string | null>(null);
   const [dragOverRow, setDragOverRow] = useState<number>(-1);
@@ -546,7 +545,7 @@ export function FormFieldArray({
    * @param {string} key
    * @param {number} index
    */
-  const handleDragStart = (event: DragEvent, key: string, index: number) => {
+  const handleDragStart = (event: DragEvent, index: number) => {
     event.dataTransfer?.setData('text/plain', String(index));
     startIndex.current = index;
   };
@@ -557,7 +556,7 @@ export function FormFieldArray({
    * @param {string} key
    * @param {number} index
    */
-  const handleDragOver = (event: any, key: string, index: number) => {
+  const handleDragOver = (event: any, index: number) => {
     event.stopPropagation();
     event.preventDefault();
 
@@ -579,7 +578,7 @@ export function FormFieldArray({
    * @param {string} key
    * @param {number} index
    */
-  const handleDragLeave = (event: DragEvent, key: string, index: number) => {
+  const handleDragLeave = (event: DragEvent) => {
     // Only clear visual highlight if leaving to an element outside this row's container.
     // Do NOT clear insertIndexRef here — it will be updated by the next dragOver or cleared by dragEnd.
     if (!event.currentTarget.contains(event.relatedTarget as Node)) {
@@ -593,7 +592,7 @@ export function FormFieldArray({
    * @param {string} key
    * @param {number} index
    */
-  const handleDrop = (event: DragEvent, key: string, index: number) => {
+  const handleDrop = () => {
     const resolvedInsertIndex = insertIndexRef.current;
 
     if (resolvedInsertIndex < 0 || startIndex.current === resolvedInsertIndex) {
@@ -632,32 +631,6 @@ export function FormFieldArray({
     : listCount === 0
       ? '0'
       : currentItemNumber + 1 + ' / ' + listCount;
-
-  // information for when viewing single item
-  const singleItem: any =
-    allowSingleItemView && fields.length > 0 ? fields[currentItemNumber] : {};
-  const localId =
-    singleItem?.uuid || singleItem?.name || singleItem?.id || currentItemNumber;
-
-  const singleFieldKey = `${localId}${arrayFieldName}`;
-  const singleIndexedField = `${arrayFieldName}[${currentItemNumber}]`;
-  const singleIndexedErrors = arrayErrors
-    ? arrayErrors[currentItemNumber]
-    : null;
-
-  const singleItemProps = {
-    formMethods,
-    fieldName: arrayFieldName,
-    indexedArrayField: singleIndexedField,
-    indexedErrors: singleIndexedErrors,
-    isModal,
-    label: defaultLabel,
-    placeholder,
-    readOnly,
-    rowIndex: currentItemNumber,
-    isValid,
-    isFocused: rowFocused === currentItemNumber,
-  };
 
   return (
     <section role="list" style={{ width }}>
@@ -729,7 +702,7 @@ export function FormFieldArray({
                     flexDirection: 'row',
                     alignContent: 'center',
                     backgroundColor: (theme: any) => `${theme.nav.fill}`,
-                    borderColor: (theme: any) => 'primary.light',
+                    borderColor: () => 'primary.light',
                     borderStyle: 'none',
                     borderWidth: '1px',
                   }}
@@ -763,7 +736,7 @@ export function FormFieldArray({
                     // variant="middle"
                     flexItem
                     sx={{
-                      backgroundColor: (theme: any) => `primary.light`,
+                      backgroundColor: () => `primary.light`,
                       borderRadius: '2px',
                       // top/bottom  left/right
                       margin: '4px 0px',
@@ -945,19 +918,19 @@ export function FormFieldArray({
                             }`,
                         }}
                         onDragOver={(event) =>
-                          handleDragOver(event, localId, index)
+                          handleDragOver(event, index)
                         }
                         onDragLeave={(event) =>
-                          handleDragLeave(event, localId, index)
+                          handleDragLeave(event)
                         }
-                        onDrop={(event) => handleDrop(event, localId, index)}
+                        onDrop={() => handleDrop()}
                       >
                         <Box
                           draggable
                           onDragStart={(event) =>
-                            handleDragStart(event, localId, index)
+                            handleDragStart(event, index)
                           }
-                          onDragEnd={(event) => {
+                          onDragEnd={() => {
                             insertIndexRef.current = -1;
                             setDragOverRow(-1);
                           }}
@@ -1008,7 +981,7 @@ export function FormFieldArray({
                               display: 'flex',
                               flexDirection: 'row',
                               padding: '8px 0px 4px',
-                              backgroundColor: (theme) => 'none',
+                              backgroundColor: () => 'none',
                             }}
                           >
                             {/* List view shows item number */}
@@ -1067,7 +1040,7 @@ export function FormFieldArray({
                                 props={{
                                   disabled:
                                     currentItemNumber >= fields.length - 1,
-                                  onClick: (event) => {
+                                  onClick: () => {
                                     setCurrentItemNumber(currentItemNumber + 1);
                                   },
                                 }}

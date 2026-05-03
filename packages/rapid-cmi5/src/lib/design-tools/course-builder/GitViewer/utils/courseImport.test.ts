@@ -1,7 +1,7 @@
 import JSZip from 'jszip';
 import YAML from 'yaml';
 import {
-  CourseData,
+  type CourseData,
   RC5_FILENAME,
   SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';

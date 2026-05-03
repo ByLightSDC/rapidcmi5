@@ -26,7 +26,6 @@ import {
   IconButton,
   Paper,
   Stack,
-  SxProps,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -36,13 +35,13 @@ import QuestionNav from './QuestionNav';
 import { usePersistQuizProgress } from './hooks/usePersistQuiz';
 import { useHydrateQuiz } from './hooks/useHydrateQuiz';
 import {
-  AnswerType,
-  AuContextProps,
-  QuizContent,
-  QuizQuestion,
+  type AnswerType,
+  type AuContextProps,
+  type QuizContent,
+  type QuizQuestion,
   QuestionResponse,
   QuizCompletionEnum,
-  ActivityScore,
+  type ActivityScore,
   RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 import { ButtonMinorUi, ButtonMainUi } from '../../utility/buttons';

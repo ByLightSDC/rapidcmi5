@@ -4,11 +4,11 @@ import { Editor } from '@monaco-editor/react';
 import { useState, useEffect, useRef, useContext } from 'react';
 import { Box, Typography } from '@mui/material';
 import {
-  RepoState,
+  type RepoState,
   setFileContent,
   setSelectedFile,
 } from '../../../../../redux/repoManagerReducer';
-import { RootState, AppDispatch } from '../../../../../redux/store';
+import { type RootState, type AppDispatch } from '../../../../../redux/store';
 import { ButtonModalCancelUi } from '@rapid-cmi5/ui';
 
 /* Icons */
@@ -16,7 +16,7 @@ import { Stack, useTheme } from '@mui/system';
 import path from 'path-browserify';
 import { validateMarkdownDirectives } from '@rapid-cmi5/cmi5-build-common';
 import {
-  ConflictBlock,
+  type ConflictBlock,
   parseConflictBlocksFromModel,
 } from './mergeConflictHelpers';
 import { GitContext } from '../../session/GitContext';

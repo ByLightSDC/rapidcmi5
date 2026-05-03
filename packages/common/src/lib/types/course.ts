@@ -1,5 +1,5 @@
-import { KSATElement, MoveOnCriteriaEnum } from './activity';
-import { SlideType } from './slide';
+import { type KSATElement, type MoveOnCriteriaEnum } from './activity';
+import { type SlideType } from './slide';
 
 export type Cmi5Scenario = {
   uuid?: string;

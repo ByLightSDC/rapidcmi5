@@ -1,16 +1,16 @@
 import { Grid } from '@mui/system';
-import { Credentials } from '@rapid-cmi5/cmi5-build-common';
+import { type Credentials } from '@rapid-cmi5/cmi5-build-common';
 import {
-  CommonAppModalState,
+  type CommonAppModalState,
   FormControlPassword,
   FormControlTextField,
   FormControlUIProvider,
-  FormStateType,
+  type FormStateType,
   MiniForm,
   ModalDialog,
 } from '@rapid-cmi5/ui';
 import { useCallback } from 'react';
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 import * as yup from 'yup';
 
 export const configureSSOCredsModalId = 'configureSSOCredsModalId';

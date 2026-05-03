@@ -12,7 +12,7 @@ import {
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
-import { UseFormReturn, useForm, useWatch } from 'react-hook-form';
+import { type UseFormReturn, useForm, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Grid from '@mui/material/Grid2';
 
@@ -40,10 +40,10 @@ import { StepperContext } from '../navigation/stepper/StepperContext';
 import StepperUi from '../navigation/stepper/Stepper';
 import { useNavigateAlias } from '../hooks/useNavigateAlias';
 
-import { FormStateType } from '../types/form';
-import { iListItemType } from '../dashboards/constants';
+import { type FormStateType } from '../types/form';
+import { type iListItemType } from '../dashboards/constants';
 import { debugLog } from '../utility/logger';
-import AuthoringInfoFields, { tAuthoringInfoFieldProps } from './AuthoringInfoFields';
+import AuthoringInfoFields, { type tAuthoringInfoFieldProps } from './AuthoringInfoFields';
 import Form from './Form';
 import { modal, setLoader } from '../redux/commonAppReducer';
 import { FormCrudType } from '../redux/utils/types';
@@ -112,7 +112,6 @@ export type tMultiSelectionMeta = {
 export function SharedFormWithProvider<
   tFormType,
   tFormCreateType extends iListItemType,
-  tFormUpdateType,
 >({
   authoringProps = { includeVersioning: false },
   dataCache,
@@ -289,11 +288,11 @@ export function SharedFormWithProvider<
     if (!theErrors) {
       return undefined;
     }
-    let result: string[] = [];
-    let field: string = '';
+    const result: string[] = [];
+    let field = '';
 
     function traverse(obj: any) {
-      for (let key in obj) {
+      for (const key in obj) {
         if (key === 'message') {
           //result.push({ key, value: obj[key] });
           result.push(`${field} ${obj[key]}`);
@@ -406,7 +405,7 @@ export function SharedFormWithProvider<
    * @param {*} formData
    * @param {boolean} isValid
    */
-  const submitDesign = (formData: any, isValid: boolean) => {
+  const submitDesign = (formData: any) => {
     debugLog('[SharedFormWithProvider] submit design');
     const errorMessages = getErrorMessages(errors);
     //inject form errors
@@ -434,7 +433,7 @@ export function SharedFormWithProvider<
    * @param data
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmitInvalid = async (data: any) => {
+  const onSubmitInvalid = async () => {
     if (designer?.isEnabled) {
       debugLog('[SharedFormWithProvider] onSubmitInvalid');
       setSubmitError('');
@@ -445,7 +444,7 @@ export function SharedFormWithProvider<
       if (getCleanSubmissionData) {
         cleanData = getCleanSubmissionData(cleanData);
       }
-      submitDesign(cleanData, false);
+      submitDesign(cleanData);
     }
   };
 
@@ -479,7 +478,7 @@ export function SharedFormWithProvider<
         //design must be added to parent form in order to be present
         if (crudType === FormCrudType.design) {
           if (designer?.isEnabled) {
-            submitDesign(data, true);
+            submitDesign(data);
           }
           return;
         }
@@ -572,7 +571,7 @@ export function SharedFormWithProvider<
       loaderFunction: (isLoading) => {
         dispatch(setLoader(isLoading));
       },
-      errorFunction: (errorState) => {
+      errorFunction: () => {
         // no toaster - alert handled separately
       },
       shouldDisplayToaster: false,
@@ -593,7 +592,7 @@ export function SharedFormWithProvider<
       loaderFunction: (isLoading) => {
         dispatch(setLoader(isLoading));
       },
-      errorFunction: (errorState) => {
+      errorFunction: () => {
         // no toaster - alert handled separately
       },
       shouldDisplayToaster: false,
@@ -1080,8 +1079,7 @@ export function SharedFormWithProvider<
                         </ButtonLoadingUi>
                       </>
                     ) : (
-                      <>
-                        <ButtonModalMainUi
+                      <ButtonModalMainUi
                           id="close-button"
                           startIcon={null}
                           type="button"
@@ -1093,7 +1091,6 @@ export function SharedFormWithProvider<
                         >
                           Close
                         </ButtonModalMainUi>
-                      </>
                     )}
                   </>
                 )}

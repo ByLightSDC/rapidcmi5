@@ -12,7 +12,7 @@ import type {
 
 import { DecoratorNode } from 'lexical';
 import { VideoEditor } from './VideoEditor';
-import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
+import { type MdxJsxAttribute, type MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
 function convertVideoElement(domNode: Node): null | DOMConversionOutput {
   if (domNode instanceof HTMLVideoElement) {

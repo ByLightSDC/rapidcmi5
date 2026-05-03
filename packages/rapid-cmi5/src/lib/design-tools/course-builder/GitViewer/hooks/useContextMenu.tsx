@@ -1,15 +1,15 @@
 import { useContext, useState } from 'react';
-import { INode } from 'react-accessible-treeview';
-import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
+import { type INode } from 'react-accessible-treeview';
+import { type IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  RepoState,
+  type RepoState,
   setClipBoard,
 } from '../../../../redux/repoManagerReducer';
 import {
-  AppDispatch,
-  RootState,
+  type AppDispatch,
+  type RootState,
 } from '../../../../redux/store';
 import {
   expandedFileTreeNodes,

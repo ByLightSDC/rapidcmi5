@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
-import { QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
+import { type QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
 import { SelectorMainUi } from '../../../../inputs/selectors/selectors';
 
 

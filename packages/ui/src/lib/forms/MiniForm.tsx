@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 import { yupResolver } from '@hookform/resolvers/yup';
 import Grid from '@mui/material/Grid2';
-import { Alert, Box, Button, Stack, SxProps } from '@mui/material';
+import { Alert, Box, Stack, type SxProps } from '@mui/material';
 import {
   useCallback,
   useContext,
@@ -10,7 +10,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useForm, UseFormReturn, useWatch } from 'react-hook-form';
+import { useForm, type UseFormReturn, useWatch } from 'react-hook-form';
 
 /* Icons */
 import Check from '@mui/icons-material/Check';
@@ -20,7 +20,7 @@ import {
   ButtonModalCancelUi,
   ButtonModalMainUi,
 } from '../inputs/buttons/buttonsmodal';
-import { FormStateType } from '../types/form';
+import { type FormStateType } from '../types/form';
 import { FormControlUIContext } from './FormControlUIContext';
 import Form from './Form';
 import { FormCrudType } from '../redux/utils/types';
@@ -96,7 +96,6 @@ export function MiniForm({
   getFormFields,
   formTitle,
   formWidth,
-  formMaxWidth,
   formSxProps = { margin: '12px' },
   instructions,
   loadingButtonText = 'Loading',
@@ -146,7 +145,6 @@ export function MiniForm({
     handleSubmit,
     reset,
     getValues,
-    setValue,
     trigger,
     formState,
   } = methods;
@@ -259,7 +257,7 @@ export function MiniForm({
     ],
   );
 
-  const onSubmitInvalid = async (data: any) => {
+  const onSubmitInvalid = async () => {
     // placeholder
   };
 

@@ -1,12 +1,12 @@
 
-import Ajv, { ErrorObject } from 'ajv';
-import { ScenarioContent } from '../types/slide';
+import Ajv, { type ErrorObject } from 'ajv';
+import { type ScenarioContent } from '../types/slide';
 import { DownloadFilesSchema, QuizContentSchema, ScenarioContentSchema, TeamConsolesContentSchema, CTFContentSchema, CodeRunnerContentSchema } from '../..';
-import { CTFContent } from '../types/ctf';
-import { DownloadFilesContent } from '../types/download';
-import { CodeRunnerContent } from '../types/codeRunner';
-import { QuizContent } from '../types/quiz';
-import { TeamConsolesContent } from '../types/teamConsoles';
+import { type CTFContent } from '../types/ctf';
+import { type DownloadFilesContent } from '../types/download';
+import { type CodeRunnerContent } from '../types/codeRunner';
+import { type QuizContent } from '../types/quiz';
+import { type TeamConsolesContent } from '../types/teamConsoles';
 
 // To generate new schemas, ensure that whenever the types change ./utils/ajv-schema-generator.sh is ran
 const ajv = new Ajv({

@@ -3,7 +3,7 @@
 /* MUI */
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import Stepper, { Orientation } from '@mui/material/Stepper';
+import Stepper, { type Orientation } from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepButton from '@mui/material/StepButton';
 import Typography from '@mui/material/Typography';

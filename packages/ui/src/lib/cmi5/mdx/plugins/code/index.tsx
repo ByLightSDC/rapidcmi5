@@ -1,8 +1,8 @@
 import { Cell, Signal, map } from '@mdxeditor/gurx';
-import { Extension } from '@codemirror/state';
+import { type Extension } from '@codemirror/state';
 import {
   realmPlugin,
-  CodeBlockEditorDescriptor,
+  type CodeBlockEditorDescriptor,
   appendCodeBlockEditorDescriptor$,
   insertCodeBlock$,
 } from '@mdxeditor/editor';

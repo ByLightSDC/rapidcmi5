@@ -1,9 +1,9 @@
 import {
   $isGenericHTMLNode,
-  GenericHTMLNode,
-  LexicalExportVisitor,
+  type GenericHTMLNode,
+  type LexicalExportVisitor,
 } from '@mdxeditor/editor';
-import * as Mdast from 'mdast';
+import type * as Mdast from 'mdast';
 
 /**
  * Visits Lexical HTML ol tag

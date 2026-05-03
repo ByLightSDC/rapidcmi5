@@ -1,7 +1,4 @@
-import {
-  debugLog,
-  debugLogError,
-} from '@rapid-cmi5/ui';
+import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import {
   addCourseOperation,
   courseDataCache,
@@ -13,7 +10,7 @@ import {
   isLessonMounted,
   reorderLesson,
   reorderSlide,
-  Scenario,
+  type Scenario,
   setIsLessonMounted,
   updateAuAndSlideIndex,
   updateAuIndex,
@@ -28,7 +25,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { RC5Context } from '../contexts/RC5Context';
 import { Operation } from '@rapid-cmi5/cmi5-build-common';
-import { CreateLessonType } from '../../course-builder/CourseBuilderApiTypes';
+import { type CreateLessonType } from '../../course-builder/CourseBuilderApiTypes';
 
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
 import { createLesson } from '../../course-builder/GitViewer/utils/useCourseOperationsUtils';
@@ -73,7 +70,7 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
    * rebuilds course json with latest slide deck
    */
   const getCoursePayload = useCallback(
-    (shouldIgnoreDisplay?: boolean) => {
+    (_shouldIgnoreDisplay?: boolean) => {
       return courseData;
     },
     [courseData],
@@ -89,7 +86,7 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
     if (!repoAccessObject) return;
     const fsInstance = getFsInstance();
 
-    let blockIndex = courseData.blocks.findIndex(
+    const blockIndex = courseData.blocks.findIndex(
       (block) => block.blockName === req.blockName,
     );
 

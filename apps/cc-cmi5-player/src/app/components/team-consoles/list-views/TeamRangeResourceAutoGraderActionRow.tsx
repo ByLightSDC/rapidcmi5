@@ -4,17 +4,14 @@ import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 
 import {
   Typography,
-  List,
   ListItem,
   ListItemAvatar,
   ListItemText,
-  Divider,
   Stack,
 } from '@mui/material';
-import { Box } from '@mui/system';
-import { DeployedAutoGrader, AutoGraderMetadata } from '@rangeos-nx/frontend/clients/hooks';
+import { type DeployedAutoGrader, type AutoGraderMetadata } from '@rangeos-nx/frontend/clients/hooks';
 import { listStyles, OverflowTypography, actionRowHeaderColor } from '@rapid-cmi5/ui';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
 
 type Props = {

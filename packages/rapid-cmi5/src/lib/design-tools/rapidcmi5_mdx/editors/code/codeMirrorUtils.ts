@@ -1,5 +1,5 @@
-import { Text } from '@codemirror/state';
-import { Diagnostic, linter } from '@codemirror/lint';
+import { type Text } from '@codemirror/state';
+import { type Diagnostic, linter } from '@codemirror/lint';
 import { validateMarkdownDirectives } from '@rapid-cmi5/cmi5-build-common';
 
 

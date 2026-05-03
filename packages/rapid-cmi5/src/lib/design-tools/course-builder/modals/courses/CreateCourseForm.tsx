@@ -3,7 +3,7 @@ import {
   FileUpload,
   FormControlTextField,
   FormControlUIProvider,
-  FormStateType,
+  type FormStateType,
   MiniForm,
   ModalDialog,
 } from '@rapid-cmi5/ui';
@@ -12,23 +12,23 @@ import * as yup from 'yup';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 import { createCourseModalId } from '../../../rapidcmi5_mdx/modals/constants';
-import { CommonAppModalState } from '@rapid-cmi5/ui';
+import { type CommonAppModalState } from '@rapid-cmi5/ui';
 
 import { Alert, Box, IconButton, Tooltip } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
-import { useForm, UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 
 import {
   DESCRIPTION_GROUP_OPT,
   NAME_GROUP,
   STARTS_WITH_HTTPS_GROUP,
 } from '@rapid-cmi5/ui';
-import { CreateCourseType } from '../../CourseBuilderApiTypes';
-import { useContext, useMemo, useState } from 'react';
+import { type CreateCourseType } from '../../CourseBuilderApiTypes';
+import { useContext, useMemo } from 'react';
 import { GitContext } from '../../GitViewer/session/GitContext';
 
-export function CreateCourseForm({
+export default function CreateCourseForm({
   defaultData,
   modalObj,
   handleCloseModal,
@@ -59,7 +59,7 @@ export function CreateCourseForm({
       courseId: STARTS_WITH_HTTPS_GROUP(),
       firstAuName: yup.mixed().when('zipFile', {
         is: (file: File | undefined) => !!file,
-        then: (schema) => yup.string().optional(),
+        then: (_schema) => yup.string().optional(),
         otherwise: () => NAME_GROUP,
       }),
       zipFile: yup
@@ -67,7 +67,7 @@ export function CreateCourseForm({
         .test('is-zip', 'Must be a .zip file', (value) =>
           value
             ? value instanceof File &&
-              value.name?.toLowerCase().endsWith('.zip')
+            value.name?.toLowerCase().endsWith('.zip')
             : true,
         ),
     });
@@ -81,7 +81,7 @@ export function CreateCourseForm({
     handleCloseModal();
   };
 
-  const onResponse = (isSuccess: boolean, data: any, message: string) => {
+  const onResponse = (isSuccess: boolean, data: any, _message: string) => {
     if (isSuccess) {
       handleModalAction(modalObj.type, 1, data);
     }
@@ -218,4 +218,3 @@ export function CreateCourseForm({
   );
 }
 
-export default CreateCourseForm;

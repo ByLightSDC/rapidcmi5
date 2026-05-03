@@ -5,7 +5,6 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { DevopsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
 import {
   defaultQueryConfig,
-  defaultSortOrderBy,
   defaultSortOrder,
   queryHooksConfig,
 } from './config';
@@ -135,7 +134,7 @@ export const usePostPauseRangeResourceContainer = ({
     ({ rangeId, scenarioId, uuid }: any) =>
       postResult(rangeId, scenarioId, uuid),
     {
-      onSettled: async (data, error, variables: any) => {
+      onSettled: async (_data, error, _variables: any) => {
         if (!error) {
           //TEMP queryCache.putObjInArray(queryKeyRangeResourceContainers + '-' + rangeId, scenarioId, data);
           queryClient.invalidateQueries([
@@ -194,7 +193,7 @@ export const usePostResumeRangeResourceContainer = ({
     ({ rangeId, scenarioId, uuid }: any) =>
       postResult(rangeId, scenarioId, uuid),
     {
-      onSettled: async (data, error, variables: any) => {
+      onSettled: async (_data, error, _variables: any) => {
         if (!error) {
           //TEMP we may use this to replace modifying cache directly
           // const queryClient = useQueryClient();
@@ -235,7 +234,7 @@ export const useDeleteRangeResourceContainer = ({
     ({ rangeId, scenarioId, uuid }: any) =>
       deleteResult(rangeId, scenarioId, uuid),
     {
-      onSettled: async (data, error, variables: any) => {
+      onSettled: async (_data, error, _variables: any) => {
         if (!error) {
           queryClient.invalidateQueries(queryKeyRangeResourceContainers);
           queryClient.invalidateQueries([

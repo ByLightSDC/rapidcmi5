@@ -4,7 +4,8 @@
     "**/*"
   ],
   "plugins": [
-    "@nx"
+    "@nx",
+    "unused-imports"
   ],
   "overrides": [
     {
@@ -47,7 +48,24 @@
       ],
       "rules": {
         "@typescript-eslint/no-extra-semi": "error",
-        "no-extra-semi": "off"
+        "no-extra-semi": "off",
+        "@typescript-eslint/consistent-type-imports": [
+          "error",
+          {
+            "prefer": "type-imports",
+            "fixStyle": "inline-type-imports"
+          }
+        ],
+        "@typescript-eslint/no-unused-vars": "off",
+        "unused-imports/no-unused-imports": "error",
+        "unused-imports/no-unused-vars": [
+          "warn",
+          {
+            "argsIgnorePattern": "^_",
+            "varsIgnorePattern": "^_",
+            "caughtErrorsIgnorePattern": "^_"
+          }
+        ]
       }
     },
     {

@@ -1,8 +1,8 @@
 import { useContext, useState } from 'react';
-import { INode } from 'react-accessible-treeview';
-import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
+import { type INode } from 'react-accessible-treeview';
+import { type IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch } from '../../../../redux/store';
+import { type AppDispatch } from '../../../../redux/store';
 import {
   repoFolderChange,
   toggleRepoFolderChange,
@@ -10,7 +10,6 @@ import {
 import path from 'path-browserify';
 import { GitContext } from '../session/GitContext';
 import { currentRepoAccessObjectSel } from '../../../../redux/repoManagerReducer';
-import { getRepoPath } from '../utils/fileSystem';
 
 export const usePopup = () => {
   const dispatch = useDispatch<AppDispatch>();

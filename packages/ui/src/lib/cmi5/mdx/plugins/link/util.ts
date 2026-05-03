@@ -1,4 +1,4 @@
-import { RectData } from '@mdxeditor/editor';
+import { type RectData } from '@mdxeditor/editor';
 
 /**
  * Virtual element for positioning MUI Popper

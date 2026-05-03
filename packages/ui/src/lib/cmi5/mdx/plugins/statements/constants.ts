@@ -1,4 +1,4 @@
-import { StatementPreset } from './types';
+import { type StatementPreset } from './types';
 
 /**
  * Available statements layout presets.

@@ -1,9 +1,8 @@
-import * as Mdast from 'mdast';
+import type * as Mdast from 'mdast';
 
-import { MdastImportVisitor } from '@mdxeditor/editor';
+import { type MdastImportVisitor } from '@mdxeditor/editor';
 
 import { realmPlugin, addImportVisitor$ } from '@mdxeditor/editor';
-
 
 /**
  * A plugin that allows you to debug the syntax tree when you are creating a custom plugin
@@ -32,7 +31,7 @@ export const CatchAllVisitor: MdastImportVisitor<
  */
 export const RootVisitor: MdastImportVisitor<Mdast.Root> = {
   testNode: () => true,
-  visitNode: ({ mdastNode, actions }) => {
+  visitNode: ({ mdastNode }) => {
     console.log('catch root', { mdastNode });
     // add based on type here
     // actions.addAndStepInto($createTextNode())

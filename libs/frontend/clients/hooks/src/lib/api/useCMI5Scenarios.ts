@@ -10,7 +10,11 @@ import {
 } from './config';
 import { getErrorMessage } from './errorMessages';
 
-import { DevopsApiClient, ScenariosCreate1Request, ScenariosDeployRequest } from '@rangeos-nx/frontend/clients/devops-api';
+import {
+  DevopsApiClient,
+  type ScenariosCreate1Request,
+  type ScenariosDeployRequest,
+} from '@rangeos-nx/frontend/clients/devops-api';
 export const queryKeyCMI5Scenarios = 'cmi5-scenarios';
 
 export const useGetCMI5Scenarios = (reqOptions?: any) => {
@@ -60,7 +64,7 @@ export const useGetCMI5Scenarios = (reqOptions?: any) => {
   );
 };
 
-export const usePostCMI5Scenarios = (formData: any) => {
+export const usePostCMI5Scenarios = (_formData: any) => {
   const postResult = async (formData: any) => {
     const scenarioDeployRequest: ScenariosDeployRequest = {
       classId: formData.classId,
@@ -83,7 +87,7 @@ export const usePostCMI5Scenarios = (formData: any) => {
   return useMutation((formData: any) => postResult(formData), {});
 };
 
-export const usePostInitializeCMI5Scenarios = (formData: any) => {
+export const usePostInitializeCMI5Scenarios = () => {
   const postResult = async (formData: any) => {
     const req: ScenariosCreate1Request = {
       classId: formData.classId,

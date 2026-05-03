@@ -36,7 +36,7 @@ export default function TeamConsoleUpdates({
 
   useQueryDetails({
     queryObj: consolesQuery,
-    errorFunction: (queryError: any) => {
+    errorFunction: (_queryError: any) => {
       console.log('error consoles');
       //addNotification('Error Retrieving Consoles', true);
       //setInitialized(Topic.ResourceConsole, true);

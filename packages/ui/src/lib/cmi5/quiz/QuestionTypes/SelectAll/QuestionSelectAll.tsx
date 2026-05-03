@@ -5,7 +5,7 @@ import { Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
 import { useEffect, useState } from 'react';
-import { QuizOption, QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
+import { type QuizOption, type QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
 
 function SelectAll({
   question,

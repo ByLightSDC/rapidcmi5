@@ -1,7 +1,7 @@
 import SearchIcon from '@mui/icons-material/Search';
 import { toTitleCase } from './formUtils';
-import { MenuItem, SxProps } from '@mui/material';
-import { UseFormReturn } from 'react-hook-form';
+import { MenuItem, type SxProps } from '@mui/material';
+import { type UseFormReturn } from 'react-hook-form';
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
@@ -13,15 +13,15 @@ import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
 import LrsHeaderWithDetails from './LrsStatementHelper';
 import {
   RC5ActivityTypeEnum,
-  QuizContent,
+  type QuizContent,
   SlideTypeEnum,
   QuizCompletionEnum,
   MoveOnCriteriaEnum,
   QuestionResponse,
   QuestionGrading,
   moveOnCriteriaOptions,
-  QuizQuestion,
-  QuestionBankApi,
+  type QuizQuestion,
+  type QuestionBankApi,
   convertFromApi,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
@@ -36,9 +36,9 @@ import {
   FormControlUIProvider,
   FormCrudType,
   FormFieldArray,
-  FormStateType,
+  type FormStateType,
   MiniForm,
-  tFormFieldRendererProps,
+  type tFormFieldRendererProps,
   ButtonModalMinorUi,
   LessonThemeContext,
   maxFormWidths,
@@ -71,7 +71,7 @@ export const QuizForm = ({
   handleCloseModal?: () => void;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const { QuizBankSearchModal, QuizBankAddModal, userAuth } =
+  const { QuizBankSearchModal, QuizBankAddModal } =
     useRapidCmi5Opts();
   const slideType =
     activityKind === RC5ActivityTypeEnum.quiz
@@ -278,16 +278,16 @@ export const QuizForm = ({
             additionalButtons={[
               ...(QuizBankSearchModal
                 ? [
-                    <ButtonModalMinorUi
-                      aria-label="search-question-bank"
-                      id="search-question-bank-button"
-                      size="small"
-                      onClick={() => setIsSearchBankOpen(true)}
-                      startIcon={<SearchIcon fontSize="small" />}
-                    >
-                      Quiz Bank
-                    </ButtonModalMinorUi>,
-                  ]
+                  <ButtonModalMinorUi
+                    aria-label="search-question-bank"
+                    id="search-question-bank-button"
+                    size="small"
+                    onClick={() => setIsSearchBankOpen(true)}
+                    startIcon={<SearchIcon fontSize="small" />}
+                  >
+                    Quiz Bank
+                  </ButtonModalMinorUi>,
+                ]
                 : []),
             ]}
             arrayRenderItem={(props: tFormFieldRendererProps) => {
@@ -321,7 +321,7 @@ export const QuizForm = ({
             <KSATsFieldGroup
               formMethods={formMethods}
               crudType={crudType}
-              //#REF scopedKsatsFieldName={scopedKsatsFieldName}
+            //#REF scopedKsatsFieldName={scopedKsatsFieldName}
             />
           </Grid>
         )}

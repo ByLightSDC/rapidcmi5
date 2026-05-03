@@ -1,7 +1,7 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { ExtraProps } from 'react-markdown';
+import { type ExtraProps } from 'react-markdown';
 import ReactPlayer from 'react-player';
 import Button from '@mui/material/Button';
 
@@ -21,7 +21,7 @@ import MarkdownImage from './MarkdownImage';
 import { SlideEvent } from './constants/SlideEvents';
 import MDTextEffects from './components/MDTextEffects';
 import MDAnimation from './components/MDAnimation';
-import { AuContextProps } from '@rapid-cmi5/cmi5-build-common';
+import { type AuContextProps } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Take an html-like tag and extract its attributes into a record of key-value
@@ -225,7 +225,7 @@ export const customMarkdownParser = (
     },
 
     code: (props: any) => {
-      const { children, className, node, ...rest } = props;
+      const { children, className } = props;
       const match = /language-(\w+)/.exec(className || '');
 
       const isMultiLine =

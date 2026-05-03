@@ -2,7 +2,7 @@ import { Box, Paper, Stack, Typography } from '@mui/material';
 import ModalDialog from '../../../../modals/ModalDialog';
 import { useCallback, useState } from 'react';
 import Grid from '@mui/material/Grid2';
-import { STATEMENT_PRESETS, StatementPreset } from '@rapid-cmi5/ui';
+import { STATEMENT_PRESETS, type StatementPreset } from '@rapid-cmi5/ui';
 
 /**
  * Modal dialog for configuring a statements block.

@@ -3,7 +3,7 @@ import { useCellValue } from '@mdxeditor/editor';
 import { useMemo } from 'react';
 
 import { fnRefOrder$, fnUrl$ } from './vars';
-import { FootnoteRefEditorProps } from './types';
+import { type FootnoteRefEditorProps } from './types';
 
 /**
  * MDX Editor for Footnote Reference
@@ -15,7 +15,6 @@ import { FootnoteRefEditorProps } from './types';
  * @returns
  */
 export const FootnoteReferenceEditor: React.FC<FootnoteRefEditorProps> = ({
-  config,
   label,
   lexicalNode,
 }) => {

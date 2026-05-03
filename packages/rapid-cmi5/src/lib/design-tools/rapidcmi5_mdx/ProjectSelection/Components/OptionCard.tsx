@@ -1,6 +1,5 @@
-import { Info, InfoOutlined } from '@mui/icons-material';
+import { Info } from '@mui/icons-material';
 import {
-  ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,

@@ -1,4 +1,4 @@
-import { BufferEncodingOption, RmOptions } from 'fs';
+import { type RmOptions } from 'fs';
 
 export interface FileStat {
   size: number;

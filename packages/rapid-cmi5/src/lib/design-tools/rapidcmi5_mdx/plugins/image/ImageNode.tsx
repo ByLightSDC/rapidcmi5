@@ -12,7 +12,7 @@ import type {
 
 import { DecoratorNode } from 'lexical';
 import { ImageEditor } from './ImageEditor';
-import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
+import { type MdxJsxAttribute, type MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
 import { useTimeStampUUID } from '@rapid-cmi5/ui';
 

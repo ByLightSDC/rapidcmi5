@@ -10,7 +10,6 @@ interface VideoResizerProps {
 }
 
 export default function VideoResizer({
-  editor,
   videoRef,
   onResizeStart,
   onResizeEnd,

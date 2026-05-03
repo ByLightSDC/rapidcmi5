@@ -1,4 +1,4 @@
-import { MessageCardProps } from '../../types/cardTypes';
+import { type MessageCardProps } from '../../types/cardTypes';
 
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid2';

@@ -1,5 +1,5 @@
 import {
-  DirectiveEditorProps,
+  type DirectiveEditorProps,
   insertMarkdown$,
   NestedLexicalEditor,
   readOnly$,
@@ -7,11 +7,10 @@ import {
   useCellValues,
   usePublisher,
 } from '@mdxeditor/editor';
-import * as Mdast from 'mdast';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import type * as Mdast from 'mdast';
 import type { BlockContent, DefinitionContent } from 'mdast';
-import { ContainerDirective } from 'mdast-util-directive';
-import { CSSProperties, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { type ContainerDirective } from 'mdast-util-directive';
+import { type CSSProperties, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import { $getRoot } from 'lexical';
 
@@ -24,11 +23,11 @@ import {
   ListItemText,
   Paper,
   Stack,
-  SxProps,
+  type SxProps,
   Tab,
   Tabs,
   Tooltip,
-  TypographyOwnProps,
+  type TypographyOwnProps,
   useTheme,
 } from '@mui/material';
 
@@ -44,7 +43,7 @@ import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
 import { TabsContext } from './TabsContext';
-import { TabContentDirectiveNode, TabDirectiveNode } from './types';
+import { type TabContentDirectiveNode, type TabDirectiveNode } from './types';
 
 import { $isElementNode } from 'lexical';
 import { DEFAULT_TAB } from './constants';
@@ -58,7 +57,7 @@ import { LessonThemeContext } from '../../contexts/LessonThemeContext';
 import { resolveLessonThemeCSS, resolveBlockMaxWidth } from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
 import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
-import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { type ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { getDirectiveBlockShadow } from '../../../../styles/directiveStyles';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
@@ -91,11 +90,8 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     structuredClone(mdastNode.children),
   );
   const insertMarkdown = usePublisher(insertMarkdown$);
-  const [editor] = useLexicalComposerContext();
   const [isConfiguring, setIsConfiguring] = useState(false);
-  const [boxStyle, setBoxStyle] = useState<string | undefined>(
-    mdastNode?.attributes.style,
-  );
+
   const [sxProps, setSxProps] = useState<SxProps>({});
   const [backgroundColor, setBackgroundColor] = useState<string>(
     mdastNode?.attributes.backgroundColor ?? '',
@@ -115,8 +111,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
   // Set to true when handleClearColor already rebuilt, so onClose skips its rebuild.
   const skipNextCloseRebuildRef = useRef(false);
-  const colorPickerOpen = Boolean(colorPickerAnchor);
-  const [isPlayback, readOnly, syntaxExtensions] = useCellValues(
+  const [isPlayback, readOnly] = useCellValues(
     editorInPlayback$,
     readOnly$,
     syntaxExtensions$,
@@ -298,7 +293,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   /**
    * Handle Change Tab
    */
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
   };
 
@@ -635,7 +630,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
                               handleClick:
                                 | React.MouseEventHandler<HTMLButtonElement>
                                 | undefined,
-                              tooltip: string,
+                              _tooltip: string,
                             ) => {
                               return (
                                 <IconButton
@@ -672,7 +667,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
                                 sx={{
                                   height: 30,
                                 }}
-                                onClick={(event) => {
+                                onClick={(_event) => {
                                   handleAddTabBefore(index);
                                 }}
                               >
@@ -695,7 +690,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
                                 sx={{
                                   height: 30,
                                 }}
-                                onClick={(event) => {
+                                onClick={(_event) => {
                                   handleAddTabAfter(index);
                                 }}
                               >
@@ -718,7 +713,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
                                 sx={{
                                   height: 30,
                                 }}
-                                onClick={(event) => {
+                                onClick={(_event) => {
                                   handleRemoveTab(index);
                                 }}
                               >

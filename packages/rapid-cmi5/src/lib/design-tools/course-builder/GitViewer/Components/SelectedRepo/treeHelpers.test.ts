@@ -1,6 +1,6 @@
-import { filterTreeHelper, filterCourseTreeHelper, filterTreePath } from './treeHelpers';
-import { INode } from 'react-accessible-treeview';
-import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
+import { filterTreeHelper, filterTreePath } from './treeHelpers';
+import { type INode } from 'react-accessible-treeview';
+import { type IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 
 const mockTree: INode<IFlatMetadata>[] = [
   {

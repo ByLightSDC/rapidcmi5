@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { defaultScenarioResourceData, ScenarioResources } from './types';
+import { defaultScenarioResourceData, type ScenarioResources } from './types';
 import {
 
   defaultSortOrder,
@@ -22,7 +22,7 @@ import {
 } from '@rangeos-nx/frontend/clients/hooks';
 
 import {
-  DeployedRangeConsole,
+  type DeployedRangeConsole,
   DevopsApiClient,
 } from '@rangeos-nx/frontend/clients/devops-api';
 
@@ -30,9 +30,8 @@ import { routeDelim } from '../scenario/ScenarioConsoleTab';
 import { sendScenarioEventVerb } from '../../utils/LmsStatementManager';
 import { debugLog, debugLogError, logger } from '../../debug';
 
-import { useCellValue } from '@mdxeditor/editor';
 import { AuManagerContext } from '../../session/AuManager';
-import { TeamConsolesContent, ScenarioSubmitResponse, ActivityScore, RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import { type TeamConsolesContent, type ScenarioSubmitResponse, type ActivityScore, RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ConsoleProvider } from '../scenario/console/ConsoleContext';
 import ConsolesDisplay from '../scenario/console/ConsolesDisplay';
 
@@ -165,17 +164,6 @@ export const TeamScenarioContextProvider: any = (props: tProviderProps) => {
     return consoles;
   };
 
-  /**
-   * Returns whether a scenario has autograders
-   * @param deployedScenarioId
-   * @returns
-   */
-  const getHasAutograders = (deployedScenarioId: string) => {
-    const updates = getUpdates(deployedScenarioId, Topic.ResourceAutoGrader);
-    return (
-      updates && typeof updates === 'object' && Object.keys(updates).length > 0
-    );
-  };
 
   /**
    * Returns whether a scenario's topic has been initialized
@@ -302,7 +290,7 @@ export const TeamScenarioContextProvider: any = (props: tProviderProps) => {
       data: any,
       topic: Topic,
       skipCounter?: boolean,
-      skipNotify?: boolean,
+      _skipNotify?: boolean,
     ) => {
       // console.log('setUpdate ' + topic, data);
 

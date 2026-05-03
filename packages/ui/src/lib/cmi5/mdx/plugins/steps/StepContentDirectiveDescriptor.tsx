@@ -1,5 +1,5 @@
-import { DirectiveDescriptor } from '@mdxeditor/editor';
-import { StepContentDirectiveNode } from './types';
+import { type DirectiveDescriptor } from '@mdxeditor/editor';
+import { type StepContentDirectiveNode } from './types';
 import { StepContentEditor } from './StepContentEditor';
 
 /**

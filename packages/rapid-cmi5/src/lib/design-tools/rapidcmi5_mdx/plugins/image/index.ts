@@ -24,8 +24,8 @@ import {
   DRAGOVER_COMMAND,
   DRAGSTART_COMMAND,
   DROP_COMMAND,
-  LexicalCommand,
-  LexicalEditor,
+  type LexicalCommand,
+  type LexicalEditor,
   PASTE_COMMAND,
   createCommand,
 } from 'lexical';
@@ -40,17 +40,17 @@ import {
   createActiveEditorSubscription$,
 } from '@mdxeditor/editor';
 
-import { EditImageToolbar, EditImageToolbarProps } from './EditImageToolbar';
+import { EditImageToolbar, type EditImageToolbarProps } from './EditImageToolbar';
 import { ImageDialog } from './ImageDialog';
 import {
   $createImageNode,
   $isImageNode,
-  CreateImageNodeParameters,
+  type CreateImageNodeParameters,
   ImageNode,
 } from './ImageNode';
 import { LexicalImageVisitor } from './LexicalImageVisitor';
 import { MdastImageVisitor, MdastJsxImageVisitor } from './MdastImageVisitor';
-import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
+import { type MdxJsxAttribute, type MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 import { imagePreviewHandler$, imageUploadHandler$ } from '@rapid-cmi5/ui';
 
 export const CAN_USE_DOM: boolean =

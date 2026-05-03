@@ -1,7 +1,7 @@
 // .storybook/preview.tsx
 import '../src/styles.css';
 import { ThemeProvider } from '@mui/material';
-import { DecoratorFn } from '@storybook/react';
+import { type DecoratorFn } from '@storybook/react';
 
 import CssBaseline from '@mui/material/CssBaseline';
 import { lightTheme } from '../src/app/styles/muiTheme';

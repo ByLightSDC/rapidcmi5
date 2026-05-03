@@ -10,7 +10,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 
 /* Constants */
 import {
-  DeployedRangeConsole,
+  type DeployedRangeConsole,
   RangeVMStatusEnum,
   RangeVMKubevirtVmStatusEnum,
 } from '@rangeos-nx/frontend/clients/devops-api';

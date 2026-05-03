@@ -36,7 +36,7 @@ export default function TeamAutoGraderUpdates({
   });
   useQueryDetails({
     queryObj: autogradersQuery,
-    errorFunction: (queryError) => {
+    errorFunction: (_queryError) => {
       setIsInitialized(true);
     },
     successFunction: (successData) => {

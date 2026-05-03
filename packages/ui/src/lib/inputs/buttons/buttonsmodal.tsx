@@ -2,7 +2,7 @@
  *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
  *   All rights reserved.
  */
-import Button, { ButtonProps } from '@mui/material/Button';
+import Button, { type ButtonProps } from '@mui/material/Button';
 
 /* Material UI */
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -11,7 +11,7 @@ import { styled } from '@mui/material';
 const minButtonWidth = '0px';
 const minButtonHeight = '32px';
 
-const StyledButton = styled(Button)(({ theme }: { theme: any }) => ({
+const StyledButton = styled(Button)(({ }: { theme: any }) => ({
   margin: 2,
   padding: 0,
   //paddingTop: 2, //text align fix
@@ -23,7 +23,6 @@ export function ButtonModalMainUi(props: ButtonProps) {
   // optional "type" prop to override - when multiple "main" buttons in form - e.g. upload file
   const { sx, ...otherProps } = props;
 
-  const type = props.type ? props.type : 'submit';
   return (
     <StyledButton
       id={props?.id ?? 'modal-main-button'}
@@ -117,7 +116,7 @@ export function ButtonModalCancelUi(props: ButtonProps) {
       variant="outlined"
       sx={{
         boxShadow: 1,
-        borderColor: (theme: any) => `primary.dark`,
+        borderColor: () => `primary.dark`,
         color: (theme: any) => `${theme.breadcrumbs.underline}`,
         minWidth: minButtonWidth,
         //minHeight: minButtonHeight,

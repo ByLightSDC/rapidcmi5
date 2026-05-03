@@ -1,9 +1,8 @@
 import {
-  LexicalEditor,
+  type LexicalEditor,
   $getSelection,
   $isRangeSelection,
   $isNodeSelection,
-  $getNodeByKey,
 } from 'lexical';
 import { $isImageNode } from '../../../plugins/image/ImageNode';
 import { $isAudioNode } from '../../../plugins/audio/AudioNode';

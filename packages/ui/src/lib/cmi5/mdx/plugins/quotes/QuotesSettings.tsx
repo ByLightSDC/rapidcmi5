@@ -8,7 +8,7 @@ import {
   ButtonModalMainUi,
   ModalDialog,
   QUOTE_PRESETS,
-  QuotePreset,
+  type QuotePreset,
 } from '@rapid-cmi5/ui';
 import { imageUploadHandler$ } from '../image/methods';
 

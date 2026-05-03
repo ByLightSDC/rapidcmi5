@@ -1,7 +1,5 @@
-import { ButtonWithTooltip } from '@mdxeditor/editor';
 import { useCallback, useState } from 'react';
 
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { HIGHLIGHT_PRESET_COLORS } from '../../constants/colors';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { IconButton, Tooltip } from '@mui/material';
@@ -10,7 +8,6 @@ import PaletteIcon from '@mui/icons-material/Palette';
 export default function ColorPickerButton({
   onColorPicked,
   defaultColor = '#FFFFFF',
-  disabled,
   openCallback,
 }: {
   onColorPicked?: (color: string | null) => void;

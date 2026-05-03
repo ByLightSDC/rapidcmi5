@@ -1,15 +1,15 @@
 import {
-  FolderStruct,
-  Credentials,
-  GitUserConfig,
-  SSOConfig,
-  TokenResponse,
-  CertInfo,
-  DirMeta,
+  type FolderStruct,
+  type Credentials,
+  type GitUserConfig,
+  type SSOConfig,
+  type TokenResponse,
+  type CertInfo,
+  type DirMeta,
 } from '@rapid-cmi5/cmi5-build-common';
-import { ModifiedFile } from './design-tools/course-builder/GitViewer/Components/GitActions/GitFileStatus';
-import { DirEntry } from './design-tools/course-builder/GitViewer/utils/ElectronFsApi';
-import { ReadCommitResult, StatusRow } from 'isomorphic-git';
+import { type ModifiedFile } from './design-tools/course-builder/GitViewer/Components/GitActions/GitFileStatus';
+import { type DirEntry } from './design-tools/course-builder/GitViewer/utils/ElectronFsApi';
+import { type ReadCommitResult, type StatusRow } from 'isomorphic-git';
 
 export interface ipc {
   cmi5Build: (

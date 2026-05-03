@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import ProductionModeSelection from './ProductionModeSelection';
 import RecentProjectSelection from './RecentProjectSelection';
-import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
+import { type DirMeta } from '@rapid-cmi5/cmi5-build-common';
 
 interface OptionDocumentation {
   title: string;

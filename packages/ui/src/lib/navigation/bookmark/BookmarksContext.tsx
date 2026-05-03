@@ -2,7 +2,7 @@
 
 
 import { createContext, useEffect, useRef, useState } from 'react';
-import { tBookmark, tBookmarkMetaData, bookmarkCue, bookmarkFormData, bookmarkGlobalData, clearAllFormData, clearBookmarks, saveFormData, clearFormData, appendBookmarkMetaData, clearBookmarkMetaData, pushBookmark, popBookmark } from './bookmarksReducer';
+import { type tBookmark, type tBookmarkMetaData, bookmarkCue, bookmarkFormData, bookmarkGlobalData, clearAllFormData, clearBookmarks, saveFormData, clearFormData, appendBookmarkMetaData, clearBookmarkMetaData, pushBookmark, popBookmark } from './bookmarksReducer';
 import { setModal } from '../../redux/commonAppReducer';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -82,7 +82,6 @@ export const BookmarksContextProvider: any = (props: tProviderProps) => {
   const formData: { [key: string]: any } = useSelector(bookmarkFormData);
   const globalData: { [key: string]: any } = useSelector(bookmarkGlobalData);
   const [lastBookmarkCount, setLastBookmarkCount] = useState(0);
-  const [lastBookmarkKey, setLastBookmarkKey] = useState('');
 
   const dispatch: any = useDispatch();
   /** @constant
@@ -325,7 +324,6 @@ export const BookmarksContextProvider: any = (props: tProviderProps) => {
       return;
     }
 
-    setLastBookmarkKey(bookmark.key);
     dispatch(pushBookmark(bookmark));
   };
 
@@ -333,7 +331,6 @@ export const BookmarksContextProvider: any = (props: tProviderProps) => {
    * Pop last bookmark off the stack
    */
   const removeLastBookmark = () => {
-    setLastBookmarkKey('');
     dispatch(popBookmark());
   };
 

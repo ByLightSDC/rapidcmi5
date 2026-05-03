@@ -1,4 +1,4 @@
-import { Paper, Typography, Button } from '@mui/material';
+import { Typography, Button } from '@mui/material';
 import { alpha, Box, useTheme } from '@mui/system';
 import {
   Science as SandboxIcon,

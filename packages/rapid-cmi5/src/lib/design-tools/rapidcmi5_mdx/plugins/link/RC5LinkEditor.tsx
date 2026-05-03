@@ -1,9 +1,3 @@
-
-
-
-import  { useState } from 'react';
-
-
 import { IconButton, Stack } from '@mui/material';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
@@ -36,7 +30,6 @@ export default function RC5LinkEditor({
   virtualElement: any;
 }) {
   const theme = useTheme();
-  const [copyUrlTooltipOpen, setCopyUrlTooltipOpen] = useState(false);
 
   return (
     <Popper
@@ -82,7 +75,7 @@ export default function RC5LinkEditor({
         {onEditLink && (
           <Stack direction="row" sx={{ marginLeft: '48px' }}>
             <IconButton
-              onMouseUp={(e) => {
+              onMouseUp={(_e) => {
                 onEditLink();
               }}
             >
@@ -93,10 +86,7 @@ export default function RC5LinkEditor({
             <IconButton
               onClick={() => {
                 window.navigator.clipboard.writeText(url).then(() => {
-                  setCopyUrlTooltipOpen(true);
-                  setTimeout(() => {
-                    setCopyUrlTooltipOpen(false);
-                  }, 1000);
+
                 });
               }}
             >

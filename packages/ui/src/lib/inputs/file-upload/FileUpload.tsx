@@ -8,7 +8,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
 
 
-import { SxProps } from '@mui/system';
+import { type SxProps } from '@mui/system';
 import { ButtonModalMinorUi, ButtonModalCancelUi } from '../buttons/buttonsmodal';
 
 // Choose between folder or file upload with the onFileSelected or onFolderSelected functions
@@ -45,7 +45,7 @@ export function FileUpload({
   onFileSelected,
   onFolderSelected,
 }: tFileUploadProps) {
-  const [fileNames, setFileNames] = useState<String[]>([noFileSelectedMessage]);
+  const [fileNames, setFileNames] = useState<string[]>([noFileSelectedMessage]);
   const [selectedFile, setSelectedFile] = useState<File | File[] | null>(null);
 
   useEffect(() => {

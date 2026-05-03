@@ -1,26 +1,11 @@
 import {
-  ButtonWithTooltip,
-  activeEditor$,
-  $createDirectiveNode,
-  DirectiveNode,
-  exportVisitors$,
-  jsxComponentDescriptors$,
-  jsxIsAvailable$,
-  syntaxExtensions$,
-  $isDirectiveNode,
+  type DirectiveNode,
 } from '@mdxeditor/editor';
 
 import {
-  $getSelection,
-  $setSelection,
-  $isRangeSelection,
   $getNodeByKey,
   type LexicalEditor,
-  LexicalNode,
-  TextNode,
-  ElementNode,
 } from 'lexical';
-import { MutableRefObject } from 'react';
 
 /**
  * Methods for selection

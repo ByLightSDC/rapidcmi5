@@ -1,4 +1,4 @@
-import { CourseData, createAuMappingName, generateAuId, generateBlockId } from '@rapid-cmi5/cmi5-build-common';
+import { type CourseData, createAuMappingName, generateAuId, generateBlockId } from '@rapid-cmi5/cmi5-build-common';
 
 type TfDict = {
   resource: {

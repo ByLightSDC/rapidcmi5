@@ -1,5 +1,5 @@
-import { MdastImportVisitor } from '@mdxeditor/editor';
-import * as Mdast from 'mdast';
+import { type MdastImportVisitor } from '@mdxeditor/editor';
+import type * as Mdast from 'mdast';
 
 import { githubSlugger$ } from '.';
 import { $createTocHeadingNode } from './TocHeading';

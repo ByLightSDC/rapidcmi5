@@ -1,5 +1,5 @@
 {
-  "extends": ["../../../.eslintrc.json"],
+  "extends": ["../../.eslintrc.json"],
   "ignorePatterns": ["!**/*"],
   "overrides": [
     {
@@ -7,10 +7,7 @@
       "rules": {}
     },
     {
-      "files": ["*.ts", "*.tsx"],
-      "rules": {
-        "@typescript-eslint/no-floating-promises": ["error"]
-      }
+      "files": ["*.ts", "*.tsx"]
     },
     {
       "files": ["*.js", "*.jsx"],

@@ -1,11 +1,11 @@
 import {
-  DirectiveEditorProps,
+  type DirectiveEditorProps,
   NestedLexicalEditor,
   useCellValues,
   useMdastNodeUpdater,
 } from '@mdxeditor/editor';
 
-import { ContainerDirective } from 'mdast-util-directive';
+import { type ContainerDirective } from 'mdast-util-directive';
 import {
   useCallback,
   useContext,
@@ -18,14 +18,14 @@ import {
 import { editorInPlayback$ } from '../../state/vars';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 
-import { alpha, Box, IconButton, SxProps, Tooltip, useTheme } from '@mui/material';
+import { alpha, Box, IconButton, type SxProps, Tooltip, useTheme } from '@mui/material';
 
 import DeleteIconButton from '../../components/DeleteIconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import PaletteIcon from '@mui/icons-material/Palette';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
-import { QuotePreset, QuotesContainerDirectiveNode } from './types';
+import { type QuotePreset, type QuotesContainerDirectiveNode } from './types';
 import { QUOTE_PRESETS } from './constants';
 
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
@@ -47,7 +47,7 @@ import QuotesSettings from './QuotesSettings';
 export const QuotesContainerEditor: React.FC<
   DirectiveEditorProps<QuotesContainerDirectiveNode>
 > = ({ lexicalNode, mdastNode, parentEditor }) => {
-  const { isFocused, ref: contentRef } = useFocusWithin<HTMLDivElement>();
+  const { isFocused } = useFocusWithin<HTMLDivElement>();
   const updateMdastNode = useMdastNodeUpdater();
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [isPlayback] = useCellValues(editorInPlayback$);
@@ -108,7 +108,7 @@ export const QuotesContainerEditor: React.FC<
   /** Carousel index
    * FUTURE handle multiple quotes in the container
    */
-  const [carouselIndex, setCarouselIndex] = useState<number>(0);
+  const carouselIndex = 0;
 
   /**
    * Reverts changes and closes modal

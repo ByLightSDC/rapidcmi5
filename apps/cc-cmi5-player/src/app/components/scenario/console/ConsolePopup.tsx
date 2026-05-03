@@ -1,11 +1,8 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 
-import { useState, useRef, useContext, useEffect, SyntheticEvent } from 'react';
+import { useState, useRef, useContext, useEffect, type SyntheticEvent } from 'react';
 import { useSelector } from 'react-redux';
 import Draggable from 'react-draggable';
-import { Resizable, ResizeCallbackData } from 'react-resizable';
+import { Resizable, type ResizeCallbackData } from 'react-resizable';
 import Guacamole from 'guacamole-common-js';
 import 'react-resizable/css/styles.css';
 
@@ -274,9 +271,9 @@ export function ConsolePopup(props: tProps) {
   /**
    * When mousing down on a window, bring the window to the top of the
    * z hierarchy and set that window as active.
-   * @param e
+   * @param _e
    */
-  const handleMouseDown = (e: MouseEvent) => {
+  const handleMouseDown = (_e: MouseEvent) => {
     setCurrentZIndex((zIndex: number) => {
       const nextZIndex = zIndex + 1;
       setZIndex(nextZIndex);
@@ -625,7 +622,7 @@ export function ConsolePopup(props: tProps) {
       }
     };
 
-    const handleWindowResizeEnd = debounce(function (e: any) {
+    const handleWindowResizeEnd = debounce(function (_e: any) {
       if (isMaximizedRef.current && !isAspectRatioLocked) {
         guacClientRef.current.sendSize(
           window.innerWidth,
@@ -679,7 +676,7 @@ export function ConsolePopup(props: tProps) {
   };
 
   //ts-ignore
-  const handleResize = (e: SyntheticEvent, data: ResizeCallbackData) => {
+  const handleResize = (_e: SyntheticEvent, data: ResizeCallbackData) => {
     let width = data.size.width;
     let height = data.size.height;
 
@@ -706,10 +703,10 @@ export function ConsolePopup(props: tProps) {
    * If the aspect ratio is locked, do nothing.
    * If the aspect ratio is NOT locked, send the new display size to the server
    * and handle the new size.
-   * @param e
+   * @param _e
    * @param data
    */
-  const handleResizeStop = (e: SyntheticEvent, data: ResizeCallbackData) => {
+  const handleResizeStop = (_e: SyntheticEvent, data: ResizeCallbackData) => {
     if (!isAspectRatioLocked) {
       if (guacClientRef.current) {
         guacClientRef.current.sendSize(data.size.width, data.size.height);
@@ -902,8 +899,8 @@ export function ConsolePopup(props: tProps) {
     guacClientRef.current.getDisplay().showCursor(false);
 
     guacClientRef.current.getDisplay().onresize = (
-      width: number,
-      height: number,
+      _width: number,
+      _height: number,
     ) => {
       if (!isAspectRatioLocked) {
         if (guacClientRef.current) {
@@ -974,9 +971,9 @@ export function ConsolePopup(props: tProps) {
   const fixGuacElementZindex = (element: HTMLElement) => {
     element.style.zIndex = '0';
 
-    // @ts-ignore
-    for (const child of element.children) {
-      fixGuacElementZindex(child);
+    // @ts-nocheck
+    for (const child of element.children as any) {
+      fixGuacElementZindex(child as any);
     }
   };
 
@@ -1059,9 +1056,9 @@ export function ConsolePopup(props: tProps) {
                     desiredWidth ||
                     // due to an unknown oddity with guacamole, the width may be one pixel less than what is requested in sendSize
                     guacClientRef.current.getDisplay().getWidth() ===
-                      desiredWidth - 1) &&
+                    desiredWidth - 1) &&
                   guacClientRef.current.getDisplay().getHeight() ===
-                    desiredHeight
+                  desiredHeight
                 ) {
                   clearInterval(intervalId);
                 } else {
@@ -1092,7 +1089,7 @@ export function ConsolePopup(props: tProps) {
     } else {
       // @ts-ignore
       for (const child of element.children) {
-        if (updateDisplaySize(child)) {
+        if (updateDisplaySize(child as any)) {
           break;
         }
       }
@@ -1131,31 +1128,30 @@ export function ConsolePopup(props: tProps) {
         setDataError(error.message);
       };
 
-      // @ts-ignore
       guacClientRef.current.onstatechange = (state: Guacamole.Client.State) => {
-        let stateString = '';
+        // let stateString = '';
         switch (state) {
-          case 0:
-            stateString = 'IDLE';
-            break;
-          case 1:
-            stateString = 'CONNECTING';
-            break;
-          case 2:
-            stateString = 'WAITING';
-            break;
+          // case 0:
+          //   stateString = 'IDLE';
+          //   break;
+          // case 1:
+          //   stateString = 'CONNECTING';
+          //   break;
+          // case 2:
+          //   stateString = 'WAITING';
+          //   break;
           case 3:
-            stateString = 'CONNECTED';
+            // stateString = 'CONNECTED';
             //do something MICO
             setConnectionCounter(0);
             setIsConnected(true);
             break;
-          case 4:
-            stateString = 'DISCONNECTING';
-            break;
-          case 5:
-            stateString = 'DISCONNECTED';
-            break;
+          // case 4:
+          //   stateString = 'DISCONNECTING';
+          //   break;
+          // case 5:
+          //   stateString = 'DISCONNECTED';
+          //   break;
         }
       };
 
@@ -1254,7 +1250,7 @@ export function ConsolePopup(props: tProps) {
     }
 
     // what is the new position of the window in screen space?
-    setWindowPosition((position) => {
+    setWindowPosition((_position) => {
       const updatedPos = viewportToScreen(netmapViewportPosRef.current);
 
       dragOffsetRef.current = {
@@ -1273,7 +1269,7 @@ export function ConsolePopup(props: tProps) {
    * @param forceOffset A plain object with an x and y property
    */
   const updatePosition = (x: number, y: number, forceOffset: any = null) => {
-    setWindowPosition((oldPosition) => {
+    setWindowPosition((_oldPosition) => {
       if (forceOffset) {
         dragOffsetRef.current = {
           x: forceOffset.x,
@@ -1340,7 +1336,7 @@ export function ConsolePopup(props: tProps) {
         onStart={handleDragStart}
         onStop={handleDragStop}
         disabled={isMaximizedRef.current}
-        // bounds={{ left: 0, top: 0 }}
+      // bounds={{ left: 0, top: 0 }}
       >
         <div
           id="window-container"

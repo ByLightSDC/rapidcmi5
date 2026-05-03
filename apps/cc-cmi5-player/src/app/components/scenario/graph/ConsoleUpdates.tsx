@@ -30,7 +30,7 @@ export default function ConsoleUpdates({
   const consolesQuery = useGetRangeResourceConsolesGraph(rangeId, scenarioId);
   useQueryDetails({
     queryObj: consolesQuery,
-    errorFunction: (queryError: any) => {
+    errorFunction: (_queryError: any) => {
       setInitialized(Topic.ResourceConsole, true);
     },
     successFunction: (successData: any) => {

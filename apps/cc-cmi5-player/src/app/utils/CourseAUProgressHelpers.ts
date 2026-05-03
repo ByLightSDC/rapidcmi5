@@ -6,24 +6,24 @@
  */
 
 import {
-  CourseAUProgress,
-  CourseAUProgressInit,
-  CourseStructure,
-  SlideIdentifier,
-  SlideActivityMetadata,
-  SlideStatus,
+  type CourseAUProgress,
+  type CourseAUProgressInit,
+  type CourseStructure,
+  type SlideIdentifier,
+  type SlideActivityMetadata,
+  type SlideStatus,
 } from '../types/CourseAUProgress';
 
 import {
-  SlideActivityStatus,
+  type SlideActivityStatus,
   SlideActivityType,
 } from '../types/SlideActivityStatusState';
-import { SlideChangedStatus } from '../types/SlideState';
+import { type SlideChangedStatus } from '../types/SlideState';
 import { cmi5Instance } from '../session/cmi5';
 
 // import { SlideActivityStatusState } from '../types/SlideActivityStatusState'; // Commented out - not used
 import { logger } from '../debug';
-import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
+import { type CourseAU } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Create slide identifiers from CourseAU data
@@ -170,13 +170,18 @@ function parseActivityMetadata(slideContent: string): {
   }
 
   // Parse Code Runner blocks
-  const codeRunnerBlockRegex = /:::codeRunner\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
+  const codeRunnerBlockRegex =
+    /:::codeRunner\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
   let codeRunnerMatch;
 
   while ((codeRunnerMatch = codeRunnerBlockRegex.exec(slideContent)) !== null) {
     try {
       const codeRunnerData = JSON.parse(codeRunnerMatch[1]);
-      logger.debug('Parsed Code Runner data from markdown', codeRunnerData, 'auManager');
+      logger.debug(
+        'Parsed Code Runner data from markdown',
+        codeRunnerData,
+        'auManager',
+      );
 
       // Generate cmi5QuizId if not provided (use title or fallback)
       // TODO: don't like either of these... alsothis should be done in the CodeRunner component automatically during export/packaging (guid etc) remove this when that's working
@@ -193,10 +198,12 @@ function parseActivityMetadata(slideContent: string): {
         } else {
           // Create a simple hash from the evaluator content for consistency
           const contentHash = Math.abs(
-            codeRunnerData.evaluator?.split('').reduce((a: number, b: string) => {
-              a = (a << 5) - a + b.charCodeAt(0);
-              return a & a;
-            }, 0) || 0,
+            codeRunnerData.evaluator
+              ?.split('')
+              .reduce((a: number, b: string) => {
+                a = (a << 5) - a + b.charCodeAt(0);
+                return a & a;
+              }, 0) || 0,
           )
             .toString(36)
             .substr(0, 8);
@@ -1254,25 +1261,6 @@ export async function getCourseAUProgressFromLRS(
   }
 }
 
-/**
- * Get slide GUID for a specific activity (helper for backward compatibility)
- */
-function getSlideGuidForActivity(
-  courseAUProgress: CourseAUProgress,
-  activityId: string,
-): string | null {
-  const { slideActivitiesMeta: slideActivities } = courseAUProgress;
-
-  for (const slideGuid of Object.keys(slideActivities)) {
-    const activities = slideActivities[slideGuid];
-    if (activities[activityId]) {
-      return slideGuid;
-    }
-  }
-
-  return null;
-}
-
 // Module-level mutex: tracks which slides currently have a slidePassing call in flight.
 // Each handleActivityScoring call gets a deep-cloned progress object, so mutating that
 // object is not visible across concurrent calls. This Set is shared across all calls.
@@ -1355,7 +1343,8 @@ export async function updateSlideStatus(
   // Use provided previous status or fall back to current status
   const wasPreviouslyCompleted =
     previousStatus?.wasCompleted ?? progress.slideStatus[slideGuid]?.completed;
-  const wasPreviouslyPassed = previousStatus?.wasPassed ?? progress.slideStatus[slideGuid]?.passed;
+  const wasPreviouslyPassed =
+    previousStatus?.wasPassed ?? progress.slideStatus[slideGuid]?.passed;
 
   if (allActivitiesCompleted && !wasPreviouslyCompleted) {
     // All activities completed - send slideCompleted event
@@ -1450,28 +1439,4 @@ export async function updateSlideStatus(
   // ============================================================================
   // ACTIVITY SCORING FUNCTIONS
   // ============================================================================
-
-  /**
-   * Extract activity ID from activity content based on content type
-   */
-  function getActivityId(activityContent: any): string {
-    if ('cmi5QuizId' in activityContent && activityContent.cmi5QuizId) {
-      return activityContent.cmi5QuizId;
-    } else if ('uuid' in activityContent && activityContent.uuid) {
-      return activityContent.uuid;
-    } else if (
-      'scenarioUUID' in activityContent &&
-      activityContent.scenarioUUID
-    ) {
-      return activityContent.scenarioUUID;
-    } else if ('name' in activityContent && activityContent.name) {
-      return activityContent.name;
-    } else if (
-      'scenarioName' in activityContent &&
-      activityContent.scenarioName
-    ) {
-      return activityContent.scenarioName;
-    }
-    return SlideActivityType.UNKNOWN;
-  }
 }

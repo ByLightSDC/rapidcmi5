@@ -1,7 +1,7 @@
-import { $getNodeByKey, $getRoot, LexicalEditor, LexicalNode } from 'lexical';
+import { $getNodeByKey, $getRoot, type LexicalEditor } from 'lexical';
 
 import { findDirectiveNodeKeyById } from './directiveResolver';
-import { debugLog, AnimationConfig } from '@rapid-cmi5/ui';
+import { debugLog, type AnimationConfig } from '@rapid-cmi5/ui';
 
 /**
  * Simple string hash function for generating content-based IDs

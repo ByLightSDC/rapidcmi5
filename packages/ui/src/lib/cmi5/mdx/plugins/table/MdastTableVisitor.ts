@@ -1,8 +1,8 @@
-import { ElementNode } from 'lexical';
-import * as Mdast from 'mdast';
+import { type ElementNode } from 'lexical';
+import type * as Mdast from 'mdast';
 //import { MdastImportVisitor } from '../../importMarkdownToLexical'
 import { $createTableNode } from './TableNode';
-import { MdastImportVisitor } from '@mdxeditor/editor';
+import { type MdastImportVisitor } from '@mdxeditor/editor';
 
 export const MdastTableVisitor: MdastImportVisitor<Mdast.Table> = {
   testNode: 'table',

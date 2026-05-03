@@ -1,7 +1,7 @@
 import {
   rootEditor$,
   $createDirectiveNode,
-  DirectiveNode,
+  type DirectiveNode,
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
@@ -9,7 +9,7 @@ import { $getSelection, $isRangeSelection } from 'lexical';
 import type { LexicalEditor } from 'lexical';
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 import type { BlockContent } from 'mdast';
-import { ContainerDirective } from 'mdast-util-directive';
+import { type ContainerDirective } from 'mdast-util-directive';
 import { ButtonMinorUi } from '@rapid-cmi5/ui';
 
 /**
@@ -20,7 +20,6 @@ import ViewStreamIcon from '@mui/icons-material/ViewStream';
 import { useTheme } from '@mui/material';
 import {
   convertMarkdownToMdast,
-  placeCaretInsideDirective,
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 

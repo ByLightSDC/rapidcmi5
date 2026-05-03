@@ -1,12 +1,12 @@
 /*MUI */
 import { alpha, styled, useTheme } from '@mui/material';
 
-import Button, { ButtonProps } from '@mui/material/Button';
-import Chip, { ChipProps } from '@mui/material/Chip';
+import Button, { type ButtonProps } from '@mui/material/Button';
+import Chip, { type ChipProps } from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Tooltip, { TooltipProps } from '@mui/material/Tooltip';
+import Tooltip, { type TooltipProps } from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
 /*Icon */
@@ -14,24 +14,23 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TouchAppIcon from '@mui/icons-material/TouchApp';
-
-/*Constants */
-const minLoadingButtonWidth = '94px'; // so button wont change size when "Loading"
-const minButtonHeight = '32px';
-const maxButtonHeight = '30px';
 import {
   Alert,
-  AlertProps,
+  type AlertProps,
   Box,
   ClickAwayListener,
   IconButton,
-  IconButtonProps,
+  type IconButtonProps,
   Popper,
 } from '@mui/material';
 import { useMemo, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { copyTextToClipboard } from './copy';
+
+/*Constants */
+const minButtonHeight = '32px';
+const maxButtonHeight = '30px';
 
 const zOrderAboveDialog = 9999;
 const defaultInfoIcon = <div />;
@@ -199,22 +198,22 @@ export function ButtonInfoField({
   );
 }
 
-const StyledButton = styled(Button)(({ theme }: { theme: any }) => ({
+const StyledButton = styled(Button)(() => ({
   margin: 2, //REF
   padding: 0,
   //REF paddingTop: 1, //text align fix
   minHeight: minButtonHeight,
 }));
 
-const StyledChip = styled(Chip)(({ theme }: { theme: any }) => ({
+const StyledChip = styled(Chip)(() => ({
   margin: 4,
 }));
 
-const StyledIconButton = styled(IconButton)(({ theme }: { theme: any }) => ({
+const StyledIconButton = styled(IconButton)(() => ({
   size: 'small',
 }));
 
-const StyledLoadingButton = styled(Button)(({ theme }: { theme: any }) => ({
+const StyledLoadingButton = styled(Button)(() => ({
   margin: 2,
   padding: 0,
 }));
@@ -728,7 +727,6 @@ export function ButtonOptions({
   menuOptions = [],
   closeOnClick = false,
   disabled = false,
-  onOptionSelect,
   onTrigger,
 }: {
   children?: JSX.Element;

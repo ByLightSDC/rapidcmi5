@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Dispatch } from '@reduxjs/toolkit';
+import { type Dispatch } from '@reduxjs/toolkit';
 import {
   setApiUrl,
   setEventKey,

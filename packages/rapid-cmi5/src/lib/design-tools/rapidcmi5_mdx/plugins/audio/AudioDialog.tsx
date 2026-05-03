@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
+import React, { type ChangeEvent, useContext, useEffect, useState } from 'react';
 
 import {
   closeAudioDialog$,
@@ -57,7 +57,7 @@ export const AudioDialog: React.FC = () => {
   const [fileOptions, setFileOptions] = useState<string[]>([]);
   const [autoplay, setAutoplay] = useState<boolean>(false);
 
-  const { isFsLoaded, handleGetFolderStructure } =
+  const { handleGetFolderStructure } =
     useContext(GitContext);
 
   // get the state from Gurx

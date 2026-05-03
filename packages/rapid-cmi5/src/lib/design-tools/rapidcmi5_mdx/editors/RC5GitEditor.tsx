@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch } from '../../../redux/store';
+import { type AppDispatch } from '../../../redux/store';
 import {
   currentFsTypeSel,
   setCurrentWorkingDir,
@@ -19,7 +19,6 @@ import { Stack } from '@mui/system';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import SpokeIcon from '@mui/icons-material/Spoke';
 
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
@@ -35,7 +34,7 @@ import { useToaster, ButtonMinorUi } from '@rapid-cmi5/ui';
  * Rapid CMI5 Git Editor
  * @returns
  */
-export default function RC5GitEditor({ top = '0px' }: { top?: string }) {
+export default function RC5GitEditor() {
   const dispatch = useDispatch<AppDispatch>();
   const displayToaster = useToaster();
   const currentTab = useSelector(gitViewCurrentTab);
@@ -47,11 +46,9 @@ export default function RC5GitEditor({ top = '0px' }: { top?: string }) {
     modifiedFiles,
     stashFiles,
     canPop,
-    canStash,
     canPush,
     canCommit,
     gitRepoCommits,
-    handleGitStashChanges,
     handleGitStashPopChanges,
     unpushedCommits,
     isRepoConnectedToRemote,
@@ -78,23 +75,6 @@ export default function RC5GitEditor({ top = '0px' }: { top?: string }) {
   } = useRC5Prompts();
 
   //@Aaron these should move to git context
-  const handeGitStash = async () => {
-    try {
-      await handleGitStashChanges();
-      displayToaster({
-        autoHideDuration: 5000,
-        message: 'Changes have been stashed',
-        severity: 'success',
-      });
-    } catch (error: any) {
-      displayToaster({
-        autoHideDuration: 8000,
-        message: error.message,
-        severity: 'error',
-      });
-      return;
-    }
-  };
 
   const handeGitStashPop = async () => {
     try {

@@ -34,7 +34,6 @@ import {
 function ScenarioWrapper({ children }: { children: any }) {
   const dispatch = useDispatch();
   const [initializationAttempt, setInitializationAttempt] = useState(0);
-  const [rangeId, setRangeId] = useState<string | undefined>(undefined);
   const [scenarioId, setScenarioId] = useState<string | undefined>(undefined);
   const rangeData = useSelector(rangeDataSel);
   const rangeConsoleData = useSelector(rangeConsoleDataSel);
@@ -49,16 +48,15 @@ function ScenarioWrapper({ children }: { children: any }) {
       setUsername(debugUserName);
       setPassword(debugPassword);
       setScenarioId(debugScenarioId);
-      setRangeId(debugRangeId);
       return;
     }
 
     const isDisabled =
       rangeData?.rangeId &&
-      rangeData.deployedScenarios &&
-      rangeData.deployedScenarios.length > 0 &&
-      rangeConsoleData?.credentials &&
-      rangeConsoleData.credentials.length > 0
+        rangeData.deployedScenarios &&
+        rangeData.deployedScenarios.length > 0 &&
+        rangeConsoleData?.credentials &&
+        rangeConsoleData.credentials.length > 0
         ? false
         : true;
     if (!isDisabled) {

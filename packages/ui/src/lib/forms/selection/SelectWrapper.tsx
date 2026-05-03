@@ -13,7 +13,7 @@ import { ActionRow } from './ActionRow';
 
 
 /* Types */
-import { RowAction } from '../../types/actionRowTypes';
+import { type RowAction } from '../../types/actionRowTypes';
 
 /* MUI */
 import Alert from '@mui/material/Alert';
@@ -32,11 +32,11 @@ import { ButtonModalCancelUi } from '../../inputs/buttons/buttonsmodal';
 import ModalDialog from '../../modals/ModalDialog';
 import { BookmarksContext } from '../../navigation/bookmark/BookmarksContext';
 import {
-  tBookmark,
+  type tBookmark,
   bookmarkCue,
 } from '../../navigation/bookmark/bookmarksReducer';
 import {
-  inputFilterType,
+  type inputFilterType,
   PaginationFiltersContextProvider,
 } from '../../navigation/paging/PaginationFiltersContext';
 import PaginationListView from '../../navigation/paging/PaginationListView';
@@ -136,7 +136,6 @@ export function SelectWrapper(props: tSelectWrapperProps) {
     // nonModalButtonText,
     // onHandleNonModalAction,
     nonModalProps,
-    pageLabel = '',
     queryKey,
     renderItem = ActionRow,
     route,
@@ -202,7 +201,7 @@ export function SelectWrapper(props: tSelectWrapperProps) {
     restoreModal,
   } = useContext(BookmarksContext);
 
-  const [excludeId, setExcludeId] = useState(getLastBookMarkRecordId());
+  const excludeId = getLastBookMarkRecordId();
   /**
    * Handles action button click
    * If apply clicked (1) apply local state to redux state
@@ -258,7 +257,7 @@ export function SelectWrapper(props: tSelectWrapperProps) {
     }
   };
 
-  const handleDeleteSelection = (chipToDelete: any) => {
+  const handleDeleteSelection = () => {
     setCurrentSelection(null);
   };
 
@@ -387,7 +386,7 @@ export function SelectWrapper(props: tSelectWrapperProps) {
    *  @param {any[]} data Page data
    * @param {number} totalCount Total number of records, regardless of paging
    */
-  const onPageData = (data: any[], totalCount: number) => {
+  const onPageData = (data: any[]) => {
     setPageData(data);
   };
 

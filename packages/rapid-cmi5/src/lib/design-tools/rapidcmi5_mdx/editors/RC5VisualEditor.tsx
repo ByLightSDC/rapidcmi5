@@ -3,7 +3,7 @@ import '../plugins/animation/styles/animationIndicators.css';
 
 import {
   MDXEditor,
-  MDXEditorMethods,
+  type MDXEditorMethods,
   toolbarPlugin,
   listsPlugin,
   linkPlugin,
@@ -12,7 +12,7 @@ import {
   directivesPlugin,
   frontmatterPlugin,
   quotePlugin,
-  RealmPlugin,
+  type RealmPlugin,
 } from '@mdxeditor/editor';
 
 import { history } from '@codemirror/commands';
@@ -21,7 +21,7 @@ import { autocompletion } from '@codemirror/autocomplete';
 import '@mdxeditor/editor/style.css';
 
 import React, {
-  RefObject,
+  type RefObject,
   useCallback,
   useContext,
   useEffect,
@@ -75,7 +75,7 @@ import {
 
 import {
   animationPlugin,
-  AnimationConfig,
+  type AnimationConfig,
   parseAnimationsFromFrontmatter,
   injectAnimationsIntoFrontmatter,
   areAnimationsEqual,
@@ -561,43 +561,43 @@ function RC5VisualEditor() {
     return {
       current: ref.current
         ? {
-            ...ref.current,
-            getMarkdown: () => {
-              const baseMarkdown = ref.current?.getMarkdown() || '';
-              const cachedAnims =
-                slideAnimationsRef.current.get(currentSlideIndex) || [];
+          ...ref.current,
+          getMarkdown: () => {
+            const baseMarkdown = ref.current?.getMarkdown() || '';
+            const cachedAnims =
+              slideAnimationsRef.current.get(currentSlideIndex) || [];
 
-              // IMPORTANT: If the user modified animations in source mode (or otherwise),
-              // the markdown frontmatter is the source of truth. Do NOT resurrect stale
-              // in-memory animations by injecting the cache over the markdown.
-              const parsedFromMarkdown =
-                parseAnimationsFromFrontmatter(baseMarkdown);
-              const animsToPersist = areAnimationsEqual(
-                cachedAnims,
-                parsedFromMarkdown,
-              )
-                ? cachedAnims
-                : parsedFromMarkdown;
+            // IMPORTANT: If the user modified animations in source mode (or otherwise),
+            // the markdown frontmatter is the source of truth. Do NOT resurrect stale
+            // in-memory animations by injecting the cache over the markdown.
+            const parsedFromMarkdown =
+              parseAnimationsFromFrontmatter(baseMarkdown);
+            const animsToPersist = areAnimationsEqual(
+              cachedAnims,
+              parsedFromMarkdown,
+            )
+              ? cachedAnims
+              : parsedFromMarkdown;
 
-              // Keep cache aligned for subsequent saves/publishes
-              if (!areAnimationsEqual(cachedAnims, animsToPersist)) {
-                slideAnimationsRef.current.set(
-                  currentSlideIndex,
-                  animsToPersist,
-                );
-              }
-
-              const markdownWithAnimations = injectAnimationsIntoFrontmatter(
-                baseMarkdown,
+            // Keep cache aligned for subsequent saves/publishes
+            if (!areAnimationsEqual(cachedAnims, animsToPersist)) {
+              slideAnimationsRef.current.set(
+                currentSlideIndex,
                 animsToPersist,
               );
-              debugLog(
-                `Injecting animations into markdown for slide ${currentSlideIndex}:`,
-                animsToPersist,
-              );
-              return markdownWithAnimations;
-            },
-          }
+            }
+
+            const markdownWithAnimations = injectAnimationsIntoFrontmatter(
+              baseMarkdown,
+              animsToPersist,
+            );
+            debugLog(
+              `Injecting animations into markdown for slide ${currentSlideIndex}:`,
+              animsToPersist,
+            );
+            return markdownWithAnimations;
+          },
+        }
         : null,
     };
   }, [ref.current, currentSlideIndex]);

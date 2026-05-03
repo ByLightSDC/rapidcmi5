@@ -1,6 +1,6 @@
 import {
   MDXEditor,
-  MDXEditorMethods,
+  type MDXEditorMethods,
   toolbarPlugin,
   listsPlugin,
   linkPlugin,
@@ -48,7 +48,7 @@ import {
   ImageLabelDirectiveDescriptor,
   onCheckClickOutsideImageLabel,
   debugLog,
-  AnimationConfig,
+  type AnimationConfig,
   themeColor,
   ImageTextDirectiveDescriptor,
   generateLessonThemeStyleTag,
@@ -261,7 +261,6 @@ function RC5Player() {
     const css = generateLessonThemeStyleTag(
       themeClass,
       currentLessonTheme,
-      slideWidthSel,
     );
     return css;
   }, [themeClass, currentLessonTheme, slideWidthSel]);

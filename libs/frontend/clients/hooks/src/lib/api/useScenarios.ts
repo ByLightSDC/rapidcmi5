@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { AxiosRequestConfig } from 'axios';
+import { type AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 
 import {
@@ -14,9 +14,9 @@ import {
 import { getErrorMessage } from './errorMessages';
 import {
   DevopsApiClient,
-  ScenarioCreate,
-  ScenariosValidateBeforeCreateRequest,
-  ScenarioUpdate,
+  type ScenarioCreate,
+  type ScenariosValidateBeforeCreateRequest,
+  type ScenarioUpdate,
 } from '@rangeos-nx/frontend/clients/devops-api';
 
 export const queryKeyScenarios = 'scenarios';
@@ -106,7 +106,7 @@ export const usePostScenario = () => {
   };
 
   return useMutation((formData: ScenarioCreate) => postResult(formData), {
-    onSettled: async (data, error, variables: any) => {
+    onSettled: async (_data, error, _variables: any) => {
       if (!error) {
         queryClient.invalidateQueries(queryKeyScenarios);
       }
@@ -130,7 +130,7 @@ export const usePutScenario = () => {
   };
 
   return useMutation(({ uuid, formData }: any) => putResult(uuid, formData), {
-    onSettled: async (data, error, variables: any) => {
+    onSettled: async (_data, error, _variables: any) => {
       if (!error) {
         queryClient.invalidateQueries(queryKeyScenarios);
       }
@@ -153,7 +153,7 @@ export const useDeleteScenario = () => {
   };
 
   return useMutation((uuid: string) => deleteResult(uuid), {
-    onSettled: async (data, error, variables: any) => {
+    onSettled: async (_data, error, _variables: any) => {
       if (!error) {
         queryClient.invalidateQueries(queryKeyScenarios);
       }
@@ -245,7 +245,7 @@ export const usePostValidateScenarioPayload = () => {
   return useMutation(
     (scenario: ScenariosValidateBeforeCreateRequest) => postResult(scenario),
     {
-      onSettled: async (data, error, variables: any) => {
+      onSettled: async (_data, error, _variables: any) => {
         if (!error) {
           queryClient.invalidateQueries(queryKeyScenarioValidation);
         }
@@ -253,4 +253,3 @@ export const usePostValidateScenarioPayload = () => {
     },
   );
 };
-

@@ -3,7 +3,7 @@ import { useRef, useEffect, useState } from 'react';
 
 /* MUI */
 import Tooltip from '@mui/material/Tooltip';
-import Typography, { TypographyProps } from '@mui/material/Typography';
+import Typography, { type TypographyProps } from '@mui/material/Typography';
 import { ButtonCopyText } from '../utility/buttons';
 
 /**
@@ -83,7 +83,7 @@ export function OverflowTypography(props: OverflowTypographyProps) {
           //   overflowWrap: 'anywhere', // allows LONG words to wrap (example: chart digest)
           //   width: 'auto',
           // }}
-          onMouseEnter={(e) => {
+          onMouseEnter={() => {
             // entering the actual tooltip
             setIsCursorOnTooltip(true);
           }}
@@ -113,7 +113,7 @@ export function OverflowTypography(props: OverflowTypographyProps) {
           //   whiteSpace: 'pre', // so UUID won't wrap
           //   width: 'auto',
           // }}
-          onMouseEnter={(e) => {
+          onMouseEnter={() => {
             // entering the actual tooltip
             setIsCursorOnTooltip(true);
           }}
@@ -145,7 +145,7 @@ export function OverflowTypography(props: OverflowTypographyProps) {
           evt.stopPropagation();
         }
       }}
-      onMouseLeave={(e) => {
+      onMouseLeave={() => {
         // when we leave this component, we are no longer on tooltip
         setIsCursorOnTooltip(false);
       }}

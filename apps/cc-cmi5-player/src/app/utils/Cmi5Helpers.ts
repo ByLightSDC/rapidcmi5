@@ -1,35 +1,41 @@
-import XAPI, { InteractionComponent, LanguageMap, Statement } from '@xapi/xapi';
+import XAPI, {
+  type InteractionComponent,
+  type LanguageMap,
+  type Statement,
+} from '@xapi/xapi';
 import { cmi5Instance } from '../session/cmi5';
 import { v4 as uuidv4 } from 'uuid';
 
-import { AnswerType, IQuestionType, QuizOption } from '../types/QuizState';
 import {
-  State,
+  type AnswerType,
+  type IQuestionType,
+  type QuizOption,
+} from '../types/QuizState';
+import {
+  type State,
   stateQuizCurrentAnswers,
   stateQuizCurrentQuestion,
   stateViewedSlides,
 } from '../types/SlideState';
-import { AxiosPromise } from 'axios';
+import { type AxiosPromise } from 'axios';
 import { checkForDevMode } from './DevMode';
 import { logger } from '../debug';
 
 import { sendActivityCompletedVerb } from './LmsStatementManager';
-import { gradeActivity, createSlideActivityScore } from './gradeActivity';
 import {
-  ActivityType,
-  SlideActivityScore,
+  type SlideActivityScore,
   SlideActivityType,
 } from '../types/SlideActivityStatusState';
 import {
-  ActivityScore,
+  type ActivityScore,
   RC5ActivityTypeEnum,
-  CTFContent,
-  QuizScore,
-  QuizContent,
+  type CTFContent,
+  type QuizScore,
+  type QuizContent,
   QuestionResponse,
   CTFResponse,
-  QuizQuestion,
-  QuizState,
+  type QuizQuestion,
+  type QuizState,
 } from '@rapid-cmi5/cmi5-build-common';
 
 /**
@@ -771,7 +777,7 @@ export async function setAutoGradersProgress(uuid: string): Promise<void> {
   };
 
   try {
-    await xapi.sendStatement({statement: statement as any});
+    await xapi.sendStatement({ statement: statement as any });
     console.log(`Sent statement for UUID ${uuid}`);
   } catch (error) {
     console.error('Failed to send statement for AutoGrader UUID:', error);
@@ -903,7 +909,7 @@ async function submitInteractionChoice(
   ) as QuizOption[];
 
   const correctAnswerIds: string[] = correctOptions.map(
-    (option, index) => `q-${index}`,
+    (_option, index) => `q-${index}`,
   );
   if (question.typeAttributes.options === undefined) {
     console.error('Select all type question should have options');

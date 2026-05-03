@@ -1,4 +1,4 @@
-import { StepContentDirectiveNode, StepDirectiveNode } from './types';
+import { type StepContentDirectiveNode } from './types';
 
 export const DEFAULT_STEP: StepContentDirectiveNode = {
   type: 'containerDirective',

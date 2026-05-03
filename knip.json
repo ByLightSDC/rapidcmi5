@@ -1,0 +1,64 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    "apps/cc-cmi5-player": {
+      "entry": ["src/main.tsx"],
+      "project": "src/**/*.{ts,tsx}"
+    },
+    "apps/cc-cmi5-player-e2e": {
+      "entry": ["cypress.config.ts", "src/**/*.cy.{ts,tsx}", "src/support/**/*.ts"],
+      "project": "src/**/*.{ts,tsx}"
+    },
+    "apps/cmi5-builder": {
+      "entry": ["src/main.ts", "src/setupTests.js"],
+      "project": "src/**/*.{ts,tsx,js}"
+    },
+    "apps/cmi5-builder-e2e": {
+      "entry": ["jest.config.ts", "test-setup.ts", "src/**/*.spec.{ts,tsx}"],
+      "project": "src/**/*.{ts,tsx}"
+    },
+    "apps/rapid-cmi5-electron": {
+      "entry": [
+        "src/main.ts",
+        "jest.config.ts",
+        "playwright.config.ts",
+        "e2e/**/*.spec.ts"
+      ],
+      "project": "src/**/*.ts"
+    },
+    "apps/rapid-cmi5-electron-frontend": {
+      "entry": ["src/main.tsx"],
+      "project": "src/**/*.{ts,tsx}"
+    },
+    "packages/common": {
+      "entry": ["src/index.ts"],
+      "project": "src/**/*.{ts,tsx}"
+    },
+    "packages/rapid-cmi5": {
+      "entry": ["src/index.ts"],
+      "project": "src/**/*.{ts,tsx}"
+    },
+    "packages/ui": {
+      "entry": ["src/index.ts"],
+      "project": "src/**/*.{ts,tsx}"
+    },
+    "libs/keycloak": {
+      "entry": ["src/index.ts"],
+      "project": "src/**/*.ts"
+    },
+    "libs/frontend/clients/devops-api": {
+      "entry": ["src/index.ts"],
+      "project": "src/**/*.ts"
+    },
+    "libs/frontend/clients/lms-api": {
+      "entry": ["src/index.ts"],
+      "project": "src/**/*.ts"
+    },
+    "libs/frontend/clients/hooks": {
+      "entry": ["src/index.ts"],
+      "project": "src/**/*.{ts,tsx}"
+    }
+  },
+  "ignoreBinaries": ["nx", "electron", "concurrently"],
+  "ignoreDependencies": ["@nx/.*", "tslib"]
+}

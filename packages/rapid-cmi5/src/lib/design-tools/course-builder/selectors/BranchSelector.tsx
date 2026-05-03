@@ -1,4 +1,4 @@
-import { MenuItem, SxProps } from '@mui/material';
+import { MenuItem, type SxProps } from '@mui/material';
 
 import AnySelector from '../AnySelector';
 
@@ -10,10 +10,7 @@ import AnySelector from '../AnySelector';
 export default function BranchSelector({
   currentBranch,
   availableBranches,
-  disabled,
-  onAction,
   onSelect,
-  styleProps = {},
 }: {
   currentBranch?: string;
   availableBranches?: string[];
@@ -43,9 +40,9 @@ export default function BranchSelector({
       noOptionsPlaceholder={noBranchesFound}
       optionsPlaceholder="Select Branch"
       selectorStyleProps={{ width: '160px' }}
-      //iconButtonHandler={onAction}
-      //iconButtonTooltip="Create Branch"
-      //iconButtonDisabled={false}
+    //iconButtonHandler={onAction}
+    //iconButtonTooltip="Create Branch"
+    //iconButtonDisabled={false}
     >
       {availableBranches &&
         availableBranches.map((name) => (

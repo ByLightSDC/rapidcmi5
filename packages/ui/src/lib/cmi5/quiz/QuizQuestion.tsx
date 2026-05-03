@@ -6,7 +6,7 @@ import SelectAll from './QuestionTypes/SelectAll/QuestionSelectAll';
 import Matching from './QuestionTypes/Matching/QuestionMatching';
 import { Typography } from '@mui/material';
 import { MarkdownConvertorQuiz } from '../markdown/MarkdownConvertor';
-import { QuizQuestion, AnswerType, QuestionResponse } from '@rapid-cmi5/cmi5-build-common';
+import { type QuizQuestion, type AnswerType, QuestionResponse } from '@rapid-cmi5/cmi5-build-common';
 
 export default function AuQuizQuestion({
   question,

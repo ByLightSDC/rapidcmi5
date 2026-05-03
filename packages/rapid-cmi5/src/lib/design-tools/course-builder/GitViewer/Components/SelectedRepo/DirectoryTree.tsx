@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import TreeView, {
-  INode,
-  ITreeViewOnNodeSelectProps,
-  ITreeViewOnExpandProps,
+  type INode,
+  type ITreeViewOnNodeSelectProps,
+  type ITreeViewOnExpandProps,
 } from 'react-accessible-treeview';
-import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
-import { useContext, useEffect, useMemo, useRef } from 'react';
+import { type IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
+import { useContext, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   currentAuPath,
@@ -16,7 +16,7 @@ import {
 
 import { TreeFolderIcon } from '../icons/TreeFolderIcon';
 import { TreeFileIcon } from '../icons/TreeFileIcon';
-import { AppDispatch } from '../../../../../redux/store';
+import { type AppDispatch } from '../../../../../redux/store';
 
 import './tree-view.css';
 import {
@@ -77,7 +77,6 @@ function DirectoryTree({
 
   const handleNodeSelect = ({
     element,
-    isSelected,
     isBranch,
   }: ITreeViewOnNodeSelectProps) => {
     handleFileClick(element, isBranch);
@@ -90,10 +89,6 @@ function DirectoryTree({
   const handleNodeExpand = ({
     element,
     isExpanded,
-    isSelected,
-    isHalfSelected,
-    isDisabled,
-    treeState,
   }: ITreeViewOnExpandProps) => {
     let currentlyExpanded: string[] = [...currentExpandedFileTreeNodes.current];
 

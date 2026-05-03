@@ -1,13 +1,11 @@
 import {
   NestedEditorsContext,
   NestedLexicalEditor,
-  useCellValue,
 } from '@mdxeditor/editor';
 
-import * as Mdast from 'mdast';
-import { fnRefOrder$, fnRefs$ } from './vars';
-import { useMemo } from 'react';
-import { FootnoteDefEditorProps } from './types';
+import type * as Mdast from 'mdast';
+
+import { type FootnoteDefEditorProps } from './types';
 
 /**
  * MDX Editor for Footnote Definitions
@@ -25,8 +23,8 @@ export const FootnoteDefinitionEditor: React.FC<FootnoteDefEditorProps> = ({
   mdastNode,
   focusEmitter,
 }) => {
-  const fnRefs = useCellValue(fnRefs$);
-  const fnRefOrder = useCellValue(fnRefOrder$);
+  // const fnRefs = useCellValue(fnRefs$);
+  // const fnRefOrder = useCellValue(fnRefOrder$);
 
   //REF
   /**
@@ -35,14 +33,14 @@ export const FootnoteDefinitionEditor: React.FC<FootnoteDefEditorProps> = ({
    * and rendering in an <ol> tag so counter is currently unused, but helpful for testing
    * Definitions are ordered by the FootnoteRegistry (see FootnoteRegistry.tsx)
    */
-  const theCounter = useMemo(() => {
-    for (const [key, value] of Object.entries(fnRefs)) {
-      if (value === label) {
-        return fnRefOrder.indexOf(key) + 1;
-      }
-    }
-    return -1;
-  }, [fnRefOrder, label, fnRefs]);
+  // const theCounter = useMemo(() => {
+  //   for (const [key, value] of Object.entries(fnRefs)) {
+  //     if (value === label) {
+  //       return fnRefOrder.indexOf(key) + 1;
+  //     }
+  //   }
+  //   return -1;
+  // }, [fnRefOrder, label, fnRefs]);
 
   return (
     <>

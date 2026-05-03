@@ -1,11 +1,11 @@
 import {
   $createGenericHTMLNode,
-  MdastHTMLNode,
-  MdastImportVisitor,
+  type MdastHTMLNode,
+  type MdastImportVisitor,
 } from '@mdxeditor/editor';
 
-import { MdxJsxAttribute } from 'mdast-util-mdx';
-import { $createParagraphNode, RootNode } from 'lexical';
+import { type MdxJsxAttribute } from 'mdast-util-mdx';
+import { $createParagraphNode, type RootNode } from 'lexical';
 import { $isMdastIFrameNode } from './methods';
 
 /**

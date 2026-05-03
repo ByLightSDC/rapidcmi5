@@ -14,7 +14,7 @@ import {
   Box,
 } from '@mui/material';
 import TocIcon from '@mui/icons-material/Toc';
-import { TableOfContentsEntry } from './TocPlugin';
+import { type TableOfContentsEntry } from './TocPlugin';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { toolbarRect$ } from '@rapid-cmi5/ui';
@@ -47,7 +47,6 @@ import { useSignalEffect } from '@preact/signals-react';
  */
 export const TOCComponent = ({
   tocEntries,
-  editor,
   defaultTopOffset = 0,
 }: {
   tocEntries: Array<TableOfContentsEntry>;

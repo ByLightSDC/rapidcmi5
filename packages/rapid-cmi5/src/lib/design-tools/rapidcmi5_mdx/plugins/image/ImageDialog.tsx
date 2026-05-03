@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
+import React, { type ChangeEvent, useContext, useEffect, useState } from 'react';
 
 import {
   closeImageDialog$,
@@ -10,10 +10,9 @@ import {
 import { useCellValues, usePublisher } from '@mdxeditor/gurx';
 
 // MUI
-import { Box, Paper, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Paper, Stack, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid2';
-import EditIcon from '@mui/icons-material/Edit';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 
 import {

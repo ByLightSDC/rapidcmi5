@@ -3,7 +3,7 @@
 import { useContext, useEffect } from 'react';
 import { gql } from 'graphql-request';
 
-import { RangeContainer } from '@rangeos-nx/frontend/clients/devops-api';
+import { type RangeContainer } from '@rangeos-nx/frontend/clients/devops-api';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
 import { graphqlContainerFields, Topic, useSubscription } from '@rangeos-nx/frontend/clients/hooks';
 

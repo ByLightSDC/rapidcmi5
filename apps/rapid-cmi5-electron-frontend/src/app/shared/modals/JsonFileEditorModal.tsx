@@ -3,13 +3,13 @@ import { Grid } from '@mui/system';
 import { Button, Stack, Typography } from '@mui/material';
 import * as yup from 'yup';
 import { useCallback } from 'react';
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 
 import {
-  CommonAppModalState,
+  type CommonAppModalState,
   FormControlTextField,
   FormControlUIProvider,
-  FormStateType,
+  type FormStateType,
   MiniForm,
   ModalDialog,
 } from '@rapid-cmi5/ui';

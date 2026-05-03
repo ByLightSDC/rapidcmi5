@@ -1,8 +1,8 @@
 import { Cell } from '@mdxeditor/editor';
 import { createCommand } from 'lexical';
 import {
-  iFootnoteDefinitionEditorDescriptor,
-  iFootnoteReferenceEditorDescriptor,
+  type iFootnoteDefinitionEditorDescriptor,
+  type iFootnoteReferenceEditorDescriptor,
 } from './types';
 
 // reference keys

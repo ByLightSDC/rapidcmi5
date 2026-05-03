@@ -1,5 +1,5 @@
 import { useCallback, useContext, useRef, useState } from 'react';
-import { CommonAppModalState, ModalDialog } from '@rapid-cmi5/ui';
+import { type CommonAppModalState, ModalDialog } from '@rapid-cmi5/ui';
 import {
   Box,
   Button,
@@ -14,7 +14,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import SecurityIcon from '@mui/icons-material/Security';
-import { CertInfo } from '@rapid-cmi5/cmi5-build-common';
+import { type CertInfo } from '@rapid-cmi5/cmi5-build-common';
 import { UserConfigContext } from '../../contexts/UserConfigContext';
 
 export const configureCertsModalId = 'configureCertsModalId';

@@ -4,7 +4,6 @@ import {
   Box,
   Typography,
   Stack,
-  Alert,
 } from '@mui/material';
 import { ButtonInfoField, ButtonInfoFormHeaderLayout, useToaster } from '@rapid-cmi5/ui';
 import {
@@ -70,7 +69,7 @@ const PopupInput: React.FC<PopupInputProps> = ({
     if (isFileSelected) {
       if (fileFormData) {
         const fileReader = new FileReader();
-        fileReader.onload = function (event: any) {
+        fileReader.onload = function (_event: any) {
           if (fileReader.result) {
             const imgData = new Uint8Array(fileReader.result as ArrayBuffer);
             onCreateFile(name, imgData);
@@ -85,7 +84,7 @@ const PopupInput: React.FC<PopupInputProps> = ({
       if (folderFormData) {
         for (const subfileFormData of folderFormData) {
           const fileReader = new FileReader();
-          fileReader.onload = function (event: any) {
+          fileReader.onload = function (_event: any) {
             if (fileReader.result) {
               const imgData = new Uint8Array(fileReader.result as ArrayBuffer);
               onCreateFile(`${name}/${subfileFormData.name}`, imgData);
@@ -199,30 +198,30 @@ const PopupInput: React.FC<PopupInputProps> = ({
           percentLoaded={percentComplete}
           {...(type === 'file'
             ? {
-                onFileSelected: (file: File, selected: boolean) => {
-                  setIsFileSelected(selected);
-                  if (file && selected) {
-                    setFileFormData(file);
-                    if (name === '' || name === undefined) {
-                      setName(file.name);
-                    }
+              onFileSelected: (file: File, selected: boolean) => {
+                setIsFileSelected(selected);
+                if (file && selected) {
+                  setFileFormData(file);
+                  if (name === '' || name === undefined) {
+                    setName(file.name);
                   }
-                },
-              }
+                }
+              },
+            }
             : {
-                onFolderSelected: (files: File[], selected: boolean) => {
-                  setIsFolderSelected(selected);
-                  if (files && selected && files.length > 0) {
-                    setFolderFormData(files);
+              onFolderSelected: (files: File[], selected: boolean) => {
+                setIsFolderSelected(selected);
+                if (files && selected && files.length > 0) {
+                  setFolderFormData(files);
 
-                    if (name === '' || name === undefined) {
-                      const firstFile = files[0];
-                      const folderName = dirname(firstFile.webkitRelativePath);
-                      setName(folderName);
-                    }
+                  if (name === '' || name === undefined) {
+                    const firstFile = files[0];
+                    const folderName = dirname(firstFile.webkitRelativePath);
+                    setName(folderName);
                   }
-                },
-              })}
+                }
+              },
+            })}
         />
 
         <Box

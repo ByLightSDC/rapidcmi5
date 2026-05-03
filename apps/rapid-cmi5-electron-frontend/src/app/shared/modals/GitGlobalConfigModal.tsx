@@ -1,17 +1,17 @@
 import { Alert } from '@mui/material';
 import { Grid } from '@mui/system';
-import { Credentials, GitUserConfig } from '@rapid-cmi5/cmi5-build-common';
+import { type Credentials, type GitUserConfig } from '@rapid-cmi5/cmi5-build-common';
 import {
-  CommonAppModalState,
+  type CommonAppModalState,
   FormControlPassword,
   FormControlTextField,
   FormControlUIProvider,
-  FormStateType,
+  type FormStateType,
   MiniForm,
   ModalDialog,
 } from '@rapid-cmi5/ui';
 import { useCallback, useMemo } from 'react';
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 import * as yup from 'yup';
 
 export const configureGlobalGitConfigModalId =

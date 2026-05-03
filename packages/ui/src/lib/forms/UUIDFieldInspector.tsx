@@ -12,7 +12,6 @@ Because we use react hook form , clicking submit button in one form will trigger
 */
 
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
 import EditIcon from '@mui/icons-material/Edit';
@@ -22,7 +21,7 @@ import TextField from '@mui/material/TextField';
 
 import { LoadingUi } from '../indicators/Loading';
 import DataCacheOrFetcher from './DataCacheOrFetcher';
-import { tFormControlTextFieldProps } from './FormControlTextField';
+import { type tFormControlTextFieldProps } from './FormControlTextField';
 import ReadOnlyTextField from './ReadOnlyTextField';
 import { FormCrudType } from '../redux/utils/types';
 import { ButtonIcon } from '../utility/buttons';
@@ -122,14 +121,12 @@ export function UUIDFieldInspector(props: tUUIDFieldInspectorProps) {
   const navigate = useNavigate();
   const [readyToLoad, setReadyToLoad] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isModalTriggered, setIsModalTriggered] = useState(false);
   const [data, setData] = useState<any>(null);
   const [apiRequestError, setApiRequestError] = useState<any>(null);
   //initialAlias is the key for key value pairs otherwise, its the field value
   const [alias, setAlias] = useState(
     initialAlias ? initialAlias : isKeyValue ? '' : uuid,
   );
-  const dispatch = useDispatch();
   const fieldError = formFieldProps.error;
   const fieldHelperText = formFieldProps.helperText;
 
@@ -186,7 +183,6 @@ export function UUIDFieldInspector(props: tUUIDFieldInspectorProps) {
    */
   const handleViewOrEditData = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
-    setIsModalTriggered(true);
     //Pull from Common or fallback on last load
 
     if (editRoute) {

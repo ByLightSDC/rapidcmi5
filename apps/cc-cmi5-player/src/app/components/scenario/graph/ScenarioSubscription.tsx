@@ -5,7 +5,7 @@ import { gql } from 'graphql-request';
 
 
 import {
-  DeployedScenarioData,
+  type DeployedScenarioData,
   ScenarioUpdatesContext,
 } from '../ScenarioUpdatesContext';
 import { graphqlScenarioFields, Topic, useSubscription } from '@rangeos-nx/frontend/clients/hooks';

@@ -1,5 +1,5 @@
 import { usePublisher } from '@mdxeditor/gurx';
-import { ContainerDirective } from 'mdast-util-directive';
+import { type ContainerDirective } from 'mdast-util-directive';
 import { insertActivityDirective$ } from '../../plugins/Activity';
 import { useSelector } from 'react-redux';
 import { useMemo } from 'react';

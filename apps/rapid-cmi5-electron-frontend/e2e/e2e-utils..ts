@@ -1,5 +1,4 @@
-import { expect, Page } from '@playwright/test';
-import { join } from 'path-browserify';
+import { expect, type Page } from '@playwright/test';
 export const PUBLIC_TEST_REPO =
   'https://github.com/aaiirr123/rapid-cmi5-test-course.git';
 // ============================================================================
@@ -114,7 +113,7 @@ export const createRepo = async (
   authorName: string,
   authorEmail: string,
   remoteUrl?: string,
-  isWebApp = false,
+  _isWebApp = false,
 ) => {
   const createRepoButton = window.getByTestId('create-repo-button');
   await expect(createRepoButton).toBeAttached();

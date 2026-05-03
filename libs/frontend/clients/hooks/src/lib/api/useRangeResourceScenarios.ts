@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/rules-of-hooks */
-import { AxiosRequestConfig } from 'axios';
+import { type AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import {
@@ -12,10 +12,10 @@ import {
 } from './config';
 import { getErrorMessage, getErrorMessageDetail } from './errorMessages';
 import {
-  DeployedScenarioPermission,
+  type DeployedScenarioPermission,
   DevopsApiClient,
-  ScenariosCreateByRangeIdRequest,
-  ScenariosUpdateByRangeIdUuidRequest,
+  type ScenariosCreateByRangeIdRequest,
+  type ScenariosUpdateByRangeIdUuidRequest,
 } from '@rangeos-nx/frontend/clients/devops-api';
 
 export const queryKeyRangeResourceScenarios = 'range-resource-scenarios';
@@ -131,7 +131,7 @@ export const usePostRangeResourceScenario = () => {
   return useMutation(
     ({ rangeId, formData }: any) => postResult(rangeId, formData),
     {
-      onSettled: async (data, error, variables: any) => {
+      onSettled: async (_data, error, _variables: any) => {
         if (!error) {
           queryClient.invalidateQueries(queryKeyRangeResourceScenarios);
         }
@@ -173,7 +173,7 @@ export const usePutRangeResourceScenario = () => {
   return useMutation(
     ({ rangeId, uuid, formData }: any) => putResult(rangeId, uuid, formData),
     {
-      onSettled: async (data, error, variables: any) => {
+      onSettled: async (_data, error, _variables: any) => {
         if (!error) {
           queryClient.invalidateQueries(queryKeyRangeResourceScenarios);
           queryClient.invalidateQueries(queryKeyRangeResourceScenarioOverrides);
@@ -184,8 +184,6 @@ export const usePutRangeResourceScenario = () => {
 };
 
 export const useDeleteRangeResourceScenario = ({
-  rangeId,
-  uuid,
   shouldInvalidate = false, // since we use graphql - don't need to invalidate on delete - just add/update
 }: any) => {
   const queryClient = useQueryClient();
@@ -206,7 +204,7 @@ export const useDeleteRangeResourceScenario = ({
   };
 
   return useMutation(({ rangeId, uuid }: any) => deleteResult(rangeId, uuid), {
-    onSettled: async (data, error, variables: any) => {
+    onSettled: async (_data, error, _variables: any) => {
       if (!error) {
         if (shouldInvalidate) {
           queryClient.invalidateQueries([queryKeyRangeResourceScenarios]);
@@ -217,8 +215,6 @@ export const useDeleteRangeResourceScenario = ({
 };
 
 export const useStartRangeResourceScenario = ({
-  rangeId,
-  uuid,
   shouldInvalidate = false, // since we use graphql - don't need to invalidate on delete - just add/update
 }: any) => {
   const queryClient = useQueryClient();
@@ -236,23 +232,18 @@ export const useStartRangeResourceScenario = ({
     }
   };
 
-  return useMutation(
-    ({ rangeId, uuid, formData }: any) => postResult(rangeId, uuid),
-    {
-      onSettled: async (data, error, variables: any) => {
-        if (!error) {
-          if (shouldInvalidate) {
-            queryClient.invalidateQueries([queryKeyRangeResourceScenarios]);
-          }
+  return useMutation(({ rangeId, uuid }: any) => postResult(rangeId, uuid), {
+    onSettled: async (_data, error, _variables: any) => {
+      if (!error) {
+        if (shouldInvalidate) {
+          queryClient.invalidateQueries([queryKeyRangeResourceScenarios]);
         }
-      },
+      }
     },
-  );
+  });
 };
 
 export const useStopRangeResourceScenario = ({
-  rangeId,
-  uuid,
   shouldInvalidate = false, // since we use graphql - don't need to invalidate on delete - just add/update
 }: any) => {
   const queryClient = useQueryClient();
@@ -270,18 +261,15 @@ export const useStopRangeResourceScenario = ({
     }
   };
 
-  return useMutation(
-    ({ rangeId, uuid, formData }: any) => postResult(rangeId, uuid),
-    {
-      onSettled: async (data, error, variables: any) => {
-        if (!error) {
-          if (shouldInvalidate) {
-            queryClient.invalidateQueries([queryKeyRangeResourceScenarios]);
-          }
+  return useMutation(({ rangeId, uuid }: any) => postResult(rangeId, uuid), {
+    onSettled: async (_data, error, _variables: any) => {
+      if (!error) {
+        if (shouldInvalidate) {
+          queryClient.invalidateQueries([queryKeyRangeResourceScenarios]);
         }
-      },
+      }
     },
-  );
+  });
 };
 
 export const useGetRangeResourceScenarioOverrides = ({
@@ -370,7 +358,7 @@ export const usePutRangeResourceScenarioPermissions = () => {
   return useMutation(
     ({ rangeId, uuid, formData }: any) => putResult(rangeId, uuid, formData),
     {
-      onSettled: async (data, error, variables: any) => {
+      onSettled: async (_data, error, _variables: any) => {
         if (!error) {
           queryClient.invalidateQueries(
             queryKeyRangeResourceScenarioPermissions,
@@ -410,7 +398,7 @@ export const usePostUserToScenarioPermission = () => {
     ({ rangeId, scenarioId, group, username }: any) =>
       postResult(rangeId, scenarioId, group, username),
     {
-      onSettled: async (data, error, variables: any) => {
+      onSettled: async (_data, error, _variables: any) => {
         if (!error) {
           queryClient.invalidateQueries(queryKeyRangeResourceScenarios);
         }
@@ -419,7 +407,7 @@ export const usePostUserToScenarioPermission = () => {
   );
 };
 
-export const useDeleteUserFromScenarioPermission = ({ rangeId }: any) => {
+export const useDeleteUserFromScenarioPermission = () => {
   const queryClient = useQueryClient();
   const deleteResult = async (
     rangeId: string,
@@ -448,7 +436,7 @@ export const useDeleteUserFromScenarioPermission = ({ rangeId }: any) => {
     ({ rangeId, scenarioId, group, username }: any) =>
       deleteResult(rangeId, scenarioId, group, username),
     {
-      onSettled: async (data, error, variables: any) => {
+      onSettled: async (_data, error, _variables: any) => {
         if (!error) {
           queryClient.invalidateQueries([
             queryKeyRangeResourceScenarioPermissions,

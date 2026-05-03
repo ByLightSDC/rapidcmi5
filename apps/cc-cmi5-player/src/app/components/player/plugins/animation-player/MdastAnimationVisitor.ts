@@ -1,7 +1,7 @@
-import { MdastImportVisitor } from '@mdxeditor/editor';
-import { Yaml } from 'mdast';
+import { type MdastImportVisitor } from '@mdxeditor/editor';
+import { type Yaml } from 'mdast';
 import * as yaml from 'js-yaml';
-import { AnimationConfig } from '@rapid-cmi5/ui';
+import { type AnimationConfig } from '@rapid-cmi5/ui';
 
 /**
  * Parse animations from markdown frontmatter

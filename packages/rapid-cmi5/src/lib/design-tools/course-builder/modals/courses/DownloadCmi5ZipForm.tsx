@@ -1,19 +1,19 @@
 import {
   FormControlTextField,
   FormControlUIProvider,
-  FormStateType,
+  type FormStateType,
   MiniForm,
   ModalDialog,
-  CommonAppModalState,
+  type CommonAppModalState,
 } from '@rapid-cmi5/ui';
 import * as yup from 'yup';
 
 import Grid from '@mui/material/Grid2';
 
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 import { NAME_GROUP_OPT } from '@rapid-cmi5/ui';
-import { DownloadCmi5Type } from '../../CourseBuilderApiTypes';
-import { useContext, useState } from 'react';
+import { type DownloadCmi5Type } from '../../CourseBuilderApiTypes';
+import { useContext } from 'react';
 import { GitContext } from '../../GitViewer/session/GitContext';
 import { downloadCmi5ZipModalId } from '../../../rapidcmi5_mdx/modals/constants';
 
@@ -34,9 +34,6 @@ export function DownloadCmi5ZipForm({
 }) {
   const { handleDownloadCmi5Zip } = useContext(GitContext);
 
-  const [currentCourseId, setCurrentCourseId] = useState<string>('');
-  const [courseHasUUID, setCourseHasUUID] = useState(true);
-
   const validationSchema = yup.object().shape({
     username: NAME_GROUP_OPT,
   });
@@ -49,7 +46,7 @@ export function DownloadCmi5ZipForm({
     handleCloseModal();
   };
 
-  const onResponse = (isSuccess: boolean, data: any, message: string) => {
+  const onResponse = (isSuccess: boolean, data: any) => {
     if (isSuccess) {
       handleModalAction(modalObj.type, 1, data);
     }

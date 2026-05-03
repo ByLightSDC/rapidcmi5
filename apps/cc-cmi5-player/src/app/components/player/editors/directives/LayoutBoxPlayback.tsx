@@ -1,5 +1,5 @@
-import { DirectiveEditorProps, NestedLexicalEditor } from '@mdxeditor/editor';
-import { ContainerDirective } from 'mdast-util-directive';
+import { type DirectiveEditorProps, NestedLexicalEditor } from '@mdxeditor/editor';
+import { type ContainerDirective } from 'mdast-util-directive';
 import React, { useRef } from 'react';
 
 export const LayoutBoxPlayback: React.FC<

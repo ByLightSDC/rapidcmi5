@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { resetPersistance } from '../../redux/utils/store';
 
 interface State {
@@ -50,10 +50,10 @@ export const bookmarksSlice = createSlice({
       return { ...initialState };
     }),
   reducers: {
-    clearBookmarks: (state, action: PayloadAction) => {
+    clearBookmarks: (state) => {
       state.cue = [];
     },
-    clearBookmarkMeta: (state, action: PayloadAction) => {
+    clearBookmarkMeta: (state) => {
       if (state.cue?.length > 0) {
         state.cue[state.cue?.length - 1].meta = null;
       }
@@ -68,7 +68,7 @@ export const bookmarksSlice = createSlice({
         }
       }
     },
-    clearAllFormData: (state, action: PayloadAction) => {
+    clearAllFormData: (state) => {
       state.formData = {};
     },
     clearFormData: (state, action: PayloadAction<string>) => {
@@ -78,7 +78,7 @@ export const bookmarksSlice = createSlice({
     },
     popToBookmark: (state, action: PayloadAction<number>) => {
       if (state.cue?.length > 0) {
-        let newArr: tBookmark[] = [];
+        const newArr: tBookmark[] = [];
         for (let i = 0; i < state.cue?.length; i++) {
           if (i <= action.payload) {
             newArr.push(state.cue[i]);
@@ -90,7 +90,7 @@ export const bookmarksSlice = createSlice({
         state.cue = newArr;
       }
     },
-    popBookmark: (state, action: PayloadAction) => {
+    popBookmark: (state) => {
       if (state.cue?.length > 0) {
         state.cue.pop();
       }

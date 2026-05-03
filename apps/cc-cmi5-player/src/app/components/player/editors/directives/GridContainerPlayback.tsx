@@ -1,8 +1,8 @@
-import { DirectiveEditorProps, NestedLexicalEditor } from '@mdxeditor/editor';
-import { ContainerDirective } from 'mdast-util-directive';
+import { type DirectiveEditorProps, NestedLexicalEditor } from '@mdxeditor/editor';
+import { type ContainerDirective } from 'mdast-util-directive';
 import React, { useMemo, useRef } from 'react';
 import { parseStyleString, resolveBlockMaxWidth } from '@rapid-cmi5/ui';
-import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { type ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 export const GridContainerPlayback: React.FC<
   DirectiveEditorProps<ContainerDirective>

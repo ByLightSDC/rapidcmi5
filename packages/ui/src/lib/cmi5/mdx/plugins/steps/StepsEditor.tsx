@@ -1,19 +1,15 @@
 import {
-  DirectiveEditorProps,
+  type DirectiveEditorProps,
   insertMarkdown$,
   NestedLexicalEditor,
   readOnly$,
-  syntaxExtensions$,
   useCellValues,
   usePublisher,
 } from '@mdxeditor/editor';
-import * as Mdast from 'mdast';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import type * as Mdast from 'mdast';
 import type { BlockContent, DefinitionContent } from 'mdast';
-import { ContainerDirective } from 'mdast-util-directive';
-import { CSSProperties, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { toMarkdown } from 'mdast-util-to-markdown';
-import { $getRoot } from 'lexical';
+import { type ContainerDirective } from 'mdast-util-directive';
+import { type CSSProperties, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import {
   Box,
@@ -24,12 +20,10 @@ import {
   ListItemText,
   Paper,
   Stack,
-  SxProps,
-  Tab,
-  Tabs,
+  type SxProps,
   Tooltip,
   Typography,
-  TypographyOwnProps,
+  type TypographyOwnProps,
   useTheme,
 } from '@mui/material';
 
@@ -50,9 +44,8 @@ import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
 import { StepsContext } from './StepsContext';
-import { StepContentDirectiveNode, StepDirectiveNode } from './types';
+import { type StepContentDirectiveNode, type StepDirectiveNode } from './types';
 
-import { $isElementNode } from 'lexical';
 import { DEFAULT_STEP } from './constants';
 import ModalDialog from '../../../../modals/ModalDialog';
 import {
@@ -63,7 +56,6 @@ import {
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import {
-  convertMarkdownToMdast,
   convertMdastToMarkdown,
 } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
@@ -75,7 +67,7 @@ import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover'
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { useGutterRight } from '../shared/useGutterRight';
-import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { type ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Steps Editor for steps directive
@@ -90,7 +82,6 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   const muiTheme = useTheme();
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
   const insertMarkdown = usePublisher(insertMarkdown$);
-  const [editor] = useLexicalComposerContext();
 
   const [formData, setFormData] = useState<Array<StepContentDirectiveNode>>(
     structuredClone(mdastNode.children),
@@ -101,7 +92,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   const [sxProps, setSxProps] = useState<SxProps>({});
   const [title, setTitle] = useState('');
 
-  const [isPlayback, readOnly] = useCellValues(editorInPlayback$, readOnly$);
+  const [isPlayback] = useCellValues(editorInPlayback$, readOnly$);
 
   const { lessonTheme } = useContext(LessonThemeContext);
   const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
@@ -296,7 +287,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
    * @param event
    */
   const handleNext = useCallback(
-    (event: React.SyntheticEvent) => {
+    (_event: React.SyntheticEvent) => {
       setStep(step + 1);
     },
     [step],
@@ -307,7 +298,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
    * @param event
    */
   const handlePrevious = useCallback(
-    (event: React.SyntheticEvent) => {
+    (_event: React.SyntheticEvent) => {
       setStep(step - 1);
     },
     [step],
@@ -315,9 +306,9 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
 
   /**
    * Reset step to beginning
-   * @param event
+   * @param _event
    */
-  const handleReset = (event: React.SyntheticEvent) => {
+  const handleReset = (_event: React.SyntheticEvent) => {
     setStep(0);
   };
 
@@ -781,7 +772,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                               handleClick:
                                 | React.MouseEventHandler<HTMLButtonElement>
                                 | undefined,
-                              tooltip: string,
+                              _tooltip: string,
                             ) => {
                               return (
                                 <IconButton
@@ -818,7 +809,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                                 sx={{
                                   height: 30,
                                 }}
-                                onClick={(event) => {
+                                onClick={(_event) => {
                                   handleAddStepBefore(index);
                                 }}
                               >
@@ -841,7 +832,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                                 sx={{
                                   height: 30,
                                 }}
-                                onClick={(event) => {
+                                onClick={(_event) => {
                                   handleAddStepAfter(index);
                                 }}
                               >
@@ -864,7 +855,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                                 sx={{
                                   height: 30,
                                 }}
-                                onClick={(event) => {
+                                onClick={(_event) => {
                                   handleRemoveStep(index);
                                 }}
                               >

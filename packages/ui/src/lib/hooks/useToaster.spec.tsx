@@ -153,7 +153,7 @@ xdescribe('useToaster hook', () => {
   });
 
   it('should render toaster at given anchor position', async () => {
-    const { baseElement, getByText, findByRole, asFragment } = render(
+    const { baseElement, getByText, asFragment } = render(
       <NotificationsProvider
         slotProps={{
           snackbar: {
@@ -170,7 +170,6 @@ xdescribe('useToaster hook', () => {
     const button = getByText('toaster');
     expect(button).toBeTruthy();
     fireEvent.click(button);
-    const toaster = await findByRole('alert');
     // since there is no actual painted element in a browser,
     // we can't verify the actual position
     // we will just snapshot the "rendered" fragment

@@ -1,4 +1,4 @@
-import { app, autoUpdater, dialog, MessageBoxOptions } from 'electron';
+import { app, autoUpdater, dialog, type MessageBoxOptions } from 'electron';
 import { platform, arch } from 'os';
 import { updateServerUrl } from '../constants';
 import App from '../app';
@@ -31,7 +31,7 @@ export default class UpdateEvents {
 
 autoUpdater.on(
   'update-downloaded',
-  (event, releaseNotes, releaseName, releaseDate) => {
+  (_event, releaseNotes, releaseName) => {
     const dialogOpts: MessageBoxOptions = {
       type: 'info' as const,
       buttons: ['Restart', 'Later'],

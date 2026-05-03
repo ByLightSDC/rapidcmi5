@@ -4,19 +4,19 @@ import {
   FormControlPassword,
   FormControlTextField,
   FormControlUIProvider,
-  FormStateType,
+  type FormStateType,
   MiniForm,
   ModalDialog,
   ViewExpander,
 } from '@rapid-cmi5/ui';
 import * as yup from 'yup';
 
-import { CommonAppModalState } from '@rapid-cmi5/ui';
+import { type CommonAppModalState } from '@rapid-cmi5/ui';
 
 import { Box } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 
 import { GIT_URL_GROUP, NAME_GROUP } from '@rapid-cmi5/ui';
 import { useCallback, useContext, useEffect, useMemo } from 'react';
@@ -24,7 +24,7 @@ import { useCallback, useContext, useEffect, useMemo } from 'react';
 import CheckIcon from '@mui/icons-material/Check';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import { cloneRepoModalId } from '../../../rapidcmi5_mdx/modals/constants';
-import { CreateCloneType } from '../../CourseBuilderApiTypes';
+import { type CreateCloneType } from '../../CourseBuilderApiTypes';
 import { GitContext } from '../../GitViewer/session/GitContext';
 
 const validationSchema = yup.object().shape({
@@ -61,7 +61,7 @@ export function CloneRepoForm({
     handleCloseModal();
   };
 
-  const onResponse = (isSuccess: boolean, data: any, message: string) => {
+  const onResponse = (isSuccess: boolean, data: any, _message: string) => {
     if (isSuccess) {
       handleModalAction(modalObj.type, 1, data);
     }

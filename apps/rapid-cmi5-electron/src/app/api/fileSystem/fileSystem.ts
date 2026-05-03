@@ -1,6 +1,6 @@
 import {
-  DirMeta,
-  FolderStruct,
+  type DirMeta,
+  type FolderStruct,
   sortProjectMetas,
 } from '@rapid-cmi5/cmi5-build-common';
 

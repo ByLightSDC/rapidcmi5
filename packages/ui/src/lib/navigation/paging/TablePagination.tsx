@@ -19,7 +19,6 @@ export interface TablePaginationProps {
 
 export function TablePaginationUi({
   id = 'table-pagination',
-  label = '',
   labelHeight = '32px',
   page,
   rowsPerPage,

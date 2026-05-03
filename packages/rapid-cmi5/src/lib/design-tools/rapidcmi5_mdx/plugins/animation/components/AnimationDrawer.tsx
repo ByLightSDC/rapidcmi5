@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import {
   Box,
   Drawer,
@@ -132,13 +132,13 @@ export function AnimationDrawer() {
           sx={{
             alignItems: 'center',
             padding: 2,
-             background: alpha(theme.palette.primary.main, 0.15),
+            background: alpha(theme.palette.primary.main, 0.15),
             borderBottom: 1,
             borderColor: 'divider',
           }}
         >
-          <MotionPhotosAutoIcon color="primary"/>
-          <Typography variant="h6" sx={{ color:'primary.main', flex: 1, marginLeft: 1 }}>
+          <MotionPhotosAutoIcon color="primary" />
+          <Typography variant="h6" sx={{ color: 'primary.main', flex: 1, marginLeft: 1 }}>
             Animation Library
           </Typography>
           <Tooltip title={autoHide ? 'Auto-hide on (click to pin)' : 'Auto-hide off (click to enable)'}>

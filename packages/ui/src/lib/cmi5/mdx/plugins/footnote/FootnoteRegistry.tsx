@@ -3,14 +3,12 @@ import { FootnoteReferenceNode } from './FootnoteReferenceNode';
 import { FootnoteDefinitionNode } from './FootnoteDefinitionNode';
 import {
   $createGenericHTMLNode,
-  GenericHTMLNode,
+  type GenericHTMLNode,
   rootEditor$,
-  useCellValue,
   useCellValues,
   usePublisher,
 } from '@mdxeditor/editor';
 import { mergeRegister } from '@lexical/utils';
-import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 import {
   $getNodeByKey,
   $getRoot,
@@ -359,7 +357,7 @@ export default function FootnoteRegistry() {
           (mutations: any) => {
             rootEditor.read(() => {
               //console.log('cleanUpCrudGroupListener');
-              for (const [key, mutation] of mutations) {
+              for (const [_key, mutation] of mutations) {
                 if (mutation === 'destroyed') {
                   groupKey.current = null;
                 }

@@ -1,11 +1,10 @@
 import { Cell } from '@mdxeditor/editor';
 import {
-  ActivityScore,
-  GetActivityCacheHandler,
-  LessonTheme,
-  SetActivityCacheHandler,
-  SetCmi5ProgressHandler,
-  SubmitCmiScoreHandler,
+  type GetActivityCacheHandler,
+  type LessonTheme,
+  type SetActivityCacheHandler,
+  type SetCmi5ProgressHandler,
+  type SubmitCmiScoreHandler,
 } from '@rapid-cmi5/cmi5-build-common';
 
 /**

@@ -1,5 +1,5 @@
-import { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx';
-import * as Mdast from 'mdast';
+import { type MdxJsxTextElement, type MdxJsxFlowElement } from 'mdast-util-mdx';
+import type * as Mdast from 'mdast';
 
 export function getAttributeValue(
   node: MdxJsxTextElement | MdxJsxFlowElement,

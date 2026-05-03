@@ -12,7 +12,7 @@ import {
 } from '@mdxeditor/editor';
 
 import AnimationDirectiveRegistry from '../../editors/AnimationDirectiveRegistry';
-import { AnimationConfig } from '../../animation/types/Animation.types';
+import { type AnimationConfig } from '../../animation/types/Animation.types';
 
 
 /**

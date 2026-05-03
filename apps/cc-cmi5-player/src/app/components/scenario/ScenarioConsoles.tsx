@@ -20,7 +20,6 @@ import {
   ListItemIcon,
   Paper,
   Stack,
-  SxProps,
   Tabs,
   Tooltip,
   Typography,
@@ -49,23 +48,23 @@ import ScenarioProgress from './ScenarioProgress';
 import { useAutoGraderProgress } from './hooks/useAutoGraderProgress';
 import AutoGraderSubscription from './graph/AutoGraderSubscription';
 import {
-  DeployedScenario,
+  type DeployedScenario,
   DeployedScenarioDetailStatusEnum,
 } from '@rangeos-nx/frontend/clients/devops-api';
 import {
   queryKeyRangeResourceContainers,
   getScenarioStatusIcon,
   Topic,
-  AutoGraderEvent,
+  type AutoGraderEvent,
 } from '@rangeos-nx/frontend/clients/hooks';
-import { AuContextProps, ScenarioContent } from '@rapid-cmi5/cmi5-build-common';
+import { type AuContextProps, type ScenarioContent } from '@rapid-cmi5/cmi5-build-common';
 import {
   ButtonMainUi,
   setModal,
   ButtonMinorUi,
   OverflowTypography,
   TabMainUi,
-  LessonThemeContext,  maxFormWidths,
+  LessonThemeContext, maxFormWidths,
   useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
 
@@ -122,7 +121,7 @@ function ScenarioConsoles({
   //   scenarioId,
   // ]);
 
-  const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChangeTab = (_event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
   };
 
@@ -296,7 +295,7 @@ function ScenarioStatus({
 }) {
   const [isClockShowing, setIsClockShowing] = useState(false);
 
-  const { getUpdates, rangeId, scenarioId, scenarioStatusChangeCounter } =
+  const { getUpdates, rangeId, scenarioStatusChangeCounter } =
     useContext(ScenarioUpdatesContext);
 
   const confirmStopButtonText =
@@ -347,17 +346,17 @@ function ScenarioStatus({
           />
           {scenarioWithStatus.status !==
             DeployedScenarioDetailStatusEnum.Ready && (
-            <ListItemIcon
-              sx={{
-                padding: 0,
-                margin: 0,
-                height: '32px',
-                minWidth: 0,
-              }}
-            >
-              {rowStatus.icon}
-            </ListItemIcon>
-          )}
+              <ListItemIcon
+                sx={{
+                  padding: 0,
+                  margin: 0,
+                  height: '32px',
+                  minWidth: 0,
+                }}
+              >
+                {rowStatus.icon}
+              </ListItemIcon>
+            )}
           <Stack
             direction="row"
             sx={{

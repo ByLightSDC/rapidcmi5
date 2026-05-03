@@ -1,7 +1,7 @@
-export function ErrorMessageDetail(
+export default function ErrorMessageDetail(
   displayError: any,
   defaultMessage: string | undefined | null = '',
-  shouldShowDetail: boolean = false,
+  shouldShowDetail = false,
 ) {
   const optDetailStr =
     shouldShowDetail && displayError?.message
@@ -24,4 +24,3 @@ export function ErrorMessageDetail(
     </>
   );
 }
-export default ErrorMessageDetail;

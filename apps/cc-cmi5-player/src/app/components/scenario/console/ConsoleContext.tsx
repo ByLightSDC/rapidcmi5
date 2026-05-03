@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React, { createContext, useRef, useState } from 'react';
-import { ReactFlowInstance } from 'reactflow';
+import { type ReactFlowInstance } from 'reactflow';
 import { ConsoleWindowManager } from './ConsoleWindowManager';
 import ConsolePopup from './ConsolePopup';
 import { DeployedRangeConsoleStatusEnum } from '@rangeos-nx/frontend/clients/devops-api';
@@ -43,37 +43,37 @@ interface iConsoleContext {
 
 export const ConsoleContext = createContext<iConsoleContext>({
   addConsoleWindow: async (
-    connectionId: string,
-    connectionType: string,
-    connectionUrl: string,
-    title: string,
-    resizeMethod: string | null | undefined,
-    protocol: string | null,
-  ) => {},
-  removeConsoleWindow: (winNumber: number) => {},
+    _connectionId: string,
+    _connectionType: string,
+    _connectionUrl: string,
+    _title: string,
+    _resizeMethod: string | null | undefined,
+    _protocol: string | null,
+  ) => { },
+  removeConsoleWindow: (_winNumber: number) => { },
   consoleWindows: [],
   currentZIndex: -1,
-  isConsoleReady: (status?: DeployedRangeConsoleStatusEnum) => true,
-  setCurrentZIndex: (currIndex: number) => {},
-  setReactFlowInstance: (obj: any) => {},
-  setIsDockingEnabled: (bool: boolean) => {},
+  isConsoleReady: (_status?: DeployedRangeConsoleStatusEnum) => true,
+  setCurrentZIndex: (_currIndex: number) => { },
+  setReactFlowInstance: (_obj: any) => { },
+  setIsDockingEnabled: (_bool: boolean) => { },
   isDockingEnabled: () => {
     return false;
   },
   setStoredWindowSettings: (
-    id: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    isMaximized: boolean,
-  ) => {},
-  getStoredWindowSettings: (id: string) => {
+    _id: string,
+    _x: number,
+    _y: number,
+    _width: number,
+    _height: number,
+    _isMaximized: boolean,
+  ) => { },
+  getStoredWindowSettings: (_id: string) => {
     return { x: 0, y: 0, width: 0, height: 0, isMaximized: false };
   },
-  screenToViewport: (obj: any) => {},
-  viewportToScreen: (obj: any) => {},
-  sendScenarioEvent: async () => {},
+  screenToViewport: (_obj: any) => { },
+  viewportToScreen: (_obj: any) => { },
+  sendScenarioEvent: async () => { },
 });
 
 /**
@@ -113,7 +113,7 @@ export function ConsoleProvider(props: tProviderProps) {
 
   // console windows
   const [currentZIndex, setCurrentZIndex] = useState<number>(9999);
-  const [consoleWinNum, setConsoleWinNum] = useState<number>(0);
+  const [_consoleWinNum, setConsoleWinNum] = useState<number>(0);
   const [consoleWindows, setConsoleWindows] = useState<JSX.Element[]>([]);
 
   const addConsoleWindow = async (

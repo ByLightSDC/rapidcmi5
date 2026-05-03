@@ -1,16 +1,16 @@
-import * as Mdast from 'mdast';
-import { VoidEmitter } from '@mdxeditor/editor';
+import type * as Mdast from 'mdast';
+import { type VoidEmitter } from '@mdxeditor/editor';
 
 import {
-  EditorConfig,
-  LexicalEditor,
-  SerializedElementNode,
-  SerializedLexicalNode,
-  Spread,
+  type EditorConfig,
+  type LexicalEditor,
+  type SerializedElementNode,
+  type SerializedLexicalNode,
+  type Spread,
 } from 'lexical';
-import React from 'react';
-import { FootnoteDefinitionNode } from './FootnoteDefinitionNode';
-import { FootnoteReferenceNode } from './FootnoteReferenceNode';
+import type React from 'react';
+import { type FootnoteDefinitionNode } from './FootnoteDefinitionNode';
+import { type FootnoteReferenceNode } from './FootnoteReferenceNode';
 
 //#region Footnote Definition Group
 

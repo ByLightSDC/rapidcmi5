@@ -12,7 +12,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { alpha } from '@mui/material';
-import { ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
+import { type ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
 
 interface ScenarioCardProps {
   scenarioUUID: string;

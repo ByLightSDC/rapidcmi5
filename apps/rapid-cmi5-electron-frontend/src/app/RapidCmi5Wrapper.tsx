@@ -1,9 +1,9 @@
-import { Credentials, GitUserConfig } from '@rapid-cmi5/cmi5-build-common';
+import { type Credentials, type GitUserConfig } from '@rapid-cmi5/cmi5-build-common';
 import {
   RapidCmi5,
-  GetScenarioFormProps,
-  GetQuizBankAddModalProps,
-  GetQuizBankSearchModalProps,
+  type GetScenarioFormProps,
+  type GetQuizBankAddModalProps,
+  type GetQuizBankSearchModalProps,
 } from '@rapid-cmi5/react-editor';
 import { useContext } from 'react';
 import { ScenarioSelectionForm } from './shared/modals/ScenarioSelectionModal';

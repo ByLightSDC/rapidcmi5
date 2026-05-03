@@ -1,7 +1,7 @@
 import {
   FormControlCheckboxField,
   FormControlUIProvider,
-  FormStateType,
+  type FormStateType,
   MiniForm,
   ModalDialog,
 } from '@rapid-cmi5/ui';
@@ -17,14 +17,14 @@ import Grid from '@mui/material/Grid2';
 import LabelIcon from '@mui/icons-material/Label';
 import { useState } from 'react';
 import {
-  Control,
-  FieldValues,
-  UseFormReturn,
-  UseFormSetValue,
+  type Control,
+  type FieldValues,
+  type UseFormReturn,
+  type UseFormSetValue,
   useWatch,
 } from 'react-hook-form';
 import {
-  QuizBankAddModalProps,
+  type QuizBankAddModalProps,
 } from '@rapid-cmi5/react-editor';
 import {
   currentQuizBankApiVersion,

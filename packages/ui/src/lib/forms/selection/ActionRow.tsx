@@ -29,7 +29,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 
-import { RowAction, RowStatus } from '../../types/actionRowTypes';
+import { type RowAction, type RowStatus } from '../../types/actionRowTypes';
 import Box from '@mui/material/Box';
 import { ButtonIcon } from '../../utility/buttons';
 

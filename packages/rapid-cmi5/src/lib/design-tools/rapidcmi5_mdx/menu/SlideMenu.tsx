@@ -1,7 +1,5 @@
 import {
-  IconButton,
   Stack,
-  Tooltip,
   Typography,
   useTheme,
 } from '@mui/material';
@@ -10,11 +8,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 
-import {
-  iconButtonSize,
-  iconButtonStyle,
-  tooltipStyle,
-} from '../styles/styles';
+
+
 import { useDispatch, useSelector } from 'react-redux';
 import {
   addASlide,
@@ -36,7 +31,6 @@ import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
  * Icons
  */
 
-import { appHeaderVisible } from '@rapid-cmi5/ui';
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
 import { MUIButtonWithTooltip } from '../toolbar/components/MUIButtonWithTooltip';
 
@@ -49,12 +43,12 @@ export const SlideMenu = () => {
   const dispatch = useDispatch();
   const currentSlideIndex = useSelector(currentSlideNum);
   const currentAuDir = useSelector(currentAuPath);
-  const { currentRepo, isGitLoaded, handleGetUniqueFilePath } =
+  const { currentRepo, handleGetUniqueFilePath } =
     useContext(GitContext);
   const { lessonSlides, saveSlide } = useContext(RC5Context);
   const repoAccessObject = useSelector(currentRepoAccessObjectSel);
 
-  const onAddSlide = async (insert?: number, trimPrevious?: boolean) => {
+  const onAddSlide = async (_insert?: number, _trimPrevious?: boolean) => {
     if (!currentRepo) return;
     saveSlide(); //save before navigating away from this slide
     const slideTitle = `Slide ${lessonSlides.length + 1}`;

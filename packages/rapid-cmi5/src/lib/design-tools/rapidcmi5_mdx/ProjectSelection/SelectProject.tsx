@@ -4,13 +4,13 @@ import { useSelector } from 'react-redux';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import DocumentationDialog from './Dialogs/DocumentationDialog';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
-import { RepoState } from '../../../redux/repoManagerReducer';
-import { RootState } from '../../../redux/store';
+import { type RepoState } from '../../../redux/repoManagerReducer';
+import { type RootState } from '../../../redux/store';
 import WebAppSelection from './Components/WebAppSelection';
 import ElectronAppSelection from './Components/ElectronSelection';
 import CloneLoadingOverlay from './Components/LoadingOverlay';
 import { useToaster } from '@rapid-cmi5/ui';
-import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
+import { type DirMeta } from '@rapid-cmi5/cmi5-build-common';
 
 interface OptionDocumentation {
   title: string;

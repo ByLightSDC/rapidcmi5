@@ -1,9 +1,9 @@
-import { Extension } from '@codemirror/state';
+import { type Extension } from '@codemirror/state';
 import { DiffSourceWrapper } from './DiffSourceWrapper';
 import { Cell } from '@mdxeditor/gurx';
 import {
   realmPlugin,
-  ViewMode,
+  type ViewMode,
   addEditorWrapper$,
   viewMode$,
 } from '@mdxeditor/editor';

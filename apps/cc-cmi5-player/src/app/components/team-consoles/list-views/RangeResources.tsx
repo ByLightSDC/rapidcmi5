@@ -10,15 +10,15 @@ import Box from '@mui/material/Box';
 
 import TeamRangeResourceVMActionRow from './TeamRangeResourceVMActionRow';
 import TeamRangeResourceContainerActionRow from './TeamRangeResourceContainerActionRow';
-import { DeployedRangeConsole } from '@rangeos-nx/frontend/clients/devops-api';
+import { type DeployedRangeConsole } from '@rangeos-nx/frontend/clients/devops-api';
 import TeamRangeResourceAutoGraderActionActionRow from './TeamRangeResourceAutoGraderActionRow';
 import AutoGraderProgressDisplay from './AutoGraderProgressDisplay';
 import {
-  DeployedAutoGrader,
+  type DeployedAutoGrader,
   queryKeyRangeResourceVMs,
   Topic,
 } from '@rangeos-nx/frontend/clients/hooks';
-import { ListView, iListItemType, LoadingUi } from '@rapid-cmi5/ui';
+import { ListView, type iListItemType, LoadingUi } from '@rapid-cmi5/ui';
 
 /**
  * Displays Deployed Scenario VMs, Containers, and Autograders

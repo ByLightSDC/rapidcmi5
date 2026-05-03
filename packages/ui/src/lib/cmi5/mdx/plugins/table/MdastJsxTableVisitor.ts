@@ -2,10 +2,10 @@
  * Copyright (c) 2025 By Light Professional IT Services LLC
  * All rights reserved.
  */
-import * as Mdast from 'mdast';
-import { MdastImportVisitor } from '@mdxeditor/editor';
-import { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx';
-import { RootNode } from 'lexical';
+import type * as Mdast from 'mdast';
+import { type MdastImportVisitor } from '@mdxeditor/editor';
+import { type MdxJsxTextElement, type MdxJsxFlowElement } from 'mdast-util-mdx';
+import { type RootNode } from 'lexical';
 import { $createTableNode } from './TableNode';
 import { extractRows } from './methods';
 

@@ -7,10 +7,10 @@ import TerminalIcon from '@mui/icons-material/Terminal';
 
 import { useEffect } from 'react';
 import {
-  DeployedRangeConsole,
-  DeployedRangeConsoleStatusEnum,
+  type DeployedRangeConsole,
+  type DeployedRangeConsoleStatusEnum,
 } from '@rangeos-nx/frontend/clients/devops-api';
-import { SxProps } from '@mui/system';
+import { type SxProps } from '@mui/system';
 import { ButtonMinorUi } from '@rapid-cmi5/ui';
 
 /**

@@ -4,12 +4,10 @@ import {
   MenuItem,
   TextField,
   IconButton,
-  Box,
-  Typography,
 } from '@mui/material';
-import { ILessonNode } from './LessonTreeNode';
+import { type ILessonNode } from './LessonTreeNode';
 
-import { Check, Close, Delete, Edit } from '@mui/icons-material';
+import { Check } from '@mui/icons-material';
 
 /**
  * Provides wrapper for menu of desired options

@@ -1,18 +1,18 @@
-import * as Mdast from 'mdast';
+import type * as Mdast from 'mdast';
 import { useCellValue, voidEmitter } from '@mdxeditor/editor';
 
 import {
   DecoratorNode,
-  DOMConversionMap,
-  EditorConfig,
-  LexicalEditor,
-  NodeKey,
+  type DOMConversionMap,
+  type EditorConfig,
+  type LexicalEditor,
+  type NodeKey,
 } from 'lexical';
 import React from 'react';
 
 import FootnoteDefinitionEditorContextProvider from './FootnoteDefinitionEditorContext';
 import { footnoteDefinitionEditorDescriptors$ } from './vars';
-import { FootnoteDefEditorProps, SerializedFootnoteDefNode } from './types';
+import { type FootnoteDefEditorProps, type SerializedFootnoteDefNode } from './types';
 import { $createFootnoteDefinitionNode } from './methods';
 
 /**
@@ -155,7 +155,6 @@ const FootnoteDefEditorContainer: React.FC<FootnoteDefEditorProps> = (
 
   const Editor = descriptor.Editor;
 
-  const { lexicalNode: _, parentEditor: __, ...restProps } = props;
 
   return (
     <FootnoteDefinitionEditorContextProvider

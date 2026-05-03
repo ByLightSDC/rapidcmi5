@@ -1,14 +1,14 @@
-import { useCellValue, voidEmitter, VoidEmitter } from '@mdxeditor/editor';
+import { useCellValue, voidEmitter, type VoidEmitter } from '@mdxeditor/editor';
 
 import {
   DecoratorNode,
-  DOMConversionOutput,
-  EditorConfig,
-  LexicalEditor,
-  LexicalNode,
-  NodeKey,
-  SerializedLexicalNode,
-  Spread,
+  type DOMConversionOutput,
+  type EditorConfig,
+  type LexicalEditor,
+  type LexicalNode,
+  type NodeKey,
+  type SerializedLexicalNode,
+  type Spread,
 } from 'lexical';
 import React from 'react';
 import MathEditorContextProvider from './MathEditorContext';

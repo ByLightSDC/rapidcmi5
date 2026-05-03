@@ -37,17 +37,3 @@ const getLocalTime = (localDateStr: string, dateFormat: string): string => {
   const localDate = new Date(localDateStr);
   return format(localDate, dateFormat);
 };
-
-/**
- * Returns formatted date in local time
- * @param {string} localDateStr Local date string
- * @param {string} [dateFormat = 'MM/dd/yyyy hh:mm a'] Format
- * @return {JSX.Element} Formatted date
- */
-const getUTCTime = (localDateStr: string, dateFormat: string): string => {
-  const localDate = new Date(localDateStr);
-  const displayDate = new Date(
-    localDate.getTime() + localDate.getTimezoneOffset() * 60000,
-  );
-  return format(displayDate, dateFormat);
-};

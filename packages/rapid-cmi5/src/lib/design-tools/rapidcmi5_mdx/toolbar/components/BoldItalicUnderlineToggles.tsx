@@ -1,9 +1,4 @@
 import {
-  applyFormat$,
-  currentFormat$,
-  FORMAT,
-  iconComponentFor$,
-  IconKey,
   IS_BOLD,
   IS_CODE,
   IS_ITALIC,

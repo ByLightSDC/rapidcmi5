@@ -1,11 +1,11 @@
 import {
-  DirectiveEditorProps,
+  type DirectiveEditorProps,
   NestedLexicalEditor,
   useCellValues,
   useMdastNodeUpdater,
 } from '@mdxeditor/editor';
 
-import { ContainerDirective } from 'mdast-util-directive';
+import { type ContainerDirective } from 'mdast-util-directive';
 import {
   useCallback,
   useContext,
@@ -18,14 +18,14 @@ import {
 import { editorInPlayback$ } from '../../state/vars';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 
-import { Box, IconButton, SxProps, Tooltip, useTheme } from '@mui/material';
+import { Box, IconButton, type SxProps, Tooltip, useTheme } from '@mui/material';
 
 import DeleteIconButton from '../../components/DeleteIconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import PaletteIcon from '@mui/icons-material/Palette';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
-import { StatementPreset, StatementsContainerDirectiveNode } from './types';
+import { type StatementPreset, type StatementsContainerDirectiveNode } from './types';
 import { STATEMENT_PRESETS } from './constants';
 
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
@@ -85,18 +85,7 @@ export const StatementsContainerEditor: React.FC<
     useState<StatementPreset>(currentPreset);
 
   /** Carousel index */
-  const [carouselIndex, setCarouselIndex] = useState<number>(0);
-
-  /** Avatar */
-  const currentAvatar = useMemo(() => {
-    if (
-      mdastNode.children.length > 0 &&
-      mdastNode.children[0].name === 'statement'
-    ) {
-      return mdastNode.children[0].attributes.avatar;
-    }
-    return undefined;
-  }, [mdastNode.children[0].attributes.avatar]);
+  const carouselIndex = 0
 
 
   /**

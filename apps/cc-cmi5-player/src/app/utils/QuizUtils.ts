@@ -1,8 +1,8 @@
 import {
-  AnswerType,
+  type AnswerType,
   QuestionGradingType,
   QuestionResponseType,
-  QuizQuestionType,
+  type QuizQuestionType,
 } from '../types/QuizState';
 
 export default function gradeQuiz(

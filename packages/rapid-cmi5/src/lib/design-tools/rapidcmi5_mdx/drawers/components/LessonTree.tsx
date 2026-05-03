@@ -3,16 +3,15 @@
 
 import './lesson-tree.css';
 import TreeView, {
-  INode,
-  ITreeViewOnExpandProps,
-  NodeId,
+  type INode,
+  type ITreeViewOnExpandProps,
+  type NodeId,
 } from 'react-accessible-treeview';
-import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
+import { type IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 import {
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -24,23 +23,23 @@ import {
   navigateSlide,
 } from '../../../../redux/courseBuilderReducer';
 
-import { AppDispatch } from '../../../../redux/store';
+import { type AppDispatch } from '../../../../redux/store';
 
 //REF if we want to change colors
 // import './tree-view.css';
 import { useCourseData } from '../../data-hooks/useCourseData';
 import {
-  ILessonNode,
-  ILessonNodeSelectProps,
+  type ILessonNode,
+  type ILessonNodeSelectProps,
   LessonNodeActionEnum,
   LessonTreeNode,
   SlideNodeActionEnum,
 } from './LessonTreeNode';
 import {
-  CourseData,
+  type CourseData,
   defaultSlideContent,
-  MoveOnCriteriaEnum,
-  LessonTheme,
+  type MoveOnCriteriaEnum,
+  type LessonTheme,
   SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 
@@ -55,9 +54,8 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 import { currentRepoAccessObjectSel } from '../../../../redux/repoManagerReducer';
 import { slugifyPath } from '../../../course-builder/GitViewer/utils/useCourseOperationsUtils';
-import { appHeaderVisible, ButtonMinorUi, useToaster } from '@rapid-cmi5/ui';
-import { Divider } from '@mui/material';
-import { Box, minWidth } from '@mui/system';
+import { appHeaderVisible, useToaster } from '@rapid-cmi5/ui';
+import { Box } from '@mui/system';
 
 const textColor = 'text.hint';
 
@@ -81,7 +79,6 @@ function LessonTree({
   courseData,
   isReadOnly = false,
   paddingBase = 12,
-  onCreateLesson,
 }: LessonTreeViewProps) {
   const {
     changeLesson,
@@ -103,7 +100,7 @@ function LessonTree({
   const displayToaster = useToaster();
   const [treeData, setTreeData] = useState<INode<IFlatMetadata>[]>([]);
   const currentExpandedNodes = useRef<NodeId[]>([]);
-  const { promptDeleteLesson, promptCreateLesson } = useRC5Prompts();
+  const { promptDeleteLesson } = useRC5Prompts();
   const currentAuDir = useSelector(currentAuPath);
   const { handleGetUniqueFilePath } = useContext(GitContext);
 
@@ -234,8 +231,6 @@ function LessonTree({
    */
   const handleNodeSelect = ({
     element,
-    isSelected,
-    isBranch,
   }: ILessonNodeSelectProps) => {
     if (
       element.type === LessonTreeNodeType.Slide &&
@@ -269,10 +264,6 @@ function LessonTree({
   const handleNodeExpand = ({
     element,
     isExpanded,
-    isSelected,
-    isHalfSelected,
-    isDisabled,
-    treeState,
   }: ITreeViewOnExpandProps) => {
     const currentlyExpanded: NodeId[] = [...currentExpandedNodes.current];
     if (isExpanded) {
@@ -465,7 +456,6 @@ function LessonTree({
                 selectedIds={[]}
                 nodeRenderer={({
                   element,
-                  isBranch,
                   isExpanded,
                   getNodeProps,
                   level,
@@ -517,10 +507,10 @@ function LessonTree({
                   handleModalAction={handleMoveOn}
                   currentMoveOn={
                     moveOnCriteriaForm.id !== undefined &&
-                    moveOnCriteriaForm.block !== undefined
+                      moveOnCriteriaForm.block !== undefined
                       ? courseData?.blocks?.[moveOnCriteriaForm.block]?.aus?.[
-                          moveOnCriteriaForm.id as number
-                        ]?.moveOnCriteria
+                        moveOnCriteriaForm.id as number
+                      ]?.moveOnCriteria
                       : undefined
                   }
                 />
@@ -533,10 +523,10 @@ function LessonTree({
                   handleModalAction={handleLessonSettings}
                   currentTheme={
                     lessonSettingsForm.id !== undefined &&
-                    lessonSettingsForm.block !== undefined
+                      lessonSettingsForm.block !== undefined
                       ? courseData?.blocks?.[lessonSettingsForm.block]?.aus?.[
-                          lessonSettingsForm.id as number
-                        ]?.lessonTheme
+                        lessonSettingsForm.id as number
+                      ]?.lessonTheme
                       : undefined
                   }
                 />

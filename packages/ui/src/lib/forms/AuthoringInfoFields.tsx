@@ -2,7 +2,7 @@
  *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
  *   All rights reserved.
  */
-import { Control } from 'react-hook-form';
+import { type Control } from 'react-hook-form';
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
@@ -75,8 +75,7 @@ export function AuthoringInfoFields({
         </>
       ) : null}
       {crudType === FormCrudType.design ? (
-        <>
-          <Grid size={12}>
+        <Grid size={12}>
             <FormControlTextField
               control={control}
               name="uuid"
@@ -85,7 +84,6 @@ export function AuthoringInfoFields({
               disabled={true}
             />
           </Grid>
-        </>
       ) : null}
     </>
   );

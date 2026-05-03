@@ -1,4 +1,4 @@
-import { ReviewProps } from '@rapid-cmi5/cmi5-build-common';
+import { type ReviewProps } from '@rapid-cmi5/cmi5-build-common';
 import useQuizGrader from '../../hooks/useQuizGrader';
 
 export default function ReviewFreeResponse(props: ReviewProps) {

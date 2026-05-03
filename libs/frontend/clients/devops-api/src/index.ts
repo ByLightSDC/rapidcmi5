@@ -96,9 +96,9 @@ import {
   ManageRangeResourcesVirtualMachineRestoresApiFactory,
   ManageRangeResourcesAnsiblePlaybookApiFactory,
   ManageRangeResourcesRangeVMExportsApiFactory,
-  BootDetailsCreate,
+  type BootDetailsCreate,
   VersionApiFactory,
-  ChartIconTypeEnum,
+  type ChartIconTypeEnum,
   Cmi5BuildApiFactory,
 } from './lib';
 import type { ScenarioGroup } from './lib';

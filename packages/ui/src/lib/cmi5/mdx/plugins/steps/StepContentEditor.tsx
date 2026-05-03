@@ -1,19 +1,18 @@
 import {
-  DirectiveEditorProps,
-  NestedLexicalEditor,
+  type DirectiveEditorProps,
   readOnly$,
   useCellValues,
   useMdastNodeUpdater,
 } from '@mdxeditor/editor';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { StepsContext } from './StepsContext';
-import { ContainerDirective } from 'mdast-util-directive';
-import { StepContentDirectiveNode } from './types';
+import { type ContainerDirective } from 'mdast-util-directive';
+import { type StepContentDirectiveNode } from './types';
 import { Box, useTheme } from '@mui/material';
 import { editorInPlayback$ } from '../../state/vars';
 import { AlignmentToolbarControls } from '../../components/AlignmentToolbarControls';
 import {
-  TextAlign,
+  type TextAlign,
   useScopedAlignmentStyles,
 } from '../shared/useScopedAlignmentStyles';
 import { useFocusWithin } from '../shared/useFocusWithin';

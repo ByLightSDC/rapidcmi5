@@ -1,12 +1,12 @@
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 import {
   FormControlCheckboxField,
   FormControlSelectField,
   FormControlTextField,
   FormControlUIProvider,
   FormCrudType,
-  FormStateType,
+  type FormStateType,
   LessonThemeContext,
   MiniForm,
   NAME_GROUP_OPT,
@@ -14,13 +14,13 @@ import {
   maxFormWidths,
   useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
-import { Alert, MenuItem, SxProps, Typography, useTheme } from '@mui/material';
+import { Alert, MenuItem, type SxProps, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import * as yup from 'yup';
 import {
   moveOnCriteriaOptions,
-  RC5ScenarioContent,
+  type RC5ScenarioContent,
 } from '@rapid-cmi5/cmi5-build-common';
 
 import { getInfoText } from '../../../../../utils/infoButtonText';
@@ -45,7 +45,6 @@ export const ScenarioForm = ({
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
   const { GetScenariosForm, fetchScenario } = useRapidCmi5Opts();
-  const theme = useTheme();
 
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);

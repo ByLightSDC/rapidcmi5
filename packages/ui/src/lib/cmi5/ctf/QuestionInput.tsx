@@ -1,4 +1,4 @@
-import { AnswerType, CTFDisplay } from '@rapid-cmi5/cmi5-build-common';
+import { type AnswerType, type CTFDisplay } from '@rapid-cmi5/cmi5-build-common';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { TextField } from '@mui/material';
@@ -155,7 +155,7 @@ export function QuestionInput({
         onChange={(event) => {
           setTheAnswer(event.target.value);
         }}
-        onFocus={(event) => {
+        onFocus={() => {
           if (inputRef.current && theAnswer) {
             inputRef.current.select();
           }

@@ -4,17 +4,17 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { config } from '@rapid-cmi5/ui';
 import { debugLog } from '@rapid-cmi5/ui';
-import { DownloadCmi5Type } from '../../CourseBuilderApiTypes';
+import { type DownloadCmi5Type } from '../../CourseBuilderApiTypes';
 import {
-  RepoAccessObject,
-  RepoState,
+  type RepoAccessObject,
+  type RepoState,
 } from '../../../../redux/repoManagerReducer';
-import { RootState } from '../../../../redux/store';
+import { type RootState } from '../../../../redux/store';
 import { getRepoAccess } from './GitContext';
-import { getRepoPath, GitFS } from '../utils/fileSystem';
+import { getRepoPath, type GitFS } from '../utils/fileSystem';
 import { join } from 'path-browserify';
 import {
-  CourseAU,
+  type CourseAU,
   generateBlockId,
   generateCourseJson,
 } from '@rapid-cmi5/cmi5-build-common';

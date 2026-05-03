@@ -1,13 +1,10 @@
 import { useQuery } from 'react-query';
-import { AxiosRequestConfig } from 'axios';
-import qs from 'qs';
-import { defaultQueryConfig, queryHooksConfig } from '../config';
+
+import { defaultQueryConfig } from '../config';
 import { getErrorMessage } from '../errorMessages';
 
 export const queryKeyKSATs = 'ksats';
 
-const defaultKsatSortBy = 'element_type';
-const defaultKsatOrderBy = 'asc';
 const defaultKsatElementTypes = ['knowledge', 'skill', 'task'];
 
 /**
@@ -24,14 +21,6 @@ export const useGetKSATs = (reqOptions?: any) => {
         // default to filter by all of the ones we allow
         element_type = defaultKsatElementTypes;
       }
-      const options: AxiosRequestConfig = {
-        ...queryHooksConfig,
-        params: { element_type },
-        paramsSerializer(params) {
-          return qs.stringify(params);
-        },
-        authToken: reqOptions?.authToken,
-      };
 
       // const response = await LmsApiClient.ksaTsList(
       //   undefined, // reqOptions?.element_type -- array must be set with paramsSerializer in options above

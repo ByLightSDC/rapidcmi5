@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from 'axios';
+import { type AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import {
@@ -11,9 +11,8 @@ import {
 import { getErrorMessage } from './errorMessages';
 import {
   DevopsApiClient,
-  RangeConsole,
-  RangeConsoleCreate,
-  RangeConsoleUpdate,
+  type RangeConsoleCreate,
+  type RangeConsoleUpdate,
 } from '@rangeos-nx/frontend/clients/devops-api';
 
 export const queryKeyRangeConsoles = 'range-consoles';
@@ -94,7 +93,7 @@ export const usePostRangeConsole = () => {
   };
 
   return useMutation((formData: RangeConsoleCreate) => postResult(formData), {
-    onSettled: async (data, error, variables: any) => {
+    onSettled: async (_data, error, _variables: any) => {
       if (!error) {
         queryClient.invalidateQueries(queryKeyRangeConsoles);
       }
@@ -119,7 +118,7 @@ export const usePutRangeConsole = () => {
   };
 
   return useMutation(({ uuid, formData }: any) => putResult(uuid, formData), {
-    onSettled: async (data, error, variables: any) => {
+    onSettled: async (_data, error, _variables: any) => {
       if (!error) {
         queryClient.invalidateQueries(queryKeyRangeConsoles);
       }
@@ -128,7 +127,7 @@ export const usePutRangeConsole = () => {
 };
 
 export const useDeleteRangeConsole = (
-  uuid?: string, //  mark as “optional” so  when CrudModals sets up the api query it doesn’t complain about “undefined”
+  _uuid?: string, //  mark as “optional” so  when CrudModals sets up the api query it doesn’t complain about “undefined”
   skipInvalidate = false, // normally we want to invalidate, but not when doing bulk delete
 ) => {
   const queryClient = useQueryClient();
@@ -145,7 +144,7 @@ export const useDeleteRangeConsole = (
   };
 
   return useMutation((uuid: string) => deleteResult(uuid), {
-    onSettled: async (data, error, variables: any) => {
+    onSettled: async (_data, error, _variables: any) => {
       if (!error) {
         if (skipInvalidate) {
           return;

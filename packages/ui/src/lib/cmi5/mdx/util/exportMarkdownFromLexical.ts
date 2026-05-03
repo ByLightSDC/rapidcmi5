@@ -1,17 +1,16 @@
 import {
   $isElementNode,
-  ElementNode as LexicalElementNode,
-  LexicalNode,
-  RootNode as LexicalRootNode,
+  type ElementNode as LexicalElementNode,
+  type LexicalNode,
 } from 'lexical';
-import * as Mdast from 'mdast';
+import type * as Mdast from 'mdast';
 import type { MdxjsEsm } from 'mdast-util-mdx';
 import {
-  Options as ToMarkdownOptions,
+  type Options as ToMarkdownOptions,
   toMarkdown,
 } from 'mdast-util-to-markdown';
-import { ImportStatement } from './importMarkdownToLexical';
-import { isMdastHTMLNode, JsxComponentDescriptor } from '@mdxeditor/editor';
+import { type ImportStatement } from './importMarkdownToLexical';
+import { isMdastHTMLNode, type JsxComponentDescriptor } from '@mdxeditor/editor';
 import { mergeStyleAttributes } from './mergeStyleAttributes';
 
 /** Utility to exportMarkdownFromLexical

@@ -1,7 +1,6 @@
-import React from 'react';
 import { Stack, Typography, Box } from '@mui/material';
 import { AnimationItem } from './AnimationItem';
-import { AnimationConfig } from '../types/Animation.types';
+import { type AnimationConfig } from '../types/Animation.types';
 
 interface Props {
   animations: AnimationConfig[];

@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { ButtonWithTooltip } from '@mdxeditor/editor';
 import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 import WidgetsIcon from '@mui/icons-material/Widgets';
 import { drawerMode$, DRAWER_TYPE, blockShowSeq$ } from './drawers';

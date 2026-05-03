@@ -1,4 +1,4 @@
-import { DirectiveDescriptor } from '@mdxeditor/editor';
+import { type DirectiveDescriptor } from '@mdxeditor/editor';
 
 import { ActivityEditor } from './ActivityEditor';
 import { ActivityType } from '@rapid-cmi5/cmi5-build-common';

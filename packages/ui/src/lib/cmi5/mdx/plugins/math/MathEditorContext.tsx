@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 
-import { LexicalEditor } from 'lexical';
+import { type LexicalEditor } from 'lexical';
 import React, { createContext } from 'react';
-import { MathEditorProps, MathNode } from './MathNode';
+import { type MathEditorProps, type MathNode } from './MathNode';
 
 /**
  * @interface MathEditorContextValue

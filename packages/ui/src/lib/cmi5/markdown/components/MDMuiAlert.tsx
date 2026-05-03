@@ -1,12 +1,11 @@
 import React, {
-  ReactElement,
-  ReactNode,
-  useCallback,
+  type ReactElement,
+  type ReactNode,
   useEffect,
   useState,
 } from 'react';
 import Alert from '@mui/material/Alert';
-import { AlertColor, AlertTitle, Box, TextField } from '@mui/material';
+import { type AlertColor, AlertTitle, Box, TextField } from '@mui/material';
 import {
   getAdmonitionColor,
   getAdmonitionHexColor,

@@ -14,7 +14,7 @@ import {
 import { Box } from '@mui/system';
 
 import { auCompletionDivWidth } from './constants';
-import { AuAutoGrader } from '@rapid-cmi5/cmi5-build-common';
+import { type AuAutoGrader } from '@rapid-cmi5/cmi5-build-common';
 
 // REFACTOR
 function ScenarioProgress({

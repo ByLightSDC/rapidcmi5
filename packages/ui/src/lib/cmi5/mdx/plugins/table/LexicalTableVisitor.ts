@@ -1,11 +1,11 @@
-import * as Mdast from 'mdast';
-import { TableNode, $isTableNode } from './TableNode';
-import { LexicalExportVisitor } from '@mdxeditor/editor';
+import type * as Mdast from 'mdast';
+import { type TableNode, $isTableNode } from './TableNode';
+import { type LexicalExportVisitor } from '@mdxeditor/editor';
 import { toHast } from 'mdast-util-to-hast';
 import { toHtml } from 'hast-util-to-html';
 import type { Element } from 'hast';
 import { CONTENT_WIDTH_MAP } from '../../../../styles/lessonThemeStyles';
-import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { type ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Manually converts a Table Row Mdast node to a HAST <tr> element

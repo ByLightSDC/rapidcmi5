@@ -13,7 +13,7 @@ import {
   ButtonMainUi,
   setModal,
 } from '@rapid-cmi5/ui';
-import { CustomTheme } from '../../styles/createPalette';
+import { type CustomTheme } from '../../styles/createPalette';
 import { TOOLTIP_ENTER_DELAY, TOOLTIP_ENTER_NEXT_DELAY } from './shared';
 
 const featureFlagChangeClassRoom = false;

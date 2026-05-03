@@ -1,4 +1,4 @@
-import { Cell, ImagePreviewHandler, ImageUploadHandler } from "@mdxeditor/editor";
+import { Cell, type ImagePreviewHandler, type ImageUploadHandler } from "@mdxeditor/editor";
 
 /**
  * Holds the image preview handler callback.

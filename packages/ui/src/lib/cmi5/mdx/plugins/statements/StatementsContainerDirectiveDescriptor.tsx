@@ -1,5 +1,5 @@
-import { DirectiveDescriptor } from '@mdxeditor/editor';
-import { StatementsContainerDirectiveNode } from './types';
+import { type DirectiveDescriptor } from '@mdxeditor/editor';
+import { type StatementsContainerDirectiveNode } from './types';
 import { StatementsContainerEditor } from './StatementsContainerEditor';
 
 /**

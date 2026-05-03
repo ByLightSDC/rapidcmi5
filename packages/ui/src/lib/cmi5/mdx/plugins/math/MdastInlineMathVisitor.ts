@@ -1,7 +1,7 @@
-import { InlineMath } from 'mdast-util-math';
+import { type InlineMath } from 'mdast-util-math';
 
-import { $createParagraphNode, RootNode } from 'lexical';
-import { MdastImportVisitor } from '@mdxeditor/editor';
+import { $createParagraphNode, type RootNode } from 'lexical';
+import { type MdastImportVisitor } from '@mdxeditor/editor';
 import { $createMathNode } from './MathNode';
 
 /**
@@ -18,7 +18,7 @@ import { $createMathNode } from './MathNode';
  */
 export const MdastInlineMathVisitor: MdastImportVisitor<InlineMath> = {
   testNode: 'inlineMath',
-  visitNode({ actions, mdastNode, mdastParent, lexicalParent }) {
+  visitNode({ mdastNode, lexicalParent }) {
     const theNode = $createMathNode({
       isInline: true,
       code: mdastNode.value,

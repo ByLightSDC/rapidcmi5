@@ -1,13 +1,13 @@
 import { Typography } from '@mui/material';
-import { Box, SxProps } from '@mui/system';
+import { Box, type SxProps } from '@mui/system';
 import {
-  DownloadFilesContent,
+  type DownloadFilesContent,
   RC5ActivityTypeEnum,
-  DownloadFileData,
+  type DownloadFileData,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   FormCrudType,
-  FormStateType,
+  type FormStateType,
   FileFormFieldArray,
   FileDownloadLink,
   FormControlUIProvider,
@@ -17,12 +17,12 @@ import {
   useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
 import { useState, useContext } from 'react';
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 import { useImageFile } from '../../data-hooks/useImageFile';
 import * as yup from 'yup';
-import { currentAuPath } from '@rapid-cmi5/react-editor';
+import { currentAuPath } from '../../../../redux/courseBuilderReducer';
 
 
 /**

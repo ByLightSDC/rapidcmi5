@@ -1,4 +1,4 @@
-import { DirectiveDescriptor } from '@mdxeditor/editor';
+import { type DirectiveDescriptor } from '@mdxeditor/editor';
 import type { ContainerDirective } from 'mdast-util-directive';
 import { LayoutBoxEditor } from './LayoutBoxEditor';
 

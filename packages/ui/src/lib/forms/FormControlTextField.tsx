@@ -3,7 +3,7 @@
  *   All rights reserved.
  */
 /* eslint-disable react/jsx-no-useless-fragment */
-import { Control, Controller } from 'react-hook-form';
+import { type Control, Controller } from 'react-hook-form';
 
 /* MUI */
 import FormControl from '@mui/material/FormControl';

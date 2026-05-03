@@ -1,6 +1,6 @@
 import {
-  InlineMath,
-  Math,
+  type InlineMath,
+  type Math,
   mathFromMarkdown,
   mathToMarkdown,
 } from 'mdast-util-math';
@@ -23,7 +23,7 @@ import { MdastInlineMathVisitor } from './MdastInlineMathVisitor';
 import { MdastBlockMathVisitor } from './MdastBlockMathVisitor';
 import { MathNode } from './MathNode';
 import { LexicalMathVisitor } from './LexicalMathVisitor';
-import { MathEditorDescriptor } from './MathEditorContext';
+import { type MathEditorDescriptor } from './MathEditorContext';
 
 /**
  * Custom nodes must be added to MdxEditor content map

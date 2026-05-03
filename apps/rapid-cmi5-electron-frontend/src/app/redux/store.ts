@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
+import { configureStore, type ThunkAction, type Action } from '@reduxjs/toolkit';
 
 //Persist
 import storage from 'redux-persist/lib/storage';
@@ -13,7 +13,7 @@ import {
   PURGE,
   REGISTER,
 } from 'redux-persist';
-import { CURRENT_STORE_VERSION, storeMigrations } from './storeMigrations';
+import { CURRENT_STORE_VERSION } from './storeMigrations';
 import { keycloakUiReducer } from '@rapid-cmi5/keycloak';
 import { commonAppReducer, commonAppTransReducer } from '@rapid-cmi5/ui';
 import globalReducer from './globalReducer';

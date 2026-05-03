@@ -1,5 +1,5 @@
-import { ContainerDirective } from 'mdast-util-directive';
-import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { type ContainerDirective } from 'mdast-util-directive';
+import { type ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Grid layout preset configuration.

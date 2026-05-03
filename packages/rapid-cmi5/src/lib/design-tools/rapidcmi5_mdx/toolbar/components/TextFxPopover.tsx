@@ -1,18 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  $getNodeByKey,
-  $getSelection,
-  $isNodeSelection,
-  $setSelection,
-  CLICK_COMMAND,
-  COMMAND_PRIORITY_LOW,
-  DRAGSTART_COMMAND,
-  KEY_BACKSPACE_COMMAND,
-  KEY_DELETE_COMMAND,
-  KEY_ENTER_COMMAND,
-  KEY_ESCAPE_COMMAND,
-  SELECTION_CHANGE_COMMAND,
-} from 'lexical';
 
 import {
   Popover,
@@ -28,18 +14,16 @@ import {
 import { MuiColorInput } from 'mui-color-input';
 
 
-import { RoughNotation, types } from 'react-rough-notation';
+import { RoughNotation, type types } from 'react-rough-notation';
 
 import DoneIcon from '@mui/icons-material/Done';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 import {
   activeEditor$,
-  editorInFocus$,
   useCellValue,
-  usePublisher,
 } from '@mdxeditor/editor';
-import { FxDirectiveAttributes, SHAPE_PRESET_COLORS, refreshTextFx$, selFxNode$, applyFx$, defaultFxColor, debugLog, CHANGE_TEXT_FX, ButtonMinorUi, ButtonModalCancelUi, ButtonLoadingUi } from '@rapid-cmi5/ui';
+import { type FxDirectiveAttributes, SHAPE_PRESET_COLORS, refreshTextFx$, selFxNode$, applyFx$, defaultFxColor, debugLog, CHANGE_TEXT_FX, ButtonMinorUi, ButtonModalCancelUi, ButtonLoadingUi } from '@rapid-cmi5/ui';
 
 /**
  * A color square on which to click
@@ -99,7 +83,6 @@ export function TextFxPopover({
     [],
   );
 
-  const editorInFocus = useCellValue(editorInFocus$);
   const editor = useCellValue(activeEditor$); //required for commands
   const refreshTextFx = useCellValue(refreshTextFx$);
   const selFxNode = useCellValue(selFxNode$);

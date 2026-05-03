@@ -1,14 +1,13 @@
 import {
-  DirectiveEditorProps,
+  type DirectiveEditorProps,
   NestedLexicalEditor,
   readOnly$,
-  syntaxExtensions$,
   useCellValues,
   useMdastNodeUpdater,
 } from '@mdxeditor/editor';
 import type { ContainerDirective } from 'mdast-util-directive';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -19,7 +18,7 @@ import { Box, IconButton, Stack, useTheme } from '@mui/material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
-import { ImageTextDirectiveNode } from './types';
+import { type ImageTextDirectiveNode } from './types';
 import { debugLog } from '../../../../utility/logger';
 import { editorInPlayback$ } from '../../state/vars';
 
@@ -218,8 +217,7 @@ export const ImageTextEditor: React.FC<
   // Get the target DOM node
   if (portalTarget) {
     return createPortal(
-      <>
-        <Stack
+      <Stack
           ref={boxRef}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
@@ -273,8 +271,7 @@ export const ImageTextEditor: React.FC<
               <DeleteForeverIcon />
             </IconButton>
           )}
-        </Stack>
-      </>,
+        </Stack>,
       portalTarget, // Render the children into the portalTarget DOM node
     );
   }

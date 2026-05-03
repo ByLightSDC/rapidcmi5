@@ -1,15 +1,14 @@
 import {
   DecoratorNode,
-  DOMConversionMap,
-  DOMConversionOutput,
-  LexicalEditor,
-  LexicalNode,
-  NodeKey,
-  SerializedLexicalNode,
-  Spread,
+  type DOMConversionMap,
+  type DOMConversionOutput,
+  type LexicalEditor,
+  type LexicalNode,
+  type NodeKey,
+  type SerializedLexicalNode,
+  type Spread,
 } from 'lexical';
-import * as Mdast from 'mdast';
-import React from 'react';
+import type * as Mdast from 'mdast';
 import { TableEditor } from './TableEditor';
 //import { TableCell, TableRow } from 'mdast-util-gfm-table/lib'
 import type { TableRow, TableCell } from 'mdast';

@@ -1,4 +1,4 @@
-import { QuotePreset } from './types';
+import { type QuotePreset } from './types';
 
 /**
  * Available quotes layout presets.

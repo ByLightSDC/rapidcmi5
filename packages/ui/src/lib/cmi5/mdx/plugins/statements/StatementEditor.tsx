@@ -1,7 +1,7 @@
-import { DirectiveEditorProps } from '@mdxeditor/editor';
+import { type DirectiveEditorProps } from '@mdxeditor/editor';
 import { useContext, useMemo, useRef, useState } from 'react';
-import { ContainerDirective } from 'mdast-util-directive';
-import { StatementDirectiveNode } from './types';
+import { type ContainerDirective } from 'mdast-util-directive';
+import { type StatementDirectiveNode } from './types';
 import { Box, Stack } from '@mui/material';
 import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 import { StatementsContext } from './StatementsContext';

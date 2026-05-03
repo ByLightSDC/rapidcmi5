@@ -1,6 +1,6 @@
 import {
   alpha,
-  ButtonProps,
+  type ButtonProps,
   IconButton,
   Tooltip,
   useTheme,

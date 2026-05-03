@@ -1,7 +1,7 @@
 import download from 'js-file-download';
 import { useDispatch, useSelector } from 'react-redux';
 /* Branded */
-import { AlertColor, TextField } from '@mui/material';
+import { type AlertColor, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import ModalDialog from '../../modals/ModalDialog';
 import { modal, setModal } from '../../redux/commonAppReducer';

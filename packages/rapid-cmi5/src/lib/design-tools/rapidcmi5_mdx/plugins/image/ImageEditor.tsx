@@ -28,7 +28,7 @@ import {
   KEY_ESCAPE_COMMAND,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical';
-import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
+import { type MdxJsxAttribute, type MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 import type { ContainerDirective } from 'mdast-util-directive';
 import type { BlockContent } from 'mdast';
 import {
@@ -42,9 +42,9 @@ import {
   readOnly$,
   syntaxExtensions$,
   viewMode$,
-  DirectiveNode,
+  type DirectiveNode,
 } from '@mdxeditor/editor';
-import { $isImageNode, ImageNode } from './ImageNode';
+import { $isImageNode, type ImageNode } from './ImageNode';
 import ImageResizer from './ImageResizer';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 import { useSelector } from 'react-redux';
@@ -68,8 +68,8 @@ import {
   imagePreviewHandler$,
   resolveBlockMaxWidth,
 } from '@rapid-cmi5/ui';
-import { currentAuPath } from '@rapid-cmi5/react-editor';
-import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { currentAuPath } from '../../../../redux/courseBuilderReducer';
+import { type ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 export interface ImageEditorProps {
   nodeKey: string;
@@ -96,7 +96,6 @@ function LazyImage({
   src,
   width,
   height,
-  rest,
   style,
   id,
 }: {

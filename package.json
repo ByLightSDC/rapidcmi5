@@ -252,6 +252,7 @@
     "eslint-plugin-playwright": "^1.6.2",
     "eslint-plugin-react": "7.32.2",
     "eslint-plugin-react-hooks": "5.0.0",
+    "eslint-plugin-unused-imports": "^4.4.1",
     "fake-indexeddb": "^6.0.1",
     "fast-xml-parser": "^5.2.0",
     "headers-polyfill": "^3.2.5",

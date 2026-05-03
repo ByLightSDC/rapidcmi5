@@ -1,10 +1,10 @@
 import { Cell } from '@mdxeditor/editor';
 import { createCommand } from 'lexical';
 import {
-  ApplyFxHandler,
-  FxDirectiveAttributes,
-  FxGlobalSelection,
-  RefreshFxHandler,
+  type ApplyFxHandler,
+  type FxDirectiveAttributes,
+  type FxGlobalSelection,
+  type RefreshFxHandler,
 } from './types';
 
 export const defaultFxColor = '#000000';

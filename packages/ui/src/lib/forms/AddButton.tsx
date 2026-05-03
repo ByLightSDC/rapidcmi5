@@ -3,7 +3,7 @@
  *   All rights reserved.
  */
 import { ButtonModalMinorUi } from '../inputs/buttons/buttonsmodal';
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 
 import PlusOneIcon from '@mui/icons-material/PlusOne';
 import { useDispatch, useSelector } from 'react-redux';

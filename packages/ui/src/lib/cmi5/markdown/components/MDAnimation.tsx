@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import uniqid from 'uniqid';
 import { SlideTrigger } from '../constants/SlideTriggers';
 import anime from 'animejs/lib/anime';
 import { SlideEvent } from '../constants/SlideEvents';
-import { useItemVisibleInBounds } from '../../../hooks/useItemVisibleInBounds';
 
 /**
  * A component that allows for an element in markdown to be animated.
@@ -48,19 +47,6 @@ export default function MDAnimation(props: any) {
   };
 
   const processedProps = processRestProps(rest);
-
-  // watch for item being visible on screen
-  const isVisible = useItemVisibleInBounds(
-    animationItemRef,
-    null,
-    '2px',
-    (isVisible: boolean) => {
-      // console.log('visibility changed', id, isVisible);
-      if (trigger === SlideTrigger.InView) {
-        playAnimation();
-      }
-    }
-  );
 
   // does this animation trigger from a tag?
   let waitForTag = '';
@@ -108,7 +94,7 @@ export default function MDAnimation(props: any) {
     };
 
     // handle a slide click
-    const handleSlideClick = (e: any) => {
+    const handleSlideClick = () => {
       // console.log('slide clicked', e);
       playAnimation();
     };

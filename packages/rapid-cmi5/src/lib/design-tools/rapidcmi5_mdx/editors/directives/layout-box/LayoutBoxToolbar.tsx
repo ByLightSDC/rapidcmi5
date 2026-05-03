@@ -29,7 +29,6 @@ interface AlignmentToolbarProps {
  */
 export function LayoutBoxToolbar({
   handleJustificationChange,
-  handleAlignmentChange,
   handleClearLayout,
   onOpenStyleDialog,
 }: AlignmentToolbarProps): JSX.Element {
@@ -46,7 +45,7 @@ export function LayoutBoxToolbar({
       <IconButton
         aria-label="left"
         disabled={readOnly}
-        onClick={(e) => {
+        onClick={(_e) => {
           handleJustificationChange('flex-start');
         }}
       >
@@ -61,7 +60,7 @@ export function LayoutBoxToolbar({
       <IconButton
         aria-label="center"
         disabled={readOnly}
-        onClick={(e) => {
+        onClick={(_e) => {
           handleJustificationChange('center');
         }}
       >
@@ -76,7 +75,7 @@ export function LayoutBoxToolbar({
       <IconButton
         aria-label="right"
         disabled={readOnly}
-        onClick={(e) => {
+        onClick={(_e) => {
           handleJustificationChange('flex-end');
         }}
       >
@@ -102,7 +101,7 @@ export function LayoutBoxToolbar({
       <IconButton
         aria-label="clear"
         disabled={readOnly}
-        onClick={(e) => {
+        onClick={(_e) => {
           handleClearLayout();
         }}
       >

@@ -10,13 +10,13 @@ import {
   slugifyPath,
 } from './useCourseOperationsUtils';
 
-import { GitFS } from './fileSystem';
+import { type GitFS } from './fileSystem';
 import { createNewFsInstance } from './gitFsInstance';
 import {
-  FileState,
+  type FileState,
   fsType,
   initFileState,
-  RepoAccessObject,
+  type RepoAccessObject,
 } from '../../../../redux/repoManagerReducer';
 
 // ============================================================================
@@ -127,7 +127,7 @@ export async function createAndVerifyLesson(
   coursePath: string,
   courseData: any,
   lessonName: string,
-  blockIndex: number = 0,
+  blockIndex = 0,
 ) {
   const updatedCourseData = await createLesson({
     auName: lessonName,

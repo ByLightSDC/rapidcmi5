@@ -1,18 +1,17 @@
 import {
-  DirectiveEditorProps,
-  NestedLexicalEditor,
+  type DirectiveEditorProps,
   readOnly$,
   useCellValues,
   useMdastNodeUpdater,
 } from '@mdxeditor/editor';
 import { useMemo, useState } from 'react';
-import { ContainerDirective } from 'mdast-util-directive';
-import { GridCellDirectiveNode } from './types';
+import { type ContainerDirective } from 'mdast-util-directive';
+import { type GridCellDirectiveNode } from './types';
 import { Box, useTheme } from '@mui/material';
 import { editorInPlayback$ } from '../../state/vars';
 import { AlignmentToolbarControls } from '../../components/AlignmentToolbarControls';
 import {
-  TextAlign,
+  type TextAlign,
   useScopedAlignmentStyles,
 } from '../shared/useScopedAlignmentStyles';
 import { useFocusWithin } from '../shared/useFocusWithin';

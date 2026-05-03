@@ -1,20 +1,18 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 import {
-  FormControlPassword,
   FormControlTextField,
   FormControlUIProvider,
-  FormStateType,
+  type FormStateType,
   MiniForm,
   ModalDialog,
 } from '@rapid-cmi5/ui';
 import * as yup from 'yup';
 
 
-import { CommonAppModalState } from '@rapid-cmi5/ui';
+import { type CommonAppModalState } from '@rapid-cmi5/ui';
 
-import { Box } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 
 import {
   DESCRIPTION_GROUP,
@@ -24,7 +22,7 @@ import {
 } from '@rapid-cmi5/ui';
 import { useContext } from 'react';
 import { commitChangesModalId } from '../../../rapidcmi5_mdx/modals/constants';
-import { CreateCommitType } from '../../CourseBuilderApiTypes';
+import { type CreateCommitType } from '../../CourseBuilderApiTypes';
 import { GitContext } from '../../GitViewer/session/GitContext';
 
 export function CommitForm({
@@ -58,7 +56,7 @@ export function CommitForm({
     handleCloseModal();
   };
 
-  const onResponse = (isSuccess: boolean, data: any, message: string) => {
+  const onResponse = (isSuccess: boolean, data: any) => {
     if (isSuccess) {
       handleModalAction(modalObj.type, 1, data);
     }
@@ -74,8 +72,8 @@ export function CommitForm({
     formMethods: UseFormReturn,
     formState: FormStateType,
   ): JSX.Element => {
-    const { control, getValues, setValue, trigger } = formMethods;
-    const { errors, isValid } = formState;
+    const { control } = formMethods;
+    const { errors } = formState;
     return (
       <>
         <Grid size={11.5}>

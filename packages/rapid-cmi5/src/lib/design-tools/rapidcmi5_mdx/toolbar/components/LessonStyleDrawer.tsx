@@ -11,7 +11,6 @@ import {
   Typography,
   alpha,
   useTheme,
-  Box,
   Alert,
 } from '@mui/material';
 
@@ -45,8 +44,8 @@ import {
   defaultAlignmentLabels,
 } from '../../drawers/constants';
 import { RC5Context } from '../../contexts/RC5Context';
-import { ILessonNode } from '../../drawers/components/LessonTreeNode';
-import { currentAu } from '@rapid-cmi5/react-editor';
+import { type ILessonNode } from '../../drawers/components/LessonTreeNode';
+import { currentAu } from '../../../../redux/courseBuilderReducer';
 
 /**
  * LessonStyle

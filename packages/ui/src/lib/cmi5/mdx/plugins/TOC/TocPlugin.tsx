@@ -2,7 +2,7 @@
 import type {JSX} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import { HeadingTagType} from '@lexical/rich-text';
+import { type HeadingTagType} from '@lexical/rich-text';
 
 import {$getNextRightPreorderNode} from '@lexical/utils';
 
@@ -10,10 +10,10 @@ import {
   $getNodeByKey,
   $getRoot,
   $isElementNode,
-  ElementNode,
-  LexicalEditor,
-  NodeKey,
-  NodeMutation,
+  type ElementNode,
+  type LexicalEditor,
+  type NodeKey,
+  type NodeMutation,
   TextNode,
 } from 'lexical';
 import {useEffect, useState} from 'react';

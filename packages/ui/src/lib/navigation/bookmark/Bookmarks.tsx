@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 /* Icons */
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { OverflowTypography } from '../../data-display/OverflowTypography';
-import { bookmarkCue, tBookmark, popToBookmark } from './bookmarksReducer';
+import { bookmarkCue, type tBookmark, popToBookmark } from './bookmarksReducer';
 import { ButtonInfoField, ButtonTooltip } from '../../utility/buttons';
 
 /**

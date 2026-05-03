@@ -2,13 +2,13 @@ import { useCellValues } from '@mdxeditor/gurx';
 import React, { useEffect, useMemo } from 'react';
 import { Compartment } from '@codemirror/state';
 import { languages } from '@codemirror/language-data';
-import { EditorState, Extension } from '@codemirror/state';
+import { EditorState, type Extension } from '@codemirror/state';
 import { EditorView, lineNumbers, keymap } from '@codemirror/view';
 import { indentWithTab } from '@codemirror/commands';
 import { githubLight, githubDark } from '@uiw/codemirror-theme-github';
 import { basicSetup } from 'codemirror';
 import {
-  CodeBlockEditorProps,
+  type CodeBlockEditorProps,
   useCodeBlockEditorContext,
   codeMirrorAutoLoadLanguageSupport$,
   readOnly$,

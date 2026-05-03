@@ -3,10 +3,10 @@ import axios from 'axios';
 import { safeStorage } from 'electron';
 
 import {
-  Credentials,
-  GitUserConfig,
-  SSOConfig,
-  TokenResponse,
+  type Credentials,
+  type GitUserConfig,
+  type SSOConfig,
+  type TokenResponse,
 } from '@rapid-cmi5/cmi5-build-common';
 
 interface StoreSchema {

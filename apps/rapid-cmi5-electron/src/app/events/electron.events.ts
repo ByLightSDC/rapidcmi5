@@ -13,13 +13,13 @@ export default class ElectronEvents {
 }
 
 // Retrieve app version
-ipcMain.handle('get-app-version', (event) => {
+ipcMain.handle('get-app-version', () => {
   console.log(`Fetching application version... [v${environment.version}]`);
 
   return environment.version;
 });
 
 // Handle App termination
-ipcMain.on('quit', (event, code) => {
+ipcMain.on('quit', (_event, code) => {
   app.exit(code);
 });

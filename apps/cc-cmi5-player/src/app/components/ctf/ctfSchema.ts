@@ -1,7 +1,5 @@
 import {
-  BasicResponseType,
-  QuizCompletionEnum,
-  QuizType,
+  type QuizCompletionEnum,
 } from '../../types/QuizState';
 
 /**

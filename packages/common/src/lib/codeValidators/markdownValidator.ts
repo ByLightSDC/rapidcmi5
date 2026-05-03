@@ -1,5 +1,5 @@
 import {
-  ContainerDirective,
+  type ContainerDirective,
   directiveFromMarkdown,
 } from 'mdast-util-directive';
 import type { Position } from 'unist';
@@ -14,8 +14,8 @@ import {
   validateScenarioContent,
   validateTeamConsolesContent,
 } from './directiveValidators';
-import { RC5ScenarioContent } from '../types/slide';
-import { TeamConsolesContent } from '../types/teamConsoles';
+import { type RC5ScenarioContent } from '../types/slide';
+import { type TeamConsolesContent } from '../types/teamConsoles';
 
 // We create our own version from monaco editor, no reason to be tied up with theres
 export enum MarkerSeverity {
@@ -132,7 +132,7 @@ export function getScenarioDirectives(
       return;
     }
 
-    let result = validator(directiveContent);
+    const result = validator(directiveContent);
     if (!result.valid) return;
     directives.push(result.data);
   });
@@ -162,7 +162,7 @@ export function validateDirective(node: ContainerDirective): IMarkerData[] {
     const validator = directiveValidators[node.name];
     if (!validator) return [invalidJsonResponse(node.position)];
 
-    let result = validator(directiveContent);
+    const result = validator(directiveContent);
 
     if (result.valid) return [];
 

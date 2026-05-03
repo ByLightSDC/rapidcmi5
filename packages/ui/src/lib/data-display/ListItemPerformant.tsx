@@ -11,7 +11,7 @@ const DEFAULT_ITEM_HEIGHT = 38;
  * @param props
  * @constructor
  */
-export default function ListItemPerformant<T>(props: any) {
+export default function ListItemPerformant(props: any) {
   // the outer container of the item, used to set the height so that scroll position is consistent
   const outerContainerRef = useRef(null);
   const [outerContainerHeight, setOuterContainerHeight] =

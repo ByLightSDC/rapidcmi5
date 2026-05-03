@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { gql } from 'graphql-request';
 
 import {
-  AutoGraderEvent,
+  type AutoGraderEvent,
   graphqlAutoGraderResultsFields,
   useSubscription,
 } from '@rangeos-nx/frontend/clients/hooks';
@@ -25,7 +25,7 @@ export default function AutoGraderSubscription({
   onUpdate: (results: AutoGraderEvent[]) => void;
 }) {
   const seenUUIDs = useRef<Set<string>>(new Set());
-  const [events, setEvents] = useState<AutoGraderEvent[]>([]);
+  const [_events, setEvents] = useState<AutoGraderEvent[]>([]);
 
   /**
    * Listen for realtime range scenario updates

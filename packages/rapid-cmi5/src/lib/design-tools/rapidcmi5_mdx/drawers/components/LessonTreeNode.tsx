@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { INode } from 'react-accessible-treeview/dist/TreeView/types';
+import { type INode } from 'react-accessible-treeview/dist/TreeView/types';
 
 /* MUI */
 import {
@@ -14,10 +14,10 @@ import {
   ListItemText,
   Tooltip,
   Typography,
-  TypographyOwnProps,
+  type TypographyOwnProps,
 } from '@mui/material';
 import type { Identifier } from 'dnd-core';
-import { useDrag, useDrop, XYCoord } from 'react-dnd';
+import { useDrag, useDrop, type XYCoord } from 'react-dnd';
 
 /**
  * Icons
@@ -34,8 +34,8 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import PaletteIcon from '@mui/icons-material/Palette';
 
 import React, { useRef } from 'react';
-import { ButtonOptions, RowAction } from '@rapid-cmi5/ui';
-import { ITreeViewOnNodeSelectProps } from 'react-accessible-treeview';
+import { ButtonOptions, type RowAction } from '@rapid-cmi5/ui';
+import { type ITreeViewOnNodeSelectProps } from 'react-accessible-treeview';
 import { LessonTreeNodeType } from './LessonTree';
 
 interface NodeProps {
@@ -149,9 +149,7 @@ export const ItemTypes = {
  */
 export const LessonTreeNode: React.FC<NodeProps> = ({
   isOpen,
-  isReadOnly,
   element,
-  currentCourse,
   currentLesson,
   currentSlide,
   onAction,
@@ -271,7 +269,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
     },
   });
 
-  const [{ isDragging, opacity }, drag] = useDrag({
+  const [{ opacity }, drag] = useDrag({
     type: ItemTypes.slide,
     item: element,
     collect: (monitor) => ({
@@ -338,9 +336,9 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
             sx={
               isCurrentLessonFolder
                 ? {
-                    transform: expandIconTransform,
-                    color: focusColor,
-                  }
+                  transform: expandIconTransform,
+                  color: focusColor,
+                }
                 : { transform: expandIconTransform }
             }
           />
@@ -358,7 +356,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
             }}
           >
             {element.type === LessonTreeNodeType.Slide &&
-            element.hasActivity === true ? (
+              element.hasActivity === true ? (
               <LocalActivity color="inherit" />
             ) : (
               <NewspaperOutlinedIcon color="inherit" />
@@ -387,7 +385,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
         <Box sx={{ flexGrow: 1 }} />
         {element.type === LessonTreeNodeType.Slide && (
           <ButtonOptions
-            optionButton={(handleClick: any, tooltip: string) => {
+            optionButton={(handleClick: any, _tooltip: string) => {
               return (
                 <IconButton
                   aria-label="slide options"
@@ -472,7 +470,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                   className="nodrag"
                   sx={{
                     color: 'primary',
-                    marginRight:-1,
+                    marginRight: -1,
                   }}
                   onClick={(event) => {
                     event.stopPropagation();
@@ -486,7 +484,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
               </Tooltip>
             )}
             <ButtonOptions
-              optionButton={(handleClick: any, tooltip: string) => {
+              optionButton={(handleClick: any, _tooltip: string) => {
                 return (
                   <Tooltip title="Lesson Options">
                     <span>

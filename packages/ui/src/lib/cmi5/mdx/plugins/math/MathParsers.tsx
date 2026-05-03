@@ -1,7 +1,5 @@
-import { Tooltip } from '@mui/material';
 
 /* Icons */
-import EditIcon from '@mui/icons-material/Edit';
 //<EditIcon />
 
 /**
@@ -13,7 +11,7 @@ export const inlineMathParser = () => {
       return <span {...props}>{props.children}</span>;
     },
     span: (props: any) => {
-      const { node, className, children } = props;
+      const { className } = props;
       //FUTURE editor root of math span tags
       if (className === 'katex') {
         return <span {...props}>{props.children}</span>;

@@ -1,12 +1,12 @@
 import {
-  DirectiveEditorProps,
+  type DirectiveEditorProps,
   syntaxExtensions$,
   useCellValues,
 } from '@mdxeditor/editor';
 import { useContext, useMemo, useRef, useState } from 'react';
-import { ContainerDirective } from 'mdast-util-directive';
-import { QuoteContentDirectiveNode } from './types';
-import { Box, Stack, Typography } from '@mui/material';
+import { type ContainerDirective } from 'mdast-util-directive';
+import { type QuoteContentDirectiveNode } from './types';
+import { Box, Stack } from '@mui/material';
 import type { Paragraph } from 'mdast';
 import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 import { QuotesContext } from './QuotesContext';
@@ -26,7 +26,7 @@ export const QuoteContentEditor: React.FC<
 > = ({ lexicalNode, mdastNode, parentEditor }) => {
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const [cellIndex, setCellIndex] = useState(-1);
-  const { avatar, carouselIndex, imageSource, preset } =
+  const { avatar, imageSource, preset } =
     useContext(QuotesContext);
 
   //#region Styles
@@ -108,7 +108,7 @@ export const QuoteContentEditor: React.FC<
 
   const authorEl = (
     <RC5NestedLexicalEditor<Paragraph>
-      getContent={(node) => {
+      getContent={(_node) => {
         const theNode = convertMarkdownToMdast(
           mdastNode.attributes.author || '',
           syntaxExtensions,

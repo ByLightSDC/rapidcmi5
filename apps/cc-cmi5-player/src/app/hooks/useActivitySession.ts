@@ -1,8 +1,8 @@
 
-import { QuizState } from '@rapid-cmi5/cmi5-build-common';
+import { type QuizState } from '@rapid-cmi5/cmi5-build-common';
 import { debugLogError } from '../debug';
 import { useDispatch } from 'react-redux';
-import { RootState, store } from '../redux/store';
+import { type RootState, store } from '../redux/store';
 import {
   addAutoGraderUUID,
   setAllAutoGraderUUIDs,

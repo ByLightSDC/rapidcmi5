@@ -23,7 +23,7 @@ import {
   COMMAND_PRIORITY_LOW,
   KEY_ESCAPE_COMMAND,
   KEY_MODIFIER_COMMAND,
-  RangeSelection,
+  type RangeSelection,
 } from 'lexical';
 import { $findMatchingParent } from '@lexical/utils';
 import {

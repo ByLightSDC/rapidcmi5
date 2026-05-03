@@ -2,15 +2,13 @@ import { useCallback, useMemo } from 'react';
 import { initClient } from '@ts-rest/core';
 import {
   scenarioContract,
-  ScenarioApi,
-  ScenarioQuery,
-  PaginatedScenariosResponse,
+  type ScenarioApi,
+  type ScenarioQuery,
+  type PaginatedScenariosResponse,
 } from '../scenarioContract';
-import {
-  CourseAU,
-  createAuMappingNameWithAuId,
-  generateAuId,
-} from '@rapid-cmi5/cmi5-build-common';
+import { type CourseAU } from '../../types/course';
+import { createAuMappingNameWithAuId } from '../../generateAuConfigs';
+import { generateAuId } from '../../generateCmi5Xml';
 
 export function useScenarioApi(url?: string, token?: string) {
   const apiClient = useMemo(

@@ -4,7 +4,6 @@
  **/
 
 import { useCallback } from 'react';
-import axios from 'axios';
 import { Typography, Stack, Box, alpha, useTheme } from '@mui/material';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -12,8 +11,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 
 import { DynamicModal } from '@rapid-cmi5/ui';
-import { ScenarioFormProps } from '@rapid-cmi5/react-editor';
-import { ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
+import { type ScenarioFormProps } from '@rapid-cmi5/react-editor';
+import { type ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
 
 const ITEMS_PER_PAGE = 50;
 

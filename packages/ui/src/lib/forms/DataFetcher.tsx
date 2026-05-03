@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { LoadingUi } from '@rapid-cmi5/ui';
 
 /* API Hooks & Types*/
-import { SxProps } from '@mui/system';
+import { type SxProps } from '@mui/system';
 import { Box } from '@mui/material';
 import { useToaster } from '../utility/useToaster';
 import { useQueryDetails } from '../utility/useQueryDetails';

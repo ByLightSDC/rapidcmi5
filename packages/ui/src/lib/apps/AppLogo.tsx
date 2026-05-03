@@ -1,5 +1,4 @@
 /* MUI */
-import Box from '@mui/material/Box';
 
 export const drawerClosedWidth = 64;
 export const drawerOpenWidth = 232; //256;
@@ -11,8 +10,6 @@ export const navMenuDirection = 'row';
 export function AppLogo({
   appThemeColor = 'light',
   bgColor,
-  isNavOpen = false,
-  isOverrideOpen = false,
   assetId = 'rapid-cmi5',
 }: {
   appThemeColor?: string;

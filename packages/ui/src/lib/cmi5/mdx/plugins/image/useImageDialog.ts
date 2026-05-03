@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { type ChangeEvent, useEffect, useState } from 'react';
 import { placeholderAvatar } from '../quotes/constants';
 
 const IMAGE_DIR = './Assets/Images/';
@@ -14,7 +14,6 @@ export function useImageDialog({
 }) {
   const [src, setSrc] = useState<string>(defaultSrc);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
-  const [altText, setAltText] = useState<string>('');
 
   // handle file selection
   const handleFileSelected = (e: ChangeEvent<HTMLInputElement>) => {
@@ -22,7 +21,6 @@ export function useImageDialog({
     if (fileList) {
       setSelectedFiles(fileList);
       if (fileList.length > 0) {
-        setAltText(fileList[0].name.replace(/\.[^/.]+$/, '')); // removes file extension
         setSrc(`${IMAGE_DIR}${fileList[0].name}`);
       }
     } else {

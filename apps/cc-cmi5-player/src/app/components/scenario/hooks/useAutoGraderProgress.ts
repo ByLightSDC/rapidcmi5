@@ -1,21 +1,23 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
-  ActivityScore,
-  AuAutoGrader,
-  GetActivityCacheHandler,
+  type ActivityScore,
+  type AuAutoGrader,
+  type GetActivityCacheHandler,
   RC5ActivityTypeEnum,
-  ScenarioContent,
-  ScenarioSubmitResponse,
-  SetActivityCacheHandler,
-  SetCmi5ProgressHandler,
-  SubmitCmiScoreHandler,
+  type ScenarioContent,
+  type ScenarioSubmitResponse,
+  type SetActivityCacheHandler,
+  type SetCmi5ProgressHandler,
+  type SubmitCmiScoreHandler,
 } from '@rapid-cmi5/cmi5-build-common';
 
 import { cmi5Instance } from '../../../session/cmi5';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
 import { debugLogError } from '@rapid-cmi5/ui';
-import { logger } from '../../../debug';
-import { AutoGrader, DevopsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
+import {
+  type AutoGrader,
+  DevopsApiClient,
+} from '@rangeos-nx/frontend/clients/devops-api';
 
 type UseAutoGraderProgressArgs = {
   isTestMode?: boolean;
@@ -34,10 +36,8 @@ export function useAutoGraderProgress({
   setActivityCache,
   isTestMode,
   isAuthenticated,
-  setProgress,
   submitScore,
   scenarioContent,
-  slideGuid,
 }: UseAutoGraderProgressArgs) {
   const { rangeId, scenarioId } = useContext(ScenarioUpdatesContext);
 

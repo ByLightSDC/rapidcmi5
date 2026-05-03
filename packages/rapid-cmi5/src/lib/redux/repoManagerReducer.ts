@@ -1,9 +1,9 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { flattenTree, INode } from 'react-accessible-treeview';
-import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
-import { RootState } from './store';
+import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { flattenTree, type INode } from 'react-accessible-treeview';
+import { type IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
+import { type RootState } from './store';
 import { getRepoPath } from '../design-tools/course-builder/GitViewer/utils/gitOperations';
-import { CourseData } from '@rapid-cmi5/cmi5-build-common';
+import { type CourseData } from '@rapid-cmi5/cmi5-build-common';
 import { getFsInstance } from '../design-tools/course-builder/GitViewer/utils/gitFsInstance';
 import { resetPersistance } from '@rapid-cmi5/ui';
 import { slugifyPath } from '../design-tools/course-builder/GitViewer/utils/useCourseOperationsUtils';
@@ -155,7 +155,7 @@ export const repoManagerSlice = createSlice({
     selectCourse: (state, action: PayloadAction<Course>) => {
       state.fileState.selectedCourse = action.payload;
     },
-    unselectCourse: (state, action: PayloadAction<void>) => {
+    unselectCourse: (state, _action: PayloadAction<void>) => {
       state.fileState.selectedCourse = null;
     },
     setCourseList: (state, action: PayloadAction<Course[]>) => {
@@ -192,7 +192,7 @@ export const repoManagerSlice = createSlice({
   },
   extraReducers(builder) {
     builder
-      .addCase(recalculateFileTree.pending, (state, action) => {
+      .addCase(recalculateFileTree.pending, (state, _action) => {
         state.fileState.directoryTree = [
           { name: 'Root', id: '/', children: [], isBranch: true, parent: null },
         ];
@@ -200,7 +200,7 @@ export const repoManagerSlice = createSlice({
       .addCase(recalculateFileTree.fulfilled, (state, action) => {
         state.fileState.directoryTree = action.payload;
       })
-      .addCase(recalculateFileTree.rejected, (state, action) => {
+      .addCase(recalculateFileTree.rejected, (state, _action) => {
         state.fileState.directoryTree = [
           { name: 'Root', id: '/', children: [], isBranch: true, parent: null },
         ];

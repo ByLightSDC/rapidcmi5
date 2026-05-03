@@ -12,7 +12,7 @@ export const getErrorMessage = (
   error: any,
   defaultMessage: string | undefined = '',
 ) => {
-  let errorMessage: tDisplayError = {
+  const errorMessage: tDisplayError = {
     status: -1,
     statusText: '',
     message: '',
@@ -48,7 +48,7 @@ export const getErrorMessage = (
 export const getErrorMessageDetail = (
   displayError: any,
   defaultMessage: string | undefined | null = '',
-  shouldShowDetail: boolean = false,
+  shouldShowDetail = false,
 ) => {
   const optDetailStr = shouldShowDetail
     ? ' (' + displayError?.message + ')'

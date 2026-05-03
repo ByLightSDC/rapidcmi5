@@ -12,11 +12,11 @@ import { useContext, useEffect, useState } from 'react';
 import { MonacoEditor, resolveMonacoLanguage } from '../../forms/MonacoEditor';
 
 import {
-  AuContextProps,
-  ActivityScore,
+  type AuContextProps,
+  type ActivityScore,
   RC5ActivityTypeEnum,
-  CodeRunnerContent,
-  CodeRunnerSubmitResponse,
+  type CodeRunnerContent,
+  type CodeRunnerSubmitResponse,
   useCodeRunnerApi,
 } from '@rapid-cmi5/cmi5-build-common';
 

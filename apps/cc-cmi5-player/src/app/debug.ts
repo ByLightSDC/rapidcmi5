@@ -1,6 +1,5 @@
 import { config } from '@rapid-cmi5/ui';
 
-const currentMinLogLevel = config.CLIENT_LOG ? 0 : -1;
 export const debugColorSuccess = 'background:lightgreen';
 export const debugColor2 = 'background:lightblue';
 export const debugColor3 = 'background:lightgrey';

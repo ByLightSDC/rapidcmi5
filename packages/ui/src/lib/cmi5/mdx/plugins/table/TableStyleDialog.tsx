@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 // @ts-ignore - inline-style-parser has type declaration issues
 import parse from 'inline-style-parser';
 
@@ -162,13 +162,13 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
   };
 
   // Handlers
-  const handleBorderWidthSliderChange = (e: Event, value: number | number[]) => { if (typeof value === 'number') setBorderWidth(value); };
-  const handleBorderRadiusSliderChange = (e: Event, value: number | number[]) => { if (typeof value === 'number') setBorderRadius(value); };
+  const handleBorderWidthSliderChange = (_e: Event, value: number | number[]) => { if (typeof value === 'number') setBorderWidth(value); };
+  const handleBorderRadiusSliderChange = (_e: Event, value: number | number[]) => { if (typeof value === 'number') setBorderRadius(value); };
 
   // Shadow Handlers
-  const handleShadowXChange = (e: Event, value: number | number[]) => { if (typeof value === 'number') setShadowX(value); };
-  const handleShadowYChange = (e: Event, value: number | number[]) => { if (typeof value === 'number') setShadowY(value); };
-  const handleShadowBlurChange = (e: Event, value: number | number[]) => { if (typeof value === 'number') setShadowBlur(value); };
+  const handleShadowXChange = (_e: Event, value: number | number[]) => { if (typeof value === 'number') setShadowX(value); };
+  const handleShadowYChange = (_e: Event, value: number | number[]) => { if (typeof value === 'number') setShadowY(value); };
+  const handleShadowBlurChange = (_e: Event, value: number | number[]) => { if (typeof value === 'number') setShadowBlur(value); };
 
   // Generate dynamic styles for the preview table
   const previewTableStyle: React.CSSProperties = {

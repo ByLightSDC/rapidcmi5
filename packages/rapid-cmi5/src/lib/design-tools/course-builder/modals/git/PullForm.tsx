@@ -1,11 +1,11 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 import {
-  CommonAppModalState,
+  type CommonAppModalState,
   FormControlCheckboxField,
   FormControlPassword,
   FormControlTextField,
   FormControlUIProvider,
-  FormStateType,
+  type FormStateType,
   MiniForm,
   ModalDialog,
   NAME_GROUP_OPT,
@@ -17,10 +17,10 @@ import Grid from '@mui/material/Grid2';
 
 import { Typography } from '@mui/material';
 
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 import { useContext } from 'react';
 import { gitPullModalId } from '../../../rapidcmi5_mdx/modals/constants';
-import { PullType } from '../../CourseBuilderApiTypes';
+import { type PullType } from '../../CourseBuilderApiTypes';
 import { GitContext } from '../../GitViewer/session/GitContext';
 
 
@@ -53,7 +53,7 @@ export function PullForm({
     handleCloseModal();
   };
 
-  const onResponse = (isSuccess: boolean, data: any, message: string) => {
+  const onResponse = (isSuccess: boolean, data: any, _message: string) => {
     if (isSuccess) {
       handleModalAction(modalObj.type, 1, data);
     }

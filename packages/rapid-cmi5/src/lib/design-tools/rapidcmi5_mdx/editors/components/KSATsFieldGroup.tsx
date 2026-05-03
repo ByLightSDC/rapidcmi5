@@ -1,7 +1,7 @@
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 import { useEffect } from 'react';
 import KsatFieldDetail from './KsatFieldDetail';
-import { FormCrudType, FormFieldArray, tFormFieldRendererProps, DynamicSelectorFieldGroup } from '@rapid-cmi5/ui';
+import { FormCrudType, FormFieldArray, type tFormFieldRendererProps, DynamicSelectorFieldGroup } from '@rapid-cmi5/ui';
 
 const queryKeyKSATs = 'ksats'
 const TopicKsat = 'KSAT'
@@ -177,7 +177,7 @@ export function KSATsFieldGroup(props: tFieldGroupProps) {
               readOnly: crudType === FormCrudType.view,
             }}
             queryKey={queryKeyKSATs}
-            getRenderItems={(data: any, index: number) => {
+            getRenderItems={(_data: any, index: number) => {
               if (index === 1) {
                 const fieldData = getValues(props.indexedArrayField);
                 return (
@@ -198,7 +198,7 @@ export function KSATsFieldGroup(props: tFieldGroupProps) {
               shouldResolve: false,
               sxInputProps: { minWidth: '125px' },
             }}
-            onApplySelection={(fieldName, value) => {
+            onApplySelection={(_fieldName, value) => {
               handleApplyKsatSelection(props.indexedArrayField, value);
             }}
             itemLabel="Element ID"
@@ -225,7 +225,7 @@ export function KSATsFieldGroup(props: tFieldGroupProps) {
         topicId: TopicKsat,
         onApply: handleSelectMultipleKsats,
       }}
-      //#REF  onDeleteEntry={handleDeleteKsat}
+    //#REF  onDeleteEntry={handleDeleteKsat}
     />
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DirectiveEditorProps, useCellValues } from '@mdxeditor/editor';
+import { type DirectiveEditorProps, useCellValues } from '@mdxeditor/editor';
 
 import ScenarioConsoles from '../../../scenario/ScenarioConsoles';
 import TeamScenarioExercise from '../../../team-consoles/TeamScenarioExercise';
@@ -9,13 +9,13 @@ import { useCMI5Session } from '../../../../hooks/useCMI5Session';
 import { SlideActivityType } from '../../../../../app/types/SlideActivityStatusState';
 import { Box } from '@mui/material';
 import {
-  AuContextProps,
-  RC5ScenarioContent,
-  QuizContent,
-  CTFContent,
-  TeamConsolesContent,
-  DownloadFileData,
-  CodeRunnerContent,
+  type AuContextProps,
+  type RC5ScenarioContent,
+  type QuizContent,
+  type CTFContent,
+  type TeamConsolesContent,
+  type DownloadFileData,
+  type CodeRunnerContent,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   setProgress$,

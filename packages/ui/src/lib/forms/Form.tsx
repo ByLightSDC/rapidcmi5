@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid2';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import { SxProps } from '@mui/system';
+import { type SxProps } from '@mui/system';
 
 export function Form({
   title,

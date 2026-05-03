@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
 import { useDispatch, useSelector } from 'react-redux';
 import { ModalDialog } from '@rapid-cmi5/ui';

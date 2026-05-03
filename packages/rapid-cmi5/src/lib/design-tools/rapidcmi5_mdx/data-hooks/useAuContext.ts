@@ -10,7 +10,7 @@ import {
 import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
-import { AuContextProps } from '@rapid-cmi5/cmi5-build-common';
+import { type AuContextProps } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * AU State & Methods
@@ -29,7 +29,7 @@ export const useAuContext = (): AuContextProps => {
   const { getLocalFileBlobUrl } = useContext(GitContext);
 
   //RC5 removal
-  const getSlide = (props: AuContextProps) => {
+  const getSlide = (_props: AuContextProps) => {
     return null;
   };
 

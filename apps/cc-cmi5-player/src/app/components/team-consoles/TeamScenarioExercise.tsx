@@ -8,7 +8,7 @@ import {
 } from 'react';
 
 import {
-  DeployedScenario,
+  type DeployedScenario,
   DeployedScenarioDetailStatusEnum,
 } from '@rangeos-nx/frontend/clients/devops-api';
 
@@ -21,7 +21,6 @@ import {
   ListItemIcon,
   Paper,
   Stack,
-  SxProps,
   Tabs,
   Tooltip,
   Typography,
@@ -35,7 +34,7 @@ import TerminalIcon from '@mui/icons-material/Terminal';
 import TimeClock from '../scenario/TimeClock';
 import RangeResources from './list-views/RangeResources';
 import { TeamConsolesContext } from './TeamScenarioContext';
-import { ScenarioResources } from './types';
+import { type ScenarioResources } from './types';
 import TeamVMUpdates from './queries/TeamVMUpdates';
 import TeamContainerUpdates from './queries/TeamContainerUpdates';
 import TeamConsoleUpdates from './queries/TeamConsoleUpdates';
@@ -47,8 +46,8 @@ import {
   Topic,
 } from '@rangeos-nx/frontend/clients/hooks';
 import {
-  AuContextProps,
-  TeamConsolesContent,
+  type AuContextProps,
+  type TeamConsolesContent,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   LessonThemeContext,
@@ -66,7 +65,6 @@ import {
  * @returns
  */
 function TeamScenarioExercise({
-  auProps,
   content,
 }: {
   auProps: Partial<AuContextProps>;
@@ -122,7 +120,7 @@ function TeamScenarioExercise({
   };
 
   const handleChangeTab = useCallback(
-    (event: React.SyntheticEvent, newValue: number) => {
+    (_event: React.SyntheticEvent, newValue: number) => {
       setCurrentTab(newValue);
     },
     [setCurrentTab],
@@ -133,7 +131,7 @@ function TeamScenarioExercise({
    * This triggers nested action rows to render
    */
   const notifyEvents = useCallback(
-    (topic: Topic, updates: any[]) => {
+    (topic: Topic, _updates: any[]) => {
       if (currentTab === 0 && topic !== Topic.ResourceAutoGrader) {
         setNotificationsCounter(notificationsCounter + 1);
       } else if (currentTab === 1 && topic === Topic.ResourceAutoGrader) {

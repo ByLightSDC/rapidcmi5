@@ -11,7 +11,7 @@ import {
   COMMAND_PRIORITY_LOW,
   KEY_DELETE_COMMAND,
 } from 'lexical';
-import * as Mdast from 'mdast';
+import type * as Mdast from 'mdast';
 
 import styles from './styles.module.css';
 import {
@@ -133,11 +133,11 @@ export const RC5NestedLexicalEditor = function <
   /**
    * Handles delete & backspace key events occuring in nested lexical editor content
    * Blocks the event from bubbling if the content is empty
-   * @param payload
+   * @param _payload
    * @param editor
    * @returns
    */
-  const onCheckDelete = (payload: KeyboardEvent, editor: any) => {
+  const onCheckDelete = (_payload: KeyboardEvent, editor: any) => {
     const editorElement = editor.getRootElement();
     // the innerText here is actually the text before backspace takes effect.
     if (editorElement?.innerText === '\n') {

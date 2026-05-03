@@ -1,6 +1,6 @@
 import { debugLog } from '../../../../utility/logger';
 import {
-  AnimationConfig,
+  type AnimationConfig,
   AnimationTrigger,
   EntranceEffect,
   ExitEffect,
@@ -42,7 +42,6 @@ export class AnimationEngine {
   private animations: AnimationConfig[];
   private options: AnimationEngineOptions;
   private playbackState: PlaybackState = PlaybackState.IDLE;
-  private currentAnimationIndex = 0;
   private animationTimeouts: Map<string, number> = new Map();
   private animationElements: Map<string, HTMLElement> = new Map();
 
@@ -64,7 +63,6 @@ export class AnimationEngine {
     }
 
     this.playbackState = PlaybackState.PLAYING;
-    this.currentAnimationIndex = 0;
 
     // Initialize elements (hide those with entrance effects)
     this.initialize();
@@ -120,7 +118,6 @@ export class AnimationEngine {
     });
     this.animationElements.clear();
 
-    this.currentAnimationIndex = 0;
   }
 
   /**

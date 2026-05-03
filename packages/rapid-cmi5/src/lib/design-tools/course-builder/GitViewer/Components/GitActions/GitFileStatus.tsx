@@ -10,7 +10,7 @@ import {
   Chip,
   Tooltip,
   tooltipClasses,
-  TooltipProps,
+  type TooltipProps,
   styled,
   Button,
   Stack,
@@ -19,7 +19,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import {
-  FileStatus,
+  type FileStatus,
   isDeletedStatus,
   stagedStatuses,
 } from '../../utils/StatusMatrix';
@@ -105,7 +105,6 @@ export default function GitFileStatus({
   handeleUnStageFile,
   handleRevertFile,
   handleRemoveFile,
-  handleGetDiff,
   handleNavToFile,
   gettingRepoStatus,
 }: {
@@ -174,7 +173,7 @@ export default function GitFileStatus({
             size="small"
             checked={shouldStageAll}
             disabled={modifiedFiles.length <= 0 || gettingRepoStatus}
-            onChange={(event, value) => {
+            onChange={(_event, value) => {
               setShouldStageAll(value);
               if (value) {
                 handleStageAll();
@@ -274,7 +273,7 @@ export default function GitFileStatus({
                         size="small"
                         checked={stagedStatuses.includes(file.status)}
                         disabled={gettingRepoStatus}
-                        onChange={(event, value) => {
+                        onChange={(_event, value) => {
                           if (value) {
                             handeleStageFile(file.name);
                           } else {

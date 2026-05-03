@@ -16,7 +16,7 @@ import {
   queryKeyRangeResourceVMs,
   Topic,
 } from '@rangeos-nx/frontend/clients/hooks';
-import { ListView, LoadingUi, iListItemType } from '@rapid-cmi5/ui';
+import { ListView, LoadingUi, type iListItemType } from '@rapid-cmi5/ui';
 import { Alert } from '@mui/material';
 
 /**

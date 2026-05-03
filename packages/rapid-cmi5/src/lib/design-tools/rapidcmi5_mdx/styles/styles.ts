@@ -1,4 +1,4 @@
-import { TooltipProps } from '@mui/material';
+import { type TooltipProps } from '@mui/material';
 
 const myGrey = '#2E2E2E';
 const myLightGray = '#3F3F3F';
@@ -28,16 +28,16 @@ export const iconButtonSize = undefined;
 /**
  * REF handy for debugging
  */
-const testOverrideStyle = {
-  '& .MuiOutlinedInput-notchedOutline': {
-    border: `5px solid red`,
-  },
-  '&.Mui-focused': {
-    '& .MuiOutlinedInput-notchedOutline': {
-      border: `5px dotted red`,
-    },
-  },
-};
+// const testOverrideStyle = {
+//   '& .MuiOutlinedInput-notchedOutline': {
+//     border: `5px solid red`,
+//   },
+//   '&.Mui-focused': {
+//     '& .MuiOutlinedInput-notchedOutline': {
+//       border: `5px dotted red`,
+//     },
+//   },
+// };
 
 /**
  * default text field style with no border

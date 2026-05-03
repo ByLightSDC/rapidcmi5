@@ -1,9 +1,9 @@
 // @ts-nocheck
 //TODO upgrading from MUI 5 to 6 broke List with component property
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 /* MUI */
-import Divider, { DividerProps } from '@mui/material/Divider';
+import Divider, { type DividerProps } from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Typography from '@mui/material/Typography';

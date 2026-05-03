@@ -1,5 +1,5 @@
 import {
-  DirectiveEditorProps,
+  type DirectiveEditorProps,
   insertMarkdown$,
   NestedLexicalEditor,
   readOnly$,
@@ -7,11 +7,10 @@ import {
   useCellValues,
   usePublisher,
 } from '@mdxeditor/editor';
-import * as Mdast from 'mdast';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import type * as Mdast from 'mdast';
 import type { BlockContent, DefinitionContent } from 'mdast';
-import { ContainerDirective } from 'mdast-util-directive';
-import { CSSProperties, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { type ContainerDirective } from 'mdast-util-directive';
+import { type CSSProperties, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import { $getRoot } from 'lexical';
 
@@ -24,9 +23,9 @@ import {
   ListItemText,
   Paper,
   Stack,
-  SxProps,
+  type SxProps,
   Tooltip,
-  TypographyOwnProps,
+  type TypographyOwnProps,
   useTheme,
 } from '@mui/material';
 
@@ -41,7 +40,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
-import { AccordionContentDirectiveNode, AccordionDirectiveNode } from './types';
+import { type AccordionContentDirectiveNode, type AccordionDirectiveNode } from './types';
 
 import { $isElementNode } from 'lexical';
 import { DEFAULT_ACCORDION } from './constants';
@@ -54,7 +53,7 @@ import { LessonThemeContext } from '../../contexts/LessonThemeContext';
 import { resolveLessonThemeCSS, resolveBlockMaxWidth } from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
 import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
-import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { type ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 /**
@@ -78,7 +77,6 @@ export const AccordionEditor: React.FC<
     Array<AccordionContentDirectiveNode>
   >(structuredClone(mdastNode.children));
   const insertMarkdown = usePublisher(insertMarkdown$);
-  const [editor] = useLexicalComposerContext();
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState<string>(
     (mdastNode?.attributes as AccordionDirectiveNode['attributes'])?.backgroundColor ?? '',
@@ -96,8 +94,7 @@ export const AccordionEditor: React.FC<
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
   const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
-  const colorPickerOpen = Boolean(colorPickerAnchor);
-  const [isPlayback, readOnly, syntaxExtensions] = useCellValues(
+  const [isPlayback] = useCellValues(
     editorInPlayback$,
     readOnly$,
     syntaxExtensions$,
@@ -537,7 +534,7 @@ export const AccordionEditor: React.FC<
                               handleClick:
                                 | React.MouseEventHandler<HTMLButtonElement>
                                 | undefined,
-                              tooltip: string,
+                              _tooltip: string,
                             ) => {
                               return (
                                 <IconButton
@@ -574,7 +571,7 @@ export const AccordionEditor: React.FC<
                                 sx={{
                                   height: 30,
                                 }}
-                                onClick={(event) => {
+                                onClick={(_event) => {
                                   handleAddAccordionBefore(index);
                                 }}
                               >
@@ -597,7 +594,7 @@ export const AccordionEditor: React.FC<
                                 sx={{
                                   height: 30,
                                 }}
-                                onClick={(event) => {
+                                onClick={(_event) => {
                                   handleAddAccordionAfter(index);
                                 }}
                               >
@@ -620,7 +617,7 @@ export const AccordionEditor: React.FC<
                                 sx={{
                                   height: 30,
                                 }}
-                                onClick={(event) => {
+                                onClick={(_event) => {
                                   handleRemoveAccordion(index);
                                 }}
                               >

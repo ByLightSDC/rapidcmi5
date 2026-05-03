@@ -1,13 +1,13 @@
 // hooks/useGitOperations.ts
 import { useCallback, useState } from 'react';
-import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
+import { type ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import {
-  CreateCloneType,
-  CreateCommitType,
-  GitConfigType,
-  ImportRepoZipType,
-  PullType,
-  PushType,
+  type CreateCloneType,
+  type CreateCommitType,
+  type GitConfigType,
+  type ImportRepoZipType,
+  type PullType,
+  type PushType,
 } from '../../CourseBuilderApiTypes';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -15,15 +15,15 @@ import {
   fsType,
   recalculateFileTree,
   removeRepo,
-  RepoAccessObject,
-  RepoState,
+  type RepoAccessObject,
+  type RepoState,
   setCurrentRepo,
   setCurrentWorkingDir,
   setFileContent,
   setSelectedFile,
 } from '../../../../redux/repoManagerReducer';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
-import { AppDispatch, RootState } from '../../../../redux/store';
+import { type AppDispatch, type RootState } from '../../../../redux/store';
 import {
   cloneFailMessage,
   importFailMessage,
@@ -37,7 +37,7 @@ import {
 import JSZip from 'jszip';
 import { getRepoAccess } from './GitContext';
 import { GitOperations } from '../utils/gitOperations';
-import { GitFS } from '../utils/fileSystem';
+import { type GitFS } from '../utils/fileSystem';
 import { slugifyPath } from '../utils/useCourseOperationsUtils';
 
 export const useGitOperations = (

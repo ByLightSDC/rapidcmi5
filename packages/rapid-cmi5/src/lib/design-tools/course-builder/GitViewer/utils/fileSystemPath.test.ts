@@ -1,8 +1,8 @@
-import { GitFS } from './fileSystem';
+import { type GitFS } from './fileSystem';
 
 import { MAX_FS_SLUG_LENGTH } from './fileSystem';
 
-import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
+import { fsType, type RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { createNewFsInstance } from './gitFsInstance';
 import { createUniquePath, slugifyPath } from './useCourseOperationsUtils';
 

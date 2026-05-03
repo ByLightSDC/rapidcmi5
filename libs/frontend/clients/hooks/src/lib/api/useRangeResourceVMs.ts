@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from 'axios';
+import { type AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { DevopsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
@@ -91,7 +91,7 @@ export const useGetRangeResourceVM = ({
   });
 };
 
-export const usePostStopRangeResourceVM = ({ rangeId, scenarioId }: any) => {
+export const usePostStopRangeResourceVM = () => {
   const queryClient = useQueryClient();
   const postResult = async (
     rangeId: string,
@@ -115,7 +115,7 @@ export const usePostStopRangeResourceVM = ({ rangeId, scenarioId }: any) => {
     ({ rangeId, scenarioId, uuid }: any) =>
       postResult(rangeId, scenarioId, uuid),
     {
-      onSettled: async (data, error, variables: any) => {
+      onSettled: async (_data, error, _variables: any) => {
         if (!error) {
           queryClient.invalidateQueries(queryKeyRangeResourceVMs);
         }
@@ -124,7 +124,7 @@ export const usePostStopRangeResourceVM = ({ rangeId, scenarioId }: any) => {
   );
 };
 
-export const usePostStartRangeResourceVM = ({ rangeId, scenarioId }: any) => {
+export const usePostStartRangeResourceVM = () => {
   const queryClient = useQueryClient();
   const postResult = async (
     rangeId: string,
@@ -149,7 +149,7 @@ export const usePostStartRangeResourceVM = ({ rangeId, scenarioId }: any) => {
     ({ rangeId, scenarioId, uuid }: any) =>
       postResult(rangeId, scenarioId, uuid),
     {
-      onSettled: async (data, error, variables: any) => {
+      onSettled: async (_data, error, _variables: any) => {
         if (!error) {
           queryClient.invalidateQueries(queryKeyRangeResourceVMs);
         }
@@ -158,7 +158,7 @@ export const usePostStartRangeResourceVM = ({ rangeId, scenarioId }: any) => {
   );
 };
 
-export const usePostRebootRangeResourceVM = ({ rangeId, scenarioId }: any) => {
+export const usePostRebootRangeResourceVM = () => {
   const queryClient = useQueryClient();
   const postResult = async (
     rangeId: string,
@@ -189,7 +189,7 @@ export const usePostRebootRangeResourceVM = ({ rangeId, scenarioId }: any) => {
     ({ rangeId, scenarioId, uuid }: any) =>
       postResult(rangeId, scenarioId, uuid),
     {
-      onSettled: async (data, error, variables: any) => {
+      onSettled: async (_data, error, _variables: any) => {
         if (!error) {
           queryClient.invalidateQueries(queryKeyRangeResourceVMs);
         }
@@ -198,7 +198,7 @@ export const usePostRebootRangeResourceVM = ({ rangeId, scenarioId }: any) => {
   );
 };
 
-export const useDeleteRangeResourceVM = ({ rangeId, scenarioId }: any) => {
+export const useDeleteRangeResourceVM = () => {
   const queryClient = useQueryClient();
   const deleteResult = async (
     rangeId: string,
@@ -222,7 +222,7 @@ export const useDeleteRangeResourceVM = ({ rangeId, scenarioId }: any) => {
     ({ rangeId, scenarioId, uuid }: any) =>
       deleteResult(rangeId, scenarioId, uuid),
     {
-      onSettled: async (data, error, variables: any) => {
+      onSettled: async (_data, error, _variables: any) => {
         if (!error) {
           queryClient.invalidateQueries(queryKeyRangeResourceVMs);
         }

@@ -1,4 +1,4 @@
-import { TabContentDirectiveNode, TabDirectiveNode } from './types';
+import { type TabContentDirectiveNode } from './types';
 
 export const DEFAULT_TAB: TabContentDirectiveNode = {
   type: 'containerDirective',

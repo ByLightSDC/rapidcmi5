@@ -1,5 +1,5 @@
 import { QUOTE_PRESETS } from './constants';
-import { QuotePreset } from './types';
+import { type QuotePreset } from './types';
 
 /**
  * Finds the preset that matches the current quote configuration.

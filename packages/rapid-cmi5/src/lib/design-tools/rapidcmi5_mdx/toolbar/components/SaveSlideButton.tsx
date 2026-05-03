@@ -1,18 +1,13 @@
-import { CircularProgress, IconButton, Tooltip } from '@mui/material';
+import { CircularProgress, Tooltip } from '@mui/material';
 
 import { useSelector } from 'react-redux';
-import {
-  iconButtonSize,
-  iconButtonStyle,
-  tooltipStyle,
-} from '../../styles/styles';
 
 /** Icons */
 import SaveIcon from '@mui/icons-material/Save';
 
 import { useContext } from 'react';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
-import { isDisplayDirty } from '@rapid-cmi5/react-editor';
+import { isDisplayDirty } from '../../../../redux/courseBuilderReducer';
 import { useRC5Prompts } from '../../modals/useRC5Prompts';
 import { RC5Context } from '../../contexts/RC5Context';
 import { MessageType } from '../../../course-builder/CourseBuilderTypes';

@@ -1,4 +1,4 @@
-import { AnimationConfig, AnimationEngine } from '@rapid-cmi5/ui';
+import { type AnimationConfig, AnimationEngine } from '@rapid-cmi5/ui';
 import { useEffect, useRef } from 'react';
 
 /**
@@ -8,7 +8,7 @@ import { useEffect, useRef } from 'react';
 export function useAnimationPlayback(
   animations: AnimationConfig[],
   slideIndex: number,
-  enabled: boolean = true,
+  enabled = true,
 ) {
   const engineRef = useRef<AnimationEngine | null>(null);
 

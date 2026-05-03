@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useCellValues } from '@mdxeditor/gurx';
 import classNames from 'classnames';
-import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
+import { type MdxJsxAttribute, type MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
 import { imagePlaceholder$ as imagePlaceholderComponent$ } from './index';
 import styles from './styles/image-plugin.module.css';
@@ -26,7 +26,6 @@ function LazyImage({
   src,
   width,
   height,
-  rest,
   style,
   id,
 }: {
@@ -61,11 +60,9 @@ export function ImageViewer({
   src,
   title,
   alt,
-  nodeKey,
   width,
   height,
   rest,
-  href,
   id,
 }: ImageViewerProps): JSX.Element | null {
   const [ImagePlaceholderComponent, imagePreviewHandler] = useCellValues(

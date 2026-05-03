@@ -1,6 +1,6 @@
-import * as Mdast from 'mdast';
-import { $createParagraphNode, RootNode } from 'lexical';
-import { MdastImportVisitor } from '@mdxeditor/editor';
+import type * as Mdast from 'mdast';
+import { $createParagraphNode, type RootNode } from 'lexical';
+import { type MdastImportVisitor } from '@mdxeditor/editor';
 import { $createFootnoteDefinitionNode } from './methods';
 
 /**

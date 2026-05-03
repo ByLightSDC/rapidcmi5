@@ -5,7 +5,7 @@ import * as git from 'isomorphic-git';
 import http from 'isomorphic-git/http/node';
 
 import {
-  RepoAccessObject,
+  type RepoAccessObject,
   fsType,
   initFileState,
 } from '../../../../redux/repoManagerReducer';
@@ -15,7 +15,7 @@ import {
   createAndVerifyLesson,
   createTestCourse,
   syncCourseToFs,
-  TestContext,
+  type TestContext,
   verifyCourseStructure,
 } from './courseOperations.test';
 import { Operation } from '@rapid-cmi5/cmi5-build-common';
@@ -52,7 +52,7 @@ const MOCK_CREDENTIALS = {
 // ============================================================================
 
 async function setupTestContext(
-  repoName: string = 'test-repo',
+  repoName = 'test-repo',
 ): Promise<TestContext> {
   vol.reset();
 
@@ -69,7 +69,7 @@ async function setupTestContext(
   return { instance, r, gitOps, fileState: initFileState };
 }
 
-async function initializeRepo(ctx: TestContext, branch: string = 'main') {
+async function initializeRepo(ctx: TestContext, branch = 'main') {
   await ctx.gitOps.initGitRepo(ctx.r, branch);
 }
 
@@ -93,7 +93,7 @@ async function commitTestFile(
   ctx: TestContext,
   filepath: string,
   content: string,
-  message: string = 'Test commit',
+  message = 'Test commit',
 ) {
   await createTestFile(ctx, filepath, content);
   await ctx.gitOps.gitStageFile(ctx.r, filepath);

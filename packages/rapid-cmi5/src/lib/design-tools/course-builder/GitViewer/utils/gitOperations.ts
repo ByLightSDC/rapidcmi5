@@ -1,12 +1,12 @@
-import { FileStatus, getFileStatus, mapGitStatus } from './StatusMatrix';
-import { GitFS } from './fileSystem';
-import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
+import { type FileStatus, getFileStatus, mapGitStatus } from './StatusMatrix';
+import { type GitFS } from './fileSystem';
+import { type ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import * as git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
-import { GitConfigType } from '../../CourseBuilderApiTypes';
+import { type GitConfigType } from '../../CourseBuilderApiTypes';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import path, { join } from 'path-browserify';
-import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
+import { fsType, type RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { slugifyPath } from './useCourseOperationsUtils';
 import { repoNameInUseMessage, sandBoxName } from '../session/constants';
 
@@ -112,7 +112,7 @@ export class GitOperations {
   };
   initGitRepo = async (
     r: RepoAccessObject,
-    defaultBranch: string = 'main',
+    defaultBranch = 'main',
   ): Promise<void> => {
     const dir = getRepoPath(r);
 

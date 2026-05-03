@@ -16,7 +16,7 @@ import {
 
 import {
   ButtonOptions,
-  RowAction,
+  type RowAction,
   setModal,
 } from '@rapid-cmi5/ui';
 
@@ -96,7 +96,7 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
     },
   ];
 
-  const onRepoContextAction = (event: any, whichAction: number) => {
+  const onRepoContextAction = (_event: any, whichAction: number) => {
     if (!currentRepo) {
       return;
     }
@@ -167,7 +167,7 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
                   />
                   <Stack direction="row" sx={{ marginRight: 2 }}>
                     <ButtonOptions
-                      optionButton={(handleClick: any, tooltip: string) => {
+                      optionButton={(handleClick: any, _tooltip: string) => {
                         return (
                           <Box
                             sx={{

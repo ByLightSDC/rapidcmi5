@@ -2,7 +2,6 @@ import * as ReactDOM from 'react-dom/client';
 import AppWrapper from './app/AppWrapper';
 import { worker } from './mocks/browser';
 import { http } from 'msw';
-import { store } from './app/redux/store';
 import './assets/fonts/stylesheet.css';
 import './styles.css';
 import './app/components/player/rc5-styles.css';

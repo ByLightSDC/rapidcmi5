@@ -3,18 +3,17 @@
  * When using via an npm package this is very important.
  */
 import {
-  RC5ActivityTypeEnum,
-  CourseAU,
-  GitUserConfig,
-  Credentials,
-  ScenarioApi,
-  ScenarioQuery,
-  PaginatedScenariosResponse,
+  type RC5ActivityTypeEnum,
+  type CourseAU,
+  type GitUserConfig,
+  type Credentials,
+  type ScenarioApi,
+  type ScenarioQuery,
+  type PaginatedScenariosResponse,
 } from '@rapid-cmi5/cmi5-build-common';
-import { Scenario } from '@rapid-cmi5/react-editor';
-import { FormCrudType } from '@rapid-cmi5/ui';
+import { type FormCrudType } from '@rapid-cmi5/ui';
 import { createContext, useContext } from 'react';
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 
 export type SubmitScenarioFormFn<T = any> = (item: T) => void;
 

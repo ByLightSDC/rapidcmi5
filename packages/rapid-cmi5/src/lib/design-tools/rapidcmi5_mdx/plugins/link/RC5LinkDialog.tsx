@@ -9,12 +9,12 @@ import {
 } from '@mdxeditor/editor';
 import * as yup from 'yup';
 
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 import {
   cancelLinkEdit$,
-  EditLinkDialog,
+  type EditLinkDialog,
   linkDialogState$,
-  PreviewLinkDialog,
+  type PreviewLinkDialog,
   removeLink$,
   switchFromPreviewToLinkEdit$,
   updateLink$,
@@ -23,7 +23,6 @@ import {
 /* MUI */
 import Grid from '@mui/material/Grid2';
 import Popper from '@mui/material/Popper';
-import { useTheme } from '@mui/system';
 
 import { $setSelection } from 'lexical';
 import { useClickOutside } from './useClickOutside';
@@ -32,7 +31,7 @@ import { useSelector } from 'react-redux';
 import {
   editorInPlayback$,
   debugLog,
-  FormStateType,
+  type FormStateType,
   FormControlTextField,
   ModalDialog,
   FormControlUIProvider,

@@ -1,7 +1,7 @@
 import {
   rootEditor$,
   $createDirectiveNode,
-  DirectiveNode,
+  type DirectiveNode,
   exportVisitors$,
   jsxComponentDescriptors$,
   jsxIsAvailable$,
@@ -12,7 +12,7 @@ import {
   $getSelection,
   $setSelection,
   $isRangeSelection,
-  LexicalNode,
+  type LexicalNode,
 } from 'lexical';
 import type { LexicalEditor } from 'lexical';
 
@@ -20,8 +20,8 @@ import type { LexicalEditor } from 'lexical';
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 import ViewComfyIcon from '@mui/icons-material/ViewComfy';
 import type { BlockContent } from 'mdast';
-import { ContainerDirective } from 'mdast-util-directive';
-import { Options as ToMarkdownOptions } from 'mdast-util-to-markdown';
+import { type ContainerDirective } from 'mdast-util-directive';
+import { type Options as ToMarkdownOptions } from 'mdast-util-to-markdown';
 import {
   convertMarkdownToMdast,
   exportMarkdownFromLexical,

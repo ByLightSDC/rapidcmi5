@@ -6,7 +6,7 @@
 
 import { initContract } from '@ts-rest/core';
 import { z } from 'zod';
-import { QuestionGrading, QuestionResponse, QuizQuestion } from '../types/quiz';
+import { QuestionGrading, QuestionResponse, type QuizQuestion } from '../types/quiz';
 
 const c = initContract();
 

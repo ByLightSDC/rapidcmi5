@@ -1,4 +1,4 @@
-import { AnimationConfig } from '@rapid-cmi5/ui';
+import { type AnimationConfig } from '@rapid-cmi5/ui';
 import * as yaml from 'js-yaml';
 
 /**

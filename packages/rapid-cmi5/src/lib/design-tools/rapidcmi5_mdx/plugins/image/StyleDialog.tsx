@@ -1,4 +1,4 @@
-import React, { ChangeEvent, CSSProperties, useEffect, useState } from 'react';
+import React, { type ChangeEvent, useEffect, useState } from 'react';
 // @ts-ignore - inline-style-parser has type declaration issues
 import parse from 'inline-style-parser';
 import ImagePreviewPNG from './icons/image-preview.png';
@@ -19,11 +19,7 @@ import Grid from '@mui/material/Grid2';
 import { MuiColorInput } from 'mui-color-input';
 
 // icons
-import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
-import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
-import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
-import BlockIcon from '@mui/icons-material/Block';
-import { BlockWidthValue, BLOCK_WIDTH_INHERIT, ModalDialog, SelectorMainUi } from '@rapid-cmi5/ui';
+import { type BlockWidthValue, BLOCK_WIDTH_INHERIT, ModalDialog, SelectorMainUi } from '@rapid-cmi5/ui';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 const blockWidthDescriptions: Record<BlockWidthValue, string> = {
@@ -88,7 +84,6 @@ export const StyleDialog: React.FC<StyleProps> = ({
   onContentWidthSave,
 }) => {
   // misc styles
-  const [alignment, setAlignment] = useState<string | null>('');
   const [opacity, setOpacity] = useState(1);
   const [blockWidthValue, setBlockWidthValue] = useState<BlockWidthValue>(
     contentWidth ?? BLOCK_WIDTH_INHERIT,
@@ -125,9 +120,9 @@ export const StyleDialog: React.FC<StyleProps> = ({
         } else if (style.property === 'border-width') {
           const numberValue = parseFloat(removeUnit(style.value));
           setBorderWidth(numberValue);
-        // text-align is now handled via the textAlign attribute (toolbar controls), not the style string
-        // } else if (style.property === 'text-align') {
-        //   setAlignment(style.value);
+          // text-align is now handled via the textAlign attribute (toolbar controls), not the style string
+          // } else if (style.property === 'text-align') {
+          //   setAlignment(style.value);
         } else if (style.property === 'border-color') {
           setBorderColor(style.value);
         } else if (style.property === 'border-style') {
@@ -165,21 +160,21 @@ export const StyleDialog: React.FC<StyleProps> = ({
   }, [style]);
 
   const handleFlipHorizontalCheckboxChange = (
-    e: ChangeEvent<HTMLInputElement>,
+    _e: ChangeEvent<HTMLInputElement>,
     checked: boolean,
   ) => {
     setIsFlipHorizontal(checked);
   };
 
   const handleFlipVerticalCheckboxChange = (
-    e: ChangeEvent<HTMLInputElement>,
+    _e: ChangeEvent<HTMLInputElement>,
     checked: boolean,
   ) => {
     setIsFlipVertical(checked);
   };
 
   const handleDropShadowOffsetXSliderChange = (
-    e: Event,
+    _e: Event,
     value: number | number[],
   ) => {
     if (typeof value === 'number') {
@@ -188,7 +183,7 @@ export const StyleDialog: React.FC<StyleProps> = ({
   };
 
   const handleDropShadowOffsetYSliderChange = (
-    e: Event,
+    _e: Event,
     value: number | number[],
   ) => {
     if (typeof value === 'number') {
@@ -197,7 +192,7 @@ export const StyleDialog: React.FC<StyleProps> = ({
   };
 
   const handleDropShadowBlurRadiusSliderChange = (
-    e: Event,
+    _e: Event,
     value: number | number[],
   ) => {
     if (typeof value === 'number') {
@@ -210,7 +205,7 @@ export const StyleDialog: React.FC<StyleProps> = ({
   };
 
   const handleBorderRadiusSliderChange = (
-    e: Event,
+    _e: Event,
     value: number | number[],
   ) => {
     if (typeof value === 'number') {
@@ -218,14 +213,14 @@ export const StyleDialog: React.FC<StyleProps> = ({
     }
   };
 
-  const handleOpacitySliderChange = (e: Event, value: number | number[]) => {
+  const handleOpacitySliderChange = (_e: Event, value: number | number[]) => {
     if (typeof value === 'number') {
       setOpacity(value);
     }
   };
 
   const handleBorderWidthSliderChange = (
-    e: Event,
+    _e: Event,
     value: number | number[],
   ) => {
     if (typeof value === 'number') {
@@ -288,12 +283,6 @@ export const StyleDialog: React.FC<StyleProps> = ({
     setIsStyleDialogOpen(false);
   };
 
-  const handleAlignmentToggle = (
-    event: React.MouseEvent<HTMLElement>,
-    newAlignment: string | null,
-  ) => {
-    setAlignment(newAlignment);
-  };
 
   const handleBorderStyleSelect = (value: string) => {
     setBorderStyle(value);
@@ -463,9 +452,7 @@ export const StyleDialog: React.FC<StyleProps> = ({
                 <div
                   style={{
                     // alignment
-                    textAlign: alignment
-                      ? (alignment as CSSProperties['textAlign'])
-                      : undefined,
+                    textAlign: undefined,
                   }}
                 >
                   <img
@@ -482,8 +469,8 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       // drop shadow styles
                       filter:
                         dropShadowOffsetX !== 0 ||
-                        dropShadowOffsetY !== 0 ||
-                        dropShadowBlurRadius !== 0
+                          dropShadowOffsetY !== 0 ||
+                          dropShadowBlurRadius !== 0
                           ? `drop-shadow(${dropShadowOffsetX}px ${dropShadowOffsetY}px ${dropShadowBlurRadius}px ${dropShadowColor})`
                           : undefined,
 

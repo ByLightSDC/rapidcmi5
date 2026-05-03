@@ -3,11 +3,10 @@ import { debugLog } from '../../utility/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const attributeListRegEx = /(?:{):(.+)}/g;
-const debugMe = true;
 
 export const imagePlugin = () => {
   function transformer(tree: any) {
-    visit(tree, 'image', (node, position = -1, parent) => {
+    visit(tree, 'image', (node, _position = -1, parent) => {
       const definition = [];
 
       //console.log('imagePlugin node', node);
@@ -105,7 +104,7 @@ export const parseAttributeList = (attributesStr: string) => {
 
   //console.log('parseAttributeList', attributesStr);
   const matches = [...attributesStr.matchAll(attributeListRegEx)];
-  let theProps: { [key: string]: any } = {};
+  const theProps: { [key: string]: any } = {};
 
   if (matches && matches.length > 0) {
     for (const match of matches) {

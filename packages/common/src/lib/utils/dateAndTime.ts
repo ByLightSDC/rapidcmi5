@@ -1,4 +1,4 @@
-import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
+import { type DirMeta } from '../types/projects';
 
 export const formatRelativeTime = (isoDate: string): string => {
   const now = new Date();

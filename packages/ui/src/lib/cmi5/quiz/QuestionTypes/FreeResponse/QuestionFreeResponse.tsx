@@ -3,10 +3,9 @@ import { Stack, TextField, Typography } from '@mui/material';
 
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
-import { QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
+import { type QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
 
 function FreeResponse({
-  question,
   handlePickAnswer,
   currentQuestion,
   currentAnswer,

@@ -1,6 +1,6 @@
-import { DirectiveDescriptor } from '@mdxeditor/editor';
+import { type DirectiveDescriptor } from '@mdxeditor/editor';
 import { ImageTextEditor } from './ImageTextEditor';
-import { ImageTextDirectiveNode } from './types';
+import { type ImageTextDirectiveNode } from './types';
 
 /**
  * Image Label directive 

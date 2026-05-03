@@ -2,15 +2,15 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 /* MUI */
 import MenuItem from '@mui/material/MenuItem';
-import TextField, { StandardTextFieldProps } from '@mui/material/TextField';
+import TextField, { type StandardTextFieldProps } from '@mui/material/TextField';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { TypographyProps } from '@mui/material/Typography';
+import { type TypographyProps } from '@mui/material/Typography';
 import Autocomplete from '@mui/material/Autocomplete';
 
 /* Icons */
 import Checkbox from '@mui/material/Checkbox';
-import { SelectProps, Stack } from '@mui/material';
+import { type SelectProps } from '@mui/material';
 import { ButtonInfoField } from '../../utility/buttons';
 
 export type SelectorMenuOption = {
@@ -216,7 +216,7 @@ export function SelectorMainUi(props: BrandedSelectorProps) {
             ></MenuItem>
           )}
           {header}
-          {theList.map((option: any, index) => {
+          {theList.map((option: any, _index) => {
             // handle label/value vs simple string option
             const label = option.label ? option.label : option;
             const value = option.value ? option.value : label;
@@ -446,7 +446,7 @@ export function ComboBoxSelectorUi(props: BrandedComboSelectorProps) {
           isOptionEqualToValue={(option, value) => {
             return option === value;
           }}
-          onChange={(event: any, newValue: any) => {
+          onChange={(_event: any, newValue: any) => {
             //user clicked option
             // if field is cleared Autocomplete sends back null so set as empty
             setInputValue(newValue || '');
@@ -456,7 +456,7 @@ export function ComboBoxSelectorUi(props: BrandedComboSelectorProps) {
               onSelect(newValue || '');
             }
           }}
-          onInputChange={(event, newInputValue) => {
+          onInputChange={(_event, newInputValue) => {
             //user typed
             setInputValue(newInputValue);
             if (autocompleteProps.freeSolo) {
@@ -464,7 +464,7 @@ export function ComboBoxSelectorUi(props: BrandedComboSelectorProps) {
             }
           }}
           onOpen={() => setDropdownOpen(true)}
-          onClose={(event, reason) => {
+          onClose={(_event, reason) => {
             setDropdownOpen(false);
             // handle typed in entry
             if (onSelect && reason === 'blur') {

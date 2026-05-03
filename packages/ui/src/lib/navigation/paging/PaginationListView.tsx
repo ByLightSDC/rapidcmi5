@@ -9,12 +9,12 @@ import { PaginationFiltersContext } from './PaginationFiltersContext';
 /* MUI */
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-import { DividerProps } from '@mui/material/Divider';
+import { type DividerProps } from '@mui/material/Divider';
 import { Typography } from '@mui/material';
 
 /*Icons */
 import RefreshIcon from '@mui/icons-material/Refresh';
-import ListView, { ListViewProps } from '../../data-display/ListView';
+import ListView, { type ListViewProps } from '../../data-display/ListView';
 import { debugLogWarning } from '../../utility/logger';
 import { authoredByMeFilter, paginationFiltersConfig } from './paginationFiltersConstants';
 import TablePaginationUi from './TablePagination';

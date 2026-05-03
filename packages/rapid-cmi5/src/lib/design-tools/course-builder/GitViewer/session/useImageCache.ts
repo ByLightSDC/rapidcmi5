@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { getRepoPath, GitFS } from '../utils/fileSystem';
-import { Course, RepoAccessObject } from '../../../../redux/repoManagerReducer';
+import { getRepoPath, type GitFS } from '../utils/fileSystem';
+import { type Course, type RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import path from 'path-browserify';
 import { getRepoAccess } from './GitContext';
 import { debugLog } from '@rapid-cmi5/ui';

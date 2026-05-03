@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { LexicalEditor } from 'lexical';
+import { type LexicalEditor } from 'lexical';
 import React, { createContext } from 'react';
-import { FootnoteReferenceNode } from './FootnoteReferenceNode';
+import { type FootnoteReferenceNode } from './FootnoteReferenceNode';
 import { useCellValue } from '@mdxeditor/editor';
 import { fnRefOrder$ } from './vars';
 

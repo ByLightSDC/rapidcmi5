@@ -1,13 +1,10 @@
-import { $createQuoteNode, HeadingTagType } from '@lexical/rich-text';
+import { $createQuoteNode, type HeadingTagType } from '@lexical/rich-text';
 import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 import {
   $createParagraphNode,
-  $createRangeSelection,
   $insertNodes,
   $isNodeSelection,
-  $setPointFromCaret,
   $setSelection,
-  $setSelectionFromCaretRange,
 } from 'lexical';
 import {
   activePlugins$,

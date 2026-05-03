@@ -6,7 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import EditIcon from '@mui/icons-material/Edit';
-import { QuizContent } from '@rapid-cmi5/cmi5-build-common';
+import { type QuizContent } from '@rapid-cmi5/cmi5-build-common';
 
 export type QuizReviewProps = {
   content: QuizContent;

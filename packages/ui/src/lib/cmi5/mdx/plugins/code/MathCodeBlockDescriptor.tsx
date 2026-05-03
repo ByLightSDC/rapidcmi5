@@ -4,8 +4,8 @@ import rehypeRaw from 'rehype-raw';
 import remarkMath from 'remark-math';
 
 import {
-  CodeBlockEditorDescriptor,
-  CodeBlockEditorProps,
+  type CodeBlockEditorDescriptor,
+  type CodeBlockEditorProps,
 } from '@mdxeditor/editor';
 
 /**
@@ -13,7 +13,7 @@ import {
  */
 export const MathCodeBlockDescriptor: CodeBlockEditorDescriptor = {
   priority: 1,
-  match(language: string | null | undefined, meta: string | null | undefined) {
+  match(language: string | null | undefined, _meta: string | null | undefined) {
     return language === 'math';
   },
   Editor: (props: CodeBlockEditorProps) => {

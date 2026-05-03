@@ -25,7 +25,7 @@ export default function AppHeader() {
   const [settingsMenuAnchor, setSettingsMenuAnchor] =
     React.useState<null | HTMLElement>(null);
 
-  const onAppIconClick = (iconKey: number, optionIndex?: number) => {
+  const onAppIconClick = (iconKey: number, _optionIndex?: number) => {
     switch (iconKey) {
       case appsKey:
         //REF -- currently not doing anything here -- onOptionSelect event passes optionIndex

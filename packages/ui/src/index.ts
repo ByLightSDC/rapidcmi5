@@ -107,3 +107,4 @@ export * from './lib/cmi5/mdx/util/conversion';
 export * from './lib/colors/ColorSelectionPopover';
 export * from './lib/cmi5/mdx/plugins/shared/BlockAppearanceForm';
 export * from './lib/cmi5/mdx/components/AlignmentToolbarControls';
+export * from './lib/cmi5/mdx/editors/YouTubeDirectiveDescriptor';

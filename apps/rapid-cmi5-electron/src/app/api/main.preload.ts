@@ -1,7 +1,7 @@
 import {
-  Credentials,
-  GitUserConfig,
-  SSOConfig,
+  type Credentials,
+  type GitUserConfig,
+  type SSOConfig,
 } from '@rapid-cmi5/cmi5-build-common';
 import { contextBridge, ipcRenderer } from 'electron';
 

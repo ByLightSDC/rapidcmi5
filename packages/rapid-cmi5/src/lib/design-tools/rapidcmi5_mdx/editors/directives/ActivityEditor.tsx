@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import {
-  DirectiveEditorProps,
+  type DirectiveEditorProps,
   useCellValue,
   useLexicalNodeRemove,
   useMdastNodeUpdater,
@@ -20,10 +20,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { DownloadFilesForm } from './DownloadFilesForm';
 import {
   RC5ActivityTypeEnum,
-  ActivityJsonNode,
-  QuizContent,
-  CTFContent,
-  CodeRunnerContent,
+  type ActivityJsonNode,
+  type QuizContent,
+  type CTFContent,
+  type CodeRunnerContent,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   useTimeStampUUID,
@@ -37,7 +37,7 @@ import {
   AuCTF,
   CodeRunner,
 } from '@rapid-cmi5/ui';
-import { updateScenario, updateTeamScenario } from '@rapid-cmi5/react-editor';
+import { updateScenario, updateTeamScenario } from '../../../../redux/courseBuilderReducer';
 import ScenarioMock from './ScenarioMock';
 import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 import { TeamConsolesForm } from '../forms/scenario/TeamConsolesForm';
@@ -48,10 +48,8 @@ import { TeamConsolesForm } from '../forms/scenario/TeamConsolesForm';
  * @returns
  */
 export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
-  lexicalNode,
   mdastNode,
   parentEditor,
-  descriptor,
 }) => {
   const { generateId } = useTimeStampUUID();
   const { name } = mdastNode; //scenario, quiz, etc.

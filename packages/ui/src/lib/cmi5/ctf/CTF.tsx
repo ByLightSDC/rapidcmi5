@@ -1,9 +1,9 @@
 import {
-  ActivityScore,
-  AnswerType,
-  AuContextProps,
-  CTFContent,
-  CTFQuestion,
+  type ActivityScore,
+  type AnswerType,
+  type AuContextProps,
+  type CTFContent,
+  type CTFQuestion,
   QuizCompletionEnum,
   RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
@@ -99,7 +99,6 @@ export function AuCTF({
   } = useCTFGrader(ctfContent);
 
   const [isFocused, setIsFocused] = useState(currentQuestionIndex >= 0);
-  const [focused, setFocused] = useState<Element | null>(null);
   const focusHelper = useDisplayFocus();
   const [isInputEnabled, setIsInputEnabled] = useState(false);
   const displayToaster = useToaster();

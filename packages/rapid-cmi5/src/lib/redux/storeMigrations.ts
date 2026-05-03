@@ -1,5 +1,5 @@
 
-import { MigrationManifest } from 'redux-persist/es/types';
+import { type MigrationManifest } from 'redux-persist/es/types';
 
 export const CURRENT_STORE_VERSION = 0;
 

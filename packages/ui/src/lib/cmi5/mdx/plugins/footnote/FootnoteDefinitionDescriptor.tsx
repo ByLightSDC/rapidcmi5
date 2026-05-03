@@ -1,4 +1,4 @@
-import { iFootnoteDefinitionEditorDescriptor } from './types';
+import { type iFootnoteDefinitionEditorDescriptor } from './types';
 import { FootnoteDefinitionEditor } from './FootnoteDefinitionEditor';
 
 /**

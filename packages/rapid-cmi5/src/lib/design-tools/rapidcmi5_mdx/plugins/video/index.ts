@@ -24,8 +24,8 @@ import {
   DRAGOVER_COMMAND,
   DRAGSTART_COMMAND,
   DROP_COMMAND,
-  LexicalCommand,
-  LexicalEditor,
+  type LexicalCommand,
+  type LexicalEditor,
   PASTE_COMMAND,
   createCommand,
 } from 'lexical';
@@ -40,12 +40,12 @@ import {
   createActiveEditorSubscription$,
 } from '@mdxeditor/editor';
 
-import { EditVideoToolbar, EditVideoToolbarProps } from './EditVideoToolbar';
+import { EditVideoToolbar, type EditVideoToolbarProps } from './EditVideoToolbar';
 import { VideoDialog } from './VideoDialog';
 import {
   $createVideoNode,
   $isVideoNode,
-  CreateVideoNodeParameters,
+  type CreateVideoNodeParameters,
   VideoNode,
 } from './VideoNode';
 import { LexicalVideoVisitor } from './LexicalVideoVisitor';
@@ -53,7 +53,7 @@ import {
   MdastHtmlVideoVisitor,
   MdastJsxVideoVisitor,
 } from './MdastVideoVisitor';
-import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
+import { type MdxJsxAttribute, type MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
 export const CAN_USE_DOM: boolean =
   typeof window !== 'undefined' &&

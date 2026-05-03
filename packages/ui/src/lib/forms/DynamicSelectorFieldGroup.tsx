@@ -3,15 +3,14 @@ import { useSelector, useDispatch } from 'react-redux';
 
 /* Branded */
 import {
-  tFormFieldRendererProps,
+  type tFormFieldRendererProps,
   useDisplayFocus,
-  useIsVisible,
 } from '@rapid-cmi5/ui';
 
 /* MUI */
-import { TextFieldProps } from '@mui/material/TextField';
+import { type TextFieldProps } from '@mui/material/TextField';
 import UUIDFieldInspector, {
-  tUUIDFieldInspectorProps,
+  type tUUIDFieldInspectorProps,
 } from './UUIDFieldInspector';
 import { message, selection, setMessage } from '../redux/commonAppReducer';
 import { useClearCacheSelection, useGetCacheSelection } from '../redux/useCacheSelection';
@@ -163,7 +162,6 @@ export function DynamicSelectorFieldGroup(
   const focusHelper = useDisplayFocus();
 
   const divRef = useRef(null);
-  const isVisible = useIsVisible(divRef);
 
   const watchKey = !shouldOverrideSelectionName
     ? watch(`${indexedArrayField}.name`)
@@ -383,7 +381,7 @@ export function DynamicSelectorFieldGroup(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectionArr, messageObj.message, messageObj.meta?.indexedArrayField]);
 
-  const handleOpenSelection = (event: any) => {
+  const handleOpenSelection = (_event: any) => {
     const selectionData = {
       dataIdField,
       modalId: selectionModalId,
@@ -411,8 +409,7 @@ export function DynamicSelectorFieldGroup(
       ref={divRef}
       style={{ marginTop: marginTop, gap: '4px' }} //negative margin to undo extra div vertical
     >
-      <>
-        {!readOnly && (
+      {!readOnly && (
           <ButtonSelectUi
             aria-label={`select-${itemName}`}
             id={selectButtonFocusId}
@@ -431,7 +428,6 @@ export function DynamicSelectorFieldGroup(
           </ButtonSelectUi>
         )}
         {uuidMemo}
-      </>
     </div>
   );
 }

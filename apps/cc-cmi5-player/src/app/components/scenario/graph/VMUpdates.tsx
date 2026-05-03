@@ -29,7 +29,7 @@ export default function VMUpdates({
   const vmsQuery = useGetRangeResourceVmsGraph(rangeId, scenarioId);
   useQueryDetails({
     queryObj: vmsQuery,
-    errorFunction: (queryError) => {
+    errorFunction: (_queryError) => {
       setInitialized(Topic.ResourceVM, true);
     },
     successFunction: (successData) => {

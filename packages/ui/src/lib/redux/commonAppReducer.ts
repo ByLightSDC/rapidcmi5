@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction, type Slice } from '@reduxjs/toolkit';
 import { resetPersistance } from './utils/store';
 import { FormCrudType } from './utils/types';
 

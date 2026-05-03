@@ -1,22 +1,25 @@
 import {
-  FolderStruct,
+  type FolderStruct,
   generateCourseJson,
   RC5_FILENAME,
   generateCourseDist,
-  FsOperations,
+  type FsOperations,
   generateCmi5Xml,
-  DirMeta,
+  type DirMeta,
   sortProjectMetas,
 } from '@rapid-cmi5/cmi5-build-common';
 import JSZip from 'jszip';
 import path, { basename, dirname, join, relative } from 'path-browserify';
 import { configure, fs as zenFs } from '@zenfs/core';
 import { IndexedDB, WebAccess } from '@zenfs/dom';
-import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
+import {
+  fsType,
+  type RepoAccessObject,
+} from '../../../../redux/repoManagerReducer';
 import { set, get, keys, getMany, del } from 'idb-keyval';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import { electronFs } from './ElectronFsApi';
-import { IFs } from 'memfs';
+import { type IFs } from 'memfs';
 import saveAs from 'file-saver';
 import {
   getRc5Content,
@@ -48,16 +51,16 @@ const noGitInProjectError =
 export class GitFS {
   public fs: FileSystemObject;
 
-  public isBrowserFsLoaded: boolean = false;
-  public isLocalFsLoaded: boolean = false;
-  public isMountStarted: boolean = false;
-  public isElectron: boolean = false;
+  public isBrowserFsLoaded = false;
+  public isLocalFsLoaded = false;
+  public isMountStarted = false;
+  public isElectron = false;
   public cache = {};
   // This allows us to remove a recent project from the recents list
   // If we delete it in the UI
   public currentProjectRecentsId?: string = undefined;
 
-  constructor(isElectron: boolean = false) {
+  constructor(isElectron = false) {
     if (isElectron) {
       this.fs = electronFs;
       this.isElectron = true;
@@ -144,9 +147,15 @@ export class GitFS {
 
     for (const filename of ['index.html', 'cfg.json', 'favicon.ico']) {
       const res = await fetch(`${base}/${filename}`);
-      if (!res.ok) throw new Error(`Failed to fetch ${filename} from player dev server (${res.status})`);
+      if (!res.ok)
+        throw new Error(
+          `Failed to fetch ${filename} from player dev server (${res.status})`,
+        );
       const buf = await res.arrayBuffer();
-      await this.fs.promises.writeFile(join(cmi5BuildCache, filename), new Uint8Array(buf));
+      await this.fs.promises.writeFile(
+        join(cmi5BuildCache, filename),
+        new Uint8Array(buf),
+      );
     }
   };
 
@@ -185,7 +194,7 @@ export class GitFS {
         writeFile: async (
           path: string,
           content: string | Uint8Array,
-          encoding?: string,
+          _encoding?: string,
         ) => {
           await this.fs.promises.writeFile(path, content);
         },
@@ -202,7 +211,7 @@ export class GitFS {
         copy: async (
           src: string,
           dest: string,
-          options: { recursive: boolean },
+          _options: { recursive: boolean },
         ) => {
           await this.copyRecursive(src, dest);
         },
@@ -346,7 +355,7 @@ export class GitFS {
         }
       }
 
-      const folders = await this.getFolderStructure(cmi5BuildCache, '', false);
+      await this.getFolderStructure(cmi5BuildCache, '', false);
 
       if (failCount > 0) {
         throw new Error(`Failed to extract ${failCount} files`);
@@ -361,7 +370,7 @@ export class GitFS {
   // this is browser specific
   openLocalDirectory = async (
     dirHandle: FileSystemDirectoryHandle,
-    forClone: boolean = false,
+    forClone = false,
   ) => {
     const webacess = await WebAccess.create({ handle: dirHandle });
 
@@ -450,7 +459,7 @@ export class GitFS {
       // We don't need to take care of recents here, thats an electron backend job
     } else {
       // @ts-ignore
-      let dirHandle = (await window.showDirectoryPicker({
+      const dirHandle = (await window.showDirectoryPicker({
         mode: 'readwrite',
         startIn: 'documents',
       })) as FileSystemDirectoryHandle;
@@ -898,12 +907,7 @@ export class GitFS {
     const zip = new JSZip();
     const courseRoot = zip.folder(basePath);
     const fullPath = join(path);
-    const files = await this.getFolderStructure(
-      fullPath,
-      path,
-      true,
-      courseRoot,
-    );
+    await this.getFolderStructure(fullPath, path, true, courseRoot);
 
     return zip;
   };

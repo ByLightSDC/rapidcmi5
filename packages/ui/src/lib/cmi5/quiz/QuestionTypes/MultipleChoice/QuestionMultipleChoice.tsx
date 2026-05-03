@@ -2,7 +2,7 @@
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
 import { Typography } from '@mui/material';
-import { QuizQuestion, QuizOption } from '@rapid-cmi5/cmi5-build-common';
+import { type QuizQuestion, type QuizOption } from '@rapid-cmi5/cmi5-build-common';
 import { useEffect, useState } from 'react';
 
 function QuestionMultipleChoice({

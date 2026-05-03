@@ -1,9 +1,4 @@
-const resourceQuantityInfoAddendum =
-  '\nAssume bytes if units are unspecified or value contains exponents (Ex. 1e10)';
-
-const infoButtonText: Record<string, Record<string, string>> = {
- 
-}
+const infoButtonText: Record<string, Record<string, string>> = {};
 export const getInfoText = (
   formName: string,
   fieldName: string,

@@ -34,7 +34,7 @@ const baseUrl = `${config.DEVOPS_API_URL}${config.DEVOPS_API_CMI_VERSION}`;
 
 export const cmi5Class = [
   // GET list
-  http.get(`${baseUrl}/classes`, ({ request, params, cookies }) => {
+  http.get(`${baseUrl}/classes`, ({ request }) => {
     const url = new URL(request.url);
     const offset = url.searchParams.get('offset');
     const limit = url.searchParams.get('limit');
@@ -55,10 +55,7 @@ export const cmi5Class = [
   }),
 
   // DELETE
-  http.delete(
-    `${baseUrl}/12345678-6fb7-4997-8f3c-70f0a335d5a3`,
-    ({ request, params, cookies }) => {
-      return HttpResponse.json({}, { status: 200 });
-    },
-  ),
+  http.delete(`${baseUrl}/12345678-6fb7-4997-8f3c-70f0a335d5a3`, () => {
+    return HttpResponse.json({}, { status: 200 });
+  }),
 ];

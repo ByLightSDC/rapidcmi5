@@ -1,8 +1,7 @@
 import {
-  ButtonWithTooltip,
   rootEditor$,
   $createDirectiveNode,
-  DirectiveNode,
+  type DirectiveNode,
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
@@ -16,7 +15,7 @@ import GridViewIcon from '@mui/icons-material/GridView';
 import { convertMarkdownToMdast } from '@rapid-cmi5/ui';
 
 import type { BlockContent } from 'mdast';
-import { ContainerDirective } from 'mdast-util-directive';
+import { type ContainerDirective } from 'mdast-util-directive';
 import { ButtonMinorUi, DEFAULT_GRID } from '@rapid-cmi5/ui';
 
 /**

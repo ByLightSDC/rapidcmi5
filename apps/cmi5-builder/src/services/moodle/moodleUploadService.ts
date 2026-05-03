@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { AuMappingService } from '../auMappingService';
-import { CourseData } from '@rapid-cmi5/cmi5-build-common';
+import { type AuMappingService } from '../auMappingService';
+import { type CourseData } from '@rapid-cmi5/cmi5-build-common';
 
 import FormData from 'form-data';
 import fs from 'fs';
@@ -67,35 +67,6 @@ export class MoodleUploadService {
     });
 
     console.log('update response: ', response.data);
-
-    return response.data;
-  }
-
-  private async updateCourse(course: MoodleCourse, zipPath: string) {
-    const url = `${this.baseUrl}/webservice/rest/server.php`;
-
-    const formData = new FormData();
-    formData.append('file', fs.createReadStream(zipPath));
-    formData.append('wstoken', this.wstoken);
-    formData.append('wsfunction', 'mod_cmi5launch_update_cmi5_course');
-    formData.append('moodlewsrestformat', 'json');
-    if (course.courseid) {
-      formData.append('courseid', course.courseid);
-    } else if (course.courseName) {
-      formData.append('courseid', course.courseName);
-    } else {
-      throw Error('No course id or course name was provided');
-    }
-    formData.append('sectionid', '1');
-    formData.append('filename', path.basename(zipPath));
-    formData.append('cmid', course.cmi5id);
-    formData.append('modulename', course.modulename);
-
-    const response = await axios.post(url, formData, {
-      headers: formData.getHeaders(),
-    });
-
-    console.log('upload response: ', response.data);
 
     return response.data;
   }

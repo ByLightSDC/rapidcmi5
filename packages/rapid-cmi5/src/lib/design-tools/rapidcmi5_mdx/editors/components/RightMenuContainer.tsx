@@ -1,4 +1,4 @@
-import { Box, SxProps } from '@mui/material';
+import { Box, type SxProps } from '@mui/material';
 
 /**
  * Editor Menu Wrapper

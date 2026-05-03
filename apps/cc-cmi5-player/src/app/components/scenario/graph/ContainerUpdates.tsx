@@ -33,7 +33,7 @@ export default function ContainerUpdates({
   );
   useQueryDetails({
     queryObj: containersQuery,
-    errorFunction: (queryError: any) => {
+    errorFunction: (_queryError: any) => {
       setInitialized(Topic.ResourceContainer, true);
     },
     successFunction: (successData: any) => {

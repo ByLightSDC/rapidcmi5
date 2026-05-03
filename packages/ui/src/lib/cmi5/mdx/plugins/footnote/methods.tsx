@@ -1,15 +1,11 @@
 import { Signal, insertDecoratorNode$, map } from '@mdxeditor/editor';
 import {
-  $getSelection,
-  $insertNodes,
-  $isRangeSelection,
-  $setSelection,
-  LexicalNode,
+  type LexicalNode,
 } from 'lexical';
 
 import {
-  FootnoteDefinitionAttributes,
-  FootnoteReferenceAttributes,
+  type FootnoteDefinitionAttributes,
+  type FootnoteReferenceAttributes,
 } from './types';
 import { FootnoteReferenceNode } from './FootnoteReferenceNode';
 import { FootnoteDefinitionNode } from './FootnoteDefinitionNode';

@@ -1,4 +1,4 @@
-import { langs, langNames } from '@uiw/codemirror-extensions-langs';
+import { langNames } from '@uiw/codemirror-extensions-langs';
 
 const blackList = ['brainfuck'];
 

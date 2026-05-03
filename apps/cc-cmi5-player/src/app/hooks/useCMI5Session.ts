@@ -19,11 +19,11 @@ import {
   setRangeDataAttempts,
   setRangeDataError,
 } from '../redux/auReducer';
-import { rangeDataType } from '../types/AuState';
+import { type rangeDataType } from '../types/AuState';
 
 import {
-  InitScenarioResponse,
-  ScenarioConsolesResponse,
+  type InitScenarioResponse,
+  type ScenarioConsolesResponse,
 } from '../types/SlideState';
 import { config, useToaster } from '@rapid-cmi5/ui';
 import { cmi5Instance } from '../session/cmi5';

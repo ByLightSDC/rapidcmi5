@@ -1,5 +1,5 @@
-import { GenericHTMLNode, LexicalExportVisitor } from '@mdxeditor/editor';
-import { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx';
+import { type GenericHTMLNode, type LexicalExportVisitor } from '@mdxeditor/editor';
+import { type MdxJsxFlowElement, type MdxJsxTextElement } from 'mdast-util-mdx-jsx';
 import { $isIFrameNode } from './methods';
 
 /**

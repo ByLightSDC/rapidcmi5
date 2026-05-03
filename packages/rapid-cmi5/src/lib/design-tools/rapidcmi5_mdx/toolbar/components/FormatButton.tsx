@@ -1,17 +1,13 @@
 import {
   applyFormat$,
   currentFormat$,
-  FORMAT,
+  type FORMAT,
   iconComponentFor$,
-  IconKey,
-  IS_BOLD,
-  IS_ITALIC,
-  IS_UNDERLINE,
+  type IconKey,
   useCellValues,
   usePublisher,
-  useTranslation,
 } from '@mdxeditor/editor';
-import { TextFormatType } from 'lexical';
+import { type TextFormatType } from 'lexical';
 import { MUIToggleSingleGroupWithItem } from './MUIToggleSingleGroupWithItem';
 
 
@@ -44,7 +40,7 @@ export const FormatButton: React.FC<FormatButtonProps> = ({
       onClick={() => {
         applyFormat(formatName);
       }}
-      //sx={{padding:'0px', marginRight:'2px'}}
+    //sx={{padding:'0px', marginRight:'2px'}}
     >
       {iconComponentFor(icon)}
     </MUIToggleSingleGroupWithItem>

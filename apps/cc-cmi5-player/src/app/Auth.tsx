@@ -1,11 +1,10 @@
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   auConfigInitializedSel,
-  auJsonSel,
   setIsDisplayInitialized,
 } from './redux/auReducer';
-import { config, debugLog } from '@rapid-cmi5/ui';
+import { config } from '@rapid-cmi5/ui';
 import { authToken, KeycloakUi } from '@rapid-cmi5/keycloak';
 import { queryHooksConfig } from '@rangeos-nx/frontend/clients/hooks';
 import { logger } from './debug';

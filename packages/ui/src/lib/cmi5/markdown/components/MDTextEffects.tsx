@@ -1,7 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { RoughNotation } from 'react-rough-notation';
 import { SlideTrigger } from '../constants/SlideTriggers';
-import { useItemVisibleInBounds } from '../../../hooks/useItemVisibleInBounds';
 import uniqid from 'uniqid';
 import { SlideEvent } from '../constants/SlideEvents';
 
@@ -46,18 +45,6 @@ export default function MDTextEffects(props: any) {
     setIsShow(true);
   };
 
-  // watch for item being visible on screen
-  const isVisible = useItemVisibleInBounds(
-    effectItemRef,
-    null,
-    '2px',
-    (isVisible: boolean) => {
-      // console.log('visibility changed', id, isVisible);
-      if (trigger === SlideTrigger.InView) {
-        playEffect();
-      }
-    },
-  );
 
   // add listeners appropriate for the trigger type
   useEffect(() => {
@@ -80,7 +67,7 @@ export default function MDTextEffects(props: any) {
     };
 
     // handle a slide click
-    const handleSlideClick = (e: any) => {
+    const handleSlideClick = () => {
       // console.log('slide clicked', e);
       playEffect();
     };
@@ -142,7 +129,7 @@ export default function MDTextEffects(props: any) {
         }}
       >
         <RoughNotation
-          getAnnotationObject={(annotation) => {}}
+          getAnnotationObject={() => {}}
           show={isShow}
           {...rest}
         >

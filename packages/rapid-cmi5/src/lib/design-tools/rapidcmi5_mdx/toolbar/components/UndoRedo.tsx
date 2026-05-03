@@ -16,10 +16,6 @@ import UndoIcon from '@mui/icons-material/Undo';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 import {
   activeEditor$,
-  iconComponentFor$,
-  IS_APPLE,
-  MultipleChoiceToggleGroup,
-  useTranslation,
 } from '@mdxeditor/editor';
 
 /**
@@ -27,13 +23,11 @@ import {
  * @group Toolbar Components
  */
 export function UndoRedo() {
-  const [iconComponentFor, activeEditor] = useCellValues(
-    iconComponentFor$,
+  const [activeEditor] = useCellValues(
     activeEditor$,
   );
   const [canUndo, setCanUndo] = React.useState(false);
   const [canRedo, setCanRedo] = React.useState(false);
-  const t = useTranslation();
 
   useEffect(() => {
     if (!activeEditor) {

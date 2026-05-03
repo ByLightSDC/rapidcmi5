@@ -1,5 +1,5 @@
 import {
-  DirectiveEditorProps,
+  type DirectiveEditorProps,
   NestedLexicalEditor,
   readOnly$,
   syntaxExtensions$,
@@ -7,11 +7,11 @@ import {
 } from '@mdxeditor/editor';
 import type { ContainerDirective } from 'mdast-util-directive';
 
-import { Paragraph } from 'mdast';
+import { type Paragraph } from 'mdast';
 import { toMarkdown } from 'mdast-util-to-markdown';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import Popper, { PopperPlacementType } from '@mui/material/Popper';
+import Popper, { type PopperPlacementType } from '@mui/material/Popper';
 import { createPortal } from 'react-dom';
 import { useSignalEffect } from '@preact/signals-react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -20,10 +20,7 @@ import {
   Box,
   Divider,
   IconButton,
-  Paper,
   Stack,
-  SxProps,
-  Tooltip,
   useTheme,
 } from '@mui/material';
 import Fade from '@mui/material/Fade';
@@ -32,7 +29,7 @@ import Fade from '@mui/material/Fade';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
-import { ImageLabelDirectiveNode } from './types';
+import { type ImageLabelDirectiveNode } from './types';
 import { imageLabelKeys$, imagePopper$ } from './vars';
 import { useSelector } from 'react-redux';
 import { ButtonIcon } from '../../../../utility/buttons';
@@ -52,7 +49,7 @@ import { convertMarkdownToMdast } from '../../util/conversion';
  */
 export const ImageLabelEditor: React.FC<
   DirectiveEditorProps<ImageLabelDirectiveNode>
-> = ({ lexicalNode, mdastNode, parentEditor }) => {
+> = ({ lexicalNode, mdastNode }) => {
   const popperRef = useRef<null | HTMLDivElement>(null);
   const [editor] = useLexicalComposerContext();
   const [isOpen, setIsOpen] = useState(false);
@@ -66,7 +63,7 @@ export const ImageLabelEditor: React.FC<
   const muiTheme = useTheme();
   const themedDividerColor = useSelector(dividerColor);
 
-  const [sxProps, setSxProps] = useState<SxProps>({});
+  const sxProps = {};
   const [title, setTitle] = useState(mdastNode.attributes.title);
 
   const [isPlayback, readOnly, syntaxExtensions] = useCellValues(
@@ -325,7 +322,7 @@ export const ImageLabelEditor: React.FC<
                 {/* title editor */}
                 <Box sx={{ padding: 2 }}>
                   <NestedLexicalEditor<Paragraph>
-                    getContent={(node) => {
+                    getContent={() => {
                       const theNode = convertMarkdownToMdast(
                         theTitle,
                         syntaxExtensions,

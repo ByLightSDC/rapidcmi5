@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
-import { AppMenuConfigItem } from './utils/types';
+import { createSlice, type PayloadAction, type Slice } from '@reduxjs/toolkit';
+import { type AppMenuConfigItem } from './utils/types';
 
 export type tCommonAppTransState = {
   appHeaderVisible: boolean;

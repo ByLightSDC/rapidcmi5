@@ -1,6 +1,6 @@
-import { LexicalExportVisitor } from '@mdxeditor/editor';
-import * as Mdast from 'mdast';
-import { $isTOCHeadingNode, TOCHeadingNode } from './TocHeading';
+import { type LexicalExportVisitor } from '@mdxeditor/editor';
+import type * as Mdast from 'mdast';
+import { $isTOCHeadingNode, type TOCHeadingNode } from './TocHeading';
 
 export const LexicalHeadingVisitor: LexicalExportVisitor<
   TOCHeadingNode,

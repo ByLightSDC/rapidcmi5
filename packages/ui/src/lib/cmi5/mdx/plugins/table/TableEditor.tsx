@@ -10,7 +10,7 @@ import { useGutterRight } from '../shared/useGutterRight';
 import { useFocusWithin } from '../shared/useFocusWithin';
 import {
   useScopedAlignmentStyles,
-  TextAlign,
+  type TextAlign,
 } from '../shared/useScopedAlignmentStyles';
 import { AlignmentToolbarControls } from '../../components/AlignmentToolbarControls';
 import DeleteIconButton from '../../components/DeleteIconButton';
@@ -25,12 +25,12 @@ import {
   FOCUS_COMMAND,
   KEY_ENTER_COMMAND,
   KEY_TAB_COMMAND,
-  LexicalEditor,
+  type LexicalEditor,
   createEditor,
 } from 'lexical';
-import * as Mdast from 'mdast';
+import type * as Mdast from 'mdast';
 import React, {
-  ElementType,
+  type ElementType,
   useEffect,
   useState,
   useRef,
@@ -39,10 +39,10 @@ import React, {
 } from 'react';
 import { resolveLessonThemeCSS, resolveBlockMaxWidth } from '../../../../styles/lessonThemeStyles';
 import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
-import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { type ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { lessonTheme$ } from '../../state/vars';
-import { TableNode } from './TableNode';
+import { type TableNode } from './TableNode';
 
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { mergeRegister } from '@lexical/utils';
@@ -55,7 +55,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 import {
   NESTED_EDITOR_UPDATED_COMMAND,
-  Separator,
   codeBlockEditorDescriptors$,
   directiveDescriptors$,
   editorRootElementRef$,

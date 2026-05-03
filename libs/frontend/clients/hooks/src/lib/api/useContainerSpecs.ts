@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/rules-of-hooks */
-import { AxiosRequestConfig } from 'axios';
+import { type AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import {
@@ -12,8 +12,8 @@ import {
 } from './config';
 import { getErrorMessage } from './errorMessages';
 import {
-  ContainerSpecificationCreate,
-  ContainerSpecificationUpdate,
+  type ContainerSpecificationCreate,
+  type ContainerSpecificationUpdate,
   DevopsApiClient,
 } from '@rangeos-nx/frontend/clients/devops-api';
 
@@ -104,7 +104,7 @@ export const usePostContainerSpec = () => {
   return useMutation(
     (formData: ContainerSpecificationCreate) => postResult(formData),
     {
-      onSettled: async (data, error, variables: any) => {
+      onSettled: async (_data, error, _variables: any) => {
         if (!error) {
           queryClient.invalidateQueries(queryKeyContainerSpecs);
         }
@@ -132,7 +132,7 @@ export const usePutContainerSpec = () => {
   };
 
   return useMutation(({ uuid, formData }: any) => putResult(uuid, formData), {
-    onSettled: async (data, error, variables: any) => {
+    onSettled: async (_data, error, _variables: any) => {
       if (!error) {
         queryClient.invalidateQueries(queryKeyContainerSpecs);
       }
@@ -141,7 +141,7 @@ export const usePutContainerSpec = () => {
 };
 
 export const useDeleteContainerSpec = (
-  uuid?: string, //  mark as “optional” so  when CrudModals sets up the api query it doesn’t complain about “undefined”
+  _uuid?: string, //  mark as “optional” so  when CrudModals sets up the api query it doesn’t complain about “undefined”
   skipInvalidate = false, // normally we want to invalidate, but not when doing bulk delete
 ) => {
   const queryClient = useQueryClient();
@@ -158,7 +158,7 @@ export const useDeleteContainerSpec = (
   };
 
   return useMutation((uuid: string) => deleteResult(uuid), {
-    onSettled: async (data, error, variables: any) => {
+    onSettled: async (_data, error, _variables: any) => {
       if (!error) {
         if (skipInvalidate) {
           return;

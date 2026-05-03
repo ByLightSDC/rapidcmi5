@@ -1,5 +1,5 @@
 import {
-  DirectiveDescriptor,
+  type DirectiveDescriptor,
   editorInFocus$,
   insertMarkdown$,
   NestedLexicalEditor,
@@ -12,12 +12,12 @@ import {
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { mergeRegister } from '@lexical/utils';
 import { COMMAND_PRIORITY_LOW } from 'lexical';
-import { RoughNotation, types } from 'react-rough-notation';
-import { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx';
+import { RoughNotation, type types } from 'react-rough-notation';
+import { type MdxJsxTextElement } from 'mdast-util-mdx';
 import { useCallback, useEffect, useState } from 'react';
 
 import { CHANGE_TEXT_FX, selFxNode$, showTextFx$ } from '../plugins/fx/vars';
-import { FxDirectiveAttributes, FxDirectiveNode } from '../plugins/fx/types';
+import { type FxDirectiveAttributes, type FxDirectiveNode } from '../plugins/fx/types';
 import { convertMdastToMarkdown } from '../util/conversion';
 
 /**
@@ -36,7 +36,7 @@ export const FxDirectiveDescriptor: DirectiveDescriptor<FxDirectiveNode> = {
   },
   attributes: ['type', 'color'],
   hasChildren: true,
-  Editor: ({ mdastNode, lexicalNode, descriptor, parentEditor }) => {
+  Editor: ({ mdastNode, lexicalNode, parentEditor }) => {
     const [editor] = useLexicalComposerContext();
     const [isFocused, setIsFocused] = useState(false); //editor focused
     const [shouldAnimate, setShouldAnimate] = useState(false); //editor focused

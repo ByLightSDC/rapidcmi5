@@ -2,12 +2,12 @@
  *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
  *   All rights reserved.
  */
-import { Control, Controller } from 'react-hook-form';
+import { type Control, Controller } from 'react-hook-form';
 import { useDisplayDateFormatter } from '../hooks/useDisplayDateFormatter';
 
 /* MUI */
 import FormControl from '@mui/material/FormControl';
-import TextField, { TextFieldProps } from '@mui/material/TextField';
+import { type TextFieldProps } from '@mui/material/TextField';
 
 import ReadOnlyTextField from './ReadOnlyTextField';
 

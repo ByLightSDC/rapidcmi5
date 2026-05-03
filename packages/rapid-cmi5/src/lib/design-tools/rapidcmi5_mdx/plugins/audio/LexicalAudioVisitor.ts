@@ -1,6 +1,6 @@
-import * as Mdast from 'mdast';
-import { LexicalExportVisitor } from '@mdxeditor/editor';
-import { AudioNode, $isAudioNode } from './AudioNode';
+import type * as Mdast from 'mdast';
+import { type LexicalExportVisitor } from '@mdxeditor/editor';
+import { type AudioNode, $isAudioNode } from './AudioNode';
 
 /**
  * Exports audio as HTML <audio /> elements

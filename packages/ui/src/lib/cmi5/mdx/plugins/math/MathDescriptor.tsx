@@ -2,8 +2,8 @@ import Markdown from 'react-markdown';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
 
-import { MathEditorDescriptor } from '../../plugins/math/MathEditorContext';
-import { MathEditorProps } from '../../plugins/math/MathNode';
+import { type MathEditorDescriptor } from '../../plugins/math/MathEditorContext';
+import { type MathEditorProps } from '../../plugins/math/MathNode';
 import { inlineMathParser } from './MathParsers';
 
 /**
@@ -12,7 +12,7 @@ import { inlineMathParser } from './MathParsers';
  */
 export const MathDescriptor: MathEditorDescriptor = {
   priority: 1,
-  match(language: string | null | undefined, meta: string | null | undefined) {
+  match(language: string | null | undefined) {
     return language === 'math';
   },
   Editor: (props: MathEditorProps) => {

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { type resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
 
 type ResolvedThemeCSS = ReturnType<typeof resolveLessonThemeCSS>;
 

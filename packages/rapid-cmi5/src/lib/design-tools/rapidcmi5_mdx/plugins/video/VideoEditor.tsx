@@ -3,7 +3,6 @@ import {
   $getNodeByKey,
   $getSelection,
   $isNodeSelection,
-  $setSelection,
   CLICK_COMMAND,
   COMMAND_PRIORITY_LOW,
   DRAGSTART_COMMAND,
@@ -11,8 +10,7 @@ import {
   KEY_DELETE_COMMAND,
   KEY_ENTER_COMMAND,
   KEY_ESCAPE_COMMAND,
-  LexicalEditor,
-  NodeKey,
+  type NodeKey,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -28,9 +26,9 @@ import {
 } from './index';
 import { $isVideoNode } from './VideoNode';
 import styles from './styles/video-plugin.module.css';
-import { useCellValues, usePublisher } from '@mdxeditor/gurx';
+import { useCellValues } from '@mdxeditor/gurx';
 import VideoResizer from './VideoResizer';
-import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
+import { type MdxJsxAttribute, type MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
 const imageCache = new Set();
 
@@ -108,8 +106,6 @@ function VideoComponent({
     useLexicalNodeSelection(nodeKey);
   const [isResizing, setIsResizing] = React.useState(false);
   const [editor] = useLexicalComposerContext();
-  const [selection, setSelection] = React.useState<any>(null);
-  const activeEditorRef = React.useRef<LexicalEditor | null>(null);
 
   const onDelete = React.useCallback(
     (payload: KeyboardEvent) => {
@@ -148,7 +144,7 @@ function VideoComponent({
   );
 
   const onEscape = React.useCallback(
-    (event: KeyboardEvent) => {
+    (_event: KeyboardEvent) => {
       if (isSelected) {
         const node = $getNodeByKey(nodeKey);
         if ($isVideoNode(node)) {
@@ -203,8 +199,6 @@ function VideoComponent({
   );
 
   React.useEffect(() => {
-    let isMounted = true;
-    const rootElement = editor.getRootElement();
     const unregister = mergeRegister(
       editor.registerCommand<MouseEvent>(
         CLICK_COMMAND,
@@ -241,10 +235,7 @@ function VideoComponent({
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         () => {
-          const latestSelection = $getSelection();
-          if (isMounted) {
-            setSelection(latestSelection);
-          }
+
           return false;
         },
         COMMAND_PRIORITY_LOW,
@@ -252,7 +243,6 @@ function VideoComponent({
     );
 
     return () => {
-      isMounted = false;
       unregister();
     };
   }, [
@@ -335,7 +325,7 @@ export function VideoEditor({
   const [disableSettingsButton] = useCellValues(disableVideoSettingsButton$);
   const [videoPreviewHandler] = useCellValues(videoPreviewHandler$);
   const [previewSrc, setPreviewSrc] = React.useState(src);
-  const [isSelected, setSelected, clearSelection] =
+  const [isSelected] =
     useLexicalNodeSelection(nodeKey);
 
   React.useEffect(() => {

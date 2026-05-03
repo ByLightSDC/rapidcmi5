@@ -4,12 +4,12 @@
  */
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 
 /* Icons */
 import TouchAppIcon from '@mui/icons-material/TouchApp';
 import { ButtonModalMinorUi } from '../inputs/buttons/buttonsmodal';
-import { tMultiSelectionMeta } from './SharedFormWithProvider';
+import { type tMultiSelectionMeta } from './SharedFormWithProvider';
 import { message, setMessage, setModal } from '../redux/commonAppReducer';
 import { useSetCacheMultipleSelection, useGetCacheMultipleSelection } from '../redux/useCacheSelection';
 import { ButtonMinorUi } from '../utility/buttons';
@@ -47,7 +47,6 @@ export function MultiSelectButton({
   fieldName = 'xxx',
   id = 'select-multiple',
   isKeyValue = false,
-  isModal = false,
   arrayMethods,
   formMethods,
   selectionTargetId,
@@ -86,7 +85,7 @@ export function MultiSelectButton({
 
         if (cache) {
           if (isKeyValue) {
-            let pairs: { [name: string]: string } = {};
+            const pairs: { [name: string]: string } = {};
             // first clear the array field before adding selected one(s)
             if (arrayMethods.replace && arrayMethods.append) {
               arrayMethods.replace([]);
@@ -167,10 +166,10 @@ export function MultiSelectButton({
   const openMultiSelection = () => {
     //get values from form
     //create a new array and inject modal id
-    let arr: any[] = [];
+    const arr: any[] = [];
     if (formMethods?.getValues) {
       formMethods.getValues(fieldName).map((item: any, index: number) => {
-        let shouldAdd = isKeyValue ? item.value : item;
+        const shouldAdd = isKeyValue ? item.value : item;
         //ensure blank entries don't appear in selection
 
         if (shouldAdd) {

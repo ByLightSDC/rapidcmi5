@@ -21,9 +21,9 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import LockIcon from '@mui/icons-material/Lock';
 import {
   convertFromApi,
-  QuestionBankApi,
+  type QuestionBankApi,
   QuestionResponse,
-  QuizQuestion,
+  type QuizQuestion,
 } from '@rapid-cmi5/cmi5-build-common';
 import { DeleteDialog } from '@rapid-cmi5/ui';
 

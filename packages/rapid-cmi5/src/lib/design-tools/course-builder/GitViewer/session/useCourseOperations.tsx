@@ -4,12 +4,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   setCourseList,
   selectCourse,
-  Course,
+  type Course,
   pushCourseList,
   recalculateFileTree,
   renameCurrentCourse,
-  RepoAccessObject,
-  FileState,
+  type RepoAccessObject,
+  type FileState,
 } from '../../../../redux/repoManagerReducer';
 import {
   updateCourseData,
@@ -19,12 +19,12 @@ import {
   resetCourseOperations,
 } from '../../../../redux/courseBuilderReducer';
 
-import { AppDispatch } from '../../../../redux/store';
+import { type AppDispatch } from '../../../../redux/store';
 import { ViewModeEnum } from '../../CourseBuilderTypes';
-import { CourseData, Operation } from '@rapid-cmi5/cmi5-build-common';
-import { CreateCourseType } from '../../CourseBuilderApiTypes';
+import { type CourseData, type Operation } from '@rapid-cmi5/cmi5-build-common';
+import { type CreateCourseType } from '../../CourseBuilderApiTypes';
 import { courseNameInUseMessage, deleteCourseFailMessage } from './constants';
-import { GitFS } from '../utils/fileSystem';
+import { type GitFS } from '../utils/fileSystem';
 import { warningModalId } from '../../../rapidcmi5_mdx/modals/constants';
 import { setModal } from '@rapid-cmi5/ui';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
@@ -269,7 +269,7 @@ export const useCourseOperations = (
   const getCourseData = async (
     r: RepoAccessObject,
     coursePath: string,
-    getContents: boolean = true,
+    getContents = true,
   ): Promise<CourseData | null> => {
     return await getCourseDataInFs({
       r,

@@ -1,6 +1,5 @@
 import { openNewVideoDialog$ } from '../../plugins/video';
-import { readOnly$ } from '@mdxeditor/editor';
-import { useCellValues, usePublisher } from '@mdxeditor/gurx';
+import { usePublisher } from '@mdxeditor/gurx';
 import VideocamIcon from '@mui/icons-material/Videocam';
 /**
  * Icons
@@ -19,7 +18,6 @@ import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
  */
 export const InsertVideo = ({ isDrawer }: { isDrawer?: boolean }) => {
   const openNewVideoDialog = usePublisher(openNewVideoDialog$);
-  const [readOnly] = useCellValues(readOnly$);
   const theme = useTheme();
 
   return (

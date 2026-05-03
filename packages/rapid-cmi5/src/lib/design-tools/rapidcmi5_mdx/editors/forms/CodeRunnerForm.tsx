@@ -1,16 +1,16 @@
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 import { toTitleCase } from './formUtils';
 import Grid from '@mui/material/Grid2';
 import MenuItem from '@mui/material/MenuItem';
 import * as yup from 'yup';
 import { useContext, useEffect, useMemo, useState } from 'react';
-import { SxProps } from '@mui/system';
+import { type SxProps } from '@mui/system';
 
 import { Alert } from '@mui/material';
 import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
 import {
-  CodeRunnerContent,
-  LanguagesResponseApi,
+  type CodeRunnerContent,
+  type LanguagesResponseApi,
   moveOnCriteriaOptions,
   RC5ActivityTypeEnum,
   useCodeRunnerApi,
@@ -18,7 +18,7 @@ import {
 import {
   FormCrudType,
   REQUIRED_ENTRY,
-  FormStateType,
+  type FormStateType,
   FormControlTextField,
   FormControlMonacoField,
   FormControlSelectField,
@@ -43,7 +43,6 @@ export const CodeRunnerForm = ({
   handleCloseModal?: () => void;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const rc5id = defaultFormData?.rc5id;
   const { apiUrls, userAuth } = useRapidCmi5Opts();
   const { getLanguages } = useCodeRunnerApi(
     'Bearer',

@@ -29,8 +29,8 @@ import { FootnoteDefinitionGroupNode } from './FootnoteDefinitionGroupNode';
 import { LexicalFootnoteDefinitionGroupVisitor } from './LexicalFootnoteDefinitionGroupVisitor';
 import { LexicalFootnoteHTMLVisitor } from './LexicalFootnoteHtmlVisitor';
 import {
-  iFootnoteDefinitionEditorDescriptor,
-  iFootnoteReferenceEditorDescriptor,
+  type iFootnoteDefinitionEditorDescriptor,
+  type iFootnoteReferenceEditorDescriptor,
 } from './types';
 import {
   footnoteDefinitionEditorDescriptors$,

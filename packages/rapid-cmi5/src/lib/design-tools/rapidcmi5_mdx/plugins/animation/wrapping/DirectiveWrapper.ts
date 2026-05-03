@@ -25,7 +25,6 @@ import {
   $isRangeSelection,
   $isNodeSelection,
   $setSelection,
-  $getNodeByKey,
 } from 'lexical';
 import type { ContainerDirective, TextDirective } from 'mdast-util-directive';
 import { SelectionValidator } from './SelectionValidator';
@@ -34,7 +33,13 @@ import type { WrapOptions, WrapResult } from './types/Wrapping.types';
 import { $createDirectiveNode, type DirectiveNode } from '@mdxeditor/editor';
 import type { BlockContent, PhrasingContent } from 'mdast';
 import type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown';
-import { convertMarkdownToMdast, debugLog, defaultToMarkdownExtensions, exportMarkdownFromLexical, placeCaretInsideDirective } from '@rapid-cmi5/ui';
+import {
+  convertMarkdownToMdast,
+  debugLog,
+  defaultToMarkdownExtensions,
+  exportMarkdownFromLexical,
+  placeCaretInsideDirective,
+} from '@rapid-cmi5/ui';
 
 const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
   listItemIndent: 'one',
@@ -344,9 +349,7 @@ export class DirectiveWrapper {
       }
 
       // Verify the node exists in the editor state
-      editor.getEditorState().read(() => {
-        const node = $getNodeByKey(directiveKey!);
-      });
+      editor.getEditorState().read(() => {});
 
       // CRITICAL: Place caret inside the directive to trigger markdown export
       // This performs additional editor.update() calls that trigger the export visitors
@@ -500,9 +503,7 @@ export class DirectiveWrapper {
       }
 
       // Verify node exists
-      editor.getEditorState().read(() => {
-        const node = $getNodeByKey(directiveKey!);
-      });
+      editor.getEditorState().read(() => {});
 
       // Place caret after the inline directive
       placeCaretInsideDirective(editor, directiveKey);

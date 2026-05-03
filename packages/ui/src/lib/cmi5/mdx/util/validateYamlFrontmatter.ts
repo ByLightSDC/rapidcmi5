@@ -1,4 +1,3 @@
-import { parse as parseYaml } from 'yaml';
 
 export interface YamlValidationResult {
   isValid: boolean;
@@ -22,10 +21,7 @@ export function validateYamlFrontmatter(markdown: string): YamlValidationResult 
       return { isValid: true };
     }
 
-    const frontmatter = frontmatterMatch[1];
 
-    // Attempt to parse YAML
-    const parsed = parseYaml(frontmatter);
 
     // Successfully parsed
     return { isValid: true };

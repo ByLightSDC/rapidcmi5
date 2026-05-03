@@ -1,8 +1,5 @@
 import { useCallback } from 'react';
-import { ButtonWithTooltip } from '@mdxeditor/editor';
 import { useCellValue, usePublisher } from '@mdxeditor/gurx';
-import MotionPhotosAutoIcon from '@mui/icons-material/MotionPhotosAuto';
-import { toggleAnimationDrawer$ } from '../../plugins/animation';
 import PaletteIcon from '@mui/icons-material/Palette';
 import { DRAWER_TYPE, drawerMode$, stylesShowSeq$ } from './drawers';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';

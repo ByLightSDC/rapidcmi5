@@ -1,15 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
-// import 'katex/dist/katex.min.css';
-
-import { AuContextProps } from '@rapid-cmi5/cmi5-build-common';
+import { type AuContextProps } from '@rapid-cmi5/cmi5-build-common';
 
 import { Typography } from '@mui/material';
 import { MarkdownConvertorSlide } from './MarkdownConvertor';
 import { markDownSlideStyle } from './styles';
-import { imagePopper$ } from '../mdx';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const h = require('hastscript');
 
 /**
  * AuMarkDownSlide
@@ -21,7 +16,6 @@ export function AuMarkDownSlide({
   content,
   isSplitPanelShown,
   slideTop,
-  slideRight,
   slideWidth,
   slideHeight,
 }: {

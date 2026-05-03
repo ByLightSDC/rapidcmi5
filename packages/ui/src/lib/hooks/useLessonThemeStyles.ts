@@ -1,10 +1,9 @@
-import { SxProps } from '@mui/system';
+import { type SxProps } from '@mui/system';
 import {
   DefaultAlignmentEnum,
-  LessonTheme,
+  type LessonTheme,
 } from '@rapid-cmi5/cmi5-build-common';
 import { resolveLessonThemeCSS } from '../styles/lessonThemeStyles';
-import { useSelector } from 'react-redux';
 import { useSignalEffect } from '@preact/signals-react';
 import { maxSlideWidth$ } from '../cmi5/mdx';
 import { useMemo, useState } from 'react';

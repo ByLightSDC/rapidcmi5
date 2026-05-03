@@ -1,23 +1,23 @@
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 import { toTitleCase } from '../formUtils';
 import {
   FormControlSelectField,
   FormControlTextField,
   FormControlUIProvider,
-  FormStateType,
+  type FormStateType,
   LessonThemeContext,
   MiniForm,
   NAME_GROUP_OPT,
   REQUIRED_ENTRY,
   UUID_GROUP,
 } from '@rapid-cmi5/ui';
-import { Alert, MenuItem, SxProps, Typography } from '@mui/material';
+import { Alert, MenuItem, type SxProps, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import * as yup from 'yup';
 import {
   moveOnCriteriaOptions,
-  TeamConsolesContent,
+  type TeamConsolesContent,
 } from '@rapid-cmi5/cmi5-build-common';
 import { FormCrudType, useLessonThemeStyles } from '@rapid-cmi5/ui';
 

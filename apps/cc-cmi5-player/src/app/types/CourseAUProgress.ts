@@ -5,8 +5,8 @@
  * that serves as the global source of truth for all progress data.
  */
 
-import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
-import { ActivityType, SlideActivityStatus } from './SlideActivityStatusState';
+import { type CourseAU } from '@rapid-cmi5/cmi5-build-common';
+import { type ActivityType, type SlideActivityStatus } from './SlideActivityStatusState';
 
 // Slide identification using filepath as GUID
 export interface SlideIdentifier {

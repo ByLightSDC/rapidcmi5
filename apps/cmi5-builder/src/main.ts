@@ -9,18 +9,18 @@ import AdmZip from 'adm-zip';
 import { generateAllAuMappings } from './commands/generateAuMappings';
 import { AuMappingService } from './services/auMappingService';
 import {
-  CourseAU,
-  CourseBlock,
-  CourseData,
-  FsOperations,
+  type CourseAU,
+  type CourseBlock,
+  type CourseData,
+  type FsOperations,
   generateCmi5Xml,
   generateCourseDist,
   QuestionGrading,
   QuestionResponse,
   QuizCompletionEnum,
-  QuizContent,
+  type QuizContent,
   RC5_VERSION,
-  SlideType,
+  type SlideType,
   SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 
@@ -31,7 +31,7 @@ import { MoodleUploadService } from './services/moodle/moodleUploadService';
 import {
   cleanMkdocs,
   flattenFolders,
-  FolderStruct,
+  type FolderStruct,
   generateCourseJson,
 } from '@rapid-cmi5/cmi5-build-common';
 import { getFolderStructureBackend } from './fileSystem/fileSystem';
@@ -422,7 +422,6 @@ async function buildCmi5(
     writeFile: async (
       path: string,
       content: string | Uint8Array,
-      encoding?: string,
     ) => {
       await fs.writeFile(path, content);
     },
@@ -439,7 +438,6 @@ async function buildCmi5(
     copy: async (
       src: string,
       dest: string,
-      options: { recursive: boolean },
     ) => {
       await fs.cp(src, dest, { recursive: true });
     },

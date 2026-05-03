@@ -2,13 +2,13 @@
  *   Copyright (c) 2023 - 2024 By Light Professional IT Services LLC
  *   All rights reserved.
  */
-import { Control, Controller } from 'react-hook-form';
+import { type Control, Controller } from 'react-hook-form';
 import { useState } from 'react';
 
 /* MUI */
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
-import Checkbox, { CheckboxProps } from '@mui/material/Checkbox';
+import Checkbox, { type CheckboxProps } from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
 import { ButtonInfoField } from '../utility/buttons';
 import { Stack } from '@mui/material';

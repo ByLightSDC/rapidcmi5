@@ -1,6 +1,6 @@
 import { Search, Clear } from '@mui/icons-material';
 import { alpha, IconButton, InputAdornment, TextField } from '@mui/material';
-import { palette, useTheme } from '@mui/system';
+import { useTheme } from '@mui/system';
 
 export default function SearchBar({
   searchQuery,

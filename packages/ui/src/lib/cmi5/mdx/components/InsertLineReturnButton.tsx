@@ -1,7 +1,7 @@
 import { IconButton, Tooltip } from '@mui/material';
 import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft';
-import { $createParagraphNode, LexicalNode } from 'lexical';
-import { LexicalEditor } from 'lexical';
+import { $createParagraphNode, type LexicalNode } from 'lexical';
+import { type LexicalEditor } from 'lexical';
 
 interface InsertLineReturnButtonProps {
   parentEditor: LexicalEditor;

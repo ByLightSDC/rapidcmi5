@@ -34,7 +34,7 @@ const configResponse = {
 };
 
 export const lessonContent = [
-  http.get(`/config.json`, ({ request, params, cookies }) => {
+  http.get(`/config.json`, ({}) => {
     return HttpResponse.json(configResponse, { status: 200 });
   }),
 ];

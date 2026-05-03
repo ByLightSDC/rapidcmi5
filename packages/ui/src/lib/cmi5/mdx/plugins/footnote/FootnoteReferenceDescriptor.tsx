@@ -1,5 +1,5 @@
 import { FootnoteReferenceEditor } from './FootnoteReferenceEditor';
-import { iFootnoteReferenceEditorDescriptor } from './types';
+import { type iFootnoteReferenceEditorDescriptor } from './types';
 
 /**
  * Footnote Reference Descriptor

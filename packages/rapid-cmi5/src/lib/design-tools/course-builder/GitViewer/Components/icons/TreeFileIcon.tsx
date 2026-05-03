@@ -2,11 +2,11 @@ import { Box, Tooltip } from '@mui/material';
 import { useContextMenu } from '../../hooks/useContextMenu';
 import FileContextMenu from '../../modals/FileContextMenu';
 import { FormatListBulleted, Javascript, Css } from '@mui/icons-material';
-import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
-import { INode } from 'react-accessible-treeview';
+import { type IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
+import { type INode } from 'react-accessible-treeview';
 import SyncIcon from '@mui/icons-material/Sync';
-import { RepoState } from '../../../../../redux/repoManagerReducer';
-import { RootState } from '../../../../../redux/store';
+import { type RepoState } from '../../../../../redux/repoManagerReducer';
+import { type RootState } from '../../../../../redux/store';
 import { useSelector } from 'react-redux';
 
 interface FileIconProps {

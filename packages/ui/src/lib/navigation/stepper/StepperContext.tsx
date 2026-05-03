@@ -1,7 +1,7 @@
 import { createContext, useState } from 'react';
 
 /* MUI */
-import { Orientation } from '@mui/material/Stepper';
+import { type Orientation } from '@mui/material/Stepper';
 
 /* Constants */
 import {

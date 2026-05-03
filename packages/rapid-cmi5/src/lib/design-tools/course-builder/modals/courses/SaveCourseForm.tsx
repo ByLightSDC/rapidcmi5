@@ -2,11 +2,11 @@ import {
   ModalDialog,
   FormControlTextField,
   FormControlUIProvider,
-  FormStateType,
+  type FormStateType,
   MiniForm,
   FormControlCheckboxField,
   FormControlPassword,
-  CommonAppModalState,
+  type CommonAppModalState,
   NAME_GROUP_OPT,
   useToaster,
 } from '@rapid-cmi5/ui';
@@ -15,8 +15,8 @@ import Grid from '@mui/material/Grid2';
 import { Alert } from '@mui/material';
 import * as yup from 'yup';
 
-import { UseFormReturn } from 'react-hook-form';
-import { SuperSaveFormType } from '../../CourseBuilderApiTypes';
+import { type UseFormReturn } from 'react-hook-form';
+import { type SuperSaveFormType } from '../../CourseBuilderApiTypes';
 
 import {
   cacheWarning,
@@ -99,7 +99,7 @@ export function SaveCourseForm({
   }, [courseOperationsSet]);
 
   const handleSaveFileActions = useCallback(
-    async (whichButton: number, meta?: any) => {
+    async (whichButton: number) => {
       setIsSaving(false);
       if (whichButton === 0) {
         handleCloseModal();
@@ -209,8 +209,8 @@ export function SaveCourseForm({
     formMethods: UseFormReturn,
     formState: FormStateType,
   ): JSX.Element => {
-    const { control, getValues, setValue, trigger, watch } = formMethods;
-    const { errors, isValid } = formState;
+    const { control, getValues, watch } = formMethods;
+    const { errors } = formState;
 
     const theData = getValues();
     if (Object.keys(theData).length === 0) {
@@ -344,7 +344,7 @@ export function SaveCourseForm({
       }}
       disableButtons={isSaving}
       handleAction={(whichButton) =>
-        handleSaveFileActions(whichButton, modalObj.meta)
+        handleSaveFileActions(whichButton)
       }
       maxWidth={saveError ? 'lg' : 'sm'}
     >

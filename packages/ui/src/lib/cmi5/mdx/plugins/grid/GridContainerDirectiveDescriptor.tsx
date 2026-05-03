@@ -1,5 +1,5 @@
-import { DirectiveDescriptor } from '@mdxeditor/editor';
-import { GridContainerDirectiveNode } from './types';
+import { type DirectiveDescriptor } from '@mdxeditor/editor';
+import { type GridContainerDirectiveNode } from './types';
 import { GridContainerEditor } from './GridContainerEditor';
 
 /**

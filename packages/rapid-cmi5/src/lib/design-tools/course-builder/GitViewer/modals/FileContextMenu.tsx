@@ -8,8 +8,8 @@ import {
   Typography,
 } from '@mui/material';
 import { Check, Close, Delete, Edit } from '@mui/icons-material';
-import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
-import { INode } from 'react-accessible-treeview';
+import { type IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
+import { type INode } from 'react-accessible-treeview';
 
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import ContentPasteGoIcon from '@mui/icons-material/ContentPasteGo';

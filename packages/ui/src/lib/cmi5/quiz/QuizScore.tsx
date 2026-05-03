@@ -1,8 +1,7 @@
 import { Box, CircularProgress, Stack, Typography } from '@mui/material';
 import SportsScoreIcon from '@mui/icons-material/SportsScore';
-import { PieChart } from '@mui/x-charts/PieChart';
 import CircleIcon from '@mui/icons-material/Circle';
-import { QuizContent, QuizCompletionEnum } from '@rapid-cmi5/cmi5-build-common';
+import { type QuizContent, QuizCompletionEnum } from '@rapid-cmi5/cmi5-build-common';
 
 export function QuizScore({
   quiz,

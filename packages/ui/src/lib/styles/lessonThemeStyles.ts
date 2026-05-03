@@ -2,7 +2,7 @@ import {
   BlockPaddingEnum,
   ContentWidthEnum,
   DefaultAlignmentEnum,
-  LessonTheme,
+  type LessonTheme,
 } from '@rapid-cmi5/cmi5-build-common';
 
 export const CONTENT_WIDTH_MAP: Record<ContentWidthEnum, string | null> = {
@@ -100,7 +100,6 @@ export function resolveLessonThemeCSS(theme?: LessonTheme): {
 export function generateLessonThemeStyleTag(
   scopedClass: string,
   theme?: LessonTheme,
-  slideWidth?: number,
 ): string {
   const css = resolveLessonThemeCSS(theme);
 

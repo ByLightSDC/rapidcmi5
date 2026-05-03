@@ -1,9 +1,9 @@
 import {
-  DirectiveEditorProps,
+  type DirectiveEditorProps,
   NestedLexicalEditor,
   useCellValue,
 } from '@mdxeditor/editor';
-import { ContainerDirective } from 'mdast-util-directive';
+import { type ContainerDirective } from 'mdast-util-directive';
 import React, { useRef } from 'react';
 import { editorInPlayback$ } from '@rapid-cmi5/ui';
 

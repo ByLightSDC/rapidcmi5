@@ -1,8 +1,7 @@
-import { readOnly$ } from '@mdxeditor/editor';
-import { useCellValues, usePublisher } from '@mdxeditor/gurx';
+import { usePublisher } from '@mdxeditor/gurx';
 
 import { insertActivityDirective$ } from '../../plugins/Activity';
-import { ContainerDirective } from 'mdast-util-directive';
+import { type ContainerDirective } from 'mdast-util-directive';
 import { ButtonMinorUi, getDefaultData } from '@rapid-cmi5/ui';
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 
@@ -21,7 +20,6 @@ import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
  * @group Toolbar Components
  */
 export const InsertFile = ({ isDrawer }: { isDrawer?: boolean }) => {
-  const [readOnly] = useCellValues(readOnly$);
   const insertActivity = usePublisher(insertActivityDirective$);
   const theme = useTheme();
 

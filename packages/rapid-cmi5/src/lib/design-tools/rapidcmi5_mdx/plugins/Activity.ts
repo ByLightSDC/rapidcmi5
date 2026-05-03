@@ -5,7 +5,7 @@ import {
   map,
 } from '@mdxeditor/editor';
 
-import { Directives } from 'mdast-util-directive';
+import { type Directives } from 'mdast-util-directive';
 
 /**
  * Inserts Activity Directive with children

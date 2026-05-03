@@ -1,8 +1,8 @@
 import { logger } from '../debug';
 import { store } from '../redux/store';
 import {
-  ActivityCompletionPayload,
-  SlideActivityStatus,
+  type ActivityCompletionPayload,
+  type SlideActivityStatus,
 } from '../types/SlideActivityStatusState';
 
 export async function updateActivityStatus(

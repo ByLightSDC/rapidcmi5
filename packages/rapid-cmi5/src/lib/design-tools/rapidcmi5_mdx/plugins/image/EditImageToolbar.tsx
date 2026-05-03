@@ -31,8 +31,8 @@ import {
   isTextDropping$,
   AlignmentToolbarControls,
 } from '@rapid-cmi5/ui';
-import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
-import { MdxJsxAttribute } from 'mdast-util-mdx-jsx';
+import { type ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { type MdxJsxAttribute } from 'mdast-util-mdx-jsx';
 import { $isImageNode } from './ImageNode';
 
 import { StyleDialog } from './StyleDialog';
@@ -170,7 +170,7 @@ export function EditImageToolbar({
         <IconButton
           aria-label="edit"
           disabled={readOnly}
-          onClick={(e) => {
+          onClick={(_e) => {
             openEditImageDialog({
               nodeKey: nodeKey,
               initialValues: {

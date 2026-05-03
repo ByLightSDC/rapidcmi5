@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
-  CodeBlockEditorDescriptor,
-  DirectiveDescriptor,
-  FORMAT,
-  JsxComponentDescriptor,
+  type CodeBlockEditorDescriptor,
+  type DirectiveDescriptor,
+  type FORMAT,
+  type JsxComponentDescriptor,
 } from '@mdxeditor/editor';
-import { ElementNode, LexicalNode } from 'lexical';
-import * as Mdast from 'mdast';
+import { type ElementNode, type LexicalNode } from 'lexical';
+import type * as Mdast from 'mdast';
 import { fromMarkdown, type Options } from 'mdast-util-from-markdown';
-import { MdxjsEsm } from 'mdast-util-mdx';
+import { type MdxjsEsm } from 'mdast-util-mdx';
 import { toMarkdown } from 'mdast-util-to-markdown';
-import { ParseOptions } from 'micromark-util-types';
+import { type ParseOptions } from 'micromark-util-types';
 
 /** Utility to importMdastTreeToLexical 
  * see importMdastTreeToLexical fxn below
@@ -171,7 +171,7 @@ export type SyntaxExtension = MarkdownParseOptions['syntaxExtensions'][number];
  * @group Markdown Processing
  */
 export class MarkdownParseError extends Error {
-  constructor(message: string, cause: unknown) {
+  constructor(message: string, _cause: unknown) {
     super(message);
     this.name = 'MarkdownParseError';
     //this.cause = cause

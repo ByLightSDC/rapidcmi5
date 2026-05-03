@@ -8,7 +8,6 @@ import {
   IconButton,
   Paper,
   Stack,
-  SxProps,
   Tabs,
   Tooltip,
   Typography,
@@ -27,7 +26,7 @@ import {
   useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
 
-import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import { type RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Mock Activity display so course authors can perceive activity layout in preview mode
@@ -50,7 +49,7 @@ function ScenarioMock({
   );
 
   const handleChangeTab = useCallback(
-    (event: React.SyntheticEvent, newValue: number) => {
+    (_event: React.SyntheticEvent, newValue: number) => {
       setCurrentTab(newValue);
     },
     [setCurrentTab],

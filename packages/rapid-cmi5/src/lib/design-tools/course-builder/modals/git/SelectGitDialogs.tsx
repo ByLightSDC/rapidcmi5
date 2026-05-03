@@ -47,7 +47,8 @@ import GitConfigForm from './GitConfigForm';
 import PullForm from './PullForm';
 import PushForm from './PushForm';
 import DirectoryTree from '../../GitViewer/Components/SelectedRepo/DirectoryTree';
-import { RepoState, RootState } from '@rapid-cmi5/react-editor';
+import { type RepoState } from '../../../../redux/repoManagerReducer';
+import { type RootState } from '../../../../redux/store';
 import { useRapidCmi5Opts } from '../../GitViewer/session/RapidCmi5OptsContext';
 
 /**
@@ -124,8 +125,8 @@ export function SelectGitDialogs() {
 
   const handleModalResponse = (
     modalId: string,
-    buttonAction: number,
-    data?: any,
+    _buttonAction: number,
+    _data?: any,
   ) => {
     if (modalObj.meta.notify) {
       sendMessage({

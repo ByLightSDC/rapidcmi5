@@ -24,17 +24,17 @@ import { listStyles } from '../../data-display/ListView';
 import ModalDialog from '../../modals/ModalDialog';
 import { BookmarksContext } from '../../navigation/bookmark/BookmarksContext';
 import {
-  inputFilterType,
+  type inputFilterType,
   PaginationFiltersContextProvider,
 } from '../../navigation/paging/PaginationFiltersContext';
 import PaginationListView from '../../navigation/paging/PaginationListView';
-import { RowAction } from '../../types/actionRowTypes';
+import { type RowAction } from '../../types/actionRowTypes';
 import ActionRow from './ActionRow';
 import {
   modal,
   setMessage,
   setModal,
-  CommonAppSelectionState,
+  type CommonAppSelectionState,
   setLoader,
 } from '../../redux/commonAppReducer';
 import {
@@ -147,12 +147,10 @@ export function MultipleSelectWrapper(props: tMultipleSelectWrapperProps) {
     isTopicEditable = true,
     defaultPageData,
     maxNumSelected = -1, //no max
-    menu,
     modalButtonText = dialogButtons,
     modalIdPrefix = 'multiselect',
     disableOnEmptySelection = false,
     noDataFoundMsg = 'No items found',
-    pageLabel = '',
     queryKey,
     renderItem = ActionRow,
     route,
@@ -162,7 +160,6 @@ export function MultipleSelectWrapper(props: tMultipleSelectWrapperProps) {
     styleProps = { formWidth: '100%' },
     testId = modalIdPrefix + '-' + topicId,
     title = 'Select Items',
-    rowTitleFormat = '',
     visibleFilters,
     onApplySelection,
   } = props;
@@ -215,7 +212,6 @@ export function MultipleSelectWrapper(props: tMultipleSelectWrapperProps) {
     restoreModal,
   } = useContext(BookmarksContext);
 
-  const [excludeId, setExcludeId] = useState(getLastBookMarkRecordId());
 
   /**
    * Transfers cache into local selection state
@@ -270,11 +266,6 @@ export function MultipleSelectWrapper(props: tMultipleSelectWrapperProps) {
     handleResolveNames();
   }, [pageData]);
 
-  const delay = (milliseconds: number) => {
-    return new Promise((resolve) => {
-      setTimeout(resolve, milliseconds);
-    });
-  };
 
   /**
    * Handles action button click
@@ -336,7 +327,7 @@ export function MultipleSelectWrapper(props: tMultipleSelectWrapperProps) {
         if (maxNumSelected >= 0 && selection.current.length >= maxNumSelected) {
           break;
         }
-        if (excludeId && excludeId === id) {
+        if (getLastBookMarkRecordId() && getLastBookMarkRecordId() === id) {
           continue; // skip this one
         }
         selection.current.push({
@@ -426,8 +417,8 @@ export function MultipleSelectWrapper(props: tMultipleSelectWrapperProps) {
 
             const resolveName =
               pageData[selIndex].name || pageData[selIndex][dataIdField];
-            let newMeta = { ...selection.current[i].meta, name: resolveName };
-            let newObj = {
+            const newMeta = { ...selection.current[i].meta, name: resolveName };
+            const newObj = {
               ...selection.current[i],
               meta: newMeta,
               name: resolveName,
@@ -445,11 +436,11 @@ export function MultipleSelectWrapper(props: tMultipleSelectWrapperProps) {
               if (cacheData) {
                 numToResolve--;
                 const resolveNameFromQueryCache = cacheData?.name;
-                let newMeta = {
+                const newMeta = {
                   ...selection.current[i].meta,
                   name: resolveNameFromQueryCache,
                 };
-                let newObj = {
+                const newObj = {
                   ...selection.current[i],
                   meta: newMeta,
                   name: resolveNameFromQueryCache,
@@ -584,9 +575,9 @@ export function MultipleSelectWrapper(props: tMultipleSelectWrapperProps) {
   //  selectListHeight is listHeight + (pagination padding/steps @32 + buttons & filters which could be open @76 = 108)
 
   const handleNavigateTo = (
-    navCrud: FormCrudType,
+    _navCrud: FormCrudType,
     route: string,
-    data?: any,
+    _data?: any,
   ) => {
     navigate(route);
   };

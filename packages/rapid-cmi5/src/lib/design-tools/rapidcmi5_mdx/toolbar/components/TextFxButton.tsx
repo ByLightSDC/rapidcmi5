@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  ButtonWithTooltip,
   activeEditor$,
   Cell,
-  DirectiveNode,
+  type DirectiveNode,
   exportVisitors$,
   jsxComponentDescriptors$,
   jsxIsAvailable$,
@@ -21,26 +20,24 @@ import {
   $getSelection,
   $isRangeSelection,
   $setSelection,
-  LexicalNode,
+  type LexicalNode,
 } from 'lexical';
 
 /* mdast */
 import type { PhrasingContent } from 'mdast';
 
-import { Options as ToMarkdownOptions } from 'mdast-util-to-markdown';
+import { type Options as ToMarkdownOptions } from 'mdast-util-to-markdown';
 
-import { TextDirective } from 'mdast-util-directive';
+import { type TextDirective } from 'mdast-util-directive';
 
 import { TextFxPopover } from './TextFxPopover';
 
 /** MUI  */
 import RttIcon from '@mui/icons-material/Rtt';
-import { Box, Stack } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import CircleIcon from '@mui/icons-material/Circle';
 import { useSelector } from 'react-redux';
 import {
-  FxDirectiveAttributes,
+  type FxDirectiveAttributes,
   DEFAULT_SHAPE,
   selFxNode$,
   showTextFx$,

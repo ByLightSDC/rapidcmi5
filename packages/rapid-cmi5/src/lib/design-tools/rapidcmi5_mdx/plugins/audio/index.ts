@@ -13,8 +13,7 @@ import {
   $getNodeByKey,
   $insertNodes,
   $isRootOrShadowRoot,
-  COMMAND_PRIORITY_EDITOR,
-  LexicalCommand,
+  type LexicalCommand,
   createCommand,
 } from 'lexical';
 
@@ -27,11 +26,11 @@ import {
   addLexicalNode$,
 } from '@mdxeditor/editor';
 
-import { EditAudioToolbar, EditAudioToolbarProps } from './EditAudioToolbar';
+import { EditAudioToolbar, type EditAudioToolbarProps } from './EditAudioToolbar';
 import { AudioDialog } from './AudioDialog';
 import {
   $createAudioNode,
-  CreateAudioNodeParameters,
+  type CreateAudioNodeParameters,
   AudioNode,
 } from './AudioNode';
 import { LexicalAudioVisitor } from './LexicalAudioVisitor';
@@ -39,7 +38,7 @@ import {
   MdastHtmlAudioVisitor,
   MdastJsxAudioVisitor,
 } from './MdastAudioVisitor';
-import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
+import { type MdxJsxAttribute, type MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
 
 /**

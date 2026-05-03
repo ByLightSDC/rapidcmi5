@@ -17,10 +17,10 @@ import { Alert, Box, TextField, Typography } from '@mui/material';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { useRapidCmi5Opts } from '../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 
-import { RootState } from '../../../redux/store';
-import { RepoState } from '../../../redux/repoManagerReducer';
+import { type RootState } from '../../../redux/store';
+import { type RepoState } from '../../../redux/repoManagerReducer';
 import SaveCourseForm from '../../course-builder/modals/courses/SaveCourseForm';
-import { SuperSaveFormType } from '../../course-builder/CourseBuilderApiTypes';
+import { type SuperSaveFormType } from '../../course-builder/CourseBuilderApiTypes';
 import SelectGitDialogs from '../../course-builder/modals/git/SelectGitDialogs';
 
 export default function RC5Modals() {
@@ -165,7 +165,7 @@ export default function RC5Modals() {
 
   const handleModalResponse = (
     modalId: string,
-    buttonAction: number,
+    _buttonAction: number,
     data?: any,
   ) => {
     if (modalId === saveCourseFileModalId) {
@@ -184,7 +184,7 @@ export default function RC5Modals() {
   };
 
   const defaultSaveData = useMemo(() => {
-    const theDefaultData : SuperSaveFormType = {
+    const theDefaultData: SuperSaveFormType = {
       commit: {
         ...defaultCommitData,
         authorEmail: currentGitConfig?.authorEmail?.toLowerCase(),

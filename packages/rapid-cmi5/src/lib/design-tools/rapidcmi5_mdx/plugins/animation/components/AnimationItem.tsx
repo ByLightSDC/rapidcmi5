@@ -18,7 +18,7 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { usePublisher, useCellValue } from '@mdxeditor/gurx';
 import { selectedAnimation$, updateAnimation$ } from '../state/animationCells';
-import { AnimationConfig, EntranceEffect, ExitEffect, AnimationTrigger, SelectorMainUi } from '@rapid-cmi5/ui';
+import { type AnimationConfig, EntranceEffect, ExitEffect, AnimationTrigger, SelectorMainUi } from '@rapid-cmi5/ui';
 
 
 interface Props {

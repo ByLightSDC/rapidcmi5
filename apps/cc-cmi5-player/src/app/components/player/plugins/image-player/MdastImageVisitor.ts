@@ -1,8 +1,8 @@
-import * as Mdast from 'mdast';
-import { MdastImportVisitor } from '@mdxeditor/editor';
+import type * as Mdast from 'mdast';
+import { type MdastImportVisitor } from '@mdxeditor/editor';
 import { $createImageNode } from './ImageNode';
-import { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx';
-import { $createParagraphNode, RootNode } from 'lexical';
+import { type MdxJsxTextElement, type MdxJsxFlowElement } from 'mdast-util-mdx';
+import { $createParagraphNode, type RootNode } from 'lexical';
 
 export const MdastImageVisitor: MdastImportVisitor<Mdast.Image> = {
   testNode: 'image',

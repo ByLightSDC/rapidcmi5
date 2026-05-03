@@ -3,9 +3,9 @@
  *   All rights reserved.
  */
 
-import { $getRoot, LexicalEditor } from 'lexical';
+import { $getRoot, type LexicalEditor } from 'lexical';
 import { $isDirectiveNode } from '@mdxeditor/editor';
-import { debugLog, AnimationConfig } from '@rapid-cmi5/ui';
+import { debugLog, type AnimationConfig } from '@rapid-cmi5/ui';
 
 
 /**

@@ -1,16 +1,16 @@
-import { ReadCommitResult } from 'isomorphic-git';
+import { type ReadCommitResult } from 'isomorphic-git';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
+import { type ModifiedFile } from '../Components/GitActions/GitFileStatus';
 
 import { stagedStatuses } from '../utils/StatusMatrix';
-import { RootState } from '../../../../redux/store';
+import { type RootState } from '../../../../redux/store';
 import { useSelector } from 'react-redux';
 import {
-  RepoAccessObject,
-  RepoState,
+  type RepoAccessObject,
+  type RepoState,
 } from '../../../../redux/repoManagerReducer';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
-import { FolderStructWithMtime, getRepoPath, GitFS } from '../utils/fileSystem';
+import { type FolderStructWithMtime, getRepoPath, type GitFS } from '../utils/fileSystem';
 import { failedMergePath, GitOperations } from '../utils/gitOperations';
 
 export function useGitRepoStatus(
@@ -94,7 +94,7 @@ export function useGitRepoStatus(
   };
 
   const resolveDir = async (r: RepoAccessObject, dirpath: string) => {
-    let changedFiles = await gitOperator.gitRepoStatus(r, [dirpath]);
+    const changedFiles = await gitOperator.gitRepoStatus(r, [dirpath]);
 
     const newFiles = changedFiles.map((f) => f.name);
     let status = [...modifiedFiles];
@@ -152,7 +152,6 @@ export function useGitRepoStatus(
             await gitOperator.gitGetUntrackedAndDeletedFiles(r, allFilePaths);
 
           const untrackedSet = new Set(untracked);
-          const needsUnstageSet = new Set(needsUnstage);
 
           // Filter to only tracked files modified after last commit
           const recentlyModified = flattenedStruct
@@ -175,7 +174,7 @@ export function useGitRepoStatus(
 
           // unstage these files
           const unstageFiles = await gitOperator.gitRepoStatus(r, needsUnstage);
-          const removedFiles = await gitOperator.gitRemoveAllModified(
+          await gitOperator.gitRemoveAllModified(
             r,
             unstageFiles,
           );
@@ -286,7 +285,7 @@ export function useGitRepoStatus(
     let hasUnstaged = false;
     let numOfStaged = 0;
 
-    for (let file of modifiedFiles) {
+    for (const file of modifiedFiles) {
       if (stagedStatuses.includes(file.status)) {
         hasStaged = true;
         numOfStaged++;

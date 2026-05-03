@@ -1,16 +1,15 @@
 import { commitChangesModalId } from '../../modals/constants';
 
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
 import Typography from '@mui/material/Typography';
 
 import * as yup from 'yup';
-import { useSelector } from 'react-redux';
 import React from 'react';
 import { MoveOnCriteriaEnum, moveOnCriteriaOptions } from '@rapid-cmi5/cmi5-build-common';
-import { modal, FormStateType, SelectorMainUi, ModalDialog, FormControlUIProvider, MiniForm } from '@rapid-cmi5/ui';
+import { type FormStateType, SelectorMainUi, ModalDialog, FormControlUIProvider, MiniForm } from '@rapid-cmi5/ui';
 
 const moveOnOptionDescriptions = new Map<string, string>([
   [
@@ -37,7 +36,6 @@ export function MoveOnCriteriaForm({
   handleModalAction: (moveOn: MoveOnCriteriaEnum) => void;
   currentMoveOn?: MoveOnCriteriaEnum;
 }) {
-  const modalObj = useSelector(modal);
 
   const [moveOnCriteria, setMoveOnCriteria] = React.useState(
     currentMoveOn || MoveOnCriteriaEnum.CompletedAndPassed,
@@ -55,18 +53,17 @@ export function MoveOnCriteriaForm({
     handleCloseModal();
   };
 
-  const onResponse = (isSuccess: boolean, data: any, message: string) => {
+  const onResponse = (isSuccess: boolean, _data: any, _message: string) => {
     if (isSuccess) {
       handleModalAction(moveOnCriteria);
     }
   };
 
   const getFormFields = (
-    formMethods: UseFormReturn,
-    formState: FormStateType,
+    _formMethods: UseFormReturn,
+    _formState: FormStateType,
   ): JSX.Element => {
-    const { control, getValues, setValue, trigger } = formMethods;
-    const { errors, isValid } = formState;
+
     return (
       <>
         <Grid size={11.5}>

@@ -6,17 +6,6 @@ import { modal, setModal } from '../../redux/commonAppReducer';
 
 export const importFileModalId = 'importFileModalId';
 
-/**
- * Verifies whether file chosen is a valid format for import
- * @param {string} body Text to be verified
- * @param {any} fileFormatData File selected
- * @return {boolean} Whether file is valid for import
- */
-export const getIsValidExport = (body: string, fileFormatData: any) => {
-  //TODO
-  return true;
-};
-
 export function FileImportDialog({
   handleImport,
   message = 'This will replace any data in your current plan with data from the imported file.',
@@ -28,11 +17,8 @@ export function FileImportDialog({
   modalId?: string;
   title?: string;
 }) {
-  const [isFileSelected, setIsFileSelected] = useState(false);
-  const [fileImportError, setFileImportError] = useState<any>(null);
   const [fileFormData, setFileFormData] = useState<any>(null);
   const [isImporting] = useState(false);
-  const [percentComplete, setPercentComplete] = useState(0);
 
   const dispatch = useDispatch();
   const modalObj = useSelector(modal);
@@ -44,27 +30,17 @@ export function FileImportDialog({
 
   const handleImportAction = (buttonIndex: number) => {
     if (buttonIndex === 1) {
-      // if (!getIsValidFileType(fileFormData.type)) {
-      //     setFileImportError('File type not supported');
-      //   }
-      setFileImportError('');
+ 
       const reader = new FileReader();
       reader.readAsText(fileFormData);
-      const errMsg = null;
       reader.onload = (evt: any) => {
         try {
           const body = evt.target.result;
-          if (getIsValidExport(body, fileFormData)) {
             if (handleImport) {
               handleImport(body, fileFormData);
-              setFileImportError(errMsg);
             }
-          } else {
-            setFileImportError('Unrecognized format');
-          }
+          
         } catch (e: any) {
-          const errMsg = e.message;
-          setFileImportError(errMsg);
         }
       };
     }
@@ -89,11 +65,9 @@ export function FileImportDialog({
             fileTypes={fileTypes}
             isUploading={isImporting}
             noFileSelectedMessage={noFileSelectedMessage}
-            percentLoaded={percentComplete}
             testId={modalId}
             onFileSelected={(file, selected) => {
-              setFileImportError('');
-              setIsFileSelected(selected);
+             
               if (file && selected) {
                 setFileFormData(file);
               } else {

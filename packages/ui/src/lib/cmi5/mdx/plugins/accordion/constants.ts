@@ -1,4 +1,4 @@
-import { AccordionContentDirectiveNode } from './types';
+import { type AccordionContentDirectiveNode } from './types';
 
 export const DEFAULT_ACCORDION: AccordionContentDirectiveNode = {
   type: 'containerDirective',

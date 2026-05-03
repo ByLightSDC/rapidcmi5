@@ -12,8 +12,6 @@ import {
   queryKeyContainerSpecs,
 } from './useContainerSpecs';
 
-
-
 import {
   useGetRangeConsole,
   useDeleteRangeConsole,
@@ -28,7 +26,6 @@ import {
   useGetRangeResourceContainers,
   queryKeyRangeResourceContainers,
 } from './useRangeResourceContainers';
-
 
 import {
   useGetRangeResourceScenario,
@@ -48,7 +45,6 @@ import {
   usePostAutoGrader,
   usePutAutoGrader,
 } from './useAutoGraders';
-
 
 import { queryKeyCMI5Scenarios, useGetCMI5Scenarios } from './useCMI5Scenarios';
 import { queryKeyKSATs, useGetKSATs } from './lms/useKSATs';
@@ -350,7 +346,6 @@ export const apiTopicsHookData: iApiHooks = {
     queryKey: queryKeyAutoGraders,
   },
 
-
   [Topic.Console]: {
     apiHook: useGetRangeConsole,
     beTypeStr: 'RangeConsole',
@@ -369,8 +364,7 @@ export const apiTopicsHookData: iApiHooks = {
     putApiHook: usePutContainerSpec,
     queryKey: queryKeyContainerSpecs,
   },
-  
- 
+
   [Topic.KSAT]: {
     apiHook: null,
     listApiHook: useGetKSATs,
@@ -423,7 +417,6 @@ export const apiTopicsHookData: iApiHooks = {
 
   //#region CMI5
 
-
   [Topic.CMI5Scenario]: {
     apiHook: null,
     listApiHook: useGetCMI5Scenarios,
@@ -433,7 +426,6 @@ export const apiTopicsHookData: iApiHooks = {
   //#endregion CMI5
 
   //#region KeyCloak
-
 
   //#endregion KeyCloak
 };
@@ -445,7 +437,7 @@ export const apiTopicsHookData: iApiHooks = {
  */
 export const getApiHookDataByBeStr = (beStr: string) => {
   return Object.entries(apiTopicsHookData).find(
-    ([key, value]) => value.beTypeStr === beStr,
+    ([, value]) => value.beTypeStr === beStr,
   );
 };
 

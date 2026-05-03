@@ -1,5 +1,5 @@
-import { DOMConversionMap, EditorConfig, ElementNode } from 'lexical';
-import { SerializedFootnoteDefGroupNode } from './types';
+import { type DOMConversionMap, type EditorConfig, ElementNode } from 'lexical';
+import { type SerializedFootnoteDefGroupNode } from './types';
 import { $createFootnoteDefinitionGroupNode } from './methods';
 
 /**
@@ -56,7 +56,6 @@ export class FootnoteDefinitionGroupNode extends ElementNode {
    * @returns
    */
   static override importJSON(
-    serializedNode: SerializedFootnoteDefGroupNode,
   ): FootnoteDefinitionGroupNode {
     return $createFootnoteDefinitionGroupNode();
   }

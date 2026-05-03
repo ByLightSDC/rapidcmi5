@@ -1,5 +1,5 @@
 
-import { QuizQuestion, AnswerType, QuestionGrading, QuestionResponse } from '@rapid-cmi5/cmi5-build-common';
+import { type QuizQuestion, type AnswerType, QuestionGrading, QuestionResponse } from '@rapid-cmi5/cmi5-build-common';
 import { useState } from 'react';
 
 export default function useQuizGrader() {

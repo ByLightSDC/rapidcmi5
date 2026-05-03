@@ -1,8 +1,5 @@
 import {
-  DeployedRangeConsole,
-  DeployedScenario,
-  RangeContainer,
-  RangeVM,
+  type DeployedRangeConsole,
 } from '@rangeos-nx/frontend/clients/devops-api';
 
 export type ScenarioResources = {

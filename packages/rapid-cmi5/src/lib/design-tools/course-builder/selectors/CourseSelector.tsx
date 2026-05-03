@@ -1,10 +1,10 @@
-import { MenuItem, SxProps } from '@mui/material';
+import { MenuItem, type SxProps } from '@mui/material';
 
 import AnySelector from '../AnySelector';
 
 import { useEffect } from 'react';
 
-import { Course } from '../../../redux/repoManagerReducer';
+import { type Course } from '../../../redux/repoManagerReducer';
 
 /**
  * Selector Component for displaying packages and L3s in a Package Group
@@ -15,7 +15,6 @@ export default function CourseSelector({
   availableCourses,
   currentCoursePath,
   currentRepo,
-  disabled,
   onSelect,
   styleProps = {},
   onAction,

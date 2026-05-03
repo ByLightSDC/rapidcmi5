@@ -1,7 +1,7 @@
 import { realmPlugin, addComposerChild$ } from '@mdxeditor/editor';
 import { AnimationDrawer } from './components/AnimationDrawer';
 import { AnimationResolver } from './components/AnimationResolver';
-import { AnimationConfig } from './types/Animation.types';
+import { type AnimationConfig } from './types/Animation.types';
 import {
   slideAnimations$,
   selectedAnimation$,

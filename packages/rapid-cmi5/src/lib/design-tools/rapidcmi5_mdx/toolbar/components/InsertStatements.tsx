@@ -1,7 +1,6 @@
 import {
   rootEditor$,
   $createDirectiveNode,
-  DirectiveNode,
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
@@ -12,14 +11,14 @@ import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 
 import SubjectIcon from '@mui/icons-material/Subject';
 
-import { ContainerDirective } from 'mdast-util-directive';
+import { type ContainerDirective } from 'mdast-util-directive';
 
 import AddIcon from '@mui/icons-material/Add';
 import { useTheme } from '@emotion/react';
 import {
   ButtonMinorUi,
   StatementsSettings,
-  StatementPreset,
+  type StatementPreset,
   DEFAULT_STATEMENT,
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';

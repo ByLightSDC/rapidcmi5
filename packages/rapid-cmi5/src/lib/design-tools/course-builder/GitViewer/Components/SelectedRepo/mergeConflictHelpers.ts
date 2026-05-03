@@ -25,8 +25,6 @@ export function parseConflictBlocksFromModel(content: string): ConflictBlock[] {
 
   let leftStart = -1,
     leftEnd = -1;
-  let baseStart = -1,
-    baseEnd = -1;
   let rightStart = -1,
     rightEnd = -1;
 
@@ -66,7 +64,6 @@ export function parseConflictBlocksFromModel(content: string): ConflictBlock[] {
         // reset state for next block
         state = State.Idle;
         leftStart = leftEnd = -1;
-        baseStart = baseEnd = -1;
         rightStart = rightEnd = -1;
       }
     }

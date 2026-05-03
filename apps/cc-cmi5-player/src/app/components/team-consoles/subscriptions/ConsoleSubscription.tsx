@@ -7,7 +7,7 @@ import {
   useSubscription,
   Topic,
 } from '@rangeos-nx/frontend/clients/hooks';
-import { DeployedRangeConsole } from '@rangeos-nx/frontend/clients/devops-api';
+import { type DeployedRangeConsole } from '@rangeos-nx/frontend/clients/devops-api';
 import { useEffect } from 'react';
 
 /**

@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
+import { configureStore, type ThunkAction, type Action } from '@reduxjs/toolkit';
 
 //Internal
 import courseBuilderReducer from './courseBuilderReducer';
@@ -16,7 +16,6 @@ import {
 //Persist
 import storage from 'redux-persist/lib/storage';
 import {
-  createMigrate,
   persistReducer,
   persistStore,
   FLUSH,

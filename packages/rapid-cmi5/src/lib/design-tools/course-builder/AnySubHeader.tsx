@@ -1,4 +1,4 @@
-import { ListSubheader, ListSubheaderProps } from "@mui/material";
+import { ListSubheader, type ListSubheaderProps } from "@mui/material";
 
 export default function AnySubheader(
     props: ListSubheaderProps & { muiSkipListHighlight: boolean },

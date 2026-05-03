@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { debounce } from 'lodash';
 import {
-  AnswerType,
-  QuizState,
+  type AnswerType,
+  type QuizState,
   RC5ActivityTypeEnum,
-  SetActivityCacheHandler,
+  type SetActivityCacheHandler,
 } from '@rapid-cmi5/cmi5-build-common';
 
 /* 

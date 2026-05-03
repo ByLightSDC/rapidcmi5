@@ -1,4 +1,4 @@
-import { AnimationConfig, debugLog } from '@rapid-cmi5/ui';
+import { type AnimationConfig, debugLog } from '@rapid-cmi5/ui';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 
 

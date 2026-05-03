@@ -1,17 +1,17 @@
-import { Plugin } from 'unified';
+import { type Plugin } from 'unified';
 import { visit } from 'unist-util-visit';
 
 /**
  * Debug Nodes
  */
-export const debugPlugin: Plugin = () => {
-  function transformer(tree: any) {
-    visit(tree, (node, index, parent) => {
-      //console.log('node', node);
-    });
-  }
-  return transformer;
-};
+// export const debugPlugin: Plugin = () => {
+//   function transformer(tree: any) {
+//     // visit(tree, (node, index, parent) => {
+//     //   console.log('node', node);
+//     // });
+//   }
+//   return transformer;
+// };
 
 /**
  * Plugin fixes an issue where remarkGfm adds link tags to text that
@@ -22,7 +22,7 @@ export const linkPlugin: Plugin = () => {
     let startIndex = -1;
     let endIndex = -1;
 
-    visit(tree, 'html', (node, position = -1, parent) => {
+    visit(tree, 'html', (node, position = -1) => {
       if (node.value && node.value.startsWith('<a href')) {
         startIndex = position;
         endIndex = -1;

@@ -2,15 +2,9 @@
 import {
   // APIs
   AIApiFactory,
-  Cmi5EnrollmentApiFactory,
-  Cmi5ManagementApiFactory,
   CourseEnrollmentApiFactory,
   CourseInstructorApiFactory,
   CourseManagementApiFactory,
-  LRSGradesApiFactory,
-  LRSStatementApiFactory,
-  MoodleEnrollmentApiFactory,
-  MoodleManagementApiFactory,
   NICEKSATsApiFactory,
 } from './lib';
 

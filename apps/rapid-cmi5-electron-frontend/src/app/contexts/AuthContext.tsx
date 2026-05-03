@@ -7,15 +7,11 @@ import {
   isAuthenticated,
   KeycloakUi,
   setIsLoggingOut,
-  setAuth,
-  setAuthToken,
-  setAuthIdToken,
-  setIsAuthenticated,
 } from '@rapid-cmi5/keycloak';
 import { modal, resetPersistance, setModal } from '@rapid-cmi5/ui';
 import {
   createContext,
-  ReactNode,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -24,9 +20,9 @@ import {
 import { detectIsElectron } from '../utils/appType';
 import { useDispatch, useSelector } from 'react-redux';
 import { UserConfigContext } from './UserConfigContext';
-import { Credentials } from '@rapid-cmi5/cmi5-build-common';
+import { type Credentials } from '@rapid-cmi5/cmi5-build-common';
 
-import { AppDispatch } from '@rapid-cmi5/react-editor';
+import { type AppDispatch } from '@rapid-cmi5/react-editor';
 import ConfigureSSOCredentialsForm, {
   configureSSOCredsModalId,
 } from '../shared/modals/ElectronLoginModal';
@@ -62,7 +58,7 @@ export const AuthContext = createContext<AuthContextType>({
   logout: () => {
     return;
   },
-  handleSaveSSOCredsElectron: (creds: Credentials) => {
+  handleSaveSSOCredsElectron: (_creds: Credentials) => {
     return;
   },
 });

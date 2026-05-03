@@ -48,7 +48,7 @@ export interface Element {
    */
   text?: string;
 }
-import { tFormFieldRendererProps, ReadOnlyTextField } from '@rapid-cmi5/ui';
+import { type tFormFieldRendererProps, ReadOnlyTextField } from '@rapid-cmi5/ui';
 
 /**
  * @typedef tFormProps

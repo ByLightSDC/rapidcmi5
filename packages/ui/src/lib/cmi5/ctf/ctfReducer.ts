@@ -1,9 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import {
-  AnswerType,
-  CTFContent,
-  QuizCompletionEnum,
+  type AnswerType,
 } from '@rapid-cmi5/cmi5-build-common';
 
 type tCTFState = {

@@ -3,7 +3,7 @@ import React, { useContext, useEffect } from 'react';
 
 import {
   PaginationFiltersContext,
-  inputFilterType,
+  type inputFilterType,
 } from './PaginationFiltersContext';
 
 import {
@@ -215,7 +215,7 @@ export function PaginationFilters(props: PaginationFilterProps) {
                         aria-label={inputFilter.label}
                         checked={filter === 'true'}
                         disabled={inputFilter.isDisabled || false}
-                        onChange={(event, value) => {
+                        onChange={(_event, value) => {
                           onSetFilter(
                             inputFilter.key,
                             value === true ? 'true' : 'false',

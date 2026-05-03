@@ -3,8 +3,8 @@ import archiver from 'archiver';
 import { app } from 'electron';
 
 import {
-  FolderStruct,
-  FsOperations,
+  type FolderStruct,
+  type FsOperations,
   generateCmi5Xml,
   generateCourseDist,
   generateCourseJson,
@@ -27,7 +27,7 @@ const fsOps: FsOperations = {
     }
     return content;
   },
-  writeFile: async (path: string, content: string | Uint8Array, encoding?: string) => {
+  writeFile: async (path: string, content: string | Uint8Array, _encoding?: string) => {
     await fs.promises.writeFile(path, content);
   },
   deleteFolder: async (path: string, options: { recursive: boolean; force: boolean }) => {
@@ -37,7 +37,7 @@ const fsOps: FsOperations = {
       if (!options.force) throw err;
     }
   },
-  copy: async (src: string, dest: string, options: { recursive: boolean }) => {
+  copy: async (src: string, dest: string, _options: { recursive: boolean }) => {
     await fs.promises.cp(src, dest, { recursive: true });
   },
   mkdir: async (path: string, options: { recursive: boolean }) => {

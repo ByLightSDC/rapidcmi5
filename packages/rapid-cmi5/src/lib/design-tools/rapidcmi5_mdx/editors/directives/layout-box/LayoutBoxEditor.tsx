@@ -1,22 +1,15 @@
-import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
+import React, { useState, useRef, useEffect, type ChangeEvent } from 'react';
 
 import {
-  DirectiveEditorProps,
+  type DirectiveEditorProps,
   NestedLexicalEditor,
-  useCellValues,
   useLexicalNodeRemove,
   useMdastNodeUpdater,
-  activeEditor$,
-  jsxComponentDescriptors$,
-  directiveDescriptors$,
-  codeBlockEditorDescriptors$,
-  syntaxExtensions$,
-  importVisitors$,
   usePublisher,
   insertMarkdown$,
 } from '@mdxeditor/editor';
 
-import { ContainerDirective } from 'mdast-util-directive';
+import { type ContainerDirective } from 'mdast-util-directive';
 import { LayoutBoxToolbar } from './LayoutBoxToolbar';
 
 /* MUI */
@@ -303,7 +296,7 @@ export const LayoutBoxEditor: React.FC<
                       <ToggleButtonGroup
                         value={form.justifyContent}
                         exclusive
-                        onChange={(e, newValue: string | null) =>
+                        onChange={(_e, newValue: string | null) =>
                           setForm((s) => ({
                             ...s,
                             justifyContent: newValue ? newValue : '',
@@ -344,7 +337,7 @@ export const LayoutBoxEditor: React.FC<
                       <ToggleButtonGroup
                         value={form.alignItems}
                         exclusive
-                        onChange={(e, newValue: string | null) =>
+                        onChange={(_e, newValue: string | null) =>
                           setForm((s) => ({
                             ...s,
                             alignItems: newValue ? newValue : '',

@@ -1,11 +1,10 @@
 import {
   GenericHTMLNode,
   isMdastHTMLNode,
-  MdastHTMLNode,
+  type MdastHTMLNode,
 } from '@mdxeditor/editor';
-import { LexicalNode } from 'lexical';
-import * as Mdast from 'mdast';
-import { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx';
+import { type LexicalNode } from 'lexical';
+import type * as Mdast from 'mdast';
 
 /**
  * Returns true if the given node is a iframe HTML Node

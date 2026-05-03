@@ -1,14 +1,14 @@
-import { ResultScore, Statement } from '@xapi/xapi';
+import { type ResultScore, type Statement } from '@xapi/xapi';
 import { v4 as uuidv4 } from 'uuid';
 import { cmi5Instance } from '../session/cmi5';
-import { debugLog, logger } from '../debug';
+import { logger } from '../debug';
 import { checkForDevMode } from './DevMode';
 import sha256 from 'crypto-js/sha256';
 
 // Imports for progress management functions
-import { Dispatch } from '@reduxjs/toolkit';
-import { RootState } from '../redux/store';
-import { CourseAUProgress } from '../types/CourseAUProgress';
+import { type Dispatch } from '@reduxjs/toolkit';
+import { type RootState } from '../redux/store';
+import { type CourseAUProgress } from '../types/CourseAUProgress';
 import { setCourseAUProgress, setAuProgress } from '../redux/auReducer';
 // import { slideViewed } from './Cmi5Helpers'; // TODO: Fix this import
 import {
@@ -26,12 +26,12 @@ import {
 } from './Cmi5Helpers';
 import { gradeActivity, createSlideActivityScore } from './gradeActivity';
 import {
-  ActivityType,
-  SlideActivityScore,
+  type ActivityType,
+  type SlideActivityScore,
   SlideActivityType,
 } from '../types/SlideActivityStatusState';
 import {
-  ActivityScore,
+  type ActivityScore,
   getActivityTypeFromDisplayName,
 } from '@rapid-cmi5/cmi5-build-common';
 import { config } from '@rapid-cmi5/ui';
@@ -975,10 +975,6 @@ export async function handleSlideViewed(
 
         // Only calculate completion status if progress changed significantly
         if (Math.abs(newProgress - courseAUProgress.progress.auProgress) > 0) {
-          // Store previous AU completion status to detect transitions
-          const wasAuCompleted = courseAUProgress.progress.auCompleted;
-          const wasAuPassed = courseAUProgress.progress.auPassed;
-
           updatedProgress.progress.auCompleted =
             isAUCompletedCheck(updatedProgress);
 
@@ -1643,11 +1639,6 @@ export async function handleActivityScoring(
       'lms',
     );
 
-    // Update AU completion status after slide completion check
-    // Store previous AU completion status to detect transitions
-    const wasAuCompleted = courseAUProgress.progress.auCompleted;
-    const wasAuPassed = courseAUProgress.progress.auPassed;
-
     // Always recalculate AU progress after slide status changes
     const newProgress = calculateProgressPercentage(updatedProgress);
     updatedProgress.progress.auProgress = newProgress;
@@ -1716,7 +1707,7 @@ async function handleQuizInteractionStatements(
     passed: boolean;
     score?: SlideActivityScore;
   },
-  calculatedScore: { raw: number; min: number; max: number; scaled?: number },
+  _calculatedScore: { raw: number; min: number; max: number; scaled?: number },
 ): Promise<void> {
   try {
     // Skip async operations in dev mode
@@ -1777,7 +1768,7 @@ async function handleCodeRunnerInteractionStatements(
     passed: boolean;
     score?: SlideActivityScore;
   },
-  calculatedScore: { raw: number; min: number; max: number; scaled?: number },
+  _calculatedScore: { raw: number; min: number; max: number; scaled?: number },
 ): Promise<void> {
   try {
     // Skip async operations in dev mode
@@ -1808,7 +1799,11 @@ async function handleCodeRunnerInteractionStatements(
     // Additional CodeRunner-specific LRS operations can be added here if needed
     // For example: logging code submission, execution results, etc.
   } catch (error) {
-    logger.error('Error in CodeRunner activity scored LMS operations', error, 'lms');
+    logger.error(
+      'Error in CodeRunner activity scored LMS operations',
+      error,
+      'lms',
+    );
   }
 }
 
@@ -1824,7 +1819,7 @@ async function handleScenarioInteractionStatements(
     passed: boolean;
     score?: SlideActivityScore;
   },
-  calculatedScore: { raw: number; min: number; max: number; scaled?: number },
+  _calculatedScore: { raw: number; min: number; max: number; scaled?: number },
 ): Promise<void> {
   try {
     // Skip async operations in dev mode

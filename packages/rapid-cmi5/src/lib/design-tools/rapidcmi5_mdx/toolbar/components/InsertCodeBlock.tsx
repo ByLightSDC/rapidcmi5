@@ -10,7 +10,6 @@ import { ButtonMinorUi } from '@rapid-cmi5/ui';
  */
 import AddIcon from '@mui/icons-material/Add';
 import {
-  ButtonWithTooltip,
   insertCodeBlock$,
 } from '@mdxeditor/editor';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';

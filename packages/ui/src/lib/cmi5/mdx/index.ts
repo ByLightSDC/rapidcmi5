@@ -15,7 +15,6 @@ export * from './editors/AnimationDirectiveRegistry';
 export * from './editors/AnimDirectiveDescriptor';
 export { InlineAnimDirectiveDescriptor } from './editors/AnimDirectiveDescriptor';
 export * from './editors/FxDirectiveDescriptor';
-export * from './editors/YouTubeDirectiveDescriptor';
 
 export * from './icons/Icons';
 

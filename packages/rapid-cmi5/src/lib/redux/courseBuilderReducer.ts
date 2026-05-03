@@ -1,17 +1,17 @@
 import {
-  CourseData,
-  QuizContent,
-  ScenarioContent,
-  SlideType,
+  type CourseData,
+  type QuizContent,
+  type ScenarioContent,
+  type SlideType,
   SlideTypeEnum,
-  CTFContent,
+  type CTFContent,
   Operation,
-  CourseAU,
-  LessonTheme,
-  CodeRunnerContent,
+  type CourseAU,
+  type LessonTheme,
+  type CodeRunnerContent,
 } from '@rapid-cmi5/cmi5-build-common';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from './store';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { type RootState } from './store';
 import { debugLog, defaultCourseData, resetPersistance } from '@rapid-cmi5/ui';
 import { ViewModeEnum } from '../design-tools/course-builder/CourseBuilderTypes';
 

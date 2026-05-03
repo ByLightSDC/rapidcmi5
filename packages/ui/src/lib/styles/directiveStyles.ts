@@ -1,4 +1,4 @@
-import { Theme } from '@mui/material';
+import { type Theme } from '@mui/material';
 
 /**
  * Returns a subtle drop shadow for directive block containers (tabs, accordion, etc.)

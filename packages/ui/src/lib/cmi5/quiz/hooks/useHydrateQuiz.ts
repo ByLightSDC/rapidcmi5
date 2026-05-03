@@ -1,10 +1,8 @@
 import {
-  QuizContent,
-  AnswerType,
-  GetCmi5QuizProgressHandler,
-  GetActivityCacheHandler,
+  type AnswerType,
+  type GetActivityCacheHandler,
   RC5ActivityTypeEnum,
-  QuizState,
+  type QuizState,
 } from '@rapid-cmi5/cmi5-build-common';
 import { useEffect } from 'react';
 import { debugLogError } from '../../../utility/logger';

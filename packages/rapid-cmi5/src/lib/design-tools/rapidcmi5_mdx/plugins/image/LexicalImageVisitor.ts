@@ -1,6 +1,6 @@
-import * as Mdast from 'mdast';
-import { LexicalExportVisitor } from '@mdxeditor/editor';
-import { ImageNode, $isImageNode } from './ImageNode';
+import type * as Mdast from 'mdast';
+import { type LexicalExportVisitor } from '@mdxeditor/editor';
+import { type ImageNode, $isImageNode } from './ImageNode';
 
 // camelCase rest attr names → data-* HTML attribute names that survive MDX parsing
 const attrToDataMap: Record<string, string> = {

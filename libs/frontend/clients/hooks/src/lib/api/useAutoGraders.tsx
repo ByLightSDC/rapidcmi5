@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { AxiosRequestConfig } from 'axios';
+import { type AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 
 import {
@@ -14,8 +14,8 @@ import {
 } from './config';
 import { getErrorMessage } from './errorMessages';
 import {
-  AutoGraderCreate,
-  AutoGraderUpdate,
+  type AutoGraderCreate,
+  type AutoGraderUpdate,
   DevopsApiClient,
 } from '@rangeos-nx/frontend/clients/devops-api';
 
@@ -118,7 +118,7 @@ export const usePostAutoGrader = () => {
   };
 
   return useMutation((formData: AutoGraderCreate) => postResult(formData), {
-    onSettled: async (data, error, variables: any) => {
+    onSettled: async (_data, error, _variables: any) => {
       if (!error) {
         queryClient.invalidateQueries(queryKeyAutoGraders);
       }
@@ -150,7 +150,7 @@ export const usePutAutoGrader = () => {
   };
 
   return useMutation(({ uuid, formData }: any) => putResult(uuid, formData), {
-    onSettled: async (data, error, variables: any) => {
+    onSettled: async (_data, error, _variables: any) => {
       if (!error) {
         queryClient.invalidateQueries(queryKeyAutoGraders);
       }
@@ -180,7 +180,7 @@ export const useDeleteAutoGrader = () => {
   };
 
   return useMutation((uuid: string) => deleteResult(uuid), {
-    onSettled: async (data, error, variables: any) => {
+    onSettled: async (_data, error, _variables: any) => {
       if (!error) {
         queryClient.invalidateQueries(queryKeyAutoGraders);
       }

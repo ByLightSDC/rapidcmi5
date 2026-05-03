@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 
 import * as yup from 'yup';
 
@@ -14,11 +14,11 @@ import Grid from '@mui/material/Grid2';
 
 /* API Topic */
 
-import { ClassEntry, defaultClassEntryData } from '../session/constants';
+import { type ClassEntry, defaultClassEntryData } from '../session/constants';
 import {
   FormCrudType,
   NAME_GROUP,
-  FormStateType,
+  type FormStateType,
   FormControlTextField,
   SharedFormWithProvider,
 } from '@rapid-cmi5/ui';
@@ -92,7 +92,7 @@ export default function ClassPromptForm(props: tFormProps) {
   };
 
   return (
-    <SharedFormWithProvider<ClassEntry, ClassEntry, ClassEntry>
+    <SharedFormWithProvider<ClassEntry, ClassEntry>
       {...props}
       crudLabel="Enter"
       featureNameOverride="Class"

@@ -1,6 +1,6 @@
 import { Signal, map } from '@mdxeditor/gurx';
-import * as Mdast from 'mdast';
-import { $createTableNode, TableNode } from './TableNode';
+import type * as Mdast from 'mdast';
+import { $createTableNode } from './TableNode';
 import { insertDecoratorNode$ } from '@mdxeditor/editor';
 import type {
   TableRow,

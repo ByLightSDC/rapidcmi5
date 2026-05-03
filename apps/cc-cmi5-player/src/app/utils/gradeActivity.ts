@@ -1,7 +1,7 @@
 import {
-  ActivityCompletionPayload,
-  SlideActivityScore,
-  ActivityType,
+  type ActivityCompletionPayload,
+  type SlideActivityScore,
+  type ActivityType,
   SlideActivityType,
 } from '../types/SlideActivityStatusState';
 

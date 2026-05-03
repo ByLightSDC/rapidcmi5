@@ -13,9 +13,9 @@ import { app } from 'electron';
 import { cmi5Builder } from './app/api/cmi5Builder/build';
 import fs from 'fs';
 import {
-  Credentials,
-  GitUserConfig,
-  SSOConfig,
+  type Credentials,
+  type GitUserConfig,
+  type SSOConfig,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   decryptCredentials,

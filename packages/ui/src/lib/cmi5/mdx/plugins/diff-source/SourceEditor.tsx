@@ -1,6 +1,6 @@
 import { markdown as markdownLanguageSupport } from '@codemirror/lang-markdown';
 import { Compartment } from '@codemirror/state';
-import { EditorState, Extension } from '@codemirror/state';
+import { EditorState, type Extension } from '@codemirror/state';
 import { EditorView, lineNumbers } from '@codemirror/view';
 import { basicSetup } from 'codemirror';
 import React, { useCallback, useEffect, useMemo } from 'react';

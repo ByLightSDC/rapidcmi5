@@ -3,14 +3,14 @@ import Grid from '@mui/material/Grid2';
 import { Stack } from '@mui/material';
 
 import { useEffect, useState } from 'react';
-import { useFieldArray, UseFormReturn } from 'react-hook-form';
+import { useFieldArray, type UseFormReturn } from 'react-hook-form';
 import DownloadIcon from '@mui/icons-material/Download';
 
 import download from 'js-file-download';
 
-import { FormStateType } from '../types/form';
+import { type FormStateType } from '../types/form';
 import FormControlTextField from './FormControlTextField';
-import FormFieldArray, { tFormFieldRendererProps } from './FormFieldArray';
+import FormFieldArray, { type tFormFieldRendererProps } from './FormFieldArray';
 import FileUpload from '../inputs/file-upload/FileUpload';
 import { FormCrudType } from '../redux/utils/types';
 import { ButtonIcon } from '../utility/buttons';
@@ -60,7 +60,7 @@ export function FileFormFieldArray({
    * @param fieldName
    * @param fieldIndex
    */
-  const triggerDownload = async (fieldName: string, fieldIndex: number) => {
+  const triggerDownload = async (fieldIndex: number) => {
     const theFileData = fields[fieldIndex]; //getValues(fieldName);
     setDownloadFileData(theFileData);
     const blobData = await downloadHandler(theFileData);
@@ -88,7 +88,7 @@ export function FileFormFieldArray({
         <Grid size={12}>
           <FileUpload
             fileTypes={'*'}
-            onFileSelected={(file, selected) => {
+            onFileSelected={(file) => {
               append({
                 name: file.name,
                 path: file.name,
@@ -132,7 +132,6 @@ export function FileFormFieldArray({
                     onClick: (event) => {
                       event.stopPropagation();
                       triggerDownload(
-                        props.indexedArrayField,
                         props.rowIndex || 0,
                       );
                     },

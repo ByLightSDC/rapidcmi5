@@ -4,7 +4,7 @@ import { $createParagraphNode, $getNodeByKey } from 'lexical';
 import React from 'react';
 import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 import {
-  VoidEmitter,
+  type VoidEmitter,
   activeEditor$,
   editorInFocus$,
   useCodeBlockEditorContext,

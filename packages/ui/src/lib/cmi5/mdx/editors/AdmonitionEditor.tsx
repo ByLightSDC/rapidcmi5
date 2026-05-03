@@ -1,17 +1,14 @@
 import {
-  activeEditor$,
-  currentSelection$,
-  DirectiveDescriptor,
-  DirectiveEditorProps,
-  editorInFocus$,
+  type DirectiveDescriptor,
+  type DirectiveEditorProps,
   NestedLexicalEditor,
   syntaxExtensions$,
   useCellValues,
   useLexicalNodeRemove,
   useMdastNodeUpdater,
 } from '@mdxeditor/editor';
-import { LexicalEditor } from 'lexical';
-import { ContainerDirective, Directives } from 'mdast-util-directive';
+import { type LexicalEditor } from 'lexical';
+import { type ContainerDirective, type Directives } from 'mdast-util-directive';
 import type { Paragraph } from 'mdast';
 
 import {
@@ -20,7 +17,7 @@ import {
   AccordionSummary,
   Box,
   IconButton,
-  SxProps,
+  type SxProps,
   Tooltip,
   useTheme,
 } from '@mui/material';
@@ -39,7 +36,7 @@ import {
   getSeverityHexColor,
 } from '../../markdown/components/AdmonitionStyles';
 
-import { AdmonitionDirectiveNode } from './AdmonitionDirectiveDescriptor';
+import { type AdmonitionDirectiveNode } from './AdmonitionDirectiveDescriptor';
 import DeleteIconButton from '../components/DeleteIconButton';
 import SettingsIconButton from '../components/SettingsIconButton';
 import InsertLineReturnButton from '../components/InsertLineReturnButton';
@@ -52,7 +49,7 @@ import { LessonThemeContext } from '../contexts/LessonThemeContext';
 import { resolveLessonThemeCSS, resolveBlockMaxWidth } from '../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../plugins/shared/useGutterRight';
 import { BlockAppearanceForm } from '../plugins/shared/BlockAppearanceForm';
-import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { type ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../constants/colors';
 
@@ -86,7 +83,6 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   lexicalNode,
   mdastNode,
   parentEditor,
-  descriptor,
 }) => {
   const muiTheme = useTheme();
   const { lessonTheme } = useContext(LessonThemeContext);
@@ -101,8 +97,6 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   const updateMdastNode = useMdastNodeUpdater();
   const [isCollapsible, setIsCollapsible] = useState(false);
   const [isConfiguring, setIsConfiguring] = useState(false);
-  const [isFocused, setIsFocused] = useState(false); //editor focused
-  const [isPlaceholderAllowed, setIsPlaceholderAllowed] = useState(false); //editor focused
 
   const [isOpen, setIsOpen] = useState(true);
   const [title, setTitle] = useState('');
@@ -154,11 +148,8 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
     }
   }
 
-  const [currentSelection, activeEditor, editorInFocus, isPlayback] =
+  const [isPlayback] =
     useCellValues(
-      currentSelection$,
-      activeEditor$,
-      editorInFocus$,
       editorInPlayback$,
     );
 
@@ -286,24 +277,6 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
     }
   }, [mdastNode?.name]);
 
-  /**
-   * UE sets a flag if this editor is focused
-   * If focused, set a flag that allows UI to display placeholder text so user can find cursor input location
-   */
-  useEffect(() => {
-    let editorIsFocused = false;
-    if (
-      editorInFocus &&
-      editorInFocus?.rootNode?.getKey() === lexicalNode.getKey()
-    ) {
-      editorIsFocused = true;
-      setIsPlaceholderAllowed(false);
-    } else {
-      setIsPlaceholderAllowed(true);
-    }
-    setIsFocused(editorIsFocused);
-  }, [editorInFocus, lexicalNode]);
-
   // Sync backgroundColor and contentWidth from mdastNode
   useEffect(() => {
     const bgColor = mdastNode?.attributes?.['backgroundColor'] ?? '';
@@ -316,12 +289,12 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
 
   const outerSx: SxProps = backgroundColor
     ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
+      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+      clipPath: `inset(0 -100vmax 0)`,
+      backgroundColor,
+      paddingTop: blockPadding,
+      paddingBottom: blockPadding,
+    }
     : {};
 
   const expandIcon = useMemo(() => {
@@ -407,7 +380,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
               }}
             >
               <NestedLexicalEditor<Paragraph>
-                getContent={(node) => {
+                getContent={() => {
                   const theNode = convertMarkdownToMdast(
                     getTitle(mdastNode.attributes),
                     syntaxExtensions,

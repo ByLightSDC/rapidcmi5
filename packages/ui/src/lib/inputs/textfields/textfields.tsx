@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 /* MUI */
-import TextField, { StandardTextFieldProps } from '@mui/material/TextField';
+import TextField, { type StandardTextFieldProps } from '@mui/material/TextField';
 import { InputAdornment } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { ButtonIcon, ButtonInfoField } from '../../utility/buttons';

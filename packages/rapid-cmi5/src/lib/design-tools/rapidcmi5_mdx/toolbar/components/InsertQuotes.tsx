@@ -1,8 +1,7 @@
 import {
-  ButtonWithTooltip,
   rootEditor$,
   $createDirectiveNode,
-  DirectiveNode,
+  type DirectiveNode,
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
@@ -13,7 +12,7 @@ import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 
-import { ContainerDirective } from 'mdast-util-directive';
+import { type ContainerDirective } from 'mdast-util-directive';
 
 /**
  * Icons
@@ -24,9 +23,8 @@ import {
   convertMarkdownToMdast,
   ButtonMinorUi,
   QuotesSettings,
-  debugLogWarning,
   DEFAULT_QUOTES,
-  QuotePreset,
+  type QuotePreset,
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 import { useCallback, useState } from 'react';

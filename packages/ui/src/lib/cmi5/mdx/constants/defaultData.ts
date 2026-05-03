@@ -1,4 +1,4 @@
-import { SlideTypeEnum, CourseAU, CodeRunnerContent, MoveOnCriteriaEnum, QuestionResponse, QuestionGrading, ScenarioContent, CourseData, QuizContent, QuizCompletionEnum, CTFContent, DownloadFilesContent, RC5ScenarioContent, TeamConsolesContent, RC5ActivityTypeEnum } from "@rapid-cmi5/cmi5-build-common";
+import { SlideTypeEnum, type CourseAU, type CodeRunnerContent, MoveOnCriteriaEnum, QuestionResponse, QuestionGrading, type ScenarioContent, type CourseData, type QuizContent, QuizCompletionEnum, type CTFContent, type DownloadFilesContent, type RC5ScenarioContent, type TeamConsolesContent, RC5ActivityTypeEnum } from "@rapid-cmi5/cmi5-build-common";
 
 
 export const jsonFormatSpaces = 1;

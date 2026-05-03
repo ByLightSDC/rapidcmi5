@@ -1,5 +1,5 @@
-import { LeafDirective } from 'mdast-util-directive';
-import { RoughNotationProps, types } from 'react-rough-notation';
+import { type LeafDirective } from 'mdast-util-directive';
+import { type types } from 'react-rough-notation';
 
 /**
  * Defined Mdast Node Attributes

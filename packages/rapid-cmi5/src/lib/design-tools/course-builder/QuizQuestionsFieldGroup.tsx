@@ -4,19 +4,19 @@ import { useWatch } from 'react-hook-form';
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
-import { Box, MenuItem, Stack, Tooltip } from '@mui/material';
+import { Box, MenuItem, Stack } from '@mui/material';
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import {
   SlideTypeEnum,
   QuestionResponse,
   responseOptions,
   gradingOptions,
-  QuizOption,
-  MatchingOption,
+  type QuizOption,
+  type MatchingOption,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   FormCrudType,
-  tFormFieldRendererProps,
+  type tFormFieldRendererProps,
   useDisplayFocus,
   FormControlSelectField,
   FormControlTextField,
@@ -158,44 +158,44 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
       </Grid>
       {(watchQuestionType === QuestionResponse.MultipleChoice ||
         watchQuestionType === QuestionResponse.SelectAll) && (
-        <>
-          <Grid size={6}>
-            <FormControlCheckboxField
-              control={control}
-              name={`${indexedArrayField}.typeAttributes.shuffleAnswers`}
-              label="Shuffle Answer Order"
-            />
-          </Grid>
-          <Grid size={11}>
-            <FormFieldArray
-              errors={indexedErrors?.typeAttributes}
-              arrayFieldName={`${indexedArrayField}.typeAttributes.options`}
-              arrayRenderItem={(props: tFormFieldRendererProps) => {
-                return (
-                  <QuestionOptionsFieldGroup
-                    crudType={crudType}
-                    formProps={props}
-                    questionField={indexedArrayField}
-                    questionType={watchQuestionType}
-                    slideType={slideType}
-                  />
-                );
-              }}
-              defaultIsExpanded={true}
-              defaultValues={{
-                text: '',
-                correct:
-                  watchQuestionType === QuestionResponse.SelectAll
-                    ? true
-                    : false,
-              }}
-              isExpandable={true}
-              title="Options *"
-              {...formProps}
-            />
-          </Grid>
-        </>
-      )}
+          <>
+            <Grid size={6}>
+              <FormControlCheckboxField
+                control={control}
+                name={`${indexedArrayField}.typeAttributes.shuffleAnswers`}
+                label="Shuffle Answer Order"
+              />
+            </Grid>
+            <Grid size={11}>
+              <FormFieldArray
+                errors={indexedErrors?.typeAttributes}
+                arrayFieldName={`${indexedArrayField}.typeAttributes.options`}
+                arrayRenderItem={(props: tFormFieldRendererProps) => {
+                  return (
+                    <QuestionOptionsFieldGroup
+                      crudType={crudType}
+                      formProps={props}
+                      questionField={indexedArrayField}
+                      questionType={watchQuestionType}
+                      slideType={slideType}
+                    />
+                  );
+                }}
+                defaultIsExpanded={true}
+                defaultValues={{
+                  text: '',
+                  correct:
+                    watchQuestionType === QuestionResponse.SelectAll
+                      ? true
+                      : false,
+                }}
+                isExpandable={true}
+                title="Options *"
+                {...formProps}
+              />
+            </Grid>
+          </>
+        )}
       {watchQuestionType === QuestionResponse.TrueFalse && (
         <Grid size={4}>
           <FormControlSelectField
@@ -264,7 +264,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           />
         </Box>
       )}
-   
+
       <Grid size={3}>
         <FormControlSelectField
           control={control}
@@ -329,7 +329,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
             <ButtonInfoField message="Adding questions to the Quiz Bank allows you to reuse them in future quizzes, lessons, and courses." />
           </Stack>
         </Grid>
-      )} 
+      )}
     </Grid>
   );
 }
@@ -402,7 +402,7 @@ function QuestionOptionsFieldGroup(props: optionFieldGroupProps) {
           checkboxProps={{
             disabled: crudType === FormCrudType.view,
           }}
-          onChange={(event, value) =>
+          onChange={(_event, value) =>
             handleOptionSelection(rowIndex || 0, value)
           }
         />

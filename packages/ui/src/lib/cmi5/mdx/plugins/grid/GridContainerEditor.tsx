@@ -1,15 +1,15 @@
 import {
-  DirectiveEditorProps,
+  type DirectiveEditorProps,
   insertMarkdown$,
   NestedLexicalEditor,
   useCellValues,
   usePublisher,
 } from '@mdxeditor/editor';
-import * as Mdast from 'mdast';
+import type * as Mdast from 'mdast';
 
-import { ContainerDirective } from 'mdast-util-directive';
+import { type ContainerDirective } from 'mdast-util-directive';
 import {
-  CSSProperties,
+  type CSSProperties,
   useCallback,
   useContext,
   useEffect,
@@ -28,7 +28,7 @@ import {
   Box,
   IconButton,
   Paper,
-  SxProps,
+  type SxProps,
   Tooltip,
   Typography,
   useTheme,
@@ -42,9 +42,9 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
 import {
-  GridCellDirectiveNode,
-  GridContainerDirectiveNode,
-  GridPreset,
+  type GridCellDirectiveNode,
+  type GridContainerDirectiveNode,
+  type GridPreset,
 } from './types';
 import { createGridCell, findMatchingPreset, GRID_PRESETS } from './constants';
 import { GridContextProvider } from './GridContext';
@@ -52,7 +52,7 @@ import { LessonThemeContext } from '../../contexts/LessonThemeContext';
 import { resolveLessonThemeCSS, resolveBlockMaxWidth } from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
 import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
-import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { type ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 

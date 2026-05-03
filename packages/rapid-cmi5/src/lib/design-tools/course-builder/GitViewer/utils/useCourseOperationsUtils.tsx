@@ -1,22 +1,22 @@
 // These are used to separate the react / redux logic from the actual operations
 
-import { Course, RepoAccessObject } from '../../../../redux/repoManagerReducer';
+import { type Course, type RepoAccessObject } from '../../../../redux/repoManagerReducer';
 
 import YAML from 'yaml';
 import {
-  CourseAU,
-  CourseData,
-  KSATElement,
-  LessonTheme,
+  type CourseAU,
+  type CourseData,
+  type KSATElement,
+  type LessonTheme,
   Operation,
   RC5_VERSION,
-  RC5ScenarioContent,
-  SlideType,
+  type RC5ScenarioContent,
+  type SlideType,
   SlideTypeEnum,
-  TeamConsolesContent,
+  type TeamConsolesContent,
 } from '@rapid-cmi5/cmi5-build-common';
 import { courseNameInUseMessage } from '../session/constants';
-import { GitFS, MAX_FS_SLUG_LENGTH } from './fileSystem';
+import { type GitFS, MAX_FS_SLUG_LENGTH } from './fileSystem';
 import {
   flattenFolders,
   generateCourseJson,
@@ -635,7 +635,7 @@ export const computeCourseFromJsonFs = async ({
     throw Error('Course Data is null');
   }
 
-  let rc5Meta = await readRC5Meta(
+  const rc5Meta = await readRC5Meta(
     r,
     fsInstance,
     join(course.basePath, RC5_FILENAME),

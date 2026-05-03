@@ -1,4 +1,4 @@
-import { tFormFieldRendererProps } from '@rapid-cmi5/ui';
+import { type tFormFieldRendererProps } from '@rapid-cmi5/ui';
 import { FormCrudType } from '@rapid-cmi5/ui';
 
 // Shared Field constants

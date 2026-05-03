@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { Plugin } from 'unified';
+import { type Plugin } from 'unified';
 
 function extractTextFromNode(node) {
   if (!node) return '';

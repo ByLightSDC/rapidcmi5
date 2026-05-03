@@ -1,5 +1,5 @@
-import { DirectiveDescriptor } from '@mdxeditor/editor';
-import { AccordionDirectiveNode } from './types';
+import { type DirectiveDescriptor } from '@mdxeditor/editor';
+import { type AccordionDirectiveNode } from './types';
 import { AccordionEditor } from './AccordionEditor';
 
 /**

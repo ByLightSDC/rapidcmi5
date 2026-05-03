@@ -2,13 +2,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /* CCMI5 Flavor */
-import { useContext, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 
 
 /* MUI */
 import ListItemIcon from '@mui/material/ListItemIcon';
-import { DeployedRangeConsole, RangeContainerStatusEnum } from '@rangeos-nx/frontend/clients/devops-api';
+import { type DeployedRangeConsole, RangeContainerStatusEnum } from '@rangeos-nx/frontend/clients/devops-api';
 import { getContainerStatusIcon } from '@rangeos-nx/frontend/clients/hooks';
 import { listStyles, OverflowTypography, actionRowHeaderColor } from '@rapid-cmi5/ui';
 import ConsoleList from '../../scenario/console/ConsoleList';

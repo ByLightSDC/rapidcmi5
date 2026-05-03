@@ -12,7 +12,7 @@ import type {
 
 import { DecoratorNode } from 'lexical';
 import { AudioEditor } from './AudioEditor';
-import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
+import { type MdxJsxAttribute, type MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
 function convertAudioElement(domNode: Node): null | DOMConversionOutput {
   if (domNode instanceof HTMLAudioElement) {

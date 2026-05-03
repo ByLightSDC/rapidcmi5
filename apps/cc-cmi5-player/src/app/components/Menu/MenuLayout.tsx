@@ -19,7 +19,7 @@ import {
   setIconColor,
   maxSlideWidth$,
 } from '@rapid-cmi5/ui';
-import { CustomTheme } from '../../styles/createPalette';
+import { type CustomTheme } from '../../styles/createPalette';
 import LessonToolbar from './LessonToolbar';
 
 export default function MenuLayout() {

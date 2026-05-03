@@ -261,7 +261,7 @@ Confirm item name below...`
           dispatch(setLoader(isLoading ? true : false));
         }
       },
-      errorFunction: (errorState) => {
+      errorFunction: () => {
         // no toaster - alert handled separately
       },
       shouldDisplayToaster: shouldDisplayErrorToaster,

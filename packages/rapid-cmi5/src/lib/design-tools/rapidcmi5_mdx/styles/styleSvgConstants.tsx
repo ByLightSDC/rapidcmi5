@@ -1,8 +1,8 @@
 import { SvgIcon } from '@mui/material';
-import { CSSProperties } from 'react';
+import { type CSSProperties } from 'react';
 export const svgWrapper = (
   icon: JSX.Element,
-  size?: string,
+  _size?: string,
   fontSize?: 'small' | 'inherit' | 'medium' | 'large' | undefined,
   sxProps?: any,
   id?: string,

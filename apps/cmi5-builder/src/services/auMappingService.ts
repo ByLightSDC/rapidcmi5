@@ -1,17 +1,17 @@
 import {
-  CourseAU,
-  CourseData,
+  type CourseAU,
+  type CourseData,
   createAuMappingName,
   generateAuId,
   generateBlockId,
 } from '@rapid-cmi5/cmi5-build-common';
-import { AxiosRequestConfig, isAxiosError } from 'axios';
+import { type AxiosRequestConfig, isAxiosError } from 'axios';
 
 import {
   overrideDevOpsApiClient,
   DevopsApiClient,
-  Cmi5AUMapping,
-  Cmi5AuMappingUpdate,
+  type Cmi5AUMapping,
+  type Cmi5AuMappingUpdate,
 } from '@rangeos-nx/frontend/clients/devops-api';
 
 import path from 'path';

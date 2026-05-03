@@ -1,4 +1,4 @@
-const { BrowserWindow, shell, screen, nativeImage } = require('electron');
+const { BrowserWindow, screen, nativeImage } = require('electron');
 const { rendererAppName, rendererAppPort } = require('./constants');
 const { environment } = require('../environments/environment');
 const { join } = require('path');
@@ -14,14 +14,14 @@ export default class App {
   public static isDevelopmentMode() {
     const isEnvironmentSet: boolean = 'ELECTRON_IS_DEV' in process.env;
     const getFromEnvironment: boolean =
-      parseInt(process.env.ELECTRON_IS_DEV || '10', 10) === 1;
+      parseInt(process.env["ELECTRON_IS_DEV"] || '10', 10) === 1;
 
     return isEnvironmentSet ? getFromEnvironment : !environment.production;
   }
 
   public static isTestMode() {
     const isEnvironmentSet: boolean = 'ELECTRON_IS_TEST' in process.env;
-    const getFromEnvironment: boolean = process.env.ELECTRON_IS_TEST === 'true';
+    const getFromEnvironment: boolean = process.env["ELECTRON_IS_TEST"] === 'true';
 
     // Only use test mode if explicitly set to 'true'
     return isEnvironmentSet && getFromEnvironment;
@@ -41,13 +41,6 @@ export default class App {
     App.mainWindow = null;
   }
 
-  private static onRedirect(event: any, url: string) {
-    if (url !== App.mainWindow.webContents.getURL()) {
-      // this is a normal external redirect, open it in a new browser window
-      event.preventDefault();
-      shell.openExternal(url);
-    }
-  }
 
   private static onReady() {
     // This method will be called when Electron has finished

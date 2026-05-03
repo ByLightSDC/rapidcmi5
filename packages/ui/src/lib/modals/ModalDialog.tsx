@@ -1,8 +1,8 @@
 /* MUI */
-import Alert, { AlertColor } from '@mui/material/Alert';
+import Alert, { type AlertColor } from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Box from '@mui/material/Box';
-import Dialog, { DialogProps } from '@mui/material/Dialog';
+import Dialog, { type DialogProps } from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
@@ -26,7 +26,7 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 
 import { ButtonModalCancelUi } from '../inputs/buttons/buttonsmodal';
-import React, { Fragment } from 'react';
+import { Fragment } from 'react';
 import { ButtonLoadingUi } from '../utility/buttons';
 
 /**

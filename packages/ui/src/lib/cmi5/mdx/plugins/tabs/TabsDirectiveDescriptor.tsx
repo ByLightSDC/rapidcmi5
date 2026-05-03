@@ -1,5 +1,5 @@
-import { DirectiveDescriptor } from '@mdxeditor/editor';
-import { TabDirectiveNode } from './types';
+import { type DirectiveDescriptor } from '@mdxeditor/editor';
+import { type TabDirectiveNode } from './types';
 import { TabsEditor } from './TabsEditor';
 
 /**

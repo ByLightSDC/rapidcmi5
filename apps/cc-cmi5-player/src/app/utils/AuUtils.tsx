@@ -2,19 +2,19 @@ import { cmi5Instance } from '../session/cmi5';
 import { setCourseAUProgress, courseAUProgressSel } from '../redux/auReducer';
 
 import { setActiveTab } from '../redux/navigationReducer';
-import { State } from '../types/SlideState';
+import { type State } from '../types/SlideState';
 import { getSlideState } from './Cmi5Helpers';
-import { Dispatch } from '@reduxjs/toolkit';
+import { type Dispatch } from '@reduxjs/toolkit';
 import { checkForDevMode } from './DevMode';
 import { logger } from '../debug';
 import { handleSlideViewed } from './LmsStatementManager';
-import { RootState, store } from '../redux/store';
+import { type RootState, store } from '../redux/store';
 import {
   initializeCourseAUProgress,
   getCourseAUProgressFromLRS,
   getFirstIncompleteSlideIndex,
 } from './CourseAUProgressHelpers';
-import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
+import { type CourseAU } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Retrieves current slide from LRS and restores full CourseAUProgress

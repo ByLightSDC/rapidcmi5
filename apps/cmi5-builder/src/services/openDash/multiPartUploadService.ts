@@ -1,4 +1,4 @@
-import io, { Socket } from "socket.io-client";
+import io, { type Socket } from "socket.io-client";
 import fs from "fs";
 import path from "path";
 import { createHash } from "crypto";

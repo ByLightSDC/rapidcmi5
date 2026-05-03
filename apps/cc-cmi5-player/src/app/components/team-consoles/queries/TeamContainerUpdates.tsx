@@ -40,7 +40,7 @@ export default function TeamContainerUpdates({
   );
   useQueryDetails({
     queryObj: containersQuery,
-    errorFunction: (queryError: any) => {
+    errorFunction: (_queryError: any) => {
       // ignore - container subscriptions may be able to get latest status
       debugLogError('Error retrieving Containers via graphql');
       //setInitialized(Topic.ResourceContainer, true);

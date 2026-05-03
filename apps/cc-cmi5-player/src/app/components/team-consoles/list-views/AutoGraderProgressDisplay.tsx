@@ -20,7 +20,6 @@ export default function AutoGraderProgressDisplay({
     autoGraderStatusChangeCounter,
     getAutogradersPercentComplete,
     getInitialized,
-    setUpdate,
   } = useContext(TeamConsolesContext);
 
   /**

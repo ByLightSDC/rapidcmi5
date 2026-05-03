@@ -1,8 +1,8 @@
-import { AxiosRequestConfig } from 'axios';
+import { type AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import { useQuery } from 'react-query';
 import {
-  AutoGrader,
+  type AutoGrader,
   DevopsApiClient,
 } from '@rangeos-nx/frontend/clients/devops-api';
 import {
@@ -15,8 +15,8 @@ import {
 } from './config';
 import { getErrorMessage } from './errorMessages';
 import {
-  AutoGraderEventData,
-  AutoGraderEventResult,
+  type AutoGraderEventData,
+  type AutoGraderEventResult,
 } from './useAutoGraderResultsGraph';
 
 export const queryKeyRangeResourceAutoGraders = 'range-resource-autograders';

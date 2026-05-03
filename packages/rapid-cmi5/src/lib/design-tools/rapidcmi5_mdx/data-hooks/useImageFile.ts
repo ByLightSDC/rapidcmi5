@@ -10,7 +10,10 @@ import { getRepoPath } from '../../course-builder/GitViewer/utils/fileSystem';
 
 import { join } from 'path-browserify';
 import { currentAuPath } from '../../../redux/courseBuilderReducer';
-import { currentRepoAccessObjectSel, RepoAccessObject } from '../../../redux/repoManagerReducer';
+import {
+  currentRepoAccessObjectSel,
+  type RepoAccessObject,
+} from '../../../redux/repoManagerReducer';
 
 /**
  * This hook is used to create an image upload handler for the image plugin.
@@ -97,8 +100,14 @@ export const useImageFile = () => {
           fileReader.onload = async function () {
             try {
               if (fileReader.result) {
-                const relativePath = join(currentAuPathSel, imagePath, fileName);
-                const imgData = new Uint8Array(fileReader.result as ArrayBuffer);
+                const relativePath = join(
+                  currentAuPathSel,
+                  imagePath,
+                  fileName,
+                );
+                const imgData = new Uint8Array(
+                  fileReader.result as ArrayBuffer,
+                );
                 await handleCreateFile(relativePath, false, imgData);
                 await handleStageFile(relativePath);
               }
@@ -137,7 +146,9 @@ export const useImageFile = () => {
           fileReader.onload = async function () {
             try {
               if (fileReader.result) {
-                const fileData = new Uint8Array(fileReader.result as ArrayBuffer);
+                const fileData = new Uint8Array(
+                  fileReader.result as ArrayBuffer,
+                );
                 await handleCreateFile(
                   `${currentAuPathSel}/${defaultDownloadFilePath}/${fileName}`,
                   false,
@@ -176,7 +187,9 @@ export const useImageFile = () => {
         fileReader.onload = async function () {
           try {
             if (fileReader.result) {
-              const videoData = new Uint8Array(fileReader.result as ArrayBuffer);
+              const videoData = new Uint8Array(
+                fileReader.result as ArrayBuffer,
+              );
               const relativePath = join(currentAuPathSel, videoPath, fileName);
               await handleCreateFile(relativePath, false, videoData);
               await handleStageFile(relativePath);
@@ -209,7 +222,7 @@ export const useImageFile = () => {
         // Wait for file to be read and saved before returning
         await new Promise<void>((resolve, reject) => {
           const fileReader = new FileReader();
-          fileReader.onload = async function (event: any) {
+          fileReader.onload = async function (_event: any) {
             try {
               if (fileReader.result) {
                 const audioData = new Uint8Array(

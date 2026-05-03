@@ -1,7 +1,7 @@
 
-import { Math } from 'mdast-util-math';
-import { $createParagraphNode, RootNode } from 'lexical';
-import { MdastImportVisitor } from '@mdxeditor/editor';
+import { type Math } from 'mdast-util-math';
+import { $createParagraphNode, type RootNode } from 'lexical';
+import { type MdastImportVisitor } from '@mdxeditor/editor';
 import { $createMathNode } from './MathNode';
 
 /**

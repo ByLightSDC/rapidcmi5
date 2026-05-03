@@ -1,6 +1,6 @@
 import { Cell, Signal, Action, map, withLatestFrom } from '@mdxeditor/gurx';
 import { debugLog } from '@rapid-cmi5/ui';
-import { AnimationConfig, PlaybackState } from '../types/Animation.types';
+import { type AnimationConfig, PlaybackState } from '../types/Animation.types';
 
 /**
  * Helper to log slideAnimations$ updates with stack trace

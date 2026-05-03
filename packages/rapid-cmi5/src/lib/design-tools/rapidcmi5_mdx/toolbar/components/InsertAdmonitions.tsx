@@ -1,28 +1,17 @@
-import { useCellValue, usePublisher } from '@mdxeditor/gurx';
-import { ContainerDirective } from 'mdast-util-directive';
-import { rapidIconFor, RapidIconKey } from '../../editors/Icons';
-import { insertActivityDirective$ } from '../../plugins/Activity';
+import { usePublisher } from '@mdxeditor/gurx';
 
-import { useSelector } from 'react-redux';
-import { useEffect, useMemo } from 'react';
-import { Box, MenuItem, Stack, Typography, useTheme } from '@mui/material';
+import { useMemo } from 'react';
+import { Stack, useTheme } from '@mui/material';
 import {
-  RC5ActivityTypeEnum,
-  getActivityTypeFromDisplayName,
-  activityLabels,
-  AdmonitionTypeEnum,
   admonitionLabels,
 } from '@rapid-cmi5/cmi5-build-common';
 import { ButtonMinorUi, capitalizeFirstLetter } from '@rapid-cmi5/ui';
-import { scenario, teamScenario } from '../../../../redux/courseBuilderReducer';
-import { DeleteForever, LocalActivity } from '@mui/icons-material';
-import { directiveDescriptors$, insertDirective$ } from '@mdxeditor/editor';
+import { insertDirective$ } from '@mdxeditor/editor';
 
 /**
  * Icons
  */
 import AddIcon from '@mui/icons-material/Add';
-import AttachFileIcon from '@mui/icons-material/AttachFile';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import InfoIcon from '@mui/icons-material/Info';
@@ -44,7 +33,6 @@ import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
  */
 export const InsertAdmonitions = () => {
   const insertDirective = usePublisher(insertDirective$);
-  const directiveDescriptors = useCellValue(directiveDescriptors$);
   const theme = useTheme();
 
   /**

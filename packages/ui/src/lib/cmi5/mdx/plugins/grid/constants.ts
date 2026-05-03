@@ -1,4 +1,4 @@
-import { GridCellDirectiveNode, GridPreset } from './types';
+import { type GridCellDirectiveNode, type GridPreset } from './types';
 
 /**
  * Available grid layout presets.

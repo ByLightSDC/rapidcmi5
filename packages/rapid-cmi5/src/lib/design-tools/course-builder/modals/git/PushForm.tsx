@@ -3,24 +3,24 @@ import {
   FormControlPassword,
   FormControlTextField,
   FormControlUIProvider,
-  FormStateType,
+  type FormStateType,
   MiniForm,
   ModalDialog,
 } from '@rapid-cmi5/ui';
 import * as yup from 'yup';
 
-import { CommonAppModalState } from '@rapid-cmi5/ui';
+import { type CommonAppModalState } from '@rapid-cmi5/ui';
 
 import { Typography } from '@mui/material';
 
-import { UseFormReturn } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 
 import { NAME_GROUP_OPT } from '@rapid-cmi5/ui';
 import { useContext } from 'react';
 
 import Grid from '@mui/material/Grid2';
 import { gitPushModalId } from '../../../rapidcmi5_mdx/modals/constants';
-import { PushType } from '../../CourseBuilderApiTypes';
+import { type PushType } from '../../CourseBuilderApiTypes';
 import { GitContext } from '../../GitViewer/session/GitContext';
 
 export function PushForm({
@@ -52,7 +52,7 @@ export function PushForm({
     handleCloseModal();
   };
 
-  const onResponse = (isSuccess: boolean, data: any, message: string) => {
+  const onResponse = (isSuccess: boolean, data: any, _message: string) => {
     if (isSuccess) {
       handleModalAction(modalObj.type, 1, data);
     }

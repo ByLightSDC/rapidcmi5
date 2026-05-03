@@ -3,7 +3,7 @@
 import { useContext, useEffect } from 'react';
 import { gql } from 'graphql-request';
 
-import { DeployedRangeConsole } from '@rangeos-nx/frontend/clients/devops-api';
+import { type DeployedRangeConsole } from '@rangeos-nx/frontend/clients/devops-api';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
 import { graphqlConsoleFields, Topic, useSubscription } from '@rangeos-nx/frontend/clients/hooks';
 

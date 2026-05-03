@@ -2,7 +2,7 @@ import {
   alpha,
   Box,
   IconButton,
-  SxProps,
+  type SxProps,
   Tooltip,
   useTheme,
 } from '@mui/material';
@@ -30,7 +30,7 @@ export const MUISingleChoiceToggleGroup = <T extends string>({
   const theme = useTheme();
   return (
     <Box sx={sxProps}>
-      {items.map((item, index) => {
+      {items.map((item, _index) => {
         const on = item.value === value;
         return (
           <Tooltip title={item.title} {...tooltipStyle}>

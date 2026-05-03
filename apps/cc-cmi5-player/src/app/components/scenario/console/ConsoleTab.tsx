@@ -1,5 +1,5 @@
 import { useParams } from 'react-router';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { Alert } from '@mui/material';
 import { useGetRangeResourceConsolesGraph } from '@rangeos-nx/frontend/clients/hooks';
@@ -24,7 +24,7 @@ export function ConsoleTab() {
   );
   useQueryDetails({
     queryObj: consolesQuery,
-    errorFunction: (queryError: any) => {
+    errorFunction: (_queryError: any) => {
       setErrorMessage('Unable to retrieve console');
       setIsConsoleInitialized(true);
     },

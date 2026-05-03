@@ -1,6 +1,5 @@
 import {
   alpha,
-  Box,
   Divider,
   IconButton,
   List,
@@ -32,18 +31,15 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import FolderZipIcon from '@mui/icons-material/FolderZip';
-import ImportExportIcon from '@mui/icons-material/ImportExport';
 import IosShareIcon from '@mui/icons-material/IosShare';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 
-import { debugLogError, RowAction } from '@rapid-cmi5/ui';
+import { debugLogError, type RowAction } from '@rapid-cmi5/ui';
 import { listItemProps } from './components/LessonTreeNode';
 import { useSelector } from 'react-redux';
 import { Renamer } from './components/Renamer';
 
-import { ButtonOptions, ButtonMinorUi } from '@rapid-cmi5/ui';
+import { ButtonOptions } from '@rapid-cmi5/ui';
 
 /** Order important actions */
 export enum CourseActionEnum {
@@ -72,7 +68,6 @@ export const LessonDrawer = () => {
     promptCreateLesson,
     promptDeleteCourse,
     promptDownloadCourseCMI5Zip,
-    promptTestInPlayer,
   } = useRC5Prompts();
 
   const [menuAnchor, setMenuAnchor] = useState<any>(null);
@@ -169,7 +164,7 @@ export const LessonDrawer = () => {
     setMenuAnchor(null);
   };
 
-  const updateCourseName = (newName: string, record: any) => {
+  const updateCourseName = (newName: string, _record: any) => {
     changeCourseName(newName);
   };
 

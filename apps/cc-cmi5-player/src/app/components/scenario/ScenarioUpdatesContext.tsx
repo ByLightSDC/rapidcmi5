@@ -5,9 +5,9 @@
 import { createContext, useRef, useState } from 'react';
 
 import {
-  DeployedPackageDetail,
-  DeployedRangeConsole,
-  DeployedScenario,
+  type DeployedPackageDetail,
+  type DeployedRangeConsole,
+  type DeployedScenario,
 } from '@rangeos-nx/frontend/clients/devops-api';
 import ContainerUpdates from './graph/ContainerUpdates';
 import ConsoleUpdates from './graph/ConsoleUpdates';
@@ -331,7 +331,7 @@ export const ScenarioUpdatesContextProvider: any = (props: tProviderProps) => {
     data: any,
     topic: Topic,
     skipCounter?: boolean,
-    skipNotify?: boolean,
+    _skipNotify?: boolean,
   ) => {
     // console.log('setUpdate ' + topic, data);
 

@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import {
-  QuestionBankApi,
-  QuestionBankApiCreate,
+  type QuestionBankApi,
+  type QuestionBankApiCreate,
   quizBankContract,
 } from '../quizBankContract';
 import { initClient } from '@ts-rest/core';
