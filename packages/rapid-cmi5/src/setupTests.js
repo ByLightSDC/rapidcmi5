@@ -99,11 +99,6 @@ jest.mock('monaco-editor', () => ({
   },
 }));
 
-jest.mock('react-syntax-highlighter', () => ({
-  __esModule: true,
-  Prism: {},
-}));
-
 jest.mock('hastscript', () => ({
   __esModule: true,
 }));
@@ -175,7 +170,6 @@ jest.mock('mdast-util-gfm-strikethrough', () => ({
   gfmStrikethroughFromMarkdown: jest.fn(),
   gfmStrikethroughToMarkdown: jest.fn(),
 }));
-
 
 jest.mock('mdast-util-frontmatter', () => ({
   __esModule: true,

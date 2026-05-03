@@ -15,16 +15,8 @@ global.structuredClone = (val) => JSON.parse(JSON.stringify(val));
 /** jest hates isomorpphic git */
 
 /** Jest does not like using router navigate in a custom hook */
-jest.mock(
-  '../../../packages/ui/src/lib/hooks/useNavigateAlias',
-  () => ({
-    useNavigateAlias: () => jest.fn(),
-  }),
-);
-
-jest.mock('./app/utils/featureFlags', () => ({
-  __esModule: false,
-  featureFlagBookmarks: false,
+jest.mock('../../../packages/ui/src/lib/hooks/useNavigateAlias', () => ({
+  useNavigateAlias: () => jest.fn(),
 }));
 
 /** Local Date Display Snapshots Break  */
@@ -39,18 +31,12 @@ const mockDateFormatter = () => {
 const mockIsVisible = () => {
   return true;
 };
-jest.mock(
-  `../../../packages/ui/src/lib/hooks/useVisibility`,
-  () => ({
-    useIsVisible: mockIsVisible,
-  }),
-);
-jest.mock(
-  `../../../packages/ui/src/lib/hooks/useDisplayDateFormatter`,
-  () => ({
-    useDisplayDateFormatter: mockDateFormatter,
-  }),
-);
+jest.mock(`../../../packages/ui/src/lib/hooks/useVisibility`, () => ({
+  useIsVisible: mockIsVisible,
+}));
+jest.mock(`../../../packages/ui/src/lib/hooks/useDisplayDateFormatter`, () => ({
+  useDisplayDateFormatter: mockDateFormatter,
+}));
 
 /** Mock Intersection Observer */
 class IntersectionObserver {
@@ -75,7 +61,6 @@ Object.defineProperty(global, 'IntersectionObserver', {
 Jest can't handle ES6 modules without turning on experimental feature
 Mocking the module is easier if you don't need to test it with jest
 */
-
 
 jest.mock('github-slugger', () => ({
   __esModule: true,
@@ -262,14 +247,11 @@ jest.mock('@mdxeditor/gurx', () => ({
   namedExport: jest.fn(),
 }));
 
-jest.mock(
-  '../../../packages/ui/src/lib/cmi5/mdx/state/vars',
-  () => ({
-    editorInPlayback$: false,
-    setProgress$: () => jest.fn(),
-    submitScore$: () => jest.fn(),
-  }),
-);
+jest.mock('../../../packages/ui/src/lib/cmi5/mdx/state/vars', () => ({
+  editorInPlayback$: false,
+  setProgress$: () => jest.fn(),
+  submitScore$: () => jest.fn(),
+}));
 
 jest.mock('micromark-extension-math', () => ({
   __esModule: true,

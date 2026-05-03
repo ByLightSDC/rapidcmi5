@@ -30,11 +30,6 @@ import { repoNameInUseMessage } from '../session/constants';
 
 const memfs = createFsFromVolume(vol);
 
-const DEFAULT_REPO: RepoAccessObject = {
-  fileSystemType: fsType.inBrowser,
-  repoName: 'test-repo',
-};
-
 const DEFAULT_GIT_CONFIG = {
   authorName: 'Test User',
   authorEmail: 'test@example.com',
@@ -51,9 +46,7 @@ const MOCK_CREDENTIALS = {
 // Setup and Teardown
 // ============================================================================
 
-async function setupTestContext(
-  repoName = 'test-repo',
-): Promise<TestContext> {
+async function setupTestContext(repoName = 'test-repo'): Promise<TestContext> {
   vol.reset();
 
   const instance = createNewFsInstance(false);
