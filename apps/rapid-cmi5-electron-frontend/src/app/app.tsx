@@ -24,6 +24,7 @@ import { lightTheme } from './styles/muiTheme';
 import UserConfig from './contexts/UserConfigContext';
 import Auth from './contexts/AuthContext';
 import { RapidCmi5Wrapper } from './RapidCmi5Wrapper';
+import ClaudeWindow from './ClaudeWindow';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -81,6 +82,7 @@ export default function App() {
                           }}
                         >
                           <RapidCmi5Wrapper />
+                          <ClaudeWindow />
                         </main>
                       </Auth>
                     </UserConfig>

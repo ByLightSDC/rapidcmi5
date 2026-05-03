@@ -12,14 +12,15 @@
     "cmi5-builder": "nx run cmi5-builder:build",
     "cmi5-player": "nx run cc-cmi5-player:build",
     "postinstall": "electron-builder install-app-deps",
+    "nxe:build:mcp": "node scripts/build-mcp-server.mjs",
     "nxe:build:frontend": "nx build rapid-cmi5-electron-frontend",
-    "nxe:build:backend": "nx build rapid-cmi5-electron",
+    "nxe:build:backend": "npm run nxe:build:mcp && nx build rapid-cmi5-electron",
     "nxe:serve:frontend": "nx serve rapid-cmi5-electron-frontend",
-    "nxe:serve:backend": "nx serve rapid-cmi5-electron",
+    "nxe:serve:backend": "npm run nxe:build:mcp && nx serve rapid-cmi5-electron",
     "nxe:test:frontend": "nx test rapid-cmi5-electron-frontend",
     "nxe:test:backend": "nx test rapid-cmi5-electron",
-    "nxe:package:app": "nx run rapid-cmi5-electron:make --prepackageOnly",
-    "nxe:make:app": "nx run rapid-cmi5-electron:make"
+    "nxe:package:app": "npm run nxe:build:mcp && nx run rapid-cmi5-electron:make --prepackageOnly",
+    "nxe:make:app": "npm run nxe:build:mcp && nx run rapid-cmi5-electron:make"
   },
   "browserslist": [
     "last 2 chrome versions",
@@ -37,6 +38,7 @@
     }
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.92.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@faker-js/faker": "^9.9.0",
@@ -63,6 +65,8 @@
     "@uiw/codemirror-themes": "^4.24.1",
     "@xapi/cmi5": "^1.4.0",
     "@xapi/xapi": "^3.0.2",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
     "@zenfs/core": "^2.4.3",
     "@zenfs/dom": "^1.2.5",
     "adm-zip": "^0.5.16",
@@ -106,6 +110,7 @@
     "minimatch": "^10.0.1",
     "monaco-editor": "^0.52.2",
     "mui-color-input": "^5.0.1",
+    "node-pty": "^1.1.0",
     "path-browserify": "^1.0.1",
     "preact": "^10.28.2",
     "prismjs": "^1.29.0",
@@ -159,6 +164,7 @@
     "@babel/core": "^7.14.5",
     "@babel/preset-react": "^7.14.5",
     "@babel/preset-typescript": "^7.13.0",
+    "@electron/rebuild": "^4.0.4",
     "@hookform/resolvers": "^5.2.1",
     "@jest-performance-reporter/core": "^2.1.3",
     "@nx/cypress": "21.6.8",

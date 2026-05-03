@@ -164,6 +164,93 @@ export const userSettingsApi = {
 
 contextBridge.exposeInMainWorld('userSettingsApi', userSettingsApi);
 
+export interface ClaudeStartOptions {
+  cwd?: string;
+  args?: string[];
+  command?: string;
+  cols?: number;
+  rows?: number;
+}
+
+export interface ClaudeDataPayload {
+  sessionId: string;
+  data: string;
+  stream: 'stdout' | 'stderr';
+}
+
+export interface ClaudeExitPayload {
+  sessionId: string;
+  code: number | null;
+  signal: NodeJS.Signals | null;
+}
+
+export interface ClaudeErrorPayload {
+  sessionId: string;
+  message: string;
+}
+
+export const claudeApi = {
+  start: (opts: ClaudeStartOptions = {}): Promise<{ sessionId: string }> =>
+    ipcRenderer.invoke('claude:start', opts),
+  input: (sessionId: string, data: string): Promise<void> =>
+    ipcRenderer.invoke('claude:input', sessionId, data),
+  resize: (sessionId: string, cols: number, rows: number): Promise<void> =>
+    ipcRenderer.invoke('claude:resize', sessionId, cols, rows),
+  stop: (sessionId: string): Promise<void> =>
+    ipcRenderer.invoke('claude:stop', sessionId),
+  onData: (handler: (payload: ClaudeDataPayload) => void) => {
+    const listener = (_e: unknown, payload: ClaudeDataPayload) =>
+      handler(payload);
+    ipcRenderer.on('claude:data', listener);
+    return () => ipcRenderer.removeListener('claude:data', listener);
+  },
+  onExit: (handler: (payload: ClaudeExitPayload) => void) => {
+    const listener = (_e: unknown, payload: ClaudeExitPayload) =>
+      handler(payload);
+    ipcRenderer.on('claude:exit', listener);
+    return () => ipcRenderer.removeListener('claude:exit', listener);
+  },
+  onError: (handler: (payload: ClaudeErrorPayload) => void) => {
+    const listener = (_e: unknown, payload: ClaudeErrorPayload) =>
+      handler(payload);
+    ipcRenderer.on('claude:error', listener);
+    return () => ipcRenderer.removeListener('claude:error', listener);
+  },
+};
+
+contextBridge.exposeInMainWorld('claudeApi', claudeApi);
+
+export const terminalApi = {
+  start: (opts: ClaudeStartOptions = {}): Promise<{ sessionId: string }> =>
+    ipcRenderer.invoke('terminal:start', opts),
+  input: (sessionId: string, data: string): Promise<void> =>
+    ipcRenderer.invoke('terminal:input', sessionId, data),
+  resize: (sessionId: string, cols: number, rows: number): Promise<void> =>
+    ipcRenderer.invoke('terminal:resize', sessionId, cols, rows),
+  stop: (sessionId: string): Promise<void> =>
+    ipcRenderer.invoke('terminal:stop', sessionId),
+  onData: (handler: (payload: ClaudeDataPayload) => void) => {
+    const listener = (_e: unknown, payload: ClaudeDataPayload) =>
+      handler(payload);
+    ipcRenderer.on('terminal:data', listener);
+    return () => ipcRenderer.removeListener('terminal:data', listener);
+  },
+  onExit: (handler: (payload: ClaudeExitPayload) => void) => {
+    const listener = (_e: unknown, payload: ClaudeExitPayload) =>
+      handler(payload);
+    ipcRenderer.on('terminal:exit', listener);
+    return () => ipcRenderer.removeListener('terminal:exit', listener);
+  },
+  onError: (handler: (payload: ClaudeErrorPayload) => void) => {
+    const listener = (_e: unknown, payload: ClaudeErrorPayload) =>
+      handler(payload);
+    ipcRenderer.on('terminal:error', listener);
+    return () => ipcRenderer.removeListener('terminal:error', listener);
+  },
+};
+
+contextBridge.exposeInMainWorld('terminalApi', terminalApi);
+
 async function normalizeData(data: any): Promise<string | Uint8Array> {
   if (typeof data === 'string') return data;
   if (data instanceof Uint8Array) return data;

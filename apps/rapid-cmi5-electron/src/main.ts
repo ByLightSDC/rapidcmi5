@@ -2,10 +2,11 @@ import SquirrelEvents from './app/events/squirrel.events';
 import ElectronEvents from './app/events/electron.events';
 import { BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import App from './app/app';
-import * as nodePath from 'path'; // Renamed to avoid conflicts
+import path, * as nodePath from 'path'; // Renamed to avoid conflicts
 import { pipeline } from 'stream/promises';
 import {
   ElectronFsHandler,
+  getRapidBase,
   resolveSafe,
 } from './app/api/fileSystem/fileSystem';
 
@@ -37,6 +38,60 @@ import {
   addRecentProject,
   removeRecentProject,
 } from './app/api/userSettings/recentProjects';
+import {
+  inputToSession,
+  resizeSession,
+  startPtySession,
+  stopAllSessionsForWebContents,
+  stopSession,
+  type StartOptions,
+} from './app/api/claude/cli';
+
+function defaultShell(): string {
+  if (process.platform === 'win32') {
+    return process.env.COMSPEC ?? 'cmd.exe';
+  }
+  return process.env.SHELL ?? '/bin/bash';
+}
+
+function getLocalFsBase(): string {
+  return path.join(getRapidBase(App.isTestMode()), 'localFileSystem');
+}
+
+function getMcpServerSrc(): string {
+  const root = app.isPackaged ? process.resourcesPath : __dirname;
+  return path.join(root, 'assets', 'mcp', 'server.js');
+}
+
+async function installMcpServer(): Promise<void> {
+  const base = getLocalFsBase();
+  const mcpDir = path.join(base, '.rapid-mcp');
+  await fs.promises.mkdir(mcpDir, { recursive: true });
+
+  const dest = path.join(mcpDir, 'server.js');
+  await fs.promises.copyFile(getMcpServerSrc(), dest);
+
+  const mcpJson = {
+    mcpServers: {
+      rapidcmi5: {
+        type: 'stdio',
+        command: 'node',
+        args: [dest],
+      },
+    },
+  };
+  await fs.promises.writeFile(
+    path.join(base, '.mcp.json'),
+    JSON.stringify(mcpJson, null, 2) + '\n',
+    'utf-8',
+  );
+}
+
+app.whenReady().then(() => {
+  installMcpServer().catch((e) =>
+    console.error('Failed to install MCP server:', e),
+  );
+});
 
 const builder = new cmi5Builder();
 let fsHandler: ElectronFsHandler | null = null;
@@ -670,6 +725,58 @@ ipcMain.handle(
     }
   },
 );
+
+// Claude CLI Handlers
+ipcMain.handle('claude:start', (e, opts: StartOptions = {}) => {
+  return startPtySession(e.sender, 'claude', {
+    ...opts,
+    command: opts.command ?? 'claude',
+    cwd: opts.cwd ?? getLocalFsBase(),
+  });
+});
+
+ipcMain.handle('claude:input', (_e, sessionId: string, data: string) => {
+  inputToSession(sessionId, data);
+});
+
+ipcMain.handle(
+  'claude:resize',
+  (_e, sessionId: string, cols: number, rows: number) => {
+    resizeSession(sessionId, cols, rows);
+  },
+);
+
+ipcMain.handle('claude:stop', (_e, sessionId: string) => {
+  stopSession(sessionId);
+});
+
+// Terminal Handlers (direct OS shell)
+ipcMain.handle('terminal:start', (e, opts: StartOptions = {}) => {
+  return startPtySession(e.sender, 'terminal', {
+    ...opts,
+    command: opts.command ?? defaultShell(),
+    cwd: opts.cwd ?? getLocalFsBase(),
+  });
+});
+
+ipcMain.handle('terminal:input', (_e, sessionId: string, data: string) => {
+  inputToSession(sessionId, data);
+});
+
+ipcMain.handle(
+  'terminal:resize',
+  (_e, sessionId: string, cols: number, rows: number) => {
+    resizeSession(sessionId, cols, rows);
+  },
+);
+
+ipcMain.handle('terminal:stop', (_e, sessionId: string) => {
+  stopSession(sessionId);
+});
+
+app.on('web-contents-created', (_e, wc) => {
+  wc.on('destroyed', () => stopAllSessionsForWebContents(wc));
+});
 
 export default class Main {
   static initialize() {
