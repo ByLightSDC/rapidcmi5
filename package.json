@@ -47,6 +47,7 @@
     "@mui/x-charts": "^7.22.3",
     "@mui/x-date-pickers": "7.29.4",
     "@preact/signals-react": "^3.7.0",
+    "@react-keycloak/web": "^3.4.0",
     "@reduxjs/toolkit": "^2.11.2",
     "@tailwindcss/typography": "^0.5.15",
     "@toolpad/core": "^0.13.0",
