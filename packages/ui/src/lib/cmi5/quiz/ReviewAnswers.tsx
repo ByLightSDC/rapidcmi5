@@ -8,7 +8,7 @@ import ReviewMultipleChoice from './QuestionTypes/MultipleChoice/ReviewMultipleC
 import ReviewSelectAll from './QuestionTypes/SelectAll/ReviewSelectAll';
 import ReviewFreeResponse from './QuestionTypes/FreeResponse/ReviewFreeResponse';
 import useQuizGrader from './hooks/useQuizGrader';
-import { MarkdownConvertorQuiz } from '../markdown/MarkdownConvertor';
+import { Typography } from '@mui/material';
 
 export function ReviewAnswers({
   quiz,
@@ -27,7 +27,7 @@ export function ReviewAnswers({
             {qindex + 1} / {quiz.questions.length}
           </p>
 
-          <MarkdownConvertorQuiz markdown={question.question} />
+          <Typography>{question.question}</Typography>
 
           {question.type === QuestionResponse.MultipleChoice && (
             <ReviewMultipleChoice
@@ -69,7 +69,7 @@ export function ReviewAnswers({
               <p>You answered: </p>
 
               <div
-               className={`bg-blue-800 px-4 py-1 rounded-xl ${getReviewIndication(
+                className={`bg-blue-800 px-4 py-1 rounded-xl ${getReviewIndication(
                   question,
                   allAnswers[qindex] as number,
                 )}`}

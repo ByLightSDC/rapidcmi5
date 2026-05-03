@@ -16,7 +16,6 @@ import {
 } from 'react';
 
 import { editorInPlayback$ } from '../../state/vars';
-import { parseStyleString } from '../../../markdown/MarkDownParser';
 
 import { Box, IconButton, type SxProps, Tooltip, useTheme } from '@mui/material';
 
@@ -37,6 +36,7 @@ import { findMatchingStatementPreset } from './methods';
 
 import { StatementsContextProvider } from './StatementsContext';
 import StatementsSettings from './StatementsSettings';
+import { parseStyleString } from '../../../markdown/MarkDownParser';
 
 /**
  * Statements Container Editor for the statements layout directive.
@@ -77,7 +77,7 @@ export const StatementsContainerEditor: React.FC<
   const currentPreset = useMemo(() => {
     return mdastNode?.attributes?.preset
       ? findMatchingStatementPreset(mdastNode?.attributes?.preset) ||
-          STATEMENT_PRESETS[0]
+      STATEMENT_PRESETS[0]
       : STATEMENT_PRESETS[0];
   }, [mdastNode?.attributes?.preset]);
 
@@ -119,7 +119,7 @@ export const StatementsContainerEditor: React.FC<
 
       await new Promise((resolve) => setTimeout(resolve, 500));
       setSelectedPreset(newPreset);
-  
+
     },
     [mdastNode, updateMdastNode, carouselIndex],
   );
@@ -171,12 +171,12 @@ export const StatementsContainerEditor: React.FC<
 
   const outerSx: SxProps = backgroundColor
     ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
+      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+      clipPath: `inset(0 -100vmax 0)`,
+      backgroundColor,
+      paddingTop: blockPadding,
+      paddingBottom: blockPadding,
+    }
     : {};
 
   return (

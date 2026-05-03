@@ -7,6 +7,8 @@ export const defaultSlideContent = '# Slide'; //TODO focus issues if you try to 
 
 export enum SlideTypeEnum {
   Markdown = 'markdown',
+  CTF = 'CTF',
+  Quiz = 'Quiz',
 }
 
 export const slideOptions = Object.values(SlideTypeEnum);

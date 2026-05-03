@@ -77,7 +77,7 @@ export const useGetRangeScenariosGraph = (rangeId: string) => {
       );
       return response;
     } catch (error: any) {
-      return []
+      return [];
     }
   };
 

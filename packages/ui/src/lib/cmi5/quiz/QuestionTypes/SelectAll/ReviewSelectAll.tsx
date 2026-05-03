@@ -1,6 +1,6 @@
 import useQuizGrader from '../../hooks/useQuizGrader';
-import { MarkdownConvertorQuiz } from '../../../markdown/MarkdownConvertor';
 import { type ReviewProps } from '@rapid-cmi5/cmi5-build-common';
+import { Typography } from '@mui/material';
 
 export default function ReviewSelectAll(props: ReviewProps) {
   const { question, answer } = props;
@@ -8,14 +8,15 @@ export default function ReviewSelectAll(props: ReviewProps) {
   return (
     <div>
       {question.typeAttributes.options?.map((option, optionIndex) => (
-        <MarkdownConvertorQuiz
-          markdown={option.text}
-          className={`option-rangeos bg-blue-800 ${getReviewIndication(
+        <Typography
+          className={`bg-blue-800 option-rangeos ${getReviewIndication(
             question,
             answer,
             optionIndex,
           )}`}
-        />
+        >
+          {option.text}
+        </Typography>
       ))}
     </div>
   );

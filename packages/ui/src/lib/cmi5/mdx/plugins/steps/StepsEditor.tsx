@@ -53,7 +53,6 @@ import {
   ButtonMinorUi,
   ButtonOptions,
 } from '../../../../utility/buttons';
-import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import {
   convertMdastToMarkdown,
@@ -68,6 +67,7 @@ import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { useGutterRight } from '../shared/useGutterRight';
 import { type ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { parseStyleString } from '../../../markdown/MarkDownParser';
 
 /**
  * Steps Editor for steps directive
@@ -406,12 +406,12 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
 
   const outerSx: SxProps = backgroundColor
     ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
+      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+      clipPath: `inset(0 -100vmax 0)`,
+      backgroundColor,
+      paddingTop: blockPadding,
+      paddingBottom: blockPadding,
+    }
     : {};
 
   /**
@@ -430,10 +430,10 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
           ...sxProps,
           ...(blockMaxWidth
             ? {
-                maxWidth: blockMaxWidth,
-                marginLeft: 'auto',
-                marginRight: 'auto',
-              }
+              maxWidth: blockMaxWidth,
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }
             : {}),
           marginTop: 0,
           marginBottom: 0,

@@ -1,5 +1,5 @@
+import { Typography } from '@mui/material';
 import useQuizGrader from '../../hooks/useQuizGrader';
-import { MarkdownConvertorQuiz } from '../../../markdown/MarkdownConvertor';
 import { type ReviewProps } from '@rapid-cmi5/cmi5-build-common';
 
 export default function ReviewMultipleChoice(props: ReviewProps) {
@@ -8,14 +8,16 @@ export default function ReviewMultipleChoice(props: ReviewProps) {
   return (
     <div>
       {question.typeAttributes.options?.map((option, optionIndex) => (
-        <MarkdownConvertorQuiz
-          markdown={option.text}
+
+        <Typography
           className={`bg-blue-800 option-rangeos ${getReviewIndication(
             question,
             answer,
             optionIndex,
           )}`}
-        />
+        >
+          {option.text}
+        </Typography>
       ))}
     </div>
   );

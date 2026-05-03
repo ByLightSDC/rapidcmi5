@@ -22,7 +22,6 @@ import { $getRoot, $isElementNode } from 'lexical';
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { editorInPlayback$ } from '../../state/vars';
 import ModalDialog from '../../../../modals/ModalDialog';
-import { parseStyleString } from '../../../markdown/MarkDownParser';
 
 import {
   Box,
@@ -55,6 +54,7 @@ import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { type ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
+import { parseStyleString } from '../../../markdown/MarkDownParser';
 
 /**
  * Grid Container Editor for grid layout directive.
@@ -290,12 +290,12 @@ export const GridContainerEditor: React.FC<
   // Outer box: full-width background color band when backgroundColor is set.
   const outerSx: SxProps = backgroundColor
     ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
+      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+      clipPath: `inset(0 -100vmax 0)`,
+      backgroundColor,
+      paddingTop: blockPadding,
+      paddingBottom: blockPadding,
+    }
     : {};
 
   return (

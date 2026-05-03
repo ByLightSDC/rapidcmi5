@@ -46,7 +46,6 @@ import { $isElementNode } from 'lexical';
 import { DEFAULT_ACCORDION } from './constants';
 import ModalDialog from '../../../../modals/ModalDialog';
 import { ButtonMinorUi, ButtonOptions } from '../../../../utility/buttons';
-import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
@@ -56,6 +55,7 @@ import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { type ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
+import { parseStyleString } from '../../../markdown/MarkDownParser';
 /**
  * Accordion Editor for accordion directives
  * @param param0
@@ -314,12 +314,12 @@ export const AccordionEditor: React.FC<
   // Outer box: full-width background color band when backgroundColor is set.
   const outerSx: SxProps = backgroundColor
     ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
+      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+      clipPath: `inset(0 -100vmax 0)`,
+      backgroundColor,
+      paddingTop: blockPadding,
+      paddingBottom: blockPadding,
+    }
     : {};
 
   const innerSx: SxProps = blockMaxWidth

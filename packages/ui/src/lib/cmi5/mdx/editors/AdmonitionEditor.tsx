@@ -34,7 +34,7 @@ import {
   getAdmonitionIcon,
   getSeverityHexBorderColor,
   getSeverityHexColor,
-} from '../../markdown/components/AdmonitionStyles';
+} from '../../markdown/AdmonitionStyles';
 
 import { type AdmonitionDirectiveNode } from './AdmonitionDirectiveDescriptor';
 import DeleteIconButton from '../components/DeleteIconButton';

@@ -16,8 +16,6 @@ import {
 } from 'react';
 
 import { editorInPlayback$ } from '../../state/vars';
-import { parseStyleString } from '../../../markdown/MarkDownParser';
-
 import { alpha, Box, IconButton, type SxProps, Tooltip, useTheme } from '@mui/material';
 
 import DeleteIconButton from '../../components/DeleteIconButton';
@@ -38,6 +36,7 @@ import { findMatchingQuotePreset } from './methods';
 import { QuotesContextProvider } from './QuotesContext';
 import { useFocusWithin } from '../shared/useFocusWithin';
 import QuotesSettings from './QuotesSettings';
+import { parseStyleString } from '../../../markdown/MarkDownParser';
 
 /**
  * Quotes Container Editor for grid layout directive.
@@ -74,12 +73,12 @@ export const QuotesContainerEditor: React.FC<
   // Outer box: full-width background color band when backgroundColor is set.
   const outerSx: SxProps = backgroundColor
     ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
+      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+      clipPath: `inset(0 -100vmax 0)`,
+      backgroundColor,
+      paddingTop: blockPadding,
+      paddingBottom: blockPadding,
+    }
     : {};
   //#endregion
 
@@ -89,7 +88,7 @@ export const QuotesContainerEditor: React.FC<
   const currentPreset = useMemo(() => {
     return mdastNode?.attributes?.preset
       ? findMatchingQuotePreset(mdastNode?.attributes?.preset) ||
-          QUOTE_PRESETS[0]
+      QUOTE_PRESETS[0]
       : QUOTE_PRESETS[0];
   }, [mdastNode?.attributes?.preset]);
 
@@ -139,9 +138,9 @@ export const QuotesContainerEditor: React.FC<
         children: mdastNode.children.map((child, i) =>
           i === carouselIndex
             ? {
-                ...child,
-                attributes: { ...child.attributes, avatar: newAvatar },
-              }
+              ...child,
+              attributes: { ...child.attributes, avatar: newAvatar },
+            }
             : child,
         ) as any,
       });
@@ -218,7 +217,7 @@ export const QuotesContainerEditor: React.FC<
             borderStyle: 'solid',
             borderRadius: 1,
             boxShadow: 2,
-            backgroundColor: (theme) => `${alpha(theme.palette.background.default, muiTheme.palette.mode === 'light' ? 0:0.50)}`,
+            backgroundColor: (theme) => `${alpha(theme.palette.background.default, muiTheme.palette.mode === 'light' ? 0 : 0.50)}`,
             paddingTop: blockPadding,
             paddingBottom: blockPadding,
           }}

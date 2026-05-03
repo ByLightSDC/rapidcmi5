@@ -5,7 +5,6 @@ import TrueFalse from './QuestionTypes/TrueFalse/TrueFalse';
 import SelectAll from './QuestionTypes/SelectAll/QuestionSelectAll';
 import Matching from './QuestionTypes/Matching/QuestionMatching';
 import { Typography } from '@mui/material';
-import { MarkdownConvertorQuiz } from '../markdown/MarkdownConvertor';
 import { type QuizQuestion, type AnswerType, QuestionResponse } from '@rapid-cmi5/cmi5-build-common';
 
 export default function AuQuizQuestion({
@@ -33,7 +32,7 @@ export default function AuQuizQuestion({
         Q {currentQuestion + 1} / {numQuestions}
       </Typography>
       <Typography color="text.primary">
-        <MarkdownConvertorQuiz markdown={question.question} />
+        {question.question}
       </Typography>
       <div
         className="flex flex-col space-y-4 mt-2"
@@ -41,16 +40,16 @@ export default function AuQuizQuestion({
       >
         {(question.type === QuestionResponse.FreeResponse ||
           question.type === QuestionResponse.Number) && (
-          <FreeResponse
-            question={question}
-            currentQuestion={currentQuestion}
-            currentAnswer={currentAnswer as string}
-            handlePickAnswer={handlePickAnswer}
-            correctAnswer={correctAnswer as string}
-            isCorrect={isCorrect}
-            isGraded={isGraded}
-          />
-        )}
+            <FreeResponse
+              question={question}
+              currentQuestion={currentQuestion}
+              currentAnswer={currentAnswer as string}
+              handlePickAnswer={handlePickAnswer}
+              correctAnswer={correctAnswer as string}
+              isCorrect={isCorrect}
+              isGraded={isGraded}
+            />
+          )}
 
         {question.type === QuestionResponse.MultipleChoice && (
           <QuestionMultipleChoice

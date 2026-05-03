@@ -50,7 +50,6 @@ import { DEFAULT_TAB } from './constants';
 import { darkTab } from './styles';
 import ModalDialog from '../../../../modals/ModalDialog';
 import { ButtonMinorUi, ButtonOptions } from '../../../../utility/buttons';
-import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
@@ -64,6 +63,7 @@ import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import {
   DIRECTIVE_INNER_BOX_SHADOW,
 } from '../../constants/directiveLayout';
+import { parseStyleString } from '../../../markdown/MarkDownParser';
 
 /**
  * Tabs Editor for tabs directive
@@ -353,12 +353,12 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   // trailing <p>'s margin-top so the band fills flush to the next block.
   const outerSx: SxProps = backgroundColor
     ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
+      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+      clipPath: `inset(0 -100vmax 0)`,
+      backgroundColor,
+      paddingTop: blockPadding,
+      paddingBottom: blockPadding,
+    }
     : {};
 
   // Inner box: fills all available width (lesson content width applies to text
@@ -371,14 +371,14 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     : {};
   const innerSx: SxProps = backgroundColor
     ? {
-        backgroundColor: muiTheme.palette.background.paper,
-        boxShadow: DIRECTIVE_INNER_BOX_SHADOW,
-        ...widthOverrideSx,
-      }
+      backgroundColor: muiTheme.palette.background.paper,
+      boxShadow: DIRECTIVE_INNER_BOX_SHADOW,
+      ...widthOverrideSx,
+    }
     : {
-        boxShadow: dropShadow,
-        ...widthOverrideSx,
-      };
+      boxShadow: dropShadow,
+      ...widthOverrideSx,
+    };
 
   /**
    * Render Tabs and Nested Content

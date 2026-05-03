@@ -13,10 +13,6 @@
       "entry": ["src/main.ts", "src/setupTests.js"],
       "project": "src/**/*.{ts,tsx,js}"
     },
-    "apps/cmi5-builder-e2e": {
-      "entry": ["jest.config.ts", "test-setup.ts", "src/**/*.spec.{ts,tsx}"],
-      "project": "src/**/*.{ts,tsx}"
-    },
     "apps/rapid-cmi5-electron": {
       "entry": [
         "src/main.ts",
