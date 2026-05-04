@@ -211,12 +211,20 @@ export const courseBuilderSlice = createSlice({
       const theSlides = [
         ...state.courseData.blocks[blockIndex].aus[auIndex].slides,
       ];
+
       if (insertionPoint) {
-        state.currentSlideIndex = insertionPoint;
         theSlides.splice(insertionPoint, 0, newSlide);
       } else {
         theSlides.push(newSlide);
-        state.currentSlideIndex = theSlides.length - 1;
+      }
+
+      // decide if we should move our current slide index
+      if (state.currentAuIndex === auIndex) {
+        if (insertionPoint) {
+          state.currentSlideIndex = insertionPoint;
+        } else {
+          state.currentSlideIndex = theSlides.length - 1;
+        }
       }
 
       state.courseData.blocks[blockIndex].aus[auIndex].slides = theSlides;
@@ -831,12 +839,12 @@ function updateLastSlideAndAuPath(state: CourseBuilderState) {
 function updateLastSlidePath(state: CourseBuilderState) {
   if (
     state.currentRepo &&
-    state.repoCache[state.currentRepo] &&
-    state.repoCache[state.currentRepo].courses[state.currentCourse]
+    state.repoCache[state.currentRepo]?.courses[state.currentCourse]
   ) {
     const currentSlide =
       state.courseData.blocks[state.currentBlockIndex].aus[state.currentAuIndex]
         .slides[state.currentSlideIndex];
+    if (!currentSlide?.filepath) return;
 
     state.repoCache[state.currentRepo].courses[
       state.currentCourse
