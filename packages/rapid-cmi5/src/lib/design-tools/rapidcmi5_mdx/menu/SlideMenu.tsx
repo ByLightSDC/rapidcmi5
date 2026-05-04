@@ -29,6 +29,7 @@ import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
 import { MUIButtonWithTooltip } from '../toolbar/components/MUIButtonWithTooltip';
+import { slugifyPath } from '../../course-builder/GitViewer/utils/useCourseOperationsUtils';
 
 /**
  * Menu to deal with adding slides, navigating slides, deleting slide
@@ -54,7 +55,19 @@ export const SlideMenu = () => {
     // Go from index value to actual slide numbering starting at 1
     const slideTitle = `Slide ${insertionPoint + 1}`;
 
-    if (!repoAccessObject) return;
+    if (!currentAuDir) {
+      throw new Error('Current AU Dir has not been set');
+    }
+
+    if (!repoAccessObject) {
+      throw new Error('Repo access object is required');
+    }
+
+    const filepath = await handleGetUniqueFilePath(
+      repoAccessObject,
+      slugifyPath(slideTitle),
+      currentAuDir,
+    );
 
     dispatch(
       addASlide({
@@ -65,11 +78,7 @@ export const SlideMenu = () => {
           display: defaultSlideContent,
           slideTitle: slideTitle,
           type: SlideTypeEnum.Markdown,
-          filepath: await handleGetUniqueFilePath(
-            repoAccessObject,
-            slideTitle,
-            currentAuDir || '',
-          ),
+          filepath,
         },
         insertionPoint,
       }),

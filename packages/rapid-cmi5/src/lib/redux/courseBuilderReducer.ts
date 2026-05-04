@@ -212,13 +212,15 @@ export const courseBuilderSlice = createSlice({
         ...state.courseData.blocks[blockIndex].aus[auIndex].slides,
       ];
 
+      // Decide if this is a push operation or an insertion
       if (insertionPoint) {
         theSlides.splice(insertionPoint, 0, newSlide);
       } else {
         theSlides.push(newSlide);
       }
 
-      // decide if we should move our current slide index
+      // Decide if we should move our current slide index
+      // We dont want to move if the slide was added to a different lesson
       if (state.currentAuIndex === auIndex) {
         if (insertionPoint) {
           state.currentSlideIndex = insertionPoint;

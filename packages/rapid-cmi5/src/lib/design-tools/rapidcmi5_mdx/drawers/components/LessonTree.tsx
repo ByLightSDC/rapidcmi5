@@ -163,10 +163,6 @@ function LessonTree({
             throw new Error('Repo access object is required');
           }
 
-          if (element.id == null) {
-            throw new Error('Slide could not be added: missing id');
-          }
-
           if (element.block == null) {
             throw new Error('Slide could not be added: missing block');
           }
@@ -174,8 +170,8 @@ function LessonTree({
           const filepath = await handleGetUniqueFilePath(
             repoAccessObject,
             slugifyPath(slideTitle),
-            courseData.blocks[currentBlockIndex]?.aus?.[Number(element.id)]
-              ?.dirPath || '',
+            courseData.blocks[currentBlockIndex].aus[Number(element.id)]
+              .dirPath,
           );
 
           dispatch(
@@ -262,6 +258,7 @@ function LessonTree({
           saveSlide();
           dispatch(navigateSlide(element.slide));
         }
+        ``;
       }
     }
   };
