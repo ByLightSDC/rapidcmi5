@@ -249,6 +249,34 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     };
   }
 
+  /**
+   * Sets the striped row configuration for the table.
+   * @param enabled - Whether alternating row colors are enabled
+   * @param oddColor - Background color for odd data rows (1st, 3rd, ...)
+   * @param evenColor - Background color for even data rows (2nd, 4th, ...)
+   */
+  setStripedRows(enabled: boolean, oddColor: string, evenColor: string): void {
+    const self = this.getWritable();
+    const table = self.__mdastNode;
+    const data = table.data || {};
+    const hProperties: any = { ...(data.hProperties || {}) };
+
+    if (enabled) {
+      hProperties['data-striped'] = 'true';
+      hProperties['data-stripe-odd'] = oddColor;
+      hProperties['data-stripe-even'] = evenColor;
+    } else {
+      delete hProperties['data-striped'];
+      delete hProperties['data-stripe-odd'];
+      delete hProperties['data-stripe-even'];
+    }
+
+    self.__mdastNode = {
+      ...table,
+      data: { ...data, hProperties },
+    };
+  }
+
   /** @internal */
   updateCellContents(
     colIndex: number,

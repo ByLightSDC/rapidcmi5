@@ -188,15 +188,17 @@ export function EditImageToolbar({
           <EditIcon />
         </IconButton>
 
-        <IconButton
-          aria-label="edit styles"
-          disabled={readOnly}
-          onClick={() => {
-            setIsStyleDialogOpen(true);
-          }}
-        >
-          <PaletteIcon />
-        </IconButton>
+        <Tooltip title="Edit Image Styles">
+          <IconButton
+            aria-label="edit styles"
+            disabled={readOnly}
+            onClick={() => {
+              setIsStyleDialogOpen(true);
+            }}
+          >
+            <PaletteIcon />
+          </IconButton>
+        </Tooltip>
 
         <Tooltip title="Alignment">
           <IconButton
@@ -205,28 +207,38 @@ export function EditImageToolbar({
             onClick={() => setIsAlignOpen((v) => !v)}
             sx={{ opacity: isAlignOpen ? 1 : 0.5 }}
           >
-            {textAlign === 'right' ? <VerticalAlignTopIcon sx={{ transform: 'rotate(90deg)' }} /> : textAlign === 'center' ? <VerticalAlignCenterIcon sx={{ transform: 'rotate(90deg)' }} /> : <VerticalAlignBottomIcon sx={{ transform: 'rotate(90deg)' }} />}
+            {textAlign === 'right' ? (
+              <VerticalAlignTopIcon sx={{ transform: 'rotate(90deg)' }} />
+            ) : textAlign === 'center' ? (
+              <VerticalAlignCenterIcon sx={{ transform: 'rotate(90deg)' }} />
+            ) : (
+              <VerticalAlignBottomIcon sx={{ transform: 'rotate(90deg)' }} />
+            )}
           </IconButton>
         </Tooltip>
 
-        <IconButton
-          aria-label="Add Label"
-          disabled={readOnly}
-          onClick={(e) => {
-            handleDragLabelStart(e);
-          }}
-        >
-          <RoomIcon />
-        </IconButton>
-        <IconButton
-          aria-label="Add Text"
-          disabled={readOnly}
-          onClick={(e) => {
-            handlePlaceTextStart(e);
-          }}
-        >
-          <TextFieldsIcon />
-        </IconButton>
+        <Tooltip title="Add Label">
+          <IconButton
+            aria-label="Add Label"
+            disabled={readOnly}
+            onClick={(e) => {
+              handleDragLabelStart(e);
+            }}
+          >
+            <RoomIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Add Text">
+          <IconButton
+            aria-label="Add Text"
+            disabled={readOnly}
+            onClick={(e) => {
+              handlePlaceTextStart(e);
+            }}
+          >
+            <TextFieldsIcon />
+          </IconButton>
+        </Tooltip>
         {isTextDropping && (
           <div
             style={{
@@ -255,57 +267,61 @@ export function EditImageToolbar({
             <AddCircleIcon color="warning" />
           </div>
         )}
-        <IconButton
-          aria-label="delete"
-          disabled={readOnly}
-          onClick={(e) => {
-            e.preventDefault();
-            editor.update(() => {
-              $getNodeByKey(nodeKey)?.remove();
-            });
-          }}
-        >
-          <DeleteForeverIcon />
-        </IconButton>
+        <Tooltip title="Delete Image">
+          <IconButton
+            aria-label="delete"
+            disabled={readOnly}
+            onClick={(e) => {
+              e.preventDefault();
+              editor.update(() => {
+                $getNodeByKey(nodeKey)?.remove();
+              });
+            }}
+          >
+            <DeleteForeverIcon />
+          </IconButton>
+        </Tooltip>
       </Stack>
 
       {/* Second-row alignment toolbar — revealed by toggle button */}
-      {isAlignOpen && <Stack
-        direction="row"
-        spacing={0}
-        sx={{
-          backgroundColor:
-            muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
-          position: 'absolute',
-          right: 0,
-          top: 36,
-          display: 'flex',
-          zIndex: 1,
-        }}
-      >
-        <AlignmentToolbarControls
-          currentAlignment={textAlign ?? 'left'}
-          onAlignmentChange={(value) => {
-            editor.update(() => {
-              const node = $getNodeByKey(nodeKey);
-              if ($isImageNode(node)) {
-                const filteredRest = (rest ?? []).filter(
-                  (a: MdxJsxAttribute) => a.name !== 'textAlign',
-                );
-                if (value !== 'left') {
-                  filteredRest.push({
-                    type: 'mdxJsxAttribute',
-                    name: 'textAlign',
-                    value,
-                  } as MdxJsxAttribute);
-                }
-                node.setRest(filteredRest);
-              }
-            });
+      {isAlignOpen && (
+        <Stack
+          direction="row"
+          spacing={0}
+          sx={{
+            backgroundColor:
+              muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
+            position: 'absolute',
+            right: 0,
+            top: 36,
+            display: 'flex',
+            zIndex: 1,
           }}
-          disabled={readOnly}
-        />
-      </Stack>}
+        >
+          <AlignmentToolbarControls
+            currentAlignment={textAlign ?? 'left'}
+            onAlignmentChange={(value) => {
+              editor.update(() => {
+                const node = $getNodeByKey(nodeKey);
+                if ($isImageNode(node)) {
+                  const filteredRest = (rest ?? []).filter(
+                    (a: MdxJsxAttribute) => a.name !== 'textAlign',
+                  );
+                  if (value !== 'left') {
+                    filteredRest.push({
+                      type: 'mdxJsxAttribute',
+                      name: 'textAlign',
+                      value,
+                    } as MdxJsxAttribute);
+                  }
+                  node.setRest(filteredRest);
+                }
+              });
+            }}
+            disabled={readOnly}
+          />
+        </Stack>
+      )}
 
       {/* Style Dialog — includes Content Width (block appearance) */}
       <StyleDialog
