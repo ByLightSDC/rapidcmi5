@@ -10,6 +10,8 @@ import {
   Stack,
   Switch,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
   Box,
 } from '@mui/material';
@@ -17,17 +19,32 @@ import Grid from '@mui/material/Grid2';
 import { MuiColorInput } from 'mui-color-input';
 import { SelectorMainUi } from '../../../../inputs/selectors/selectors';
 import ModalDialog from '../../../../modals/ModalDialog';
+import {
+  BLOCK_WIDTH_INHERIT,
+  BlockWidthValue,
+} from '../shared/BlockAppearanceForm';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+
+const contentWidthDescriptions: Record<BlockWidthValue, string> = {
+  [BLOCK_WIDTH_INHERIT]: 'Use lesson-level content width setting',
+  [ContentWidthEnum.None]: 'No width constraint (full editor width)',
+  [ContentWidthEnum.Small]: 'Narrow content area (55% of available width)',
+  [ContentWidthEnum.Medium]: 'Standard content area (75% of available width)',
+  [ContentWidthEnum.Large]: 'Full width content area',
+};
 
 interface TableStyleProps {
   isOpen: boolean;
   style: string;
   tableHProperties?: Record<string, any>;
+  contentWidth?: ContentWidthEnum;
   setTableStyle: (style: string) => void;
   setStripedRows: (
     enabled: boolean,
     oddColor: string,
     evenColor: string,
   ) => void;
+  onContentWidthSave: (contentWidth: ContentWidthEnum | undefined) => void;
   setIsStyleDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -60,8 +77,10 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
   isOpen,
   style,
   tableHProperties,
+  contentWidth,
   setTableStyle,
   setStripedRows,
+  onContentWidthSave,
   setIsStyleDialogOpen,
 }) => {
   // --- Border State ---
@@ -80,6 +99,15 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
   const [stripedEnabled, setStripedEnabled] = useState<boolean>(false);
   const [stripeOddColor, setStripeOddColor] = useState<string>('#d6e4f7');
   const [stripeEvenColor, setStripeEvenColor] = useState<string>('#ffffff');
+
+  // --- Content Width State ---
+  const [blockWidthValue, setBlockWidthValue] = useState<BlockWidthValue>(
+    contentWidth ?? BLOCK_WIDTH_INHERIT,
+  );
+
+  useEffect(() => {
+    setBlockWidthValue(contentWidth ?? BLOCK_WIDTH_INHERIT);
+  }, [contentWidth, isOpen]);
 
   // Parse the style string and populate local state
   useEffect(() => {
@@ -177,6 +205,7 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
 
     setTableStyle(styleString);
     setStripedRows(stripedEnabled, stripeOddColor, stripeEvenColor);
+    onContentWidthSave(blockWidthValue === BLOCK_WIDTH_INHERIT ? undefined : blockWidthValue);
     setIsStyleDialogOpen(false);
   };
 
@@ -260,32 +289,32 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
                 />
 
                 <Box sx={{ visibility: stripedEnabled ? 'visible' : 'hidden' }}>
-                  <Stack spacing={2}>
-                    <Stack spacing={1}>
-                      <Typography variant="caption">
-                        Odd rows (1st, 3rd…)
-                      </Typography>
-                      <MuiColorInput
-                        format="hex"
-                        value={stripeOddColor}
-                        onChange={setStripeOddColor}
-                        isAlphaHidden={true}
-                        fullWidth
-                      />
-                    </Stack>
-                    <Stack spacing={1}>
-                      <Typography variant="caption">
-                        Even rows (2nd, 4th…)
-                      </Typography>
-                      <MuiColorInput
-                        format="hex"
-                        value={stripeEvenColor}
-                        onChange={setStripeEvenColor}
-                        isAlphaHidden={true}
-                        fullWidth
-                      />
-                    </Stack>
-                  </Stack>
+                  <Grid container spacing={2}>
+                    <Grid size={6}>
+                      <Stack spacing={1}>
+                        <Typography variant="caption">Odd rows (1st, 3rd…)</Typography>
+                        <MuiColorInput
+                          format="hex"
+                          value={stripeOddColor}
+                          onChange={setStripeOddColor}
+                          isAlphaHidden={true}
+                          fullWidth
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid size={6}>
+                      <Stack spacing={1}>
+                        <Typography variant="caption">Even rows (2nd, 4th…)</Typography>
+                        <MuiColorInput
+                          format="hex"
+                          value={stripeEvenColor}
+                          onChange={setStripeEvenColor}
+                          isAlphaHidden={true}
+                          fullWidth
+                        />
+                      </Stack>
+                    </Grid>
+                  </Grid>
                 </Box>
               </Stack>
             </Paper>
@@ -652,6 +681,34 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
               </Stack>
             </Paper>
           </Grid>
+
+          {/* --- CONTENT WIDTH --- */}
+          <Grid size={12}>
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Typography variant="h6" sx={{ mb: 1 }}>Content Width</Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <ToggleButtonGroup
+                  value={blockWidthValue}
+                  exclusive
+                  onChange={(_, val: BlockWidthValue | null) => {
+                    if (val !== null) setBlockWidthValue(val);
+                  }}
+                  size="small"
+                  sx={{ width: '60%' }}
+                >
+                  <ToggleButton value={BLOCK_WIDTH_INHERIT} sx={{ flex: 1 }}>Lesson</ToggleButton>
+                  <ToggleButton value={ContentWidthEnum.None} sx={{ flex: 1 }}>None</ToggleButton>
+                  <ToggleButton value={ContentWidthEnum.Small} sx={{ flex: 1 }}>S</ToggleButton>
+                  <ToggleButton value={ContentWidthEnum.Medium} sx={{ flex: 1 }}>M</ToggleButton>
+                  <ToggleButton value={ContentWidthEnum.Large} sx={{ flex: 1 }}>L</ToggleButton>
+                </ToggleButtonGroup>
+              </Box>
+              <Typography variant="body2" sx={{ mt: 0.5, textAlign: 'center' }}>
+                {contentWidthDescriptions[blockWidthValue]}
+              </Typography>
+            </Paper>
+          </Grid>
+
         </Grid>
       </div>
     </ModalDialog>

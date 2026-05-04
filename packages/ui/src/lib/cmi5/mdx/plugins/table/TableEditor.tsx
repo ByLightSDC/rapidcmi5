@@ -41,9 +41,7 @@ import {
   resolveLessonThemeCSS,
   resolveBlockMaxWidth,
 } from '../../../../styles/lessonThemeStyles';
-import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
-import SettingsIcon from '@mui/icons-material/Settings';
 import { lessonTheme$ } from '../../state/vars';
 import { TableNode } from './TableNode';
 
@@ -204,7 +202,6 @@ export const TableEditor: React.FC<TableEditorProps> = ({
       | ContentWidthEnum
       | undefined,
   );
-  const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
   const { gutterRef, gutterRight } = useGutterRight(
     resolvedThemeCSS,
@@ -497,17 +494,17 @@ export const TableEditor: React.FC<TableEditorProps> = ({
               zIndex: 2,
             }}
           >
-            <Tooltip title="Block Appearance">
-              <IconButton
-                size="small"
-                onClick={() => setBlockAppearanceOpen(true)}
-              >
-                <SettingsIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
             <TableSettingsButton
               parentEditor={parentEditor}
               lexicalTable={lexicalTable}
+              contentWidth={contentWidth}
+              onContentWidthSave={(newContentWidth) => {
+                setContentWidth(newContentWidth);
+                parentEditor.update(
+                  () => { lexicalTable.setContentWidth(newContentWidth); },
+                  { discrete: true },
+                );
+              }}
             />
             <InsertLineReturnButton
               parentEditor={parentEditor}
@@ -782,20 +779,6 @@ export const TableEditor: React.FC<TableEditorProps> = ({
         </div>
       </div>
 
-      <BlockAppearanceForm
-        open={blockAppearanceOpen}
-        currentContentWidth={contentWidth}
-        onClose={() => setBlockAppearanceOpen(false)}
-        onSave={(newContentWidth) => {
-          setContentWidth(newContentWidth);
-          parentEditor.update(
-            () => {
-              lexicalTable.setContentWidth(newContentWidth);
-            },
-            { discrete: true },
-          );
-        }}
-      />
     </>
   );
 };
@@ -1344,7 +1327,9 @@ const RowEditor: React.FC<RowEditorProps> = ({
 const TableSettingsButton: React.FC<{
   parentEditor: LexicalEditor;
   lexicalTable: TableNode;
-}> = ({ parentEditor, lexicalTable }) => {
+  contentWidth: ContentWidthEnum | undefined;
+  onContentWidthSave: (contentWidth: ContentWidthEnum | undefined) => void;
+}> = ({ parentEditor, lexicalTable, contentWidth, onContentWidthSave }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentStyle, setCurrentStyle] = useState('');
   const [currentHProperties, setCurrentHProperties] = useState<
@@ -1390,8 +1375,10 @@ const TableSettingsButton: React.FC<{
           isOpen={isDialogOpen}
           style={currentStyle}
           tableHProperties={currentHProperties}
+          contentWidth={contentWidth}
           setTableStyle={handleSetTableStyle}
           setStripedRows={handleSetStripedRows}
+          onContentWidthSave={onContentWidthSave}
           setIsStyleDialogOpen={setIsDialogOpen}
         />
       )}
