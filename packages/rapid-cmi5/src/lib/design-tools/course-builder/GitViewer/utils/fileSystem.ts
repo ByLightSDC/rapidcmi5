@@ -120,6 +120,44 @@ export class GitFS {
     coursePath: string,
     zipName: string,
   ) => {
+    const zipBlob = await this.buildCmi5CourseBlob(r, coursePath);
+    saveAs(zipBlob, zipName);
+  };
+
+  /**
+   * Seeds the ZenFS cmi5 build cache with the three files that copyIndexFile
+   * needs (index.html, cfg.json, favicon.ico) by fetching them directly from
+   * the running player dev server.  This lets buildCmi5CourseBlob work without
+   * a pre-built cc-cmi5-player.zip — useful after a fresh clone or when the zip
+   * is stale.
+   */
+  seedPlayerCacheFromDevServer = async (playerUrl: string): Promise<void> => {
+    const base = playerUrl.replace(/\/$/, '');
+
+    try {
+      await this.clearDirectory(cmi5BuildCache);
+    } catch {}
+    try {
+      await this.fs.promises.rmdir(cmi5BuildCache);
+    } catch {}
+    await this.createDirRecursive(cmi5BuildCache);
+
+    for (const filename of ['index.html', 'cfg.json', 'favicon.ico']) {
+      const res = await fetch(`${base}/${filename}`);
+      if (!res.ok) throw new Error(`Failed to fetch ${filename} from player dev server (${res.status})`);
+      const buf = await res.arrayBuffer();
+      await this.fs.promises.writeFile(join(cmi5BuildCache, filename), new Uint8Array(buf));
+    }
+  };
+
+  /**
+   * Builds the CMI5 course zip and returns the raw Blob without saving to disk.
+   * Used by TestInPlayerDialog to ship the zip directly to the player dev server.
+   */
+  buildCmi5CourseBlob = async (
+    r: RepoAccessObject,
+    coursePath: string,
+  ): Promise<Blob> => {
     const repoPath = getRepoPath(r);
 
     try {
@@ -188,9 +226,7 @@ export class GitFS {
 
       const builtZip = await this.generateZip(cmi5BuildCache, '');
 
-      const zipBlob = await builtZip.generateAsync({ type: 'blob' });
-
-      saveAs(zipBlob, zipName);
+      return await builtZip.generateAsync({ type: 'blob' });
     } catch (error: any) {
       throw error;
     } finally {
@@ -1342,10 +1378,25 @@ export class GitFS {
       const fullNewPath = join('/', parentDir, newName);
 
       // Ensure the old file/folder exists
-      await this.fs.promises.stat(fullOldPath);
+      const resp = await this.fs.promises.stat(fullOldPath);
+
+      // Needed for windows who does not care about caps
+      const isCaseOnlyRename =
+        fullOldPath.toLowerCase() === fullNewPath.toLowerCase() &&
+        fullOldPath !== fullNewPath;
 
       // Perform the rename (move)
-      await this.fs.promises.rename(fullOldPath, fullNewPath);
+      if (resp.isFile()) {
+        const content = await this.fs.promises.readFile(fullOldPath);
+        await this.fs.promises.writeFile(fullNewPath, content);
+        if (!isCaseOnlyRename) await this.fs.promises.rm(fullOldPath);
+      } else {
+        await this.copyRecursive(fullOldPath, fullNewPath);
+        if (!isCaseOnlyRename) {
+          await this.clearDirectory(fullOldPath);
+          await this.fs.promises.rmdir(fullOldPath);
+        }
+      }
     } catch (error) {
       console.error('Error renaming file or folder:', error);
     }

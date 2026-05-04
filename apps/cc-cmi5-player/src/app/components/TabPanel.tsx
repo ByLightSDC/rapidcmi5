@@ -270,7 +270,7 @@ export default function TabPanel() {
                   <Typography
                     component="span"
                     color="text.primary"
-                    sx={{ flexGrow: 1, fontSize: '18px', fontWeight: 'bold' }}
+                    sx={{ flexGrow: 1, fontSize: '16px', fontWeight: 'bold', lineHeight:1.1 }}
                     align="center"
                   >
                     {slide.slideTitle}

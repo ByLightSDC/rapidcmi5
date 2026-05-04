@@ -1,4 +1,5 @@
 import SearchIcon from '@mui/icons-material/Search';
+import { toTitleCase } from './formUtils';
 import { MenuItem, SxProps } from '@mui/material';
 import { UseFormReturn } from 'react-hook-form';
 
@@ -238,7 +239,7 @@ export const QuizForm = ({
           >
             {moveOnCriteriaOptions.map((item) => (
               <MenuItem key={item} value={item}>
-                {item}
+                {toTitleCase(item)}
               </MenuItem>
             ))}
           </FormControlSelectField>

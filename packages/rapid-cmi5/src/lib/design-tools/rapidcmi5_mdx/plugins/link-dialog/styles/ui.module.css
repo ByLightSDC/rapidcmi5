@@ -1,0 +1,8 @@
+
+.textInput {
+  all: unset;
+  border-radius: var(--radius-base);
+  border: 1px solid var(--baseBorder);
+  background-color: var(--baseBase);
+  padding: var(--spacing-2) var(--spacing-3);
+}

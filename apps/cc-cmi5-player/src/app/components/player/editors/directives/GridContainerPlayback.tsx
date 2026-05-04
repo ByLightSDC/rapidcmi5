@@ -1,7 +1,8 @@
 import { DirectiveEditorProps, NestedLexicalEditor } from '@mdxeditor/editor';
 import { ContainerDirective } from 'mdast-util-directive';
 import React, { useMemo, useRef } from 'react';
-import { parseStyleString } from '@rapid-cmi5/ui';
+import { parseStyleString, resolveBlockMaxWidth } from '@rapid-cmi5/ui';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 export const GridContainerPlayback: React.FC<
   DirectiveEditorProps<ContainerDirective>
@@ -28,12 +29,20 @@ export const GridContainerPlayback: React.FC<
     const bgColor = mdastNode.attributes?.backgroundColor as string | undefined;
     if (bgColor) {
       styles.backgroundColor = bgColor;
-      (styles as any).boxShadow = `0 0 0 100vmax ${bgColor}`;
-      (styles as any).clipPath = 'inset(0 -100vmax 0)';
+      styles.boxShadow = `0 0 0 100vmax ${bgColor}`;
+      styles.clipPath = 'inset(0 -100vmax 0)';
+    }
+
+    const blockContentWidth = mdastNode.attributes?.contentWidth as ContentWidthEnum | undefined;
+    const maxWidth = resolveBlockMaxWidth(blockContentWidth);
+    if (maxWidth) {
+      styles.maxWidth = maxWidth;
+      styles.marginLeft = 'auto';
+      styles.marginRight = 'auto';
     }
 
     return styles;
-  }, [mdastNode.attributes?.style, mdastNode.attributes?.backgroundColor]);
+  }, [mdastNode.attributes?.style, mdastNode.attributes?.backgroundColor, mdastNode.attributes?.contentWidth]);
 
   return (
     <div
@@ -54,9 +63,9 @@ export const GridContainerPlayback: React.FC<
       <NestedLexicalEditor<ContainerDirective>
         block={true}
         getContent={(node) => node.children}
-        getUpdatedMdastNode={(node, children: any) => ({
+        getUpdatedMdastNode={(node, children) => ({
           ...node,
-          children,
+          children: children as ContainerDirective['children'],
         })}
         contentEditableProps={{ role: 'none' }}
       />

@@ -197,6 +197,7 @@ interface IGitContext {
   deleteRecentProject: (id: string) => Promise<void>;
   getDirHandle: () => Promise<FileSystemDirectoryHandle | null>;
   gettingRepoStatus: boolean;
+  downloadCmi5Player?: () => Promise<any>;
 }
 
 interface tProviderProps {
@@ -591,12 +592,12 @@ export const GitContextProvider = (props: tProviderProps) => {
 
     const r = {
       fileSystemType: fsType.localFileSystem,
-      repoName: req.repoDirName,
+      repoName: cleanedName,
     };
 
     try {
       await gitFs.createRepoInDir(
-        req.repoDirName,
+        cleanedName,
         async () => await cloneRemoteRepo(req),
       );
 
@@ -612,7 +613,7 @@ export const GitContextProvider = (props: tProviderProps) => {
       dispatch(setCurrentFileSystemType(fsType.localFileSystem));
 
       await resetRepoStatus();
-      dispatch(setCurrentRepo(req.repoDirName));
+      dispatch(setCurrentRepo(cleanedName));
       setIsGitLoaded(false);
 
       setLocalFileSystemLoaded(true);
@@ -879,7 +880,7 @@ export const GitContextProvider = (props: tProviderProps) => {
     const repoPath = getRepoPath(r);
 
     return await createUniquePath({
-      name: slugifyPath(slideTitle),
+      name: slideTitle,
       basePath: currentAuDir,
       repoPath,
       isFile: true,
@@ -1116,7 +1117,7 @@ export const GitContextProvider = (props: tProviderProps) => {
 
       try {
         await gitFs.createRepoInDir(
-          req.repoDirName,
+          cleanedName,
           async () => await gitOperator.initGitRepo(r, req.repoBranch),
         );
 
@@ -1275,6 +1276,7 @@ export const GitContextProvider = (props: tProviderProps) => {
         openLocalRepo,
         deleteRecentProject,
         getDirHandle,
+        downloadCmi5Player: rapidCmi5Opts.downloadCmi5Player,
       }}
     >
       {children}

@@ -1,5 +1,3 @@
-
-
 export const featureName = 'Scenario';
 export const noneFound = 'No design tools found.';
 
@@ -24,7 +22,7 @@ export const designToolCategories = [
         url: '/rapid_cmi5_mdx',
         hidden: false,
         tagline: 'Publish CMI5 Courses',
-      }
+      },
     ],
   },
 ];

@@ -31,15 +31,17 @@ import {
 import * as Mdast from 'mdast';
 import React, {
   ElementType,
-  useContext,
   useEffect,
   useState,
   useRef,
   useLayoutEffect,
   useMemo,
 } from 'react';
-import { LessonThemeContext } from '../../contexts/LessonThemeContext';
-import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { resolveLessonThemeCSS, resolveBlockMaxWidth } from '../../../../styles/lessonThemeStyles';
+import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { lessonTheme$ } from '../../state/vars';
 import { TableNode } from './TableNode';
 
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -179,19 +181,31 @@ export const TableEditor: React.FC<TableEditorProps> = ({
     null,
   );
 
-  const [iconComponentFor, readOnly, isPlayback] = useCellValues(
+  const [iconComponentFor, readOnly, isPlayback, lessonTheme] = useCellValues(
     iconComponentFor$,
     readOnly$,
     editorInPlayback$,
+    lessonTheme$,
   );
 
   const muiTheme = useTheme();
-  const { lessonTheme } = useContext(LessonThemeContext);
   const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';
-  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
+
+  const [contentWidth, setContentWidth] = useState<ContentWidthEnum | undefined>(
+    mdastNode.data?.hProperties?.['contentWidth'] as ContentWidthEnum | undefined,
+  );
+  const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
+  const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
+  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
+
+  useEffect(() => {
+    setContentWidth(
+      mdastNode.data?.hProperties?.['contentWidth'] as ContentWidthEnum | undefined,
+    );
+  }, [mdastNode]);
 
   const isReadOnly = useMemo(() => {
     return readOnly || isPlayback;
@@ -425,12 +439,22 @@ export const TableEditor: React.FC<TableEditorProps> = ({
 
   // remove tool cols in readOnly mode
   return (
+    <>
     <div
-      style={{
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-        position: 'relative',
-      }}
+      {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
+      {...(contentWidth !== undefined
+        ? { style: {
+            paddingTop: blockPadding,
+            paddingBottom: blockPadding,
+            position: 'relative',
+            '--block-max-width': blockMaxWidth ?? 'none',
+          } as React.CSSProperties }
+        : { style: {
+            paddingTop: blockPadding,
+            paddingBottom: blockPadding,
+            position: 'relative',
+          } }
+      )}
     >
       {!isReadOnly && (
         <Box
@@ -441,10 +465,15 @@ export const TableEditor: React.FC<TableEditorProps> = ({
             display: 'flex',
             position: 'absolute',
             top: 0,
-            right: gutterRight,
-            zIndex: 1,
+            right: gutterRight === '0px' ? '2rem' : gutterRight,
+            zIndex: 2,
           }}
         >
+          <Tooltip title="Block Appearance">
+            <IconButton size="small" onClick={() => setBlockAppearanceOpen(true)}>
+              <SettingsIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
           <TableSettingsButton parentEditor={parentEditor} lexicalTable={lexicalTable} />
           <InsertLineReturnButton parentEditor={parentEditor} lexicalNode={lexicalTable} />
           <DeleteIconButton
@@ -460,11 +489,12 @@ export const TableEditor: React.FC<TableEditorProps> = ({
       <div
         style={
           isReadOnly
-            ? undefined
+            ? (blockMaxWidth ? { maxWidth: blockMaxWidth, marginLeft: 'auto', marginRight: 'auto' } : undefined)
             : {
                 border: '1px dashed var(--baseBgActive, #ccc)',
                 borderRadius: '4px',
                 padding: '2px',
+                ...(blockMaxWidth ? { maxWidth: blockMaxWidth, marginLeft: 'auto', marginRight: 'auto' } : {}),
               }
         }
       >
@@ -689,6 +719,19 @@ export const TableEditor: React.FC<TableEditorProps> = ({
         </div>
       </div>
     </div>
+
+    <BlockAppearanceForm
+      open={blockAppearanceOpen}
+      currentContentWidth={contentWidth}
+      onClose={() => setBlockAppearanceOpen(false)}
+      onSave={(newContentWidth) => {
+        setContentWidth(newContentWidth);
+        parentEditor.update(() => {
+          lexicalTable.setContentWidth(newContentWidth);
+        }, { discrete: true });
+      }}
+    />
+    </>
   );
 };
 

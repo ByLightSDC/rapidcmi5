@@ -1,4 +1,5 @@
 import { ContainerDirective } from 'mdast-util-directive';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Grid layout preset configuration.
@@ -32,6 +33,7 @@ export interface GridContainerDirectiveNode extends ContainerDirective {
   attributes: {
     style?: string;
     backgroundColor?: string;
+    contentWidth?: ContentWidthEnum;
   };
 
   children: GridCellDirectiveNode[];

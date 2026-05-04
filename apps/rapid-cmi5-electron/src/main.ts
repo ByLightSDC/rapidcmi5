@@ -596,6 +596,28 @@ ipcMain.handle('userSettingsApi:removeCert', (_e, id: string) => {
   applyCustomCerts();
 });
 
+// Test In Player Handler — writes config.json directly from in-memory AU data,
+// then opens the player dev server in the default browser. No zip build needed.
+ipcMain.handle(
+  'cmi5:testInPlayer',
+  async (
+    _evt,
+    auJson: string,
+    playerUrl: string,
+    configDestPath: string,
+  ) => {
+    try {
+      await fs.promises.mkdir(nodePath.dirname(configDestPath), { recursive: true });
+      await fs.promises.writeFile(configDestPath, auJson, 'utf-8');
+      shell.openExternal(playerUrl);
+      return { success: true };
+    } catch (err: any) {
+      console.error('cmi5:testInPlayer failed', err);
+      return { success: false, error: err?.message ?? String(err) };
+    }
+  },
+);
+
 // CMI5 Build Handler
 ipcMain.handle(
   'cmi5Build',

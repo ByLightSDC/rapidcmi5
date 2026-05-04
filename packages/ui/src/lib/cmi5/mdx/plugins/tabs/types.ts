@@ -1,4 +1,5 @@
 import { ContainerDirective, LeafDirective } from 'mdast-util-directive';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Represents a container directive node for a tab group.
@@ -19,6 +20,7 @@ export interface TabDirectiveNode extends ContainerDirective {
   attributes: {
     style?: string;
     backgroundColor?: string;
+    contentWidth?: ContentWidthEnum;
   };
 
   children: TabContentDirectiveNode[];

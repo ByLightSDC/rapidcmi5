@@ -9,12 +9,13 @@ import {
   KSATElement,
   LessonTheme,
   Operation,
+  RC5_VERSION,
   RC5ScenarioContent,
   SlideType,
   SlideTypeEnum,
   TeamConsolesContent,
 } from '@rapid-cmi5/cmi5-build-common';
-import { courseNameInUseMessage, RC5_VERSION } from '../session/constants';
+import { courseNameInUseMessage } from '../session/constants';
 import { GitFS, MAX_FS_SLUG_LENGTH } from './fileSystem';
 import {
   flattenFolders,
@@ -22,15 +23,10 @@ import {
   getScenarioDirectives,
   RC5_FILENAME,
 } from '@rapid-cmi5/cmi5-build-common';
-import {
-  debugLog,
-  debugLogError,
-  defaultCourseData,
-  defaultEmptySlide,
-} from '@rapid-cmi5/ui';
+import { debugLog, debugLogError, defaultEmptySlide } from '@rapid-cmi5/ui';
 import { basename, dirname, join, normalize } from 'path-browserify';
 import JSZip from 'jszip';
-import { getRepoPath } from './gitOperations';
+import { getRepoPath, GitOperations } from './gitOperations';
 import slug from 'slug';
 
 export interface FsContextOptions {
@@ -82,10 +78,10 @@ export interface CreateNewCourseInFsOptions extends FsContextOptions {
   courseAu: string;
   courseDescription: string;
   courseId: string;
-
   baseSlideTitle?: string;
   baseSlideContent?: string;
 }
+
 /**
  * Creates a new CMI5 course structure in the virtual file system.
  * This includes creating the course directory, the AU subdirectory,
@@ -117,13 +113,21 @@ export const createNewCourseInFs = async ({
 }: CreateNewCourseInFsOptions) => {
   try {
     await fsInstance.createDir(r, coursePath);
+    const sluggedAu = slugifyPath(courseAu);
 
-    const auDirPath = join(coursePath, courseAu);
+    const auDirPath = join(coursePath, sluggedAu);
     const sluggedFilename = slugifyPath(baseSlideTitle);
     const firstSlidePath = join(auDirPath, sluggedFilename + '.md');
 
+    const gitOps = new GitOperations(fsInstance);
+    const remotes = await gitOps.listRepoRemotes(r);
+
+    const gitBranch = (await gitOps.getCurrentGitBranch(r)) ?? undefined;
+    const buildTime = new Date().toISOString();
+    const remoteGitUrl = remotes.find((rem) => rem.remote === 'origin')?.url;
+
     // Create the course meta file
-    const courseDataFileContent = {
+    const courseDataFileContent: CourseData = {
       blocks: [
         {
           blockName: coursePath,
@@ -140,12 +144,16 @@ export const createNewCourseInFs = async ({
               ],
             },
           ],
+
           blockDescription: '',
         },
       ],
+      gitBranch,
+      remoteGitUrl,
+      buildTime,
       courseId,
-      courseTitle: courseTitle,
-      courseDescription: courseDescription,
+      courseTitle,
+      courseDescription,
       rc5Version: RC5_VERSION,
     };
 
@@ -192,6 +200,7 @@ export const createCourseInFs = async ({
   courseAu,
 }: CreateCourseInFsOptions) => {
   // Ensure this is a valid course name
+
   const coursePath = slugifyPath(courseTitle);
 
   if (availableCourses.find((course) => course.basePath === coursePath)) {
@@ -696,17 +705,29 @@ export const computeCourseFromJsonFs = async ({
       }
     }
     await updatePaths(editableCourseData, repoPath, fsInstance, changedFiles);
+
+    editableCourseData.rc5Version = RC5_VERSION;
+
+    const gitOps = new GitOperations(fsInstance);
+    const remotes = await gitOps.listRepoRemotes(r);
+
+    const branch = await gitOps.getCurrentGitBranch(r);
+
+    editableCourseData.remoteGitUrl = remotes.find(
+      (rem) => rem.remote === 'origin',
+    )?.url;
+
+    editableCourseData.gitBranch = branch ?? undefined;
+
+    editableCourseData.buildTime = new Date().toISOString();
+
     // update the file system
     await fsInstance.updateFile(
       r,
       `${course.basePath}/${RC5_FILENAME}`,
       YAML.stringify(stripSlideContent(editableCourseData)),
     );
-    // update our current course data in visual designer
-    // const changedFiles = [
-    //   ...courseOperationsList.map((file) => file.filepath),
-    //   `${course.basePath}/${RC5_FILENAME}`,
-    // ];
+
     changedFiles.push(`${course.basePath}/${RC5_FILENAME}`);
 
     return {
@@ -721,7 +742,7 @@ export const computeCourseFromJsonFs = async ({
   }
 };
 
-export // We do not want contents of files to be put into RC5.yaml
+// We do not want contents of files to be put into RC5.yaml
 const stripSlideContent = (course: CourseData): CourseData => ({
   ...course,
   blocks: course.blocks.map((block) => ({

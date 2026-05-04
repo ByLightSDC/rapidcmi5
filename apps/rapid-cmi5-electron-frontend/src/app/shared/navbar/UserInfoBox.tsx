@@ -1,4 +1,4 @@
-import { AppDispatch, useMDStyleIcons } from '@rapid-cmi5/react-editor';
+import { AppDispatch } from '@rapid-cmi5/react-editor';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import {
@@ -21,7 +21,7 @@ import Box from '@mui/material/Box';
 import ListIcon from '@mui/icons-material/List';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import Brightness6Icon from '@mui/icons-material/Brightness6';
-
+import InfoIcon from '@mui/icons-material/Info';
 import SecurityIcon from '@mui/icons-material/Security';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import KeyIcon from '@mui/icons-material/Key';
@@ -49,6 +49,7 @@ import {
   StyleIconTypeEnum,
 } from 'packages/rapid-cmi5/src/lib/design-tools/rapidcmi5_mdx/styles/styleSvgConstants';
 import { CustomTheme } from '../../styles/createPalette';
+import { RC5_VERSION } from '@rapid-cmi5/cmi5-build-common';
 
 interface UserInfoBoxProps {
   anchorEl: HTMLElement | null;
@@ -56,6 +57,7 @@ interface UserInfoBoxProps {
 }
 
 const clearStoragePromptModalId = 'reset-persistence';
+const showVersionModalId = 'showVersionModalId';
 const configureCmi5CFGModalId = 'configureCmi5CFGModalId';
 
 export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
@@ -150,6 +152,37 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
             title="Clear Data"
             handleAction={handleClearStorage}
             maxWidth="xs"
+          />
+        )}
+
+        {modalObj.type === showVersionModalId && (
+          <ModalDialog
+            testId={showVersionModalId}
+            buttons={['OK']}
+            dialogProps={{ open: true }}
+            message={
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 1,
+                }}
+              >
+                <img
+                  width={220}
+                  src={
+                    appThemeColor === 'light'
+                      ? '/assets/images/RapidCMI5_Logo_Light.png'
+                      : '/assets/images/RapidCMI5_Logo_Dark.png'
+                  }
+                  alt="Rapid CMI5 Logo"
+                />
+                Version: {RC5_VERSION}
+              </Box>
+            }
+            maxWidth="xs"
+            handleAction={() => handleCloseModal()}
           />
         )}
 
@@ -290,6 +323,24 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
               ))}
           </>
         )}
+        <MenuItem
+          onClick={() => {
+            dispatch(
+              setModal({
+                id: null,
+                meta: undefined,
+                name: null,
+                type: showVersionModalId,
+              }),
+            );
+            onClose();
+          }}
+        >
+          <ListItemIcon>
+            <InfoIcon sx={{ transform: 'scaleX(-1)' }} />
+          </ListItemIcon>
+          <MenuItemText label="Version" />
+        </MenuItem>
         <MenuItem
           onClick={() => {
             dispatch(

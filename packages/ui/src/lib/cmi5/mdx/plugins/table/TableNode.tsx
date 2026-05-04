@@ -204,6 +204,29 @@ export class TableNode extends DecoratorNode<JSX.Element> {
   }
 
   /**
+   * Sets the content width override for the table.
+   * Stored in data.hProperties.contentWidth.
+   */
+  setContentWidth(contentWidth: string | undefined): void {
+    const self = this.getWritable();
+    const table = self.__mdastNode;
+    const data = table.data || {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const hProperties = { ...(data.hProperties || {}) } as any;
+
+    if (contentWidth) {
+      hProperties['contentWidth'] = contentWidth;
+    } else {
+      delete hProperties['contentWidth'];
+    }
+
+    self.__mdastNode = {
+      ...table,
+      data: { ...data, hProperties },
+    };
+  }
+
+  /**
    * Sets the full style string for the table.
    * Used by the TableStyleDialog to apply complex border styles.
    */

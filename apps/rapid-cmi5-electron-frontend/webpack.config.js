@@ -35,7 +35,6 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
     type: 'asset/resource',
   });
 
-  // Your existing MDX rule
   config.module.rules.push({
     test: /\.mdx?$/,
     use: [
@@ -82,6 +81,6 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
       ],
     },
   });
-  
+
   return theConfig;
 });

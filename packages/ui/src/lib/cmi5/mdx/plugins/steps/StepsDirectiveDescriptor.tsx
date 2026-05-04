@@ -28,7 +28,7 @@ export const StepsDirectiveDescriptor: DirectiveDescriptor<StepDirectiveNode> = 
   testNode(node) {
     return node.name === 'steps';
   },
-  attributes: ['style', 'backgroundColor'],
+  attributes: ['style', 'backgroundColor', 'contentWidth'],
   hasChildren: true,
   Editor: StepsEditor
 };

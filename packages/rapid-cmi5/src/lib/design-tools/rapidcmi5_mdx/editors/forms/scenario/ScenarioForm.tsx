@@ -1,5 +1,4 @@
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { UseFormReturn } from 'react-hook-form';
 import {
   FormControlCheckboxField,
@@ -31,6 +30,7 @@ import { useRapidCmi5Opts } from '../../../../course-builder/GitViewer/session/R
 import { useContext } from 'react';
 import { ScenarioCard } from './ScenarioCard';
 import { NoScenarioCard } from './NoScenarioCard';
+import { toTitleCase } from '../formUtils';
 
 export const ScenarioForm = ({
   crudType,
@@ -182,7 +182,7 @@ export const ScenarioForm = ({
           >
             {moveOnCriteriaOptions.map((item) => (
               <MenuItem key={item} value={item}>
-                {item}
+                {toTitleCase(item)}
               </MenuItem>
             ))}
           </FormControlSelectField>

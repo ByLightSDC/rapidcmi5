@@ -45,6 +45,19 @@ export const DEFAULT_LESSON_THEME = {
 };
 
 /**
+ * Resolves the explicit block-level maxWidth CSS value.
+ * Returns the CSS string only when a block-level override is set.
+ * Returns undefined when no override — callers can then fall back to lesson theme.
+ * Returns null when override is ContentWidthEnum.None (unconstrained / no max-width).
+ */
+export function resolveBlockMaxWidth(
+  blockContentWidth: ContentWidthEnum | undefined,
+): string | null | undefined {
+  if (blockContentWidth === undefined) return undefined;
+  return CONTENT_WIDTH_MAP[blockContentWidth] ?? null;
+}
+
+/**
  * Resolves a LessonTheme to concrete CSS values.
  * Returns null if no theme is set (avoids unnecessary style injection).
  */
@@ -92,8 +105,41 @@ export function generateLessonThemeStyleTag(
   const css = resolveLessonThemeCSS(theme);
 
 
+  // Always-emitted rules — must fire regardless of lesson theme settings.
+  // Image block overrides must work even when no lesson content width is set.
+  const imageBaseRule = `
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > [data-lexical-decorator] {
+      display: block;
+      width: 100%;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > [data-lexical-decorator] > div {
+      width: 100%;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] {
+      max-width: 100%;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-block-override] {
+      max-width: var(--block-max-width) !important;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] img {
+      max-width: 100%;
+      height: auto;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-block-expand] img {
+      display: block;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-image-align="center"] img {
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-image-align="right"] img {
+      margin-left: auto;
+      margin-right: 0;
+    }
+  `;
+
   // Always emit --content-margin so directive calc() expressions resolve even when no theme is set.
-  if (!css) return `.${scopedClass} { --content-margin: 0px; }`;
+  if (!css) return `.${scopedClass} { --content-margin: 0px; }` + imageBaseRule;
 
   const widthRule = css.maxWidth
     ? `
@@ -101,13 +147,15 @@ export function generateLessonThemeStyleTag(
     --content-margin: calc((100% - ${css.maxWidth}) / 2);
   }
   .${scopedClass} .mdxeditor-root-contenteditable {
-    max-width: ${css.maxWidth};
-    margin-left: auto;
-    margin-right: auto;
     overflow: visible;
   }
   .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:not(:has(.paper-activity)) {
     max-width: ${css.maxWidth};
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:has([data-block-override]) {
+    max-width: var(--block-max-width) !important;
     margin-left: auto;
     margin-right: auto;
   }
@@ -119,18 +167,37 @@ export function generateLessonThemeStyleTag(
     transform: translateX(-50%);
     overflow: visible;
   }
-  .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] [data-lexical-decorator]:not(:has(.paper-activity)) {
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] [data-lexical-editor="true"] [data-lexical-decorator]:not(:has(.paper-activity)) {
     max-width: none;
     margin-left: unset;
     margin-right: unset;
   }
-  .${scopedClass} .mdxeditor-root-contenteditable [data-lexical-editor="true"] {
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] [data-lexical-editor="true"] {
       --content-margin: 0px;
   }`
     : `
   .${scopedClass} {
       --content-margin: 0px;
   }`;
+
+  const paragraphWidthRule = css.maxWidth
+    ? `
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p:not(:has([data-block-expand])),
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-paragraph="true"],
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > ul,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > ol,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > blockquote,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h1,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h2,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h3,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h4,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h5,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h6 {
+      max-width: ${css.maxWidth};
+      margin-left: auto;
+      margin-right: auto;
+    }`
+    : '';
 
   const alignmentRule = css.textAlign
     ? `
@@ -172,5 +239,5 @@ export function generateLessonThemeStyleTag(
     }`
     : '';
 
-  return alignmentRule + widthRule + blockPaddingRule + blockBaseRule;
+  return imageBaseRule + paragraphWidthRule + alignmentRule + widthRule + blockPaddingRule + blockBaseRule;
 }

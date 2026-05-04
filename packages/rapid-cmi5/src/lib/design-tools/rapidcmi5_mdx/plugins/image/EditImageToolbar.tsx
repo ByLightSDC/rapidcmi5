@@ -6,9 +6,12 @@ import { $getNodeByKey } from 'lexical';
 // MUI
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
+import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
+import VerticalAlignCenterIcon from '@mui/icons-material/VerticalAlignCenter';
+import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
 
 /** Icons */
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -26,7 +29,11 @@ import {
   clickPosition$,
   isLabelDropping$,
   isTextDropping$,
+  AlignmentToolbarControls,
 } from '@rapid-cmi5/ui';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { MdxJsxAttribute } from 'mdast-util-mdx-jsx';
+import { $isImageNode } from './ImageNode';
 
 import { StyleDialog } from './StyleDialog';
 import { useImageStyle } from './useImageStyle';
@@ -41,6 +48,8 @@ export interface EditImageToolbarProps {
   width?: number;
   height?: number;
   href?: string;
+  contentWidth?: ContentWidthEnum;
+  textAlign?: 'left' | 'center' | 'right';
 }
 
 /**
@@ -63,6 +72,8 @@ export function EditImageToolbar({
   width,
   height,
   href,
+  contentWidth,
+  textAlign,
 }: EditImageToolbarProps): JSX.Element {
   const [readOnly] = useCellValues(readOnly$);
   const [editor] = useLexicalComposerContext();
@@ -76,6 +87,7 @@ export function EditImageToolbar({
   // For letting style dialogue work outside of image dialog.
   const { imageStyle, setImageStyle } = useImageStyle(nodeKey);
   const [isStyleDialogOpen, setIsStyleDialogOpen] = useState(false);
+  const [isAlignOpen, setIsAlignOpen] = useState(false);
 
   /**
    * Set marker position to follow mouse
@@ -186,6 +198,17 @@ export function EditImageToolbar({
           <PaletteIcon />
         </IconButton>
 
+        <Tooltip title="Alignment">
+          <IconButton
+            aria-label="toggle alignment"
+            disabled={readOnly}
+            onClick={() => setIsAlignOpen((v) => !v)}
+            sx={{ opacity: isAlignOpen ? 1 : 0.5 }}
+          >
+            {textAlign === 'right' ? <VerticalAlignTopIcon sx={{ transform: 'rotate(90deg)' }} /> : textAlign === 'center' ? <VerticalAlignCenterIcon sx={{ transform: 'rotate(90deg)' }} /> : <VerticalAlignBottomIcon sx={{ transform: 'rotate(90deg)' }} />}
+          </IconButton>
+        </Tooltip>
+
         <IconButton
           aria-label="Add Label"
           disabled={readOnly}
@@ -246,12 +269,69 @@ export function EditImageToolbar({
         </IconButton>
       </Stack>
 
-      {/* Style Dialog lives OUTSIDE the button, but inside the toolbar component */}
+      {/* Second-row alignment toolbar — revealed by toggle button */}
+      {isAlignOpen && <Stack
+        direction="row"
+        spacing={0}
+        sx={{
+          backgroundColor:
+            muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
+          position: 'absolute',
+          right: 0,
+          top: 36,
+          display: 'flex',
+          zIndex: 1,
+        }}
+      >
+        <AlignmentToolbarControls
+          currentAlignment={textAlign ?? 'left'}
+          onAlignmentChange={(value) => {
+            editor.update(() => {
+              const node = $getNodeByKey(nodeKey);
+              if ($isImageNode(node)) {
+                const filteredRest = (rest ?? []).filter(
+                  (a: MdxJsxAttribute) => a.name !== 'textAlign',
+                );
+                if (value !== 'left') {
+                  filteredRest.push({
+                    type: 'mdxJsxAttribute',
+                    name: 'textAlign',
+                    value,
+                  } as MdxJsxAttribute);
+                }
+                node.setRest(filteredRest);
+              }
+            });
+          }}
+          disabled={readOnly}
+        />
+      </Stack>}
+
+      {/* Style Dialog — includes Content Width (block appearance) */}
       <StyleDialog
         isOpen={isStyleDialogOpen}
         style={imageStyle}
         setImageStyle={setImageStyle}
         setIsStyleDialogOpen={setIsStyleDialogOpen}
+        contentWidth={contentWidth}
+        onContentWidthSave={(newContentWidth) => {
+          editor.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            if ($isImageNode(node)) {
+              const filteredRest = (rest ?? []).filter(
+                (a: MdxJsxAttribute) => a.name !== 'contentWidth',
+              );
+              if (newContentWidth !== undefined) {
+                filteredRest.push({
+                  type: 'mdxJsxAttribute',
+                  name: 'contentWidth',
+                  value: newContentWidth,
+                } as MdxJsxAttribute);
+              }
+              node.setRest(filteredRest);
+            }
+          });
+        }}
       />
     </>
   );

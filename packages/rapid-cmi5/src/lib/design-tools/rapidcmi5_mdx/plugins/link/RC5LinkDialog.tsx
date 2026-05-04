@@ -1,36 +1,44 @@
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   activeEditor$,
-  cancelLinkEdit$,
   currentSelection$,
-  EditLinkDialog,
-  linkDialogState$,
   onWindowChange$,
-  PreviewLinkDialog,
-  removeLink$,
-  switchFromPreviewToLinkEdit$,
-  updateLink$,
   useCellValues,
   usePublisher,
   viewMode$,
 } from '@mdxeditor/editor';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import * as yup from 'yup';
 
-import React, { useCallback, useEffect, useRef } from 'react';
-
 import { UseFormReturn } from 'react-hook-form';
+import {
+  cancelLinkEdit$,
+  EditLinkDialog,
+  linkDialogState$,
+  PreviewLinkDialog,
+  removeLink$,
+  switchFromPreviewToLinkEdit$,
+  updateLink$,
+} from '../link-dialog/index';
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
 import Popper from '@mui/material/Popper';
 import { useTheme } from '@mui/system';
 
-
 import { $setSelection } from 'lexical';
 import { useClickOutside } from './useClickOutside';
 import RC5LinkEditor from './RC5LinkEditor';
 import { useSelector } from 'react-redux';
-import { editorInPlayback$, debugLog, FormStateType, FormControlTextField, ModalDialog, FormControlUIProvider, MiniForm, delay } from '@rapid-cmi5/ui';
+import {
+  editorInPlayback$,
+  debugLog,
+  FormStateType,
+  FormControlTextField,
+  ModalDialog,
+  FormControlUIProvider,
+  MiniForm,
+  delay,
+} from '@rapid-cmi5/ui';
 import { currentSlideNum } from '../../../../redux/courseBuilderReducer';
 
 /**
@@ -38,8 +46,6 @@ import { currentSlideNum } from '../../../../redux/courseBuilderReducer';
  * @returns
  */
 export const RC5LinkDialog: React.FC = () => {
-  const theme = useTheme();
-
   const [
     activeEditor,
     linkDialogState,
@@ -54,7 +60,6 @@ export const RC5LinkDialog: React.FC = () => {
     viewMode$,
   );
   const currentSlideIndex = useSelector(currentSlideNum); //would be better to detect lexical refresh
-  const [editor] = useLexicalComposerContext();
   const publishWindowChange = usePublisher(onWindowChange$);
   const updateLinkDialogState = usePublisher(linkDialogState$);
   const updateLink = usePublisher(updateLink$);
@@ -226,11 +231,20 @@ export const RC5LinkDialog: React.FC = () => {
         <Grid size={6}>
           <FormControlTextField
             control={control}
+            error={Boolean(errors?.text)}
+            helperText={errors?.text?.message}
+            name="text"
+            label="Display Text"
+            readOnly={false}
+          />
+        </Grid>
+        <Grid size={6}>
+          <FormControlTextField
+            control={control}
             error={Boolean(errors?.title)}
             helperText={errors?.title?.message}
             name="title"
-            required
-            label="Title"
+            label="Tooltip Text"
             readOnly={false}
           />
         </Grid>
@@ -253,7 +267,7 @@ export const RC5LinkDialog: React.FC = () => {
           <MiniForm
             dataCache={linkDialogState}
             doAction={(req: EditLinkDialog) => {
-              updateLink({ text: req.title, title: req.title, url: req.url });
+              updateLink({ text: req.text, title: req.title, url: req.url });
             }}
             formTitle="Link"
             getFormFields={getFormFields}

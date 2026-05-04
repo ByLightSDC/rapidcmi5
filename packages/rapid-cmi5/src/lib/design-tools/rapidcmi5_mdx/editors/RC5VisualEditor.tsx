@@ -7,7 +7,6 @@ import {
   toolbarPlugin,
   listsPlugin,
   linkPlugin,
-  linkDialogPlugin,
   thematicBreakPlugin,
   codeBlockPlugin,
   directivesPlugin,
@@ -112,6 +111,7 @@ import { LessonThemeContext } from '@rapid-cmi5/ui';
 import { RC5Context } from '../contexts/RC5Context';
 import { RapidCmi5Toolbar } from '../toolbar/RapidCmi5Toolbar';
 import { ErrorBoundary } from './ErrorBoundary';
+import { linkDialogPlugin } from '../plugins/link-dialog';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -460,7 +460,7 @@ function RC5VisualEditor() {
         }),
         toolbarPlugin({
           toolbarClassName: 'mdxeditor-editor-toolbar',
-          toolbarContents: () => <RapidCmi5Toolbar />,
+          toolbarContents: () => <RapidCmi5Toolbar lessonTheme={currentLessonTheme} />,
         }),
       );
     }

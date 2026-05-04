@@ -28,7 +28,7 @@ export const TabsDirectiveDescriptor: DirectiveDescriptor<TabDirectiveNode> = {
   testNode(node) {
     return node.name === 'tabs';
   },
-  attributes: ['style', 'backgroundColor'],
+  attributes: ['style', 'backgroundColor', 'contentWidth'],
   hasChildren: true,
   Editor: TabsEditor
 };

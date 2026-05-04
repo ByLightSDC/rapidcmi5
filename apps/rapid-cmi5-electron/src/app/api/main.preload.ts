@@ -24,6 +24,17 @@ export const ipc = {
       projectName,
       createAuMappings,
     ),
+  testInPlayer: (
+    auJson: string,
+    playerUrl: string,
+    configDestPath: string,
+  ) =>
+    ipcRenderer.invoke(
+      'cmi5:testInPlayer',
+      auJson,
+      playerUrl,
+      configDestPath,
+    ),
 };
 
 contextBridge.exposeInMainWorld('ipc', ipc);

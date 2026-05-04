@@ -28,7 +28,7 @@ export const AccordionDirectiveDescriptor: DirectiveDescriptor<AccordionDirectiv
   testNode(node) {
     return node.name === 'accordion';
   },
-  attributes: ['style', 'backgroundColor'],
+  attributes: ['style', 'backgroundColor', 'contentWidth'],
   hasChildren: true,
   Editor: AccordionEditor
 };
