@@ -1,5 +1,5 @@
 import { KSATElement, MoveOnCriteriaEnum } from './activity';
-import { AuAutoGrader, SlideType } from './slide';
+import { SlideType } from './slide';
 
 export type Cmi5Scenario = {
   uuid?: string;
@@ -51,7 +51,7 @@ export type LessonTheme = {
   blockPadding?: BlockPaddingEnum;
   blockPaddingCustomValue?: number;
   defaultAlignment?: DefaultAlignmentEnum;
-  defaultActivityAlignment?:DefaultAlignmentEnum;
+  defaultActivityAlignment?: DefaultAlignmentEnum;
 };
 
 export const contentWidthOptions = Object.values(ContentWidthEnum);
@@ -83,6 +83,15 @@ export type CourseAU = {
   ksats?: KSATElement[];
   moveOnCriteria?: MoveOnCriteriaEnum;
   lessonTheme?: LessonTheme;
+  // A way to easily display info such as publish time, git repo, git commit hash, etc
+  metadata?: AuMetaData;
+};
+
+export type AuMetaData = {
+  buildTime?: string;
+  remoteGitUrl?: string;
+  gitBranch?: string;
+  rc5Version?: string;
 };
 
 export enum Operation {
@@ -109,7 +118,13 @@ export type CourseData = {
   courseId: string;
   blocks: CourseBlock[];
   designer?: any;
+  // what version of rapid cmi5 was this course last saved with
   rc5Version?: string;
+  // used to track origin of the package
+  remoteGitUrl?: string;
+  // the branch which this course was made from
+  gitBranch?: string;
+  buildTime?: string;
 };
 
 export enum CourseLevel {

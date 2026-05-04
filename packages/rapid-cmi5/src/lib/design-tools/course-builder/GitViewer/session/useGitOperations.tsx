@@ -234,7 +234,7 @@ export const useGitOperations = (
         req.authorName,
       );
     },
-    [repoAccessObject, currentGitConfig],
+    [repoAccessObject, currentGitConfig, gitOperator],
   );
 
   const stashChanges = useCallback(async () => {

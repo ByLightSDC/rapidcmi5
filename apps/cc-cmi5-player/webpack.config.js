@@ -1,8 +1,44 @@
 const { merge } = require('webpack-merge');
 const { composePlugins, withNx } = require('@nx/webpack');
 const { withReact } = require('@nx/react');
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
+
+const { version: rc5Version } = require('../../packages/common/package.json');
+
+/*
+  This is a manifest just for the player. It supports swapping out the player in the Moodle 
+  plugin. 
+*/
+class PlayerManifestPlugin {
+  apply(compiler) {
+    compiler.hooks.afterEmit.tapAsync(
+      'PlayerManifestPlugin',
+      (compilation, callback) => {
+        if (compiler.watchMode) return callback();
+        const outputPath = compilation.outputOptions.path;
+        const manifest = {
+          playerVersion: rc5Version,
+          buildTimestamp: Math.floor(Date.now() / 1000),
+          files: [
+            'index.html',
+            'cfg.json',
+            'favicon.ico',
+            'env-config.js',
+            '3rdpartylicenses.txt',
+          ],
+        };
+        fs.writeFile(
+          path.join(outputPath, 'player-manifest.json'),
+          JSON.stringify(manifest, null, 2),
+          'utf-8',
+          callback,
+        );
+      },
+    );
+  }
+}
+
 const AdmZip = require('adm-zip');
 
 const TEST_DIR = path.resolve(__dirname, 'src/test');
@@ -12,7 +48,6 @@ const TEST_ASSETS_PATH = path.join(TEST_DIR, 'Assets');
 function setCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 }
-
 // Nx plugins for webpack.
 module.exports = composePlugins(withNx(), withReact(), (config) => {
   // Exclude monaco-editor from default CSS rules (postcss-loader can't resolve .ttf)
@@ -44,6 +79,9 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
     test: /\.(woff|woff2|eot|ttf|otf)$/i,
     type: 'asset/resource',
   });
+
+  config.plugins = config.plugins || [];
+  config.plugins.push(new PlayerManifestPlugin());
 
   const theConfig = merge(config, {
     ignoreWarnings: [/Failed to parse source map/],
@@ -77,7 +115,9 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
         devServer.app.post('/test-config', (req, res) => {
           setCors(res);
           let body = '';
-          req.on('data', (chunk) => { body += chunk; });
+          req.on('data', (chunk) => {
+            body += chunk;
+          });
           req.on('end', () => {
             try {
               JSON.parse(body); // validate
@@ -98,11 +138,18 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
           setCors(res);
           const lessonDirPath = req.query['lessonDirPath'];
           if (!lessonDirPath) {
-            return res.status(400).json({ success: false, error: 'lessonDirPath query param is required' });
+            return res
+              .status(400)
+              .json({
+                success: false,
+                error: 'lessonDirPath query param is required',
+              });
           }
 
           const chunks = [];
-          req.on('data', (chunk) => { chunks.push(chunk); });
+          req.on('data', (chunk) => {
+            chunks.push(chunk);
+          });
           req.on('end', () => {
             try {
               const zipBuffer = Buffer.concat(chunks);
@@ -111,14 +158,27 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
               // Extract config.json
               const configEntry = zip.getEntry(`${lessonDirPath}/config.json`);
               if (!configEntry) {
-                return res.status(400).json({ success: false, error: `config.json not found at ${lessonDirPath}/config.json in zip` });
+                return res
+                  .status(400)
+                  .json({
+                    success: false,
+                    error: `config.json not found at ${lessonDirPath}/config.json in zip`,
+                  });
               }
               fs.mkdirSync(TEST_DIR, { recursive: true });
-              fs.writeFileSync(TEST_CONFIG_PATH, configEntry.getData().toString('utf-8'), 'utf-8');
+              fs.writeFileSync(
+                TEST_CONFIG_PATH,
+                configEntry.getData().toString('utf-8'),
+                'utf-8',
+              );
 
               // Extract Assets/ folder if present
               const assetsPrefix = `${lessonDirPath}/Assets/`;
-              const assetEntries = zip.getEntries().filter(e => e.entryName.startsWith(assetsPrefix) && !e.isDirectory);
+              const assetEntries = zip
+                .getEntries()
+                .filter(
+                  (e) => e.entryName.startsWith(assetsPrefix) && !e.isDirectory,
+                );
               if (assetEntries.length > 0) {
                 fs.rmSync(TEST_ASSETS_PATH, { recursive: true, force: true });
                 for (const entry of assetEntries) {
@@ -146,16 +206,25 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
         devServer.app.post('/load-course-zip', (req, res) => {
           setCors(res);
           let body = '';
-          req.on('data', (chunk) => { body += chunk; });
+          req.on('data', (chunk) => {
+            body += chunk;
+          });
           req.on('end', () => {
             try {
               const { zipPath, lessonDirPath } = JSON.parse(body);
 
               if (!zipPath || !lessonDirPath) {
-                return res.status(400).json({ success: false, error: 'zipPath and lessonDirPath are required' });
+                return res
+                  .status(400)
+                  .json({
+                    success: false,
+                    error: 'zipPath and lessonDirPath are required',
+                  });
               }
               if (!fs.existsSync(zipPath)) {
-                return res.status(400).json({ success: false, error: `Zip not found: ${zipPath}` });
+                return res
+                  .status(400)
+                  .json({ success: false, error: `Zip not found: ${zipPath}` });
               }
 
               const zip = new AdmZip(zipPath);
@@ -163,14 +232,27 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
               // Extract config.json
               const configEntry = zip.getEntry(`${lessonDirPath}/config.json`);
               if (!configEntry) {
-                return res.status(400).json({ success: false, error: `config.json not found at ${lessonDirPath}/config.json in zip` });
+                return res
+                  .status(400)
+                  .json({
+                    success: false,
+                    error: `config.json not found at ${lessonDirPath}/config.json in zip`,
+                  });
               }
               fs.mkdirSync(TEST_DIR, { recursive: true });
-              fs.writeFileSync(TEST_CONFIG_PATH, configEntry.getData().toString('utf-8'), 'utf-8');
+              fs.writeFileSync(
+                TEST_CONFIG_PATH,
+                configEntry.getData().toString('utf-8'),
+                'utf-8',
+              );
 
               // Extract Assets/ folder if present
               const assetsPrefix = `${lessonDirPath}/Assets/`;
-              const assetEntries = zip.getEntries().filter(e => e.entryName.startsWith(assetsPrefix) && !e.isDirectory);
+              const assetEntries = zip
+                .getEntries()
+                .filter(
+                  (e) => e.entryName.startsWith(assetsPrefix) && !e.isDirectory,
+                );
               if (assetEntries.length > 0) {
                 fs.rmSync(TEST_ASSETS_PATH, { recursive: true, force: true });
                 for (const entry of assetEntries) {

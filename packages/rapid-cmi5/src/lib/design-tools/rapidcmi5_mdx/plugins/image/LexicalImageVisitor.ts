@@ -2,6 +2,12 @@ import * as Mdast from 'mdast';
 import { LexicalExportVisitor } from '@mdxeditor/editor';
 import { ImageNode, $isImageNode } from './ImageNode';
 
+// camelCase rest attr names → data-* HTML attribute names that survive MDX parsing
+const attrToDataMap: Record<string, string> = {
+  contentWidth: 'data-content-width',
+  textAlign: 'data-text-align',
+};
+
 /**
  * Replaces > with /> At the end of an html tag
  * because > is not suppported by MdxEditor
@@ -71,7 +77,8 @@ export const LexicalImageVisitor: LexicalExportVisitor<
             attr.type === 'mdxJsxAttribute' &&
             typeof attr.value === 'string'
           ) {
-            img.setAttribute(attr.name, attr.value);
+            const htmlAttrName = attrToDataMap[attr.name] ?? attr.name;
+            img.setAttribute(htmlAttrName, attr.value);
           }
         }
         // ❌ DO NOT set img.src - it resolves blob URLs!
@@ -109,7 +116,8 @@ export const LexicalImageVisitor: LexicalExportVisitor<
             attr.type === 'mdxJsxAttribute' &&
             typeof attr.value === 'string'
           ) {
-            img.setAttribute(attr.name, attr.value);
+            const htmlAttrName = attrToDataMap[attr.name] ?? attr.name;
+            img.setAttribute(htmlAttrName, attr.value);
           }
         }
 

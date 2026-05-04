@@ -4,6 +4,12 @@ import { $createImageNode } from './ImageNode';
 import { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx';
 import { $createParagraphNode, RootNode } from 'lexical';
 
+// data-* HTML attribute names → camelCase rest attr names
+const dataAttrToNameMap: Record<string, string> = {
+  'data-content-width': 'contentWidth',
+  'data-text-align': 'textAlign',
+};
+
 //![alt text](url "title")
 export const MdastImageVisitor: MdastImportVisitor<Mdast.Image> = {
   testNode: 'image',
@@ -43,6 +49,17 @@ export const MdastHtmlImageVisitor: MdastImportVisitor<Mdast.Html> = {
     const height = img.height;
     const id = img.id;
 
+    const rest = Array.from(img.attributes)
+      .filter(
+        (attr) =>
+          !['src', 'alt', 'title', 'width', 'height', 'id'].includes(attr.name),
+      )
+      .map((attr) => ({
+        type: 'mdxJsxAttribute' as const,
+        name: dataAttrToNameMap[attr.name] ?? attr.name,
+        value: attr.value,
+      }));
+
     const image = $createImageNode({
       src: src || '',
       altText,
@@ -50,6 +67,7 @@ export const MdastHtmlImageVisitor: MdastImportVisitor<Mdast.Html> = {
       width,
       height,
       id,
+      rest,
     });
 
     if (lexicalParent.getType() === 'root') {
@@ -116,20 +134,13 @@ export const MdastJsxImageVisitor: MdastImportVisitor<
       href = getAttributeValue(imageNode, 'href');
     }
 
-    const rest = imageNode.attributes.filter((a) => {
-      return (
-        a.type === 'mdxJsxAttribute' &&
-        ![
-          'src',
-          'alt',
-          'title',
-          'height',
-          'width',
-          'href',
-          'id',
-        ].includes(a.name)
-      );
-    });
+    const excluded = ['src', 'alt', 'title', 'height', 'width', 'href', 'id'];
+    const rest = imageNode.attributes
+      .filter((a) => a.type === 'mdxJsxAttribute' && !excluded.includes(a.name))
+      .map((a: any) => ({
+        ...a,
+        name: dataAttrToNameMap[a.name] ?? a.name,
+      }));
 
     const image = $createImageNode({
       src,

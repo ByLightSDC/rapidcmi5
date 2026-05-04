@@ -462,7 +462,7 @@ function RC5VisualEditor() {
         }),
         toolbarPlugin({
           toolbarClassName: 'mdxeditor-editor-toolbar',
-          toolbarContents: () => <RapidCmi5Toolbar />,
+          toolbarContents: () => <RapidCmi5Toolbar lessonTheme={currentLessonTheme} />,
         }),
       );
     }

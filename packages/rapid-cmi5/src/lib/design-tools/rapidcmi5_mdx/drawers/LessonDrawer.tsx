@@ -20,6 +20,7 @@ import CourseSelector from '../../course-builder/selectors/CourseSelector';
 import LessonTree from './components/LessonTree';
 import {
   courseDataCache,
+  currentAu,
   currentBlock,
 } from '../../../redux/courseBuilderReducer';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
@@ -32,18 +33,15 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import FolderZipIcon from '@mui/icons-material/FolderZip';
-import ImportExportIcon from '@mui/icons-material/ImportExport';
 import IosShareIcon from '@mui/icons-material/IosShare';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 
 import { debugLogError, RowAction } from '@rapid-cmi5/ui';
 import { listItemProps } from './components/LessonTreeNode';
 import { useSelector } from 'react-redux';
 import { Renamer } from './components/Renamer';
 
-import { ButtonOptions, ButtonMinorUi } from '@rapid-cmi5/ui';
+import { ButtonOptions } from '@rapid-cmi5/ui';
 
 /** Order important actions */
 export enum CourseActionEnum {
@@ -65,6 +63,8 @@ export const LessonDrawer = () => {
 
   const courseData = useSelector(courseDataCache);
   const currentBlockIndex = useSelector(currentBlock);
+  const currentAuIndex = useSelector(currentAu);
+
   const { changeCourseName, saveSlide } = useContext(RC5Context);
   const {
     promptChangeCourse,
@@ -406,6 +406,8 @@ export const LessonDrawer = () => {
           anchorPos={menuAnchorPos}
           element={{
             id: '',
+            block: currentBlockIndex,
+            lesson: currentAuIndex,
             name: courseData?.courseTitle || '',
             parent: '',
             children: [],

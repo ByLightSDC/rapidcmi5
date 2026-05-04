@@ -131,19 +131,13 @@ export function ScenarioSelectionForm({
   const fetchItems = useCallback(
     async (page: number, search: string) => {
       const offset = (page - 1) * ITEMS_PER_PAGE;
-      const params: Record<string, string | number> = {
-        offset,
-        limit: ITEMS_PER_PAGE,
-        sortBy: 'dateEdited',
-        sort: 'desc',
-      };
-      if (search.trim()) params.search = search.trim();
 
       const response = await listScenarios({
         offset,
         limit: ITEMS_PER_PAGE,
         sortBy: 'dateEdited',
         sort: 'desc',
+        search: search.trim(),
       });
 
       return {
