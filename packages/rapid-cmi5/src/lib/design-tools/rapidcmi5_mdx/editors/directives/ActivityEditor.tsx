@@ -21,9 +21,7 @@ import { CodeRunnerForm } from '../forms/CodeRunnerForm';
 import { QuizForm } from '../forms/QuizForm';
 import { useAuContext } from '../../data-hooks/useAuContext';
 import DeleteIconButton from '../components/DeleteIconButton';
-import RightMenuContainer from '../components/RightMenuContainer';
 import { useDispatch, useSelector } from 'react-redux';
-import SettingsIcon from '@mui/icons-material/Settings';
 import PaletteIcon from '@mui/icons-material/Palette';
 
 import { DownloadFilesForm } from './DownloadFilesForm';
