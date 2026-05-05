@@ -34,6 +34,7 @@ export function DraggableBlockHandle() {
   const ghostRef = useRef<HTMLElement | null>(null);
   const hoveredBlockRef = useRef<HTMLElement | null>(null);
   const hoveredKeyRef = useRef<string | null>(null);
+  const hoveredTargetRef = useRef<HTMLElement | null>(null);
   const draggedKeyRef = useRef<string | null>(null);
   const isDraggingRef = useRef(false);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -77,10 +78,18 @@ export function DraggableBlockHandle() {
   const positionHandle = useCallback((blockEl: HTMLElement) => {
     const handle = handleRef.current;
     if (!handle) return;
-    const rect = blockEl.getBoundingClientRect();
+
+    //correct rect for an activity is on the form so adjust target for positioning
+    const activityTarget = blockEl.querySelector('.no-paper-form form.form');
+    const rect =
+      activityTarget !== null
+        ? activityTarget.getBoundingClientRect()
+        : blockEl.getBoundingClientRect();
+    const leftOffset = activityTarget ? 32 : 6;
+
     handle.style.display = 'flex';
     handle.style.top = `${rect.top}px`;
-    handle.style.left = `${rect.left - HANDLE_WIDTH - 6}px`;
+    handle.style.left = `${rect.left - HANDLE_WIDTH - leftOffset}px`;
     handle.style.height = `${rect.height}px`;
   }, []);
 
@@ -152,7 +161,12 @@ export function DraggableBlockHandle() {
       const blockEl = getTopLevelBlock(editorRoot, e.target as Element);
       if (blockEl) {
         cancelHide();
-        if (blockEl !== hoveredBlockRef.current) {
+        if (
+          hoveredBlockRef.current === null ||
+          blockEl !== hoveredBlockRef.current ||
+          hoveredTargetRef.current !== e.target ||
+          e.target
+        ) {
           hoveredBlockRef.current = blockEl;
           hoveredKeyRef.current = findKeyForDOMElement(editor, blockEl);
           positionHandle(blockEl);
