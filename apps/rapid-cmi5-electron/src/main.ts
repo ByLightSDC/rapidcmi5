@@ -46,6 +46,8 @@ import {
   stopSession,
   type StartOptions,
 } from './app/api/claude/cli';
+import { startCodexSession } from './app/api/codex/cli';
+import { startMcpHttpServer } from './app/api/mcp/httpServer';
 
 function defaultShell(): string {
   if (process.platform === 'win32') {
@@ -58,25 +60,20 @@ function getLocalFsBase(): string {
   return path.join(getRapidBase(App.isTestMode()), 'localFileSystem');
 }
 
-function getMcpServerSrc(): string {
-  const root = app.isPackaged ? process.resourcesPath : __dirname;
-  return path.join(root, 'assets', 'mcp', 'server.js');
-}
-
-async function installMcpServer(): Promise<void> {
+async function startMcpServer(): Promise<void> {
   const base = getLocalFsBase();
-  const mcpDir = path.join(base, '.rapid-mcp');
-  await fs.promises.mkdir(mcpDir, { recursive: true });
+  await fs.promises.mkdir(base, { recursive: true });
 
-  const dest = path.join(mcpDir, 'server.js');
-  await fs.promises.copyFile(getMcpServerSrc(), dest);
+  const { url } = await startMcpHttpServer({
+    rootDir: base,
+    getMainWindow: () => App.mainWindow ?? null,
+  });
 
   const mcpJson = {
     mcpServers: {
       rapidcmi5: {
-        type: 'stdio',
-        command: 'node',
-        args: [dest],
+        type: 'http',
+        url,
       },
     },
   };
@@ -88,8 +85,8 @@ async function installMcpServer(): Promise<void> {
 }
 
 app.whenReady().then(() => {
-  installMcpServer().catch((e) =>
-    console.error('Failed to install MCP server:', e),
+  startMcpServer().catch((e) =>
+    console.error('Failed to start MCP server:', e),
   );
 });
 
@@ -655,14 +652,11 @@ ipcMain.handle('userSettingsApi:removeCert', (_e, id: string) => {
 // then opens the player dev server in the default browser. No zip build needed.
 ipcMain.handle(
   'cmi5:testInPlayer',
-  async (
-    _evt,
-    auJson: string,
-    playerUrl: string,
-    configDestPath: string,
-  ) => {
+  async (_evt, auJson: string, playerUrl: string, configDestPath: string) => {
     try {
-      await fs.promises.mkdir(nodePath.dirname(configDestPath), { recursive: true });
+      await fs.promises.mkdir(nodePath.dirname(configDestPath), {
+        recursive: true,
+      });
       await fs.promises.writeFile(configDestPath, auJson, 'utf-8');
       shell.openExternal(playerUrl);
       return { success: true };
@@ -747,6 +741,29 @@ ipcMain.handle(
 );
 
 ipcMain.handle('claude:stop', (_e, sessionId: string) => {
+  stopSession(sessionId);
+});
+
+// Codex CLI Handlers
+ipcMain.handle('codex:start', (e, opts: StartOptions = {}) => {
+  return startCodexSession(e.sender, {
+    ...opts,
+    cwd: opts.cwd ?? getLocalFsBase(),
+  });
+});
+
+ipcMain.handle('codex:input', (_e, sessionId: string, data: string) => {
+  inputToSession(sessionId, data);
+});
+
+ipcMain.handle(
+  'codex:resize',
+  (_e, sessionId: string, cols: number, rows: number) => {
+    resizeSession(sessionId, cols, rows);
+  },
+);
+
+ipcMain.handle('codex:stop', (_e, sessionId: string) => {
   stopSession(sessionId);
 });
 

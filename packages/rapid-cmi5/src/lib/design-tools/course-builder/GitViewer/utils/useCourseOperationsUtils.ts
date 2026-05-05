@@ -6,6 +6,7 @@ import YAML from 'yaml';
 import {
   CourseAU,
   CourseData,
+  generateAuId,
   KSATElement,
   LessonTheme,
   Operation,

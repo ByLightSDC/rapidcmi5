@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { MDXEditorMethods } from '@mdxeditor/editor';
 
 import {
@@ -58,7 +57,7 @@ import {
   setIsLessonMounted,
   changeViewMode,
 } from '../../../redux/courseBuilderReducer';
-import { useCourseData } from '../data-hooks/useCourseData';
+import { useElectronEvent } from '../../../hooks/useElectronEvents';
 
 interface tProviderProps {
   isEnabled?: boolean;
@@ -124,6 +123,34 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
   const currentBlockIndex = useSelector(currentBlock);
 
   const editorRef = useRef<RefObject<MDXEditorMethods> | null>(null);
+
+  useElectronEvent<{ requestId?: string }>(
+    'course:saveCourse',
+    async (data) => {
+      try {
+        const changedFiles = await onSaveCourseFile();
+        if (data?.requestId) {
+          window.electronEvents?.send('course:saveCourse:done', {
+            requestId: data.requestId,
+            ok: true,
+            changedFiles,
+          });
+        }
+      } catch (error) {
+        if (data?.requestId) {
+          window.electronEvents?.send('course:saveCourse:done', {
+            requestId: data.requestId,
+            ok: false,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      }
+    },
+  );
+
+  useElectronEvent('course:refreshFrontend', async () => {
+    await handleLoadCourse(currentCourseName);
+  });
 
   const lessonSlides = useMemo(() => {
     //defensive
