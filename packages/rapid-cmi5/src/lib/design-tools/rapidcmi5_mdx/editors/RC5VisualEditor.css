@@ -80,6 +80,7 @@ a:visited {
 
 .mdxeditor-root-contenteditable {
   text-align: start;
+  padding-left: 32px;
 }
 
 .mdxeditor-source-editor {
