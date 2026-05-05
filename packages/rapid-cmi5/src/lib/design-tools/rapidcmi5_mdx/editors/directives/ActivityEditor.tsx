@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import {
   DirectiveEditorProps,
   useCellValue,
@@ -6,7 +6,14 @@ import {
   useMdastNodeUpdater,
 } from '@mdxeditor/editor';
 
-import { Stack, Typography } from '@mui/material';
+import {
+  Box,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+  useTheme,
+} from '@mui/material';
 
 import { ScenarioForm } from '../forms/scenario/ScenarioForm';
 import { CodeRunnerForm } from '../forms/CodeRunnerForm';
@@ -16,6 +23,8 @@ import { useAuContext } from '../../data-hooks/useAuContext';
 import DeleteIconButton from '../components/DeleteIconButton';
 import RightMenuContainer from '../components/RightMenuContainer';
 import { useDispatch, useSelector } from 'react-redux';
+import SettingsIcon from '@mui/icons-material/Settings';
+import PaletteIcon from '@mui/icons-material/Palette';
 
 import { DownloadFilesForm } from './DownloadFilesForm';
 import {
@@ -24,6 +33,7 @@ import {
   QuizContent,
   CTFContent,
   CodeRunnerContent,
+  ContentWidthEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   useTimeStampUUID,
@@ -36,23 +46,26 @@ import {
   AuQuiz,
   AuCTF,
   CodeRunner,
+  useLessonStyles,
+  LessonThemeContext,
+  maxFormWidths,
+  BlockAppearanceForm,
 } from '@rapid-cmi5/ui';
 import { updateScenario, updateTeamScenario } from '@rapid-cmi5/react-editor';
 import ScenarioMock from './ScenarioMock';
 import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 import { TeamConsolesForm } from '../forms/scenario/TeamConsolesForm';
+import InsertLineReturnButton from 'packages/ui/src/lib/cmi5/mdx/components/InsertLineReturnButton';
+import { ActivityDirectiveNode } from './types';
 
 /**
  * MDX Editor for Activities
- * @param param0
+ * @param param0 <ActivityDirectiveNode>
  * @returns
  */
-export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
-  lexicalNode,
-  mdastNode,
-  parentEditor,
-  descriptor,
-}) => {
+export const ActivityEditor: React.FC<
+  DirectiveEditorProps<ActivityDirectiveNode>
+> = ({ lexicalNode, mdastNode, parentEditor, descriptor }) => {
   const { generateId } = useTimeStampUUID();
   const { name } = mdastNode; //scenario, quiz, etc.
   const dispatch = useDispatch();
@@ -65,6 +78,24 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
   const auProps = useAuContext();
   const themedDividerColor = useSelector(dividerColor);
   const { userAuth, apiUrls } = useRapidCmi5Opts();
+
+  const muiTheme = useTheme();
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const {
+    blockAppearanceOpen,
+    contentWidthDisplay,
+    innerSx,
+    outerSx,
+    outerStyle,
+    gutterRef,
+    setBlockAppearanceOpen,
+    setContentWidth,
+  } = useLessonStyles(
+    lessonTheme,
+    mdastNode?.attributes?.contentWidth,
+    maxFormWidths.downloadsEditor,
+    muiTheme.palette.background.paper,
+  );
 
   // style for playback boxes
   const staticStyle = useMemo(() => {
@@ -81,35 +112,25 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
    * Handle Activity Deletion
    */
   const onDelete = useCallback((payload?: KeyboardEvent) => {
+    if (mdastNode.name === 'scenario') {
+      dispatch(
+        updateScenario({
+          scenario: undefined,
+        }),
+      );
+    } else if (mdastNode.name === 'consoles') {
+      dispatch(
+        updateTeamScenario({
+          scenario: undefined,
+        }),
+      );
+    }
     if (payload) {
       //FUTURE handle keyboard shortcut deletion
     } else {
       removeNode();
     }
     return false;
-  }, []);
-
-  const onDeleteScenario = useCallback((payload?: KeyboardEvent) => {
-    //delete scenario from redux and course data
-    dispatch(
-      updateScenario({
-        scenario: undefined,
-      }),
-    );
-
-    onDelete(payload);
-  }, []);
-
-  const onDeleteTeamScenario = useCallback((payload?: KeyboardEvent) => {
-    //delete scenario from redux and course data
-    debugLog('updateTeamScenario (delete activity)');
-    dispatch(
-      updateTeamScenario({
-        scenario: undefined,
-      }),
-    );
-
-    onDelete(payload);
   }, []);
 
   /**
@@ -159,19 +180,6 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
           scenario: { uuid: data?.uuid || undefined, name: data?.name },
         }),
       );
-      // if (data.uuid) {
-      //   dispatch(
-      //     updateScenario({
-      //       scenario: { uuid: data?.uuid || undefined, name: data?.name },
-      //     }),
-      //   );
-      // } else {
-      //   dispatch(
-      //     updateScenario({
-      //       scenario: undefined,
-      //     }),
-      //   );
-      // }
     } else if (activity === RC5ActivityTypeEnum.consoles) {
       debugLog('updateTeamScenario (save activity)', data);
       dispatch(
@@ -182,6 +190,66 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
     }
     saveFormDataToLexical(data);
   };
+
+  /** Update mdast node when content width changes */
+  const onContentWidthChange = useCallback(
+    (newContentWidth?: ContentWidthEnum) => {
+      setContentWidth(newContentWidth);
+
+      const attrs = { ...mdastNode.attributes } as Record<string, string>;
+
+      if (newContentWidth) {
+        attrs['contentWidth'] = newContentWidth;
+      } else {
+        delete attrs['contentWidth'];
+      }
+
+      updateMdastNode({
+        ...mdastNode,
+        attributes: attrs,
+      });
+    },
+    [],
+  );
+
+  /** Shared context menu */
+  const contextMenu = useMemo(() => {
+    /* Gutter buttons — absolutely positioned to the right of the decorator */
+    if (!isPlayback) {
+      return (
+        <Box
+          ref={gutterRef as any}
+          sx={{
+            backgroundColor:
+              muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
+            position: 'absolute',
+            right: 0,
+            top: 0,
+          }}
+        >
+          <Tooltip title="Block Appearance">
+            <IconButton
+              onClick={() => setBlockAppearanceOpen(true)}
+              size="small"
+            >
+              <PaletteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          <InsertLineReturnButton
+            parentEditor={parentEditor}
+            lexicalNode={lexicalNode}
+          />
+          <DeleteIconButton
+            onDelete={() => {
+              onDelete();
+            }}
+          />
+        </Box>
+      );
+    }
+    return undefined;
+  }, [muiTheme.palette.mode]);
 
   /** Get Default Form Data from MDAST Node */
   React.useEffect(() => {
@@ -222,159 +290,155 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
   }, [fromJson, mdastNode?.children]);
 
   return (
-    <div
-      style={{
-        padding: 0,
-        margin: 0,
-        width: '100%',
-      }}
-    >
-      {name === 'scenario' && fromJson && (
-        <>
-          {isPlayback && (
-            <ScenarioMock
-              activity={RC5ActivityTypeEnum.scenario}
-              scenarioName={fromJson?.name}
-            />
-          )}
-          {!isPlayback && (
-            <ScenarioForm
-              crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
-              defaultFormData={fromJson}
-              deleteButton={
-                !isPlayback ? (
-                  <RightMenuContainer>
-                    <DeleteIconButton onDelete={onDeleteScenario} />
-                  </RightMenuContainer>
-                ) : undefined
-              }
-              onSave={onSave}
-            />
-          )}
-        </>
-      )}
-      {name === 'quiz' && fromJson && (
-        <>
-          {isPlayback && (
-            <AuQuiz auProps={auProps} content={fromJson as QuizContent} />
-          )}
-          {!isPlayback && (
-            <QuizForm
-              activityKind={RC5ActivityTypeEnum.quiz}
-              crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
-              defaultFormData={fromJson}
-              deleteButton={
-                !isPlayback ? (
-                  <RightMenuContainer>
-                    <DeleteIconButton onDelete={onDelete} />
-                  </RightMenuContainer>
-                ) : undefined
-              }
-              onSave={onSave}
-            />
-          )}
-        </>
-      )}
-      {name === 'ctf' && fromJson && (
-        <>
-          {isPlayback && (
-            // eslint-disable-next-line react/jsx-no-useless-fragment
-            <>
-              {fromJson.questions.length === 0 ? (
-                <Stack direction="column" sx={staticStyle}>
-                  <Typography sx={{ fontWeight: 'bold' }}>CTF</Typography>
-                  <Typography>{'CTF has no questions.'}</Typography>
-                </Stack>
-              ) : (
-                <AuCTF auProps={auProps} content={fromJson as CTFContent} />
-              )}
-            </>
-          )}
-          {!isPlayback && (
-            <QuizForm
-              activityKind={RC5ActivityTypeEnum.ctf}
-              crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
-              defaultFormData={fromJson}
-              deleteButton={
-                !isPlayback ? (
-                  <RightMenuContainer>
-                    <DeleteIconButton onDelete={onDelete} />
-                  </RightMenuContainer>
-                ) : undefined
-              }
-              onSave={onSave}
-            />
-          )}
-        </>
-      )}
-      {name === 'codeRunner' && fromJson && (
-        <>
-          {isPlayback && (
-            <CodeRunner
-              auProps={auProps}
-              content={fromJson as CodeRunnerContent}
-              authType="Bearer"
-              token={userAuth?.token}
-              url={apiUrls?.codeRunnerUrl}
-            />
-          )}
-          {!isPlayback && (
-            <CodeRunnerForm
-              crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
-              defaultFormData={fromJson}
-              deleteButton={
-                !isPlayback ? (
-                  <RightMenuContainer>
-                    <DeleteIconButton onDelete={onDelete} />
-                  </RightMenuContainer>
-                ) : undefined
-              }
-              onSave={onSave}
-            />
-          )}
-        </>
-      )}
-      {name === 'consoles' && fromJson && (
-        <>
-          {isPlayback && (
-            <ScenarioMock
-              activity={RC5ActivityTypeEnum.consoles}
-              scenarioName={fromJson?.name}
-            />
-          )}
-          {!isPlayback && (
-            <TeamConsolesForm
-              crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
-              defaultFormData={fromJson}
-              deleteButton={
-                !isPlayback ? (
-                  <RightMenuContainer>
-                    <DeleteIconButton onDelete={onDeleteTeamScenario} />
-                  </RightMenuContainer>
-                ) : undefined
-              }
-              onSave={onSave}
-            />
-          )}
-        </>
-      )}
-      {name === 'download' && fromJson && (
-        <DownloadFilesForm
-          crudType={
-            isEditable && !isPlayback ? FormCrudType.edit : FormCrudType.preview
-          }
-          defaultFormData={fromJson}
-          deleteButton={
-            isEditable && !isPlayback ? (
-              <RightMenuContainer>
-                <DeleteIconButton onDelete={onDelete} />
-              </RightMenuContainer>
-            ) : undefined
-          }
-          testId={rc5id}
-          onSave={onSave}
-        />
-      )}
-    </div>
+    <>
+      <div
+        style={{
+          padding: 0,
+          margin: 0,
+          width: '100%',
+        }}
+      >
+        {name === 'scenario' && fromJson && (
+          <>
+            {isPlayback && (
+              <ScenarioMock
+                activity={RC5ActivityTypeEnum.scenario}
+                scenarioName={fromJson?.name}
+              />
+            )}
+            {!isPlayback && (
+              <ScenarioForm
+                contextMenu={contextMenu}
+                crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
+                defaultFormData={fromJson}
+                innerSx={innerSx}
+                outerSx={outerSx}
+                outerStyle={outerStyle}
+                onSave={onSave}
+              />
+            )}
+          </>
+        )}
+        {name === 'quiz' && fromJson && (
+          <>
+            {isPlayback && (
+              <AuQuiz auProps={auProps} content={fromJson as QuizContent} />
+            )}
+            {!isPlayback && (
+              <QuizForm
+                activityKind={RC5ActivityTypeEnum.quiz}
+                contextMenu={contextMenu}
+                crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
+                defaultFormData={fromJson}
+                innerSx={innerSx}
+                outerSx={outerSx}
+                outerStyle={outerStyle}
+                onSave={onSave}
+              />
+            )}
+          </>
+        )}
+        {name === 'ctf' && fromJson && (
+          <>
+            {isPlayback && (
+              // eslint-disable-next-line react/jsx-no-useless-fragment
+              <>
+                {fromJson.questions.length === 0 ? (
+                  <Stack direction="column" sx={staticStyle}>
+                    <Typography sx={{ fontWeight: 'bold' }}>CTF</Typography>
+                    <Typography>{'CTF has no questions.'}</Typography>
+                  </Stack>
+                ) : (
+                  <AuCTF auProps={auProps} content={fromJson as CTFContent} />
+                )}
+              </>
+            )}
+            {!isPlayback && (
+              <QuizForm
+                activityKind={RC5ActivityTypeEnum.ctf}
+                contextMenu={contextMenu}
+                crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
+                defaultFormData={fromJson}
+                innerSx={innerSx}
+                outerSx={outerSx}
+                outerStyle={outerStyle}
+                onSave={onSave}
+              />
+            )}
+          </>
+        )}
+        {name === 'codeRunner' && fromJson && (
+          <>
+            {isPlayback && (
+              <CodeRunner
+                auProps={auProps}
+                content={fromJson as CodeRunnerContent}
+                authType="Bearer"
+                token={userAuth?.token}
+                url={apiUrls?.codeRunnerUrl}
+              />
+            )}
+            {!isPlayback && (
+              <CodeRunnerForm
+                contextMenu={contextMenu}
+                crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
+                defaultFormData={fromJson}
+                innerSx={innerSx}
+                outerSx={outerSx}
+                outerStyle={outerStyle}
+                onSave={onSave}
+              />
+            )}
+          </>
+        )}
+        {name === 'consoles' && fromJson && (
+          <>
+            {isPlayback && (
+              <ScenarioMock
+                activity={RC5ActivityTypeEnum.consoles}
+                scenarioName={fromJson?.name}
+              />
+            )}
+            {!isPlayback && (
+              <TeamConsolesForm
+                contextMenu={contextMenu}
+                crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
+                defaultFormData={fromJson}
+                innerSx={innerSx}
+                outerSx={outerSx}
+                outerStyle={outerStyle}
+                onSave={onSave}
+              />
+            )}
+          </>
+        )}
+        {name === 'download' && fromJson && (
+          <DownloadFilesForm
+            contextMenu={contextMenu}
+            crudType={
+              isEditable && !isPlayback
+                ? FormCrudType.edit
+                : FormCrudType.preview
+            }
+            defaultFormData={fromJson}
+            testId={rc5id}
+            onSave={onSave}
+            innerSx={innerSx}
+            outerSx={outerSx}
+            outerStyle={outerStyle}
+          />
+        )}
+      </div>
+      <BlockAppearanceForm
+        open={blockAppearanceOpen}
+        currentContentWidth={contentWidthDisplay}
+        onClose={() => setBlockAppearanceOpen(false)}
+        onSave={(newContentWidth) => {
+          console.log('save new width', newContentWidth);
+          setContentWidth(newContentWidth);
+          onContentWidthChange(newContentWidth);
+        }}
+      />
+    </>
   );
 };

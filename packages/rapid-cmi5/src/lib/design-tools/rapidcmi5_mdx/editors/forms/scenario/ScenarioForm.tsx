@@ -7,14 +7,11 @@ import {
   FormControlUIProvider,
   FormCrudType,
   FormStateType,
-  LessonThemeContext,
   MiniForm,
   NAME_GROUP_OPT,
   UUID_GROUP,
-  maxFormWidths,
-  useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
-import { Alert, MenuItem, SxProps, Typography, useTheme } from '@mui/material';
+import { Alert, MenuItem, Typography, useTheme } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import * as yup from 'yup';
@@ -33,26 +30,27 @@ import { NoScenarioCard } from './NoScenarioCard';
 import { toTitleCase } from '../formUtils';
 
 export const ScenarioForm = ({
+  contextMenu,
   crudType,
   defaultFormData,
   deleteButton,
+  innerSx,
+  outerSx,
+  outerStyle,
   onSave,
 }: {
+  contextMenu?: JSX.Element;
   crudType: FormCrudType;
   defaultFormData: RC5ScenarioContent;
   deleteButton?: JSX.Element;
   handleCloseModal?: () => void;
+  innerSx?: any;
+  outerSx?: any;
+  outerStyle?: any;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
   const { GetScenariosForm, fetchScenario } = useRapidCmi5Opts();
   const theme = useTheme();
-
-  /* Lesson Theme */
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const { outerActivitySxWithConstrainedWidthForm } = useLessonThemeStyles(
-    lessonTheme,
-    maxFormWidths.scenarioEditor,
-  );
 
   const validationSchema = yup.object().shape({
     uuid: UUID_GROUP,
@@ -224,18 +222,15 @@ export const ScenarioForm = ({
     <FormControlUIProvider>
       <MiniForm
         className="paper-activity"
-        outerSx={outerActivitySxWithConstrainedWidthForm}
+        contextMenu={contextMenu}
+        outerSx={outerSx}
+        outerStyle={outerStyle}
         dataCache={defaultFormData}
         titleEndChildren={deleteButton}
         doAction={onSaveAction}
         formTitle="Individual Training Scenario"
         formWidth={null}
-        formSxProps={
-          {
-            flexGrow: 1,
-            maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
-          } as SxProps
-        }
+        formSxProps={{ width: '100%', flexGrow: 1, ...innerSx, margin: 0 }}
         getFormFields={getFormFields}
         loadingButtonText="Saving"
         shouldAutoSave={true}
