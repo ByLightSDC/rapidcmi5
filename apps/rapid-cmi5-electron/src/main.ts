@@ -60,6 +60,15 @@ function getLocalFsBase(): string {
   return path.join(getRapidBase(App.isTestMode()), 'localFileSystem');
 }
 
+const rapidCmi5AgentInstructions = `# RapidCMI5 Agent Notes
+
+- Use the RapidCMI5 MCP tools before editing course files directly.
+- For the current slide, call \`read_current_slide\` first and save changes with \`update_current_slide\`.
+- For quizzes, use \`create_quiz\` instead of manually writing quiz markdown.
+- For new courses, use \`create_course\` instead of creating folders and files by hand.
+- Only edit files directly when there is no RapidCMI5 tool for the task.
+`;
+
 function toTomlString(value: string): string {
   return JSON.stringify(value);
 }
@@ -99,6 +108,16 @@ async function startMcpServer(): Promise<void> {
     JSON.stringify(mcpJson, null, 2) + '\n',
     'utf-8',
   );
+  await fs.promises.writeFile(
+    path.join(base, 'AGENTS.md'),
+    rapidCmi5AgentInstructions,
+    'utf-8',
+  );
+  await fs.promises.writeFile(
+    path.join(base, 'CLAUDE.md'),
+    rapidCmi5AgentInstructions,
+    'utf-8',
+  );
 
   const codexDir = path.join(base, '.codex');
   const codexConfigPath = path.join(codexDir, 'config.toml');
@@ -106,10 +125,7 @@ async function startMcpServer(): Promise<void> {
 
   let existingCodexConfig = '';
   try {
-    existingCodexConfig = await fs.promises.readFile(
-      codexConfigPath,
-      'utf-8',
-    );
+    existingCodexConfig = await fs.promises.readFile(codexConfigPath, 'utf-8');
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
       throw error;
