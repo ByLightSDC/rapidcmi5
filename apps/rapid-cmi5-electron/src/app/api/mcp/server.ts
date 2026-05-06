@@ -3,68 +3,12 @@
 // gives them access to the localFileSystem root and the renderer window.
 import { promises as fsp } from 'fs';
 import { randomUUID } from 'crypto';
-import path from 'path';
 import { z } from 'zod/v4';
 import { ipcMain, type BrowserWindow, type IpcMainEvent } from 'electron';
-import type { CourseData as Rc5CourseData } from '@rapid-cmi5/cmi5-build-common';
 import {
-  createNewCourseFS,
-  type CourseCreationFs,
-  type CourseRepoAccessObject,
-} from '../../../../../../packages/rapid-cmi5/src/lib/design-tools/course-builder/GitViewer/utils/coureOperations';
-const SlideSchema = z.object({
-  slideTitle: z.string(),
-  type: z
-    .enum([
-      'markdown',
-      'quiz',
-      'ctf',
-      'rangeosScenario',
-      'sourceDoc',
-      'codeRunner',
-    ])
-    .describe(
-      'Slide type. Default to "markdown" unless the user asks for something else.',
-    ),
-  filepath: z
-    .string()
-    .describe(
-      'Slide path relative to the course root, e.g. "introduction/slide-1.md".',
-    ),
-  content: z.string().optional().describe('Markdown body of the slide.'),
-});
-
-const CourseAuSchema = z.object({
-  auName: z.string().describe('Human-readable AU/lesson name.'),
-  dirPath: z
-    .string()
-    .describe(
-      'AU folder name relative to the course root, lowercase with dashes, e.g. "introduction".',
-    ),
-  slides: z.array(SlideSchema),
-});
-
-const CourseBlockSchema = z.object({
-  blockName: z.string(),
-  blockDescription: z.string().optional(),
-  aus: z.array(CourseAuSchema),
-});
-
-const CourseDataSchema = z.object({
-  courseTitle: z.string().describe('Human-readable course title.'),
-  courseId: z
-    .string()
-    .describe(
-      'Unique course id, typically a URL like "https://example.com/my-course".',
-    ),
-  courseDescription: z.string().optional(),
-  author: z.string().optional(),
-  blocks: z
-    .array(CourseBlockSchema)
-    .describe('Top-level course blocks. Most courses have a single block.'),
-});
-
-type CourseDataInput = z.infer<typeof CourseDataSchema>;
+  CourseData,
+  CreateCourseInputSchema,
+} from '@rapid-cmi5/cmi5-build-common';
 
 const PROTOCOL_VERSION = '2024-11-05';
 const SERVER_NAME = 'rapid-cmi5';
@@ -116,58 +60,27 @@ interface SaveCourseReply {
   error?: string;
 }
 
-function text(s: string, isError = false): ToolResult {
-  return { content: [{ type: 'text', text: s }], isError };
+interface CreateCourseReply {
+  requestId: string;
+  ok: boolean;
+  error?: string;
 }
 
-function createElectronCourseFs(rootDir: string): CourseCreationFs {
-  const localFsPrefix = '/localFileSystem';
-  const toRealPath = (virtualPath: string) => {
-    const normalized = path.posix.normalize(virtualPath.replace(/\\/g, '/'));
-    const relative = normalized.startsWith(`${localFsPrefix}/`)
-      ? normalized.slice(localFsPrefix.length + 1)
-      : normalized === localFsPrefix
-        ? ''
-        : normalized.replace(/^\/+/, '');
-    const resolved = path.resolve(rootDir, relative);
-    const relToRoot = path.relative(rootDir, resolved);
+interface SlideReadReply {
+  requestId: string;
+  ok: boolean;
+  markdown?: string;
+  error?: string;
+}
 
-    if (relToRoot.startsWith('..') || path.isAbsolute(relToRoot)) {
-      throw new Error(
-        `Path escapes the RapidCMI5 local filesystem: ${virtualPath}`,
-      );
-    }
+interface SlideUpdateReply {
+  requestId: string;
+  ok: boolean;
+  error?: string;
+}
 
-    return resolved;
-  };
-
-  const repoPath = (r: CourseRepoAccessObject) =>
-    path.posix.join('/', r.fileSystemType, r.repoName);
-  const absoluteCoursePath = (
-    r: CourseRepoAccessObject,
-    relativePath: string,
-  ) => toRealPath(path.posix.join(repoPath(r), relativePath));
-
-  return {
-    fs: {
-      promises: {
-        stat: async (virtualPath: string) => fsp.stat(toRealPath(virtualPath)),
-      },
-    },
-    createDir: async (r, dirPath) => {
-      await fsp.mkdir(absoluteCoursePath(r, dirPath), { recursive: true });
-    },
-    createFile: async (r, filePath, content) => {
-      const realPath = absoluteCoursePath(r, filePath);
-      await fsp.mkdir(path.dirname(realPath), { recursive: true });
-      await fsp.writeFile(realPath, content);
-    },
-    updateFile: async (r, filePath, newContent) => {
-      const realPath = absoluteCoursePath(r, filePath);
-      await fsp.mkdir(path.dirname(realPath), { recursive: true });
-      await fsp.writeFile(realPath, newContent);
-    },
-  };
+function text(s: string, isError = false): ToolResult {
+  return { content: [{ type: 'text', text: s }], isError };
 }
 
 function requestSaveCourse(win: BrowserWindow, timeoutMs = 120_000) {
@@ -189,6 +102,89 @@ function requestSaveCourse(win: BrowserWindow, timeoutMs = 120_000) {
 
     ipcMain.on(replyChannel, onReply);
     win.webContents.send('course:saveCourse', { requestId });
+  });
+}
+
+function requestCreateCourse(
+  win: BrowserWindow,
+  course: CourseData,
+  repoName: string,
+  timeoutMs = 120_000,
+) {
+  const requestId = randomUUID();
+  const replyChannel = 'course:createCourse:done';
+
+  return new Promise<CreateCourseReply>((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      ipcMain.removeListener(replyChannel, onReply);
+      reject(
+        new Error('Timed out waiting for the editor to create the course.'),
+      );
+    }, timeoutMs);
+
+    const onReply = (_event: IpcMainEvent, reply: CreateCourseReply) => {
+      if (reply?.requestId !== requestId) return;
+      clearTimeout(timeout);
+      ipcMain.removeListener(replyChannel, onReply);
+      resolve(reply);
+    };
+
+    ipcMain.on(replyChannel, onReply);
+    win.webContents.send('course:createCourse', {
+      requestId,
+      course,
+      repoName,
+    });
+  });
+}
+
+function requestReadCurrentSlide(win: BrowserWindow, timeoutMs = 30_000) {
+  const requestId = randomUUID();
+  const replyChannel = 'slide:readCurrent:done';
+
+  return new Promise<SlideReadReply>((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      ipcMain.removeListener(replyChannel, onReply);
+      reject(new Error('Timed out waiting for the editor to read the slide.'));
+    }, timeoutMs);
+
+    const onReply = (_event: IpcMainEvent, reply: SlideReadReply) => {
+      if (reply?.requestId !== requestId) return;
+      clearTimeout(timeout);
+      ipcMain.removeListener(replyChannel, onReply);
+      resolve(reply);
+    };
+
+    ipcMain.on(replyChannel, onReply);
+    win.webContents.send('slide:readCurrent', { requestId });
+  });
+}
+
+function requestUpdateCurrentSlide(
+  win: BrowserWindow,
+  markdown: string,
+  timeoutMs = 30_000,
+) {
+  const requestId = randomUUID();
+  const replyChannel = 'slide:updateCurrent:done';
+
+  return new Promise<SlideUpdateReply>((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      ipcMain.removeListener(replyChannel, onReply);
+      reject(
+        new Error('Timed out waiting for the editor to update the slide.'),
+      );
+    }, timeoutMs);
+
+    const onReply = (_event: IpcMainEvent, reply: SlideUpdateReply) => {
+      if (reply?.requestId !== requestId) return;
+      clearTimeout(timeout);
+      ipcMain.removeListener(replyChannel, onReply);
+      resolve(reply);
+    };
+
+    ipcMain.on(replyChannel, onReply);
+    win.webContents.send('slide:updateCurrent', { requestId, markdown });
   });
 }
 
@@ -238,40 +234,37 @@ const tools: McpTool[] = [
   {
     name: 'create_course',
     description:
-      'Scaffold a new RapidCMI5 course from a user prompt. Fill in courseTitle, a unique courseId (URL-style), and a structure of blocks → AUs → slides matching what the user asked for. Slide filepath is "<auDirPath>/<slide-slug>.md". Default slide type is "markdown"; "content" is the markdown body.',
-    inputSchema: z.toJSONSchema(CourseDataSchema) as Record<string, unknown>,
+      'Scaffold a new RapidCMI5 course from a user prompt. Fill in courseTitle, a unique courseId (URL-style), and a structure of blocks → AUs → slides matching what the user asked for. Slide filepath is "<auDirPath>/<slide-slug>.md". Default slide type is "markdown"; "content" is the markdown body. Optionally pass repoName to choose the target repo directory.',
+    inputSchema: z.toJSONSchema(CreateCourseInputSchema) as Record<
+      string,
+      unknown
+    >,
     handler: async (args, ctx) => {
-      const courseData = CourseDataSchema.parse(
-        args,
-      ) as CourseDataInput as Rc5CourseData;
-      const win = ctx.getMainWindow();
+      const parsed = CreateCourseInputSchema.parse(args);
+      const { repoName: repoNameInput, ...courseFields } = parsed;
+      const courseData = courseFields;
+      const repoName = repoNameInput?.trim() || 'tester';
 
+      const win = ctx.getMainWindow();
       if (!win || win.isDestroyed()) {
         return text('No main window available to save the course.', true);
       }
 
-      const reply = await requestSaveCourse(win);
-      if (!reply.ok) {
+      const saveReply = await requestSaveCourse(win);
+      if (!saveReply.ok) {
         return text(
-          reply.error ?? 'The editor failed to save the course.',
+          saveReply.error ?? 'The editor failed to save the course.',
           true,
         );
       }
 
-      const repoName =
-        typeof args.repoName === 'string' && args.repoName.trim()
-          ? args.repoName.trim()
-          : 'tester';
-      const fsInstance = createElectronCourseFs(ctx.rootDir);
-
-      await createNewCourseFS({
-        course: courseData,
-        r: { repoName, fileSystemType: 'localFileSystem' },
-        fsInstance,
-      });
-
-      win.webContents.send('course:refreshFrontend');
-
+      const createReply = await requestCreateCourse(win, courseData, repoName);
+      if (!createReply.ok) {
+        return text(
+          createReply.error ?? 'The editor failed to create the course.',
+          true,
+        );
+      }
       return text(`Created course "${courseData.courseTitle}" in ${repoName}.`);
     },
   },
@@ -315,6 +308,74 @@ const tools: McpTool[] = [
       }
       win.webContents.send('course:refreshFrontend');
       return text('Triggered refresh in the editor.');
+    },
+  },
+  {
+    name: 'read_current_slide',
+    description:
+      'Read the markdown for the currently selected slide in the editor.',
+    inputSchema: {
+      type: 'object',
+      properties: {},
+      additionalProperties: false,
+    },
+    handler: async (_args, ctx) => {
+      const win = ctx.getMainWindow();
+      if (!win || win.isDestroyed()) {
+        return text(
+          'No main window available to read the current slide.',
+          true,
+        );
+      }
+
+      const reply = await requestReadCurrentSlide(win);
+      if (!reply.ok) {
+        return text(
+          reply.error ?? 'The editor failed to read the current slide.',
+          true,
+        );
+      }
+
+      return text(reply.markdown ?? '');
+    },
+  },
+  {
+    name: 'update_current_slide',
+    description:
+      'Replace the markdown for the currently selected slide in the editor.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        markdown: {
+          type: 'string',
+          description: 'New markdown content for the current slide.',
+        },
+      },
+      required: ['markdown'],
+      additionalProperties: false,
+    },
+    handler: async (args, ctx) => {
+      const win = ctx.getMainWindow();
+      if (!win || win.isDestroyed()) {
+        return text(
+          'No main window available to update the current slide.',
+          true,
+        );
+      }
+
+      if (typeof args.markdown !== 'string') {
+        return text('update_current_slide requires markdown.', true);
+      }
+
+      const reply = await requestUpdateCurrentSlide(win, args.markdown);
+      if (!reply.ok) {
+        return text(
+          reply.error ?? 'The editor failed to update the current slide.',
+          true,
+        );
+      }
+
+      return text('Updated current slide markdown.');
     },
   },
   {

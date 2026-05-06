@@ -454,7 +454,6 @@ export const courseBuilderSlice = createSlice({
         state.slides.length - 1,
       );
       theSlides[slideIndex].content = action.payload.content.toString();
-      theSlides[slideIndex].display = action.payload.display;
       state.slides = theSlides;
       if (!action.payload.skipShouldDirty) {
         state.dirtyReason = 'update slide content';
@@ -547,10 +546,7 @@ export const courseBuilderSlice = createSlice({
       const { blockIndex, lessonIndex, au } = action.payload;
       state.courseData.blocks[blockIndex].aus[lessonIndex] = au;
     },
-    setDefaultLessonTheme: (
-      state,
-      action: PayloadAction<LessonTheme>,
-    ) => {
+    setDefaultLessonTheme: (state, action: PayloadAction<LessonTheme>) => {
       state.defaultLessonTheme = action.payload;
     },
     removeCourseAu: (

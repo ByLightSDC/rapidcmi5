@@ -64,7 +64,6 @@ export const SlideMenu = () => {
     dispatch(
       addASlide({
         content: defaultSlideContent,
-        display: defaultSlideContent,
         slideTitle: slideTitle,
         type: SlideTypeEnum.Markdown,
         filepath: await handleGetUniqueFilePath(

@@ -41,11 +41,11 @@ import {
 export const useCourseOperations = (
   fsInstance: GitFS,
   repoAccessObject: RepoAccessObject | null,
-  fileState: FileState,
-  courseOperationsSet: Record<string, Operation>,
+  fileState?: FileState,
+  courseOperationsSet?: Record<string, Operation>,
 ) => {
   const availableCourses = fileState?.availableCourses ?? [];
-  const currentCourse = fileState.selectedCourse;
+  const currentCourse = fileState?.selectedCourse;
 
   const dispatch = useDispatch<AppDispatch>();
   const viewMode = useSelector(currentViewMode);
@@ -107,7 +107,7 @@ export const useCourseOperations = (
         throw Error(error);
       }
     },
-    [repoAccessObject, dispatch, findCourse, viewMode],
+    [dispatch, findCourse, viewMode],
   );
 
   const renameCourse = async (
@@ -165,7 +165,7 @@ export const useCourseOperations = (
     newCourseData: CourseData,
   ): Promise<string[]> => {
     const r = getRepoAccess(repoAccessObject);
-    if (currentCourse === null) {
+    if (!currentCourse) {
       debugLog('Current course is null');
       return [];
     }
@@ -292,6 +292,9 @@ export const useCourseOperations = (
     r: RepoAccessObject,
     course: Course,
   ): Promise<string[]> => {
+    if (!courseOperationsSet) {
+      throw Error("Course operations was not passsed")
+    }
     // If there are no course operations, then we are not updating any files, only things such as ordering
     try {
       const { changedFiles, courseData } = await computeCourseFromJsonFs({
