@@ -49,6 +49,7 @@ import {
 import {
   AuContextProps,
   TeamConsolesContent,
+  OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   LessonThemeContext,
@@ -71,6 +72,9 @@ function TeamScenarioExercise({
 }: {
   auProps: Partial<AuContextProps>;
   content: TeamConsolesContent;
+  innerSx?: SxProps;
+  outerSx?: SxProps;
+  outerStyle?: OuterStyle;
 }) {
   const loadedScenario = useRef<ScenarioResources | null>(null);
   const [currentTab, setCurrentTab] = useState(0);
