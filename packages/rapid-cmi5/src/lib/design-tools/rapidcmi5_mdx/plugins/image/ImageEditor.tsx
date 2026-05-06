@@ -233,11 +233,8 @@ export function ImageEditor({
 
     if (styleAttribute) {
       style = parseCssString(styleAttribute.value);
-      // the textAlign property is removed here and instead used on a wrapper div
-      if (style.textAlign) {
-        wrapperStyle.textAlign = style.textAlign;
-        delete style.textAlign;
-      }
+      // text-align in the style string is ignored — alignment is handled via the textAlign attribute
+      delete style.textAlign;
     }
   }
 
@@ -676,6 +673,8 @@ export function ImageEditor({
           className={styles['imageWrapper']}
           data-editor-block-type="image"
           {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
+          {...(blockMaxWidth === null ? { 'data-block-expand': 'true' } : {})}
+          {...(blockMaxWidth === null && imageTextAlign ? { 'data-image-align': imageTextAlign } : {})}
           {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as React.CSSProperties } : {})}
         >
           <div

@@ -105,8 +105,41 @@ export function generateLessonThemeStyleTag(
   const css = resolveLessonThemeCSS(theme);
 
 
+  // Always-emitted rules — must fire regardless of lesson theme settings.
+  // Image block overrides must work even when no lesson content width is set.
+  const imageBaseRule = `
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > [data-lexical-decorator] {
+      display: block;
+      width: 100%;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > [data-lexical-decorator] > div {
+      width: 100%;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] {
+      max-width: 100%;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-block-override] {
+      max-width: var(--block-max-width) !important;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] img {
+      max-width: 100%;
+      height: auto;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-block-expand] img {
+      display: block;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-image-align="center"] img {
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-image-align="right"] img {
+      margin-left: auto;
+      margin-right: 0;
+    }
+  `;
+
   // Always emit --content-margin so directive calc() expressions resolve even when no theme is set.
-  if (!css) return `.${scopedClass} { --content-margin: 0px; }`;
+  if (!css) return `.${scopedClass} { --content-margin: 0px; }` + imageBaseRule;
 
   const widthRule = css.maxWidth
     ? `
@@ -125,24 +158,6 @@ export function generateLessonThemeStyleTag(
     max-width: var(--block-max-width) !important;
     margin-left: auto;
     margin-right: auto;
-  }
-  .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > [data-lexical-decorator] {
-    display: block;
-    max-width: ${css.maxWidth};
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] {
-    max-width: 100%;
-  }
-  .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-block-override] {
-    max-width: var(--block-max-width) !important;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] img {
-    max-width: 100%;
   }
   .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:has(.paper-activity) {
     width: calc(98vw - var(--panel-width));
@@ -164,6 +179,25 @@ export function generateLessonThemeStyleTag(
   .${scopedClass} {
       --content-margin: 0px;
   }`;
+
+  const paragraphWidthRule = css.maxWidth
+    ? `
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p:not(:has([data-block-expand])),
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-paragraph="true"],
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > ul,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > ol,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > blockquote,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h1,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h2,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h3,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h4,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h5,
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > h6 {
+      max-width: ${css.maxWidth};
+      margin-left: auto;
+      margin-right: auto;
+    }`
+    : '';
 
   const alignmentRule = css.textAlign
     ? `
@@ -205,5 +239,5 @@ export function generateLessonThemeStyleTag(
     }`
     : '';
 
-  return alignmentRule + widthRule + blockPaddingRule + blockBaseRule;
+  return imageBaseRule + paragraphWidthRule + alignmentRule + widthRule + blockPaddingRule + blockBaseRule;
 }

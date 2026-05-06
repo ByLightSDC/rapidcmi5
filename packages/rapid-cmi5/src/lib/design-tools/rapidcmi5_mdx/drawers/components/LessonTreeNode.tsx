@@ -271,7 +271,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
     },
   });
 
-  const [{ isDragging, opacity }, drag] = useDrag({
+  const [{ opacity }, drag] = useDrag({
     type: ItemTypes.slide,
     item: element,
     collect: (monitor) => ({
@@ -472,7 +472,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                   className="nodrag"
                   sx={{
                     color: 'primary',
-                    marginRight:-1,
+                    marginRight: -1,
                   }}
                   onClick={(event) => {
                     event.stopPropagation();
@@ -529,11 +529,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                 {lessonNodeActions.map((option: RowAction, index: number) => {
                   if (option.hidden) return null;
                   // only allow add slide on current lesson
-                  if (
-                    index === LessonNodeActionEnum.AddSlide &&
-                    !isCurrentLessonFolder
-                  )
-                    return null;
+
                   return (
                     <React.Fragment key={option.tooltip}>
                       {index > 0 && <Divider />}

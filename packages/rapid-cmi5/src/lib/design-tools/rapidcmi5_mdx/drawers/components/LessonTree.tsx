@@ -1,6 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import './lesson-tree.css';
 import TreeView, {
   INode,
@@ -8,18 +5,11 @@ import TreeView, {
   NodeId,
 } from 'react-accessible-treeview';
 import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   addASlide,
-  currentAuPath,
+  currentBlock,
   deleteSlide,
   navigateSlide,
 } from '../../../../redux/courseBuilderReducer';
@@ -55,9 +45,8 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 import { currentRepoAccessObjectSel } from '../../../../redux/repoManagerReducer';
 import { slugifyPath } from '../../../course-builder/GitViewer/utils/useCourseOperationsUtils';
-import { appHeaderVisible, ButtonMinorUi, useToaster } from '@rapid-cmi5/ui';
-import { Divider } from '@mui/material';
-import { Box, minWidth } from '@mui/system';
+import { appHeaderVisible, useToaster } from '@rapid-cmi5/ui';
+import { Box } from '@mui/system';
 
 const textColor = 'text.hint';
 
@@ -81,7 +70,6 @@ function LessonTree({
   courseData,
   isReadOnly = false,
   paddingBase = 12,
-  onCreateLesson,
 }: LessonTreeViewProps) {
   const {
     changeLesson,
@@ -90,6 +78,7 @@ function LessonTree({
     handleReorderSlide,
     handleReorderLesson,
   } = useCourseData();
+
   const {
     changeLessonMoveOn,
     changeLessonName,
@@ -97,14 +86,15 @@ function LessonTree({
     saveSlide,
     changeLessonTheme,
   } = useContext(RC5Context);
+
   const repoAccessObject = useSelector(currentRepoAccessObjectSel);
   const isAppHeaderShowing = useSelector(appHeaderVisible);
   const dispatch = useDispatch<AppDispatch>();
   const displayToaster = useToaster();
   const [treeData, setTreeData] = useState<INode<IFlatMetadata>[]>([]);
   const currentExpandedNodes = useRef<NodeId[]>([]);
-  const { promptDeleteLesson, promptCreateLesson } = useRC5Prompts();
-  const currentAuDir = useSelector(currentAuPath);
+  const { promptDeleteLesson } = useRC5Prompts();
+  const currentBlockIndex = useSelector(currentBlock);
   const { handleGetUniqueFilePath } = useContext(GitContext);
 
   const [menuNode, setMenuNode] = useState<ILessonNode | null>(null);
@@ -155,7 +145,6 @@ function LessonTree({
     element: ILessonNode,
     whichAction: number,
   ) => {
-    // debugLog('onAction', element);
     if (element.type === LessonTreeNodeType.Lesson) {
       switch (whichAction) {
         case LessonNodeActionEnum.TriggerRename:
@@ -164,22 +153,38 @@ function LessonTree({
           break;
         case LessonNodeActionEnum.AddSlide:
           saveSlide(); //save before navigating away from this slide
-          // eslint-disable-next-line no-case-declarations
           const slideTitle = `Slide ${element.children.length + 1}`;
 
-          if (!repoAccessObject) return;
+          if (!courseData) {
+            throw new Error('Course Data object is required');
+          }
+
+          if (!repoAccessObject) {
+            throw new Error('Repo access object is required');
+          }
+
+          if (element.block == null) {
+            throw new Error('Slide could not be added: missing block');
+          }
+
+          const filepath = await handleGetUniqueFilePath(
+            repoAccessObject,
+            slugifyPath(slideTitle),
+            courseData.blocks[currentBlockIndex].aus[Number(element.id)]
+              .dirPath,
+          );
 
           dispatch(
             addASlide({
-              content: defaultSlideContent,
-              display: defaultSlideContent,
-              slideTitle: slideTitle,
-              type: SlideTypeEnum.Markdown,
-              filepath: await handleGetUniqueFilePath(
-                repoAccessObject,
-                slugifyPath(slideTitle),
-                currentAuDir || '',
-              ),
+              auIndex: Number(element.id),
+              blockIndex: element.block,
+              slide: {
+                content: defaultSlideContent,
+                display: defaultSlideContent,
+                slideTitle: slideTitle,
+                type: SlideTypeEnum.Markdown,
+                filepath,
+              },
             }),
           );
 
@@ -232,11 +237,7 @@ function LessonTree({
    * Loads slide and lesson if applicable
    * @param param0
    */
-  const handleNodeSelect = ({
-    element,
-    isSelected,
-    isBranch,
-  }: ILessonNodeSelectProps) => {
+  const handleNodeSelect = ({ element }: ILessonNodeSelectProps) => {
     if (
       element.type === LessonTreeNodeType.Slide &&
       typeof element.block !== 'undefined' &&
@@ -250,7 +251,6 @@ function LessonTree({
           if (!currentExpandedNodes.current.includes(element.lesson)) {
             currentExpandedNodes.current.push(element.lesson);
           }
-          //promptChangeLesson(blockName, lessonName, element.slide);
           changeLesson(blockName, lessonName, element.slide);
         }
       } else {
@@ -258,6 +258,7 @@ function LessonTree({
           saveSlide();
           dispatch(navigateSlide(element.slide));
         }
+        ``;
       }
     }
   };
@@ -269,10 +270,6 @@ function LessonTree({
   const handleNodeExpand = ({
     element,
     isExpanded,
-    isSelected,
-    isHalfSelected,
-    isDisabled,
-    treeState,
   }: ITreeViewOnExpandProps) => {
     const currentlyExpanded: NodeId[] = [...currentExpandedNodes.current];
     if (isExpanded) {
