@@ -154,6 +154,11 @@ function LazyImage({
     }
   }, [imageDir, src, getLocalFileBlobUrl]);
 
+  const dimStyle: React.CSSProperties = {
+    ...(typeof width === 'number' ? { width } : {}),
+    ...(typeof height === 'number' ? { height } : {}),
+  };
+
   return (
     <img
       className={className ?? undefined}
@@ -164,7 +169,7 @@ function LazyImage({
       draggable="false"
       width={width}
       height={height}
-      style={style}
+      style={{ ...dimStyle, ...style }}
       id={id}
     />
   );

@@ -127,9 +127,19 @@ export const ImageDialog: React.FC = () => {
     const img = new Image();
     img.onload = () => {
       naturalDimsRef.current = { width: img.naturalWidth, height: img.naturalHeight };
-      // Pre-populate fields only when image has no stored dimensions
-      const hasStoredDims = typeof state.initialValues.width === 'number' || typeof state.initialValues.height === 'number';
-      if (!hasStoredDims) {
+      const storedW = state.initialValues.width;
+      const storedH = state.initialValues.height;
+      const hasBothDims = typeof storedW === 'number' && typeof storedH === 'number';
+      if (hasBothDims) {
+        // If the stored ratio differs from the natural ratio by more than 1%, the
+        // user intentionally broke the aspect ratio — open the dialog unlocked.
+        const naturalRatio = img.naturalWidth / img.naturalHeight;
+        const storedRatio = (storedW as number) / (storedH as number);
+        if (Math.abs(naturalRatio - storedRatio) / naturalRatio > 0.01) {
+          setAspectLocked(false);
+        }
+      } else {
+        // No stored dims — pre-populate from natural size
         setWidth(String(img.naturalWidth));
         setHeight(String(img.naturalHeight));
       }
