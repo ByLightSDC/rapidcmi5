@@ -154,10 +154,21 @@ function LazyImage({
     }
   }, [imageDir, src, getLocalFileBlobUrl]);
 
-  const dimStyle: React.CSSProperties = {
-    ...(typeof width === 'number' ? { width } : {}),
-    ...(typeof height === 'number' ? { height } : {}),
-  };
+  // Build dimension styles that work correctly with the CSS max-width: 100% rule.
+  // - width only: cap at that pixel value, height auto (natural AR preserved)
+  // - both: use aspect-ratio so height scales correctly when container is narrower
+  const dimStyle: React.CSSProperties = {};
+  if (typeof width === 'number' && typeof height === 'number') {
+    dimStyle.width = `min(${width}px, 100%)`;
+    dimStyle.aspectRatio = `${width} / ${height}`;
+    dimStyle.height = 'auto';
+  } else if (typeof width === 'number') {
+    dimStyle.width = `min(${width}px, 100%)`;
+    dimStyle.height = 'auto';
+  } else if (typeof height === 'number') {
+    dimStyle.height = height;
+    dimStyle.width = 'auto';
+  }
 
   return (
     <img
