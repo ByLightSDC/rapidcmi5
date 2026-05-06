@@ -1,5 +1,20 @@
-import { SlideTypeEnum, CourseAU, CodeRunnerContent, MoveOnCriteriaEnum, QuestionResponse, QuestionGrading, ScenarioContent, CourseData, QuizContent, QuizCompletionEnum, CTFContent, DownloadFilesContent, RC5ScenarioContent, TeamConsolesContent, RC5ActivityTypeEnum } from "@rapid-cmi5/cmi5-build-common";
-
+import {
+  SlideTypeEnum,
+  CourseAU,
+  CodeRunnerContent,
+  MoveOnCriteriaEnum,
+  QuestionResponse,
+  QuestionGrading,
+  ScenarioContent,
+  CourseData,
+  QuizContent,
+  QuizCompletionEnum,
+  CTFContent,
+  DownloadFilesContent,
+  RC5ScenarioContent,
+  TeamConsolesContent,
+  RC5ActivityTypeEnum,
+} from '@rapid-cmi5/cmi5-build-common';
 
 export const jsonFormatSpaces = 1;
 
@@ -87,7 +102,7 @@ export const defaultCodeRunnerContent: CodeRunnerContent = {
   cmi5QuizId: 'code-runner-activity-1',
   moveOnCriteria: MoveOnCriteriaEnum.Completed,
   languageVersion: '3.12.3',
-  programmingLanguage: 'python3'
+  programmingLanguage: 'python3',
 };
 
 export const defaultQuestion = {
@@ -122,9 +137,6 @@ export const defaultCourseData: CourseData = {
       aus: [
         {
           auName: '',
-          assetsPath: '',
-          backgroundImage: '',
-          rangeosScenarioName: '',
           slides: [{ ...defaultEmptySlide }],
           dirPath: '',
         },

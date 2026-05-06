@@ -24,17 +24,8 @@ export const ipc = {
       projectName,
       createAuMappings,
     ),
-  testInPlayer: (
-    auJson: string,
-    playerUrl: string,
-    configDestPath: string,
-  ) =>
-    ipcRenderer.invoke(
-      'cmi5:testInPlayer',
-      auJson,
-      playerUrl,
-      configDestPath,
-    ),
+  testInPlayer: (auJson: string, playerUrl: string, configDestPath: string) =>
+    ipcRenderer.invoke('cmi5:testInPlayer', auJson, playerUrl, configDestPath),
 };
 
 contextBridge.exposeInMainWorld('ipc', ipc);
@@ -130,8 +121,10 @@ export const fsApi = {
     ipcRenderer.invoke('fs:getStashStatus', path),
   chooseProject: () => ipcRenderer.invoke('fs:chooseProject'),
   getRecentProjects: () => ipcRenderer.invoke('fs:getRecentProjects'),
-  removeRecentProject: (id: string) => ipcRenderer.invoke('fs:removeRecentProject', id),
-  addRecentProject: (id: string) => ipcRenderer.invoke('fs:addRecentProject', id),
+  removeRecentProject: (id: string) =>
+    ipcRenderer.invoke('fs:removeRecentProject', id),
+  addRecentProject: (id: string) =>
+    ipcRenderer.invoke('fs:addRecentProject', id),
   readPlayerConfig: () => ipcRenderer.invoke('fs:readPlayerConfig'),
   writePlayerConfig: (content: string) =>
     ipcRenderer.invoke('fs:writePlayerConfig', content),
@@ -189,6 +182,11 @@ export interface ClaudeErrorPayload {
   message: string;
 }
 
+export type CodexStartOptions = ClaudeStartOptions;
+export type CodexDataPayload = ClaudeDataPayload;
+export type CodexExitPayload = ClaudeExitPayload;
+export type CodexErrorPayload = ClaudeErrorPayload;
+
 export const claudeApi = {
   start: (opts: ClaudeStartOptions = {}): Promise<{ sessionId: string }> =>
     ipcRenderer.invoke('claude:start', opts),
@@ -220,6 +218,37 @@ export const claudeApi = {
 
 contextBridge.exposeInMainWorld('claudeApi', claudeApi);
 
+export const codexApi = {
+  start: (opts: CodexStartOptions = {}): Promise<{ sessionId: string }> =>
+    ipcRenderer.invoke('codex:start', opts),
+  input: (sessionId: string, data: string): Promise<void> =>
+    ipcRenderer.invoke('codex:input', sessionId, data),
+  resize: (sessionId: string, cols: number, rows: number): Promise<void> =>
+    ipcRenderer.invoke('codex:resize', sessionId, cols, rows),
+  stop: (sessionId: string): Promise<void> =>
+    ipcRenderer.invoke('codex:stop', sessionId),
+  onData: (handler: (payload: CodexDataPayload) => void) => {
+    const listener = (_e: unknown, payload: CodexDataPayload) =>
+      handler(payload);
+    ipcRenderer.on('codex:data', listener);
+    return () => ipcRenderer.removeListener('codex:data', listener);
+  },
+  onExit: (handler: (payload: CodexExitPayload) => void) => {
+    const listener = (_e: unknown, payload: CodexExitPayload) =>
+      handler(payload);
+    ipcRenderer.on('codex:exit', listener);
+    return () => ipcRenderer.removeListener('codex:exit', listener);
+  },
+  onError: (handler: (payload: CodexErrorPayload) => void) => {
+    const listener = (_e: unknown, payload: CodexErrorPayload) =>
+      handler(payload);
+    ipcRenderer.on('codex:error', listener);
+    return () => ipcRenderer.removeListener('codex:error', listener);
+  },
+};
+
+contextBridge.exposeInMainWorld('codexApi', codexApi);
+
 export const terminalApi = {
   start: (opts: ClaudeStartOptions = {}): Promise<{ sessionId: string }> =>
     ipcRenderer.invoke('terminal:start', opts),
@@ -250,6 +279,17 @@ export const terminalApi = {
 };
 
 contextBridge.exposeInMainWorld('terminalApi', terminalApi);
+
+export const electronEvents = {
+  on: <T>(channel: string, handler: (data: T) => void) => {
+    const listener = (_e: unknown, data: T) => handler(data);
+    ipcRenderer.on(channel, listener);
+    return () => ipcRenderer.removeListener(channel, listener);
+  },
+  send: <T>(channel: string, data: T) => ipcRenderer.send(channel, data),
+};
+
+contextBridge.exposeInMainWorld('electronEvents', electronEvents);
 
 async function normalizeData(data: any): Promise<string | Uint8Array> {
   if (typeof data === 'string') return data;

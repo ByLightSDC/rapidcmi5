@@ -35,6 +35,41 @@ export interface UserSettingsApi {
   removeCert: (id: string) => Promise<void>;
 }
 
+export interface PtyStartOptions {
+  cwd?: string;
+  args?: string[];
+  command?: string;
+  cols?: number;
+  rows?: number;
+}
+
+export interface PtyDataPayload {
+  sessionId: string;
+  data: string;
+  stream: 'stdout' | 'stderr';
+}
+
+export interface PtyExitPayload {
+  sessionId: string;
+  code: number | null;
+  signal: string | null;
+}
+
+export interface PtyErrorPayload {
+  sessionId: string;
+  message: string;
+}
+
+export interface PtyApi {
+  start: (opts?: PtyStartOptions) => Promise<{ sessionId: string }>;
+  input: (sessionId: string, data: string) => Promise<void>;
+  resize: (sessionId: string, cols: number, rows: number) => Promise<void>;
+  stop: (sessionId: string) => Promise<void>;
+  onData: (handler: (payload: PtyDataPayload) => void) => () => void;
+  onExit: (handler: (payload: PtyExitPayload) => void) => () => void;
+  onError: (handler: (payload: PtyErrorPayload) => void) => () => void;
+}
+
 export interface fsApi {
   writeFile: (
     path: string,
@@ -153,5 +188,9 @@ declare global {
     ipc: ipc;
     fsApi: fsApi;
     userSettingsApi: UserSettingsApi;
+    claudeApi: PtyApi;
+    codexApi: PtyApi;
+    terminalApi: PtyApi;
+    electronEvents: any;
   }
 }

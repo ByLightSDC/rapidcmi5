@@ -6,6 +6,7 @@ import YAML from 'yaml';
 import {
   CourseAU,
   CourseData,
+  generateAuId,
   KSATElement,
   LessonTheme,
   Operation,
@@ -786,6 +787,63 @@ const extractKsatsFromSlide = (slideContent: string): KSATElement[] => {
     console.warn('Failed to extract KSATs from slide content:', error);
   }
   return [];
+};
+
+export const createNewCourseFS = async ({
+  course,
+  r,
+  fsInstance,
+}: {
+  course: CourseData;
+  r: RepoAccessObject;
+  fsInstance: GitFS;
+}) => {
+  const repoPath = getRepoPath(r);
+  const courseSlug = slugifyPath(course.courseTitle);
+
+  for (const block of course.blocks) {
+    for (const au of block.aus) {
+      const auSlug = slugifyPath(au.auName);
+
+      const uniqueAuPath = await createUniquePath({
+        name: auSlug,
+        basePath: courseSlug,
+        repoPath,
+        isFile: false,
+        fsInstance,
+      });
+
+      await fsInstance.createDir(r, uniqueAuPath);
+      au.dirPath = uniqueAuPath;
+
+      for (const slide of au.slides) {
+        const slideSlug = slugifyPath(slide.slideTitle);
+        const filepath = join(uniqueAuPath, `${slideSlug}.md`);
+
+        await fsInstance.createFile(r, filepath, slide.content ?? '');
+        slide.filepath = filepath;
+      }
+    }
+  }
+
+  course.rc5Version = RC5_VERSION;
+  const gitOps = new GitOperations(fsInstance);
+
+  const remotes = (await gitOps.listRepoRemotes?.(r)) ?? [];
+  const branch = await gitOps.getCurrentGitBranch?.(r);
+
+  course.remoteGitUrl = remotes.find((rem) => rem.remote === 'origin')?.url;
+
+  course.gitBranch = branch ?? undefined;
+
+  course.buildTime = new Date().toISOString();
+
+  // update the file system
+  await fsInstance.createFile(
+    r,
+    `${courseSlug}/${RC5_FILENAME}`,
+    YAML.stringify(stripSlideContent(course)),
+  );
 };
 
 export interface RenameCourseInFsOptions extends FsContextOptions {

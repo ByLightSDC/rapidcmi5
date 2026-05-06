@@ -8,6 +8,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Fade from '@mui/material/Fade';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import TerminalOutlinedIcon from '@mui/icons-material/TerminalOutlined';
+import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 
 interface PtyStartOptions {
@@ -48,11 +49,12 @@ interface PtyApi {
 declare global {
   interface Window {
     claudeApi: PtyApi;
+    codexApi: PtyApi;
     terminalApi: PtyApi;
   }
 }
 
-type PanelMode = 'claude' | 'terminal';
+type PanelMode = 'claude' | 'codex' | 'terminal';
 type SessionStatus = 'starting' | 'running' | 'exited' | 'error';
 
 const STORAGE_KEY_HEIGHT = 'claudeWindow.height';
@@ -85,7 +87,7 @@ function readStoredBool(key: string, fallback: boolean): boolean {
 function readStoredMode(fallback: PanelMode): PanelMode {
   try {
     const v = localStorage.getItem(STORAGE_KEY_MODE);
-    return v === 'claude' || v === 'terminal' ? v : fallback;
+    return v === 'claude' || v === 'codex' || v === 'terminal' ? v : fallback;
   } catch {
     return fallback;
   }
@@ -208,9 +210,7 @@ function TerminalView({ api, visible, onStatusChange }: TerminalViewProps) {
     return () => clearTimeout(t);
   }, [visible, api]);
 
-  return (
-    <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
-  );
+  return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />;
 }
 
 interface TabButtonProps {
@@ -226,10 +226,10 @@ function TabButton({ active, onClick, icon, label, status }: TabButtonProps) {
     status === 'error'
       ? '#f48771'
       : status === 'exited'
-      ? '#d7ba7d'
-      : status === 'running'
-      ? '#73c991'
-      : '#888';
+        ? '#d7ba7d'
+        : status === 'running'
+          ? '#73c991'
+          : '#888';
   return (
     <button
       type="button"
@@ -272,7 +272,9 @@ export default function ClaudeWindow() {
   const [mode, setMode] = useState<PanelMode>(() => readStoredMode('claude'));
   const [openedModes, setOpenedModes] = useState<Set<PanelMode>>(() => {
     const initialOpen = readStoredBool(STORAGE_KEY_OPEN, false);
-    return initialOpen ? new Set<PanelMode>([readStoredMode('claude')]) : new Set();
+    return initialOpen
+      ? new Set<PanelMode>([readStoredMode('claude')])
+      : new Set();
   });
   const [height, setHeight] = useState<number>(() =>
     readStoredNumber(STORAGE_KEY_HEIGHT, DEFAULT_HEIGHT),
@@ -280,6 +282,10 @@ export default function ClaudeWindow() {
   const [resizing, setResizing] = useState(false);
 
   const [claudeStatus, setClaudeStatus] = useState<{
+    status: SessionStatus;
+    detail: string;
+  }>({ status: 'starting', detail: '' });
+  const [codexStatus, setCodexStatus] = useState<{
     status: SessionStatus;
     detail: string;
   }>({ status: 'starting', detail: '' });
@@ -363,6 +369,11 @@ export default function ClaudeWindow() {
       setClaudeStatus({ status, detail }),
     [],
   );
+  const codexStatusChange = useCallback(
+    (status: SessionStatus, detail: string) =>
+      setCodexStatus({ status, detail }),
+    [],
+  );
   const terminalStatusChange = useCallback(
     (status: SessionStatus, detail: string) =>
       setTerminalStatus({ status, detail }),
@@ -396,7 +407,23 @@ export default function ClaudeWindow() {
               minHeight: 0,
             }}
           >
-            Open AI Agent
+            Open Claude
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            color="primary"
+            onClick={() => openWith('codex')}
+            startIcon={<CodeOutlinedIcon />}
+            sx={{
+              textTransform: 'none',
+              fontSize: 12,
+              paddingX: 1.5,
+              paddingY: 0.5,
+              minHeight: 0,
+            }}
+          >
+            Open Codex
           </Button>
           <Button
             variant="contained"
@@ -480,8 +507,15 @@ export default function ClaudeWindow() {
               active={mode === 'claude'}
               onClick={() => switchTo('claude')}
               icon={<SmartToyOutlinedIcon style={{ fontSize: 14 }} />}
-              label="AI Agent"
+              label="Claude"
               status={claudeStatus.status}
+            />
+            <TabButton
+              active={mode === 'codex'}
+              onClick={() => switchTo('codex')}
+              icon={<CodeOutlinedIcon style={{ fontSize: 14 }} />}
+              label="Codex"
+              status={codexStatus.status}
             />
             <TabButton
               active={mode === 'terminal'}
@@ -491,7 +525,9 @@ export default function ClaudeWindow() {
               status={terminalStatus.status}
             />
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', paddingRight: 6 }}>
+          <div
+            style={{ display: 'flex', alignItems: 'center', paddingRight: 6 }}
+          >
             <Tooltip title="Hide" placement="top">
               <IconButton
                 size="small"
@@ -521,6 +557,22 @@ export default function ClaudeWindow() {
                 api={window.claudeApi}
                 visible={open && mode === 'claude'}
                 onStatusChange={claudeStatusChange}
+              />
+            </div>
+          )}
+          {openedModes.has('codex') && (
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                padding: 4,
+                display: mode === 'codex' ? 'block' : 'none',
+              }}
+            >
+              <TerminalView
+                api={window.codexApi}
+                visible={open && mode === 'codex'}
+                onStatusChange={codexStatusChange}
               />
             </div>
           )}

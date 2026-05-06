@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { MDXEditorMethods } from '@mdxeditor/editor';
 
 import {
@@ -23,12 +22,12 @@ import {
 } from '../modals/constants';
 import { ILessonNode } from '../drawers/components/LessonTreeNode';
 import {
-  SlideType,
   MoveOnCriteriaEnum,
   Operation,
   CourseAU,
   LessonTheme,
   CourseData,
+  SlideType,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   debugLog,
@@ -58,7 +57,6 @@ import {
   setIsLessonMounted,
   changeViewMode,
 } from '../../../redux/courseBuilderReducer';
-import { useCourseData } from '../data-hooks/useCourseData';
 
 interface tProviderProps {
   isEnabled?: boolean;
@@ -82,6 +80,7 @@ interface IRC5Context {
   discardLessonChanges: () => void;
   saveCourseFile: () => Promise<string[]>;
   saveSlide: () => void;
+  saveMarkdownToCurrentSlide: (markdown: string) => boolean;
   getMarkdownData: () => string | undefined;
   sendMessage: (message: Message) => void;
 }
@@ -94,21 +93,22 @@ interface IRC5Context {
 export const RC5Context = createContext<IRC5Context>({
   isEnabled: true,
   lessonSlides: [],
-  addEditor: (editorRef: RefObject<MDXEditorMethods>) => {},
-  removeEditor: () => {},
-  changeCourseName: (newName: string) => {},
-  changeLessonMoveOn: (moveOn: MoveOnCriteriaEnum, element: ILessonNode) => {},
-  changeLessonTheme: (theme: LessonTheme, element: ILessonNode) => {},
-  changeLessonName: (newName: string, element: ILessonNode) => {},
-  changeSlideName: (newName: string, element: ILessonNode) => {},
-  deleteLesson: (lessonIndex: number) => {},
-  discardLessonChanges: () => {},
+  addEditor: (editorRef: RefObject<MDXEditorMethods>) => { },
+  removeEditor: () => { },
+  changeCourseName: (newName: string) => { },
+  changeLessonMoveOn: (moveOn: MoveOnCriteriaEnum, element: ILessonNode) => { },
+  changeLessonTheme: (theme: LessonTheme, element: ILessonNode) => { },
+  changeLessonName: (newName: string, element: ILessonNode) => { },
+  changeSlideName: (newName: string, element: ILessonNode) => { },
+  deleteLesson: (lessonIndex: number) => { },
+  discardLessonChanges: () => { },
   saveCourseFile: async () => [],
-  saveSlide: () => {},
+  saveSlide: () => { },
+  saveMarkdownToCurrentSlide: (markdown: string) => false,
   getMarkdownData: () => {
     return undefined;
   },
-  sendMessage: (message: Message) => {},
+  sendMessage: (message: Message) => { },
 });
 
 // Project Context Provider
@@ -385,7 +385,7 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
         !courseData.blocks[currentBlockIndex].aus[element.lesson] ||
         !courseData.blocks[currentBlockIndex].aus[element.lesson].slides ||
         !courseData.blocks[currentBlockIndex].aus[element.lesson].slides[
-          element.slide
+        element.slide
         ]
       ) {
         debugLogError(
@@ -396,7 +396,7 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
 
       const slide = {
         ...courseData.blocks[currentBlockIndex].aus[element.lesson].slides[
-          element.slide
+        element.slide
         ],
         slideTitle: newName,
       };
@@ -464,6 +464,44 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
       );
     }
   };
+
+  const saveMarkdownToCurrentSlide = useCallback(
+    (markdown: string) => {
+      const validationResult = validateYamlFrontmatter(markdown);
+
+      if (!validationResult.isValid) {
+        const errorMsg = validationResult.lineNumber
+          ? `Cannot save slide: Invalid YAML frontmatter at line ${validationResult.lineNumber}\n\n${validationResult.details}`
+          : `Cannot save slide: Invalid YAML frontmatter\n\n${validationResult.details}`;
+
+        console.error('YAML validation error:', validationResult);
+
+        dispatch(
+          setModal({
+            type: warningModalId,
+            id: null,
+            name: null,
+            meta: {
+              title: 'Invalid YAML Frontmatter',
+              message: errorMsg,
+            },
+          }),
+        );
+        return false;
+      }
+
+      dispatch(
+        saveSlideContent({
+          position: currentSlideIndex,
+          content: markdown,
+          skipShouldDirty: true,
+        }),
+      );
+      dispatch(updateDisplayText(markdown));
+      return true;
+    },
+    [currentSlideIndex, dispatch],
+  );
 
   const containsUuid = (str: string): boolean => {
     const lastSegment = str.split('/').pop() ?? '';
@@ -581,6 +619,7 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
         removeEditor: onRemoveEditor,
         saveCourseFile: onSaveCourseFile,
         saveSlide: onSaveSlide,
+        saveMarkdownToCurrentSlide,
         getMarkdownData,
         sendMessage,
       }}

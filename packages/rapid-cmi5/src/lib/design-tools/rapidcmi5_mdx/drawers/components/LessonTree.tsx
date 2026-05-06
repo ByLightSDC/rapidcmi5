@@ -172,7 +172,6 @@ function LessonTree({
           dispatch(
             addASlide({
               content: defaultSlideContent,
-              display: defaultSlideContent,
               slideTitle: slideTitle,
               type: SlideTypeEnum.Markdown,
               filepath: await handleGetUniqueFilePath(
@@ -517,10 +516,10 @@ function LessonTree({
                   handleModalAction={handleMoveOn}
                   currentMoveOn={
                     moveOnCriteriaForm.id !== undefined &&
-                    moveOnCriteriaForm.block !== undefined
+                      moveOnCriteriaForm.block !== undefined
                       ? courseData?.blocks?.[moveOnCriteriaForm.block]?.aus?.[
-                          moveOnCriteriaForm.id as number
-                        ]?.moveOnCriteria
+                        moveOnCriteriaForm.id as number
+                      ]?.moveOnCriteria
                       : undefined
                   }
                 />
@@ -533,10 +532,10 @@ function LessonTree({
                   handleModalAction={handleLessonSettings}
                   currentTheme={
                     lessonSettingsForm.id !== undefined &&
-                    lessonSettingsForm.block !== undefined
+                      lessonSettingsForm.block !== undefined
                       ? courseData?.blocks?.[lessonSettingsForm.block]?.aus?.[
-                          lessonSettingsForm.id as number
-                        ]?.lessonTheme
+                        lessonSettingsForm.id as number
+                      ]?.lessonTheme
                       : undefined
                   }
                 />

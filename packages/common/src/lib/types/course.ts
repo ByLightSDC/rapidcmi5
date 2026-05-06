@@ -1,27 +1,5 @@
-import { KSATElement, MoveOnCriteriaEnum } from './activity';
-import { SlideType } from './slide';
-
-export type Cmi5Scenario = {
-  uuid?: string;
-  name?: string;
-  message?: string;
-  status?: string;
-};
-
-/**
- * @typedef {Object} CourseAU
- * @property {string} auName Lesson AU Name
- * @property {string} [assetsPath] Assets Path
- * @property {string} [backgroundImage] Background Image
- * @property {boolean} [promptClassId = true] Whether User Should Be Required to Enter Class Id
- * @property {Array<SlideType>} slides Slide Content
- * @property {string} [title] Title
- * @property {string} [rangeosScenarioName] Scenario Name
- * @property {string} [rangeosScenarioUUID] Scenario Id
- * @property {string} [rangeosScenarioDraftUUID] Draft Id
- * @property {boolean} [teamSSOEnabled] Whether SSO is enabled for team exercise
- * @property {string} [dirPath] Directory Path
- */
+import { z } from 'zod/v4';
+import { MoveOnCriteriaEnum } from './activity';
 
 // --- Lesson Theme Defaults ---
 
@@ -46,53 +24,9 @@ export enum DefaultAlignmentEnum {
   Right = 'right',
 }
 
-export type LessonTheme = {
-  contentWidth?: ContentWidthEnum;
-  blockPadding?: BlockPaddingEnum;
-  blockPaddingCustomValue?: number;
-  defaultAlignment?: DefaultAlignmentEnum;
-  defaultActivityAlignment?: DefaultAlignmentEnum;
-};
-
 export const contentWidthOptions = Object.values(ContentWidthEnum);
 export const blockPaddingOptions = Object.values(BlockPaddingEnum);
 export const defaultAlignmentOptions = Object.values(DefaultAlignmentEnum);
-
-export type CourseAU = {
-  auName: string;
-  assetsPath?: string;
-  description?: string;
-  backgroundImage?: string;
-  promptClassId?: boolean;
-  defaultClassId?: string;
-  // CMI5 moveOn rule for this AU. Defaults to "CompletedOrPassed" if omitted
-  // Allowed values per CMI5 spec: Passed | Completed | CompletedAndPassed | CompletedOrPassed | NotApplicable
-  moveOn?:
-    | 'Passed'
-    | 'Completed'
-    | 'CompletedAndPassed'
-    | 'CompletedOrPassed'
-    | 'NotApplicable';
-  slides: SlideType[];
-  title?: string;
-  rangeosScenarioName?: string;
-  rangeosScenarioUUID?: string;
-  rangeosScenarioDraftUUID?: string;
-  teamSSOEnabled?: boolean;
-  dirPath: string;
-  ksats?: KSATElement[];
-  moveOnCriteria?: MoveOnCriteriaEnum;
-  lessonTheme?: LessonTheme;
-  // A way to easily display info such as publish time, git repo, git commit hash, etc
-  metadata?: AuMetaData;
-};
-
-export type AuMetaData = {
-  buildTime?: string;
-  remoteGitUrl?: string;
-  gitBranch?: string;
-  rc5Version?: string;
-};
 
 export enum Operation {
   // Covers deleting a slide or AU
@@ -105,30 +39,134 @@ export enum Operation {
   Cancel = 'Cancel',
 }
 
-export type CourseBlock = {
-  blockName: string;
-  blockDescription?: string;
-  aus: CourseAU[];
-};
-
-export type CourseData = {
-  author?: string;
-  courseTitle: string;
-  courseDescription?: string;
-  courseId: string;
-  blocks: CourseBlock[];
-  designer?: any;
-  // what version of rapid cmi5 was this course last saved with
-  rc5Version?: string;
-  // used to track origin of the package
-  remoteGitUrl?: string;
-  // the branch which this course was made from
-  gitBranch?: string;
-  buildTime?: string;
-};
-
 export enum CourseLevel {
   Beginner = 'beginner',
   Intermediate = 'intermediate',
   Advanced = 'advanced',
 }
+
+export const Cmi5ScenarioSchema = z.object({
+  uuid: z.string().optional(),
+  name: z.string().optional(),
+  message: z.string().optional(),
+  status: z.string().optional(),
+});
+
+export const SlideSchema = z.object({
+  slideTitle: z.string(),
+  type: z
+    .enum([
+      'markdown',
+      'quiz',
+      'ctf',
+      'rangeosScenario',
+      'sourceDoc',
+      'codeRunner',
+    ])
+    .describe(
+      'Slide type. Default to "markdown" unless the user asks for something else.',
+    ),
+  filepath: z
+    .string()
+    .describe(
+      'Slide path relative to the course root, e.g. "introduction/slide-1.md".',
+    ),
+  content: z.string().optional().describe('Markdown body of the slide.'),
+});
+
+export const KSATElementSchema = z.object({
+  element_identifier: z.string().optional(),
+  element_type: z.enum(['task', 'knowledge', 'skill']).optional(),
+  title: z.string().optional(),
+  text: z.string().optional(),
+  doc_identifier: z.string().optional(),
+});
+
+export const LessonThemeSchema = z.object({
+  contentWidth: z.enum(ContentWidthEnum).optional(),
+  blockPadding: z.enum(BlockPaddingEnum).optional(),
+  blockPaddingCustomValue: z.number().optional(),
+  defaultAlignment: z.enum(DefaultAlignmentEnum).optional(),
+  defaultActivityAlignment: z.enum(DefaultAlignmentEnum).optional(),
+});
+
+export const AuMetaDataSchema = z.object({
+  buildTime: z.string().optional(),
+  remoteGitUrl: z.string().optional(),
+  gitBranch: z.string().optional(),
+  rc5Version: z.string().optional(),
+});
+
+export const CourseAuSchema = z.object({
+  auName: z.string().describe('Human-readable AU/lesson name.'),
+  assetsPath: z.string().optional(),
+  description: z.string().optional(),
+  backgroundImage: z.string().optional(),
+  promptClassId: z.boolean().optional(),
+  defaultClassId: z.string().optional(),
+  moveOn: z
+    .enum([
+      'Passed',
+      'Completed',
+      'CompletedAndPassed',
+      'CompletedOrPassed',
+      'NotApplicable',
+    ])
+    .optional(),
+  slides: z.array(SlideSchema),
+  title: z.string().optional(),
+  rangeosScenarioName: z.string().optional(),
+  rangeosScenarioUUID: z.string().optional(),
+  rangeosScenarioDraftUUID: z.string().optional(),
+  teamSSOEnabled: z.boolean().optional(),
+  dirPath: z
+    .string()
+    .describe(
+      'AU folder name relative to the course root, lowercase with dashes, e.g. "introduction".',
+    ),
+  ksats: z.array(KSATElementSchema).optional(),
+  moveOnCriteria: z.enum(MoveOnCriteriaEnum).optional(),
+  lessonTheme: LessonThemeSchema.optional(),
+  metadata: AuMetaDataSchema.optional(),
+});
+
+export const CourseBlockSchema = z.object({
+  blockName: z.string(),
+  blockDescription: z.string().optional(),
+  aus: z.array(CourseAuSchema),
+});
+
+export const CourseDataSchema = z.object({
+  courseTitle: z.string().describe('Human-readable course title.'),
+  courseId: z
+    .string()
+    .describe(
+      'Unique course id, typically a URL like "https://example.com/my-course".',
+    ),
+  courseDescription: z.string().optional(),
+  author: z.string().optional(),
+  buildTime: z.string().optional(),
+  remoteGitUrl: z.string().optional(),
+  gitBranch: z.string().optional(),
+  rc5Version: z.string().optional(),
+  blocks: z
+    .array(CourseBlockSchema)
+    .describe('Top-level course blocks. Most courses have a single block.'),
+});
+
+export const CreateCourseInputSchema = CourseDataSchema.extend({
+  repoName: z
+    .string()
+    .min(1)
+    .describe(
+      'Target project (repo) directory name. MUST be one of the names returned by the list_projects tool — call list_projects first if you do not already know it.',
+    ),
+});
+
+export type Cmi5Scenario = z.infer<typeof Cmi5ScenarioSchema>;
+export type LessonTheme = z.infer<typeof LessonThemeSchema>;
+export type AuMetaData = z.infer<typeof AuMetaDataSchema>;
+export type CourseAU = z.infer<typeof CourseAuSchema>;
+export type CourseBlock = z.infer<typeof CourseBlockSchema>;
+export type SlideType = z.infer<typeof SlideSchema>;
+export type CourseData = z.infer<typeof CourseDataSchema>;

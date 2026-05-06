@@ -14,7 +14,7 @@ import {
   maxFormWidths,
   useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
-import { Alert, MenuItem, SxProps, Typography, useTheme } from '@mui/material';
+import { Alert, MenuItem, Typography, useTheme } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import * as yup from 'yup';
@@ -42,10 +42,9 @@ export const ScenarioForm = ({
   defaultFormData: RC5ScenarioContent;
   deleteButton?: JSX.Element;
   handleCloseModal?: () => void;
-  onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
+  onSave: (activity: RC5ActivityTypeEnum.scenario, data: any) => void;
 }) => {
   const { GetScenariosForm, fetchScenario } = useRapidCmi5Opts();
-  const theme = useTheme();
 
   /* Lesson Theme */
   const { lessonTheme } = useContext(LessonThemeContext);
@@ -234,7 +233,7 @@ export const ScenarioForm = ({
           {
             flexGrow: 1,
             maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
-          } as SxProps
+          }
         }
         getFormFields={getFormFields}
         loadingButtonText="Saving"
