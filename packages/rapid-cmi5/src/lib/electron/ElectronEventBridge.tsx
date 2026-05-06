@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { useSelector } from 'react-redux';
-import type { CourseData } from '@rapid-cmi5/cmi5-build-common';
+import type { CourseData, QuizContent } from '@rapid-cmi5/cmi5-build-common';
 
 import { GitContext } from '../design-tools/course-builder/GitViewer/session/GitContext';
 import { RC5Context } from '../design-tools/rapidcmi5_mdx/contexts/RC5Context';
@@ -13,6 +13,7 @@ import {
 import { getFsInstance } from '../design-tools/course-builder/GitViewer/utils/gitFsInstance';
 import { fsType, RepoAccessObject } from '../redux/repoManagerReducer';
 import { useCourseOperations } from '../design-tools/course-builder/GitViewer/session/useCourseOperations';
+import { jsonFormatSpaces, useTimeStampUUID } from '@rapid-cmi5/ui';
 
 /**
  * Bridges Electron events into the frontend.
@@ -26,8 +27,22 @@ export const ElectronEventsBridge = () => {
     useContext(RC5Context);
   const currentCourseName = useSelector(currentCourse);
   const fsInstance = getFsInstance();
+  const { generateId } = useTimeStampUUID();
 
   const { loadCourse } = useCourseOperations(fsInstance, null);
+
+  const createQuiz = (quizContent: QuizContent) => {
+    const quiz = {
+      ...quizContent,
+      rc5id: quizContent.rc5id ?? generateId(),
+    };
+    const currentMarkdown = getMarkdownData() ?? '';
+    const quizJson = JSON.stringify(quiz, null, jsonFormatSpaces);
+    const quizDirective = `:::quiz\n\`\`\`json\n${quizJson}\n\`\`\`\n:::`;
+    const updatedMarkdown = `${currentMarkdown.trimEnd()}\n\n${quizDirective}\n`;
+
+    return saveMarkdownToCurrentSlide(updatedMarkdown);
+  };
 
   useElectronEvent<{ requestId?: string }>(
     'course:saveCourse',
@@ -103,6 +118,34 @@ export const ElectronEventsBridge = () => {
           ok: false,
           error: error instanceof Error ? error.message : String(error),
         });
+      }
+    },
+  );
+
+  useElectronEvent<{ requestId?: string; quiz: QuizContent }>(
+    'quiz:create',
+    async (data) => {
+      try {
+        const saved = createQuiz(data.quiz);
+
+        if (!saved) {
+          throw new Error('The editor rejected the quiz markdown.');
+        }
+
+        if (data?.requestId) {
+          window.electronEvents?.send('quiz:create:done', {
+            requestId: data.requestId,
+            ok: true,
+          });
+        }
+      } catch (error) {
+        if (data?.requestId) {
+          window.electronEvents?.send('quiz:create:done', {
+            requestId: data.requestId,
+            ok: false,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
       }
     },
   );

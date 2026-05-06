@@ -82,7 +82,11 @@ export default class App {
     const height = Math.min(720, workAreaSize.height || 720);
     // Create the browser window.
     App.mainWindow = new BrowserWindow({
-      icon: join(__dirname, 'assets', process.platform === 'win32' ? 'icon.ico' : 'icon.png'),
+      icon: join(
+        __dirname,
+        'assets',
+        process.platform === 'win32' ? 'icon.ico' : 'icon.png',
+      ),
       width: width,
       height: height,
       show: false,
@@ -103,7 +107,7 @@ export default class App {
     //   App.mainWindow.webContents.openDevTools({ mode: 'detach' });
     // }
     // You can expose dev tools with this
-    // App.mainWindow.webContents.openDevTools({ mode: 'detach' });
+    App.mainWindow.webContents.openDevTools({ mode: 'detach' });
 
     // handle all external redirects in a new browser window
     // App.mainWindow.webContents.on('will-navigate', App.onRedirect);

@@ -8,6 +8,8 @@ import { ipcMain, type BrowserWindow, type IpcMainEvent } from 'electron';
 import {
   CourseData,
   CreateCourseInputSchema,
+  QuizContent,
+  QuizContentSchema,
 } from '@rapid-cmi5/cmi5-build-common';
 
 const PROTOCOL_VERSION = '2024-11-05';
@@ -74,6 +76,12 @@ interface SlideReadReply {
 }
 
 interface SlideUpdateReply {
+  requestId: string;
+  ok: boolean;
+  error?: string;
+}
+
+interface CreateQuizReply {
   requestId: string;
   ok: boolean;
   error?: string;
@@ -188,6 +196,32 @@ function requestUpdateCurrentSlide(
   });
 }
 
+function requestCreateQuiz(
+  win: BrowserWindow,
+  quiz: QuizContent,
+  timeoutMs = 30_000,
+) {
+  const requestId = randomUUID();
+  const replyChannel = 'quiz:create:done';
+
+  return new Promise<CreateQuizReply>((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      ipcMain.removeListener(replyChannel, onReply);
+      reject(new Error('Timed out waiting for the editor to create the quiz.'));
+    }, timeoutMs);
+
+    const onReply = (_event: IpcMainEvent, reply: CreateQuizReply) => {
+      if (reply?.requestId !== requestId) return;
+      clearTimeout(timeout);
+      ipcMain.removeListener(replyChannel, onReply);
+      resolve(reply);
+    };
+
+    ipcMain.on(replyChannel, onReply);
+    win.webContents.send('quiz:create', { requestId, quiz });
+  });
+}
+
 const tools: McpTool[] = [
   {
     name: 'app_info',
@@ -214,9 +248,9 @@ const tools: McpTool[] = [
       ),
   },
   {
-    name: 'list_courses',
+    name: 'list_projects',
     description:
-      'List the top-level directories in the RapidCMI5 local file system. Each is a course.',
+      'List the available projects (top-level repo directories) in the RapidCMI5 local file system. Use one of these names as the repoName when calling create_course.',
     inputSchema: {
       type: 'object',
       properties: {},
@@ -228,13 +262,13 @@ const tools: McpTool[] = [
         .filter((e) => e.isDirectory() && !e.name.startsWith('.'))
         .map((e) => e.name)
         .sort();
-      return text(dirs.length ? dirs.join('\n') : '(no courses found)');
+      return text(dirs.length ? dirs.join('\n') : '(no projects found)');
     },
   },
   {
     name: 'create_course',
     description:
-      'Scaffold a new RapidCMI5 course from a user prompt. Fill in courseTitle, a unique courseId (URL-style), and a structure of blocks → AUs → slides matching what the user asked for. Slide filepath is "<auDirPath>/<slide-slug>.md". Default slide type is "markdown"; "content" is the markdown body. Optionally pass repoName to choose the target repo directory.',
+      'Scaffold a new RapidCMI5 course from a user prompt. Fill in courseTitle, a unique courseId (URL-style), and a structure of blocks → AUs → slides matching what the user asked for. Slide filepath is "<auDirPath>/<slide-slug>.md". Default slide type is "markdown"; "content" is the markdown body. repoName is required and must be one of the names returned by list_projects — call list_projects first if you do not already know it.',
     inputSchema: z.toJSONSchema(CreateCourseInputSchema) as Record<
       string,
       unknown
@@ -243,7 +277,20 @@ const tools: McpTool[] = [
       const parsed = CreateCourseInputSchema.parse(args);
       const { repoName: repoNameInput, ...courseFields } = parsed;
       const courseData = courseFields;
-      const repoName = repoNameInput?.trim() || 'tester';
+      const repoName = repoNameInput.trim();
+
+      const entries = await fsp.readdir(ctx.rootDir, { withFileTypes: true });
+      const validRepos = entries
+        .filter((e) => e.isDirectory() && !e.name.startsWith('.'))
+        .map((e) => e.name);
+      if (!validRepos.includes(repoName)) {
+        return text(
+          `Unknown repoName "${repoName}". Call list_projects to see valid options${
+            validRepos.length ? `: ${validRepos.join(', ')}` : ' (none found — create a project first)'
+          }.`,
+          true,
+        );
+      }
 
       const win = ctx.getMainWindow();
       if (!win || win.isDestroyed()) {
@@ -376,6 +423,28 @@ const tools: McpTool[] = [
       }
 
       return text('Updated current slide markdown.');
+    },
+  },
+  {
+    name: 'create_quiz',
+    description:
+      'Append a quiz activity to the end of the currently selected markdown slide.',
+    inputSchema: z.toJSONSchema(QuizContentSchema) as Record<string, unknown>,
+    handler: async (args, ctx) => {
+      const win = ctx.getMainWindow();
+      if (!win || win.isDestroyed()) {
+        return text('No main window available to create the quiz.', true);
+      }
+
+      const reply = await requestCreateQuiz(win, args as QuizContent);
+      if (!reply.ok) {
+        return text(
+          reply.error ?? 'The editor failed to create the quiz.',
+          true,
+        );
+      }
+
+      return text('Created quiz on current slide.');
     },
   },
   {

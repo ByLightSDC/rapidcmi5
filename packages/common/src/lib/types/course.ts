@@ -157,9 +157,9 @@ export const CourseDataSchema = z.object({
 export const CreateCourseInputSchema = CourseDataSchema.extend({
   repoName: z
     .string()
-    .optional()
+    .min(1)
     .describe(
-      'Target repo directory name under the local file system. Defaults to "tester".',
+      'Target project (repo) directory name. MUST be one of the names returned by the list_projects tool — call list_projects first if you do not already know it.',
     ),
 });
 

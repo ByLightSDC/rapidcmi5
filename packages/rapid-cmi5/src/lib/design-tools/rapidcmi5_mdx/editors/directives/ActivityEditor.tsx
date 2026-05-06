@@ -159,19 +159,6 @@ export const ActivityEditor: React.FC<DirectiveEditorProps> = ({
           scenario: { uuid: data?.uuid || undefined, name: data?.name },
         }),
       );
-      // if (data.uuid) {
-      //   dispatch(
-      //     updateScenario({
-      //       scenario: { uuid: data?.uuid || undefined, name: data?.name },
-      //     }),
-      //   );
-      // } else {
-      //   dispatch(
-      //     updateScenario({
-      //       scenario: undefined,
-      //     }),
-      //   );
-      // }
     } else if (activity === RC5ActivityTypeEnum.consoles) {
       debugLog('updateTeamScenario (save activity)', data);
       dispatch(

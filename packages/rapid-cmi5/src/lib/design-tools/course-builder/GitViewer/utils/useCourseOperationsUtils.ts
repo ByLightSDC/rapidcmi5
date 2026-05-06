@@ -814,11 +814,14 @@ export const createNewCourseFS = async ({
       });
 
       await fsInstance.createDir(r, uniqueAuPath);
+      au.dirPath = uniqueAuPath;
 
       for (const slide of au.slides) {
         const slideSlug = slugifyPath(slide.slideTitle);
         const filepath = join(uniqueAuPath, `${slideSlug}.md`);
+
         await fsInstance.createFile(r, filepath, slide.content ?? '');
+        slide.filepath = filepath;
       }
     }
   }

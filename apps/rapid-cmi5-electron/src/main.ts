@@ -60,6 +60,23 @@ function getLocalFsBase(): string {
   return path.join(getRapidBase(App.isTestMode()), 'localFileSystem');
 }
 
+function toTomlString(value: string): string {
+  return JSON.stringify(value);
+}
+
+function upsertCodexMcpConfig(config: string, url: string): string {
+  const rapidCmi5Block = `[mcp_servers.rapidcmi5]\nurl = ${toTomlString(url)}\n`;
+  const blockPattern =
+    /(^|\n)\[mcp_servers\.rapidcmi5\]\n(?:[^\n]*\n)*(?=\n?\[|\s*$)/m;
+
+  if (blockPattern.test(config)) {
+    return `${config.replace(blockPattern, `$1${rapidCmi5Block}`).trimEnd()}\n`;
+  }
+
+  const prefix = config.trimEnd();
+  return `${prefix ? `${prefix}\n\n` : ''}${rapidCmi5Block}`;
+}
+
 async function startMcpServer(): Promise<void> {
   const base = getLocalFsBase();
   await fs.promises.mkdir(base, { recursive: true });
@@ -82,10 +99,44 @@ async function startMcpServer(): Promise<void> {
     JSON.stringify(mcpJson, null, 2) + '\n',
     'utf-8',
   );
+
+  const codexDir = path.join(base, '.codex');
+  const codexConfigPath = path.join(codexDir, 'config.toml');
+  await fs.promises.mkdir(codexDir, { recursive: true });
+
+  let existingCodexConfig = '';
+  try {
+    existingCodexConfig = await fs.promises.readFile(
+      codexConfigPath,
+      'utf-8',
+    );
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw error;
+    }
+  }
+
+  await fs.promises.writeFile(
+    codexConfigPath,
+    upsertCodexMcpConfig(existingCodexConfig, url),
+    'utf-8',
+  );
+}
+
+let mcpServerReady: Promise<void> | null = null;
+
+function ensureMcpServer(): Promise<void> {
+  if (!mcpServerReady) {
+    mcpServerReady = startMcpServer().catch((error) => {
+      mcpServerReady = null;
+      throw error;
+    });
+  }
+  return mcpServerReady;
 }
 
 app.whenReady().then(() => {
-  startMcpServer().catch((e) =>
+  ensureMcpServer().catch((e) =>
     console.error('Failed to start MCP server:', e),
   );
 });
@@ -745,7 +796,8 @@ ipcMain.handle('claude:stop', (_e, sessionId: string) => {
 });
 
 // Codex CLI Handlers
-ipcMain.handle('codex:start', (e, opts: StartOptions = {}) => {
+ipcMain.handle('codex:start', async (e, opts: StartOptions = {}) => {
+  await ensureMcpServer();
   return startCodexSession(e.sender, {
     ...opts,
     cwd: opts.cwd ?? getLocalFsBase(),
