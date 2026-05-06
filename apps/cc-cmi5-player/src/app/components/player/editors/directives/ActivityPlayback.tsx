@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { DirectiveEditorProps, useCellValues } from '@mdxeditor/editor';
 
 import ScenarioConsoles from '../../../scenario/ScenarioConsoles';
@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { activeTabSel } from '../../../../redux/navigationReducer';
 import { useCMI5Session } from '../../../../hooks/useCMI5Session';
 import { SlideActivityType } from '../../../../../app/types/SlideActivityStatusState';
-import { Box } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import {
   AuContextProps,
   RC5ScenarioContent,
@@ -28,6 +28,10 @@ import {
   FileDownloadLink,
   CodeRunner,
   config,
+  LessonThemeContext,
+  useLessonStyles,
+  maxFormWidths,
+  ActivityDirectiveNode,
 } from '@rapid-cmi5/ui';
 import { cmi5Instance } from '../../../../session/cmi5';
 
@@ -37,9 +41,9 @@ import { cmi5Instance } from '../../../../session/cmi5';
  * @returns
  */
 
-export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
-  mdastNode,
-}) => {
+export const ActivityPlayback: React.FC<
+  DirectiveEditorProps<ActivityDirectiveNode>
+> = ({ mdastNode }) => {
   const { name } = mdastNode; //scenario, quiz, etc.
   const [fromJson, setFromJson] = useState<any>(undefined);
   const [setProgress, submitScore, getActivityCache, setActivityCache] =
@@ -62,6 +66,15 @@ export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
     isAuthenticated: isAuthenticated,
     isTestMode: isTestMode,
   };
+
+  const muiTheme = useTheme();
+  const { lessonTheme } = useContext(LessonThemeContext);
+  const { innerSx, innerActivitySx, outerSx, outerStyle } = useLessonStyles(
+    lessonTheme,
+    mdastNode?.attributes?.contentWidth,
+    maxFormWidths.downloadsEditor,
+    muiTheme.palette.background.paper,
+  );
 
   /** Get Default Form Data from MDAST Node */
   React.useEffect(() => {
@@ -109,15 +122,30 @@ export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
             scenarioUUID: (fromJson as RC5ScenarioContent).uuid,
             promptClassId: (fromJson as RC5ScenarioContent).promptClass,
           }}
+          innerSx={innerActivitySx}
+          outerSx={outerSx}
+          outerStyle={outerStyle}
         />
       )}
 
       {name === SlideActivityType.QUIZ && fromJson && (
-        <AuQuiz auProps={auProps} content={fromJson as QuizContent} />
+        <AuQuiz
+          auProps={auProps}
+          content={fromJson as QuizContent}
+          innerSx={innerActivitySx}
+          outerSx={outerSx}
+          outerStyle={outerStyle}
+        />
       )}
 
       {name === SlideActivityType.CTF && fromJson && (
-        <AuCTF auProps={auProps} content={fromJson as CTFContent} />
+        <AuCTF
+          auProps={auProps}
+          content={fromJson as CTFContent}
+          innerSx={innerActivitySx}
+          outerSx={outerSx}
+          outerStyle={outerStyle}
+        />
       )}
       {name === SlideActivityType.CODE_RUNNER && fromJson && (
         <CodeRunner
@@ -126,6 +154,9 @@ export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
           authType="Basic"
           url={config.DEVOPS_API_URL}
           token={cmi5Instance.getAuthToken()}
+          innerSx={innerActivitySx}
+          outerSx={outerSx}
+          outerStyle={outerStyle}
         />
       )}
       {name === SlideActivityType.CONSOLES && fromJson && (
@@ -133,6 +164,9 @@ export const ActivityPlayback: React.FC<DirectiveEditorProps> = ({
           <TeamScenarioExercise
             auProps={auProps}
             content={fromJson as TeamConsolesContent}
+            innerSx={innerActivitySx}
+            outerSx={outerSx}
+            outerStyle={outerStyle}
           />
           {/* REF keep for testing individual scenario UI with a deployed scenario requires ScenarioWrapper, debugRangeId, debugScenarioId
            <ScenarioConsoles

@@ -26,6 +26,7 @@ export * from './lib/types/course';
 export * from './lib/types/ctf';
 export * from './lib/types/download';
 export * from './lib/types/codeRunner';
+export * from './lib/types/layout';
 export * from './lib/types/player';
 export * from './lib/types/score';
 export * from './lib/types/quiz';

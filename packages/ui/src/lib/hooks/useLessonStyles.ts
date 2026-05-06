@@ -1,7 +1,7 @@
 import {
   ContentWidthEnum,
-  DefaultAlignmentEnum,
   LessonTheme,
+  OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   resolveBlockMaxWidth,
@@ -10,7 +10,7 @@ import {
 
 import { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { DIRECTIVE_INNER_BOX_SHADOW } from '../cmi5/mdx/constants/directiveLayout';
-import { SxProps, useTheme } from '@mui/material';
+import { darken, lighten, SxProps, useTheme } from '@mui/material';
 
 import { useGutterRight } from '../cmi5/mdx/plugins/shared/useGutterRight';
 
@@ -86,7 +86,7 @@ export const useLessonStyles = (
     paddingBottom: blockPadding,
   };
 
-  const outerStyle: any = {
+  const outerStyle: OuterStyle = {
     'data-block-override': contentWidth !== undefined ? 'true' : {},
     style:
       contentWidth !== undefined
@@ -94,11 +94,30 @@ export const useLessonStyles = (
         : {},
   };
 
+  const borderColor = useMemo(() => {
+    if (muiTheme.palette.mode === 'dark') {
+      return lighten(muiTheme.palette.background.paper, 0.1);
+    }
+    return darken(muiTheme.palette.background.paper, 0.1);
+  }, [muiTheme.palette.mode]);
+
+  const innerActivitySx = {
+    ...innerSx,
+    boxShadow: 3,
+    borderRadius: '7px',
+    borderColor: borderColor,
+    padding: 4,
+    borderStyle: 'solid',
+    borderWidth: '2px',
+  };
+
   return {
     blockAppearanceOpen,
     blockPadding,
+    borderColor,
     contentWidthDisplay: overrideContentWidthStr,
     innerSx,
+    innerActivitySx,
     outerSx: outerSx,
     outerStyle: outerStyle,
     defaultBackgroundColor: muiTheme.palette.background.default,

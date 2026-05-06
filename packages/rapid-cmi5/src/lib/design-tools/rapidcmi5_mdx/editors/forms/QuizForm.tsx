@@ -23,6 +23,7 @@ import {
   QuizQuestion,
   QuestionBankApi,
   convertFromApi,
+  OuterStyle
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   ENUM_GROUP,
@@ -71,9 +72,9 @@ export const QuizForm = ({
   defaultFormData: QuizContent;
   deleteButton?: JSX.Element;
   handleCloseModal?: () => void;
-  innerSx?: any;
-  outerSx?: any;
-  outerStyle?: any;
+  innerSx?: SxProps;
+  outerSx?: SxProps;
+  outerStyle?: OuterStyle;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
   const { QuizBankSearchModal, QuizBankAddModal, userAuth } =

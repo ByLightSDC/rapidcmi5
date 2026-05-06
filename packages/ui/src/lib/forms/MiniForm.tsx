@@ -26,6 +26,7 @@ import Form from './Form';
 import { FormCrudType } from '../redux/utils/types';
 import { useToaster } from '../utility/useToaster';
 import { ButtonLoadingUi } from '../utility/buttons';
+import { OuterStyle } from '@rapid-cmi5/cmi5-build-common';
 
 /**
 * @typedef {Object} MiniFormProps
@@ -70,7 +71,7 @@ export type MiniFormProps = {
   formTitle?: string;
   loadingButtonText?: string;
   outerSx?: SxProps;
-  outerStyle?: any;
+  outerStyle?: OuterStyle;
   savingButtonText?: string;
   shouldAutoSave?: boolean;
   shouldDisplaySave?: boolean;
@@ -110,8 +111,8 @@ export function MiniForm({
   shouldOverrideIsSubmitting = false,
   submitButtonText = 'Save',
   failToasterMessage,
-  outerSx = {},
-  outerStyle = {},
+  outerSx,
+  outerStyle,
   savingButtonText = 'Saving',
   shouldAutoSave = false,
   shouldDisplaySave = true,

@@ -58,17 +58,21 @@ import {
   Topic,
   AutoGraderEvent,
 } from '@rangeos-nx/frontend/clients/hooks';
-import { AuContextProps, ScenarioContent } from '@rapid-cmi5/cmi5-build-common';
+import {
+  AuContextProps,
+  OuterStyle,
+  ScenarioContent,
+} from '@rapid-cmi5/cmi5-build-common';
 import {
   ButtonMainUi,
   setModal,
   ButtonMinorUi,
   OverflowTypography,
   TabMainUi,
-  LessonThemeContext,  maxFormWidths,
+  LessonThemeContext,
+  maxFormWidths,
   useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
-
 
 /**
  * Slide that displays a Deployed Scenario status, VMs, Containers, and provides Consoles access
@@ -78,9 +82,15 @@ import {
 function ScenarioConsoles({
   auProps,
   content,
+  innerSx,
+  outerSx,
+  outerStyle,
 }: {
   auProps: Partial<AuContextProps>;
   content: ScenarioContent;
+  innerSx?: SxProps;
+  outerSx?: SxProps;
+  outerStyle?: OuterStyle;
 }) {
   const dispatch = useDispatch();
   const rangeDataError = useSelector(rangeDataErrorSel);
@@ -150,132 +160,136 @@ function ScenarioConsoles({
     });
 
   return (
-    <Paper
+    <Box
+      id="scenario-activity"
       className="paper-activity"
-      variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        ...outerActivitySxWithConstrainedWidth,
+        ...outerSx,
       }}
+      {...outerStyle}
     >
-      {content.introTitle && (
-        <Typography
-          color="text.primary"
-          align="center"
-          variant="h2"
-          style={{
-            fontWeight: 800,
-            paddingBottom: '8px',
-          }}
-        >
-          content.introTitle
-        </Typography>
-      )}
-      {content.introContent && <p>{content.introContent}</p>}
-      <Typography variant="caption">Scenario</Typography>
-
-      {(!rangeDataError || numRangeDataAttempts < numRetries) &&
-        (!rangeConsoleDataError || numRangeConsoleDataAttempts < numRetries) &&
-        !scenarioId && <p>Loading...</p>}
-
-      {autoGraders && (
-        // This is needed so that we can get autograder completion data
-        // without having the autograders tab open
-        <AutoGraderSubscription
-          rangeId={rangeId}
-          scenarioId={scenarioId}
-          onUpdate={(results: AutoGraderEvent[]) => {
-            results.forEach(({ result, autoGrader }) => {
-              if (result.success == true) markCompleted(autoGrader.uuid);
-            });
-          }}
-        />
-      )}
-
-      {rangeDataError && numRangeDataAttempts === numRetries && (
-        <Alert severity="error">
-          <AlertTitle>{rangeDataError}</AlertTitle>
-          <ButtonMainUi
-            startIcon={<ReplayIcon />}
-            onClick={() => {
-              dispatch(setRangeDataAttempts(-1));
+      <Box sx={{ ...innerSx }}>
+        {content.introTitle && (
+          <Typography
+            color="text.primary"
+            align="center"
+            variant="h2"
+            style={{
+              fontWeight: 800,
+              paddingBottom: '8px',
             }}
           >
-            Try Again
-          </ButtonMainUi>
-          <br />
-          <br />
-          <ButtonMainUi
-            startIcon={<AssignmentIndIcon />}
-            onClick={() => {
-              dispatch(
-                setModal({
-                  type: classChangeModalId,
-                  id: '',
-                  name: '',
-                }),
-              );
+            content.introTitle
+          </Typography>
+        )}
+        {content.introContent && <p>{content.introContent}</p>}
+        <Typography variant="caption">Scenario</Typography>
+
+        {(!rangeDataError || numRangeDataAttempts < numRetries) &&
+          (!rangeConsoleDataError ||
+            numRangeConsoleDataAttempts < numRetries) &&
+          !scenarioId && <p>Loading...</p>}
+
+        {autoGraders && (
+          // This is needed so that we can get autograder completion data
+          // without having the autograders tab open
+          <AutoGraderSubscription
+            rangeId={rangeId}
+            scenarioId={scenarioId}
+            onUpdate={(results: AutoGraderEvent[]) => {
+              results.forEach(({ result, autoGrader }) => {
+                if (result.success == true) markCompleted(autoGrader.uuid);
+              });
             }}
-          >
-            Change ClassRoom
-          </ButtonMainUi>
-        </Alert>
-      )}
-      {!rangeDataError &&
-        rangeConsoleDataError &&
-        numRangeConsoleDataAttempts === numRetries && (
+          />
+        )}
+
+        {rangeDataError && numRangeDataAttempts === numRetries && (
           <Alert severity="error">
-            <AlertTitle>{rangeConsoleDataError}</AlertTitle>
-            <ButtonMinorUi
+            <AlertTitle>{rangeDataError}</AlertTitle>
+            <ButtonMainUi
+              startIcon={<ReplayIcon />}
               onClick={() => {
-                dispatch(setRangeConsoleData(-1));
+                dispatch(setRangeDataAttempts(-1));
               }}
             >
               Try Again
-            </ButtonMinorUi>
-          </Alert>
-        )}
-      {scenarioId && (
-        <>
-          <ScenarioStatus
-            currentTab={currentTab}
-            handleChangeTab={handleChangeTab}
-            slideContent={content}
-          />
-          <Divider sx={{ margin: 1, marginLeft: 0 }} />
-          {currentTab === 0 && (
-            <>
-              <RangeResources />
-              <RangeResources
-                queryKey={queryKeyRangeResourceContainers}
-                title="Containers"
-                topic={Topic.ResourceContainer}
-              />
-            </>
-          )}
-          {currentTab === 1 && autoGraders.length > 0 && (
-            <ScenarioProgress
-              autoGraders={autoGraders}
-              labProgress={labProgress}
-              finishedTasks={finishedTaskUUIDs}
-            />
-          )}
-          {currentTab === 1 && autoGraders.length === 0 && (
-            <Alert
-              severity="info"
-              sx={{
-                backgroundColor: 'transparent',
-                borderWidth: '0px',
-                width: 'auto',
-                height: '48px',
+            </ButtonMainUi>
+            <br />
+            <br />
+            <ButtonMainUi
+              startIcon={<AssignmentIndIcon />}
+              onClick={() => {
+                dispatch(
+                  setModal({
+                    type: classChangeModalId,
+                    id: '',
+                    name: '',
+                  }),
+                );
               }}
             >
-              No AutoGraders Found
+              Change ClassRoom
+            </ButtonMainUi>
+          </Alert>
+        )}
+        {!rangeDataError &&
+          rangeConsoleDataError &&
+          numRangeConsoleDataAttempts === numRetries && (
+            <Alert severity="error">
+              <AlertTitle>{rangeConsoleDataError}</AlertTitle>
+              <ButtonMinorUi
+                onClick={() => {
+                  dispatch(setRangeConsoleData(-1));
+                }}
+              >
+                Try Again
+              </ButtonMinorUi>
             </Alert>
           )}
-        </>
-      )}
-    </Paper>
+        {scenarioId && (
+          <>
+            <ScenarioStatus
+              currentTab={currentTab}
+              handleChangeTab={handleChangeTab}
+              slideContent={content}
+            />
+            <Divider sx={{ margin: 1, marginLeft: 0 }} />
+            {currentTab === 0 && (
+              <>
+                <RangeResources />
+                <RangeResources
+                  queryKey={queryKeyRangeResourceContainers}
+                  title="Containers"
+                  topic={Topic.ResourceContainer}
+                />
+              </>
+            )}
+            {currentTab === 1 && autoGraders.length > 0 && (
+              <ScenarioProgress
+                autoGraders={autoGraders}
+                labProgress={labProgress}
+                finishedTasks={finishedTaskUUIDs}
+              />
+            )}
+            {currentTab === 1 && autoGraders.length === 0 && (
+              <Alert
+                severity="info"
+                sx={{
+                  backgroundColor: 'transparent',
+                  borderWidth: '0px',
+                  width: 'auto',
+                  height: '48px',
+                }}
+              >
+                No AutoGraders Found
+              </Alert>
+            )}
+          </>
+        )}
+      </Box>
+    </Box>
   );
 }
 

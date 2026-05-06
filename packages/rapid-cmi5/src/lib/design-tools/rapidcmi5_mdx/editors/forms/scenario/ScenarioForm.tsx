@@ -11,20 +11,20 @@ import {
   NAME_GROUP_OPT,
   UUID_GROUP,
 } from '@rapid-cmi5/ui';
-import { Alert, MenuItem, Typography, useTheme } from '@mui/material';
+import { Alert, MenuItem, SxProps, Typography, useTheme } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import * as yup from 'yup';
 import {
   moveOnCriteriaOptions,
   RC5ScenarioContent,
+  OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 
 import { getInfoText } from '../../../../../utils/infoButtonText';
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import LrsHeaderWithDetails from '../LrsStatementHelper';
 import { useRapidCmi5Opts } from '../../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
-import { useContext } from 'react';
 import { ScenarioCard } from './ScenarioCard';
 import { NoScenarioCard } from './NoScenarioCard';
 import { toTitleCase } from '../formUtils';
@@ -44,13 +44,12 @@ export const ScenarioForm = ({
   defaultFormData: RC5ScenarioContent;
   deleteButton?: JSX.Element;
   handleCloseModal?: () => void;
-  innerSx?: any;
-  outerSx?: any;
-  outerStyle?: any;
+  innerSx?: SxProps;
+  outerSx?: SxProps;
+  outerStyle?: OuterStyle;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
   const { GetScenariosForm, fetchScenario } = useRapidCmi5Opts();
-  const theme = useTheme();
 
   const validationSchema = yup.object().shape({
     uuid: UUID_GROUP,

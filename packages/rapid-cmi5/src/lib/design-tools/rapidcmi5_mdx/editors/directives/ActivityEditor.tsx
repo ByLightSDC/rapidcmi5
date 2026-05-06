@@ -14,6 +14,7 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
+import { darken, lighten } from '@mui/material/styles';
 
 import { ScenarioForm } from '../forms/scenario/ScenarioForm';
 import { CodeRunnerForm } from '../forms/CodeRunnerForm';
@@ -48,13 +49,13 @@ import {
   LessonThemeContext,
   maxFormWidths,
   BlockAppearanceForm,
+  ActivityDirectiveNode,
 } from '@rapid-cmi5/ui';
 import { updateScenario, updateTeamScenario } from '@rapid-cmi5/react-editor';
 import ScenarioMock from './ScenarioMock';
 import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 import { TeamConsolesForm } from '../forms/scenario/TeamConsolesForm';
 import InsertLineReturnButton from 'packages/ui/src/lib/cmi5/mdx/components/InsertLineReturnButton';
-import { ActivityDirectiveNode } from './types';
 
 /**
  * MDX Editor for Activities
@@ -74,7 +75,7 @@ export const ActivityEditor: React.FC<
   const isEditable = parentEditor.isEditable();
   const isPlayback = useCellValue(editorInPlayback$);
   const auProps = useAuContext();
-  const themedDividerColor = useSelector(dividerColor);
+
   const { userAuth, apiUrls } = useRapidCmi5Opts();
 
   const muiTheme = useTheme();
@@ -83,6 +84,7 @@ export const ActivityEditor: React.FC<
     blockAppearanceOpen,
     contentWidthDisplay,
     innerSx,
+    innerActivitySx,
     outerSx,
     outerStyle,
     gutterRef,
@@ -94,17 +96,6 @@ export const ActivityEditor: React.FC<
     maxFormWidths.downloadsEditor,
     muiTheme.palette.background.paper,
   );
-
-  // style for playback boxes
-  const staticStyle = useMemo(() => {
-    return {
-      padding: '40px',
-      border: '1px solid',
-      borderRadius: '12px',
-      borderColor: themedDividerColor,
-      borderWidth: '2px',
-    };
-  }, [themedDividerColor]);
 
   /**
    * Handle Activity Deletion
@@ -302,6 +293,9 @@ export const ActivityEditor: React.FC<
               <ScenarioMock
                 activity={RC5ActivityTypeEnum.scenario}
                 scenarioName={fromJson?.name}
+                innerSx={innerActivitySx}
+                outerSx={outerSx}
+                outerStyle={outerStyle}
               />
             )}
             {!isPlayback && (
@@ -309,7 +303,7 @@ export const ActivityEditor: React.FC<
                 contextMenu={contextMenu}
                 crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
                 defaultFormData={fromJson}
-                innerSx={innerSx}
+                innerSx={innerActivitySx}
                 outerSx={outerSx}
                 outerStyle={outerStyle}
                 onSave={onSave}
@@ -320,7 +314,13 @@ export const ActivityEditor: React.FC<
         {name === 'quiz' && fromJson && (
           <>
             {isPlayback && (
-              <AuQuiz auProps={auProps} content={fromJson as QuizContent} />
+              <AuQuiz
+                auProps={auProps}
+                content={fromJson as QuizContent}
+                innerSx={innerActivitySx}
+                outerSx={outerSx}
+                outerStyle={outerStyle}
+              />
             )}
             {!isPlayback && (
               <QuizForm
@@ -342,12 +342,24 @@ export const ActivityEditor: React.FC<
               // eslint-disable-next-line react/jsx-no-useless-fragment
               <>
                 {fromJson.questions.length === 0 ? (
-                  <Stack direction="column" sx={staticStyle}>
-                    <Typography sx={{ fontWeight: 'bold' }}>CTF</Typography>
-                    <Typography>{'CTF has no questions.'}</Typography>
+                  <Stack
+                    direction="column"
+                    sx={{ ...outerStyle }}
+                    {...outerStyle}
+                  >
+                    <Box sx={{ ...innerActivitySx }}>
+                      <Typography sx={{ fontWeight: 'bold' }}>CTF</Typography>
+                      <Typography>{'CTF has no questions.'}</Typography>
+                    </Box>
                   </Stack>
                 ) : (
-                  <AuCTF auProps={auProps} content={fromJson as CTFContent} />
+                  <AuCTF
+                    auProps={auProps}
+                    content={fromJson as CTFContent}
+                    innerSx={innerActivitySx}
+                    outerSx={outerSx}
+                    outerStyle={outerStyle}
+                  />
                 )}
               </>
             )}
@@ -357,7 +369,7 @@ export const ActivityEditor: React.FC<
                 contextMenu={contextMenu}
                 crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
                 defaultFormData={fromJson}
-                innerSx={innerSx}
+                innerSx={innerActivitySx}
                 outerSx={outerSx}
                 outerStyle={outerStyle}
                 onSave={onSave}
@@ -374,6 +386,9 @@ export const ActivityEditor: React.FC<
                 authType="Bearer"
                 token={userAuth?.token}
                 url={apiUrls?.codeRunnerUrl}
+                innerSx={innerActivitySx}
+                outerSx={outerSx}
+                outerStyle={outerStyle}
               />
             )}
             {!isPlayback && (
@@ -381,7 +396,7 @@ export const ActivityEditor: React.FC<
                 contextMenu={contextMenu}
                 crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
                 defaultFormData={fromJson}
-                innerSx={innerSx}
+                innerSx={innerActivitySx}
                 outerSx={outerSx}
                 outerStyle={outerStyle}
                 onSave={onSave}
@@ -395,6 +410,9 @@ export const ActivityEditor: React.FC<
               <ScenarioMock
                 activity={RC5ActivityTypeEnum.consoles}
                 scenarioName={fromJson?.name}
+                innerSx={innerActivitySx}
+                outerSx={outerSx}
+                outerStyle={outerStyle}
               />
             )}
             {!isPlayback && (
@@ -402,7 +420,7 @@ export const ActivityEditor: React.FC<
                 contextMenu={contextMenu}
                 crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
                 defaultFormData={fromJson}
-                innerSx={innerSx}
+                innerSx={innerActivitySx}
                 outerSx={outerSx}
                 outerStyle={outerStyle}
                 onSave={onSave}
@@ -421,7 +439,7 @@ export const ActivityEditor: React.FC<
             defaultFormData={fromJson}
             testId={rc5id}
             onSave={onSave}
-            innerSx={innerSx}
+            innerSx={innerActivitySx}
             outerSx={outerSx}
             outerStyle={outerStyle}
           />
@@ -432,7 +450,6 @@ export const ActivityEditor: React.FC<
         currentContentWidth={contentWidthDisplay}
         onClose={() => setBlockAppearanceOpen(false)}
         onSave={(newContentWidth) => {
-          console.log('save new width', newContentWidth);
           setContentWidth(newContentWidth);
           onContentWidthChange(newContentWidth);
         }}

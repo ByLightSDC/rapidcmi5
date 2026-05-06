@@ -4,6 +4,7 @@ import {
   AuContextProps,
   CTFContent,
   CTFQuestion,
+  OuterStyle,
   QuizCompletionEnum,
   RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
@@ -17,7 +18,14 @@ import { debugLog } from '../../utility/logger';
 import { useDisplayFocus } from '../../hooks/useDisplayFocus';
 import useCTFGrader from './useCTFGrader';
 
-import { Alert, alpha, Paper, Typography, useTheme } from '@mui/material';
+import {
+  Alert,
+  alpha,
+  Paper,
+  SxProps,
+  Typography,
+  useTheme,
+} from '@mui/material';
 
 /* Icons */
 import UploadIcon from '@mui/icons-material/Upload';
@@ -72,9 +80,15 @@ const ctfButtonProps = {
 export function AuCTF({
   auProps,
   content,
+  innerSx,
+  outerSx,
+  outerStyle,
 }: {
   auProps: Partial<AuContextProps>;
   content: CTFContent;
+  innerSx?: SxProps;
+  outerSx?: SxProps;
+  outerStyle?: OuterStyle;
 }) {
   const { setProgress, submitScore } = auProps;
   const ctfContent = content;
@@ -348,229 +362,261 @@ export function AuCTF({
 
   return (
     ctfContent.questions && (
-      <Paper
+      <Box
         id="ctf-activity"
         className="paper-activity"
-        variant="outlined"
         sx={{
-          ...outerActivitySxWithConstrainedWidth,
+          ...outerSx,
         }}
+        {...outerStyle}
       >
-        {ctfContent.title && (
-          <Typography
-            color="text.primary"
-            align="center"
-            variant="h3"
-            style={{
-              fontWeight: 800,
-              paddingBottom: '8px',
-            }}
-          >
-            {ctfContent.title}
-          </Typography>
-        )}
-        {ctfContent.questions.length > 0 && (
-          <div
-            className="w-full prose-xl"
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <Stack
-              direction="row"
-              spacing={4}
-              sx={{
-                padding: '8px',
-                displat: 'flex',
-                alignItems: 'flex-start',
+        <Box sx={{ padding:2, ...innerSx }}>
+          {ctfContent.title && (
+            <Typography
+              color="text.primary"
+              align="center"
+              variant="h3"
+              style={{
+                fontWeight: 800,
+                paddingBottom: '8px',
               }}
             >
-              <div style={{ flexGrow: 1 }} />
-              <ScoreLabel
-                label={attemptedLabel}
-                value={`${numAttempted}/${ctfContent.questions.length}`}
-              />
-
-              <ScoreLabel
-                label={accuracyLabel}
-                value={`${numCorrect}`}
-                startIconDisplay={<OutlinedFlagIcon />}
-              />
-
-              <ScoreLabel label="Score" value={`${accuracy}%`}>
-                <>
-                  {infoTag}
-                  {accuracy >= passingScore ? (
-                    <>
-                      <SportsScoreIcon
-                        color="success"
-                        sx={{ marginLeft: '8px' }}
-                      />
-                      <Typography color="success" variant="h6">
-                        Pass
-                      </Typography>
-                    </>
-                  ) : numAttempted === ctfContent.questions.length ? (
-                    <>
-                      <ReportIcon color="error" sx={{ marginLeft: '8px' }} />
-                      <Typography color="error" variant="h6">
-                        Fail
-                      </Typography>
-                    </>
-                  ) : (
-                    <>
-                      <HourglassBottomIcon
-                        color="info"
-                        sx={{ marginLeft: '8px' }}
-                      />
-                      <Typography
-                        color="info"
-                        variant="h6"
-                        sx={{ lineHeight: 1.1 }}
-                      >
-                        In Progress
-                      </Typography>
-                    </>
-                  )}
-                </>
-              </ScoreLabel>
-
-              <div style={{ flexGrow: 1 }} />
-            </Stack>
-            {/* aria-live region */}
-            <div aria-live="polite" className="sr-only">
-              Now answering:
-              {ctfContent.questions[currentQuestionIndex].question}
-            </div>
-            <QuestionInput
-              display={ctfContent.display}
-              answer={currentAnswersSel[currentQuestionIndex] || ''}
-              handleNextQuestion={handleNextQuestion}
-              handlePreviousQuestion={handlePreviousQuestion}
-              handleSubmitAnswer={handleSubmitAnswer}
-              numQuestions={ctfContent.questions?.length}
-            />
-
-            <Stack
-              spacing={2}
-              direction="row"
-              sx={{
-                margin: 1,
-                flexGrow: 1,
+              {ctfContent.title}
+            </Typography>
+          )}
+          {ctfContent.questions.length > 0 && (
+            <div
+              className="w-full prose-xl"
+              style={{
                 display: 'flex',
-                justifyContent: 'center',
+                flexDirection: 'column',
               }}
             >
-              <ButtonMainUi
-                sxProps={ctfButtonProps}
-                startIcon={<UploadIcon fontSize="small" />}
-                disabled={
-                  numAttempted !== ctfContent.questions.length || hasSubmitted
-                }
-                onClick={submitQuiz}
-              >
-                Submit Score
-              </ButtonMainUi>
-              <ButtonMainUi
-                id="ctf-submit-answer"
-                sxProps={{ ...ctfButtonProps, minWidth: 140 }}
-                startIcon={null}
-                disabled={!isInputEnabled}
-                onClick={() => {
-                  shouldCheckAnswer$.value = true;
+              <Stack
+                direction="row"
+                spacing={4}
+                sx={{
+                  padding: '8px',
+                  displat: 'flex',
+                  alignItems: 'flex-start',
                 }}
               >
-                Score Answer
-              </ButtonMainUi>
-              <ButtonMainUi
-                id="ctf-reset"
-                sxProps={{ ...ctfButtonProps, minWidth: 100 }}
-                onClick={handleReset}
-                startIcon={<RestartAltIcon />}
-              >
-                Reset All
-              </ButtonMainUi>
-            </Stack>
-            <Typography
-              variant="caption"
-              id="keyboard-hint"
-              sx={{
-                margin: 1,
-                display: 'flex',
-                justifyContent: 'center',
-                flexGrow: 1,
-              }}
-            >
-              Use arrow keys at the start or end of your answer to switch
-              questions.
-            </Typography>
-            <Grid
-              container
-              rowSpacing={0}
-              columnSpacing={0} //this warps buttons
-              sx={{ padding: '8px', width: '100%' }}
-            >
-              {ctfContent.questions.map(
-                (option: CTFQuestion, index: number) => {
-                  let grade: undefined | 0 | 1 = undefined;
+                <div style={{ flexGrow: 1 }} />
+                <ScoreLabel
+                  label={attemptedLabel}
+                  value={`${numAttempted}/${ctfContent.questions.length}`}
+                />
 
-                  if (
-                    Object.prototype.hasOwnProperty.call(currentGrades, index)
-                  ) {
-                    grade = currentGrades[index];
-                  }
+                <ScoreLabel
+                  label={accuracyLabel}
+                  value={`${numCorrect}`}
+                  startIconDisplay={<OutlinedFlagIcon />}
+                />
 
-                  return (
-                    <Grid
-                      aria-pressed={currentQuestionIndex === index}
-                      key={`q${index}`}
-                      size={answerBoxGridSize}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        margin: '4px',
-                        padding: '8px',
-
-                        borderRadius: 2,
-                        background:
-                          currentQuestionIndex === index && isFocused
-                            ? alpha(palette.primary.main, 0.5)
-                            : undefined,
-                        backgroundColor:
-                          currentQuestionIndex === index && isFocused
-                            ? undefined
-                            : defaultHighContrastColor,
-                        border:
-                          currentQuestionIndex === index && isFocused
-                            ? `2px solid ${alpha(palette.primary.main, 0.8)}`
-                            : `2px solid ${alpha(palette.primary.main, 0.4)}`,
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        color:
-                          currentQuestionIndex === index && isFocused
-                            ? 'common.white'
-                            : 'text.primaryContrast',
-                        '&:disabled': {
-                          backgroundColor: 'pink',
-                          background: 'none',
-                        },
-                        '&:hover': {
-                          background: alpha(palette.primary.main, 0.17),
-                          borderColor: alpha(palette.primary.main, 0.3),
-                          transform: 'translateY(-2px)',
-                          boxShadow: alpha(palette.primary.main, 0.3),
-                          cursor: 'pointer',
-                        },
-                      }}
-                      onClick={() => handleSelectQuestion(index)}
-                    >
-                      {option.title && (
-                        <div
-                          style={{ display: 'flex', flexDirection: 'column' }}
+                <ScoreLabel label="Score" value={`${accuracy}%`}>
+                  <>
+                    {infoTag}
+                    {accuracy >= passingScore ? (
+                      <>
+                        <SportsScoreIcon
+                          color="success"
+                          sx={{ marginLeft: '8px' }}
+                        />
+                        <Typography color="success" variant="h6">
+                          Pass
+                        </Typography>
+                      </>
+                    ) : numAttempted === ctfContent.questions.length ? (
+                      <>
+                        <ReportIcon color="error" sx={{ marginLeft: '8px' }} />
+                        <Typography color="error" variant="h6">
+                          Fail
+                        </Typography>
+                      </>
+                    ) : (
+                      <>
+                        <HourglassBottomIcon
+                          color="info"
+                          sx={{ marginLeft: '8px' }}
+                        />
+                        <Typography
+                          color="info"
+                          variant="h6"
+                          sx={{ lineHeight: 1.1 }}
                         >
+                          In Progress
+                        </Typography>
+                      </>
+                    )}
+                  </>
+                </ScoreLabel>
+
+                <div style={{ flexGrow: 1 }} />
+              </Stack>
+              {/* aria-live region */}
+              <div aria-live="polite" className="sr-only">
+                Now answering:
+                {ctfContent.questions[currentQuestionIndex].question}
+              </div>
+              <QuestionInput
+                display={ctfContent.display}
+                answer={currentAnswersSel[currentQuestionIndex] || ''}
+                handleNextQuestion={handleNextQuestion}
+                handlePreviousQuestion={handlePreviousQuestion}
+                handleSubmitAnswer={handleSubmitAnswer}
+                numQuestions={ctfContent.questions?.length}
+              />
+
+              <Stack
+                spacing={2}
+                direction="row"
+                sx={{
+                  margin: 1,
+                  flexGrow: 1,
+                  display: 'flex',
+                  justifyContent: 'center',
+                }}
+              >
+                <ButtonMainUi
+                  sxProps={ctfButtonProps}
+                  startIcon={<UploadIcon fontSize="small" />}
+                  disabled={
+                    numAttempted !== ctfContent.questions.length || hasSubmitted
+                  }
+                  onClick={submitQuiz}
+                >
+                  Submit Score
+                </ButtonMainUi>
+                <ButtonMainUi
+                  id="ctf-submit-answer"
+                  sxProps={{ ...ctfButtonProps, minWidth: 140 }}
+                  startIcon={null}
+                  disabled={!isInputEnabled}
+                  onClick={() => {
+                    shouldCheckAnswer$.value = true;
+                  }}
+                >
+                  Score Answer
+                </ButtonMainUi>
+                <ButtonMainUi
+                  id="ctf-reset"
+                  sxProps={{ ...ctfButtonProps, minWidth: 100 }}
+                  onClick={handleReset}
+                  startIcon={<RestartAltIcon />}
+                >
+                  Reset All
+                </ButtonMainUi>
+              </Stack>
+              <Typography
+                variant="caption"
+                id="keyboard-hint"
+                sx={{
+                  margin: 1,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  flexGrow: 1,
+                }}
+              >
+                Use arrow keys at the start or end of your answer to switch
+                questions.
+              </Typography>
+              <Grid
+                container
+                rowSpacing={0}
+                columnSpacing={0} //this warps buttons
+                sx={{ padding: '8px', width: '100%' }}
+              >
+                {ctfContent.questions.map(
+                  (option: CTFQuestion, index: number) => {
+                    let grade: undefined | 0 | 1 = undefined;
+
+                    if (
+                      Object.prototype.hasOwnProperty.call(currentGrades, index)
+                    ) {
+                      grade = currentGrades[index];
+                    }
+
+                    return (
+                      <Grid
+                        aria-pressed={currentQuestionIndex === index}
+                        key={`q${index}`}
+                        size={answerBoxGridSize}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          margin: '4px',
+                          padding: '8px',
+
+                          borderRadius: 2,
+                          background:
+                            currentQuestionIndex === index && isFocused
+                              ? alpha(palette.primary.main, 0.5)
+                              : undefined,
+                          backgroundColor:
+                            currentQuestionIndex === index && isFocused
+                              ? undefined
+                              : defaultHighContrastColor,
+                          border:
+                            currentQuestionIndex === index && isFocused
+                              ? `2px solid ${alpha(palette.primary.main, 0.8)}`
+                              : `2px solid ${alpha(palette.primary.main, 0.4)}`,
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          color:
+                            currentQuestionIndex === index && isFocused
+                              ? 'common.white'
+                              : 'text.primaryContrast',
+                          '&:disabled': {
+                            backgroundColor: 'pink',
+                            background: 'none',
+                          },
+                          '&:hover': {
+                            background: alpha(palette.primary.main, 0.17),
+                            borderColor: alpha(palette.primary.main, 0.3),
+                            transform: 'translateY(-2px)',
+                            boxShadow: alpha(palette.primary.main, 0.3),
+                            cursor: 'pointer',
+                          },
+                        }}
+                        onClick={() => handleSelectQuestion(index)}
+                      >
+                        {option.title && (
                           <div
-                            style={{ display: 'flex', flexDirection: 'row' }}
+                            style={{ display: 'flex', flexDirection: 'column' }}
                           >
+                            <div
+                              style={{ display: 'flex', flexDirection: 'row' }}
+                            >
+                              {ctfContent.display?.shouldNumberQuestions && (
+                                <Typography
+                                  variant="body1"
+                                  sx={{ padding: '8px', paddingTop: '0px' }}
+                                >
+                                  {`${index + 1}`}
+                                </Typography>
+                              )}
+                              {option.title && (
+                                <Typography
+                                  variant="body1"
+                                  sx={{ padding: '8px', paddingTop: '0px' }}
+                                >
+                                  {option.title}
+                                </Typography>
+                              )}
+                              {grade === 0 && <FlagEffect isSuccess={false} />}
+                              {grade === 1 && <FlagEffect />}
+                            </div>
+                            <Typography
+                              variant="h6"
+                              sx={{
+                                lineHeight: 1.3,
+                              }}
+                            >
+                              {option.question}
+                            </Typography>
+                          </div>
+                        )}
+                        {!option.title && (
+                          <>
                             {ctfContent.display?.shouldNumberQuestions && (
                               <Typography
                                 variant="body1"
@@ -579,65 +625,38 @@ export function AuCTF({
                                 {`${index + 1}`}
                               </Typography>
                             )}
-                            {option.title && (
-                              <Typography
-                                variant="body1"
-                                sx={{ padding: '8px', paddingTop: '0px' }}
-                              >
-                                {option.title}
-                              </Typography>
-                            )}
+
+                            <Typography
+                              variant="h6"
+                              sx={{
+                                lineHeight: 1.3,
+                              }}
+                            >
+                              {option.question}
+                            </Typography>
                             {grade === 0 && <FlagEffect isSuccess={false} />}
                             {grade === 1 && <FlagEffect />}
-                          </div>
-                          <Typography
-                            variant="h6"
-                            sx={{
-                              lineHeight: 1.3,
-                            }}
-                          >
-                            {option.question}
-                          </Typography>
-                        </div>
-                      )}
-                      {!option.title && (
-                        <>
-                          {ctfContent.display?.shouldNumberQuestions && (
-                            <Typography
-                              variant="body1"
-                              sx={{ padding: '8px', paddingTop: '0px' }}
-                            >
-                              {`${index + 1}`}
-                            </Typography>
-                          )}
-
-                          <Typography
-                            variant="h6"
-                            sx={{
-                              lineHeight: 1.3,
-                            }}
-                          >
-                            {option.question}
-                          </Typography>
-                          {grade === 0 && <FlagEffect isSuccess={false} />}
-                          {grade === 1 && <FlagEffect />}
-                        </>
-                      )}
-                    </Grid>
-                  );
-                },
-              )}
-            </Grid>
-          </div>
-        )}
-        {ctfContent.questions.length === 0 && (
-          <Box sx={{ margin: '12px' }}>
-            <Alert severity="info" sx={{ padding: '12px', maxWidth: '480px' }}>
-              {noneFound}
-            </Alert>
-          </Box>
-        )}
-      </Paper>
+                          </>
+                        )}
+                      </Grid>
+                    );
+                  },
+                )}
+              </Grid>
+            </div>
+          )}
+          {ctfContent.questions.length === 0 && (
+            <Box sx={{ margin: '12px' }}>
+              <Alert
+                severity="info"
+                sx={{ padding: '12px', maxWidth: '480px' }}
+              >
+                {noneFound}
+              </Alert>
+            </Box>
+          )}
+        </Box>
+      </Box>
     )
   );
 }
