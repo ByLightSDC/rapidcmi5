@@ -3,7 +3,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import {
   $createParagraphNode,
   $getRoot,
-  DecoratorNode,
+  ElementNode,
 } from 'lexical';
 import { realmPlugin, addComposerChild$ } from '@mdxeditor/editor';
 import { LessonThemeContext } from '@rapid-cmi5/ui';
@@ -128,30 +128,30 @@ function GutterClickHandler() {
           .find((c) => c.getKey() === key);
         if (!node) return;
 
-        const isDecorator = node instanceof DecoratorNode;
-        console.log('[GutterClick] nearest node type:', node.getType(), '| isDecorator:', isDecorator, '| isAboveMidpoint:', nearest.isAboveMidpoint);
+        const canHostCaret = node instanceof ElementNode;
+        console.log('[GutterClick] nearest node type:', node.getType(), '| canHostCaret:', canHostCaret, '| isAboveMidpoint:', nearest.isAboveMidpoint);
 
-        if (isDecorator) {
-          // DecoratorNodes (tabs, accordion, admonitions, etc.) don't support
-          // selectStart/selectEnd — place cursor in an adjacent paragraph instead.
+        if (!canHostCaret) {
+          // Non-ElementNodes (DecoratorNode, HorizontalRuleNode, etc.) cannot host a caret.
+          // Place the cursor in an adjacent ElementNode, or insert a paragraph at the boundary.
           if (nearest.isAboveMidpoint) {
             const prev = node.getPreviousSibling();
-            if (prev) {
+            if (prev instanceof ElementNode) {
               console.log('[GutterClick] selecting end of previous sibling:', prev.getType());
               prev.selectEnd();
             } else {
-              console.log('[GutterClick] no previous sibling — inserting paragraph before decorator');
+              console.log('[GutterClick] previous sibling cannot host caret — inserting paragraph before node');
               const para = $createParagraphNode();
               node.insertBefore(para);
               para.select();
             }
           } else {
             const next = node.getNextSibling();
-            if (next) {
+            if (next instanceof ElementNode) {
               console.log('[GutterClick] selecting start of next sibling:', next.getType());
               next.selectStart();
             } else {
-              console.log('[GutterClick] no next sibling — inserting paragraph after decorator');
+              console.log('[GutterClick] next sibling cannot host caret — inserting paragraph after node');
               const para = $createParagraphNode();
               node.insertAfter(para);
               para.select();
@@ -164,6 +164,8 @@ function GutterClickHandler() {
             node.selectEnd();
           }
         }
+      }, {
+        onUpdate: () => editor.focus(),
       });
     };
 
