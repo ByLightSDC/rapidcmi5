@@ -53,6 +53,7 @@ import { InsertAccordion } from './components/InsertAccordion';
 import { InsertAudio } from './components/InsertAudio';
 import { InsertAnimation } from './components/InsertAnimation';
 import { InsertBlockMenu } from './components/InsertBlockMenu';
+import { InsertAiPanel } from './components/InsertAiPanel';
 import { InsertCodeBlock } from './components/InsertCodeBlock';
 import { InsertFile } from './components/InsertFile';
 import { InsertGrid } from './components/InsertGrid';
@@ -324,6 +325,7 @@ export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5
                   <LessonStyleButton />
                   <InsertAnimation />
                   <InsertBlockMenu />
+                  <InsertAiPanel />
                 </Stack>
               </Stack>
             </Stack>

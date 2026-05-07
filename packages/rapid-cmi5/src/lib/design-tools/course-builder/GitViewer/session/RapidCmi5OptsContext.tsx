@@ -67,6 +67,8 @@ export type UserAuth = {
   apiUser?: string;
 };
 
+export type AiPanelMode = 'claude' | 'codex' | 'terminal';
+
 export interface RapidCmi5Opts {
   userAuth?: UserAuth;
   downloadCmi5Player?: () => Promise<any>;
@@ -83,6 +85,8 @@ export interface RapidCmi5Opts {
     creds?: Credentials,
   ) => void;
   apiUrls?: ApiUrls;
+  onAiClick?: (mode: AiPanelMode) => void;
+  aiThinking?: boolean;
 }
 
 const RapidCmi5OptsContext = createContext<RapidCmi5Opts>({});

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter as RouterWrapper } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -24,11 +24,23 @@ import { lightTheme } from './styles/muiTheme';
 import UserConfig from './contexts/UserConfigContext';
 import Auth from './contexts/AuthContext';
 import { RapidCmi5Wrapper } from './RapidCmi5Wrapper';
-import ClaudeWindow from './ClaudeWindow';
+import AiDrawer from './AiDrawer';
+import type { AiPanelMode } from '@rapid-cmi5/react-editor';
+
+const isElectron = typeof window !== 'undefined' && !!window.claudeApi;
 
 export default function App() {
   const dispatch = useDispatch();
   const theme = useSelector(themeColor);
+
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiMode, setAiMode] = useState<AiPanelMode>('claude');
+  const [aiThinking, setAiThinking] = useState(false);
+
+  const handleAiClick = useCallback((mode: AiPanelMode) => {
+    setAiMode(mode);
+    setAiOpen(true);
+  }, []);
 
   useEffect(() => {
     const iconColor =
@@ -81,8 +93,18 @@ export default function App() {
                             overflow: 'hidden',
                           }}
                         >
-                          <RapidCmi5Wrapper />
-                          <ClaudeWindow />
+                          <RapidCmi5Wrapper
+                            onAiClick={isElectron ? handleAiClick : undefined}
+                            aiThinking={isElectron ? aiThinking : false}
+                          />
+                          {isElectron && (
+                            <AiDrawer
+                              open={aiOpen}
+                              onClose={() => setAiOpen(false)}
+                              initialMode={aiMode}
+                              onThinkingChange={setAiThinking}
+                            />
+                          )}
                         </main>
                       </Auth>
                     </UserConfig>

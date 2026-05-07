@@ -17,7 +17,7 @@ export function startCodexSession(
 ): { sessionId: string } {
   return startPtySession(webContents, 'codex', {
     ...opts,
-    command: opts.command ?? 'codex',
+    command: opts.command ?? (process.platform === 'win32' ? 'codex.cmd' : 'codex'),
   });
 }
 

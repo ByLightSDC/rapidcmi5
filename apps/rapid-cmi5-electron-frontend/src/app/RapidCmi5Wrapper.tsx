@@ -4,6 +4,7 @@ import {
   GetScenarioFormProps,
   GetQuizBankAddModalProps,
   GetQuizBankSearchModalProps,
+  AiPanelMode,
 } from '@rapid-cmi5/react-editor';
 import { useContext } from 'react';
 import { ScenarioSelectionForm } from './shared/modals/ScenarioSelectionModal';
@@ -13,7 +14,7 @@ import AddToQuizBankForm from './shared/modals/quizBank/AddToQuizBankForm';
 import QuizBankSearchForm from './shared/modals/quizBank/SearchQuizBankForm';
 import { useScenarioApi } from '@rapid-cmi5/cmi5-build-common';
 
-export function RapidCmi5Wrapper() {
+export function RapidCmi5Wrapper({ onAiClick, aiThinking }: { onAiClick?: (mode: AiPanelMode) => void; aiThinking?: boolean }) {
   const { token, parsedUserToken } = useContext(AuthContext);
   const { gitUser, gitCredentials, ssoConfig, setGitCredentials, setGitUser } =
     useContext(UserConfigContext);
@@ -104,6 +105,8 @@ export function RapidCmi5Wrapper() {
         codeRunnerUrl: rangeURL,
         quizBankUrl: quizBankURL,
       }}
+      onAiClick={onAiClick}
+      aiThinking={aiThinking}
     />
   );
 }

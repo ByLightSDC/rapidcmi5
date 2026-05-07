@@ -266,6 +266,11 @@ function TabButton({ active, onClick, icon, label, status }: TabButtonProps) {
 }
 
 export default function ClaudeWindow() {
+  if (typeof window === 'undefined' || !window.claudeApi) return null;
+  return <ClaudeWindowInner />;
+}
+
+function ClaudeWindowInner() {
   const [open, setOpen] = useState<boolean>(() =>
     readStoredBool(STORAGE_KEY_OPEN, false),
   );

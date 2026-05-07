@@ -791,7 +791,7 @@ ipcMain.handle(
 ipcMain.handle('claude:start', (e, opts: StartOptions = {}) => {
   return startPtySession(e.sender, 'claude', {
     ...opts,
-    command: opts.command ?? 'claude',
+    command: opts.command ?? (process.platform === 'win32' ? 'claude.cmd' : 'claude'),
     cwd: opts.cwd ?? getLocalFsBase(),
   });
 });
