@@ -1,3 +1,8 @@
+/*
+  We are required to make api calls from the backend due to the 
+  fact many api calls have CORs headers which will not work for 
+  api calls made from a frontend running on localhost
+*/
 import { initClient } from '@ts-rest/core';
 import {
   scenarioContract,
@@ -12,9 +17,15 @@ import {
   QuestionBankApi,
   QuestionBankApiCreate,
   CourseAU,
-  createAuMappingNameWithAuId,
-  generateAuId,
   RC5ActivityTypeEnum,
+  handleAddQuestion,
+  handleDeleteQuestion,
+  handleExecuteCode,
+  handleFetchScenario,
+  handleGetLanguages,
+  handleListScenarios,
+  handleProcessAu,
+  handleSearchQuestions,
 } from '@rapid-cmi5/cmi5-build-common';
 
 function scenarioClient(baseUrl: string, token: string) {
@@ -24,7 +35,11 @@ function scenarioClient(baseUrl: string, token: string) {
   });
 }
 
-function codeRunnerClient(baseUrl: string, token: string, authType: 'Basic' | 'Bearer') {
+function codeRunnerClient(
+  baseUrl: string,
+  token: string,
+  authType: 'Basic' | 'Bearer',
+) {
   return initClient(codeRunnerContract, {
     baseUrl,
     baseHeaders: { Authorization: `${authType} ${token}` },
@@ -45,11 +60,8 @@ export async function fetchScenario(
   token: string,
   uuid: string,
 ): Promise<ScenarioApi> {
-  const response = await scenarioClient(baseUrl, token).getScenario({
-    params: { uuid },
-  });
-  if (response.status === 200) return response.body;
-  throw new Error(`Failed to fetch scenario "${uuid}" (status: ${response.status})`);
+  const client = scenarioClient(baseUrl, token);
+  return await handleFetchScenario(uuid, client);
 }
 
 export async function listScenarios(
@@ -57,9 +69,8 @@ export async function listScenarios(
   token: string,
   query: ScenarioQuery,
 ): Promise<PaginatedScenariosResponse> {
-  const response = await scenarioClient(baseUrl, token).listScenarios({ query });
-  if (response.status === 200) return response.body;
-  throw new Error(`Failed to list scenarios (status: ${response.status})`);
+  const client = scenarioClient(baseUrl, token);
+  return await handleListScenarios(query, client);
 }
 
 export async function processAu(
@@ -69,51 +80,7 @@ export async function processAu(
   blockId: string,
 ): Promise<void> {
   const client = scenarioClient(baseUrl, token);
-
-  let scenarioUUID: string | undefined;
-
-  if (au.rangeosScenarioUUID) {
-    const response = await client.getScenario({ params: { uuid: au.rangeosScenarioUUID } });
-    if (response.status !== 200) {
-      throw new Error(
-        `Scenario UUID "${au.rangeosScenarioUUID}" does not exist in this environment.\n` +
-          `Lesson: "${au.auName}".\n` +
-          `Update the scenario UUID or remove it from the AU settings.`,
-      );
-    }
-    scenarioUUID = au.rangeosScenarioUUID;
-  } else if (au.rangeosScenarioName) {
-    const response = await client.listScenarios({ query: { name: au.rangeosScenarioName } });
-    if (response.status !== 200 || !response.body.data || response.body.totalCount === 0) {
-      throw new Error(
-        `No scenario found with name "${au.rangeosScenarioName}" for AU "${au.auName}". ` +
-          `Check that the scenario name is correct and exists in this environment.`,
-      );
-    }
-    scenarioUUID = response.body.data.at(0)?.uuid;
-  }
-
-  if (!scenarioUUID) return;
-
-  const auId = generateAuId({ blockId, auName: au.auName });
-  const encodedAuId = encodeURIComponent(auId);
-
-  const existing = await client.getAuMapping({ params: { auId: encodedAuId } });
-
-  if (existing.status === 200) {
-    const res = await client.updateAuMapping({
-      params: { auId: encodedAuId },
-      body: { scenarios: [scenarioUUID] },
-    });
-    if (res.status !== 200) throw new Error(`Could not update AU mapping for auId: ${auId}`);
-  } else if (existing.status === 404) {
-    const res = await client.createAuMapping({
-      body: { auId, scenarios: [scenarioUUID], name: createAuMappingNameWithAuId(auId) },
-    });
-    if (res.status !== 201) throw new Error(`Could not create AU mapping for auId: ${auId}`);
-  } else {
-    throw existing.body;
-  }
+  return await handleProcessAu(au, blockId, client);
 }
 
 // ── Code Runner API ───────────────────────────────────────────────────────────
@@ -123,9 +90,8 @@ export async function listLanguages(
   token: string,
   authType: 'Basic' | 'Bearer',
 ): Promise<LanguagesResponseApi> {
-  const response = await codeRunnerClient(baseUrl, token, authType).listLanguages();
-  if (response.status === 200) return response.body;
-  throw new Error(`Failed to get languages (status: ${response.status})`);
+  const client = codeRunnerClient(baseUrl, token, authType);
+  return await handleGetLanguages(client);
 }
 
 export async function executeCode(
@@ -134,9 +100,8 @@ export async function executeCode(
   authType: 'Basic' | 'Bearer',
   body: ExecuteCodeBodyApi,
 ): Promise<ExecuteCodeResponseApi> {
-  const response = await codeRunnerClient(baseUrl, token, authType).execute({ body });
-  if (response.status === 200) return response.body;
-  throw new Error(`Failed to execute code (status: ${response.status})`);
+  const client = codeRunnerClient(baseUrl, token, authType);
+  return await handleExecuteCode(body, client);
 }
 
 // ── Quiz Bank API ─────────────────────────────────────────────────────────────
@@ -149,18 +114,8 @@ export async function searchQuestions(
   limit: number,
   activityType?: RC5ActivityTypeEnum,
 ) {
-  const response = await quizBankClient(baseUrl, token).getQuestions({
-    query: {
-      offset: (page - 1) * limit,
-      limit,
-      sortBy: 'dateEdited',
-      sort: 'desc',
-      search: query.trim(),
-      questionType: activityType === RC5ActivityTypeEnum.ctf ? 'freeResponse' : undefined,
-    },
-  });
-  if (response.status === 200) return response.body;
-  throw new Error(`Failed to search questions (status: ${response.status})`);
+  const client = quizBankClient(baseUrl, token);
+  return await handleSearchQuestions(query, page, limit, client, activityType);
 }
 
 export async function addQuestion(
@@ -168,9 +123,8 @@ export async function addQuestion(
   token: string,
   body: QuestionBankApiCreate,
 ): Promise<QuestionBankApi> {
-  const response = await quizBankClient(baseUrl, token).createQuestion({ body });
-  if (response.status === 200 || response.status === 201) return response.body as QuestionBankApi;
-  throw new Error(`Failed to add question (status: ${response.status})`);
+  const client = quizBankClient(baseUrl, token);
+  return (await handleAddQuestion(body, client)) as QuestionBankApi;
 }
 
 export async function deleteQuestion(
@@ -178,10 +132,6 @@ export async function deleteQuestion(
   token: string,
   uuid: string,
 ): Promise<void> {
-  const response = await quizBankClient(baseUrl, token).deleteQuestion({
-    params: { uuid },
-  });
-  if (response.status !== 200 && response.status !== 204) {
-    throw new Error(`Failed to delete question (status: ${response.status})`);
-  }
+  const client = quizBankClient(baseUrl, token);
+  return await handleDeleteQuestion(uuid, client);
 }

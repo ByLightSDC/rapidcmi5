@@ -35,10 +35,9 @@ interface AuthContextType {
   roles?: string[];
   isAuthenticated: boolean;
   parsedUserToken?: Record<string, any>;
-  loginElectron: () => void;
+  login: () => void;
   logout: () => void;
   authError?: { id?: string | null; error?: string | null };
-  handleSaveSSOCredsElectron: (creds: Credentials) => void;
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -49,13 +48,10 @@ export const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   parsedUserToken: undefined,
   authError: undefined,
-  loginElectron: () => {
+  login: () => {
     return;
   },
   logout: () => {
-    return;
-  },
-  handleSaveSSOCredsElectron: (creds: Credentials) => {
     return;
   },
 });
@@ -156,7 +152,7 @@ export default function Auth(props: AuthProps) {
   }, []);
 
   // Login for the web app is taken care of through another library
-  const loginElectron = useCallback(async () => {
+  const login = useCallback(async () => {
     if (isElectron) {
       try {
         const tokenResponse = await window.userSettingsApi.loginSSO();
@@ -190,27 +186,12 @@ export default function Auth(props: AuthProps) {
     dispatch(resetPersistance());
   }, [dispatch, isElectron, clearElectronAuth]);
 
-  const handleSaveSSOCredsElectron = useCallback(
-    async (data: Credentials) => {
-      try {
-        window.userSettingsApi.setSSOCredentials(data);
-        const tokenResponse = await window.userSettingsApi.loginSSO();
-        processTokenResponse(tokenResponse);
-      } catch (err: any) {
-        setElectronError({ error: err?.message ?? String(err), id: '0' });
-        setElectronIsAuthenticated(false);
-        throw err;
-      }
-    },
-    [processTokenResponse],
-  );
-
   // Trigger login when SSO config changes or when SSO is enabled without a valid token.
   // This is only valid for electron applications
   useEffect(() => {
     const attemptLogin = async () => {
       try {
-        await loginElectron();
+        await login();
       } catch (err) {
         toaster({
           message: 'Could not login via SSO',
@@ -237,7 +218,7 @@ export default function Auth(props: AuthProps) {
     if (needsLogin()) {
       attemptLogin();
     }
-  }, [isElectron, ssoConfig, electronToken, dispatch, loginElectron]);
+  }, [isElectron, ssoConfig, electronToken, dispatch, login]);
 
   // Auto-refresh before token expiry (uses stored creds, no modal).
   // Only for Electron
@@ -267,7 +248,7 @@ export default function Auth(props: AuthProps) {
     }
   }, [
     electronToken,
-    loginElectron,
+    login,
     isElectron,
     ssoConfig,
     dispatch,
@@ -278,14 +259,13 @@ export default function Auth(props: AuthProps) {
     <AuthContext.Provider
       value={{
         authError: error,
-        loginElectron,
+        login,
         logout,
         token,
         idToken,
         username,
         roles,
         isAuthenticated: authenticated,
-        handleSaveSSOCredsElectron,
         parsedUserToken,
       }}
     >
@@ -299,9 +279,9 @@ function WebAuth(props: AuthProps) {
   const authRefreshErrorSel = useSelector(authRefreshError);
   const authErrorSel = useSelector(authError);
   const hasError = !!(authErrorSel.error || authRefreshErrorSel.error);
-  if (!ssoConfig || !ssoConfig.ssoEnabled) return props.children;
+  const ssoNotEnabled = !ssoConfig || !ssoConfig.ssoEnabled;
 
-  if (hasError) {
+  if (hasError || ssoNotEnabled) {
     return props.children;
   }
 

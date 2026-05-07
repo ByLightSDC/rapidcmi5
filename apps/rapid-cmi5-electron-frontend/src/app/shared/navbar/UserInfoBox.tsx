@@ -66,7 +66,7 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
   const appThemeColor = useSelector(themeColor);
   const modalObj = useSelector(modal);
 
-  const { logout, token, loginElectron } = useContext(AuthContext);
+  const { logout, token, login } = useContext(AuthContext);
   const {
     setGitUser,
     gitUser,
@@ -129,7 +129,7 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
   };
 
   const handleLogin = () => {
-    loginElectron();
+    login();
     onClose();
   };
 

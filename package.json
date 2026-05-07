@@ -106,6 +106,7 @@
     "minimatch": "^10.0.1",
     "monaco-editor": "^0.52.2",
     "mui-color-input": "^5.0.1",
+    "openid-client": "^6.8.4",
     "path-browserify": "^1.0.1",
     "preact": "^10.28.2",
     "prismjs": "^1.29.0",
