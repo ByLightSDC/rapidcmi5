@@ -19,8 +19,8 @@ import {
   ArrowLeft,
   Files,
   GitCompareArrows,
-  GitPullRequestArrowIcon,
-  PanelLeft,
+  PanelLeftClose,
+  PanelLeftOpen,
   PencilRuler,
   TriangleAlert,
 } from 'lucide-react';
@@ -160,11 +160,19 @@ export const NavViewMenu = ({
             placement="right"
             title={isLeftPanelCollapsed ? 'Expand panel' : 'Collapse panel'}
           >
-            <PanelLeft
-              color={palette.text.hint}
-              strokeWidth={1.25}
-              style={navIconStyle}
-            />
+            {isLeftPanelCollapsed ? (
+              <PanelLeftOpen
+                color={palette.text.hint}
+                strokeWidth={1.25}
+                style={navIconStyle}
+              />
+            ) : (
+              <PanelLeftClose
+                color={palette.text.hint}
+                strokeWidth={1.25}
+                style={navIconStyle}
+              />
+            )}
           </Tooltip>
         </IconButton>
       )}
