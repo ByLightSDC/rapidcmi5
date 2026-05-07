@@ -37,7 +37,6 @@ import {
 import {
   useTimeStampUUID,
   editorInPlayback$,
-  dividerColor,
   debugLog,
   debugLogError,
   jsonFormatSpaces,
@@ -50,12 +49,13 @@ import {
   maxFormWidths,
   BlockAppearanceForm,
   ActivityDirectiveNode,
+  InsertLineReturnButton,
 } from '@rapid-cmi5/ui';
+
 import { updateScenario, updateTeamScenario } from '@rapid-cmi5/react-editor';
 import ScenarioMock from './ScenarioMock';
 import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 import { TeamConsolesForm } from '../forms/scenario/TeamConsolesForm';
-import InsertLineReturnButton from 'packages/ui/src/lib/cmi5/mdx/components/InsertLineReturnButton';
 
 /**
  * MDX Editor for Activities
