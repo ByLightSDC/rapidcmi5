@@ -13,6 +13,7 @@ import {
   getDefaultData,
   debugLogError,
   ButtonMinorUi,
+  getDefaultContentWidth,
 } from '@rapid-cmi5/ui';
 import { scenario, teamScenario } from '../../../../redux/courseBuilderReducer';
 
@@ -48,7 +49,7 @@ export const InsertActivities = () => {
 
     insertActivity({
       type: 'containerDirective',
-      attributes: {},
+      attributes: { contentWidth: getDefaultContentWidth(activityLabel) },
       name: getActivityTypeFromDisplayName(activityLabel),
       children: [data],
     } as ContainerDirective);
@@ -76,7 +77,7 @@ export const InsertActivities = () => {
           if (option.indexOf('Download') >= 0) {
             return null;
           }
-          
+
           const isDisabled = disabledActivities.includes(option);
 
           return (

@@ -7,51 +7,50 @@ import {
   FormControlUIProvider,
   FormCrudType,
   FormStateType,
-  LessonThemeContext,
   MiniForm,
   NAME_GROUP_OPT,
   UUID_GROUP,
-  maxFormWidths,
-  useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
-import { Alert, MenuItem, Typography, useTheme } from '@mui/material';
+import { Alert, MenuItem, SxProps, Typography, useTheme } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import * as yup from 'yup';
 import {
   moveOnCriteriaOptions,
   RC5ScenarioContent,
+  OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 
 import { getInfoText } from '../../../../../utils/infoButtonText';
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import LrsHeaderWithDetails from '../LrsStatementHelper';
 import { useRapidCmi5Opts } from '../../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
-import { useContext } from 'react';
 import { ScenarioCard } from './ScenarioCard';
 import { NoScenarioCard } from './NoScenarioCard';
 import { toTitleCase } from '../formUtils';
 
 export const ScenarioForm = ({
+  contextMenu,
   crudType,
   defaultFormData,
   deleteButton,
+  innerSx,
+  outerSx,
+  outerStyle,
   onSave,
 }: {
+  contextMenu?: JSX.Element;
   crudType: FormCrudType;
   defaultFormData: RC5ScenarioContent;
   deleteButton?: JSX.Element;
   handleCloseModal?: () => void;
-  onSave: (activity: RC5ActivityTypeEnum.scenario, data: any) => void;
+  innerSx?: SxProps;
+  outerSx?: SxProps;
+  outerStyle?: OuterStyle;
+  onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
   const { GetScenariosForm, fetchScenario } = useRapidCmi5Opts();
-
-  /* Lesson Theme */
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const { outerActivitySxWithConstrainedWidthForm } = useLessonThemeStyles(
-    lessonTheme,
-    maxFormWidths.scenarioEditor,
-  );
+  const gridSize = 12;
 
   const validationSchema = yup.object().shape({
     uuid: UUID_GROUP,
@@ -99,7 +98,7 @@ export const ScenarioForm = ({
     return (
       // <Grid container>
       <>
-        <Grid size={11}>
+        <Grid size={gridSize}>
           <Typography variant="body2">
             This activity will present participants with console access to a
             deployed scenario. If <b>Prompt Student for Class Id</b> is
@@ -115,7 +114,7 @@ export const ScenarioForm = ({
             scenario will be automatically deployed.
           </Typography>
         </Grid>
-        <Grid size={11}>
+        <Grid size={gridSize}>
           <Alert severity="warning" sx={{ maxWidth: '640px' }}>
             This activity requires Basic AUTH authentication and cannot be used
             in conjunction with a Team Exercise Scenario which authenticates via
@@ -123,7 +122,7 @@ export const ScenarioForm = ({
           </Alert>
         </Grid>
         {GetScenariosForm ? (
-          <Grid size={11}>
+          <Grid size={gridSize}>
             <GetScenariosForm
               submitForm={onApplyScenario}
               formType={crudType}
@@ -169,7 +168,7 @@ export const ScenarioForm = ({
           </>
         )}
 
-        <Grid size={2.8}>
+        <Grid size={3.2}>
           <FormControlSelectField
             control={control}
             name={'moveOnCriteria'}
@@ -212,7 +211,7 @@ export const ScenarioForm = ({
         {/* <Grid item xs={11.5}>
           <KSATsFieldGroup formMethods={formMethods} crudType={crudType} />
         </Grid> */}
-        <Grid size={11}>
+        <Grid size={12}>
           <LrsHeaderWithDetails activityType={RC5ActivityTypeEnum.scenario} />
         </Grid>
       </>
@@ -223,18 +222,15 @@ export const ScenarioForm = ({
     <FormControlUIProvider>
       <MiniForm
         className="paper-activity"
-        outerSx={outerActivitySxWithConstrainedWidthForm}
+        contextMenu={contextMenu}
+        outerSx={outerSx}
+        outerStyle={outerStyle}
         dataCache={defaultFormData}
         titleEndChildren={deleteButton}
         doAction={onSaveAction}
         formTitle="Individual Training Scenario"
         formWidth={null}
-        formSxProps={
-          {
-            flexGrow: 1,
-            maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
-          }
-        }
+        formSxProps={{ width: '100%', flexGrow: 1, ...innerSx, margin: 0 }}
         getFormFields={getFormFields}
         loadingButtonText="Saving"
         shouldAutoSave={true}

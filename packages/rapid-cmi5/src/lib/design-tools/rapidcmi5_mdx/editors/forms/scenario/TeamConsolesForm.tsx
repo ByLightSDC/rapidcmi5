@@ -5,13 +5,12 @@ import {
   FormControlTextField,
   FormControlUIProvider,
   FormStateType,
-  LessonThemeContext,
   MiniForm,
   NAME_GROUP_OPT,
   REQUIRED_ENTRY,
   UUID_GROUP,
 } from '@rapid-cmi5/ui';
-import { Alert, MenuItem, SxProps, Typography } from '@mui/material';
+import { Alert, MenuItem, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import * as yup from 'yup';
@@ -19,37 +18,36 @@ import {
   moveOnCriteriaOptions,
   TeamConsolesContent,
 } from '@rapid-cmi5/cmi5-build-common';
-import { FormCrudType, useLessonThemeStyles } from '@rapid-cmi5/ui';
+import { FormCrudType } from '@rapid-cmi5/ui';
 
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 
-import { useContext } from 'react';
 import LrsHeaderWithDetails from '../LrsStatementHelper';
 import { useRapidCmi5Opts } from '../../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 import { NoScenarioCard } from './NoScenarioCard';
 import { ScenarioCard } from './ScenarioCard';
 
 export const TeamConsolesForm = ({
+  contextMenu,
   crudType,
   defaultFormData,
   deleteButton,
+  innerSx,
+  outerSx,
+  outerStyle,
   onSave,
 }: {
+  contextMenu?: JSX.Element;
   crudType: FormCrudType;
   defaultFormData: TeamConsolesContent;
   deleteButton?: JSX.Element;
   handleCloseModal?: () => void;
+  innerSx?: any;
+  outerSx?: any;
+  outerStyle?: any;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
   const { GetScenariosForm, fetchScenario } = useRapidCmi5Opts();
-
-  /* Lesson Theme */
-  const formEditorMaxWidth = 800;
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const { outerActivitySxWithConstrainedWidthForm } = useLessonThemeStyles(
-    lessonTheme,
-    formEditorMaxWidth,
-  );
 
   const validationSchema = yup.object().shape({
     uuid: UUID_GROUP,
@@ -82,11 +80,6 @@ export const TeamConsolesForm = ({
     const scenarioName = watch('name');
     const scenarioUuid = watch('uuid');
 
-    /**
-     *
-     * @param {string} topicId
-     * @param {any} item New value of field
-     */
     const onApplyScenario = (item: any) => {
       setValue('uuid', item.uuid, { shouldDirty: true });
       setValue('name', item.name, { shouldDirty: true });
@@ -186,18 +179,15 @@ export const TeamConsolesForm = ({
     <FormControlUIProvider>
       <MiniForm
         className="paper-activity"
-        outerSx={outerActivitySxWithConstrainedWidthForm}
+        contextMenu={contextMenu}
+        outerSx={outerSx}
+        outerStyle={outerStyle}
         dataCache={defaultFormData}
         titleEndChildren={deleteButton}
         doAction={onSaveAction}
         formTitle="Team Exercise Scenario"
         formWidth={null}
-        formSxProps={
-          {
-            flexGrow: 1,
-            maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
-          } as SxProps
-        }
+        formSxProps={{ width: '100%', flexGrow: 1, ...innerSx, margin: 0 }}
         getFormFields={getFormFields}
         loadingButtonText="Saving"
         shouldAutoSave={true}

@@ -46,7 +46,7 @@ import {
 } from '../../drawers/constants';
 import { RC5Context } from '../../contexts/RC5Context';
 import { ILessonNode } from '../../drawers/components/LessonTreeNode';
-import { currentAu } from '@rapid-cmi5/react-editor';
+import { currentAu, currentBlock } from '@rapid-cmi5/react-editor';
 
 /**
  * LessonStyle
@@ -57,6 +57,8 @@ export function LessonStyleDrawer() {
   const drawerMode = useCellValue(drawerMode$);
   const changeViewMode = usePublisher(drawerMode$);
   const currentAuIndex = useSelector(currentAu);
+  const currentBlockIndex = useSelector(currentBlock);
+
   const { changeLessonTheme } = useContext(RC5Context);
   const theme = useTheme();
   const { au } = useAuContext();
@@ -197,9 +199,11 @@ export function LessonStyleDrawer() {
   useEffect(() => {
     setLessonNode({
       id: currentAuIndex,
+      lesson: currentAuIndex,
       name: '',
       parent: null,
       children: [],
+      block: currentBlockIndex,
     });
   }, [currentAuIndex]);
 

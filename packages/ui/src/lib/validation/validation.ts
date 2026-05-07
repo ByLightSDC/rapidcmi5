@@ -920,7 +920,7 @@ export const GIT_URL_GROUP = (isRequired = true) => {
     ? yup
         .string()
         .required(REQUIRED_ERROR)
-        .url(URL_BASE.urlError)
+        .url('Must be Valid URL starting with https:// and ending with .git')
         .test(
           'test-git-url',
           'Must be Valid URL starting with https:// and ending with .git',
@@ -935,7 +935,7 @@ export const GIT_URL_GROUP = (isRequired = true) => {
           ? yup.string().nullable()
           : yup
               .string()
-              .url(URL_BASE.urlError)
+              .url('Must be Valid URL starting with https:// and ending with .git')
               .test(
                 'test-git-url',
                 'Must be Valid URL starting with https:// and ending with .git',

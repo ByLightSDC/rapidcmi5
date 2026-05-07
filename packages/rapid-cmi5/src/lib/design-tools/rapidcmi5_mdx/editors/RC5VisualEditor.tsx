@@ -112,6 +112,8 @@ import { RC5Context } from '../contexts/RC5Context';
 import { RapidCmi5Toolbar } from '../toolbar/RapidCmi5Toolbar';
 import { ErrorBoundary } from './ErrorBoundary';
 import { linkDialogPlugin } from '../plugins/link-dialog';
+import { draggableBlockPlugin } from '../plugins/draggable-block';
+import { gutterClickPlugin } from '../plugins/gutter-click/GutterClickPlugin';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -440,6 +442,7 @@ function RC5VisualEditor() {
       quotePlugin(),
       rc5TablePlugin(),
       thematicBreakPlugin(),
+      gutterClickPlugin(),
       headingsPlugin({ topOffset: 112 }),
     ];
 
@@ -452,6 +455,7 @@ function RC5VisualEditor() {
       );
     } else {
       return initialList.concat(
+        draggableBlockPlugin(),
         diffSourcePlugin({
           //diffMarkdown: 'placeholder markdown',
           readOnlyDiff: true,

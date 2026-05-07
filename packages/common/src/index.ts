@@ -24,6 +24,7 @@ export * from './lib/types/course';
 export * from './lib/types/ctf';
 export * from './lib/types/download';
 export * from './lib/types/codeRunner';
+export * from './lib/types/layout';
 export * from './lib/types/player';
 export * from './lib/types/score';
 export * from './lib/types/quiz';
@@ -39,4 +40,8 @@ export * from './lib/apis/hooks/useScenarioApi';
 export * from './lib/utils/dateAndTime';
 export * from './lib/apis/quizBankContract';
 export * from './lib/apis/scenarioContract';
+export * from './lib/apis/utils/scenario';
+export * from './lib/apis/utils/codeRunner';
+export * from './lib/apis/utils/quizBank';
+
 export * from './lib/versions';

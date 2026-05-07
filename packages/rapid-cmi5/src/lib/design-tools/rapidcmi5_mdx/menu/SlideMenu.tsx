@@ -1,24 +1,15 @@
-import {
-  IconButton,
-  Stack,
-  Tooltip,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { Stack, Typography, useTheme } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 
-import {
-  iconButtonSize,
-  iconButtonStyle,
-  tooltipStyle,
-} from '../styles/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   addASlide,
+  currentAu,
   currentAuPath,
+  currentBlock,
   currentSlideNum,
   deleteASlide,
   navigateSlide,
@@ -36,9 +27,9 @@ import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
  * Icons
  */
 
-import { appHeaderVisible } from '@rapid-cmi5/ui';
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
 import { MUIButtonWithTooltip } from '../toolbar/components/MUIButtonWithTooltip';
+import { slugifyPath } from '../../course-builder/GitViewer/utils/useCourseOperationsUtils';
 
 /**
  * Menu to deal with adding slides, navigating slides, deleting slide
@@ -48,29 +39,47 @@ import { MUIButtonWithTooltip } from '../toolbar/components/MUIButtonWithTooltip
 export const SlideMenu = () => {
   const dispatch = useDispatch();
   const currentSlideIndex = useSelector(currentSlideNum);
+  const currentBlockIndex = useSelector(currentBlock);
+  const currentAuIndex = useSelector(currentAu);
+
   const currentAuDir = useSelector(currentAuPath);
-  const { currentRepo, isGitLoaded, handleGetUniqueFilePath } =
-    useContext(GitContext);
-  const { lessonSlides, saveSlide } = useContext(RC5Context);
+  const { currentRepo, handleGetUniqueFilePath } = useContext(GitContext);
+  const { saveSlide, lessonSlides } = useContext(RC5Context);
   const repoAccessObject = useSelector(currentRepoAccessObjectSel);
 
-  const onAddSlide = async (insert?: number, trimPrevious?: boolean) => {
+  const onAddSlide = async () => {
     if (!currentRepo) return;
     saveSlide(); //save before navigating away from this slide
-    const slideTitle = `Slide ${lessonSlides.length + 1}`;
+    // Insert at the next value
+    const insertionPoint = currentSlideIndex + 1;
+    // Go from index value to actual slide numbering starting at 1
+    const slideTitle = `Slide ${insertionPoint + 1}`;
 
-    if (!repoAccessObject) return;
+    if (!currentAuDir) {
+      throw new Error('Current AU Dir has not been set');
+    }
+
+    if (!repoAccessObject) {
+      throw new Error('Repo access object is required');
+    }
+
+    const filepath = await handleGetUniqueFilePath(
+      repoAccessObject,
+      slugifyPath(slideTitle),
+      currentAuDir,
+    );
 
     dispatch(
       addASlide({
-        content: defaultSlideContent,
-        slideTitle: slideTitle,
-        type: SlideTypeEnum.Markdown,
-        filepath: await handleGetUniqueFilePath(
-          repoAccessObject,
-          slideTitle,
-          currentAuDir || '',
-        ),
+        auIndex: currentAuIndex,
+        blockIndex: currentBlockIndex,
+        slide: {
+          content: defaultSlideContent,
+          slideTitle: slideTitle,
+          type: SlideTypeEnum.Markdown,
+          filepath,
+        },
+        insertionPoint,
       }),
     );
   };

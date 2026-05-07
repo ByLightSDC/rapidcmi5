@@ -2,6 +2,18 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Debug Electron Main",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "timeout": 30000,
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/dist/apps/rapid-cmi5-electron/**/*.js"],
+      "preLaunchTask": "nx: serve electron debug",
+      "restart": true,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
       "name": "Launch rapid-cmi5-frontend",
       "request": "launch",
       "type": "chrome",

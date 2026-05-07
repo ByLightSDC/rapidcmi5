@@ -15,19 +15,29 @@
           "$ref": "#/definitions/QuestionGrading"
         },
         "matching": {
-          "items": {
-            "$ref": "#/definitions/MatchingOption"
-          },
-          "type": "array"
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/MatchingOption"
+              },
+              "type": "array"
+            },
+            { "type": "null" }
+          ]
         },
         "options": {
-          "items": {
-            "$ref": "#/definitions/QuizOption"
-          },
-          "type": "array"
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/QuizOption"
+              },
+              "type": "array"
+            },
+            { "type": "null" }
+          ]
         },
         "shuffleAnswers": {
-          "type": "boolean"
+          "type": ["boolean", "null"]
         }
       },
       "required": [

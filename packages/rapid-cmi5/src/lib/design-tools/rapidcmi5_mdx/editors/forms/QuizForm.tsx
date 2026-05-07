@@ -23,6 +23,7 @@ import {
   QuizQuestion,
   QuestionBankApi,
   convertFromApi,
+  OuterStyle
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   ENUM_GROUP,
@@ -40,13 +41,10 @@ import {
   MiniForm,
   tFormFieldRendererProps,
   ButtonModalMinorUi,
-  LessonThemeContext,
-  maxFormWidths,
-  useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 
 import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 
@@ -59,16 +57,24 @@ export function requireField<T>(value: T | undefined | null, field: string): T {
 
 export const QuizForm = ({
   activityKind,
+  contextMenu,
   crudType,
   defaultFormData,
   deleteButton,
+  innerSx,
+  outerSx,
+  outerStyle,
   onSave,
 }: {
   activityKind: RC5ActivityTypeEnum;
+  contextMenu?: JSX.Element;
   crudType: FormCrudType;
   defaultFormData: QuizContent;
   deleteButton?: JSX.Element;
   handleCloseModal?: () => void;
+  innerSx?: SxProps;
+  outerSx?: SxProps;
+  outerStyle?: OuterStyle;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
   const { QuizBankSearchModal, QuizBankAddModal, userAuth } =
@@ -82,12 +88,6 @@ export const QuizForm = ({
   const [bankQuestion, setBankQuestion] = useState<any>(null);
 
   /* Lesson Theme */
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const { outerActivitySxWithConstrainedWidthForm } = useLessonThemeStyles(
-    lessonTheme,
-    maxFormWidths.quizEditor,
-  );
-
   const validationSchema = yup.object().shape({
     //cmi5QuizId: read-only field auto populated/updated
     completionRequired: ENUM_GROUP(QuizCompletionEnum, false), // Optional for backward compatibility
@@ -337,18 +337,15 @@ export const QuizForm = ({
     <FormControlUIProvider>
       <MiniForm
         className="paper-activity"
-        outerSx={outerActivitySxWithConstrainedWidthForm}
+        contextMenu={contextMenu}
+        outerSx={outerSx}
+        outerStyle={outerStyle}
         dataCache={defaultFormData}
         titleEndChildren={deleteButton}
         doAction={onSaveAction}
         formTitle={activityKind === RC5ActivityTypeEnum.quiz ? 'Quiz' : 'CTF'}
         formWidth={null}
-        formSxProps={
-          {
-            flexGrow: 1,
-            maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
-          } as SxProps
-        }
+        formSxProps={{ width: '100%', flexGrow: 1, ...innerSx, margin: 0 }}
         getFormFields={getFormFields}
         loadingButtonText="Saving"
         shouldAutoSave={true}
