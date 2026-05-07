@@ -3,6 +3,7 @@ export * from './animation/types/Animation.types';
 
 export * from './components/AlignmentToolbarControls';
 export * from './components/DeleteIconButton';
+export * from './components/InsertLineReturnButton';
 export * from './components/RightMenuContainer';
 export * from './components/SettingsIconButton';
 
