@@ -158,6 +158,16 @@ export function generateLessonThemeStyleTag(
     margin-left: auto;
     margin-right: auto;
   }
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > p:has([data-block-override]) {
+    max-width: var(--block-max-width) !important;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > [data-lexical-decorator]:has([data-block-override]) {
+    max-width: var(--block-max-width) !important;
+    margin-left: auto;
+    margin-right: auto;
+  }
   .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] [data-lexical-editor="true"] [data-lexical-decorator] {
     max-width: none;
     margin-left: unset;
@@ -230,12 +240,5 @@ export function generateLessonThemeStyleTag(
     }`
     : '';
 
-  return (
-    imageBaseRule +
-    paragraphWidthRule +
-    alignmentRule +
-    widthRule +
-    blockPaddingRule +
-    blockBaseRule
-  );
+  return imageBaseRule + paragraphWidthRule + alignmentRule + widthRule + blockPaddingRule + blockBaseRule;
 }
