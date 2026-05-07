@@ -31,6 +31,7 @@ import {
 import * as Mdast from 'mdast';
 import React, {
   ElementType,
+  useContext,
   useEffect,
   useState,
   useRef,
@@ -42,7 +43,7 @@ import {
   resolveBlockMaxWidth,
 } from '../../../../styles/lessonThemeStyles';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
-import { lessonTheme$ } from '../../state/vars';
+import { LessonThemeContext } from '../../contexts/LessonThemeContext';
 import { TableNode } from './TableNode';
 
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -182,12 +183,12 @@ export const TableEditor: React.FC<TableEditorProps> = ({
     null,
   );
 
-  const [iconComponentFor, readOnly, isPlayback, lessonTheme] = useCellValues(
+  const [iconComponentFor, readOnly, isPlayback] = useCellValues(
     iconComponentFor$,
     readOnly$,
     editorInPlayback$,
-    lessonTheme$,
   );
+  const { lessonTheme } = useContext(LessonThemeContext);
 
   const muiTheme = useTheme();
   const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
@@ -470,6 +471,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                 paddingTop: blockPadding,
                 paddingBottom: blockPadding,
                 position: 'relative',
+                overflow: 'visible',
                 '--block-max-width': blockMaxWidth ?? 'none',
               } as React.CSSProperties,
             }
@@ -478,6 +480,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                 paddingTop: blockPadding,
                 paddingBottom: blockPadding,
                 position: 'relative',
+                overflow: 'visible',
               },
             })}
       >
@@ -490,8 +493,8 @@ export const TableEditor: React.FC<TableEditorProps> = ({
               display: 'flex',
               position: 'absolute',
               top: 0,
-              right: gutterRight === '0px' ? '2rem' : gutterRight,
-              zIndex: 2,
+              right: gutterRight,
+              zIndex: 10,
             }}
           >
             <TableSettingsButton
@@ -501,7 +504,9 @@ export const TableEditor: React.FC<TableEditorProps> = ({
               onContentWidthSave={(newContentWidth) => {
                 setContentWidth(newContentWidth);
                 parentEditor.update(
-                  () => { lexicalTable.setContentWidth(newContentWidth); },
+                  () => {
+                    lexicalTable.setContentWidth(newContentWidth);
+                  },
                   { discrete: true },
                 );
               }}
@@ -623,6 +628,11 @@ export const TableEditor: React.FC<TableEditorProps> = ({
                           <button
                             type="button"
                             className={styles['addColumnButton']}
+                            style={
+                              gutterRight === '0px'
+                                ? { marginTop: '21px' }
+                                : undefined
+                            }
                             onClick={addColumnToRight}
                           >
                             {iconComponentFor('add_column')}
@@ -778,7 +788,6 @@ export const TableEditor: React.FC<TableEditorProps> = ({
           </div>
         </div>
       </div>
-
     </>
   );
 };
