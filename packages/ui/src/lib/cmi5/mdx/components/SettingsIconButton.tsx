@@ -6,10 +6,14 @@ import EditIcon from '@mui/icons-material/Edit';
  * @param param0
  * @returns
  */
-function SettingsIconButton({ onConfigure }: { onConfigure: () => void }) {
+function SettingsIconButton({
+  onConfigure,
+}: {
+  onConfigure: (e: React.MouseEvent<HTMLButtonElement>) => void;
+}) {
   return (
     <IconButton aria-label="configure" onClick={onConfigure}>
-     <EditIcon />
+      <EditIcon />
     </IconButton>
   );
 }
