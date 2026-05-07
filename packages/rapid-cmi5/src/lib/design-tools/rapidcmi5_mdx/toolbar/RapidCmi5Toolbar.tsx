@@ -81,11 +81,8 @@ import { useRC5Prompts } from '../modals/useRC5Prompts';
  * Layout Constants
  *
  */
-const leftToolWidthContainer = 582;
-const rightToolWidthContainer = 112;
-const toolIconWidth = 31.4;
-const rightToolbarMargin = 25; 
-const moreTextToolWidth = 100;
+const rightToolbarMargin = 25;
+
 
 /**
  * A toolbar component that includes all toolbar components.
@@ -104,10 +101,8 @@ export const RapidCmi5Toolbar: React.FC<{
   const content = useSelector(displayData);
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const extraToolbarRef = useRef<HTMLDivElement>(null);
   const [leftToolbarPos, setLeftToolbarPos] = useState<number | 0>(0);
-
-  const [minExtraToolsWidth, setMinExtraToolsWidth] = useState(0);
-  const [maxExtraToolsWidth, setMaxExtraToolsWidth] = useState(0);
 
   const [isMoreTextTools, setIsMoreTextTools] = useState(false);
 
@@ -173,20 +168,6 @@ export const RapidCmi5Toolbar: React.FC<{
         // Calculate the absolute position relative to the document
         const left = rect.left + window.scrollX;
 
-        // calculate extra width where additional tools can be injected
-        const extraWidth =
-          window.innerWidth -
-          (left + leftToolWidthContainer + rightToolWidthContainer);
-
-        // avoid partial display
-        setMinExtraToolsWidth(
-          Math.floor((extraWidth - moreTextToolWidth) / toolIconWidth) *
-            toolIconWidth,
-        );
-        setMaxExtraToolsWidth(
-          Math.floor(extraWidth / toolIconWidth) * toolIconWidth,
-        );
-
         //tool bar left plus 24 px right margin
         setLeftToolbarPos(left + rightToolbarMargin);
 
@@ -209,9 +190,6 @@ export const RapidCmi5Toolbar: React.FC<{
     // Ensure the ref is attached to a DOM element and that element exists
   }, []);
 
-  const currentExtraToolWidth = isMoreTextTools
-    ? minExtraToolsWidth
-    : maxExtraToolsWidth;
 
   return (
     <Box
@@ -238,7 +216,7 @@ export const RapidCmi5Toolbar: React.FC<{
         <Stack direction="column" spacing={1} sx={{ padding: 1 }}>
           {viewmode === 'rich-text' && !isPlayback && (
             <Stack direction="row" spacing={1}>
-              <Stack direction="row" spacing={0} sx={{ flexGrow: 1 }}>
+              <Stack direction="row" spacing={0} sx={{ flexGrow: 1, minWidth: 0 }}>
                 <BoldItalicUnderlineToggles />
                 <ColorTextSplitButton />
                 <HighlightSplitButton />
@@ -281,45 +259,43 @@ export const RapidCmi5Toolbar: React.FC<{
                 <Separator />
                 <BlockTypeSelect />
                 <Separator />
-                {currentExtraToolWidth > 0 && (
-                  <Stack
-                    direction="row"
-                    sx={{
-                      flexGrow: 1,
-                      display: 'flex',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Stack
-                      direction="row"
-                      sx={{
-                        width: `${currentExtraToolWidth}px`,
-                        flexWrap: 'nowrap',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      <InsertImage />
-                      <InsertVideo />
-                      <InsertAudio />
-                      <InsertFile />
-                      <InsertCodeBlock />
-                      <InsertGrid />
-                      <InsertLayoutBox />
-                      <InsertAccordion />
-                      <InsertQuotes />
-                      <InsertStatements />
-                      <InsertSteps />
-                      <InsertTable />
-                      <InsertTabs />
-                      <InsertThematicBreak />
-                    </Stack>
-                  </Stack>
-                )}
                 <Stack
+                  id="mask-buttons"
+                  ref={extraToolbarRef}
+                  direction="row"
+                  sx={{
+                    display: 'flex',
+                    flexGrow: 1,
+                    minWidth: 0,
+                    position: 'relative',
+                    flexWrap: 'nowrap',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <InsertImage />
+                  <InsertVideo />
+                  <InsertAudio />
+                  <InsertFile />
+                  <InsertCodeBlock />
+                  <InsertGrid />
+                  <InsertLayoutBox />
+                  <InsertAccordion />
+                  <InsertQuotes />
+                  <InsertStatements />
+                  <InsertSteps />
+                  <InsertTable />
+                  <InsertTabs />
+                  <InsertThematicBreak />
+                </Stack>
+                <Stack
+                  id="static"
                   direction="row"
                   sx={{
                     display: 'flex',
                     justifyContent: 'flex-end',
+                    minWidth: '104px',
+                    flexGrow: 0,
+                    flexShrink: 0,
                   }}
                 >
                   <Separator />
