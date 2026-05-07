@@ -1,5 +1,6 @@
 import {
   ContentWidthEnum,
+  DefaultAlignmentEnum,
   LessonTheme,
   OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
@@ -13,6 +14,8 @@ import { DIRECTIVE_INNER_BOX_SHADOW } from '../cmi5/mdx/constants/directiveLayou
 import { darken, lighten, SxProps, useTheme } from '@mui/material';
 
 import { useGutterRight } from '../cmi5/mdx/plugins/shared/useGutterRight';
+import { useSignalEffect } from '@preact/signals-react';
+import { maxSlideWidth$ } from '../cmi5/mdx';
 
 export const useLessonStyles = (
   lessonTheme: LessonTheme | undefined,
@@ -22,10 +25,14 @@ export const useLessonStyles = (
   isPlayback?: boolean,
 ) => {
   const muiTheme = useTheme();
+  const activityAlign =
+    lessonTheme?.defaultActivityAlignment || DefaultAlignmentEnum.Center;
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const [contentWidth, setContentWidth] = useState<
     ContentWidthEnum | undefined
   >(undefined);
+  // useMemo doesnt work with signals, mirror signal with state
+  const [maxSlideWidth, setMaxSlideWidth] = useState<number | null>(null);
 
   /* Lesson Theme */
   const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
@@ -40,11 +47,7 @@ export const useLessonStyles = (
       return resolveBlockMaxWidth(overrideContentWidthStr);
     }
     return lessonContentWidthSetting;
-  }, [overrideContentWidthStr]);
-
-  useEffect(() => {
-    //not sure if this is needed
-  }, [overrideContentWidthStr]);
+  }, [overrideContentWidthStr, lessonContentWidthSetting]);
 
   const { gutterRef, gutterRight } = useGutterRight(
     resolvedThemeCSS,
@@ -57,6 +60,8 @@ export const useLessonStyles = (
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';
 
+  const halfBlockPadding = parseInt(blockPadding, 10) / 2.0;
+
   // Inner box: fills all available width (lesson content width applies to text
   // inside via lesson theme CSS, not to this container). Page background color
   // creates the visual separation from the outer colored band.
@@ -64,7 +69,21 @@ export const useLessonStyles = (
   // is narrowed while the outer color band still spans full width.
 
   const widthOverrideSx: SxProps = blockMaxWidth
-    ? { maxWidth: blockMaxWidth, marginLeft: 'auto', marginRight: 'auto' }
+    ? {
+        maxWidth: blockMaxWidth,
+        marginLeft:
+          activityAlign === DefaultAlignmentEnum.Center
+            ? 'auto'
+            : activityAlign === DefaultAlignmentEnum.Left
+              ? 0
+              : 'auto',
+        marginRight:
+          activityAlign === DefaultAlignmentEnum.Center
+            ? 'auto'
+            : activityAlign === DefaultAlignmentEnum.Right
+              ? 0
+              : 'auto',
+      }
     : {};
 
   const innerSx: SxProps = {
@@ -81,9 +100,8 @@ export const useLessonStyles = (
     boxShadow: `0 0 0 100vmax ${backgroundColor}`,
     backgroundColor,
     clipPath: backgroundColor ? `inset(0 -100vmax 0)` : undefined,
-
-    paddingTop: blockPadding,
-    paddingBottom: blockPadding,
+    paddingTop: halfBlockPadding,
+    paddingBottom: halfBlockPadding,
   };
 
   const outerStyle: OuterStyle = {
@@ -110,6 +128,19 @@ export const useLessonStyles = (
     borderStyle: 'solid',
     borderWidth: '2px',
   };
+
+  useEffect(() => {
+    //not sure if this is needed
+  }, [overrideContentWidthStr]);
+
+  /**
+   * Listen for slide width changed and update internal React state
+   */
+  useSignalEffect(() => {
+    if (maxSlideWidth$.value) {
+      setMaxSlideWidth(maxSlideWidth$.value);
+    }
+  });
 
   return {
     blockAppearanceOpen,
