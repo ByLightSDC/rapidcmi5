@@ -476,11 +476,13 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
             position: 'absolute',
             top: backgroundColor ? blockPadding : 0,
             right: gutterRight,
+            zIndex:100
           }}
         >
           <Tooltip title="Background Color">
             <IconButton
               onClick={(e) => {
+                e.stopPropagation();
                 pendingColorRef.current = backgroundColor;
                 setPendingColor(backgroundColor);
                 setColorPickerAnchor(e.currentTarget);
