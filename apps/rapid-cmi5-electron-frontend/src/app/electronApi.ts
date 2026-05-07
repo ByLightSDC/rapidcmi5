@@ -15,12 +15,49 @@ import {
 export const rangeApi = (window as unknown as { rangeApi: RangeApi }).rangeApi;
 
 interface RangeApi {
-  fetchScenario: (baseUrl: string, token: string, uuid: string) => Promise<ScenarioApi>;
-  listScenarios: (baseUrl: string, token: string, query: ScenarioQuery) => Promise<PaginatedScenariosResponse>;
-  processAu: (baseUrl: string, token: string, au: CourseAU, blockId: string) => Promise<void>;
-  listLanguages: (baseUrl: string, token: string, authType: 'Basic' | 'Bearer') => Promise<LanguagesResponseApi>;
-  executeCode: (baseUrl: string, token: string, authType: 'Basic' | 'Bearer', body: ExecuteCodeBodyApi) => Promise<ExecuteCodeResponseApi>;
-  searchQuestions: (baseUrl: string, token: string, query: string, page: number, limit: number, activityType?: string) => Promise<unknown>;
-  addQuestion: (baseUrl: string, token: string, body: QuestionBankApiCreate) => Promise<QuestionBankApi>;
-  deleteQuestion: (baseUrl: string, token: string, uuid: string) => Promise<void>;
+  fetchScenario: (
+    baseUrl: string,
+    token: string,
+    uuid: string,
+  ) => Promise<ScenarioApi>;
+  listScenarios: (
+    baseUrl: string,
+    token: string,
+    query: ScenarioQuery,
+  ) => Promise<PaginatedScenariosResponse>;
+  processAu: (
+    baseUrl: string,
+    token: string,
+    au: CourseAU,
+    blockId: string,
+  ) => Promise<void>;
+  listLanguages: (
+    baseUrl: string,
+    token: string,
+    authType: 'Basic' | 'Bearer',
+  ) => Promise<LanguagesResponseApi>;
+  executeCode: (
+    baseUrl: string,
+    token: string,
+    authType: 'Basic' | 'Bearer',
+    body: ExecuteCodeBodyApi,
+  ) => Promise<ExecuteCodeResponseApi>;
+  searchQuestions: (
+    baseUrl: string,
+    token: string,
+    query: string,
+    page: number,
+    limit: number,
+    activityType?: string,
+  ) => Promise<unknown>;
+  addQuestion: (
+    baseUrl: string,
+    token: string,
+    body: QuestionBankApiCreate,
+  ) => Promise<QuestionBankApi>;
+  deleteQuestion: (
+    baseUrl: string,
+    token: string,
+    uuid: string,
+  ) => Promise<void>;
 }

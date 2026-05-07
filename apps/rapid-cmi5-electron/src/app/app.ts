@@ -104,7 +104,7 @@ export default class App {
       App.mainWindow.show();
     });
     // if (this.isDevelopmentMode()) {
-    App.mainWindow.webContents.openDevTools({ mode: 'detach' });
+    // App.mainWindow.webContents.openDevTools({ mode: 'detach' });
     // }
     // You can expose dev tools with this
     // App.mainWindow.webContents.openDevTools({ mode: 'detach' });

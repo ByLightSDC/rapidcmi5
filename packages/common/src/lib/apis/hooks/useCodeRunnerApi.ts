@@ -1,6 +1,11 @@
 import { useCallback, useMemo } from 'react';
 import { initClient } from '@ts-rest/core';
-import { codeRunnerContract, ExecuteCodeBodyApi, ExecuteCodeResponseApi, LanguagesResponseApi } from '../codeRunnerContract';
+import {
+  codeRunnerContract,
+  ExecuteCodeBodyApi,
+  ExecuteCodeResponseApi,
+  LanguagesResponseApi,
+} from '../codeRunnerContract';
 import {
   CodeRunnerApiError,
   handleExecuteCode,
@@ -29,10 +34,11 @@ export function useCodeRunnerApi(
     [url, token, authType],
   );
 
-  const getLanguagesCb = useCallback(async (): Promise<LanguagesResponseApi> => {
-    if (!apiClient) throw Error('API client is not set');
-    return await handleGetLanguages(apiClient);
-  }, [apiClient]);
+  const getLanguagesCb =
+    useCallback(async (): Promise<LanguagesResponseApi> => {
+      if (!apiClient) throw Error('API client is not set');
+      return await handleGetLanguages(apiClient);
+    }, [apiClient]);
 
   const executeCodeCb = useCallback(
     async (question: ExecuteCodeBodyApi): Promise<ExecuteCodeResponseApi> => {

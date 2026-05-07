@@ -36,7 +36,13 @@ export function useQuizBankApi(url?: string, token?: string) {
       activityType?: RC5ActivityTypeEnum,
     ) => {
       if (!apiClient) throw Error('API client is not set');
-      return await handleSearchQuestions(query, page, limit, apiClient, activityType);
+      return await handleSearchQuestions(
+        query,
+        page,
+        limit,
+        apiClient,
+        activityType,
+      );
     },
     [apiClient],
   );

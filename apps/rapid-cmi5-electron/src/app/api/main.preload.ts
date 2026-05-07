@@ -24,17 +24,8 @@ export const ipc = {
       projectName,
       createAuMappings,
     ),
-  testInPlayer: (
-    auJson: string,
-    playerUrl: string,
-    configDestPath: string,
-  ) =>
-    ipcRenderer.invoke(
-      'cmi5:testInPlayer',
-      auJson,
-      playerUrl,
-      configDestPath,
-    ),
+  testInPlayer: (auJson: string, playerUrl: string, configDestPath: string) =>
+    ipcRenderer.invoke('cmi5:testInPlayer', auJson, playerUrl, configDestPath),
 };
 
 contextBridge.exposeInMainWorld('ipc', ipc);
@@ -130,8 +121,10 @@ export const fsApi = {
     ipcRenderer.invoke('fs:getStashStatus', path),
   chooseProject: () => ipcRenderer.invoke('fs:chooseProject'),
   getRecentProjects: () => ipcRenderer.invoke('fs:getRecentProjects'),
-  removeRecentProject: (id: string) => ipcRenderer.invoke('fs:removeRecentProject', id),
-  addRecentProject: (id: string) => ipcRenderer.invoke('fs:addRecentProject', id),
+  removeRecentProject: (id: string) =>
+    ipcRenderer.invoke('fs:removeRecentProject', id),
+  addRecentProject: (id: string) =>
+    ipcRenderer.invoke('fs:addRecentProject', id),
   readPlayerConfig: () => ipcRenderer.invoke('fs:readPlayerConfig'),
   writePlayerConfig: (content: string) =>
     ipcRenderer.invoke('fs:writePlayerConfig', content),
@@ -173,9 +166,17 @@ export const rangeApi = {
   processAu: (baseUrl: string, token: string, au: object, blockId: string) =>
     ipcRenderer.invoke('rangeApi:processAu', baseUrl, token, au, blockId),
   // Code Runner
-  listLanguages: (baseUrl: string, token: string, authType: 'Basic' | 'Bearer') =>
-    ipcRenderer.invoke('rangeApi:listLanguages', baseUrl, token, authType),
-  executeCode: (baseUrl: string, token: string, authType: 'Basic' | 'Bearer', body: object) =>
+  listLanguages: (
+    baseUrl: string,
+    token: string,
+    authType: 'Basic' | 'Bearer',
+  ) => ipcRenderer.invoke('rangeApi:listLanguages', baseUrl, token, authType),
+  executeCode: (
+    baseUrl: string,
+    token: string,
+    authType: 'Basic' | 'Bearer',
+    body: object,
+  ) =>
     ipcRenderer.invoke('rangeApi:executeCode', baseUrl, token, authType, body),
   // Quiz Bank
   searchQuestions: (
