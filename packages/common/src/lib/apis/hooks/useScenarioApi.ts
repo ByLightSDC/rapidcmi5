@@ -6,11 +6,12 @@ import {
   ScenarioQuery,
   PaginatedScenariosResponse,
 } from '../scenarioContract';
+import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
 import {
-  CourseAU,
-  createAuMappingNameWithAuId,
-  generateAuId,
-} from '@rapid-cmi5/cmi5-build-common';
+  handleFetchScenario,
+  handleListScenarios,
+  handleProcessAu,
+} from '../utils/scenario';
 
 export function useScenarioApi(url?: string, token?: string) {
   const apiClient = useMemo(
@@ -30,13 +31,7 @@ export function useScenarioApi(url?: string, token?: string) {
   const fetchScenarioCb = useCallback(
     async (uuid: string): Promise<ScenarioApi> => {
       if (!apiClient) throw new Error('API client is not set');
-      const response = await apiClient.getScenario({ params: { uuid } });
-      if (response.status === 200) {
-        return response.body;
-      }
-      throw new Error(
-        `Failed to fetch scenario "${uuid}" (status: ${response.status})`,
-      );
+      return await handleFetchScenario(uuid, apiClient);
     },
     [apiClient],
   );
@@ -44,11 +39,7 @@ export function useScenarioApi(url?: string, token?: string) {
   const listScenariosCb = useCallback(
     async (query: ScenarioQuery): Promise<PaginatedScenariosResponse> => {
       if (!apiClient) throw new Error('API client is not set');
-      const response = await apiClient.listScenarios({ query });
-      if (response.status === 200) {
-        return response.body;
-      }
-      throw new Error(`Failed to list scenarios (status: ${response.status})`);
+      return await handleListScenarios(query, apiClient);
     },
     [apiClient],
   );
@@ -56,86 +47,10 @@ export function useScenarioApi(url?: string, token?: string) {
   const processAuCb = useCallback(
     async (au: CourseAU, blockId: string): Promise<void> => {
       if (!apiClient) throw new Error('API client is not set');
-
-      const scenarioUUID = await getAuScenarioUUID(au);
-      if (!scenarioUUID) return;
-
-      const auId = generateAuId({ blockId, auName: au.auName });
-      // ts-rest does not encodeURIComponent path params; auId can be a URL with
-      // slashes that would break server-side path routing if not encoded first.
-      const encodedAuId = encodeURIComponent(auId);
-      let existingMapping: Awaited<ReturnType<typeof apiClient.getAuMapping>>;
-      try {
-        existingMapping = await apiClient.getAuMapping({
-          params: { auId: encodedAuId },
-        });
-      } catch {
-        existingMapping = { status: 404, body: null } as any;
-      }
-
-      if (existingMapping.status === 200) {
-        const updateResponse = await apiClient.updateAuMapping({
-          params: { auId: encodedAuId },
-          body: { scenarios: [scenarioUUID] },
-        });
-        if (updateResponse.status !== 200) {
-          console.error(`Could not update au mapping for auId: ${auId}`);
-          throw updateResponse.body;
-        }
-      } else if (existingMapping.status === 404) {
-        const createResponse = await apiClient.createAuMapping({
-          body: {
-            auId,
-            scenarios: [scenarioUUID],
-            name: createAuMappingNameWithAuId(auId),
-          },
-        });
-        if (!(createResponse.status == 201 || createResponse.status == 200)) {
-          console.error(`Could not create au mapping for auId: ${auId}`);
-          throw new Error('Failed to create au');
-        }
-      } else {
-        throw existingMapping.body;
-      }
+      return await handleProcessAu(au, blockId, apiClient);
     },
     [apiClient],
   );
-
-  async function getAuScenarioUUID(au: CourseAU) {
-    if (!apiClient) throw new Error('API client is not set');
-    if (au.rangeosScenarioUUID) {
-      const response = await apiClient.getScenario({
-        params: { uuid: au.rangeosScenarioUUID },
-      });
-      if (response.status === 200) {
-        return au.rangeosScenarioUUID;
-      }
-      throw new Error(
-        `Scenario UUID "${au.rangeosScenarioUUID}" does not exist in this environment.\n` +
-          `Lesson: "${au.auName}". \n` +
-          `Update the scenario UUID or remove it from the AU settings.`,
-      );
-    }
-
-    if (au.rangeosScenarioName) {
-      const response = await apiClient.listScenarios({
-        query: { search: au.rangeosScenarioName },
-      });
-      if (
-        response.status !== 200 ||
-        !response.body.data ||
-        response.body.totalCount === 0
-      ) {
-        throw new Error(
-          `No scenario found with name "${au.rangeosScenarioName}" for AU "${au.auName}". ` +
-            `Check that the scenario name is correct and exists in this environment.`,
-        );
-      }
-      return response.body.data.at(0)?.uuid;
-    }
-
-    return null;
-  }
 
   const fetchScenario = apiClient ? fetchScenarioCb : undefined;
   const listScenarios = apiClient ? listScenariosCb : undefined;
