@@ -1,6 +1,11 @@
 import { useContext, useEffect } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $createParagraphNode, $getRoot, $isElementNode, DecoratorNode } from 'lexical';
+import {
+  $createParagraphNode,
+  $getRoot,
+  $isElementNode,
+  DecoratorNode,
+} from 'lexical';
 import { realmPlugin, addComposerChild$ } from '@mdxeditor/editor';
 import { LessonThemeContext } from '@rapid-cmi5/ui';
 import { resolveLessonThemeCSS } from '@rapid-cmi5/ui';
@@ -77,21 +82,25 @@ function getNearestBlock(
 function GutterClickHandler() {
   const [editor] = useLexicalComposerContext();
   const { lessonTheme } = useContext(LessonThemeContext);
+  const editorRoot = editor.getRootElement();
+
+  if (!editorRoot) return;
 
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
-      const editorRoot = editor.getRootElement();
-      if (!editorRoot) return;
-
       const css = resolveLessonThemeCSS(lessonTheme);
       const maxWidthCss = css?.maxWidth ?? null;
-      const { left: contentLeft, right: contentRight } = getContentColumnBounds(editorRoot, maxWidthCss);
+      const { left: contentLeft, right: contentRight } = getContentColumnBounds(
+        editorRoot,
+        maxWidthCss,
+      );
 
       const inGutter = e.clientX < contentLeft || e.clientX > contentRight;
       if (!inGutter) return;
 
       const target = e.target as HTMLElement;
-      if (target.closest('button, input, select, textarea, [role="button"]')) return;
+      if (target.closest('button, input, select, textarea, [role="button"]'))
+        return;
 
       e.preventDefault();
 
@@ -111,7 +120,9 @@ function GutterClickHandler() {
           // A node can host a visible caret only if it's an ElementNode with at least
           // one non-decorator child (or is empty). A paragraph whose sole child is a
           // DecoratorNode (table, audio, etc.) cannot show a cursor.
-          const nodeCanHostCaret = (n: Parameters<typeof $isElementNode>[0]): boolean => {
+          const nodeCanHostCaret = (
+            n: Parameters<typeof $isElementNode>[0],
+          ): boolean => {
             if (!$isElementNode(n)) return false;
             const children = n.getChildren();
             if (children.length === 0) return true;
@@ -119,8 +130,9 @@ function GutterClickHandler() {
           };
 
           const canHostCaret = nodeCanHostCaret(node);
-          const siblingCanHostCaret = (sibling: ReturnType<typeof node.getNextSibling>): boolean =>
-            !!sibling && nodeCanHostCaret(sibling);
+          const siblingCanHostCaret = (
+            sibling: ReturnType<typeof node.getNextSibling>,
+          ): boolean => !!sibling && nodeCanHostCaret(sibling);
 
           if (!canHostCaret) {
             if (nearest.isAboveMidpoint) {
@@ -156,8 +168,9 @@ function GutterClickHandler() {
       );
     };
 
-    document.addEventListener('mousedown', handleMouseDown, true);
-    return () => document.removeEventListener('mousedown', handleMouseDown, true);
+    editorRoot.addEventListener('mousedown', handleMouseDown, true);
+    return () =>
+      editorRoot.removeEventListener('mousedown', handleMouseDown, true);
   }, [editor, lessonTheme]);
 
   return null;
