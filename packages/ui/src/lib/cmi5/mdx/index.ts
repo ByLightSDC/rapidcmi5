@@ -3,6 +3,7 @@ export * from './animation/types/Animation.types';
 
 export * from './components/AlignmentToolbarControls';
 export * from './components/DeleteIconButton';
+export * from './components/InsertLineReturnButton';
 export * from './components/RightMenuContainer';
 export * from './components/SettingsIconButton';
 
@@ -22,6 +23,7 @@ export * from './icons/Icons';
 export * from './plugins/accordion/AccordionContentDirectiveDescriptor';
 export * from './plugins/accordion/AccordionContentEditor';
 export * from './plugins/accordion/AccordionDirectiveDescriptor';
+export * from './plugins/activity/types';
 export * from './plugins/animation-directive';
 export * from './plugins/code';
 export * from './plugins/code/CodeMirrorEditor';

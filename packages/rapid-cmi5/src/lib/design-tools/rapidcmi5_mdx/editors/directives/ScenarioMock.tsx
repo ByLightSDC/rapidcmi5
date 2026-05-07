@@ -1,4 +1,10 @@
-import { useContext, useMemo, useState, useCallback } from 'react';
+import {
+  useContext,
+  useMemo,
+  useState,
+  useCallback,
+  CSSProperties,
+} from 'react';
 
 /* MUI */
 import {
@@ -19,15 +25,9 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AutoModeIcon from '@mui/icons-material/AutoMode';
 import TerminalIcon from '@mui/icons-material/Terminal';
 
-import {
-  LessonThemeContext,
-  OverflowTypography,
-  TabMainUi,
-  maxFormWidths,
-  useLessonThemeStyles,
-} from '@rapid-cmi5/ui';
+import { OverflowTypography, TabMainUi } from '@rapid-cmi5/ui';
 
-import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import { RC5ActivityTypeEnum, OuterStyle } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Mock Activity display so course authors can perceive activity layout in preview mode
@@ -36,18 +36,17 @@ import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 function ScenarioMock({
   activity,
   scenarioName,
+  innerSx,
+  outerSx,
+  outerStyle,
 }: {
   activity: RC5ActivityTypeEnum;
   scenarioName?: string;
+  innerSx?: SxProps;
+  outerSx?: SxProps;
+  outerStyle?: OuterStyle;
 }) {
   const [currentTab, setCurrentTab] = useState(0);
-
-  /* Lesson Theme */
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
-    lessonTheme,
-    maxFormWidths.scenarioPlayback,
-  );
 
   const handleChangeTab = useCallback(
     (event: React.SyntheticEvent, newValue: number) => {
@@ -79,17 +78,17 @@ function ScenarioMock({
   }, []);
 
   return (
-    <Paper
+    <Box
+      id="scenario-activity"
       className="paper-activity"
-      variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        ...outerActivitySxWithConstrainedWidth,
+        ...outerSx,
       }}
+      {...outerStyle}
     >
-      <Typography variant="caption">{activity}</Typography>
-
-      <>
+      <Stack sx={{ padding: 2, ...innerSx }}>
+        <Typography variant="caption">{activity}</Typography>
         <Stack
           direction="row"
           sx={{
@@ -194,8 +193,8 @@ function ScenarioMock({
             </Alert>
           </Box>
         )}
-      </>
-    </Paper>
+      </Stack>
+    </Box>
   );
 }
 
