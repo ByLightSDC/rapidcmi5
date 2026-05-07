@@ -23,12 +23,24 @@ export const MdastJsxTableVisitor: MdastImportVisitor<MdxJsxFlowElement | MdxJsx
     // Extract attributes
     let data = undefined;
     if (mdastNode.attributes) {
+      const hProperties: Record<string, string> = {};
+
       const styleAttr = mdastNode.attributes.find(
         (a) => a.type === 'mdxJsxAttribute' && a.name === 'style'
       );
-
       if (styleAttr && typeof styleAttr.value === 'string') {
-        data = { hProperties: { style: styleAttr.value } };
+        hProperties['style'] = styleAttr.value;
+      }
+
+      const contentWidthAttr = mdastNode.attributes.find(
+        (a) => a.type === 'mdxJsxAttribute' && a.name === 'data-content-width'
+      );
+      if (contentWidthAttr && typeof contentWidthAttr.value === 'string') {
+        hProperties['contentWidth'] = contentWidthAttr.value;
+      }
+
+      if (Object.keys(hProperties).length > 0) {
+        data = { hProperties };
       }
     }
 

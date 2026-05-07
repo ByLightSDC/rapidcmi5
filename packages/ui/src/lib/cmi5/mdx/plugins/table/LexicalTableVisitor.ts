@@ -4,7 +4,6 @@ import { LexicalExportVisitor } from '@mdxeditor/editor';
 import { toHast } from 'mdast-util-to-hast';
 import { toHtml } from 'hast-util-to-html';
 import type { Element } from 'hast';
-import { CONTENT_WIDTH_MAP } from '../../../../styles/lessonThemeStyles';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 /**
@@ -132,23 +131,15 @@ export const LexicalTableVisitor: LexicalExportVisitor<TableNode, Mdast.HTML> =
         properties: {
           ...hProps,
           className: ['rc5-table'],
+          ...(contentWidth !== undefined ? { 'data-content-width': contentWidth } : {}),
         },
         children: tableChildren,
       };
 
       // 5. Convert HAST to HTML String
-      let htmlString = toHtml(tableHast, { allowDangerousHtml: true });
+      const htmlString = toHtml(tableHast, { allowDangerousHtml: true });
 
-      // 6. Wrap in a constraining div when contentWidth is set
-      if (contentWidth !== undefined) {
-        const maxWidth = CONTENT_WIDTH_MAP[contentWidth];
-        const style = maxWidth
-          ? `max-width: ${maxWidth}; margin-left: auto; margin-right: auto;`
-          : '';
-        htmlString = `<div class="rc5-table-container"${style ? ` style="${style}"` : ''}>${htmlString}</div>`;
-      }
-
-      // 7. Append as an HTML node
+      // 6. Append as an HTML node
       actions.appendToParent(mdastParent, {
         type: 'html',
         value: htmlString,
