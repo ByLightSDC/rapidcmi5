@@ -82,9 +82,9 @@ import { useRC5Prompts } from '../modals/useRC5Prompts';
  *
  */
 const leftToolWidthContainer = 582;
-const rightToolWidthContainer = 131;
-const toolIconWidth = 32.0;
-const rightToolbarMargin = 24;
+const rightToolWidthContainer = 112;
+const toolIconWidth = 31.4;
+const rightToolbarMargin = 25; 
 const moreTextToolWidth = 100;
 
 /**
@@ -93,7 +93,9 @@ const moreTextToolWidth = 100;
  * You'll probably want to create your own toolbar component that includes only the buttons that you need.
  * @group Toolbar Components
  */
-export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5-build-common').LessonTheme }> = ({ lessonTheme }) => {
+export const RapidCmi5Toolbar: React.FC<{
+  lessonTheme?: import('@rapid-cmi5/cmi5-build-common').LessonTheme;
+}> = ({ lessonTheme }) => {
   const changeViewMode = usePublisher(viewMode$);
   const { getMarkdownData } = useContext(RC5Context);
   const realm = useRealm();
