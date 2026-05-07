@@ -4,6 +4,7 @@ import {
   Box,
   CircularProgress,
   Paper,
+  SxProps,
   Typography,
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
@@ -18,6 +19,7 @@ import {
   CodeRunnerContent,
   CodeRunnerSubmitResponse,
   useCodeRunnerApi,
+  OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 
 import { ButtonMainUi } from '../../utility/buttons';
@@ -33,6 +35,9 @@ type CodeRunnerProps = {
   authType: 'Basic' | 'Bearer';
   token?: string;
   url?: string;
+  innerSx?: SxProps;
+  outerSx?: SxProps;
+  outerStyle?: OuterStyle;
 };
 
 function buildCodeRunnerQuizId(content: CodeRunnerContent): string {
@@ -75,6 +80,9 @@ export function CodeRunner({
   authType,
   url,
   token,
+  innerSx,
+  outerSx,
+  outerStyle,
 }: CodeRunnerProps) {
   const { setProgress, submitScore, isAuthenticated, isTestMode } = auProps;
   const { lessonTheme } = useContext(LessonThemeContext);
@@ -187,100 +195,105 @@ export function CodeRunner({
           justifyContent: 'center',
           gap: 2,
           p: 4,
+          ...outerSx,
         }}
+        {...outerStyle}
       >
-        <CircularProgress />
-        <Typography color="text.secondary">
-          CodeRunner is connecting...
-        </Typography>
+        <Box sx={{ ...innerSx }}>
+          <CircularProgress />
+          <Typography color="text.secondary">
+            CodeRunner is connecting...
+          </Typography>
+        </Box>
       </Box>
     );
 
   return (
-    <Paper
+    <Box
+      id="code-runner-activity"
       className="paper-activity"
-      variant="outlined"
       sx={{
-        backgroundColor: 'background.default',
-        ...outerActivitySxWithConstrainedWidthForm,
-        padding: blockPadding,
+        ...outerSx,
       }}
+      {...outerStyle}
     >
-      {isTestMode && !executeCode && (
-        <Alert severity="info" sx={{ mb: 1.5 }}>
-          Test mode active: no submission will be sent.
-        </Alert>
-      )}
+      <Box sx={{ padding:2, ...innerSx }}>
+        {isTestMode && !executeCode && (
+          <Alert severity="info" sx={{ mb: 1.5 }}>
+            Test mode active: no submission will be sent.
+          </Alert>
+        )}
 
-      {content.title && (
-        <Typography
-          color="text.primary"
-          align="center"
-          variant="h3"
-          sx={{ fontWeight: 800, pb: 1 }}
-        >
-          {content.title}
-        </Typography>
-      )}
+        {content.title && (
+          <Typography
+            color="text.primary"
+            align="center"
+            variant="h3"
+            sx={{ fontWeight: 800, pb: 1 }}
+          >
+            {content.title}
+          </Typography>
+        )}
 
-      {content.description && (
-        <Typography color="text.primary" sx={{ fontWeight: 800, pb: 1 }}>
-          {content.description}
-        </Typography>
-      )}
+        {content.description && (
+          <Typography color="text.primary" sx={{ fontWeight: 800, pb: 1 }}>
+            {content.description}
+          </Typography>
+        )}
 
-      {content.evaluator ? (
-        <Box sx={{ overflow: 'hidden', m: 0.5 }}>
-          <MonacoEditor
-            height={400}
-            language={monacoLanguage}
-            value={submissionStr}
-            onChange={(value) => setSubmissionStr(value ?? '')}
-          />
-        </Box>
-      ) : (
-        <Alert
-          severity="error"
-          sx={{
-            maxWidth: '480px',
-            m: 1.5,
-            mx: 'auto',
-          }}
-        >
-          CodeRunner is missing an evaluation script.
-        </Alert>
-      )}
+        {content.evaluator ? (
+          <Box sx={{ overflow: 'hidden', m: 0.5 }}>
+            <MonacoEditor
+              height={400}
+              language={monacoLanguage}
+              value={submissionStr}
+              onChange={(value) => setSubmissionStr(value ?? '')}
+            />
+          </Box>
+        ) : (
+          <Alert
+            severity="error"
+            sx={{
+              maxWidth: '480px',
+              m: 1.5,
+              mx: 'auto',
+            }}
+          >
+            CodeRunner is missing an evaluation script.
+          </Alert>
+        )}
 
-      {successStr && (
-        <Alert
-          sx={{ m: 1.5, whiteSpace: 'pre-wrap' }}
-          icon={<CheckIcon fontSize="inherit" />}
-          severity="success"
-        >
-          <AlertTitle>Success</AlertTitle>
-          {successStr}
-        </Alert>
-      )}
+        {successStr && (
+          <Alert
+            sx={{ m: 1.5, whiteSpace: 'pre-wrap' }}
+            icon={<CheckIcon fontSize="inherit" />}
+            severity="success"
+          >
+            <AlertTitle>Success</AlertTitle>
+            {successStr}
+          </Alert>
+        )}
 
-      {compileStr && (
-        <Alert sx={{ m: 1.5, whiteSpace: 'pre-wrap' }} severity="warning">
-          <AlertTitle>Compilation Error</AlertTitle>
-          {compileStr}
-        </Alert>
-      )}
+        {compileStr && (
+          <Alert sx={{ m: 1.5, whiteSpace: 'pre-wrap' }} severity="warning">
+            <AlertTitle>Compilation Error</AlertTitle>
+            {compileStr}
+          </Alert>
+        )}
 
-      {errorStr && (
-        <Alert sx={{ m: 1.5, whiteSpace: 'pre-wrap' }} severity="error">
-          <AlertTitle>Execution Failed</AlertTitle>
-          {errorStr}
-        </Alert>
-      )}
-      {content.evaluator && (
-        <Box sx={{ m: 0.5, mt: 1.5 }}>
-          <ButtonMainUi onClick={handleSubmit}>Submit</ButtonMainUi>
-        </Box>
-      )}
-    </Paper>
+        {errorStr && (
+          <Alert sx={{ m: 1.5, whiteSpace: 'pre-wrap' }} severity="error">
+            <AlertTitle>Execution Failed</AlertTitle>
+            {errorStr}
+          </Alert>
+        )}
+        {content.evaluator && (
+          <Box sx={{ m: 0.5, mt: 1.5 }}>
+            <ButtonMainUi onClick={handleSubmit}>Submit</ButtonMainUi>
+          </Box>
+        )}
+      </Box>
+    </Box>
   );
 }
 

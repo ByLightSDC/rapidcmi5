@@ -11,7 +11,7 @@ interface InsertLineReturnButtonProps {
 /**
  * Inserts a paragraph node after the given lexical node and moves the cursor to it.
  */
-function InsertLineReturnButton({
+export function InsertLineReturnButton({
   parentEditor,
   lexicalNode,
 }: InsertLineReturnButtonProps) {
@@ -33,5 +33,4 @@ function InsertLineReturnButton({
     </Tooltip>
   );
 }
-
 export default InsertLineReturnButton;

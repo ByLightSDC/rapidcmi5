@@ -44,19 +44,29 @@ import {
   QuizCompletionEnum,
   ActivityScore,
   RC5ActivityTypeEnum,
+  OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 import { ButtonMinorUi, ButtonMainUi } from '../../utility/buttons';
 import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
-import { maxFormWidths, useLessonThemeStyles } from '../../hooks/useLessonThemeStyles';
+import {
+  maxFormWidths,
+  useLessonThemeStyles,
+} from '../../hooks/useLessonThemeStyles';
 
 export type PotentialAnswerType = AnswerType | null;
 
 export function AuQuiz({
   auProps,
   content,
+  innerSx,
+  outerSx,
+  outerStyle,
 }: {
   auProps: Partial<AuContextProps>;
   content: QuizContent;
+  innerSx?: SxProps;
+  outerSx?: SxProps;
+  outerStyle?: OuterStyle;
 }) {
   const { getGrade, gradeQuiz } = useQuizGrader();
   const {
@@ -364,221 +374,223 @@ export function AuQuiz({
   }, [currentQuestionHasAnswer, currentQuestion, updateUnanswered]);
 
   return (
-    <Paper
+    <Box
       className="paper-activity"
-      variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        ...outerActivitySxWithConstrainedWidth,
+        ...outerSx,
       }}
+      {...outerStyle}
     >
-      {content.title && (
-        <Typography
-          color="text.primary"
-          align="center"
-          variant="h2"
-          style={{
-            fontWeight: 800,
-            paddingBottom: '8px',
-          }}
-        >
-          {content.title}
-        </Typography>
-      )}
-      {isLoading && (
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          minHeight="200px"
-        >
-          <CircularProgress />
-          <Typography variant="body1" sx={{ marginTop: 2 }}>
-            Loading quiz...
+      <Box sx={{ padding: 2, ...innerSx  }}>
+        {content.title && (
+          <Typography
+            color="text.primary"
+            align="center"
+            variant="h2"
+            style={{
+              fontWeight: 800,
+              paddingBottom: '8px',
+            }}
+          >
+            {content.title}
           </Typography>
-        </Box>
-      )}
-      {!isLoading && activeQuestion && (
-        <>
-          {showQuestion && (
-            <>
-              <AuQuizQuestion
-                question={activeQuestion}
-                currentQuestion={currentQuestion}
-                numQuestions={content.questions.length}
-                currentAnswer={allAnswers[currentQuestion]}
-                handlePickAnswer={handlePickAnswer}
-                correctAnswer={
-                  content.questions[currentQuestion]?.typeAttributes
-                    ?.correctAnswer
-                }
-                isCorrect={isSubmitted ? getGrade(currentQuestion) : false}
-                isGraded={isSubmitted}
-              />
-              <div className="flex flex-row py-4 space-x-4">
-                <div style={{ minWidth: '80px' }}>
-                  <IconButton
-                    aria-label="find unanswered"
-                    //size={'small'}
-                    color="primary"
-                    onClick={toggleQuestionNav}
-                  >
-                    <Tooltip
-                      arrow
-                      enterDelay={200}
-                      enterNextDelay={500}
-                      title="Find Question"
-                      placement="bottom"
-                    >
-                      <>
-                        {showQuestionNav && <SearchOffIcon />}
-                        {!showQuestionNav && <SavedSearchIcon />}
-                      </>
-                    </Tooltip>
-                  </IconButton>
-                  {!isSubmitted && (
+        )}
+        {isLoading && (
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            minHeight="200px"
+          >
+            <CircularProgress />
+            <Typography variant="body1" sx={{ marginTop: 2 }}>
+              Loading quiz...
+            </Typography>
+          </Box>
+        )}
+        {!isLoading && activeQuestion && (
+          <>
+            {showQuestion && (
+              <>
+                <AuQuizQuestion
+                  question={activeQuestion}
+                  currentQuestion={currentQuestion}
+                  numQuestions={content.questions.length}
+                  currentAnswer={allAnswers[currentQuestion]}
+                  handlePickAnswer={handlePickAnswer}
+                  correctAnswer={
+                    content.questions[currentQuestion]?.typeAttributes
+                      ?.correctAnswer
+                  }
+                  isCorrect={isSubmitted ? getGrade(currentQuestion) : false}
+                  isGraded={isSubmitted}
+                />
+                <div className="flex flex-row py-4 space-x-4">
+                  <div style={{ minWidth: '80px' }}>
                     <IconButton
-                      aria-label="Reset"
+                      aria-label="find unanswered"
+                      //size={'small'}
                       color="primary"
-                      onClick={handleReset}
+                      onClick={toggleQuestionNav}
                     >
                       <Tooltip
                         arrow
                         enterDelay={200}
                         enterNextDelay={500}
-                        title="Reset"
+                        title="Find Question"
                         placement="bottom"
                       >
-                        <RestartAltIcon />
+                        <>
+                          {showQuestionNav && <SearchOffIcon />}
+                          {!showQuestionNav && <SavedSearchIcon />}
+                        </>
                       </Tooltip>
                     </IconButton>
+                    {!isSubmitted && (
+                      <IconButton
+                        aria-label="Reset"
+                        color="primary"
+                        onClick={handleReset}
+                      >
+                        <Tooltip
+                          arrow
+                          enterDelay={200}
+                          enterNextDelay={500}
+                          title="Reset"
+                          placement="bottom"
+                        >
+                          <RestartAltIcon />
+                        </Tooltip>
+                      </IconButton>
+                    )}
+                  </div>
+                  <div
+                    style={{
+                      flexGrow: 1,
+                      display: 'flex',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <ButtonMinorUi
+                      startIcon={null}
+                      sxProps={{ marginRight: '4px' }}
+                      endIcon={
+                        <ArrowBackIosIcon
+                          sx={{
+                            padding: '0px',
+                            margin: '0px',
+                          }}
+                        />
+                      }
+                      onClick={handlePrevQuestion}
+                      disabled={currentQuestion <= 0 ? true : false}
+                      tooltip="Previous Question"
+                    ></ButtonMinorUi>
+
+                    <ButtonMinorUi
+                      onClick={handleNextQuestion}
+                      disabled={
+                        currentQuestion >= content.questions.length - 1
+                          ? true
+                          : false
+                      }
+                      sxProps={{ marginLeft: '4px' }}
+                      startIcon={null}
+                      tooltip="Next Question"
+                      endIcon={
+                        <ArrowForwardIosIcon
+                          sx={{
+                            padding: '0px',
+                            margin: '0px',
+                          }}
+                        />
+                      }
+                    ></ButtonMinorUi>
+                  </div>
+                  {!isSubmitted && (
+                    <ButtonMainUi
+                      disabled={!isSubmitEnabled}
+                      sxProps={{ maxWidth: '180px' }}
+                      onClick={submitQuiz}
+                    >
+                      Submit
+                    </ButtonMainUi>
+                  )}
+                  {isSubmitted && (
+                    <ButtonMainUi
+                      sxProps={{ maxWidth: '180px' }}
+                      startIcon={<RestartAltIcon />}
+                      onClick={handleReset}
+                    >
+                      Retake
+                    </ButtonMainUi>
                   )}
                 </div>
-                <div
-                  style={{
-                    flexGrow: 1,
-                    display: 'flex',
-                    justifyContent: 'center',
-                  }}
+                {!showReviewAnswers && showQuestionNav && (
+                  <QuestionNav
+                    content={content}
+                    currentQuestion={currentQuestion}
+                    unansweredQuestions={unansweredQuestions}
+                    goToQuestion={goToQuestion}
+                    setShowQuestionNav={setShowQuestionNav}
+                  />
+                )}
+                {showReviewAnswers && showQuestionNav && (
+                  <QuizReview
+                    content={content}
+                    currentQuestion={currentQuestion}
+                    getGrade={getGrade}
+                    goToQuestion={goToQuestion}
+                    setShowQuestionNav={setShowQuestionNav}
+                  />
+                )}
+              </>
+            )}
+
+            {showScore && (
+              <Stack
+                direction="column"
+                sx={{ justifyContent: 'center', alignItems: 'center' }}
+                spacing={1}
+              >
+                <QuizScore quiz={content} score={score} />
+
+                <ButtonMainUi
+                  sxProps={{ maxWidth: '180px' }}
+                  startIcon={<SavedSearchIcon />}
+                  onClick={reviewAnswers}
                 >
-                  <ButtonMinorUi
-                    startIcon={null}
-                    sxProps={{ marginRight: '4px' }}
-                    endIcon={
-                      <ArrowBackIosIcon
-                        sx={{
-                          padding: '0px',
-                          margin: '0px',
-                        }}
-                      />
-                    }
-                    onClick={handlePrevQuestion}
-                    disabled={currentQuestion <= 0 ? true : false}
-                    tooltip="Previous Question"
-                  ></ButtonMinorUi>
-
-                  <ButtonMinorUi
-                    onClick={handleNextQuestion}
-                    disabled={
-                      currentQuestion >= content.questions.length - 1
-                        ? true
-                        : false
-                    }
-                    sxProps={{ marginLeft: '4px' }}
-                    startIcon={null}
-                    tooltip="Next Question"
-                    endIcon={
-                      <ArrowForwardIosIcon
-                        sx={{
-                          padding: '0px',
-                          margin: '0px',
-                        }}
-                      />
-                    }
-                  ></ButtonMinorUi>
-                </div>
-                {!isSubmitted && (
-                  <ButtonMainUi
-                    disabled={!isSubmitEnabled}
-                    sxProps={{ maxWidth: '180px' }}
-                    onClick={submitQuiz}
-                  >
-                    Submit
-                  </ButtonMainUi>
-                )}
-                {isSubmitted && (
-                  <ButtonMainUi
-                    sxProps={{ maxWidth: '180px' }}
-                    startIcon={<RestartAltIcon />}
-                    onClick={handleReset}
-                  >
-                    Retake
-                  </ButtonMainUi>
-                )}
-              </div>
-              {!showReviewAnswers && showQuestionNav && (
-                <QuestionNav
-                  content={content}
-                  currentQuestion={currentQuestion}
-                  unansweredQuestions={unansweredQuestions}
-                  goToQuestion={goToQuestion}
-                  setShowQuestionNav={setShowQuestionNav}
-                />
-              )}
-              {showReviewAnswers && showQuestionNav && (
-                <QuizReview
-                  content={content}
-                  currentQuestion={currentQuestion}
-                  getGrade={getGrade}
-                  goToQuestion={goToQuestion}
-                  setShowQuestionNav={setShowQuestionNav}
-                />
-              )}
-            </>
-          )}
-
-          {showScore && (
-            <Stack
-              direction="column"
-              sx={{ justifyContent: 'center', alignItems: 'center' }}
-              spacing={1}
+                  Review Answers
+                </ButtonMainUi>
+                <ButtonMainUi
+                  sxProps={{ maxWidth: '180px' }}
+                  startIcon={<RestartAltIcon />}
+                  onClick={handleReset}
+                >
+                  Try Again
+                </ButtonMainUi>
+              </Stack>
+            )}
+          </>
+        )}
+        {!isLoading && !activeQuestion && (
+          <Box sx={{ margin: '12px' }}>
+            <Alert
+              severity="info"
+              sx={{
+                backgroundColor: 'transparent',
+                borderColor: 'transparent',
+                padding: '12px',
+                maxWidth: '640px',
+              }}
             >
-              <QuizScore quiz={content} score={score} />
-
-              <ButtonMainUi
-                sxProps={{ maxWidth: '180px' }}
-                startIcon={<SavedSearchIcon />}
-                onClick={reviewAnswers}
-              >
-                Review Answers
-              </ButtonMainUi>
-              <ButtonMainUi
-                sxProps={{ maxWidth: '180px' }}
-                startIcon={<RestartAltIcon />}
-                onClick={handleReset}
-              >
-                Try Again
-              </ButtonMainUi>
-            </Stack>
-          )}
-        </>
-      )}
-      {!isLoading && !activeQuestion && (
-        <Box sx={{ margin: '12px' }}>
-          <Alert
-            severity="info"
-            sx={{
-              backgroundColor: 'transparent',
-              borderColor: 'transparent',
-              padding: '12px',
-              maxWidth: '640px',
-            }}
-          >
-            {noneFound}
-          </Alert>
-        </Box>
-      )}
-    </Paper>
+              {noneFound}
+            </Alert>
+          </Box>
+        )}
+      </Box>
+    </Box>
   );
 }

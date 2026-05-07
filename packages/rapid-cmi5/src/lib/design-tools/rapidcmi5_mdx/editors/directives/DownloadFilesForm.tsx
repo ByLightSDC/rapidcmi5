@@ -4,6 +4,7 @@ import {
   DownloadFilesContent,
   RC5ActivityTypeEnum,
   DownloadFileData,
+  OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   FormCrudType,
@@ -12,9 +13,6 @@ import {
   FileDownloadLink,
   FormControlUIProvider,
   MiniForm,
-  LessonThemeContext,
-    maxFormWidths,
-  useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
 import { useState, useContext } from 'react';
 import { UseFormReturn } from 'react-hook-form';
@@ -24,25 +22,32 @@ import { useImageFile } from '../../data-hooks/useImageFile';
 import * as yup from 'yup';
 import { currentAuPath } from '@rapid-cmi5/react-editor';
 
-
 /**
  * Form course creators can use to attack files to a Lesson AU
  * @param param0
  * @returns
  */
 export const DownloadFilesForm = ({
+  contextMenu,
   crudType,
   defaultFormData,
   deleteButton,
   onSave,
   testId,
+  innerSx,
+  outerSx,
+  outerStyle,
 }: {
+  contextMenu?: JSX.Element;
   crudType: FormCrudType;
   defaultFormData: DownloadFilesContent;
   deleteButton?: JSX.Element;
   handleCloseModal?: () => void;
   onSave?: (activity: RC5ActivityTypeEnum, data: any) => void;
   testId?: string;
+  innerSx?: SxProps;
+  outerSx?: SxProps;
+  outerStyle?: OuterStyle;
 }) => {
   const { fileUploadHandler } = useImageFile();
   const validationSchema = yup.object().shape({});
@@ -52,13 +57,6 @@ export const DownloadFilesForm = ({
   const { getLocalFileBlob, getLocalFileBlobUrl } = useContext(GitContext);
   const { defaultDownloadFilePath } = useImageFile();
   const isDebugId = false;
-
-  /* Lesson Theme */
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const { outerActivitySxWithConstrainedWidthForm } = useLessonThemeStyles(
-    lessonTheme,
-    maxFormWidths.downloadsEditor,
-  );
 
   /**
    * fileDownloadHandler
@@ -136,19 +134,16 @@ export const DownloadFilesForm = ({
         <FormControlUIProvider>
           <MiniForm
             className="paper-activity"
-            outerSx={outerActivitySxWithConstrainedWidthForm}
+            contextMenu={contextMenu}
+            outerSx={outerSx}
+            outerStyle={outerStyle}
             autoSaveDebounceTime={1000}
             dataCache={defaultFormData}
             titleEndChildren={deleteButton}
             doAction={onSaveAction}
             formTitle={formHeadTitle}
             formWidth={null}
-            formSxProps={
-              {
-                flexGrow: 1,
-                maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
-              } as SxProps
-            }
+            formSxProps={{ width: '100%', flexGrow: 1, ...innerSx, margin: 0 }}
             getFormFields={getFormFields}
             loadingButtonText="Saving"
             shouldAutoSave={crudType === FormCrudType.edit}

@@ -4,6 +4,7 @@ import {
   FormControlTextField,
   FormControlUIProvider,
   FormStateType,
+  GIT_URL_GROUP,
   MiniForm,
   ModalDialog,
 } from '@rapid-cmi5/ui';
@@ -38,10 +39,11 @@ export function GitConfigForm({
   ) => void;
 }) {
   const { handleGitSetConfig } = useContext(GitContext);
-  const { isRepoConnectedToRemote, handleChangeRepoName, currentRepo } =
+  const { isRepoConnectedToRemote} =
     useContext(GitContext);
 
   const validationSchema = yup.object().shape({
+    remoteRepoUrl: GIT_URL_GROUP(false),
     username: NAME_GROUP_OPT,
   });
 
@@ -138,8 +140,8 @@ export function GitConfigForm({
         </Grid>
         {!isRepoConnectedToRemote && (
           <Alert severity="warning">
-            When adding a new remote, the repository MUST be blank. Please ensure there is no
-            README file before you add the remote.
+            When adding a new remote, the repository MUST be blank. Please
+            ensure there is no README file before you add the remote.
           </Alert>
         )}
       </>
