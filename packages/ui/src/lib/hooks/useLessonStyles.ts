@@ -19,6 +19,7 @@ export const useLessonStyles = (
   overrideContentWidthStr?: ContentWidthEnum,
   maxWidth?: number, //FUTURE
   backgroundColor?: string,
+  isPlayback?: boolean,
 ) => {
   const muiTheme = useTheme();
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
@@ -70,7 +71,6 @@ export const useLessonStyles = (
     backgroundColor: muiTheme.palette.background.default,
     boxShadow: DIRECTIVE_INNER_BOX_SHADOW,
     ...widthOverrideSx,
-    //TEMP backgroundColor: 'orange',
   };
 
   // Outer box: full-width background color band when backgroundColor is set.

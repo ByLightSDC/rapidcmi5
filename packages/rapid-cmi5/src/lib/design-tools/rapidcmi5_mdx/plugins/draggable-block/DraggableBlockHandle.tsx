@@ -11,6 +11,8 @@ import {
   scrollContainer,
 } from './methods';
 import { HANDLE_WIDTH, SCROLL_ZONE, SCROLL_SPEED } from './constants';
+import { editorInPlayback$ } from '@rapid-cmi5/ui';
+import { useCellValue } from '@mdxeditor/editor';
 
 /**
  * Floating drag and drop handle component rendered as a composer child over the MDX editor.
@@ -41,6 +43,7 @@ export function DraggableBlockHandle() {
   const scrollContainerRef = useRef<HTMLElement | Window | null>(null);
   const scrollRafRef = useRef<number | null>(null);
   const lastClientYRef = useRef(0);
+  const isPlayback = useCellValue(editorInPlayback$);
 
   /** Cancels any in-progress auto-scroll RAF loop. */
   const stopAutoScroll = useCallback(() => {
@@ -76,6 +79,9 @@ export function DraggableBlockHandle() {
    * its height, and makes it visible.
    */
   const positionHandle = useCallback((blockEl: HTMLElement) => {
+    if (isPlayback) {
+      return;
+    }
     const handle = handleRef.current;
     if (!handle) return;
 
@@ -91,7 +97,7 @@ export function DraggableBlockHandle() {
     handle.style.top = `${rect.top}px`;
     handle.style.left = `${rect.left - HANDLE_WIDTH - leftOffset}px`;
     handle.style.height = `${rect.height}px`;
-  }, []);
+  }, [isPlayback]);
 
   /** Clears any pending hide timer so the handle stays visible. */
   const cancelHide = useCallback(() => {

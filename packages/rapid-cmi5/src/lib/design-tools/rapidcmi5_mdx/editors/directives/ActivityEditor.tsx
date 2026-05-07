@@ -95,6 +95,7 @@ export const ActivityEditor: React.FC<
     mdastNode?.attributes?.contentWidth,
     maxFormWidths.downloadsEditor,
     muiTheme.palette.background.paper,
+    isPlayback
   );
 
   /**
