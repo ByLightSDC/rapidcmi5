@@ -8,10 +8,6 @@ import {
 } from '../../../redux/courseBuilderReducer';
 import { ViewModeEnum } from '../../course-builder/CourseBuilderTypes';
 import { setBreadCrumbVisible } from '@rapid-cmi5/ui';
-import {
-  getSvgStyleIcon,
-  StyleIconTypeEnum,
-} from '../styles/styleSvgConstants';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
 import { RC5Context } from '../contexts/RC5Context';
@@ -22,6 +18,8 @@ import { RC5Context } from '../contexts/RC5Context';
 import {
   ArrowLeft,
   Files,
+  GitCompareArrows,
+  GitPullRequestArrowIcon,
   PanelLeft,
   PencilRuler,
   TriangleAlert,
@@ -84,15 +82,6 @@ export const NavViewMenu = ({
       },
     }),
   });
-
-  const gitIcon = useMemo(
-    () =>
-      getSvgStyleIcon(StyleIconTypeEnum.GIT, {
-        color: iconColor,
-        fontSize: 'inherit',
-      }),
-    [iconColor],
-  );
 
   const iconButtonSize = 'large';
 
@@ -247,22 +236,25 @@ export const NavViewMenu = ({
         >
           <Stack direction="row">
             <Box sx={navIconStyle}>
-              {gitIcon}
+              <GitCompareArrows
+                color={iconColor}
+                strokeWidth={1.15}
+                style={navIconStyle}
+              />
               {viewMode !== ViewModeEnum.GitEditor && gitBadgeIndicator}
             </Box>
-            {!isRepoConnectedToRemote &&
-              viewMode !== ViewModeEnum.GitEditor && (
-                <TriangleAlert
-                  color={palette.warning.main}
-                  size={15}
-                  style={{
-                    position: 'absolute',
-                    left: 20,
-                    marginTop: 12,
-                    padding: 0,
-                  }}
-                />
-              )}
+            {!isRepoConnectedToRemote && (
+              <TriangleAlert
+                color={palette.warning.main}
+                size={9}
+                style={{
+                  position: 'absolute',
+                  right: 1,
+                  marginTop: 1,
+                  padding: 0,
+                }}
+              />
+            )}
           </Stack>
         </Tooltip>
       </IconButton>
