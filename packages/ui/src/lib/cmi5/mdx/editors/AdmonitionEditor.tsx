@@ -20,13 +20,14 @@ import {
   AccordionSummary,
   Box,
   IconButton,
+  Popover,
   SxProps,
   Tooltip,
   useTheme,
 } from '@mui/material';
 import PaletteIcon from '@mui/icons-material/Palette';
 import WidthFullIcon from '@mui/icons-material/WidthFull';
-
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
 import React, {
   useCallback,
@@ -65,6 +66,9 @@ import { BlockAppearanceForm } from '../plugins/shared/BlockAppearanceForm';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../constants/colors';
+import { useBackgroundColors } from '../../../hooks/useBackgroundColors';
+import EditIcon from '@mui/icons-material/Edit';
+import { BackgroundColorTrigger } from '../../../colors/BackgroundColorTrigger';
 
 export declare interface AdmonitionDirectiveEditorProps<
   T extends Directives = Directives,
@@ -112,7 +116,9 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   const removeNode = useLexicalNodeRemove();
   const updateMdastNode = useMdastNodeUpdater();
   const [isCollapsible, setIsCollapsible] = useState(false);
-  const [isConfiguring, setIsConfiguring] = useState(false);
+
+  const [configureAnchor, setConfigureAnchor] =
+    useState<HTMLButtonElement | null>(null);
   const [isFocused, setIsFocused] = useState(false); //editor focused
   const [isPlaceholderAllowed, setIsPlaceholderAllowed] = useState(false); //editor focused
 
@@ -125,15 +131,19 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   const [adType, setAdType] = useState<AdmonitionTypeEnum>(
     AdmonitionTypeEnum.note,
   );
-  const [backgroundColor, setBackgroundColor] = useState<string>(
-    mdastNode?.attributes?.['backgroundColor'] ?? '',
-  );
-  const [colorPickerAnchor, setColorPickerAnchor] =
-    useState<HTMLButtonElement | null>(null);
-  const [pendingColor, setPendingColor] = useState<string>(
-    mdastNode?.attributes?.['backgroundColor'] ?? '',
-  );
-  const pendingColorRef = useRef(pendingColor);
+
+  const {
+    backgroundColor,
+    colorPickerAnchor,
+    openPicker,
+    pendingColor,
+    pendingColorRef,
+    setBackgroundColor,
+    setColorPickerAnchor,
+    setOverrideColor,
+    setPendingColorAndRef,
+  } = useBackgroundColors(mdastNode?.attributes?.['backgroundColor'] ?? '');
+
   const skipNextCloseRebuildRef = useRef(false);
   const [contentWidth, setContentWidth] = useState<
     ContentWidthEnum | undefined
@@ -169,13 +179,10 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
     }
   }
 
-  const [currentSelection, activeEditor, editorInFocus, isPlayback] =
-    useCellValues(
-      currentSelection$,
-      activeEditor$,
-      editorInFocus$,
-      editorInPlayback$,
-    );
+  const [editorInFocus, isPlayback] = useCellValues(
+    editorInFocus$,
+    editorInPlayback$,
+  );
 
   /**
    * Stores expanded state in local state
@@ -193,15 +200,6 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
       removeNode();
     },
     [removeNode],
-  );
-
-  const onConfigure = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation();
-      onFocusHandler();
-      setIsConfiguring(!isConfiguring);
-    },
-    [isConfiguring],
   );
 
   const getTitle = (attributes?: any) => {
@@ -239,16 +237,10 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
         ...mdastNode,
         attributes: theAttributes,
       });
+      setConfigureAnchor(null);
     },
     [mdastNode, updateMdastNode],
   );
-
-  /**
-   *
-   */
-  const onFocusHandler = React.useCallback(() => {
-    lexicalNode.select();
-  }, [lexicalNode]);
 
   /**
    * Rebuilds the admonition node with a new background color.
@@ -326,9 +318,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   // Sync backgroundColor and contentWidth from mdastNode
   useEffect(() => {
     const bgColor = mdastNode?.attributes?.['backgroundColor'] ?? '';
-    setBackgroundColor(bgColor);
-    pendingColorRef.current = bgColor;
-    setPendingColor(bgColor);
+    setOverrideColor(bgColor);
     setContentWidth(
       mdastNode?.attributes?.['contentWidth'] as ContentWidthEnum | undefined,
     );
@@ -358,6 +348,8 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
 
     return <ExpandCircleDownIcon color={adColor} />;
   }, [adHexColor, adColor, isCollapsible]);
+
+  const isConfigureOpen = Boolean(configureAnchor);
 
   return (
     <Box
@@ -389,27 +381,6 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
             : {}),
         }}
       >
-        {isConfiguring && !isPlayback && (
-          <SelectorMainUi
-            defaultValue={defaultCollapseSel}
-            divProps={{ marginLeft: -24 }}
-            key="select-collapse"
-            isTransient={false}
-            listItemProps={{
-              color: 'primary',
-              fontSize: 'small',
-              fontWeight: 'lighter',
-            }}
-            options={[
-              'Collapse Start Open',
-              'Collapse Start Closed',
-              'No Collapse',
-            ]}
-            sxProps={{ minWidth: '100px', height: '30px' }}
-            isFormStyle={false}
-            onSelect={onSelectCollapsible}
-          />
-        )}
         <Accordion
           expanded={isCollapsible ? isOpen : true}
           onChange={onAccordionChange}
@@ -513,17 +484,14 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
             zIndex: 100,
           }}
         >
-          <Tooltip title="Background Color">
+          <Tooltip title="Edit Settings">
             <IconButton
               onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                 e.stopPropagation();
-                pendingColorRef.current = backgroundColor;
-                setPendingColor(backgroundColor);
-                setColorPickerAnchor(e.currentTarget);
+                setConfigureAnchor(e.currentTarget);
               }}
-              size="small"
             >
-              <PaletteIcon fontSize="small" />
+              <EditIcon />
             </IconButton>
           </Tooltip>
           <Tooltip title="Block Appearance">
@@ -534,10 +502,13 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
               }}
               size="small"
             >
-              <WidthFullIcon fontSize="small" />
+              <PaletteIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <SettingsIconButton onConfigure={onConfigure} />
+          <BackgroundColorTrigger
+            currentColor={backgroundColor ? { color: pendingColor } : undefined}
+            onTrigger={openPicker}
+          />
           <InsertLineReturnButton
             parentEditor={parentEditor}
             lexicalNode={lexicalNode}
@@ -546,6 +517,34 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
         </Box>
       )}
 
+      {/* Options Popover */}
+      <Popover
+        open={isConfigureOpen}
+        anchorEl={configureAnchor}
+        onClose={() => {
+          setConfigureAnchor(null);
+        }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      >
+        <SelectorMainUi
+          defaultValue={defaultCollapseSel}
+          key="select-collapse"
+          isTransient={false}
+          listItemProps={{
+            color: 'primary',
+            fontSize: 'small',
+            fontWeight: 'lighter',
+          }}
+          options={[
+            'Collapse Start Open',
+            'Collapse Start Closed',
+            'No Collapse',
+          ]}
+          sxProps={{ minWidth: '120px', height: '30px' }}
+          isFormStyle={false}
+          onSelect={onSelectCollapsible}
+        />
+      </Popover>
       {/* Background Color Popover */}
       <ColorSelectionPopover
         anchorEl={colorPickerAnchor}
@@ -577,15 +576,12 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
         lastColor={pendingColor}
         palette={SHAPE_PRESET_COLORS}
         onPickColor={(color) => {
-          pendingColorRef.current = color;
-          setPendingColor(color);
+          setPendingColorAndRef(color);
         }}
         onClear={() => {
           setColorPickerAnchor(null);
-          pendingColorRef.current = '';
           skipNextCloseRebuildRef.current = true;
-          setPendingColor('');
-          setBackgroundColor('');
+          setOverrideColor('');
           parentEditor.update(
             () => {
               const attrs = {
