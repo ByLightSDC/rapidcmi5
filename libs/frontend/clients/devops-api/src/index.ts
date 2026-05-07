@@ -916,6 +916,7 @@ export type {
   ScenarioCreate,
   ScenarioUpdate,
   ScenarioOverridesOverride,
+  ScenariosCreate1Request,
   ScenariosCreateByRangeIdRequest,
   ScenariosUpdateByRangeIdUuidRequest,
   ScenariosDeployRequest,
@@ -954,7 +955,6 @@ export type {
 
 //Enums
 export {
-  ScenariosCreate1Request,
   AwsMachineConfigInstanceTypeEnum,
   AwsMachineConfigZoneEnum,
   BackgroundJobStateEnum,

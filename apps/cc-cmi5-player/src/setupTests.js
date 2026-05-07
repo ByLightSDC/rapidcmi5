@@ -52,24 +52,14 @@ Object.defineProperty(global, 'IntersectionObserver', {
 });
 
 /** Jest does not like using router navigate in a custom hook */
-jest.mock(
-  '../../../packages/ui/src/lib/hooks/useNavigateAlias',
-  () => ({
-    useNavigateAlias: () => jest.fn(),
-  }),
-);
+jest.mock('../../../packages/ui/src/lib/hooks/useNavigateAlias', () => ({
+  useNavigateAlias: () => jest.fn(),
+}));
 
 /*
 Jest can't handle ES6 modules without turning on experimental feature
 Mocking the module is easier if you don't need to test it with jest
 */
-
-jest.mock('d3-transition', () => ({
-  __esModule: true,
-  default: 'd3-transition',
-  namedExport: jest.fn(),
-  containsCidr: () => true,
-}));
 
 jest.mock('remark-gfm', () => ({
   __esModule: true,
@@ -93,20 +83,6 @@ jest.mock('rehype-raw', () => ({
   __esModule: true,
   default: 'rehype-raw',
   namedExport: jest.fn(),
-}));
-
-jest.mock('cidr-tools', () => ({
-  __esModule: true,
-  default: 'cidr-tools',
-  namedExport: jest.fn(),
-  containsCidr: () => true,
-}));
-
-jest.mock('ip-bigint', () => ({
-  __esModule: true,
-  default: 'ip-bigint',
-  namedExport: jest.fn(),
-  stringifyIp: () => '10.10.10.10',
 }));
 
 jest.mock('ol/Map', () => ({
@@ -259,14 +235,11 @@ jest.mock('@mdxeditor/gurx', () => ({
   namedExport: jest.fn(),
 }));
 
-jest.mock(
-  '../../../packages/ui/src/lib/cmi5/mdx/state/vars',
-  () => ({
-    editorInPlayback$: false,
-    setProgress$: () => jest.fn(),
-    submitScore$: () => jest.fn(),
-  }),
-);
+jest.mock('../../../packages/ui/src/lib/cmi5/mdx/state/vars', () => ({
+  editorInPlayback$: false,
+  setProgress$: () => jest.fn(),
+  submitScore$: () => jest.fn(),
+}));
 
 jest.mock('./app/components/player/vars', () => ({
   editorInPlayback$: false,
