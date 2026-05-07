@@ -39,11 +39,11 @@ export function GitConfigForm({
   ) => void;
 }) {
   const { handleGitSetConfig } = useContext(GitContext);
-  const { isRepoConnectedToRemote, handleChangeRepoName, currentRepo } =
+  const { isRepoConnectedToRemote} =
     useContext(GitContext);
 
   const validationSchema = yup.object().shape({
-    repoRemoteUrl: GIT_URL_GROUP(),
+    remoteRepoUrl: GIT_URL_GROUP(false),
     username: NAME_GROUP_OPT,
   });
 
