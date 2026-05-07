@@ -104,7 +104,6 @@ export function generateLessonThemeStyleTag(
 ): string {
   const css = resolveLessonThemeCSS(theme);
 
-
   // Always-emitted rules — must fire regardless of lesson theme settings.
   // Image block overrides must work even when no lesson content width is set.
   const imageBaseRule = `
@@ -149,7 +148,7 @@ export function generateLessonThemeStyleTag(
   .${scopedClass} .mdxeditor-root-contenteditable {
     overflow: visible;
   }
-  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:not(:has(.paper-activity)) {
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] {
     max-width: ${css.maxWidth};
     margin-left: auto;
     margin-right: auto;
@@ -159,25 +158,7 @@ export function generateLessonThemeStyleTag(
     margin-left: auto;
     margin-right: auto;
   }
-  .${scopedClass} .mdxeditor-root-contenteditable > div > div > p:has([data-block-override]) {
-    max-width: var(--block-max-width) !important;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > [data-lexical-decorator]:has([data-block-override]) {
-    max-width: var(--block-max-width) !important;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:has(.paper-activity) {
-    width: calc(98vw - var(--panel-width));
-    max-width: calc(98vw - var(--panel-width));
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-    overflow: visible;
-  }
-  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] [data-lexical-editor="true"] [data-lexical-decorator]:not(:has(.paper-activity)) {
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] [data-lexical-editor="true"] [data-lexical-decorator] {
     max-width: none;
     margin-left: unset;
     margin-right: unset;
@@ -249,5 +230,12 @@ export function generateLessonThemeStyleTag(
     }`
     : '';
 
-  return imageBaseRule + paragraphWidthRule + alignmentRule + widthRule + blockPaddingRule + blockBaseRule;
+  return (
+    imageBaseRule +
+    paragraphWidthRule +
+    alignmentRule +
+    widthRule +
+    blockPaddingRule +
+    blockBaseRule
+  );
 }

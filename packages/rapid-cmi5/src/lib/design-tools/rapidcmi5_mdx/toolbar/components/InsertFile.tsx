@@ -3,7 +3,7 @@ import { useCellValues, usePublisher } from '@mdxeditor/gurx';
 
 import { insertActivityDirective$ } from '../../plugins/Activity';
 import { ContainerDirective } from 'mdast-util-directive';
-import { ButtonMinorUi, getDefaultData } from '@rapid-cmi5/ui';
+import { ButtonMinorUi, getDefaultContentWidth, getDefaultData } from '@rapid-cmi5/ui';
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 
 /**
@@ -28,7 +28,7 @@ export const InsertFile = ({ isDrawer }: { isDrawer?: boolean }) => {
   const handleInsert = () => {
     insertActivity({
       type: 'containerDirective',
-      attributes: {},
+      attributes: { contentWidth: getDefaultContentWidth(RC5ActivityTypeEnum.download) },
       name: 'download',
       children: [
         {

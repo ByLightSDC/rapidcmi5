@@ -1,0 +1,41 @@
+.rc5-drag-handle {
+  position: fixed;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  cursor: grab;
+  border-radius: 4px;
+  color: #aaa;
+  z-index: 100;
+  transition: opacity 0.15s, color 0.15s, background-color 0.15s;
+  opacity: 0.5;
+  user-select: none;
+  pointer-events: all;
+}
+
+.rc5-drag-handle:hover {
+  opacity: 1;
+  color: #555;
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.rc5-drag-handle:active {
+  cursor: grabbing;
+  opacity: 1;
+}
+
+.rc5-drag-drop-line {
+  position: fixed;
+  height: 3px;
+  background-color: #4a90e2;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 200;
+  display: none;
+  box-shadow: 0 0 6px rgba(74, 144, 226, 0.6);
+}
+
+.rc5-dragging-block {
+  opacity: 0.4;
+}
