@@ -337,8 +337,9 @@ export const lightTheme = createTheme({
     MuiTooltip: {
       styleOverrides: {
         arrow: {
+          color: tooltipColor,
           '&:before': {
-            color: tooltipOutline,
+            backgroundColor: tooltipColor,
             border: tooltipOutline,
           },
         },

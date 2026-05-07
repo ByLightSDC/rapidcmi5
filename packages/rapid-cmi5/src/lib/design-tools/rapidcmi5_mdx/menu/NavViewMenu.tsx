@@ -1,8 +1,5 @@
 import { Box, IconButton, Stack, Tooltip, Typography } from '@mui/material';
-import DesignServicesIcon from '@mui/icons-material/DesignServices';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
 
-import { iconButtonStyle } from '../styles/styles';
 import { useContext, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -10,17 +7,11 @@ import {
   currentViewMode,
 } from '../../../redux/courseBuilderReducer';
 import { ViewModeEnum } from '../../course-builder/CourseBuilderTypes';
-import {
-  darkTheme,
-  lightTheme,
-  setBreadCrumbVisible,
-  themeColor,
-} from '@rapid-cmi5/ui';
+import { setBreadCrumbVisible } from '@rapid-cmi5/ui';
 import {
   getSvgStyleIcon,
   StyleIconTypeEnum,
 } from '../styles/styleSvgConstants';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
 import { RC5Context } from '../contexts/RC5Context';
@@ -28,10 +19,16 @@ import { RC5Context } from '../contexts/RC5Context';
 /**
  * Icons
  */
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import { Home } from '@mui/icons-material';
+import {
+  ArrowLeft,
+  Files,
+  PanelLeft,
+  PencilRuler,
+  TriangleAlert,
+} from 'lucide-react';
+import { alpha, useTheme } from '@mui/system';
 
-const navIconStyle = { marginTop: '4px', position: 'relative' };
+const navIconStyle = { position: 'relative' as const };
 
 /**
  * Vertical nav menu for changing between MdxEditor, File Editor, and Git GUI
@@ -39,11 +36,14 @@ const navIconStyle = { marginTop: '4px', position: 'relative' };
  */
 export const NavViewMenu = ({
   showHomeButton,
+  isLeftPanelCollapsed,
+  onToggleLeftPanel,
 }: {
   showHomeButton?: boolean;
+  isLeftPanelCollapsed?: boolean;
+  onToggleLeftPanel?: () => void;
 }) => {
   const dispatch = useDispatch();
-  const themeSel = useSelector(themeColor);
   const viewMode = useSelector(currentViewMode);
   const {
     isRepoConnectedToRemote,
@@ -55,46 +55,57 @@ export const NavViewMenu = ({
   const { saveSlide } = useContext(RC5Context);
   const { promptNavAway } = useRC5Prompts();
 
-  // @ts-ignore
-  const disabledIconColor = lightTheme.header.buttonColor;
+  const theme = useTheme();
+  const { palette } = theme;
 
-  const menuIconStyle = {
-    ...iconButtonStyle,
-    padding: '4px',
-    margin: '8px',
-    marginBottom: '8px',
-    color: 'inherited',
-    borderColor: disabledIconColor,
-    borderStyle: 'solid',
-    borderWidth: '0px',
+  const primaryIconColor = palette.text.secondary;
+  const activeIconColor = palette.text.secondary;
+
+  const buildIconButtonSx = (active: boolean) => ({
+    padding: '1px',
+    margin: '3px',
     width: '36px',
     height: '36px',
-  };
+    borderRadius: '3px',
+    position: 'relative' as const,
+    backgroundColor: active
+      ? alpha(palette.secondary.main, 0.15)
+      : 'transparent',
+    transition: 'background-color 150ms ease',
+    '&:hover': {
+      backgroundColor: active
+        ? alpha(palette.secondary.main, 0.28)
+        : alpha(palette.primary.main, 0.08),
+    },
+    ...(active && {
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        left: 0,
+        top: '10%',
+        bottom: '10%',
+        width: '1.5px',
+        borderRadius: '2px',
+        backgroundColor: alpha(palette.primary.main, 0.8),
+      },
+    }),
+  });
 
-  const disabledMenuIconStyle = {
-    ...menuIconStyle,
-    borderWidth: '1px',
-  };
-
-  const gitIconDisabled = useMemo(
+  const gitIconActive = useMemo(
     () =>
       getSvgStyleIcon(StyleIconTypeEnum.GIT, {
-        color: disabledIconColor,
+        color: activeIconColor,
         fontSize: 'inherit',
       }),
-    [disabledIconColor],
+    [activeIconColor],
   );
 
   const gitIcon = useMemo(() => {
-    let iconColor = lightTheme.palette.primary.main;
-    if (themeSel === 'dark') {
-      iconColor = darkTheme.palette.primary.main;
-    }
     return getSvgStyleIcon(StyleIconTypeEnum.GIT, {
-      color: iconColor,
+      color: primaryIconColor,
       fontSize: 'inherit',
     });
-  }, [themeSel]);
+  }, [primaryIconColor]);
 
   const iconButtonSize = 'large';
 
@@ -111,66 +122,6 @@ export const NavViewMenu = ({
         direction="column"
         sx={{ position: 'absolute', right: -10, top: -4 }}
       >
-        {/* ref overkill */}
-        {/* {modifiedFiles.length > 0 && modifiedFiles.length === numStaged && (
-          <Box
-            sx={{
-              backgroundColor: 'success.main',
-              width: '16px',
-              height: '16px',
-              borderRadius: 1,
-            }}
-          >
-            <Typography
-              color="common.white"
-              sx={{
-                fontSize: '12px',
-              }}
-            >
-              {numStaged}
-            </Typography>
-          </Box>
-        )}
-        {modifiedFiles.length > 0 && modifiedFiles.length !== numStaged && (
-          <>
-            <Box
-              sx={{
-                width: '16px',
-                height: '16px',
-                borderRadius: 1,
-              }}
-            >
-              <Typography
-                color="common.white"
-                sx={{
-                  fontSize: '12px',
-                }}
-              >
-                {modifiedFiles.length}
-              </Typography>
-            </Box>
-            {numStaged > 0 && (
-              <Box
-                sx={{
-                  backgroundColor: 'success.main',
-                  width: '16px',
-                  height: '16px',
-                  borderRadius: 1,
-                }}
-              >
-                <Typography
-                  color="common.white"
-                  sx={{
-                    fontSize: '12px',
-                  }}
-                >
-                  {numStaged}
-                </Typography>
-              </Box>
-            )}
-          </>
-        )} */}
-
         {unpushedCommits > 0 && (
           <Box
             sx={{
@@ -186,7 +137,7 @@ export const NavViewMenu = ({
                 fontSize: '12px',
               }}
             >
-              {unpushedCommits}
+              {unpushedCommits > 99 ? '99+' : unpushedCommits}
             </Typography>
           </Box>
         )}
@@ -215,69 +166,63 @@ export const NavViewMenu = ({
   return (
     <Stack
       direction="column"
+      alignItems="center"
       sx={{
         width: '48px',
         height: '100%',
         minHeight: 0,
+        marginTop: '8px',
+        paddingX: 2,
       }}
       spacing={0}
     >
-      {showHomeButton && (
+      {onToggleLeftPanel && (
         <IconButton
-          aria-label="repo-selection-button"
-          data-testid="repo-selection-button"
-          color="inherit"
+          aria-label="toggle-left-panel"
+          data-testid="toggle-left-panel-button"
+          color="warning"
           size={iconButtonSize}
-          style={menuIconStyle}
-          onClick={() => {
-            if (viewMode === ViewModeEnum.Designer) {
-              saveSlide();
-              promptNavAway(ViewModeEnum.RepoSelector);
-            } else {
-              dispatch(changeViewMode(ViewModeEnum.RepoSelector));
-            }
-          }}
-          sx={{ backgroundColor: 'inherit' }}
+          sx={buildIconButtonSx(false)}
+          disableRipple
+          onClick={onToggleLeftPanel}
         >
-          <Tooltip arrow placement="right" title="All Projects">
-            {viewMode === ViewModeEnum.RepoSelector ? (
-              <div
-                style={{
-                  color: disabledIconColor,
-                }}
-              >
-                <ArrowBackIcon color="inherit" sx={navIconStyle} />
-              </div>
-            ) : (
-              <ArrowBackIcon color="primary" sx={navIconStyle} />
-            )}
+          <Tooltip
+            arrow
+            placement="right"
+            title={isLeftPanelCollapsed ? 'Expand panel' : 'Collapse panel'}
+          >
+            <PanelLeft
+              color={palette.text.hint}
+              strokeWidth={1.25}
+              style={navIconStyle}
+            />
           </Tooltip>
         </IconButton>
       )}
+
       <IconButton
         aria-label="select-design"
-        color="inherit"
+        color="warning"
         size={iconButtonSize}
-        style={
-          viewMode === ViewModeEnum.Designer
-            ? disabledMenuIconStyle
-            : menuIconStyle
-        }
+        sx={buildIconButtonSx(viewMode === ViewModeEnum.Designer)}
+        disableRipple
         onClick={() => {
           handleNavToDesigner();
         }}
       >
         <Tooltip arrow placement="right" title="Visual Designer">
           {viewMode === ViewModeEnum.Designer ? (
-            <div
-              style={{
-                color: disabledIconColor,
-              }}
-            >
-              <DesignServicesIcon color="inherit" sx={navIconStyle} />
-            </div>
+            <PencilRuler
+              color={activeIconColor}
+              strokeWidth={1.35}
+              style={navIconStyle}
+            />
           ) : (
-            <DesignServicesIcon color="primary" sx={navIconStyle} />
+            <PencilRuler
+              color={primaryIconColor}
+              strokeWidth={1.25}
+              style={navIconStyle}
+            />
           )}
         </Tooltip>
       </IconButton>
@@ -287,11 +232,8 @@ export const NavViewMenu = ({
         data-testid="code-editor-button"
         color="inherit"
         size={iconButtonSize}
-        style={
-          viewMode === ViewModeEnum.CodeEditor
-            ? disabledMenuIconStyle
-            : menuIconStyle
-        }
+        sx={buildIconButtonSx(viewMode === ViewModeEnum.CodeEditor)}
+        disableRipple
         onClick={() => {
           if (viewMode === ViewModeEnum.Designer) {
             saveSlide();
@@ -303,15 +245,17 @@ export const NavViewMenu = ({
       >
         <Tooltip arrow placement="right" title="Course Files">
           {viewMode === ViewModeEnum.CodeEditor ? (
-            <div
-              style={{
-                color: disabledIconColor,
-              }}
-            >
-              <FileCopyIcon color="inherit" sx={navIconStyle} />
-            </div>
+            <Files
+              color={activeIconColor}
+              strokeWidth={1.35}
+              style={navIconStyle}
+            />
           ) : (
-            <FileCopyIcon color="primary" sx={navIconStyle} />
+            <Files
+              color={primaryIconColor}
+              strokeWidth={1.25}
+              style={navIconStyle}
+            />
           )}
         </Tooltip>
       </IconButton>
@@ -320,11 +264,8 @@ export const NavViewMenu = ({
         data-testid="git-editor-button"
         color="inherit"
         size={iconButtonSize}
-        style={
-          viewMode === ViewModeEnum.GitEditor
-            ? disabledMenuIconStyle
-            : menuIconStyle
-        }
+        sx={buildIconButtonSx(viewMode === ViewModeEnum.GitEditor)}
+        disableRipple
         onClick={() => {
           //REF was promptGitModal();
           if (viewMode === ViewModeEnum.Designer) {
@@ -348,7 +289,7 @@ export const NavViewMenu = ({
             <Box sx={navIconStyle}>
               {viewMode === ViewModeEnum.GitEditor ? (
                 // eslint-disable-next-line react/jsx-no-useless-fragment
-                <>{gitIconDisabled}</>
+                <>{gitIconActive}</>
               ) : (
                 <>
                   {gitIcon}
@@ -358,20 +299,54 @@ export const NavViewMenu = ({
             </Box>
             {!isRepoConnectedToRemote &&
               viewMode !== ViewModeEnum.GitEditor && (
-                <WarningAmberIcon
-                  color="warning"
-                  sx={{
+                <TriangleAlert
+                  color={palette.warning.main}
+                  size={15}
+                  style={{
                     position: 'absolute',
-                    left: 22,
-                    marginTop: 1,
+                    left: 20,
+                    marginTop: 12,
                     padding: 0,
-                    fontSize: 'medium',
                   }}
                 />
               )}
           </Stack>
         </Tooltip>
       </IconButton>
+      {showHomeButton && (
+        <IconButton
+          aria-label="repo-selection-button"
+          data-testid="repo-selection-button"
+          color="inherit"
+          size={iconButtonSize}
+          sx={buildIconButtonSx(viewMode === ViewModeEnum.RepoSelector)}
+          disableRipple
+          onClick={() => {
+            if (viewMode === ViewModeEnum.Designer) {
+              saveSlide();
+              promptNavAway(ViewModeEnum.RepoSelector);
+            } else {
+              dispatch(changeViewMode(ViewModeEnum.RepoSelector));
+            }
+          }}
+        >
+          <Tooltip arrow placement="right" title="All Projects">
+            {viewMode === ViewModeEnum.RepoSelector ? (
+              <ArrowLeft
+                color={activeIconColor}
+                strokeWidth={1.35}
+                style={navIconStyle}
+              />
+            ) : (
+              <ArrowLeft
+                color={primaryIconColor}
+                strokeWidth={1.25}
+                style={navIconStyle}
+              />
+            )}
+          </Tooltip>
+        </IconButton>
+      )}
     </Stack>
   );
 };
