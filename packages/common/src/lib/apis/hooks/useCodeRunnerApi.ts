@@ -6,6 +6,13 @@ import {
   ExecuteCodeResponseApi,
   LanguagesResponseApi,
 } from '../codeRunnerContract';
+import {
+  CodeRunnerApiError,
+  handleExecuteCode,
+  handleGetLanguages,
+} from '../utils/codeRunner';
+
+export { CodeRunnerApiError };
 
 type AuthType = 'Basic' | 'Bearer';
 // We will attempt to move to Tan stack React Query V5 in the future
@@ -30,26 +37,13 @@ export function useCodeRunnerApi(
   const getLanguagesCb =
     useCallback(async (): Promise<LanguagesResponseApi> => {
       if (!apiClient) throw Error('API client is not set');
-      const response = await apiClient.listLanguages();
-
-      if (response.status === 200) {
-        const data = response.body;
-
-        return data;
-      }
-
-      throw new CodeRunnerApiError('Failed to get languages', response.status);
+      return await handleGetLanguages(apiClient);
     }, [apiClient]);
 
   const executeCodeCb = useCallback(
     async (question: ExecuteCodeBodyApi): Promise<ExecuteCodeResponseApi> => {
       if (!apiClient) throw Error('API client is not set');
-
-      const response = await apiClient.execute({ body: question });
-      if (response.status === 200) {
-        return response.body;
-      }
-      throw new CodeRunnerApiError('Failed to execute code', response.status);
+      return await handleExecuteCode(question, apiClient);
     },
     [apiClient],
   );
@@ -58,14 +52,4 @@ export function useCodeRunnerApi(
   const getLanguages = apiClient ? getLanguagesCb : undefined;
 
   return { getLanguages, executeCode };
-}
-
-export class CodeRunnerApiError extends Error {
-  constructor(
-    message: string,
-    public readonly status: number,
-  ) {
-    super(`${message} (status: ${status})`);
-    this.name = 'CodeRunnerApiError';
-  }
 }

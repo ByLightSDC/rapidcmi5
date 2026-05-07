@@ -1,6 +1,7 @@
+import { join } from 'path';
 import Store from 'electron-store';
-import axios from 'axios';
-import { safeStorage } from 'electron';
+import { BrowserWindow, safeStorage } from 'electron';
+import * as oidc from 'openid-client';
 
 import {
   Credentials,
@@ -8,6 +9,7 @@ import {
   SSOConfig,
   TokenResponse,
 } from '@rapid-cmi5/cmi5-build-common';
+import { STANDARD_SPLASH } from './loginPortal';
 
 interface StoreSchema {
   ssoConfig: SSOConfig | null;
@@ -27,12 +29,22 @@ export const store = new Store<StoreSchema>({
   },
 });
 
-// No custom httpsAgent needed — applyCustomCerts() patches TLS globally
-const http = axios.create({
-  headers: {
-    'Content-Type': 'application/x-www-form-urlencoded',
-  },
-});
+let _cachedOidc: { key: string; config: oidc.Configuration } | null = null;
+
+async function getOidcConfig(): Promise<oidc.Configuration> {
+  const ssoConfig = store.get('ssoConfig') as SSOConfig | null;
+  if (!ssoConfig) throw new Error('SSO config not found');
+
+  const key = `${ssoConfig.keycloakUrl}|${ssoConfig.keycloakRealm}|${ssoConfig.keycloakClientId}`;
+  if (_cachedOidc?.key === key) return _cachedOidc.config;
+
+  const baseUrl = ssoConfig.keycloakUrl.replace(/\/$/, '');
+  const issuerUrl = new URL(`${baseUrl}/realms/${ssoConfig.keycloakRealm}`);
+
+  const config = await oidc.discovery(issuerUrl, ssoConfig.keycloakClientId);
+  _cachedOidc = { key, config };
+  return config;
+}
 
 export function encryptCredentials(credentials: Credentials): string {
   if (!safeStorage.isEncryptionAvailable()) {
@@ -76,98 +88,126 @@ export function decryptToken(encrypted: string): string | null {
   }
 }
 
-export async function loginWithRefreshOrPassword(
+export async function loginWithRefreshOrRedirect(
   currentRefreshToken?: string | null,
 ): Promise<TokenResponse> {
   if (currentRefreshToken) {
     try {
-      const tokens = await refreshToken(currentRefreshToken);
-      return tokens;
+      return await refreshToken(currentRefreshToken);
     } catch (err) {
       console.warn(
-        'Refresh token failed, falling back to password login:',
+        'Refresh token failed, falling back to redirect login:',
         err,
       );
+      store.delete('refreshToken');
     }
   }
 
-  return loginSSO();
+  return loginSSORedirect();
 }
 
-export async function loginSSO(): Promise<TokenResponse> {
-  const config: SSOConfig | null = store.get('ssoConfig') as SSOConfig | null;
-  const credsEnc: string | null = store.get('ssoCredentials') as string | null;
+export async function loginSSORedirect(): Promise<TokenResponse> {
+  const ssoConfig = store.get('ssoConfig') as SSOConfig | null;
 
-  if (!credsEnc) {
-    throw new Error('Encrypted credentials not found');
-  }
-  const creds = decryptCredentials(credsEnc);
+  if (!ssoConfig) throw new Error('SSO config not found');
+  if (!ssoConfig.redirectUrl)
+    throw new Error('SSO redirect URL is not configured');
 
-  if (!config) {
-    throw new Error('SSO config not found');
-  }
+  const redirectUri = ssoConfig.redirectUrl;
+  const config = await getOidcConfig();
 
-  if (!creds?.username || !creds?.password) {
-    throw new Error('Username or password not found');
-  }
+  const codeVerifier = oidc.randomPKCECodeVerifier();
+  const codeChallenge = await oidc.calculatePKCECodeChallenge(codeVerifier);
+  const state = oidc.randomState();
 
-  const tokenUrl = new URL(
-    `realms/${config.keycloakRealm}/protocol/openid-connect/token`,
-    config.keycloakUrl,
-  ).toString();
-
-  const params = new URLSearchParams({
-    grant_type: 'password',
-    client_id: config.keycloakClientId,
-    username: creds.username,
-    password: creds.password,
+  const authUrl = oidc.buildAuthorizationUrl(config, {
+    redirect_uri: redirectUri,
+    scope: ssoConfig.keycloakScope || 'openid',
+    code_challenge: codeChallenge,
+    code_challenge_method: 'S256',
+    state,
   });
 
-  const { data } = await http.post<TokenResponse>(tokenUrl, params.toString());
-  return data;
+  return new Promise((resolve, reject) => {
+    let handled = false;
+
+    const win = new BrowserWindow({
+      width: 800,
+      height: 600,
+      title: 'Sign In',
+      icon: join(
+        __dirname,
+        'assets',
+        process.platform === 'win32' ? 'icon.ico' : 'icon.png',
+      ),
+      autoHideMenuBar: true,
+      backgroundColor: '#0f172a',
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true,
+      },
+    });
+
+    // Keycloak requests a client certificate for CAC login.
+    // Only update the title — do NOT loadURL here or it cancels the auth navigation.
+    // The dark backgroundColor keeps the window from looking broken while the OS picker is open.
+    win.webContents.on('select-client-certificate', () => {
+      win.setTitle('CAC Authentication – Select Your Certificate');
+    });
+
+    const handleRedirect = async (url: string) => {
+      if (handled || !url.startsWith(redirectUri)) return;
+      handled = true;
+      win.close();
+
+      try {
+        const tokens = await oidc.authorizationCodeGrant(
+          config,
+          new URL(url),
+          {
+            pkceCodeVerifier: codeVerifier,
+            expectedState: state,
+          },
+          { redirect_uri: redirectUri },
+        );
+        resolve(tokens as unknown as TokenResponse);
+      } catch (err) {
+        reject(err as Error);
+      }
+    };
+
+    // will-redirect fires before the browser makes a request to the redirect URI —
+    // we capture the code and close the window without ever loading the web app.
+    win.webContents.on('will-redirect', (event, url) => {
+      if (url.startsWith(redirectUri)) {
+        event.preventDefault();
+        handleRedirect(url);
+      }
+    });
+
+    win.on('closed', () => {
+      if (!handled) reject(new Error('Login cancelled'));
+    });
+
+    // Show generic splash, then navigate to auth URL once it renders.
+    win.loadURL(
+      `data:text/html;charset=utf-8,${encodeURIComponent(STANDARD_SPLASH)}`,
+    );
+    win.webContents.once('did-finish-load', () => {
+      win.webContents.loadURL(authUrl.href);
+    });
+  });
 }
 
-export async function refreshToken(
-  refreshToken: string,
-): Promise<TokenResponse> {
-  const config: SSOConfig | null = store.get('ssoConfig') as SSOConfig | null;
-
-  if (!config) {
-    throw new Error('SSO config not found');
-  }
-
-  const tokenUrl = new URL(
-    `realms/${config.keycloakRealm}/protocol/openid-connect/token`,
-    config.keycloakUrl,
-  ).toString();
-
-  const params = new URLSearchParams({
-    grant_type: 'refresh_token',
-    client_id: config.keycloakClientId,
-    refresh_token: refreshToken,
-  });
-
-  const { data } = await http.post<TokenResponse>(tokenUrl, params.toString());
-  return data;
+export async function refreshToken(token: string): Promise<TokenResponse> {
+  const config = await getOidcConfig();
+  const tokens = await oidc.refreshTokenGrant(config, token);
+  return tokens as unknown as TokenResponse;
 }
 
-export async function logoutSSO(refreshToken: string): Promise<void> {
-  const config: SSOConfig | null = store.get('ssoConfig') as SSOConfig | null;
-
-  if (!config) {
-    throw new Error('SSO config not found');
-  }
-
-  const logoutUrl = new URL(
-    `realms/${config.keycloakRealm}/protocol/openid-connect/logout`,
-    config.keycloakUrl,
-  ).toString();
-
-  const params = new URLSearchParams({
-    client_id: config.keycloakClientId,
-    refresh_token: refreshToken,
-  });
-
-  await http.post(logoutUrl, params.toString());
+export async function logoutSSO(token: string): Promise<void> {
+  const config = await getOidcConfig();
+  await oidc.tokenRevocation(config, token);
   store.delete('ssoCredentials');
+  store.delete('refreshToken');
 }

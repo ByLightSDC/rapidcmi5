@@ -24,17 +24,8 @@ export const ipc = {
       projectName,
       createAuMappings,
     ),
-  testInPlayer: (
-    auJson: string,
-    playerUrl: string,
-    configDestPath: string,
-  ) =>
-    ipcRenderer.invoke(
-      'cmi5:testInPlayer',
-      auJson,
-      playerUrl,
-      configDestPath,
-    ),
+  testInPlayer: (auJson: string, playerUrl: string, configDestPath: string) =>
+    ipcRenderer.invoke('cmi5:testInPlayer', auJson, playerUrl, configDestPath),
 };
 
 contextBridge.exposeInMainWorld('ipc', ipc);
@@ -130,8 +121,10 @@ export const fsApi = {
     ipcRenderer.invoke('fs:getStashStatus', path),
   chooseProject: () => ipcRenderer.invoke('fs:chooseProject'),
   getRecentProjects: () => ipcRenderer.invoke('fs:getRecentProjects'),
-  removeRecentProject: (id: string) => ipcRenderer.invoke('fs:removeRecentProject', id),
-  addRecentProject: (id: string) => ipcRenderer.invoke('fs:addRecentProject', id),
+  removeRecentProject: (id: string) =>
+    ipcRenderer.invoke('fs:removeRecentProject', id),
+  addRecentProject: (id: string) =>
+    ipcRenderer.invoke('fs:addRecentProject', id),
   readPlayerConfig: () => ipcRenderer.invoke('fs:readPlayerConfig'),
   writePlayerConfig: (content: string) =>
     ipcRenderer.invoke('fs:writePlayerConfig', content),
@@ -163,6 +156,53 @@ export const userSettingsApi = {
 };
 
 contextBridge.exposeInMainWorld('userSettingsApi', userSettingsApi);
+
+export const rangeApi = {
+  // Scenario
+  fetchScenario: (baseUrl: string, token: string, uuid: string) =>
+    ipcRenderer.invoke('rangeApi:fetchScenario', baseUrl, token, uuid),
+  listScenarios: (baseUrl: string, token: string, query: object) =>
+    ipcRenderer.invoke('rangeApi:listScenarios', baseUrl, token, query),
+  processAu: (baseUrl: string, token: string, au: object, blockId: string) =>
+    ipcRenderer.invoke('rangeApi:processAu', baseUrl, token, au, blockId),
+  // Code Runner
+  listLanguages: (
+    baseUrl: string,
+    token: string,
+    authType: 'Basic' | 'Bearer',
+  ) => ipcRenderer.invoke('rangeApi:listLanguages', baseUrl, token, authType),
+  executeCode: (
+    baseUrl: string,
+    token: string,
+    authType: 'Basic' | 'Bearer',
+    body: object,
+  ) =>
+    ipcRenderer.invoke('rangeApi:executeCode', baseUrl, token, authType, body),
+  // Quiz Bank
+  searchQuestions: (
+    baseUrl: string,
+    token: string,
+    query: string,
+    page: number,
+    limit: number,
+    activityType?: string,
+  ) =>
+    ipcRenderer.invoke(
+      'rangeApi:searchQuestions',
+      baseUrl,
+      token,
+      query,
+      page,
+      limit,
+      activityType,
+    ),
+  addQuestion: (baseUrl: string, token: string, body: object) =>
+    ipcRenderer.invoke('rangeApi:addQuestion', baseUrl, token, body),
+  deleteQuestion: (baseUrl: string, token: string, uuid: string) =>
+    ipcRenderer.invoke('rangeApi:deleteQuestion', baseUrl, token, uuid),
+};
+
+contextBridge.exposeInMainWorld('rangeApi', rangeApi);
 
 async function normalizeData(data: any): Promise<string | Uint8Array> {
   if (typeof data === 'string') return data;
