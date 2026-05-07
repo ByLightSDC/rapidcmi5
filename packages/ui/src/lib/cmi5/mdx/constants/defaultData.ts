@@ -254,9 +254,9 @@ export const getDefaultData = (activity: RC5ActivityTypeEnum) => {
 export const getDefaultContentWidth = (activity: RC5ActivityTypeEnum) => {
   switch (activity) {
     case RC5ActivityTypeEnum.scenario:
-      return ContentWidthEnum.Large;
+      return ContentWidthEnum.Medium;
     case RC5ActivityTypeEnum.consoles:
-      return ContentWidthEnum.Large;
+      return ContentWidthEnum.Medium;
     case RC5ActivityTypeEnum.quiz:
       return ContentWidthEnum.Medium;
     case RC5ActivityTypeEnum.ctf:

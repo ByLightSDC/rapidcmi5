@@ -69,7 +69,7 @@ export const ActivityPlayback: React.FC<
 
   const muiTheme = useTheme();
   const { lessonTheme } = useContext(LessonThemeContext);
-  const { innerSx, innerActivitySx, outerSx, outerStyle } = useLessonStyles(
+  const { innerActivitySx, outerSx, outerStyle } = useLessonStyles(
     lessonTheme,
     mdastNode?.attributes?.contentWidth,
     maxFormWidths.downloadsEditor,

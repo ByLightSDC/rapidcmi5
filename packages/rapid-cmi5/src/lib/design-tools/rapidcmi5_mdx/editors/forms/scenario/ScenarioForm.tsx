@@ -50,6 +50,7 @@ export const ScenarioForm = ({
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
   const { GetScenariosForm, fetchScenario } = useRapidCmi5Opts();
+  const gridSize = 12;
 
   const validationSchema = yup.object().shape({
     uuid: UUID_GROUP,
@@ -97,7 +98,7 @@ export const ScenarioForm = ({
     return (
       // <Grid container>
       <>
-        <Grid size={11}>
+        <Grid size={gridSize}>
           <Typography variant="body2">
             This activity will present participants with console access to a
             deployed scenario. If <b>Prompt Student for Class Id</b> is
@@ -113,7 +114,7 @@ export const ScenarioForm = ({
             scenario will be automatically deployed.
           </Typography>
         </Grid>
-        <Grid size={11}>
+        <Grid size={gridSize}>
           <Alert severity="warning" sx={{ maxWidth: '640px' }}>
             This activity requires Basic AUTH authentication and cannot be used
             in conjunction with a Team Exercise Scenario which authenticates via
@@ -121,7 +122,7 @@ export const ScenarioForm = ({
           </Alert>
         </Grid>
         {GetScenariosForm ? (
-          <Grid size={11}>
+          <Grid size={gridSize}>
             <GetScenariosForm
               submitForm={onApplyScenario}
               formType={crudType}
@@ -167,7 +168,7 @@ export const ScenarioForm = ({
           </>
         )}
 
-        <Grid size={2.8}>
+        <Grid size={3.2}>
           <FormControlSelectField
             control={control}
             name={'moveOnCriteria'}
@@ -210,7 +211,7 @@ export const ScenarioForm = ({
         {/* <Grid item xs={11.5}>
           <KSATsFieldGroup formMethods={formMethods} crudType={crudType} />
         </Grid> */}
-        <Grid size={11}>
+        <Grid size={12}>
           <LrsHeaderWithDetails activityType={RC5ActivityTypeEnum.scenario} />
         </Grid>
       </>
