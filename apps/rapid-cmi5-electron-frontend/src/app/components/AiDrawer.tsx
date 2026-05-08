@@ -1,10 +1,17 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import {
+  forwardRef,
+  type PointerEvent as ReactPointerEvent,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import '@xterm/xterm/css/xterm.css';
 import {
   Box,
-  Drawer,
   IconButton,
   LinearProgress,
   Tab,
@@ -63,7 +70,6 @@ type PanelMode = 'claude' | 'codex' | 'terminal';
 type SessionStatus = 'starting' | 'running' | 'exited' | 'error';
 
 const STORAGE_KEY_MODE = 'aiDrawer.mode';
-const DRAWER_WIDTH = 520;
 
 const THINKING_CLEAR_DEBOUNCE_MS = 600;
 
@@ -201,9 +207,18 @@ interface AiDrawerProps {
   onClose: () => void;
   initialMode?: PanelMode;
   onThinkingChange?: (thinking: boolean) => void;
+  onResizeStart?: (event: ReactPointerEvent<HTMLDivElement>) => void;
+  resizeToken?: number;
 }
 
-export default function AiDrawer({ open, onClose, initialMode, onThinkingChange }: AiDrawerProps) {
+export default function AiDrawer({
+  open,
+  onClose,
+  initialMode,
+  onThinkingChange,
+  onResizeStart,
+  resizeToken,
+}: AiDrawerProps) {
   const [mode, setMode] = useState<PanelMode>(() =>
     initialMode ?? readStoredMode('claude'),
   );
@@ -244,20 +259,30 @@ export default function AiDrawer({ open, onClose, initialMode, onThinkingChange 
   }, [open, mode]);
 
   useEffect(() => {
+    if (!open || !openedModes.has(mode)) return;
+    const fitTimer = setTimeout(() => {
+      const activeRef =
+        mode === 'claude' ? claudeRef :
+        mode === 'codex'  ? codexRef  : terminalRef;
+      activeRef.current?.fitNow();
+    }, 0);
+
+    return () => clearTimeout(fitTimer);
+  }, [mode, open, openedModes, resizeToken]);
+
+  useEffect(() => {
     try { localStorage.setItem(STORAGE_KEY_MODE, mode); } catch { /* ignore */ }
   }, [mode]);
 
-  // Call fit exactly once after the drawer finishes its open animation.
-  // We listen for transitionend on the drawer paper element so we don't
-  // depend on a hardcoded timeout that may be too short or too long.
+  // Call fit exactly once after the panel finishes its open animation.
+  // We listen for transitionend so we don't depend on a hardcoded timeout.
   useEffect(() => {
     if (!open) return;
     const paper = drawerPaperRef.current;
     if (!paper) return;
 
     const onTransitionEnd = (e: TransitionEvent) => {
-      // The drawer paper transitions 'transform' — ignore unrelated transitions
-      // (e.g. opacity on child elements).
+      // Ignore child transitions, such as opacity on the loading indicator.
       if (e.target !== paper) return;
       const activeRef =
         mode === 'claude' ? claudeRef :
@@ -307,25 +332,54 @@ export default function AiDrawer({ open, onClose, initialMode, onThinkingChange 
   );
 
   return (
-    <Drawer
-      anchor="right"
-      open={open}
-      variant="persistent"
-      PaperProps={{ ref: drawerPaperRef }}
+    <Box
+      ref={drawerPaperRef}
+      component="aside"
+      aria-hidden={!open}
       sx={{
-        width: open ? DRAWER_WIDTH : 0,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: DRAWER_WIDTH,
-          boxSizing: 'border-box',
-          display: 'flex',
-          flexDirection: 'column',
-          bgcolor: '#1e1e1e',
-          borderLeft: '1px solid #333',
-          overflow: 'hidden',
-        },
+        height: '100%',
+        minHeight: 0,
+        width: '100%',
+        position: 'relative',
+        boxSizing: 'border-box',
+        display: 'flex',
+        flexDirection: 'column',
+        bgcolor: '#1e1e1e',
+        borderTop: open ? '1px solid #333' : 0,
+        overflow: 'hidden',
+        transition: (theme) =>
+          theme.transitions.create(['border-width'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+          }),
       }}
     >
+      <Box
+        role="separator"
+        aria-orientation="horizontal"
+        aria-label="Resize AI terminal"
+        onPointerDown={onResizeStart}
+        sx={{
+          flex: '0 0 6px',
+          cursor: 'row-resize',
+          bgcolor: '#252526',
+          borderBottom: '1px solid #333',
+          '&:hover': {
+            bgcolor: '#333',
+          },
+          '&::before': {
+            content: '""',
+            display: 'block',
+            width: 40,
+            height: 2,
+            mx: 'auto',
+            mt: '2px',
+            borderRadius: 1,
+            bgcolor: '#666',
+          },
+        }}
+      />
+
       {/* Header */}
       <Box
         sx={{
@@ -438,6 +492,6 @@ export default function AiDrawer({ open, onClose, initialMode, onThinkingChange 
           </Box>
         )}
       </Box>
-    </Drawer>
+    </Box>
   );
 }

@@ -53,7 +53,6 @@ import { InsertAccordion } from './components/InsertAccordion';
 import { InsertAudio } from './components/InsertAudio';
 import { InsertAnimation } from './components/InsertAnimation';
 import { InsertBlockMenu } from './components/InsertBlockMenu';
-import { InsertAiPanel } from './components/InsertAiPanel';
 import { InsertCodeBlock } from './components/InsertCodeBlock';
 import { InsertFile } from './components/InsertFile';
 import { InsertGrid } from './components/InsertGrid';
@@ -61,7 +60,6 @@ import { InsertImage } from './components/InsertImage';
 import { InsertSteps } from './components/InsertSteps';
 import { InsertTabs } from './components/InsertTabs';
 import { InsertVideo } from './components/InsertVideo';
-//REF import { InsertLayoutBox } from './components/InsertLayoutBox';
 import { InsertLayoutBox } from './components/InsertLayoutBox';
 import { InsertLink } from './components/InsertLink';
 import { InsertThematicBreak } from './components/InsertThematicBreak';
@@ -180,7 +178,7 @@ export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5
         // avoid partial display
         setMinExtraToolsWidth(
           Math.floor((extraWidth - moreTextToolWidth) / toolIconWidth) *
-            toolIconWidth,
+          toolIconWidth,
         );
         setMaxExtraToolsWidth(
           Math.floor(extraWidth / toolIconWidth) * toolIconWidth,
@@ -325,15 +323,14 @@ export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5
                   <LessonStyleButton />
                   <InsertAnimation />
                   <InsertBlockMenu />
-                  <InsertAiPanel />
                 </Stack>
               </Stack>
             </Stack>
           )}
           {(viewmode === 'source' ||
             (viewmode === 'rich-text' && isPlayback)) && (
-            <Box sx={{ minHeight: '32px' }}></Box>
-          )}
+              <Box sx={{ minHeight: '32px' }}></Box>
+            )}
           <Stack
             direction="row"
             spacing={1}

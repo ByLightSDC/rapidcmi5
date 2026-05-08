@@ -11,7 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 
 /* Icons */
-import SettingsIcon from '@mui/icons-material/Settings';
+import { Astroid, Settings, SquareTerminal } from 'lucide-react';
 
 import UserInfoBox from './navbar/UserInfoBox';
 import { Stack } from '@mui/material';
@@ -20,10 +20,33 @@ import { Stack } from '@mui/material';
 const appsKey = 0;
 const settingsKey = 1;
 
-export default function AppHeader() {
+interface AppHeaderProps {
+  aiOpen?: boolean;
+  onAiToggle?: () => void;
+  terminalOpen?: boolean;
+  onTerminalToggle?: () => void;
+}
+
+export default function AppHeader({
+  aiOpen = false,
+  onAiToggle,
+  terminalOpen = false,
+  onTerminalToggle,
+}: AppHeaderProps) {
+
+
   const showAppHeader = useSelector(appHeaderVisible);
   const [settingsMenuAnchor, setSettingsMenuAnchor] =
     React.useState<null | HTMLElement>(null);
+
+  const handleOpenTerminal = () => {
+    if (aiOpen && onAiToggle) onAiToggle()
+    if (onTerminalToggle) onTerminalToggle()
+  }
+  const handleOpenAi = () => {
+    if (terminalOpen && onTerminalToggle) onTerminalToggle()
+    if (onAiToggle) onAiToggle()
+  }
 
   const onAppIconClick = (iconKey: number, optionIndex?: number) => {
     switch (iconKey) {
@@ -94,7 +117,7 @@ export default function AppHeader() {
             borderBottomColor: 'divider',
             display: 'flex',
             alignItems: 'center',
-            //px: 1,
+            px: 1,
           }}
         >
           {/* Left section - Logo and Dashboard Menu */}
@@ -115,11 +138,13 @@ export default function AppHeader() {
 
           {/* Right section - Settings and User */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+
             <IconButton
               aria-label="user-settings"
               id="settings-menu-anchor"
               onClick={() => onAppIconClick(settingsKey)}
               size="small"
+              disableTouchRipple
               sx={{
                 color: (theme: any) => `${theme.header.buttonColor}`,
                 borderRadius: '4px',
@@ -136,7 +161,7 @@ export default function AppHeader() {
                 title="User Settings"
                 placement="bottom"
               >
-                <SettingsIcon fontSize="small" />
+                <Settings fontSize="small" />
               </Tooltip>
             </IconButton>
 
@@ -145,6 +170,64 @@ export default function AppHeader() {
               onClose={() => setSettingsMenuAnchor(null)}
             />
           </Box>
+
+
+          <IconButton
+            aria-label="terminal"
+            aria-pressed={terminalOpen}
+            disableTouchRipple
+            onClick={handleOpenTerminal}
+            disabled={!onTerminalToggle}
+            size="small"
+            sx={{
+              color: (theme: any) => `${theme.header.buttonColor}`,
+              borderRadius: '4px',
+              backgroundColor: terminalOpen
+                ? 'action.selected'
+                : 'transparent',
+              '&:hover': {
+                backgroundColor: 'action.hover',
+                color: (theme: any) => `${theme.header.hoverColor}`,
+              },
+            }}
+          >
+            <Tooltip
+              arrow
+              enterDelay={500}
+              enterNextDelay={500}
+              title={terminalOpen ? 'Close Terminal' : 'Open Terminal'}
+              placement="bottom"
+            >
+              <SquareTerminal />
+            </Tooltip>
+          </IconButton>
+          <IconButton
+            aria-label="ai-tools"
+            aria-pressed={aiOpen}
+            disableTouchRipple
+            onClick={handleOpenAi}
+            disabled={!onAiToggle}
+            size="small"
+            sx={{
+              color: (theme: any) => `${theme.header.buttonColor}`,
+              borderRadius: '4px',
+              backgroundColor: aiOpen ? 'action.selected' : 'transparent',
+              '&:hover': {
+                backgroundColor: 'action.hover',
+                color: (theme: any) => `${theme.header.hoverColor}`,
+              },
+            }}
+          >
+            <Tooltip
+              arrow
+              enterDelay={500}
+              enterNextDelay={500}
+              title={aiOpen ? 'Close AI Tools' : 'Open AI Tools'}
+              placement="bottom"
+            >
+              <Astroid />
+            </Tooltip>
+          </IconButton>
         </Box>
       )}
     </>

@@ -1,4 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { BrowserRouter as RouterWrapper } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -15,6 +19,12 @@ import { NotificationsProvider } from '@toolpad/core';
 import CssBaseline from '@mui/material/CssBaseline';
 import Paper from '@mui/material/Paper';
 import { ThemeProvider } from '@mui/material';
+import Box from '@mui/material/Box';
+import {
+  Panel,
+  PanelGroup,
+  PanelResizeHandle,
+} from 'react-resizable-panels';
 
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -24,8 +34,9 @@ import { lightTheme } from './styles/muiTheme';
 import UserConfig from './contexts/UserConfigContext';
 import Auth from './contexts/AuthContext';
 import { RapidCmi5Wrapper } from './RapidCmi5Wrapper';
-import AiDrawer from './AiDrawer';
 import type { AiPanelMode } from '@rapid-cmi5/react-editor';
+import CodingAgentsPanel from './components/terminal/CodingAgentsPanel';
+import TerminalPanel from './components/terminal/TerminalPanel';
 
 const isElectron = typeof window !== 'undefined' && !!window.claudeApi;
 
@@ -34,12 +45,19 @@ export default function App() {
   const theme = useSelector(themeColor);
 
   const [aiOpen, setAiOpen] = useState(false);
-  const [aiMode, setAiMode] = useState<AiPanelMode>('claude');
+  const [terminalOpen, setTerminalOpen] = useState(false);
   const [aiThinking, setAiThinking] = useState(false);
 
-  const handleAiClick = useCallback((mode: AiPanelMode) => {
-    setAiMode(mode);
+  const handleAiClick = useCallback((_mode: AiPanelMode) => {
     setAiOpen(true);
+  }, []);
+
+  const handleAiToggle = useCallback(() => {
+    setAiOpen((open) => !open);
+  }, []);
+
+  const handleTerminalToggle = useCallback(() => {
+    setTerminalOpen((open) => !open);
   }, []);
 
   useEffect(() => {
@@ -82,27 +100,87 @@ export default function App() {
                   <TimePickerProvider>
                     <UserConfig>
                       <Auth>
-                        <AppHeader />
+                        <AppHeader
+                          aiOpen={aiOpen}
+                          onAiToggle={isElectron ? handleAiToggle : undefined}
+                          terminalOpen={terminalOpen}
+                          onTerminalToggle={
+                            isElectron ? handleTerminalToggle : undefined
+                          }
+                        />
 
                         <main
                           id="app-routes"
                           style={{
                             display: 'flex',
+                            flex: '1 1 auto',
                             width: '100%',
-                            height: '100%',
+                            minHeight: 0,
                             overflow: 'hidden',
                           }}
                         >
-                          <RapidCmi5Wrapper
-                            onAiClick={isElectron ? handleAiClick : undefined}
-                            aiThinking={isElectron ? aiThinking : false}
-                          />
+                          <PanelGroup
+                            direction="horizontal"
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              minWidth: 0,
+                              minHeight: 0,
+                            }}
+                          >
+                            <Panel style={{ overflow: 'hidden' }}>
+                              <Box
+                                sx={{
+                                  minWidth: 0,
+                                  height: '100%',
+                                  overflow: 'hidden',
+                                  '& > *': {
+                                    width: '100%',
+                                    height: '100%',
+                                  },
+                                }}
+                              >
+                                <RapidCmi5Wrapper
+                                  onAiClick={
+                                    isElectron ? handleAiClick : undefined
+                                  }
+                                  aiThinking={isElectron ? aiThinking : false}
+                                />
+                              </Box>
+                            </Panel>
+                            {isElectron && aiOpen && (
+                              <>
+                                <PanelResizeHandle
+                                  style={{
+                                    width: 1,
+                                    backgroundColor:
+                                      theme === 'dark'
+                                        ? darkTheme.palette.primary.main
+                                        : lightTheme.palette.primary.main,
+                                    opacity: 0.45,
+                                    cursor: 'col-resize',
+                                  }}
+                                />
+                                <Panel
+                                  defaultSize={32}
+                                  minSize={18}
+                                  maxSize={55}
+                                  style={{ overflow: 'hidden' }}
+                                >
+                                  <CodingAgentsPanel
+                                    open={aiOpen}
+                                    onClose={() => setAiOpen(false)}
+                                    onThinkingChange={setAiThinking}
+                                  />
+                                </Panel>
+                              </>
+                            )}
+                          </PanelGroup>
                           {isElectron && (
-                            <AiDrawer
-                              open={aiOpen}
-                              onClose={() => setAiOpen(false)}
-                              initialMode={aiMode}
-                              onThinkingChange={setAiThinking}
+                            <TerminalPanel
+                              open={terminalOpen}
+                              onOpenChange={setTerminalOpen}
+                              showFloatingButton={false}
                             />
                           )}
                         </main>
