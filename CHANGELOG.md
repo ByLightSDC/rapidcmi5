@@ -1,3 +1,20 @@
+## 0.13.0 (2026-05-08)
+
+### 🚀 Features
+
+- Add slides improvements ([bf074fa](https://github.com/ByLightSDC/rapidcmi5/commit/bf074fa))
+- CAC Based SSO ([237093f](https://github.com/ByLightSDC/rapidcmi5/commit/237093f))
+- Improve nav panel and add in collapse ([f3d0580](https://github.com/ByLightSDC/rapidcmi5/commit/f3d0580))
+- Added in coding agent integrations ([#148](https://github.com/ByLightSDC/rapidcmi5/issues/148))
+
+### 🩹 Fixes
+
+- Use editor root instead of document for mouse down events ([#149](https://github.com/ByLightSDC/rapidcmi5/pull/149))
+
+### ❤️ Thank You
+
+- Aaron Crawford @aaiirr123
+
 ## 0.12.4 (2026-04-28)
 
 This was a version bump only, there were no code changes.
