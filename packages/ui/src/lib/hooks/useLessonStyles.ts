@@ -25,13 +25,7 @@ import { useGutterRight } from '../cmi5/mdx/plugins/shared/useGutterRight';
 import { useSignalEffect } from '@preact/signals-react';
 import { maxSlideWidth$ } from '../cmi5/mdx';
 
-export const useLessonStyles = (
-  lessonTheme: LessonTheme | undefined,
-  overrideContentWidthStr?: ContentWidthEnum,
-  maxWidth?: number, //FUTURE
-  backgroundColor?: string,
-  isPlayback?: boolean,
-): {
+type UseLessonStylesReturn = {
   blockAppearanceOpen: boolean;
   blockPadding: string;
   borderColor: string;
@@ -45,7 +39,15 @@ export const useLessonStyles = (
   gutterRight: string;
   setBlockAppearanceOpen: Dispatch<SetStateAction<boolean>>;
   setContentWidth: Dispatch<SetStateAction<ContentWidthEnum | undefined>>;
-} => {
+};
+
+export const useLessonStyles = (
+  lessonTheme: LessonTheme | undefined,
+  overrideContentWidthStr?: ContentWidthEnum,
+  maxWidth?: number, //FUTURE
+  backgroundColor?: string,
+  isPlayback?: boolean,
+): UseLessonStylesReturn => {
   const muiTheme = useTheme();
   const activityAlign =
     lessonTheme?.defaultActivityAlignment || DefaultAlignmentEnum.Center;
