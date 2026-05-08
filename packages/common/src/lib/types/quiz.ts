@@ -65,7 +65,7 @@ export const QuizQuestionSchema = z.object({
   cmi5QuestionId: z.string(),
 });
 
-export const QuizContentSchema = z.object({
+export const QuizContentSchemaZod = z.object({
   // BaseActivity fields
   rc5id: z.string().optional(),
   ksats: z.array(KSATElementSchema).optional(),
@@ -80,6 +80,7 @@ export const QuizContentSchema = z.object({
   passingScore: z.number(),
   metadata: z.string().optional(),
 });
+export const QuizContentSchema = z.toJSONSchema(QuizContentSchemaZod);
 
 export const QuizStateSchema = z.object({
   currentQuestion: z.number().optional(),
@@ -102,7 +103,7 @@ export type QuizOption = z.infer<typeof QuizOptionSchema>;
 export type MatchingOption = z.infer<typeof MatchingOptionSchema>;
 export type BasicResponse = z.infer<typeof BasicResponseSchema>;
 export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
-export type QuizContent = z.infer<typeof QuizContentSchema>;
+export type QuizContent = z.infer<typeof QuizContentSchemaZod>;
 export type QuizState = z.infer<typeof QuizStateSchema>;
 export type QuizScore = z.infer<typeof QuizScoreSchema>;
 export type ReviewProps = z.infer<typeof ReviewPropsSchema>;

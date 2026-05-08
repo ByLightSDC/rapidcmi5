@@ -4,7 +4,7 @@ import * as YAML from 'yaml';
 import { z } from 'zod/v4';
 import {
   CourseData,
-  CourseDataSchema,
+  CourseDataSchemaZod,
   RC5_FILENAME,
 } from '@rapid-cmi5/cmi5-build-common';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -24,7 +24,7 @@ export function registerGetCourse(server: McpServer, ctx: McpContext): void {
             'Course handle from rc5_list_courses (e.g. "project-1/course-1").',
           ),
       },
-      outputSchema: CourseDataSchema,
+      outputSchema: CourseDataSchemaZod,
       annotations: {
         readOnlyHint: true,
         idempotentHint: true,
@@ -68,7 +68,7 @@ export function registerGetCourse(server: McpServer, ctx: McpContext): void {
         blocks: Array.isArray(data.blocks) ? data.blocks : [],
       };
 
-      const validated = CourseDataSchema.safeParse(merged);
+      const validated = CourseDataSchemaZod.safeParse(merged);
       if (!validated.success) {
         const issues = validated.error.issues
           .map((i) => `  - ${i.path.join('.') || '(root)'}: ${i.message}`)

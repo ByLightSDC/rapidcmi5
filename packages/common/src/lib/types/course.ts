@@ -136,7 +136,7 @@ export const CourseBlockSchema = z.object({
   aus: z.array(CourseAuSchema),
 });
 
-export const CourseDataSchema = z.object({
+export const CourseDataSchemaZod = z.object({
   courseTitle: z.string().describe('Human-readable course title.'),
   courseId: z
     .string()
@@ -153,8 +153,7 @@ export const CourseDataSchema = z.object({
     .array(CourseBlockSchema)
     .describe('Top-level course blocks. Most courses have a single block.'),
 });
-
-export const CreateCourseInputSchema = CourseDataSchema.extend({
+export const CreateCourseInputSchema = CourseDataSchemaZod.extend({
   repoName: z
     .string()
     .min(1)
@@ -169,4 +168,5 @@ export type AuMetaData = z.infer<typeof AuMetaDataSchema>;
 export type CourseAU = z.infer<typeof CourseAuSchema>;
 export type CourseBlock = z.infer<typeof CourseBlockSchema>;
 export type SlideType = z.infer<typeof SlideSchema>;
-export type CourseData = z.infer<typeof CourseDataSchema>;
+export type CourseData = z.infer<typeof CourseDataSchemaZod>;
+export const CourseDataSchema = z.toJSONSchema(CourseDataSchemaZod);

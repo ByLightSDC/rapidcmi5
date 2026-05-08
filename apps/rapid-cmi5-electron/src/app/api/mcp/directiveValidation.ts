@@ -2,7 +2,10 @@ import { fromMarkdown } from 'mdast-util-from-markdown';
 import { directive } from 'micromark-extension-directive';
 import { directiveFromMarkdown } from 'mdast-util-directive';
 import { visit } from 'unist-util-visit';
-import { CourseData, QuizContentSchema } from '@rapid-cmi5/cmi5-build-common';
+import {
+  CourseData,
+  QuizContentSchemaZod,
+} from '@rapid-cmi5/cmi5-build-common';
 
 import { CTFContentSchema } from './schemas/ctf';
 import { CodeRunnerContentSchema } from './schemas/codeRunner';
@@ -11,7 +14,7 @@ import { ScenarioContentSchema } from './schemas/scenario';
 import { TeamConsolesContentSchema } from './schemas/consoles';
 
 const DIRECTIVE_SCHEMAS = {
-  quiz: QuizContentSchema,
+  quiz: QuizContentSchemaZod,
   ctf: CTFContentSchema,
   codeRunner: CodeRunnerContentSchema,
   download: DownloadFilesContentSchema,
