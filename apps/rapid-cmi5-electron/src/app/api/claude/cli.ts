@@ -57,7 +57,15 @@ function buildPtyEnv(): NodeJS.ProcessEnv {
   );
   const packagedAppPathAdditions =
     process.platform === 'win32'
-      ? []
+      ? [
+          path.join(home, '.local', 'bin'),
+          path.join(home, 'AppData', 'Roaming', 'npm'),
+          path.join(home, 'AppData', 'Local', 'nvm'),
+          path.join(home, 'AppData', 'Local', 'Volta', 'bin'),
+          path.join(home, '.cargo', 'bin'),
+          'C:\\nvm4w\\nodejs',
+          'C:\\Program Files\\nodejs',
+        ]
       : [
           ...nvmNodeBins,
           '/opt/homebrew/bin',
@@ -101,16 +109,6 @@ function shellLaunchOptions(
 ): StartOptions {
   if (opts.command) return opts;
 
-  if (process.platform === 'win32') {
-    const command = binaryName.endsWith('.cmd')
-      ? binaryName
-      : `${binaryName}.cmd`;
-    return {
-      ...opts,
-      command,
-    };
-  }
-
   const args = opts.args ?? [];
   const commandLine = ['exec', quoteForPosixShell(binaryName)]
     .concat(args.map(quoteForPosixShell))
@@ -136,8 +134,16 @@ export function startCommandSession(
   binaryName: string,
   opts: StartOptions = {},
 ): { sessionId: string } {
+  if (process.platform === 'win32') {
+    const env = buildPtyEnv();
+    const result = spawnSync('where', [binaryName], { encoding: 'utf-8', env });
+    if (result.status !== 0) {
+      throw new Error(`${binaryName} could not be found`);
+    }
+    const command = result.stdout.trim().split('\n')[0].trim();
+    return startPtySession(webContents, channelPrefix, { ...opts, command });
+  }
   const shellOpts = shellLaunchOptions(binaryName, opts);
-
   return startPtySession(webContents, channelPrefix, shellOpts);
 }
 
@@ -170,6 +176,8 @@ export function startPtySession(
       rows,
       cwd,
       env,
+      // ConPTY hangs in Electron on some Windows setups; winpty is more reliable
+      ...(process.platform === 'win32' ? { useConpty: false } : {}),
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

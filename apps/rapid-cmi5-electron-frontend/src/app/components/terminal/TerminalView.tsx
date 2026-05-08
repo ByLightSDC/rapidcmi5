@@ -77,6 +77,12 @@ interface TerminalViewProps {
   missingBinaryName?: string;
 }
 
+function writeError(term: Terminal, message: string, hint?: string): void {
+  term.write('\r\n\x1b[31m ✖  \x1b[1m' + message + '\x1b[0m\r\n');
+  if (hint) term.write('\x1b[90m     ' + hint + '\x1b[0m\r\n');
+  term.write('\r\n');
+}
+
 export function TerminalView({
   api,
   visible,
@@ -122,15 +128,16 @@ export function TerminalView({
     });
     const unsubError = api.onError((p) => {
       if (sessionIdRef.current && p.sessionId !== sessionIdRef.current) return;
-      const missingBinaryMessage = missingBinaryName
-        ? `${missingBinaryName} binary could not be found. Please install ${missingBinaryName} and try again.`
-        : null;
-      const message =
-        missingBinaryName && /ENOENT|not found|spawn/i.test(p.message)
-          ? missingBinaryMessage
-          : p.message;
-      onStatusChange('error', message ?? p.message);
-      term.write(`\r\n\x1b[31m[error: ${message ?? p.message}]\x1b[0m\r\n`);
+      const isMissing =
+        missingBinaryName && /ENOENT|not found|spawn/i.test(p.message);
+      const message = isMissing
+        ? `${missingBinaryName} could not be found`
+        : p.message;
+      const hint = isMissing
+        ? `Make sure ${missingBinaryName} is installed and available in your PATH.`
+        : undefined;
+      onStatusChange('error', message);
+      writeError(term, message, hint);
     });
 
     const onTermData = term.onData((data) => {
@@ -160,16 +167,17 @@ export function TerminalView({
         onStatusChange('running', '');
       })
       .catch((err: unknown) => {
-        const msg = err instanceof Error ? err.message : String(err);
-        const missingBinaryMessage = missingBinaryName
-          ? `${missingBinaryName} binary could not be found. Please install ${missingBinaryName} and try again.`
-          : null;
-        const message =
-          missingBinaryName && /ENOENT|not found|spawn/i.test(msg)
-            ? missingBinaryMessage
-            : msg;
-        onStatusChange('error', message ?? msg);
-        term.write(`\r\n\x1b[31m[error: ${message ?? msg}]\x1b[0m\r\n`);
+        const raw = err instanceof Error ? err.message : String(err);
+        const isMissing =
+          missingBinaryName && /ENOENT|not found|spawn/i.test(raw);
+        const message = isMissing
+          ? `${missingBinaryName} could not be found`
+          : raw;
+        const hint = isMissing
+          ? `Make sure ${missingBinaryName} is installed and available in your PATH.`
+          : undefined;
+        onStatusChange('error', message);
+        writeError(term, message, hint);
       });
 
     return () => {

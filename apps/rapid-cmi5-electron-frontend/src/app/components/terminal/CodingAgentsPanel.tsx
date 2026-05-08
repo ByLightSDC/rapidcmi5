@@ -1,12 +1,66 @@
 import { useCallback, useEffect, useState } from 'react';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import { PanelRightCloseIcon } from 'lucide-react'
+import { PanelRightCloseIcon, PackageXIcon } from 'lucide-react';
 import {
   SessionStatus,
   TabButton,
   TerminalView,
 } from './TerminalView';
+
+interface NotInstalledOverlayProps {
+  name: string;
+  installCommand: string;
+}
+
+function NotInstalledOverlay({ name, installCommand }: NotInstalledOverlayProps) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        background: '#1e1e1e',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 14,
+        padding: 32,
+        zIndex: 10,
+      }}
+    >
+      <PackageXIcon size={36} color="#f48771" strokeWidth={1.5} />
+      <div style={{ color: '#e0e0e0', fontSize: 14, fontWeight: 600 }}>
+        {name} is not installed
+      </div>
+      <div
+        style={{
+          color: '#888',
+          fontSize: 12,
+          textAlign: 'center',
+          maxWidth: 340,
+          lineHeight: 1.6,
+        }}
+      >
+        Install {name} to use this panel. Run the following in your terminal:
+      </div>
+      <div
+        style={{
+          background: '#252526',
+          border: '1px solid #3c3c3c',
+          borderRadius: 4,
+          padding: '7px 14px',
+          fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+          fontSize: 12,
+          color: '#9cdcfe',
+          userSelect: 'all',
+        }}
+      >
+        {installCommand}
+      </div>
+    </div>
+  );
+}
 
 type AgentMode = 'claude' | 'codex';
 
@@ -188,6 +242,22 @@ function CodingAgentsPanelInner({
             />
           </div>
         )}
+        {mode === 'claude' &&
+          claudeStatus.status === 'error' &&
+          /could not be found/i.test(claudeStatus.detail) && (
+            <NotInstalledOverlay
+              name="Claude"
+              installCommand="npm install -g @anthropic-ai/claude-code"
+            />
+          )}
+        {mode === 'codex' &&
+          codexStatus.status === 'error' &&
+          /could not be found/i.test(codexStatus.detail) && (
+            <NotInstalledOverlay
+              name="Codex"
+              installCommand="npm install -g @openai/codex"
+            />
+          )}
       </div>
     </div>
   );
