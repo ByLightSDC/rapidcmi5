@@ -406,17 +406,17 @@ export const AccordionEditor: React.FC<
             ref={gutterRef as any}
             id="context-menu"
             sx={{
-              backgroundColor: 'pink',
+              //backgroundColor: 'pink',
               // backgroundColor:
               //   muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
               display: 'flex',
               position: 'absolute',
               top: backgroundColor ? blockPadding : 0,
               right: menuRight,
-              //width:20,
+              //width:0,
             }}
           >
-            <Box sx={{ position:'absolute', backgroundColor: 'orange' }}>
+            {/* <Box sx={{ position: 'absolute', right:'15px' }}> */}
               <Tooltip title="Background Color">
                 <IconButton
                   onClick={(e) => {
@@ -460,7 +460,7 @@ export const AccordionEditor: React.FC<
                   });
                 }}
               />
-            </Box>
+            {/* </Box> */}
           </Box>
         )}
       </Box>
