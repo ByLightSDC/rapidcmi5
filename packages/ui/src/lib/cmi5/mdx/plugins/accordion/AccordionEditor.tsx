@@ -407,8 +407,8 @@ export const AccordionEditor: React.FC<
             id="context-menu"
             sx={{
               //backgroundColor: 'pink',
-              // backgroundColor:
-              //   muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
+              backgroundColor:
+                muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
               display: 'flex',
               position: 'absolute',
               top: backgroundColor ? blockPadding : 0,
