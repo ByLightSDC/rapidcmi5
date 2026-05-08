@@ -76,6 +76,7 @@ import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { useGutterRight } from '../shared/useGutterRight';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { useBackgroundColors } from 'packages/ui/src/lib/hooks/useBackgroundColors';
 
 /**
  * Steps Editor for steps directive
@@ -119,15 +120,28 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
     blockMaxWidth,
   );
 
-  const [backgroundColor, setBackgroundColor] = useState<string>(
-    mdastNode?.attributes?.backgroundColor ?? '',
-  );
-  const [colorPickerAnchor, setColorPickerAnchor] =
-    useState<HTMLButtonElement | null>(null);
-  const [pendingColor, setPendingColor] = useState<string>(
-    mdastNode?.attributes?.backgroundColor ?? '',
-  );
-  const pendingColorRef = useRef(pendingColor);
+  // const [backgroundColor, setBackgroundColor] = useState<string>(
+  //   mdastNode?.attributes?.backgroundColor ?? '',
+  // );
+  // const [colorPickerAnchor, setColorPickerAnchor] =
+  //   useState<HTMLButtonElement | null>(null);
+  // const [pendingColor, setPendingColor] = useState<string>(
+  //   mdastNode?.attributes?.backgroundColor ?? '',
+  // );
+  // const pendingColorRef = useRef(pendingColor);
+
+  const {
+    backgroundColor,
+    colorPickerAnchor,
+    openPicker,
+    pendingColor,
+    pendingColorRef,
+    setBackgroundColor,
+    setColorPickerAnchor,
+    setOverrideColor,
+    setPendingColorAndRef,
+  } = useBackgroundColors(mdastNode?.attributes?.['backgroundColor'] ?? '');
+
   const skipNextCloseRebuildRef = useRef(false);
 
   const a11yStepProps = (index: number) => ({
@@ -277,10 +291,8 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
 
   const handleClearColor = useCallback(() => {
     setColorPickerAnchor(null);
-    pendingColorRef.current = '';
     skipNextCloseRebuildRef.current = true;
-    setPendingColor('');
-    setBackgroundColor('');
+    setOverrideColor('');
     parentEditor.update(
       () => {
         const attrs = { ...mdastNode.attributes };
@@ -403,9 +415,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   // Sync backgroundColor from mdastNode
   useEffect(() => {
     const bgColor = mdastNode?.attributes?.backgroundColor ?? '';
-    setBackgroundColor(bgColor);
-    pendingColorRef.current = bgColor;
-    setPendingColor(bgColor);
+    setOverrideColor(bgColor);
   }, [mdastNode]);
 
   // Sync contentWidth from mdastNode
@@ -415,12 +425,12 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
 
   const outerSx: SxProps = backgroundColor
     ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
+      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+      clipPath: `inset(0 -100vmax 0)`,
+      backgroundColor,
+      paddingTop: blockPadding,
+      paddingBottom: blockPadding,
+    }
     : {};
 
   /**
@@ -429,7 +439,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   return (
     <>
       <Box
-         ref={ containerRef }
+        ref={containerRef}
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
         {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as CSSProperties } : {})}
@@ -440,10 +450,10 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
           ...sxProps,
           ...(blockMaxWidth
             ? {
-                maxWidth: blockMaxWidth,
-                marginLeft: 'auto',
-                marginRight: 'auto',
-              }
+              maxWidth: blockMaxWidth,
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }
             : {}),
           marginTop: 0,
           marginBottom: 0,
@@ -501,16 +511,11 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                       right: menuRight,
                     }}
                   >
-                    <Tooltip title="Background Color">
-                      <IconButton
-                        onClick={(e) => {
-                          pendingColorRef.current = backgroundColor;
-                          setPendingColor(backgroundColor);
-                          setColorPickerAnchor(e.currentTarget);
-                        }}
-                        size="small"
-                      >
-                        <PaletteIcon fontSize="small" />
+
+
+                    <Tooltip title="Edit Steps Settings">
+                      <IconButton onClick={handleConfigure}>
+                        <EditIcon />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Block Appearance">
@@ -519,11 +524,6 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                         size="small"
                       >
                         <SettingsIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Edit Steps Settings">
-                      <IconButton onClick={handleConfigure}>
-                        <EditIcon />
                       </IconButton>
                     </Tooltip>
                     <InsertLineReturnButton
@@ -709,8 +709,9 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
         lastColor={pendingColor}
         palette={SHAPE_PRESET_COLORS}
         onPickColor={(color) => {
-          pendingColorRef.current = color;
-          setPendingColor(color);
+          // pendingColorRef.current = color;
+          // setPendingColor(color);
+          setPendingColorAndRef(color);
         }}
         onClear={handleClearColor}
         noneLabel="No background"

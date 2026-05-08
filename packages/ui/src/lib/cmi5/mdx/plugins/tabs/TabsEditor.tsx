@@ -73,6 +73,8 @@ import { getDirectiveBlockShadow } from '../../../../styles/directiveStyles';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { DIRECTIVE_INNER_BOX_SHADOW } from '../../constants/directiveLayout';
+import { useBackgroundColors } from 'packages/ui/src/lib/hooks/useBackgroundColors';
+import { BackgroundColorTrigger } from 'packages/ui/src/lib/colors/BackgroundColorTrigger';
 
 /**
  * Tabs Editor for tabs directive
@@ -105,20 +107,31 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     mdastNode?.attributes.style,
   );
   const [sxProps, setSxProps] = useState<SxProps>({});
-  const [backgroundColor, setBackgroundColor] = useState<string>(
-    mdastNode?.attributes.backgroundColor ?? '',
-  );
-  const [colorPickerAnchor, setColorPickerAnchor] =
-    useState<HTMLButtonElement | null>(null);
-  const [pendingColor, setPendingColor] = useState<string>(
-    mdastNode?.attributes.backgroundColor ?? '',
-  );
+  // const [backgroundColor, setBackgroundColor] = useState<string>(
+  //   mdastNode?.attributes.backgroundColor ?? '',
+  // );
+  // const [colorPickerAnchor, setColorPickerAnchor] =
+  //   useState<HTMLButtonElement | null>(null);
+  // const [pendingColor, setPendingColor] = useState<string>(
+  //   mdastNode?.attributes.backgroundColor ?? '',
+  // );
+  const {
+    backgroundColor,
+    colorPickerAnchor,
+    openPicker,
+    pendingColor,
+    pendingColorRef,
+    setBackgroundColor,
+    setColorPickerAnchor,
+    setOverrideColor,
+    setPendingColorAndRef,
+  } = useBackgroundColors(mdastNode?.attributes?.['backgroundColor'] ?? '');
   const [contentWidth, setContentWidth] = useState<
     ContentWidthEnum | undefined
   >(mdastNode?.attributes.contentWidth);
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   // Ref so onClose always sees the latest pendingColor regardless of closure staleness.
-  const pendingColorRef = useRef(pendingColor);
+  // const pendingColorRef = useRef(pendingColor);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
   const { containerRef, gutterRef, menuRight } = useGutterRight(
     resolvedThemeCSS,
@@ -299,10 +312,8 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
    */
   const handleClearColor = useCallback(() => {
     setColorPickerAnchor(null);
-    pendingColorRef.current = '';
     skipNextCloseRebuildRef.current = true;
-    setPendingColor('');
-    setBackgroundColor('');
+    setOverrideColor('');
     parentEditor.update(
       () => {
         const attrs = { ...mdastNode.attributes };
@@ -362,9 +373,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
       }
     }
     const bgColor = mdastNode.attributes.backgroundColor ?? '';
-    setBackgroundColor(bgColor);
-    pendingColorRef.current = bgColor;
-    setPendingColor(bgColor);
+    setOverrideColor(bgColor);
     setContentWidth(mdastNode.attributes.contentWidth);
   }, [tab, mdastNode]);
 
@@ -376,12 +385,12 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   // trailing <p>'s margin-top so the band fills flush to the next block.
   const outerSx: SxProps = backgroundColor
     ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
+      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+      clipPath: `inset(0 -100vmax 0)`,
+      backgroundColor,
+      paddingTop: blockPadding,
+      paddingBottom: blockPadding,
+    }
     : {};
 
   // Inner box: fills all available width (lesson content width applies to text
@@ -394,14 +403,14 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     : {};
   const innerSx: SxProps = backgroundColor
     ? {
-        backgroundColor: muiTheme.palette.background.paper,
-        boxShadow: DIRECTIVE_INNER_BOX_SHADOW,
-        ...widthOverrideSx,
-      }
+      backgroundColor: muiTheme.palette.background.paper,
+      boxShadow: DIRECTIVE_INNER_BOX_SHADOW,
+      ...widthOverrideSx,
+    }
     : {
-        boxShadow: dropShadow,
-        ...widthOverrideSx,
-      };
+      boxShadow: dropShadow,
+      ...widthOverrideSx,
+    };
 
   /**
    * Render Tabs and Nested Content
@@ -409,17 +418,17 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   return (
     <>
       <Box
-        ref={ containerRef }
+        ref={containerRef}
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         {...(contentWidth !== undefined
           ? { 'data-block-override': 'true' }
           : {})}
         {...(contentWidth !== undefined
           ? {
-              style: {
-                '--block-max-width': blockMaxWidth ?? 'none',
-              } as CSSProperties,
-            }
+            style: {
+              '--block-max-width': blockMaxWidth ?? 'none',
+            } as CSSProperties,
+          }
           : {})}
         sx={{
           padding: 0,
@@ -495,7 +504,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
               right: menuRight,
             }}
           >
-            <Tooltip title="Background Color">
+            {/* <Tooltip title="Background Color">
               <IconButton
                 onClick={(e) => {
                   pendingColorRef.current = backgroundColor;
@@ -506,8 +515,15 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
               >
                 <PaletteIcon fontSize="small" />
               </IconButton>
-            </Tooltip>
+            </Tooltip> */}
 
+
+
+            <Tooltip title="Edit Tabs Settings">
+              <IconButton onClick={handleConfigure}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
             <Tooltip title="Block Appearance">
               <IconButton
                 onClick={() => setBlockAppearanceOpen(true)}
@@ -516,12 +532,10 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
                 <SettingsIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-
-            <Tooltip title="Edit Tabs Settings">
-              <IconButton onClick={handleConfigure}>
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
+            <BackgroundColorTrigger
+              currentColor={backgroundColor ? { color: pendingColor } : undefined}
+              onTrigger={openPicker}
+            />
             <InsertLineReturnButton
               parentEditor={parentEditor}
               lexicalNode={lexicalNode}
@@ -577,8 +591,9 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
         onPickColor={(color) => {
           // Track locally; rebuild happens in onClose (once) to avoid repeated
           // lexical node removal when MuiColorInput fires on every keystroke.
-          pendingColorRef.current = color;
-          setPendingColor(color);
+          // pendingColorRef.current = color;
+          // setPendingColor(color);
+          setPendingColorAndRef(color);
         }}
         onClear={handleClearColor}
         noneLabel="No background"
