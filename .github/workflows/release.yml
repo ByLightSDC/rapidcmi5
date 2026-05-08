@@ -174,6 +174,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: [create-release, build-cc-cmi5-player]
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: macos-latest
@@ -188,6 +189,10 @@ jobs:
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      # node-gyp on Windows: force VS 2022 detection (vendored node-gyp
+      # in electron-builder 25 falls through to VS 2013/2015 lookups).
+      # No-op on macOS/Linux.
+      npm_config_msvs_version: '2022'
     steps:
       - uses: actions/checkout@v4
 
