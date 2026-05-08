@@ -9,7 +9,15 @@ import {
   resolveLessonThemeCSS,
 } from '../styles/lessonThemeStyles';
 
-import { CSSProperties, useEffect, useMemo, useState } from 'react';
+import {
+  CSSProperties,
+  Dispatch,
+  RefObject,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { DIRECTIVE_INNER_BOX_SHADOW } from '../cmi5/mdx/constants/directiveLayout';
 import { darken, lighten, SxProps, useTheme } from '@mui/material';
 
@@ -17,13 +25,29 @@ import { useGutterRight } from '../cmi5/mdx/plugins/shared/useGutterRight';
 import { useSignalEffect } from '@preact/signals-react';
 import { maxSlideWidth$ } from '../cmi5/mdx';
 
+type UseLessonStylesReturn = {
+  blockAppearanceOpen: boolean;
+  blockPadding: string;
+  borderColor: string;
+  contentWidthDisplay: ContentWidthEnum | undefined;
+  innerSx: SxProps;
+  innerActivitySx: SxProps;
+  outerSx: SxProps;
+  outerStyle: OuterStyle;
+  defaultBackgroundColor: string;
+  gutterRef: RefObject<HTMLDivElement>;
+  gutterRight: string;
+  setBlockAppearanceOpen: Dispatch<SetStateAction<boolean>>;
+  setContentWidth: Dispatch<SetStateAction<ContentWidthEnum | undefined>>;
+};
+
 export const useLessonStyles = (
   lessonTheme: LessonTheme | undefined,
   overrideContentWidthStr?: ContentWidthEnum,
   maxWidth?: number, //FUTURE
   backgroundColor?: string,
   isPlayback?: boolean,
-) => {
+): UseLessonStylesReturn => {
   const muiTheme = useTheme();
   const activityAlign =
     lessonTheme?.defaultActivityAlignment || DefaultAlignmentEnum.Center;
