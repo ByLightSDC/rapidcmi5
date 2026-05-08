@@ -1,8 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter as RouterWrapper } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -20,11 +16,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Paper from '@mui/material/Paper';
 import { ThemeProvider } from '@mui/material';
 import Box from '@mui/material/Box';
-import {
-  Panel,
-  PanelGroup,
-  PanelResizeHandle,
-} from 'react-resizable-panels';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -34,31 +26,13 @@ import { lightTheme } from './styles/muiTheme';
 import UserConfig from './contexts/UserConfigContext';
 import Auth from './contexts/AuthContext';
 import { RapidCmi5Wrapper } from './RapidCmi5Wrapper';
-import type { AiPanelMode } from '@rapid-cmi5/react-editor';
 import CodingAgentsPanel from './components/terminal/CodingAgentsPanel';
 import TerminalPanel from './components/terminal/TerminalPanel';
-
-const isElectron = typeof window !== 'undefined' && !!window.claudeApi;
+import { AppUiProvider, useAppUi } from './contexts/AppUiContext';
 
 export default function App() {
   const dispatch = useDispatch();
   const theme = useSelector(themeColor);
-
-  const [aiOpen, setAiOpen] = useState(false);
-  const [terminalOpen, setTerminalOpen] = useState(false);
-  const [aiThinking, setAiThinking] = useState(false);
-
-  const handleAiClick = useCallback((_mode: AiPanelMode) => {
-    setAiOpen(true);
-  }, []);
-
-  const handleAiToggle = useCallback(() => {
-    setAiOpen((open) => !open);
-  }, []);
-
-  const handleTerminalToggle = useCallback(() => {
-    setTerminalOpen((open) => !open);
-  }, []);
 
   useEffect(() => {
     const iconColor =
@@ -100,125 +74,9 @@ export default function App() {
                   <TimePickerProvider>
                     <UserConfig>
                       <Auth>
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            width: '100%',
-                            height: '100%',
-                            minHeight: 0,
-                          }}
-                        >
-                          <AppHeader
-                            aiOpen={aiOpen}
-                            onAiToggle={isElectron ? handleAiToggle : undefined}
-                            terminalOpen={terminalOpen}
-                            onTerminalToggle={
-                              isElectron ? handleTerminalToggle : undefined
-                            }
-                          />
-
-                          <main
-                            id="app-routes"
-                            style={{
-                              display: 'flex',
-                              flex: '1 1 auto',
-                              width: '100%',
-                              overflow: 'hidden',
-                            }}
-                          >
-                            <PanelGroup
-                              direction="vertical"
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                minHeight: 0,
-                              }}
-                            >
-                              <Panel style={{ overflow: 'hidden' }}>
-                                <PanelGroup
-                                  direction="horizontal"
-                                  style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    minWidth: 0,
-                                  }}
-                                >
-                                  <Panel style={{ overflow: 'hidden' }}>
-                                    <Box
-                                      sx={{
-                                        minWidth: 0,
-                                        height: '100%',
-                                        overflow: 'hidden',
-                                      }}
-                                    >
-                                      <RapidCmi5Wrapper
-                                        onAiClick={
-                                          isElectron ? handleAiClick : undefined
-                                        }
-                                        aiThinking={
-                                          isElectron ? aiThinking : false
-                                        }
-                                      />
-                                    </Box>
-                                  </Panel>
-                                  {isElectron && aiOpen && (
-                                    <>
-                                      <PanelResizeHandle
-                                        style={{
-                                          width: 1,
-                                          backgroundColor: 'grey',
-                                          opacity: 0.4,
-                                          cursor: 'col-resize',
-                                        }}
-                                      />
-                                      <Panel
-                                        defaultSize={32}
-                                        minSize={18}
-                                        maxSize={55}
-                                        style={{
-                                          overflow: 'hidden',
-                                          position: 'relative',
-                                          zIndex: 1400,
-                                        }}
-                                      >
-                                        <CodingAgentsPanel
-                                          open={aiOpen}
-                                          onClose={() => setAiOpen(false)}
-                                          onThinkingChange={setAiThinking}
-                                        />
-                                      </Panel>
-                                    </>
-                                  )}
-                                </PanelGroup>
-                              </Panel>
-                              {isElectron && terminalOpen && (
-                                <>
-                                  <PanelResizeHandle
-                                    style={{
-                                      height: 1,
-                                      backgroundColor: 'grey',
-                                      opacity: 0.4,
-                                      cursor: 'row-resize',
-                                    }}
-                                  />
-                                  <Panel
-                                    defaultSize={28}
-                                    minSize={16}
-                                    maxSize={60}
-                                    style={{ overflow: 'hidden' }}
-                                  >
-                                    <TerminalPanel
-                                      open={terminalOpen}
-                                      onOpenChange={setTerminalOpen}
-                                      showFloatingButton={false}
-                                    />
-                                  </Panel>
-                                </>
-                              )}
-                            </PanelGroup>
-                          </main>
-                        </Box>
+                        <AppUiProvider>
+                          <AppWorkspace />
+                        </AppUiProvider>
                       </Auth>
                     </UserConfig>
                   </TimePickerProvider>
@@ -228,6 +86,125 @@ export default function App() {
           </NotificationsProvider>
         </LocalizationProvider>
       </CssBaseline>
-    </ThemeProvider >
+    </ThemeProvider>
+  );
+}
+
+function AppWorkspace() {
+  const {
+    isElectron,
+    aiOpen,
+    terminalOpen,
+    closeAiPanel,
+    setTerminalOpen,
+    setAiThinking,
+  } = useAppUi();
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        height: '100%',
+        minHeight: 0,
+      }}
+    >
+      <AppHeader />
+
+      <main
+        id="app-routes"
+        style={{
+          display: 'flex',
+          flex: '1 1 auto',
+          width: '100%',
+          overflow: 'hidden',
+        }}
+      >
+        <PanelGroup
+          direction="vertical"
+          style={{
+            width: '100%',
+            height: '100%',
+            minHeight: 0,
+          }}
+        >
+          <Panel style={{ overflow: 'hidden' }}>
+            <PanelGroup
+              direction="horizontal"
+              style={{
+                width: '100%',
+                height: '100%',
+                minWidth: 0,
+              }}
+            >
+              <Panel style={{ overflow: 'hidden' }}>
+                <Box
+                  sx={{
+                    minWidth: 0,
+                    height: '100%',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <RapidCmi5Wrapper />
+                </Box>
+              </Panel>
+              {isElectron && aiOpen && (
+                <>
+                  <PanelResizeHandle
+                    style={{
+                      width: 1,
+                      backgroundColor: 'grey',
+                      opacity: 0.4,
+                      cursor: 'col-resize',
+                    }}
+                  />
+                  <Panel
+                    defaultSize={32}
+                    minSize={18}
+                    maxSize={55}
+                    style={{
+                      overflow: 'hidden',
+                      position: 'relative',
+                      zIndex: 1400,
+                    }}
+                  >
+                    <CodingAgentsPanel
+                      open={aiOpen}
+                      onClose={closeAiPanel}
+                      onThinkingChange={setAiThinking}
+                    />
+                  </Panel>
+                </>
+              )}
+            </PanelGroup>
+          </Panel>
+          {isElectron && terminalOpen && (
+            <>
+              <PanelResizeHandle
+                style={{
+                  height: 1,
+                  backgroundColor: 'grey',
+                  opacity: 0.4,
+                  cursor: 'row-resize',
+                }}
+              />
+              <Panel
+                defaultSize={28}
+                minSize={16}
+                maxSize={60}
+                style={{ overflow: 'hidden' }}
+              >
+                <TerminalPanel
+                  open={terminalOpen}
+                  onOpenChange={setTerminalOpen}
+                  showFloatingButton={false}
+                />
+              </Panel>
+            </>
+          )}
+        </PanelGroup>
+      </main>
+    </Box>
   );
 }

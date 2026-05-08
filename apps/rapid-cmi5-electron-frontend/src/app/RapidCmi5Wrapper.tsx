@@ -4,7 +4,6 @@ import {
   GetScenarioFormProps,
   GetQuizBankAddModalProps,
   GetQuizBankSearchModalProps,
-  AiPanelMode,
 } from '@rapid-cmi5/react-editor';
 import { useContext, useMemo } from 'react';
 import { ScenarioSelectionForm } from './shared/modals/ScenarioSelectionModal';
@@ -19,13 +18,15 @@ import {
 } from '@rapid-cmi5/cmi5-build-common';
 import { detectIsElectron } from './utils/appType';
 import { rangeApi as electronRangeApi } from './electronApi';
+import { useAppUi } from './contexts/AppUiContext';
 
-export function RapidCmi5Wrapper({ onAiClick, aiThinking }: { onAiClick?: (mode: AiPanelMode) => void; aiThinking?: boolean }) {
+export function RapidCmi5Wrapper() {
   const isElectron = detectIsElectron();
 
   const { token, parsedUserToken } = useContext(AuthContext);
   const { gitUser, gitCredentials, ssoConfig, setGitCredentials, setGitUser } =
     useContext(UserConfigContext);
+  const { openAiPanel, aiThinking } = useAppUi();
 
   const quizBankURL = ssoConfig?.quizBankApiUrl;
   const rangeURL = ssoConfig?.rangeRestApiUrl;
@@ -98,48 +99,48 @@ export function RapidCmi5Wrapper({ onAiClick, aiThinking }: { onAiClick?: (mode:
       GetScenariosForm={
         listScenarios
           ? (props: GetScenarioFormProps) => (
-            <ScenarioSelectionForm
-              submitForm={props.submitForm}
-              formType={props.formType}
-              errors={props.errors}
-              formMethods={props.formMethods}
-              listScenarios={listScenarios}
-            />
-          )
+              <ScenarioSelectionForm
+                submitForm={props.submitForm}
+                formType={props.formType}
+                errors={props.errors}
+                formMethods={props.formMethods}
+                listScenarios={listScenarios}
+              />
+            )
           : undefined
       }
       QuizBankAddModal={
         quizBankURL && token
           ? (props: GetQuizBankAddModalProps) => (
-            <AddToQuizBankForm
-              closeModal={props.closeModal}
-              question={props.question}
-              url={quizBankURL}
-              token={token}
-            />
-          )
+              <AddToQuizBankForm
+                closeModal={props.closeModal}
+                question={props.question}
+                url={quizBankURL}
+                token={token}
+              />
+            )
           : undefined
       }
       QuizBankSearchModal={
         quizBankURL && token
           ? (props: GetQuizBankSearchModalProps) => (
-            <QuizBankSearchForm
-              closeModal={props.closeModal}
-              activityType={props.activityType}
-              submitForm={props.submitForm}
-              currentUserEmail={userEmail}
-              url={quizBankURL}
-              token={token}
-            />
-          )
+              <QuizBankSearchForm
+                closeModal={props.closeModal}
+                activityType={props.activityType}
+                submitForm={props.submitForm}
+                currentUserEmail={userEmail}
+                url={quizBankURL}
+                token={token}
+              />
+            )
           : undefined
       }
       apiUrls={{
         codeRunnerUrl: rangeURL,
         quizBankUrl: quizBankURL,
       }}
-      onAiClick={onAiClick}
-      aiThinking={aiThinking}
+      onAiClick={isElectron ? openAiPanel : undefined}
+      aiThinking={isElectron ? aiThinking : false}
     />
   );
 }

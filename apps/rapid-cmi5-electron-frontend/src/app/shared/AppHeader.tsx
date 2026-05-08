@@ -1,8 +1,5 @@
-/* eslint-disable react/jsx-no-useless-fragment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-// import { useAppBreadCrumbs } from '../hooks/useAppBreadCrumbs';
 import { appHeaderVisible } from '@rapid-cmi5/ui';
 
 /* MUI */
@@ -15,6 +12,7 @@ import { Astroid, Settings, SquareTerminal } from 'lucide-react';
 
 import UserInfoBox from './navbar/UserInfoBox';
 import { Stack } from '@mui/material';
+import { useAppUi } from '../contexts/AppUiContext';
 
 /* app menu icon keys */
 const appsKey = 0;
@@ -25,33 +23,25 @@ const thinIconProps = {
   absoluteStrokeWidth: true,
 };
 
-interface AppHeaderProps {
-  aiOpen?: boolean;
-  onAiToggle?: () => void;
-  terminalOpen?: boolean;
-  onTerminalToggle?: () => void;
-}
-
-export default function AppHeader({
-  aiOpen = false,
-  onAiToggle,
-  terminalOpen = false,
-  onTerminalToggle,
-}: AppHeaderProps) {
-
-
+export default function AppHeader() {
+  const {
+    isElectron,
+    aiOpen,
+    terminalOpen,
+    toggleAiPanel,
+    toggleTerminalPanel,
+  } = useAppUi();
   const showAppHeader = useSelector(appHeaderVisible);
   const [settingsMenuAnchor, setSettingsMenuAnchor] =
     React.useState<null | HTMLElement>(null);
 
   const handleOpenTerminal = () => {
-    if (aiOpen && onAiToggle) onAiToggle()
-    if (onTerminalToggle) onTerminalToggle()
-  }
+    toggleTerminalPanel();
+  };
+
   const handleOpenAi = () => {
-    if (terminalOpen && onTerminalToggle) onTerminalToggle()
-    if (onAiToggle) onAiToggle()
-  }
+    toggleAiPanel();
+  };
 
   const onAppIconClick = (iconKey: number, optionIndex?: number) => {
     switch (iconKey) {
@@ -143,7 +133,6 @@ export default function AppHeader({
 
           {/* Right section - Settings and User */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-
             <IconButton
               aria-label="user-settings"
               id="settings-menu-anchor"
@@ -176,65 +165,65 @@ export default function AppHeader({
             />
           </Box>
 
-
-          <IconButton
-            aria-label="terminal"
-            aria-pressed={terminalOpen}
-            disableTouchRipple
-            onClick={handleOpenTerminal}
-            disabled={!onTerminalToggle}
-            size="small"
-            sx={{
-              color: (theme: any) => `${theme.header.buttonColor}`,
-              borderRadius: '4px',
-              backgroundColor: terminalOpen
-                ? 'action.selected'
-                : 'transparent',
-              '&:hover': {
-                backgroundColor: 'action.hover',
-                color: (theme: any) => `${theme.header.hoverColor}`,
-              },
-            }}
-          >
-            <Tooltip
-              arrow
-              enterDelay={500}
-              enterNextDelay={500}
-              title={terminalOpen ? 'Close Terminal' : 'Open Terminal'}
-              placement="bottom"
-            >
-              <SquareTerminal {...thinIconProps} />
-            </Tooltip>
-          </IconButton>
-          <IconButton
-            aria-label="ai-tools"
-            aria-pressed={aiOpen}
-            disableTouchRipple
-            onClick={handleOpenAi}
-            disabled={!onAiToggle}
-            size="small"
-            sx={{
-              color: (theme: any) => `${theme.header.buttonColor}`,
-              borderRadius: '4px',
-              backgroundColor: aiOpen ? 'action.selected' : 'transparent',
-              '&:hover': {
-                backgroundColor: 'action.hover',
-                color: (theme: any) => `${theme.header.hoverColor}`,
-              },
-            }}
-          >
-            <Tooltip
-              arrow
-              enterDelay={500}
-              enterNextDelay={500}
-              title={aiOpen ? 'Close AI Tools' : 'Open AI Tools'}
-              placement="bottom"
-            >
-              <Astroid {...thinIconProps} />
-            </Tooltip>
-          </IconButton>
+          {isElectron &&
+            <>
+              <IconButton
+                aria-label="terminal"
+                aria-pressed={terminalOpen}
+                disableTouchRipple
+                onClick={handleOpenTerminal}
+                size="small"
+                sx={{
+                  color: (theme: any) => `${theme.header.buttonColor}`,
+                  borderRadius: '4px',
+                  backgroundColor: terminalOpen ? 'action.selected' : 'transparent',
+                  '&:hover': {
+                    backgroundColor: 'action.hover',
+                    color: (theme: any) => `${theme.header.hoverColor}`,
+                  },
+                }}
+              >
+                <Tooltip
+                  arrow
+                  enterDelay={500}
+                  enterNextDelay={500}
+                  title={terminalOpen ? 'Close Terminal' : 'Open Terminal'}
+                  placement="bottom"
+                >
+                  <SquareTerminal {...thinIconProps} />
+                </Tooltip>
+              </IconButton>
+              <IconButton
+                aria-label="ai-tools"
+                aria-pressed={aiOpen}
+                disableTouchRipple
+                onClick={handleOpenAi}
+                size="small"
+                sx={{
+                  color: (theme: any) => `${theme.header.buttonColor}`,
+                  borderRadius: '4px',
+                  backgroundColor: aiOpen ? 'action.selected' : 'transparent',
+                  '&:hover': {
+                    backgroundColor: 'action.hover',
+                    color: (theme: any) => `${theme.header.hoverColor}`,
+                  },
+                }}
+              >
+                <Tooltip
+                  arrow
+                  enterDelay={500}
+                  enterNextDelay={500}
+                  title={aiOpen ? 'Close AI Tools' : 'Open AI Tools'}
+                  placement="bottom"
+                >
+                  <Astroid {...thinIconProps} />
+                </Tooltip>
+              </IconButton>
+            </>
+          }
         </Box>
       )}
+
     </>
   );
 }
