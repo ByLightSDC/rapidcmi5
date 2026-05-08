@@ -59,7 +59,7 @@ export const QuotesContainerEditor: React.FC<
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';
-  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
+  const { menuRight } = useGutterRight(resolvedThemeCSS);
   const [backgroundColor, setBackgroundColor] = useState<string>(
     mdastNode?.attributes?.backgroundColor ?? '',
   );
@@ -243,14 +243,13 @@ export const QuotesContainerEditor: React.FC<
         {/* Gutter buttons — absolutely positioned outside decorator at S/M, inside at L/None */}
         {!isPlayback && (
           <Box
-            ref={gutterRef as any}
             sx={{
               backgroundColor:
                 muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
               position: 'absolute',
               display: 'flex',
               top: backgroundColor ? blockPadding : 0,
-              right: gutterRight,
+              right: menuRight,
             }}
           >
             <Tooltip title="Background Color">

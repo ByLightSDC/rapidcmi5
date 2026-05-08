@@ -114,7 +114,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   >(mdastNode.attributes.contentWidth);
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
-  const { gutterRef, gutterRight } = useGutterRight(
+  const { menuRight } = useGutterRight(
     resolvedThemeCSS,
     blockMaxWidth,
   );
@@ -488,7 +488,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
               <div>
                 {!isPlayback && (
                   <Box
-                    ref={gutterRef as any}
+
                     sx={{
                       backgroundColor:
                         muiTheme.palette.mode === 'dark'
@@ -497,7 +497,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                       position: 'absolute',
                       display: 'flex',
                       top: backgroundColor ? blockPadding : 0,
-                      right: gutterRight,
+                      right: menuRight,
                     }}
                   >
                     <Tooltip title="Background Color">

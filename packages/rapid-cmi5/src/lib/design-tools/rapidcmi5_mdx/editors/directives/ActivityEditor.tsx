@@ -87,7 +87,6 @@ export const ActivityEditor: React.FC<
     innerActivitySx,
     outerSx,
     outerStyle,
-    gutterRef,
     setBlockAppearanceOpen,
     setContentWidth,
   } = useLessonStyles(
@@ -95,7 +94,7 @@ export const ActivityEditor: React.FC<
     mdastNode?.attributes?.contentWidth,
     maxFormWidths.downloadsEditor,
     muiTheme.palette.background.paper,
-    isPlayback
+    isPlayback,
   );
 
   /**
@@ -208,7 +207,6 @@ export const ActivityEditor: React.FC<
     if (!isPlayback) {
       return (
         <Box
-          ref={gutterRef as any}
           sx={{
             backgroundColor:
               muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',

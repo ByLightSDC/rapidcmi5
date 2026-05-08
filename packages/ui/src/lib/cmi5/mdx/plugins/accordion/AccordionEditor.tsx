@@ -11,7 +11,14 @@ import * as Mdast from 'mdast';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { CSSProperties, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import {
+  CSSProperties,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { $getRoot } from 'lexical';
 
@@ -51,12 +58,17 @@ import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
-import { resolveLessonThemeCSS, resolveBlockMaxWidth } from '../../../../styles/lessonThemeStyles';
-import { useGutterRight } from '../shared/useGutterRight';
+import {
+  resolveLessonThemeCSS,
+  resolveBlockMaxWidth,
+} from '../../../../styles/lessonThemeStyles';
 import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
+import { toolbarRect$ } from '../toolbar/vars';
+import { useSignalEffect } from '@preact/signals-react';
+import { useGutterRight } from '../shared/useGutterRight';
 /**
  * Accordion Editor for accordion directives
  * @param param0
@@ -81,7 +93,8 @@ export const AccordionEditor: React.FC<
   const [editor] = useLexicalComposerContext();
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState<string>(
-    (mdastNode?.attributes as AccordionDirectiveNode['attributes'])?.backgroundColor ?? '',
+    (mdastNode?.attributes as AccordionDirectiveNode['attributes'])
+      ?.backgroundColor ?? '',
   );
   const [colorPickerAnchor, setColorPickerAnchor] =
     useState<HTMLButtonElement | null>(null);
@@ -90,12 +103,18 @@ export const AccordionEditor: React.FC<
   );
   const pendingColorRef = useRef(pendingColor);
   const skipNextCloseRebuildRef = useRef(false);
-  const [contentWidth, setContentWidth] = useState<ContentWidthEnum | undefined>(
-    (mdastNode?.attributes as AccordionDirectiveNode['attributes'])?.contentWidth,
+  const [contentWidth, setContentWidth] = useState<
+    ContentWidthEnum | undefined
+  >(
+    (mdastNode?.attributes as AccordionDirectiveNode['attributes'])
+      ?.contentWidth,
   );
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
-  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
+  const { containerRef, gutterRef, menuRight } = useGutterRight(
+    resolvedThemeCSS,
+    blockMaxWidth,
+  );
   const colorPickerOpen = Boolean(colorPickerAnchor);
   const [isPlayback, readOnly, syntaxExtensions] = useCellValues(
     editorInPlayback$,
@@ -180,7 +199,11 @@ export const AccordionEditor: React.FC<
    * Used by both handleSubmit (section management) and handleApplyColor.
    */
   const rebuildNode = useCallback(
-    async (children: AccordionContentDirectiveNode[], bgColor: string, blockContentWidth?: ContentWidthEnum) => {
+    async (
+      children: AccordionContentDirectiveNode[],
+      bgColor: string,
+      blockContentWidth?: ContentWidthEnum,
+    ) => {
       if (!parentEditor) return;
 
       parentEditor.update(() => {
@@ -255,11 +278,14 @@ export const AccordionEditor: React.FC<
     skipNextCloseRebuildRef.current = true;
     setPendingColor('');
     setBackgroundColor('');
-    parentEditor.update(() => {
-      const attrs = { ...mdastNode.attributes };
-      delete attrs.backgroundColor;
-      lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-    }, { discrete: true });
+    parentEditor.update(
+      () => {
+        const attrs = { ...mdastNode.attributes };
+        delete attrs.backgroundColor;
+        lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+      },
+      { discrete: true },
+    );
   }, [lexicalNode, mdastNode, parentEditor]);
 
   /**
@@ -306,13 +332,17 @@ export const AccordionEditor: React.FC<
         // no styles applied
       }
     }
-    const bgColor = (mdastNode.attributes as AccordionDirectiveNode['attributes'])?.backgroundColor ?? '';
+    const bgColor =
+      (mdastNode.attributes as AccordionDirectiveNode['attributes'])
+        ?.backgroundColor ?? '';
     setBackgroundColor(bgColor);
     pendingColorRef.current = bgColor;
     setPendingColor(bgColor);
-    setContentWidth((mdastNode.attributes as AccordionDirectiveNode['attributes'])?.contentWidth);
+    setContentWidth(
+      (mdastNode.attributes as AccordionDirectiveNode['attributes'])
+        ?.contentWidth,
+    );
   }, [mdastNode]);
-
 
   // Outer box: full-width background color band when backgroundColor is set.
   const outerSx: SxProps = backgroundColor
@@ -335,9 +365,19 @@ export const AccordionEditor: React.FC<
   return (
     <>
       <Box
+        id="container"
+        ref={containerRef}
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
-        {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
-        {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as CSSProperties } : {})}
+        {...(contentWidth !== undefined
+          ? { 'data-block-override': 'true' }
+          : {})}
+        {...(contentWidth !== undefined
+          ? {
+              style: {
+                '--block-max-width': blockMaxWidth ?? 'none',
+              } as CSSProperties,
+            }
+          : {})}
         sx={{
           padding: 0,
           position: 'relative',
@@ -364,58 +404,63 @@ export const AccordionEditor: React.FC<
         {!isPlayback && (
           <Box
             ref={gutterRef as any}
+            id="context-menu"
             sx={{
-              backgroundColor:
-                muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
+              backgroundColor: 'pink',
+              // backgroundColor:
+              //   muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
               display: 'flex',
               position: 'absolute',
               top: backgroundColor ? blockPadding : 0,
-              right: gutterRight,
+              right: menuRight,
+              //width:20,
             }}
           >
-            <Tooltip title="Background Color">
-              <IconButton
-                onClick={(e) => {
-                  pendingColorRef.current = backgroundColor;
-                  setPendingColor(backgroundColor);
-                  setColorPickerAnchor(e.currentTarget);
+            <Box sx={{ position:'absolute', backgroundColor: 'orange' }}>
+              <Tooltip title="Background Color">
+                <IconButton
+                  onClick={(e) => {
+                    pendingColorRef.current = backgroundColor;
+                    setPendingColor(backgroundColor);
+                    setColorPickerAnchor(e.currentTarget);
+                  }}
+                  size="small"
+                >
+                  <PaletteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Block Appearance">
+                <IconButton
+                  onClick={() => setBlockAppearanceOpen(true)}
+                  size="small"
+                >
+                  <SettingsIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Edit Sections">
+                <IconButton onClick={handleConfigure}>
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+              <InsertLineReturnButton
+                parentEditor={parentEditor}
+                lexicalNode={lexicalNode}
+              />
+              <DeleteIconButton
+                onDelete={() => {
+                  parentEditor.update(() => {
+                    if (lexicalNode.getPreviousSibling()) {
+                      lexicalNode.selectPrevious();
+                    } else {
+                      lexicalNode.selectNext();
+                    }
+                    lexicalNode.remove();
+                  });
                 }}
-                size="small"
-              >
-                <PaletteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-
-            <Tooltip title="Block Appearance">
-              <IconButton
-                onClick={() => setBlockAppearanceOpen(true)}
-                size="small"
-              >
-                <SettingsIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-
-            <Tooltip title="Edit Sections">
-              <IconButton onClick={handleConfigure}>
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-            <InsertLineReturnButton
-              parentEditor={parentEditor}
-              lexicalNode={lexicalNode}
-            />
-            <DeleteIconButton
-              onDelete={() => {
-                parentEditor.update(() => {
-                  if (lexicalNode.getPreviousSibling()) {
-                    lexicalNode.selectPrevious();
-                  } else {
-                    lexicalNode.selectNext();
-                  }
-                  lexicalNode.remove();
-                });
-              }}
-            />
+              />
+            </Box>
           </Box>
         )}
       </Box>
@@ -432,15 +477,18 @@ export const AccordionEditor: React.FC<
           const latest = pendingColorRef.current;
           if (latest !== backgroundColor) {
             setBackgroundColor(latest);
-            parentEditor.update(() => {
-              const attrs = { ...mdastNode.attributes };
-              if (latest) {
-                attrs.backgroundColor = latest;
-              } else {
-                delete attrs.backgroundColor;
-              }
-              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-            }, { discrete: true });
+            parentEditor.update(
+              () => {
+                const attrs = { ...mdastNode.attributes };
+                if (latest) {
+                  attrs.backgroundColor = latest;
+                } else {
+                  delete attrs.backgroundColor;
+                }
+                lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+              },
+              { discrete: true },
+            );
           }
         }}
         lastColor={pendingColor}
@@ -459,15 +507,21 @@ export const AccordionEditor: React.FC<
         onClose={() => setBlockAppearanceOpen(false)}
         onSave={(newContentWidth) => {
           setContentWidth(newContentWidth);
-          parentEditor.update(() => {
-            const attrs = { ...mdastNode.attributes } as Record<string, string>;
-            if (newContentWidth) {
-              attrs['contentWidth'] = newContentWidth;
-            } else {
-              delete attrs['contentWidth'];
-            }
-            lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-          }, { discrete: true });
+          parentEditor.update(
+            () => {
+              const attrs = { ...mdastNode.attributes } as Record<
+                string,
+                string
+              >;
+              if (newContentWidth) {
+                attrs['contentWidth'] = newContentWidth;
+              } else {
+                delete attrs['contentWidth'];
+              }
+              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+            },
+            { discrete: true },
+          );
         }}
       />
 

@@ -1,5 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { toolbarRect$ } from '../toolbar/vars';
+import { useSignalEffect } from '@preact/signals-react';
+import { useLessonStyles } from 'packages/ui/src/lib/hooks/useLessonStyles';
 
 type ResolvedThemeCSS = ReturnType<typeof resolveLessonThemeCSS>;
 
@@ -21,6 +24,8 @@ export const useGutterRight = (
 ) => {
   const gutterRef = useRef<HTMLDivElement>(null);
   const [gutterRight, setGutterRight] = useState('-100px');
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [menuRight, setMenuRight] = useState('0px');
 
   useEffect(() => {
     if (gutterRef.current) {
@@ -28,6 +33,34 @@ export const useGutterRight = (
       setGutterRight(`-${w + 15}px`);
     }
   }, []);
+
+  const calculateMenuRight = useCallback(() => {
+    console.log('Calculate');
+    console.log('toolbarRect$.value?.right', toolbarRect$.value?.right);
+    console.log('containerRef.current', containerRef.current);
+    const appRight = toolbarRect$.value?.right;
+    if (appRight == null || !containerRef.current) {
+      console.log('return');
+      return;
+    }
+    const containerRight = containerRef.current.getBoundingClientRect().right;
+    console.log('containerRight', containerRight);
+    setMenuRight(`${containerRight - appRight + 15}px`);
+  }, []);
+
+  useSignalEffect(() => {
+    if (toolbarRect$.value) {
+      calculateMenuRight();
+    }
+  });
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      calculateMenuRight();
+    }, 500); // adjust delay as needed
+
+    return () => clearTimeout(timeout);
+  }, [blockMaxWidth || resolvedThemeCSS?.maxWidth]);
 
   // When a block-level override is active, the inner box is centered within the
   // outer (full-lesson-width) box — buttons at right:0 of the outer box already
@@ -39,5 +72,10 @@ export const useGutterRight = (
     !!resolvedThemeCSS?.maxWidth &&
     resolvedThemeCSS.maxWidth !== '100%';
 
-  return { gutterRef, gutterRight: hasLessonGutter ? gutterRight : '0px' };
+  return {
+    containerRef,
+    menuRight,
+    gutterRef,
+    gutterRight: hasLessonGutter ? gutterRight : '0px',
+  };
 };
