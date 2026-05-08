@@ -35,17 +35,13 @@ export const useGutterRight = (
   }, []);
 
   const calculateMenuRight = useCallback(() => {
-    console.log('Calculate');
-    console.log('toolbarRect$.value?.right', toolbarRect$.value?.right);
-    console.log('containerRef.current', containerRef.current);
     const appRight = toolbarRect$.value?.right;
     if (appRight == null || !containerRef.current) {
-      console.log('return');
+
       return;
     }
     const containerRight = containerRef.current.getBoundingClientRect().right;
-    console.log('containerRight', containerRight);
-    setMenuRight(`${containerRight - appRight + 15}px`);
+    setMenuRight(`${containerRight - appRight + 30}px`);
   }, []);
 
   useSignalEffect(() => {
@@ -57,7 +53,7 @@ export const useGutterRight = (
   useEffect(() => {
     const timeout = setTimeout(() => {
       calculateMenuRight();
-    }, 500); // adjust delay as needed
+    }, 100); // adjust delay as needed
 
     return () => clearTimeout(timeout);
   }, [blockMaxWidth || resolvedThemeCSS?.maxWidth]);
