@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { useSelector } from 'react-redux';
-import type { CourseData, QuizContent } from '@rapid-cmi5/cmi5-build-common';
+import type { CourseData } from '@rapid-cmi5/cmi5-build-common';
 
 import { GitContext } from '../design-tools/course-builder/GitViewer/session/GitContext';
 import { RC5Context } from '../design-tools/rapidcmi5_mdx/contexts/RC5Context';
@@ -11,9 +11,12 @@ import {
   slugifyPath,
 } from '../design-tools/course-builder/GitViewer/utils/useCourseOperationsUtils';
 import { getFsInstance } from '../design-tools/course-builder/GitViewer/utils/gitFsInstance';
-import { fsType, RepoAccessObject } from '../redux/repoManagerReducer';
+import {
+  currentRepoAccessObjectSel,
+  fsType,
+  RepoAccessObject,
+} from '../redux/repoManagerReducer';
 import { useCourseOperations } from '../design-tools/course-builder/GitViewer/session/useCourseOperations';
-import { jsonFormatSpaces, useTimeStampUUID } from '@rapid-cmi5/ui';
 
 /**
  * Bridges Electron events into the frontend.
@@ -26,27 +29,28 @@ export const ElectronEventsBridge = () => {
   const { saveCourseFile, saveMarkdownToCurrentSlide, getMarkdownData } =
     useContext(RC5Context);
   const currentCourseName = useSelector(currentCourse);
+  const repoAccessObject = useSelector(currentRepoAccessObjectSel);
   const fsInstance = getFsInstance();
-  const { generateId } = useTimeStampUUID();
+
+  const sendNoCourseError = (channel: string, requestId: string) => {
+    window.electronEvents?.send(channel, {
+      requestId,
+      ok: false,
+      error:
+        'No course is currently loaded in the editor. Open or create a course before using this tool.',
+    });
+  };
 
   const { loadCourse } = useCourseOperations(fsInstance, null);
-
-  const createQuiz = (quizContent: QuizContent) => {
-    const quiz = {
-      ...quizContent,
-      rc5id: quizContent.rc5id ?? generateId(),
-    };
-    const currentMarkdown = getMarkdownData() ?? '';
-    const quizJson = JSON.stringify(quiz, null, jsonFormatSpaces);
-    const quizDirective = `:::quiz\n\`\`\`json\n${quizJson}\n\`\`\`\n:::`;
-    const updatedMarkdown = `${currentMarkdown.trimEnd()}\n\n${quizDirective}\n`;
-
-    return saveMarkdownToCurrentSlide(updatedMarkdown);
-  };
 
   useElectronEvent<{ requestId?: string }>(
     'course:saveCourse',
     async (data) => {
+      if (!repoAccessObject) {
+        if (data?.requestId)
+          sendNoCourseError('course:saveCourse:done', data.requestId);
+        return;
+      }
       try {
         const changedFiles = await saveCourseFile();
         if (data?.requestId) {
@@ -76,12 +80,22 @@ export const ElectronEventsBridge = () => {
     'slide:readCurrent',
     async (data) => {
       if (!data?.requestId) return;
+      if (!repoAccessObject) {
+        sendNoCourseError('slide:readCurrent:done', data.requestId);
+        return;
+      }
 
       try {
+        const markdown = getMarkdownData();
+        if (markdown == null) {
+          throw new Error(
+            'No slide is currently active in the editor.',
+          );
+        }
         window.electronEvents?.send('slide:readCurrent:done', {
           requestId: data.requestId,
           ok: true,
-          markdown: getMarkdownData() ?? '',
+          markdown,
         });
       } catch (error) {
         window.electronEvents?.send('slide:readCurrent:done', {
@@ -97,10 +111,19 @@ export const ElectronEventsBridge = () => {
     'slide:updateCurrent',
     async (data) => {
       if (!data?.requestId) return;
+      if (!repoAccessObject) {
+        sendNoCourseError('slide:updateCurrent:done', data.requestId);
+        return;
+      }
 
       try {
         if (typeof data.markdown !== 'string') {
           throw new Error('slide:updateCurrent requires markdown.');
+        }
+        if (getMarkdownData() == null) {
+          throw new Error(
+            'No slide is currently active in the editor.',
+          );
         }
 
         const saved = saveMarkdownToCurrentSlide(data.markdown);
@@ -118,34 +141,6 @@ export const ElectronEventsBridge = () => {
           ok: false,
           error: error instanceof Error ? error.message : String(error),
         });
-      }
-    },
-  );
-
-  useElectronEvent<{ requestId?: string; quiz: QuizContent }>(
-    'quiz:create',
-    async (data) => {
-      try {
-        const saved = createQuiz(data.quiz);
-
-        if (!saved) {
-          throw new Error('The editor rejected the quiz markdown.');
-        }
-
-        if (data?.requestId) {
-          window.electronEvents?.send('quiz:create:done', {
-            requestId: data.requestId,
-            ok: true,
-          });
-        }
-      } catch (error) {
-        if (data?.requestId) {
-          window.electronEvents?.send('quiz:create:done', {
-            requestId: data.requestId,
-            ok: false,
-            error: error instanceof Error ? error.message : String(error),
-          });
-        }
       }
     },
   );

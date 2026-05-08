@@ -12,15 +12,14 @@
     "cmi5-builder": "nx run cmi5-builder:build",
     "cmi5-player": "nx run cc-cmi5-player:build",
     "postinstall": "electron-builder install-app-deps",
-    "nxe:build:mcp": "node scripts/build-mcp-server.mjs",
     "nxe:build:frontend": "nx build rapid-cmi5-electron-frontend",
-    "nxe:build:backend": "npm run nxe:build:mcp && nx build rapid-cmi5-electron",
+    "nxe:build:backend": "nx build rapid-cmi5-electron",
     "nxe:serve:frontend": "nx serve rapid-cmi5-electron-frontend",
-    "nxe:serve:backend": "npm run nxe:build:mcp && nx serve rapid-cmi5-electron",
+    "nxe:serve:backend": "nx serve rapid-cmi5-electron",
     "nxe:test:frontend": "nx test rapid-cmi5-electron-frontend",
     "nxe:test:backend": "nx test rapid-cmi5-electron",
-    "nxe:package:app": "npm run nxe:build:mcp && nx run rapid-cmi5-electron:make --prepackageOnly",
-    "nxe:make:app": "npm run nxe:build:mcp && nx run rapid-cmi5-electron:make"
+    "nxe:package:app": "nx run rapid-cmi5-electron:make --prepackageOnly",
+    "nxe:make:app": "nx run rapid-cmi5-electron:make"
   },
   "browserslist": [
     "last 2 chrome versions",
@@ -45,6 +44,7 @@
     "@mdx-js/loader": "^3.1.0",
     "@mdx-js/react": "^2.3.0",
     "@mdxeditor/editor": "^3.48.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@monaco-editor/react": "^4.7.0",
     "@mui/icons-material": "^6.4.8",
     "@mui/material": "^6.5.0",
