@@ -27,10 +27,17 @@ const fsOps: FsOperations = {
     }
     return content;
   },
-  writeFile: async (path: string, content: string | Uint8Array, encoding?: string) => {
+  writeFile: async (
+    path: string,
+    content: string | Uint8Array,
+    encoding?: string,
+  ) => {
     await fs.promises.writeFile(path, content);
   },
-  deleteFolder: async (path: string, options: { recursive: boolean; force: boolean }) => {
+  deleteFolder: async (
+    path: string,
+    options: { recursive: boolean; force: boolean },
+  ) => {
     try {
       await fs.promises.rm(path, options);
     } catch (err) {
@@ -52,8 +59,19 @@ export class cmi5Builder {
     projectName: string,
     courseFolder: string,
   ): Promise<string | null> {
-    const buildPath = path.join(process.cwd(), '/cmi5/output', `${projectName}_${Date.now()}`);
-    const outPath = path.join(process.cwd(), 'build-output', projectName);
+    const safeProjectName = path.basename(projectName);
+    const buildRoot = path.join(app.getPath('temp'), 'rapid-cmi5-builds');
+    const buildPath = path.join(
+      buildRoot,
+      'cmi5',
+      'output',
+      `${safeProjectName}_${Date.now()}`,
+    );
+    const outPath = path.join(
+      buildRoot,
+      'build-output',
+      `${safeProjectName}_${Date.now()}`,
+    );
 
     // We always want to cleanup the folders, on any kind of failure
 
@@ -68,7 +86,15 @@ export class cmi5Builder {
         throw new Error('Course data was null');
       }
 
-      await generateCourseDist(coursePath, buildPath, courseData, fsOps, joinPosix, relativePosix, courseFolder);
+      await generateCourseDist(
+        coursePath,
+        buildPath,
+        courseData,
+        fsOps,
+        joinPosix,
+        relativePosix,
+        courseFolder,
+      );
 
       const cmi5Xml = generateCmi5Xml(courseData);
       const cmi5Path = path.join(buildPath, 'cmi5.xml');
