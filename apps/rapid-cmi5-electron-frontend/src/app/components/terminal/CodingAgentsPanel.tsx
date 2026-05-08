@@ -163,6 +163,7 @@ function CodingAgentsPanelInner({
               api={window.claudeApi}
               visible={open && mode === 'claude'}
               onStatusChange={claudeStatusChange}
+              missingBinaryName="claude"
             />
           </div>
         )}
@@ -179,6 +180,7 @@ function CodingAgentsPanelInner({
               api={window.codexApi}
               visible={open && mode === 'codex'}
               onStatusChange={codexStatusChange}
+              missingBinaryName="codex"
             />
           </div>
         )}

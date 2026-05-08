@@ -74,12 +74,14 @@ interface TerminalViewProps {
   api: PtyApi;
   visible: boolean;
   onStatusChange: (status: SessionStatus, detail: string) => void;
+  missingBinaryName?: string;
 }
 
 export function TerminalView({
   api,
   visible,
   onStatusChange,
+  missingBinaryName,
 }: TerminalViewProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const termRef = useRef<Terminal | null>(null);
@@ -119,9 +121,16 @@ export function TerminalView({
       term.write(`\r\n\x1b[33m[process exited: ${p.code ?? '?'}]\x1b[0m\r\n`);
     });
     const unsubError = api.onError((p) => {
-      if (p.sessionId !== sessionIdRef.current) return;
-      onStatusChange('error', p.message);
-      term.write(`\r\n\x1b[31m[error: ${p.message}]\x1b[0m\r\n`);
+      if (sessionIdRef.current && p.sessionId !== sessionIdRef.current) return;
+      const missingBinaryMessage = missingBinaryName
+        ? `${missingBinaryName} binary could not be found. Please install ${missingBinaryName} and try again.`
+        : null;
+      const message =
+        missingBinaryName && /ENOENT|not found|spawn/i.test(p.message)
+          ? missingBinaryMessage
+          : p.message;
+      onStatusChange('error', message ?? p.message);
+      term.write(`\r\n\x1b[31m[error: ${message ?? p.message}]\x1b[0m\r\n`);
     });
 
     const onTermData = term.onData((data) => {
@@ -152,7 +161,15 @@ export function TerminalView({
       })
       .catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
-        onStatusChange('error', msg);
+        const missingBinaryMessage = missingBinaryName
+          ? `${missingBinaryName} binary could not be found. Please install ${missingBinaryName} and try again.`
+          : null;
+        const message =
+          missingBinaryName && /ENOENT|not found|spawn/i.test(msg)
+            ? missingBinaryMessage
+            : msg;
+        onStatusChange('error', message ?? msg);
+        term.write(`\r\n\x1b[31m[error: ${message ?? msg}]\x1b[0m\r\n`);
       });
 
     return () => {
@@ -197,6 +214,7 @@ export function TerminalView({
 interface TabButtonProps {
   active: boolean;
   onClick: () => void;
+  icon?: React.ReactNode;
   label: string;
   status: SessionStatus;
 }
@@ -204,6 +222,7 @@ interface TabButtonProps {
 export function TabButton({
   active,
   onClick,
+  icon,
   label,
   status,
 }: TabButtonProps) {
@@ -234,6 +253,7 @@ export function TabButton({
         height: '100%',
       }}
     >
+      {icon}
       <span>{label}</span>
       <span
         aria-hidden

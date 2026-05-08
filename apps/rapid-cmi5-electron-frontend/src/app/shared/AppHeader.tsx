@@ -19,6 +19,11 @@ import { Stack } from '@mui/material';
 /* app menu icon keys */
 const appsKey = 0;
 const settingsKey = 1;
+const thinIconProps = {
+  size: 20,
+  strokeWidth: 1.25,
+  absoluteStrokeWidth: true,
+};
 
 interface AppHeaderProps {
   aiOpen?: boolean;
@@ -161,7 +166,7 @@ export default function AppHeader({
                 title="User Settings"
                 placement="bottom"
               >
-                <Settings fontSize="small" />
+                <Settings {...thinIconProps} />
               </Tooltip>
             </IconButton>
 
@@ -198,7 +203,7 @@ export default function AppHeader({
               title={terminalOpen ? 'Close Terminal' : 'Open Terminal'}
               placement="bottom"
             >
-              <SquareTerminal />
+              <SquareTerminal {...thinIconProps} />
             </Tooltip>
           </IconButton>
           <IconButton
@@ -225,7 +230,7 @@ export default function AppHeader({
               title={aiOpen ? 'Close AI Tools' : 'Open AI Tools'}
               placement="bottom"
             >
-              <Astroid />
+              <Astroid {...thinIconProps} />
             </Tooltip>
           </IconButton>
         </Box>

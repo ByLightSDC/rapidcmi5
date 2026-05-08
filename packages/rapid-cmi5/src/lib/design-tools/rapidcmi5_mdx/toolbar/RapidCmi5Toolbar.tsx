@@ -177,7 +177,7 @@ export const RapidCmi5Toolbar: React.FC<{
         );
 
         //max slide width
-        maxSlideWidth$.value = window.innerWidth - rect.left;
+        maxSlideWidth$.value = rect.width;
       }
     };
 
@@ -315,7 +315,7 @@ export const RapidCmi5Toolbar: React.FC<{
             sx={{
               display: 'flex',
               alignItems: 'flex-end',
-              width: `calc(100vw - ${leftToolbarPos}px)`,
+              width: '100%',
             }}
           >
             <Stack

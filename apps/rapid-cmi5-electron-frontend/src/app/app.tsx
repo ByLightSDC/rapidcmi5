@@ -6,7 +6,7 @@ import {
 import { BrowserRouter as RouterWrapper } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { setDividerColor, setIconColor, themeColor } from '@rapid-cmi5/ui';
+import { dividerColor, setDividerColor, setIconColor, themeColor } from '@rapid-cmi5/ui';
 
 /* Shared */
 import AppHeader from './shared/AppHeader';
@@ -43,6 +43,7 @@ const isElectron = typeof window !== 'undefined' && !!window.claudeApi;
 export default function App() {
   const dispatch = useDispatch();
   const theme = useSelector(themeColor);
+  const themedDividerColor = useSelector(dividerColor);
 
   const [aiOpen, setAiOpen] = useState(false);
   const [terminalOpen, setTerminalOpen] = useState(false);
@@ -120,7 +121,7 @@ export default function App() {
                           }}
                         >
                           <PanelGroup
-                            direction="horizontal"
+                            direction="vertical"
                             style={{
                               width: '100%',
                               height: '100%',
@@ -129,60 +130,92 @@ export default function App() {
                             }}
                           >
                             <Panel style={{ overflow: 'hidden' }}>
-                              <Box
-                                sx={{
-                                  minWidth: 0,
+                              <PanelGroup
+                                direction="horizontal"
+                                style={{
+                                  width: '100%',
                                   height: '100%',
-                                  overflow: 'hidden',
-                                  '& > *': {
-                                    width: '100%',
-                                    height: '100%',
-                                  },
+                                  minWidth: 0,
+                                  minHeight: 0,
                                 }}
                               >
-                                <RapidCmi5Wrapper
-                                  onAiClick={
-                                    isElectron ? handleAiClick : undefined
-                                  }
-                                  aiThinking={isElectron ? aiThinking : false}
-                                />
-                              </Box>
+                                <Panel style={{ overflow: 'hidden' }}>
+                                  <Box
+                                    sx={{
+                                      minWidth: 0,
+                                      height: '100%',
+                                      overflow: 'hidden',
+                                      '& > *': {
+                                        width: '100%',
+                                        height: '100%',
+                                      },
+                                    }}
+                                  >
+                                    <RapidCmi5Wrapper
+                                      onAiClick={
+                                        isElectron ? handleAiClick : undefined
+                                      }
+                                      aiThinking={
+                                        isElectron ? aiThinking : false
+                                      }
+                                    />
+                                  </Box>
+                                </Panel>
+                                {isElectron && aiOpen && (
+                                  <>
+                                    <PanelResizeHandle
+                                      style={{
+                                        width: 1,
+                                        backgroundColor: 'grey',
+                                        opacity: 0.4,
+                                        cursor: 'col-resize',
+                                      }}
+                                    />
+                                    <Panel
+                                      defaultSize={32}
+                                      minSize={18}
+                                      maxSize={55}
+                                      style={{
+                                        overflow: 'hidden',
+                                        position: 'relative',
+                                        zIndex: 1400,
+                                      }}
+                                    >
+                                      <CodingAgentsPanel
+                                        open={aiOpen}
+                                        onClose={() => setAiOpen(false)}
+                                        onThinkingChange={setAiThinking}
+                                      />
+                                    </Panel>
+                                  </>
+                                )}
+                              </PanelGroup>
                             </Panel>
-                            {isElectron && aiOpen && (
+                            {isElectron && terminalOpen && (
                               <>
                                 <PanelResizeHandle
                                   style={{
-                                    width: 1,
-                                    backgroundColor:
-                                      theme === 'dark'
-                                        ? darkTheme.palette.primary.main
-                                        : lightTheme.palette.primary.main,
-                                    opacity: 0.45,
-                                    cursor: 'col-resize',
+                                    height: 1,
+                                    backgroundColor: 'grey',
+                                    opacity: 0.4,
+                                    cursor: 'row-resize',
                                   }}
                                 />
                                 <Panel
-                                  defaultSize={32}
-                                  minSize={18}
-                                  maxSize={55}
+                                  defaultSize={28}
+                                  minSize={16}
+                                  maxSize={60}
                                   style={{ overflow: 'hidden' }}
                                 >
-                                  <CodingAgentsPanel
-                                    open={aiOpen}
-                                    onClose={() => setAiOpen(false)}
-                                    onThinkingChange={setAiThinking}
+                                  <TerminalPanel
+                                    open={terminalOpen}
+                                    onOpenChange={setTerminalOpen}
+                                    showFloatingButton={false}
                                   />
                                 </Panel>
                               </>
                             )}
                           </PanelGroup>
-                          {isElectron && (
-                            <TerminalPanel
-                              open={terminalOpen}
-                              onOpenChange={setTerminalOpen}
-                              showFloatingButton={false}
-                            />
-                          )}
                         </main>
                       </Auth>
                     </UserConfig>
