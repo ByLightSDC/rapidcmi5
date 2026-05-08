@@ -107,7 +107,7 @@ export default class App {
     // App.mainWindow.webContents.openDevTools({ mode: 'detach' });
     // }
     // You can expose dev tools with this
-    App.mainWindow.webContents.openDevTools({ mode: 'detach' });
+    // App.mainWindow.webContents.openDevTools({ mode: 'detach' });
 
     // handle all external redirects in a new browser window
     // App.mainWindow.webContents.on('will-navigate', App.onRedirect);
