@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "v*.*.*"
+      - 'v*.*.*'
   workflow_dispatch:
     inputs:
       tag:
@@ -11,7 +11,7 @@ on:
         required: true
 
 permissions:
-  id-token: write 
+  id-token: write
   contents: write
 
 jobs:
@@ -112,7 +112,7 @@ jobs:
       - name: Publish @rapid-cmi5/react-editor
         run: npm publish --provenance
         working-directory: dist/packages/rapid-cmi5
-      
+
       - name: Publish @rapid-cmi5/cmi5-build-common
         run: npm publish --provenance
         working-directory: dist/packages/common
@@ -181,7 +181,7 @@ jobs:
             platform: darwin
           - os: ubuntu-latest
             platform: linux
-          - os: windows-latest
+          - os: windows-2022
             platform: win32
     env:
       APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
@@ -189,10 +189,6 @@ jobs:
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-      # node-gyp on Windows: force VS 2022 detection (vendored node-gyp
-      # in electron-builder 25 falls through to VS 2013/2015 lookups).
-      # No-op on macOS/Linux.
-      npm_config_msvs_version: '2022'
     steps:
       - uses: actions/checkout@v4
 
