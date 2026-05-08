@@ -150,7 +150,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   >(mdastNode?.attributes?.['contentWidth'] as ContentWidthEnum | undefined);
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
-  const { menuRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
+  const { containerRef, menuRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
 
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const [adColor, setAdColor] = useState<
@@ -323,12 +323,12 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
 
   const outerSx: SxProps = backgroundColor
     ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
+      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+      clipPath: `inset(0 -100vmax 0)`,
+      backgroundColor,
+      paddingTop: blockPadding,
+      paddingBottom: blockPadding,
+    }
     : {};
 
   const expandIcon = useMemo(() => {
@@ -350,14 +350,15 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
 
   return (
     <Box
+      ref={containerRef}
       {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
       {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
       {...(contentWidth !== undefined
         ? {
-            style: {
-              '--block-max-width': blockMaxWidth ?? 'none',
-            } as React.CSSProperties,
-          }
+          style: {
+            '--block-max-width': blockMaxWidth ?? 'none',
+          } as React.CSSProperties,
+        }
         : {})}
       sx={{
         margin: 0,
@@ -371,10 +372,10 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
           width: '100%',
           ...(blockMaxWidth
             ? {
-                maxWidth: blockMaxWidth,
-                marginLeft: 'auto',
-                marginRight: 'auto',
-              }
+              maxWidth: blockMaxWidth,
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }
             : {}),
         }}
       >
