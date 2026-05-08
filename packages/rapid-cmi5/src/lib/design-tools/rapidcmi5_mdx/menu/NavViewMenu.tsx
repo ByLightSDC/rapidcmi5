@@ -171,7 +171,7 @@ export const NavViewMenu = ({
           </Tooltip>
         </IconButton>
       )}
-      <Box sx={{ height: '3px' }} />
+      <Box sx={{ height: '2px' }} />
       <IconButton
         aria-label="select-design"
         color="inherit"
