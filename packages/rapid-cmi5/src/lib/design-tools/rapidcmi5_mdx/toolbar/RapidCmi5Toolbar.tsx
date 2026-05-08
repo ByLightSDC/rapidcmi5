@@ -177,7 +177,7 @@ export const RapidCmi5Toolbar: React.FC<{
         );
 
         //max slide width
-        maxSlideWidth$.value = rect.width;
+        maxSlideWidth$.value = window.innerWidth - rect.left;
       }
     };
 
@@ -197,7 +197,7 @@ export const RapidCmi5Toolbar: React.FC<{
         backgroundColor: 'background.default',
         width: '100%',
         minHeight: '40px',
-        borderBottom: `1px solid ${themedDividerColor}`,
+        borderBottom: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
         position: 'sticky',
         top: 0,
         left: 0,

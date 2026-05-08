@@ -21,7 +21,7 @@ const appsKey = 0;
 const settingsKey = 1;
 const thinIconProps = {
   size: 20,
-  strokeWidth: 1.25,
+  strokeWidth: 1.75,
   absoluteStrokeWidth: true,
 };
 

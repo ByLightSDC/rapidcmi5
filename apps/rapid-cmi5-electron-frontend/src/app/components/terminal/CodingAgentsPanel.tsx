@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import { X } from 'lucide-react'
+import { PanelRightCloseIcon } from 'lucide-react'
 import {
   SessionStatus,
   TabButton,
@@ -143,7 +143,11 @@ function CodingAgentsPanelInner({
                 '&:hover': { color: '#ffffff' },
               }}
             >
-              <X fontSize="small" />
+              <PanelRightCloseIcon
+                size={20}
+                strokeWidth={1.75}
+                absoluteStrokeWidth={true}
+              />
             </IconButton>
           </Tooltip>
         </div>
