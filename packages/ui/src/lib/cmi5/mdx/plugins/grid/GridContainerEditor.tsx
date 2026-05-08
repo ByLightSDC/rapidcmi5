@@ -77,7 +77,7 @@ export const GridContainerEditor: React.FC<
   );
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
-  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
+  const { menuRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
 
   const [sxProps, setSxProps] = useState<SxProps>({});
   const [formData, setFormData] = useState<Array<GridCellDirectiveNode>>(
@@ -357,14 +357,14 @@ export const GridContainerEditor: React.FC<
         {/* Gutter buttons — absolutely positioned outside decorator at S/M, inside at L/None */}
         {!isPlayback && (
           <Box
-            ref={gutterRef as any}
+            
             sx={{
               backgroundColor:
                 muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
               position: 'absolute',
               display: 'flex',
               top: backgroundColor ? blockPadding : 0,
-              right: gutterRight,
+              right: menuRight,
             }}
           >
             <Tooltip title="Background Color">

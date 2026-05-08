@@ -11,7 +11,14 @@ import * as Mdast from 'mdast';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { CSSProperties, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import {
+  CSSProperties,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { $getRoot } from 'lexical';
 
@@ -55,16 +62,17 @@ import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
-import { resolveLessonThemeCSS, resolveBlockMaxWidth } from '../../../../styles/lessonThemeStyles';
+import {
+  resolveLessonThemeCSS,
+  resolveBlockMaxWidth,
+} from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
 import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { getDirectiveBlockShadow } from '../../../../styles/directiveStyles';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
-import {
-  DIRECTIVE_INNER_BOX_SHADOW,
-} from '../../constants/directiveLayout';
+import { DIRECTIVE_INNER_BOX_SHADOW } from '../../constants/directiveLayout';
 
 /**
  * Tabs Editor for tabs directive
@@ -105,14 +113,17 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   const [pendingColor, setPendingColor] = useState<string>(
     mdastNode?.attributes.backgroundColor ?? '',
   );
-  const [contentWidth, setContentWidth] = useState<ContentWidthEnum | undefined>(
-    mdastNode?.attributes.contentWidth,
-  );
+  const [contentWidth, setContentWidth] = useState<
+    ContentWidthEnum | undefined
+  >(mdastNode?.attributes.contentWidth);
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   // Ref so onClose always sees the latest pendingColor regardless of closure staleness.
   const pendingColorRef = useRef(pendingColor);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
-  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
+  const { containerRef, gutterRef, menuRight } = useGutterRight(
+    resolvedThemeCSS,
+    blockMaxWidth,
+  );
   // Set to true when handleClearColor already rebuilt, so onClose skips its rebuild.
   const skipNextCloseRebuildRef = useRef(false);
   const colorPickerOpen = Boolean(colorPickerAnchor);
@@ -212,7 +223,11 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
    * Used by both handleSubmit (tab management) and handleApplyColor.
    */
   const rebuildNode = useCallback(
-    async (children: TabContentDirectiveNode[], bgColor: string, blockContentWidth?: ContentWidthEnum) => {
+    async (
+      children: TabContentDirectiveNode[],
+      bgColor: string,
+      blockContentWidth?: ContentWidthEnum,
+    ) => {
       if (!parentEditor) return;
 
       // select AFTER the current tab first
@@ -288,11 +303,14 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     skipNextCloseRebuildRef.current = true;
     setPendingColor('');
     setBackgroundColor('');
-    parentEditor.update(() => {
-      const attrs = { ...mdastNode.attributes };
-      delete attrs.backgroundColor;
-      lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-    }, { discrete: true });
+    parentEditor.update(
+      () => {
+        const attrs = { ...mdastNode.attributes };
+        delete attrs.backgroundColor;
+        lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+      },
+      { discrete: true },
+    );
   }, [lexicalNode, mdastNode, parentEditor]);
 
   /**
@@ -391,9 +409,18 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   return (
     <>
       <Box
+        ref={ containerRef }
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
-        {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
-        {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as CSSProperties } : {})}
+        {...(contentWidth !== undefined
+          ? { 'data-block-override': 'true' }
+          : {})}
+        {...(contentWidth !== undefined
+          ? {
+              style: {
+                '--block-max-width': blockMaxWidth ?? 'none',
+              } as CSSProperties,
+            }
+          : {})}
         sx={{
           padding: 0,
           position: 'relative',
@@ -458,14 +485,14 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
         {/* Gutter buttons — absolutely positioned to the right of the decorator */}
         {!isPlayback && (
           <Box
-            ref={gutterRef as any}
+            ref={gutterRef}
             sx={{
               backgroundColor:
                 muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
               display: 'flex',
               position: 'absolute',
               top: backgroundColor ? blockPadding : 0,
-              right: gutterRight,
+              right: menuRight,
             }}
           >
             <Tooltip title="Background Color">
@@ -531,15 +558,18 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
           const latest = pendingColorRef.current;
           if (latest !== backgroundColor) {
             setBackgroundColor(latest);
-            parentEditor.update(() => {
-              const attrs = { ...mdastNode.attributes };
-              if (latest) {
-                attrs.backgroundColor = latest;
-              } else {
-                delete attrs.backgroundColor;
-              }
-              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-            }, { discrete: true });
+            parentEditor.update(
+              () => {
+                const attrs = { ...mdastNode.attributes };
+                if (latest) {
+                  attrs.backgroundColor = latest;
+                } else {
+                  delete attrs.backgroundColor;
+                }
+                lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+              },
+              { discrete: true },
+            );
           }
         }}
         lastColor={pendingColor}
@@ -560,15 +590,21 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
         onClose={() => setBlockAppearanceOpen(false)}
         onSave={(newContentWidth) => {
           setContentWidth(newContentWidth);
-          parentEditor.update(() => {
-            const attrs = { ...mdastNode.attributes } as Record<string, string>;
-            if (newContentWidth) {
-              attrs['contentWidth'] = newContentWidth;
-            } else {
-              delete attrs['contentWidth'];
-            }
-            lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-          }, { discrete: true });
+          parentEditor.update(
+            () => {
+              const attrs = { ...mdastNode.attributes } as Record<
+                string,
+                string
+              >;
+              if (newContentWidth) {
+                attrs['contentWidth'] = newContentWidth;
+              } else {
+                delete attrs['contentWidth'];
+              }
+              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+            },
+            { discrete: true },
+          );
         }}
       />
 

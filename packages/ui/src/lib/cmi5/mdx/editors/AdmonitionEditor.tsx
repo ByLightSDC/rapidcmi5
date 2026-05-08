@@ -150,10 +150,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   >(mdastNode?.attributes?.['contentWidth'] as ContentWidthEnum | undefined);
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
-  const { gutterRef, gutterRight } = useGutterRight(
-    resolvedThemeCSS,
-    blockMaxWidth,
-  );
+  const { menuRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
 
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const [adColor, setAdColor] = useState<
@@ -473,14 +470,13 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
       {/* Gutter buttons — absolutely positioned outside decorator at S/M, inside at L/None */}
       {!isPlayback && (
         <Box
-          ref={gutterRef as any}
           sx={{
             backgroundColor:
               muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
             display: 'flex',
             position: 'absolute',
             top: backgroundColor ? blockPadding : 0,
-            right: gutterRight,
+            right: menuRight,
             zIndex: 100,
           }}
         >
