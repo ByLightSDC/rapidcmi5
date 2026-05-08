@@ -46,7 +46,7 @@ export interface DirEntry {
   isFile: boolean;
   isDirectory: boolean;
 }
-function getRapidBase(isTestMode: boolean) {
+export function getRapidBase(isTestMode: boolean) {
   // Change this if you prefer another location
   return path.join(
     app.getPath('userData'),

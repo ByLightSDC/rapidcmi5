@@ -60,7 +60,6 @@ import { InsertImage } from './components/InsertImage';
 import { InsertSteps } from './components/InsertSteps';
 import { InsertTabs } from './components/InsertTabs';
 import { InsertVideo } from './components/InsertVideo';
-//REF import { InsertLayoutBox } from './components/InsertLayoutBox';
 import { InsertLayoutBox } from './components/InsertLayoutBox';
 import { InsertLink } from './components/InsertLink';
 import { InsertThematicBreak } from './components/InsertThematicBreak';
@@ -198,7 +197,7 @@ export const RapidCmi5Toolbar: React.FC<{
         backgroundColor: 'background.default',
         width: '100%',
         minHeight: '40px',
-        borderBottom: `1px solid ${themedDividerColor}`,
+        borderBottom: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
         position: 'sticky',
         top: 0,
         left: 0,
@@ -308,15 +307,15 @@ export const RapidCmi5Toolbar: React.FC<{
           )}
           {(viewmode === 'source' ||
             (viewmode === 'rich-text' && isPlayback)) && (
-            <Box sx={{ minHeight: '32px' }}></Box>
-          )}
+              <Box sx={{ minHeight: '32px' }}></Box>
+            )}
           <Stack
             direction="row"
             spacing={1}
             sx={{
               display: 'flex',
               alignItems: 'flex-end',
-              width: `calc(100vw - ${leftToolbarPos}px)`,
+              width: '100%',
             }}
           >
             <Stack

@@ -26,10 +26,7 @@
     "target": [
       {
         "target": "nsis",
-        "arch": [
-          "x64",
-          "arm64"
-        ]
+        "arch": ["x64", "arm64"]
       }
     ],
     "icon": "dist/apps/rapid-cmi5-electron/assets/icon.ico"
@@ -38,10 +35,7 @@
     "target": [
       {
         "target": "AppImage",
-        "arch": [
-          "x64",
-          "arm64"
-        ]
+        "arch": ["x64", "arm64"]
       }
     ],
     "category": "Education",
@@ -51,10 +45,7 @@
     "target": [
       {
         "target": "dmg",
-        "arch": [
-          "x64",
-          "arm64"
-        ]
+        "arch": ["x64", "arm64"]
       }
     ],
     "category": "public.app-category.education",

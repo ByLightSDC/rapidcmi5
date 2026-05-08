@@ -106,7 +106,7 @@ interface IGitContext {
   handleChangeRepo: (name: string) => void;
   handleChangeFileSystem: (fsType: fsType) => void;
   handleChangeRepoName: (name: string) => void;
-  handleLoadCourse: (coursePath: string) => void;
+  handleLoadCourse: (coursePath: string) => Promise<void>;
   handlePathExists: (path: string) => Promise<boolean>;
   handleBlobImageFile: (
     r: RepoAccessObject,
@@ -229,37 +229,37 @@ const defaultGitContext: IGitContext = {
   handlePathExists: async () => false,
   handleBlobImageFile: async (r, filePath, fileType) => null,
   handleGetFolderStructure: async () => [],
-  handleDeleteCurrentRepo: async () => {},
-  handleDeleteCourse: () => {},
-  handleGitStashChanges: async () => {},
-  handleGitStashPopChanges: async () => {},
-  handleGitCommitReset: () => {},
-  handleChangeRepo: () => {},
-  handleChangeFileSystem: () => {},
-  handleChangeRepoName: () => {},
-  handleGitSetConfig: () => {},
-  handleCloneRepo: async (): Promise<void> => {},
-  handleCommit: async () => {},
-  handleResolveMerge: async () => {},
-  handleLoadCourse: () => {},
-  handleCheckoutBranch: async () => {},
-  handlePull: async (): Promise<void> => {},
-  handleDownloadCmi5Zip: async (): Promise<void> => {},
-  handleNavToDesigner: () => {},
-  handleNavToGitView: async () => {},
-  handleNavToFile: () => {},
-  handleStageAll: async () => {},
+  handleDeleteCurrentRepo: async () => { },
+  handleDeleteCourse: () => { },
+  handleGitStashChanges: async () => { },
+  handleGitStashPopChanges: async () => { },
+  handleGitCommitReset: () => { },
+  handleChangeRepo: () => { },
+  handleChangeFileSystem: () => { },
+  handleChangeRepoName: () => { },
+  handleGitSetConfig: () => { },
+  handleCloneRepo: async (): Promise<void> => { },
+  handleCommit: async () => { },
+  handleResolveMerge: async () => { },
+  handleLoadCourse: async (): Promise<void> => { },
+  handleCheckoutBranch: async () => { },
+  handlePull: async (): Promise<void> => { },
+  handleDownloadCmi5Zip: async (): Promise<void> => { },
+  handleNavToDesigner: () => { },
+  handleNavToGitView: async () => { },
+  handleNavToFile: () => { },
+  handleStageAll: async () => { },
   handleGetDiff: async (_filePath: string): Promise<any> => {
     oldFile: '';
     newFile: '';
   },
-  handleUnstageAll: () => {},
+  handleUnstageAll: () => { },
   modifiedFiles: [],
   isElectron: false,
   isInMerge: false,
   stashFiles: [],
-  handleStageFile: async () => {},
-  handleUnStageFile: () => {},
+  handleStageFile: async () => { },
+  handleUnStageFile: () => { },
   handleGetUniqueFilePath: async (
     r: RepoAccessObject,
     slideTitle: string,
@@ -274,44 +274,44 @@ const defaultGitContext: IGitContext = {
   handleRenameFile: async (
     _oldpath: string,
     _newname: string,
-  ): Promise<void> => {},
+  ): Promise<void> => { },
   handleUpdateFile: async (
     _filePath: string,
     _data: string,
-  ): Promise<void> => {},
+  ): Promise<void> => { },
   handleCreateFile: async (
     _filePath: string,
     _isDir: boolean,
     _data?: string | Uint8Array,
-  ): Promise<void> => {},
+  ): Promise<void> => { },
   handleDeleteFile: async (
     _filePath: string,
     _isDir: boolean,
-  ): Promise<void> => {},
+  ): Promise<void> => { },
   handleGetFileContents: async (
     _filePath: string,
   ): Promise<FileContent | null> => null,
-  handleCopyFile: async (_src: string, _dest: string): Promise<void> => {},
-  handleRevertFile: () => {},
-  handleRemoveFile: () => {},
+  handleCopyFile: async (_src: string, _dest: string): Promise<void> => { },
+  handleRevertFile: () => { },
+  handleRemoveFile: () => { },
   syncCurrentCourseWithGit: async () => [],
-  handleCreateCourse: async () => {},
+  handleCreateCourse: async () => { },
   getLocalFileBlob: async () => null,
   getLocalFileBlobUrl: async () => null,
-  handlePushRepo: async () => {},
+  handlePushRepo: async () => { },
   resolvePCTEProjects: async () => [],
-  publishToPCTE: () => {},
+  publishToPCTE: () => { },
   handleGetCourseData: async (_coursePath: string): Promise<CourseData> =>
     defaultCourseData,
   directoryTree: [],
-  handleRenameCourse: () => {},
-  handleImportRepoZip: () => {},
-  handleCreateLocalRepo: async () => {},
+  handleRenameCourse: () => { },
+  handleImportRepoZip: () => { },
+  handleCreateLocalRepo: async () => { },
   numStaged: 0,
   getLocalFolders: async (): Promise<DirMeta[]> => [],
-  openSandbox: async (): Promise<void> => {},
-  openLocalRepo: async (): Promise<void> => {},
-  deleteRecentProject: async (): Promise<void> => {},
+  openSandbox: async (): Promise<void> => { },
+  openLocalRepo: async (): Promise<void> => { },
+  deleteRecentProject: async (): Promise<void> => { },
   getDirHandle: async (): Promise<FileSystemDirectoryHandle | null> => null,
   gettingRepoStatus: false,
 };
@@ -578,9 +578,9 @@ export const GitContextProvider = (props: tProviderProps) => {
       const creds: Credentials | undefined =
         repoUsername && repoPassword
           ? {
-              username: repoUsername,
-              password: repoPassword,
-            }
+            username: repoUsername,
+            password: repoPassword,
+          }
           : undefined;
       rapidCmi5Opts.handleOverrideGlobalGitConfig(gitUserConfig, creds);
     }

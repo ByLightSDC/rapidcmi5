@@ -450,7 +450,6 @@ export const courseBuilderSlice = createSlice({
         state.slides.length - 1,
       );
       theSlides[slideIndex].content = action.payload.content.toString();
-      theSlides[slideIndex].display = action.payload.display;
       state.slides = theSlides;
       if (!action.payload.skipShouldDirty) {
         state.dirtyReason = 'update slide content';

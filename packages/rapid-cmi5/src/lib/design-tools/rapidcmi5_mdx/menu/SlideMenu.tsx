@@ -75,7 +75,6 @@ export const SlideMenu = () => {
         blockIndex: currentBlockIndex,
         slide: {
           content: defaultSlideContent,
-          display: defaultSlideContent,
           slideTitle: slideTitle,
           type: SlideTypeEnum.Markdown,
           filepath,

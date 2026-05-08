@@ -2,10 +2,11 @@ import SquirrelEvents from './app/events/squirrel.events';
 import ElectronEvents from './app/events/electron.events';
 import { BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import App from './app/app';
-import * as nodePath from 'path'; // Renamed to avoid conflicts
+import path, * as nodePath from 'path'; // Renamed to avoid conflicts
 import { pipeline } from 'stream/promises';
 import {
   ElectronFsHandler,
+  getRapidBase,
   resolveSafe,
 } from './app/api/fileSystem/fileSystem';
 
@@ -52,6 +53,196 @@ import {
   addRecentProject,
   removeRecentProject,
 } from './app/api/userSettings/recentProjects';
+import {
+  inputToSession,
+  resizeSession,
+  startClaudeSession,
+  startPtySession,
+  stopAllSessionsForWebContents,
+  stopSession,
+  type StartOptions,
+} from './app/api/claude/cli';
+import { startCodexSession } from './app/api/codex/cli';
+import { startMcp } from './app/api/mcp/main';
+
+function defaultShell(): string {
+  if (process.platform === 'win32') {
+    return process.env.COMSPEC ?? 'cmd.exe';
+  }
+  return process.env.SHELL ?? '/bin/bash';
+}
+
+function getLocalFsBase(): string {
+  return path.join(getRapidBase(App.isTestMode()), 'localFileSystem');
+}
+
+const rapidCmi5AgentInstructions = `# RapidCMI5 Agent Notes
+
+You are helping a course designer author CMI5 e-learning content in the
+RapidCMI5 Electron app. The user is an instructional designer, not a
+developer — they speak in lessons, slides, topics, audiences. Translate
+their phrasing into the right tool calls; never make them think in
+terms of filepaths or yaml.
+
+## Data model
+
+The workspace (your cwd) contains projects (top-level repo directories,
+git-tracked). Each project contains one or more courses (directories
+with an \`RC5.yaml\` manifest). The hierarchy:
+
+    course → blocks → AUs (lessons) → slides
+
+Most courses have a single block. Treat blocks as an organizational
+detail; don't surface them to the user.
+
+- \`coursePath\` is "\`<projectDir>/<courseDir>\`" (e.g. "test1-project/course-1").
+- An AU's \`dirPath\` is unique within a course (filesystem-enforced).
+- A slide's \`filepath\` is unique within a course AND is relative to
+  the **project** dir, not the course dir. To read a slide with the
+  host Read tool, prepend the project: "\`<projectDir>/<slide.filepath>\`".
+
+## Workflow
+
+1. **Discover before mutating.** Call \`rc5_get_course\` first whenever
+   you plan to change content. This gives you the full structure plus
+   the unique handles you'll need (dirPath, filepath).
+2. **To fetch a slide's markdown body, use the host's Read tool**, not
+   an MCP tool. The path is "\`<projectDir>/<slide.filepath>\`". There
+   is intentionally no \`rc5_get_slide\` — Read is the right primitive.
+3. **To mutate course content** (create a course, add a quiz, update
+   slides, save), use the \`rc5_*\` tools. They call into the Electron
+   renderer so the open Designer stays in sync. **Do not** write
+   RC5.yaml or slide \`.md\` files directly with Write/Edit — the
+   Designer's Redux state will diverge from disk and edits will be lost
+   the next time the user saves.
+4. **When the user's request is ambiguous** (e.g. multiple lessons or
+   slides share the same title), ASK A CLARIFYING QUESTION. Do not
+   guess. Show them the matches with enough context to pick.
+
+## Authoring guidelines
+
+- A lesson should have a clear learning objective written at an
+  appropriate Bloom's-taxonomy level. Pick a verb that matches what
+  the learner should be able to DO after the lesson:
+    - **Remember:** identify, list, recall, recognize, name
+    - **Understand:** describe, explain, summarize, classify, compare
+    - **Apply:** implement, execute, use, demonstrate, solve
+    - **Analyze:** differentiate, contrast, organize, attribute, deconstruct
+    - **Evaluate:** judge, critique, defend, justify, assess
+    - **Create:** design, construct, plan, produce, compose
+  Avoid vague verbs like "know", "understand" (the level, fine; the
+  verb, no), or "learn" — they aren't observable behaviors.
+- Slide content is markdown. Available custom directives:
+    - **Activities** (need JSON-fenced bodies): \`quiz\`, \`ctf\`,
+      \`scenario\`, \`codeRunner\`, \`download\`, \`consoles\`.
+    - **Call-outs** (markdown bodies): \`admonition\` (12 types — tip,
+      warning, danger, note, info, example, question, quote, success,
+      failure, abstract, bug).
+    - **Layouts** (markdown bodies): \`gridContainer\` (side-by-side),
+      \`accordion\` (collapsible), \`steps\` (sequential), \`tabs\`
+      (alternative views), \`statements\` (visual statement list),
+      \`quotes\` (attributed quotes), \`layout\` (flex container).
+  **Activity directive bodies (quiz / ctf / scenario / codeRunner /
+  download / consoles) MUST be a fenced JSON code block matching the
+  directive's content schema — never bare YAML or plain text.**
+  Before composing any directive, call
+  \`rc5_get_directive_format(name)\` to fetch the exact schema and a
+  worked example. Reach for layouts to break up long text slides:
+  \`accordion\` for FAQ / optional depth, \`steps\` for procedures,
+  \`tabs\` for alternatives, \`gridContainer\` for compare/contrast.
+- Keep slides focused. One concept per slide; varied formats
+  (explanation, example, check-for-understanding) across a lesson.
+- For courses targeting compliance-driven training (military, gov,
+  healthcare), tag content with KSAT codes when known.
+`;
+
+function toTomlString(value: string): string {
+  return JSON.stringify(value);
+}
+
+function upsertCodexMcpConfig(config: string, url: string): string {
+  const rapidCmi5Block = `[mcp_servers.rapidcmi5]\nurl = ${toTomlString(url)}\n`;
+  const blockPattern =
+    /(^|\n)\[mcp_servers\.rapidcmi5\]\n(?:[^\n]*\n)*(?=\n?\[|\s*$)/m;
+
+  if (blockPattern.test(config)) {
+    return `${config.replace(blockPattern, `$1${rapidCmi5Block}`).trimEnd()}\n`;
+  }
+
+  const prefix = config.trimEnd();
+  return `${prefix ? `${prefix}\n\n` : ''}${rapidCmi5Block}`;
+}
+
+async function startMcpServer(): Promise<void> {
+  const base = getLocalFsBase();
+  await fs.promises.mkdir(base, { recursive: true });
+
+  const { url } = await startMcp({
+    rootDir: base,
+    getMainWindow: () => App.mainWindow ?? null,
+  });
+
+  const mcpJson = {
+    mcpServers: {
+      rapidcmi5: {
+        type: 'http',
+        url,
+      },
+    },
+  };
+  await fs.promises.writeFile(
+    path.join(base, '.mcp.json'),
+    JSON.stringify(mcpJson, null, 2) + '\n',
+    'utf-8',
+  );
+  await fs.promises.writeFile(
+    path.join(base, 'AGENTS.md'),
+    rapidCmi5AgentInstructions,
+    'utf-8',
+  );
+  await fs.promises.writeFile(
+    path.join(base, 'CLAUDE.md'),
+    rapidCmi5AgentInstructions,
+    'utf-8',
+  );
+
+  const codexDir = path.join(base, '.codex');
+  const codexConfigPath = path.join(codexDir, 'config.toml');
+  await fs.promises.mkdir(codexDir, { recursive: true });
+
+  let existingCodexConfig = '';
+  try {
+    existingCodexConfig = await fs.promises.readFile(codexConfigPath, 'utf-8');
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw error;
+    }
+  }
+
+  await fs.promises.writeFile(
+    codexConfigPath,
+    upsertCodexMcpConfig(existingCodexConfig, url),
+    'utf-8',
+  );
+}
+
+let mcpServerReady: Promise<void> | null = null;
+
+function ensureMcpServer(): Promise<void> {
+  if (!mcpServerReady) {
+    mcpServerReady = startMcpServer().catch((error) => {
+      mcpServerReady = null;
+      throw error;
+    });
+  }
+  return mcpServerReady;
+}
+
+app.whenReady().then(() => {
+  ensureMcpServer().catch((e) =>
+    console.error('Failed to start MCP server:', e),
+  );
+});
 
 const builder = new cmi5Builder();
 let fsHandler: ElectronFsHandler | null = null;
@@ -745,6 +936,81 @@ ipcMain.handle(
     }
   },
 );
+
+// Claude CLI Handlers
+ipcMain.handle('claude:start', (e, opts: StartOptions = {}) => {
+  return startClaudeSession(e.sender, {
+    ...opts,
+    cwd: opts.cwd ?? getLocalFsBase(),
+  });
+});
+
+ipcMain.handle('claude:input', (_e, sessionId: string, data: string) => {
+  inputToSession(sessionId, data);
+});
+
+ipcMain.handle(
+  'claude:resize',
+  (_e, sessionId: string, cols: number, rows: number) => {
+    resizeSession(sessionId, cols, rows);
+  },
+);
+
+ipcMain.handle('claude:stop', (_e, sessionId: string) => {
+  stopSession(sessionId);
+});
+
+// Codex CLI Handlers
+ipcMain.handle('codex:start', async (e, opts: StartOptions = {}) => {
+  await ensureMcpServer();
+  return startCodexSession(e.sender, {
+    ...opts,
+    cwd: opts.cwd ?? getLocalFsBase(),
+  });
+});
+
+ipcMain.handle('codex:input', (_e, sessionId: string, data: string) => {
+  inputToSession(sessionId, data);
+});
+
+ipcMain.handle(
+  'codex:resize',
+  (_e, sessionId: string, cols: number, rows: number) => {
+    resizeSession(sessionId, cols, rows);
+  },
+);
+
+ipcMain.handle('codex:stop', (_e, sessionId: string) => {
+  stopSession(sessionId);
+});
+
+// Terminal Handlers (direct OS shell)
+ipcMain.handle('terminal:start', (e, opts: StartOptions = {}) => {
+  return startPtySession(e.sender, 'terminal', {
+    ...opts,
+    command: opts.command ?? defaultShell(),
+    cwd: opts.cwd ?? getLocalFsBase(),
+  });
+});
+
+ipcMain.handle('terminal:input', (_e, sessionId: string, data: string) => {
+  inputToSession(sessionId, data);
+});
+
+ipcMain.handle(
+  'terminal:resize',
+  (_e, sessionId: string, cols: number, rows: number) => {
+    resizeSession(sessionId, cols, rows);
+  },
+);
+
+ipcMain.handle('terminal:stop', (_e, sessionId: string) => {
+  stopSession(sessionId);
+});
+
+app.on('web-contents-created', (_e, wc) => {
+  wc.on('destroyed', () => stopAllSessionsForWebContents(wc));
+});
 
 export default class Main {
   static initialize() {

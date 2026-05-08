@@ -138,9 +138,6 @@ export const defaultCourseData: CourseData = {
       aus: [
         {
           auName: '',
-          assetsPath: '',
-          backgroundImage: '',
-          rangeosScenarioName: '',
           slides: [{ ...defaultEmptySlide }],
           dirPath: '',
         },

@@ -134,11 +134,11 @@ export const QuotesSettings = ({
                     {preset.name}
                   </Typography>
                   {/* Visual preview: render equal-width mini grid boxes */}
-                  <Box sx={{ display: 'flex', justifyContent:'center', gap: 0.5 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.5 }}>
                     <img
                       width={220}
                       height={74}
-                      src={`/assets/images/quotes_preset_${preset.id}.png`}
+                      src={`./assets/images/quotes_preset_${preset.id}.png`}
                       alt={`${preset.name} image`}
                     />
                   </Box>

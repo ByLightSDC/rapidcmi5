@@ -25,7 +25,7 @@ export const QUOTE_PRESETS: QuotePreset[] = [
 /**
  * Placeholder avatar image
  */
-export const placeholderAvatar = '/assets/images/quoteAuthorPlaceholder.png';
+export const placeholderAvatar = './assets/images/quoteAuthorPlaceholder.png';
 
 /** The first line return is REQUIRED!!!! */
 export const DEFAULT_QUOTES = `
