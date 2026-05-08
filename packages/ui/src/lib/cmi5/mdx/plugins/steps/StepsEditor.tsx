@@ -12,8 +12,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { CSSProperties, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { toMarkdown } from 'mdast-util-to-markdown';
-import { $getRoot } from 'lexical';
+
 
 import {
   Box,
@@ -77,6 +76,7 @@ import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { useGutterRight } from '../shared/useGutterRight';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { useBackgroundColors } from 'packages/ui/src/lib/hooks/useBackgroundColors';
+import { BackgroundColorTrigger } from 'packages/ui/src/lib/colors/BackgroundColorTrigger';
 
 /**
  * Steps Editor for steps directive
@@ -523,9 +523,13 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                         onClick={() => setBlockAppearanceOpen(true)}
                         size="small"
                       >
-                        <SettingsIcon fontSize="small" />
+                        <PaletteIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
+                    <BackgroundColorTrigger
+                      currentColor={backgroundColor ? { color: pendingColor } : undefined}
+                      onTrigger={openPicker}
+                    />
                     <InsertLineReturnButton
                       parentEditor={parentEditor}
                       lexicalNode={lexicalNode}

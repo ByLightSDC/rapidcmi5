@@ -529,7 +529,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
                 onClick={() => setBlockAppearanceOpen(true)}
                 size="small"
               >
-                <SettingsIcon fontSize="small" />
+                <PaletteIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <BackgroundColorTrigger

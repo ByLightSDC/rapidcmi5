@@ -44,7 +44,6 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PaletteIcon from '@mui/icons-material/Palette';
 import EditIcon from '@mui/icons-material/Edit';
-import SettingsIcon from '@mui/icons-material/Settings';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
@@ -66,8 +65,6 @@ import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
-import { toolbarRect$ } from '../toolbar/vars';
-import { useSignalEffect } from '@preact/signals-react';
 import { useGutterRight } from '../shared/useGutterRight';
 import { useBackgroundColors } from 'packages/ui/src/lib/hooks/useBackgroundColors';
 import { BackgroundColorTrigger } from 'packages/ui/src/lib/colors/BackgroundColorTrigger';
@@ -94,16 +91,6 @@ export const AccordionEditor: React.FC<
   const insertMarkdown = usePublisher(insertMarkdown$);
   const [editor] = useLexicalComposerContext();
   const [isConfiguring, setIsConfiguring] = useState(false);
-  // const [backgroundColor, setBackgroundColor] = useState<string>(
-  //   (mdastNode?.attributes as AccordionDirectiveNode['attributes'])
-  //     ?.backgroundColor ?? '',
-  // );
-  // const [colorPickerAnchor, setColorPickerAnchor] =
-  //   useState<HTMLButtonElement | null>(null);
-  // const [pendingColor, setPendingColor] = useState<string>(
-  //   mdastNode?.attributes.backgroundColor ?? '',
-  // );
-  // const pendingColorRef = useRef(pendingColor);
   const {
     backgroundColor,
     colorPickerAnchor,
@@ -415,7 +402,6 @@ export const AccordionEditor: React.FC<
             ref={gutterRef as any}
             id="context-menu"
             sx={{
-              //backgroundColor: 'pink',
               backgroundColor:
                 muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
               display: 'flex',
@@ -424,22 +410,6 @@ export const AccordionEditor: React.FC<
               right: menuRight,
             }}
           >
-            {/* <Box sx={{ position: 'absolute', right:'15px' }}> */}
-            {/* <Tooltip title="Background Color">
-              <IconButton
-                onClick={(e) => {
-                  pendingColorRef.current = backgroundColor;
-                  setPendingColor(backgroundColor);
-                  setColorPickerAnchor(e.currentTarget);
-                }}
-                size="small"
-              >
-                <PaletteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip> */}
-
-
-
             <Tooltip title="Edit Sections">
               <IconButton onClick={handleConfigure}>
                 <EditIcon />
@@ -473,7 +443,6 @@ export const AccordionEditor: React.FC<
                 });
               }}
             />
-            {/* </Box> */}
           </Box>
         )}
       </Box>
