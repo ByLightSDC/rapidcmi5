@@ -7,8 +7,6 @@ import {
   Drawer,
   IconButton,
   LinearProgress,
-  Tab,
-  Tabs,
   Tooltip,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -229,8 +227,18 @@ export default function AiDrawer({ open, onClose, initialMode, onThinkingChange 
   }, [isThinking, onThinkingChange]);
 
   useEffect(() => {
-    if (initialMode) setMode(initialMode);
-  }, [initialMode]);
+    if (!initialMode) return;
+    setMode(initialMode);
+    // Drawer already open — no transitionend fires, so fit the new panel directly.
+    if (open) {
+      setTimeout(() => {
+        const activeRef =
+          initialMode === 'claude' ? claudeRef :
+          initialMode === 'codex'  ? codexRef  : terminalRef;
+        activeRef.current?.fitNow();
+      }, 0);
+    }
+  }, [initialMode, open]);
 
   // When drawer opens, ensure current mode is in openedModes
   useEffect(() => {
@@ -268,24 +276,6 @@ export default function AiDrawer({ open, onClose, initialMode, onThinkingChange 
     paper.addEventListener('transitionend', onTransitionEnd);
     return () => paper.removeEventListener('transitionend', onTransitionEnd);
   }, [open, mode]);
-
-  const handleTabChange = useCallback((_: React.SyntheticEvent, newMode: PanelMode) => {
-    setMode(newMode);
-    setOpenedModes((prev) => {
-      if (prev.has(newMode)) return prev;
-      const next = new Set(prev);
-      next.add(newMode);
-      return next;
-    });
-    // When switching tabs, fit the newly visible terminal immediately
-    // (it was hidden so its canvas may be stale).
-    setTimeout(() => {
-      const activeRef =
-        newMode === 'claude' ? claudeRef :
-        newMode === 'codex'  ? codexRef  : terminalRef;
-      activeRef.current?.fitNow();
-    }, 0);
-  }, []);
 
   const noOp = useCallback(() => {}, []);
 
@@ -340,42 +330,16 @@ export default function AiDrawer({ open, onClose, initialMode, onThinkingChange 
           minHeight: 40,
         }}
       >
-        <Tabs
-          value={mode}
-          onChange={handleTabChange}
-          sx={{
-            minHeight: 40,
-            '& .MuiTab-root': {
-              minHeight: 40,
-              fontSize: 12,
-              color: '#ccc',
-              textTransform: 'none',
-              py: 0,
-              px: 1.5,
-            },
-            '& .Mui-selected': { color: '#fff' },
-            '& .MuiTabs-indicator': { backgroundColor: '#007acc' },
-          }}
-        >
-          <Tab
-            value="claude"
-            icon={<SmartToyOutlinedIcon sx={{ fontSize: 14 }} />}
-            iconPosition="start"
-            label={<span>Claude {statusDot(claudeStatus)}</span>}
-          />
-          <Tab
-            value="codex"
-            icon={<CodeOutlinedIcon sx={{ fontSize: 14 }} />}
-            iconPosition="start"
-            label={<span>Codex {statusDot(codexStatus)}</span>}
-          />
-          <Tab
-            value="terminal"
-            icon={<TerminalOutlinedIcon sx={{ fontSize: 14 }} />}
-            iconPosition="start"
-            label={<span>Terminal {statusDot(terminalStatus)}</span>}
-          />
-        </Tabs>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, pl: 0.5, color: '#ccc', fontSize: 13 }}>
+          {mode === 'claude'   && <SmartToyOutlinedIcon sx={{ fontSize: 15 }} />}
+          {mode === 'codex'    && <CodeOutlinedIcon sx={{ fontSize: 15 }} />}
+          {mode === 'terminal' && <TerminalOutlinedIcon sx={{ fontSize: 15 }} />}
+          <span style={{ textTransform: 'capitalize' }}>{mode}</span>
+          {statusDot(
+            mode === 'claude' ? claudeStatus :
+            mode === 'codex'  ? codexStatus  : terminalStatus
+          )}
+        </Box>
 
         <Tooltip title="Close" placement="left">
           <IconButton size="small" onClick={onClose} sx={{ color: '#ccc', '&:hover': { color: '#fff' } }}>
