@@ -409,7 +409,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   return (
     <>
       <Box
-     
+        ref={ containerRef }
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         {...(contentWidth !== undefined
           ? { 'data-block-override': 'true' }

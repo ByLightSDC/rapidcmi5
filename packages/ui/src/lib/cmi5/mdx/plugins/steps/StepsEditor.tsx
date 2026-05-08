@@ -114,7 +114,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   >(mdastNode.attributes.contentWidth);
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
-  const { menuRight } = useGutterRight(
+  const { containerRef, menuRight } = useGutterRight(
     resolvedThemeCSS,
     blockMaxWidth,
   );
@@ -429,6 +429,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   return (
     <>
       <Box
+         ref={ containerRef }
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
         {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as CSSProperties } : {})}
