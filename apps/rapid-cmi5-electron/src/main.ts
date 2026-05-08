@@ -56,6 +56,7 @@ import {
 import {
   inputToSession,
   resizeSession,
+  startClaudeSession,
   startPtySession,
   stopAllSessionsForWebContents,
   stopSession,
@@ -938,9 +939,8 @@ ipcMain.handle(
 
 // Claude CLI Handlers
 ipcMain.handle('claude:start', (e, opts: StartOptions = {}) => {
-  return startPtySession(e.sender, 'claude', {
+  return startClaudeSession(e.sender, {
     ...opts,
-    command: opts.command ?? (process.platform === 'win32' ? 'claude.cmd' : 'claude'),
     cwd: opts.cwd ?? getLocalFsBase(),
   });
 });

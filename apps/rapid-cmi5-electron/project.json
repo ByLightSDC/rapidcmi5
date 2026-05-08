@@ -12,7 +12,19 @@
         "outputPath": "dist/apps/rapid-cmi5-electron",
         "main": "apps/rapid-cmi5-electron/src/main.ts",
         "tsConfig": "apps/rapid-cmi5-electron/tsconfig.app.json",
-        "assets": ["apps/rapid-cmi5-electron/src/assets"]
+        "assets": [
+          "apps/rapid-cmi5-electron/src/assets",
+          {
+            "input": "apps/rapid-cmi5-electron-frontend/src/assets/images",
+            "glob": "**/*",
+            "output": "assets/images"
+          },
+          {
+            "input": "apps/rapid-cmi5-electron-frontend/src/assets/fonts",
+            "glob": "**/*",
+            "output": "assets/fonts"
+          }
+        ]
       },
       "configurations": {
         "production": {

@@ -3,6 +3,7 @@ import { type WebContents } from 'electron';
 import {
   inputToSession,
   resizeSession,
+  startCommandSession,
   startPtySession,
   stopAllSessionsForWebContents,
   stopSession,
@@ -15,10 +16,10 @@ export function startCodexSession(
   webContents: WebContents,
   opts: CodexStartOptions = {},
 ): { sessionId: string } {
-  return startPtySession(webContents, 'codex', {
-    ...opts,
-    command: opts.command ?? (process.platform === 'win32' ? 'codex.cmd' : 'codex'),
-  });
+  if (opts.command) {
+    return startPtySession(webContents, 'codex', opts);
+  }
+  return startCommandSession(webContents, 'codex', 'codex', opts);
 }
 
 export {

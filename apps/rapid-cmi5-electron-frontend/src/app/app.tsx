@@ -6,7 +6,7 @@ import {
 import { BrowserRouter as RouterWrapper } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { dividerColor, setDividerColor, setIconColor, themeColor } from '@rapid-cmi5/ui';
+import { setDividerColor, setIconColor, themeColor } from '@rapid-cmi5/ui';
 
 /* Shared */
 import AppHeader from './shared/AppHeader';
@@ -100,96 +100,96 @@ export default function App() {
                   <TimePickerProvider>
                     <UserConfig>
                       <Auth>
-                        <AppHeader
-                          aiOpen={aiOpen}
-                          onAiToggle={isElectron ? handleAiToggle : undefined}
-                          terminalOpen={terminalOpen}
-                          onTerminalToggle={
-                            isElectron ? handleTerminalToggle : undefined
-                          }
-                        />
-
-                        <main
-                          id="app-routes"
-                          style={{
+                        <Box
+                          sx={{
                             display: 'flex',
-                            flex: '1 1 auto',
+                            flexDirection: 'column',
                             width: '100%',
+                            height: '100%',
                             minHeight: 0,
-                            overflow: 'hidden',
                           }}
                         >
-                          <PanelGroup
-                            direction="vertical"
+                          <AppHeader
+                            aiOpen={aiOpen}
+                            onAiToggle={isElectron ? handleAiToggle : undefined}
+                            terminalOpen={terminalOpen}
+                            onTerminalToggle={
+                              isElectron ? handleTerminalToggle : undefined
+                            }
+                          />
+
+                          <main
+                            id="app-routes"
                             style={{
+                              display: 'flex',
+                              flex: '1 1 auto',
                               width: '100%',
-                              height: '100%',
-                              minWidth: 0,
+                              overflow: 'hidden',
                               minHeight: 0,
                             }}
                           >
-                            <Panel style={{ overflow: 'hidden' }}>
-                              <PanelGroup
-                                direction="horizontal"
-                                style={{
-                                  width: '100%',
-                                  height: '100%',
-                                  minWidth: 0,
-                                  minHeight: 0,
-                                }}
-                              >
-                                <Panel style={{ overflow: 'hidden' }}>
-                                  <Box
-                                    sx={{
-                                      minWidth: 0,
+
+                            <PanelGroup
+                              direction="horizontal"
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                minWidth: 0,
+                                minHeight: 0,
+                              }}
+                            >
+                              <Panel style={{ overflow: 'hidden' }}>
+                                <Box
+                                  sx={{
+                                    minWidth: 0,
+                                    height: '100%',
+                                    overflow: 'hidden',
+                                    '& > *': {
+                                      width: '100%',
                                       height: '100%',
+                                    },
+                                  }}
+                                >
+                                  <RapidCmi5Wrapper
+                                    onAiClick={
+                                      isElectron ? handleAiClick : undefined
+                                    }
+                                    aiThinking={
+                                      isElectron ? aiThinking : false
+                                    }
+                                  />
+                                </Box>
+                              </Panel>
+                              {isElectron && aiOpen && (
+                                <>
+                                  <PanelResizeHandle
+                                    style={{
+                                      width: 1,
+                                      backgroundColor: 'grey',
+                                      opacity: 0.4,
+                                      cursor: 'col-resize',
+                                    }}
+                                  />
+                                  <Panel
+                                    defaultSize={32}
+                                    minSize={18}
+                                    maxSize={55}
+                                    style={{
                                       overflow: 'hidden',
-                                      '& > *': {
-                                        width: '100%',
-                                        height: '100%',
-                                      },
+                                      position: 'relative',
+                                      zIndex: 1400,
                                     }}
                                   >
-                                    <RapidCmi5Wrapper
-                                      onAiClick={
-                                        isElectron ? handleAiClick : undefined
-                                      }
-                                      aiThinking={
-                                        isElectron ? aiThinking : false
-                                      }
+                                    <CodingAgentsPanel
+                                      open={aiOpen}
+                                      onClose={() => setAiOpen(false)}
+                                      onThinkingChange={setAiThinking}
                                     />
-                                  </Box>
-                                </Panel>
-                                {isElectron && aiOpen && (
-                                  <>
-                                    <PanelResizeHandle
-                                      style={{
-                                        width: 1,
-                                        backgroundColor: 'grey',
-                                        opacity: 0.4,
-                                        cursor: 'col-resize',
-                                      }}
-                                    />
-                                    <Panel
-                                      defaultSize={32}
-                                      minSize={18}
-                                      maxSize={55}
-                                      style={{
-                                        overflow: 'hidden',
-                                        position: 'relative',
-                                        zIndex: 1400,
-                                      }}
-                                    >
-                                      <CodingAgentsPanel
-                                        open={aiOpen}
-                                        onClose={() => setAiOpen(false)}
-                                        onThinkingChange={setAiThinking}
-                                      />
-                                    </Panel>
-                                  </>
-                                )}
-                              </PanelGroup>
-                            </Panel>
+                                  </Panel>
+                                </>
+                              )}
+                            </PanelGroup>
+
                             {isElectron && terminalOpen && (
                               <>
                                 <PanelResizeHandle
@@ -213,9 +213,10 @@ export default function App() {
                                   />
                                 </Panel>
                               </>
+
                             )}
-                          </PanelGroup>
-                        </main>
+                          </main>
+                        </Box>
                       </Auth>
                     </UserConfig>
                   </TimePickerProvider>
