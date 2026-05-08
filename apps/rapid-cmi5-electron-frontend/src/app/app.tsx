@@ -43,7 +43,6 @@ const isElectron = typeof window !== 'undefined' && !!window.claudeApi;
 export default function App() {
   const dispatch = useDispatch();
   const theme = useSelector(themeColor);
-  const themedDividerColor = useSelector(dividerColor);
 
   const [aiOpen, setAiOpen] = useState(false);
   const [terminalOpen, setTerminalOpen] = useState(false);
