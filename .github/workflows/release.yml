@@ -264,7 +264,6 @@ jobs:
           $configPath = "apps/rapid-cmi5-electron/src/app/options/maker.options.json"
           $config = Get-Content $configPath -Raw | ConvertFrom-Json
 
-          $config.win | Add-Member -Force -NotePropertyName publisherName -NotePropertyValue $env:WINDOWS_PUBLISHER_NAME
           $config.win | Add-Member -Force -NotePropertyName azureSignOptions -NotePropertyValue ([pscustomobject]@{
             publisherName = $env:WINDOWS_PUBLISHER_NAME
             endpoint = $env:AZURE_TRUSTED_SIGNING_ENDPOINT
