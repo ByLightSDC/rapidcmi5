@@ -49,6 +49,9 @@
       }
     ],
     "category": "public.app-category.education",
-    "icon": "dist/apps/rapid-cmi5-electron/assets/icon.icns"
+    "icon": "dist/apps/rapid-cmi5-electron/assets/icon.icns",
+    "extendInfo": {
+      "CFBundleIconFile": "icon"
+    }
   }
 }
