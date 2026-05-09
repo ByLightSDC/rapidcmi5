@@ -189,6 +189,13 @@ jobs:
       APPLE_ID: ${{ secrets.APPLE_ID }}
       APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_TRUSTED_SIGNING_ACCOUNT_NAME: ${{ secrets.AZURE_TRUSTED_SIGNING_ACCOUNT_NAME }}
+      AZURE_TRUSTED_SIGNING_CERTIFICATE_PROFILE_NAME: ${{ secrets.AZURE_TRUSTED_SIGNING_CERTIFICATE_PROFILE_NAME }}
+      AZURE_TRUSTED_SIGNING_ENDPOINT: ${{ secrets.AZURE_TRUSTED_SIGNING_ENDPOINT }}
+      WINDOWS_PUBLISHER_NAME: ${{ secrets.WINDOWS_PUBLISHER_NAME }}
     steps:
       - uses: actions/checkout@v4
 
@@ -234,6 +241,41 @@ jobs:
 
       - name: Build backend
         run: npm run nxe:build:backend
+
+      - name: Configure Azure Trusted Signing (Windows)
+        if: ${{ matrix.platform == 'win32' }}
+        shell: pwsh
+        run: |
+          $requiredEnv = @(
+            "AZURE_CLIENT_ID",
+            "AZURE_CLIENT_SECRET",
+            "AZURE_TENANT_ID",
+            "AZURE_TRUSTED_SIGNING_ACCOUNT_NAME",
+            "AZURE_TRUSTED_SIGNING_CERTIFICATE_PROFILE_NAME",
+            "AZURE_TRUSTED_SIGNING_ENDPOINT",
+            "WINDOWS_PUBLISHER_NAME"
+          )
+
+          $missingEnv = $requiredEnv | Where-Object { [string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($_)) }
+          if ($missingEnv.Count -gt 0) {
+            throw "Missing required Azure Trusted Signing secrets: $($missingEnv -join ', ')"
+          }
+
+          $configPath = "apps/rapid-cmi5-electron/src/app/options/maker.options.json"
+          $config = Get-Content $configPath -Raw | ConvertFrom-Json
+
+          $config.win | Add-Member -Force -NotePropertyName publisherName -NotePropertyValue $env:WINDOWS_PUBLISHER_NAME
+          $config.win | Add-Member -Force -NotePropertyName azureSignOptions -NotePropertyValue ([pscustomobject]@{
+            publisherName = $env:WINDOWS_PUBLISHER_NAME
+            endpoint = $env:AZURE_TRUSTED_SIGNING_ENDPOINT
+            certificateProfileName = $env:AZURE_TRUSTED_SIGNING_CERTIFICATE_PROFILE_NAME
+            codeSigningAccountName = $env:AZURE_TRUSTED_SIGNING_ACCOUNT_NAME
+            timestampRfc3161 = "http://timestamp.acs.microsoft.com"
+            timestampDigest = "SHA256"
+            fileDigest = "SHA256"
+          })
+
+          $config | ConvertTo-Json -Depth 100 | Set-Content $configPath
 
       - name: Build Electron app
         run: npm run nxe:make:app
