@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "v*.*.*"
+      - 'v*.*.*'
   workflow_dispatch:
     inputs:
       tag:
@@ -11,7 +11,7 @@ on:
         required: true
 
 permissions:
-  id-token: write 
+  id-token: write
   contents: write
 
 jobs:
@@ -112,7 +112,7 @@ jobs:
       - name: Publish @rapid-cmi5/react-editor
         run: npm publish --provenance
         working-directory: dist/packages/rapid-cmi5
-      
+
       - name: Publish @rapid-cmi5/cmi5-build-common
         run: npm publish --provenance
         working-directory: dist/packages/common
@@ -174,13 +174,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: [create-release, build-cc-cmi5-player]
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: macos-latest
             platform: darwin
           - os: ubuntu-latest
             platform: linux
-          - os: windows-latest
+          - os: windows-2022
             platform: win32
     env:
       APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}

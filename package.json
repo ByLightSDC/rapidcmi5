@@ -34,7 +34,9 @@
   "overrides": {
     "@xapi/cmi5": {
       "@xapi/xapi": "3.0.2"
-    }
+    },
+    "electron-builder": "^26.0.0",
+    "app-builder-lib": "^26.0.0"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.92.0",
