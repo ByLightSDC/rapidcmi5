@@ -1,5 +1,6 @@
 import SquirrelEvents from './app/events/squirrel.events';
 import ElectronEvents from './app/events/electron.events';
+import UpdateEvents from './app/events/update.events';
 import { BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import App from './app/app';
 import path, * as nodePath from 'path'; // Renamed to avoid conflicts
@@ -1027,7 +1028,7 @@ export default class Main {
     ElectronEvents.bootstrapElectronEvents();
 
     if (!App.isDevelopmentMode()) {
-      // UpdateEvents.initAutoUpdateService();
+      UpdateEvents.initAutoUpdateService();
     }
   }
 }
