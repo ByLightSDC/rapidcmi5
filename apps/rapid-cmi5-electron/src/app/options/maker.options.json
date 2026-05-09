@@ -5,6 +5,14 @@
   "directories": {
     "output": "dist/executables"
   },
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "ByLightSDC",
+      "repo": "rapidcmi5",
+      "releaseType": "release"
+    }
+  ],
   "files": [
     "**/*",
     "!openapitools.json",
@@ -45,6 +53,10 @@
     "target": [
       {
         "target": "dmg",
+        "arch": ["x64", "arm64"]
+      },
+      {
+        "target": "zip",
         "arch": ["x64", "arm64"]
       }
     ],
