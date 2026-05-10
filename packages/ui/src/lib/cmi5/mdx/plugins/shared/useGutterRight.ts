@@ -30,7 +30,7 @@ export const useGutterRight = (
   useEffect(() => {
     if (gutterRef.current) {
       const w = gutterRef.current.offsetWidth;
-      setGutterRight(`-${w + 15}px`);
+      setGutterRight(`-${w + 30}px`);
     }
   }, []);
 
