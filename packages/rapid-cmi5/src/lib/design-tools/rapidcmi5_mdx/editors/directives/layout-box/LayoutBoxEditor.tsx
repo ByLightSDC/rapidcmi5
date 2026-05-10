@@ -104,6 +104,17 @@ export const LayoutBoxEditor: React.FC<
     removeNode();
   };
 
+  const handleDelete = () => {
+    parentEditor.update(() => {
+      if (lexicalNode.getPreviousSibling()) {
+        lexicalNode.selectPrevious();
+      } else {
+        lexicalNode.selectNext();
+      }
+      lexicalNode.remove();
+    });
+  };
+
   const handleJustificationChange = (justification: string) => {
     updateMdastNode({
       ...mdastNode,
@@ -247,6 +258,7 @@ export const LayoutBoxEditor: React.FC<
           handleJustificationChange={handleJustificationChange}
           handleAlignmentChange={handleAlignmentChange}
           handleClearLayout={handleClearLayout}
+          onDelete={handleDelete}
           onOpenStyleDialog={() => {
             const a = mdastNode.attributes ?? {};
             const jc = a.justifyContent ?? 'flex-start';
