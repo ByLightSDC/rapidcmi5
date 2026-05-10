@@ -10,8 +10,10 @@ import {
 
 import {
   $getSelection,
+  $getRoot,
   $setSelection,
   $isRangeSelection,
+  $createParagraphNode,
   LexicalNode,
 } from 'lexical';
 import type { LexicalEditor } from 'lexical';
@@ -68,7 +70,15 @@ export const InsertLayoutBox = () => {
       const selection = $getSelection();
       if (!$isRangeSelection(selection)) return;
 
-      const block = selection.anchor.getNode().getTopLevelElementOrThrow();
+      const anchorNode = selection.anchor.getNode();
+      let block = anchorNode.getTopLevelElement();
+      if (!block) {
+        // Anchor is the RootNode itself (empty editor). Append a paragraph so
+        // we have a real block to wrap.
+        const paragraph = $createParagraphNode();
+        $getRoot().append(paragraph);
+        block = paragraph;
+      }
 
       let theNodes: LexicalNode[] = [];
       let replaceBlock = false;
