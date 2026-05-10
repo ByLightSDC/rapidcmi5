@@ -91,7 +91,7 @@ export type MiniFormProps = {
   onResponse?: (isSuccess: boolean, data: any, message: string) => void;
 };
 export function MiniForm({
-  autoSaveDebounceTime = 3000,
+  autoSaveDebounceTime = 500,
   className,
   contextMenu,
   crudType = FormCrudType.edit,
@@ -100,7 +100,6 @@ export function MiniForm({
   getFormFields,
   formTitle,
   formWidth,
-  formMaxWidth,
   formSxProps = { margin: '12px' },
   instructions,
   loadingButtonText = 'Loading',
@@ -146,15 +145,8 @@ export function MiniForm({
     resolver: yupResolver(validationSchema),
   });
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    getValues,
-    setValue,
-    trigger,
-    formState,
-  } = methods;
+  const { control, handleSubmit, reset, getValues, trigger, formState } =
+    methods;
   const { isValid, isDirty } = formState;
 
   //#region handlers
@@ -184,9 +176,14 @@ export function MiniForm({
   const autoSave = useCallback(() => {
     if (doAction) {
       doAction(getValues());
+      // Reset with the form's actual current values (not the snapshot we passed
+      // to doAction, which callers may mutate). keepValues keeps inputs as-is;
+      // updating defaultValues to match clears isDirty so the autosave effect
+      // doesn't re-fire when doAction's identity churns upstream.
+      reset(getValues(), { keepValues: true });
       setIsSubmitting(false);
     }
-  }, [getValues, doAction]);
+  }, [getValues, doAction, reset]);
 
   const hasSubmittedSuccessfully = useRef(false);
 

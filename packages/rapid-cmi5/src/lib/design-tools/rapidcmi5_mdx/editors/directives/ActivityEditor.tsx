@@ -22,7 +22,7 @@ import { CodeRunnerForm } from '../forms/CodeRunnerForm';
 import { QuizForm } from '../forms/QuizForm';
 import { useAuContext } from '../../data-hooks/useAuContext';
 import DeleteIconButton from '../components/DeleteIconButton';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import PaletteIcon from '@mui/icons-material/Palette';
 
 import { DownloadFilesForm } from './DownloadFilesForm';
@@ -64,7 +64,7 @@ import { TeamConsolesForm } from '../forms/scenario/TeamConsolesForm';
  */
 export const ActivityEditor: React.FC<
   DirectiveEditorProps<ActivityDirectiveNode>
-> = ({ lexicalNode, mdastNode, parentEditor, descriptor }) => {
+> = ({ lexicalNode, mdastNode, parentEditor }) => {
   const { generateId } = useTimeStampUUID();
   const { name } = mdastNode; //scenario, quiz, etc.
   const dispatch = useDispatch();
@@ -152,8 +152,6 @@ export const ActivityEditor: React.FC<
       ...mdastNode,
       children: [updatedCodeBlock as any],
     });
-
-    setFromJson(data);
   };
 
   /**
@@ -265,7 +263,6 @@ export const ActivityEditor: React.FC<
           } else {
             setRC5Id(generateId());
           }
-          //console.log('mount', json);
           setFromJson(json);
         } catch (e) {
           //TODO validation here like we do in source view

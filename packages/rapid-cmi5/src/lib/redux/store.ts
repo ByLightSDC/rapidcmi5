@@ -16,7 +16,6 @@ import {
 //Persist
 import storage from 'redux-persist/lib/storage';
 import {
-  createMigrate,
   persistReducer,
   persistStore,
   FLUSH,
@@ -33,13 +32,13 @@ const persistConfig = {
   version: CURRENT_STORE_VERSION,
   storage,
   blacklist: [],
-  whitelist: ['commonApp', 'courseBuilder', 'pagination'],
+  whitelist: ['commonApp', 'pagination'],
 };
 
 const courseBuilderPersistConfig = {
   key: 'courseBuilder',
   storage,
-  blacklist: ['showSelectCourses'], 
+  blacklist: ['dirtyDisplay', 'dirtyReason'],
 };
 
 const rootReducer = combineReducers({

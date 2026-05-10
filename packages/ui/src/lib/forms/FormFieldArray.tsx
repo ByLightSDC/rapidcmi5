@@ -501,10 +501,6 @@ export function FormFieldArray({
     }
   }, [fields?.length]);
 
-  useEffect(() => {
-    checkScrollToBottom();
-  }, [lastEl]);
-
   const multiProps = multiSelectButtonProps
     ? {
         ...multiSelectButtonProps,

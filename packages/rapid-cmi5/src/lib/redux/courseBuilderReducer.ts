@@ -396,65 +396,11 @@ export const courseBuilderSlice = createSlice({
     changeViewMode(state, action: PayloadAction<ViewModeEnum>) {
       state.viewMode = action.payload;
     },
-    cacheSandbox: (state, action: PayloadAction<CourseSandbox | undefined>) => {
-      state.courseSandbox = action.payload;
-    },
     setGitViewCurrentTab: (state, action: PayloadAction<number>) => {
       state.gitViewCurrentTab = action.payload;
     },
     setIsLessonMounted: (state, action: PayloadAction<boolean>) => {
       state.isLessonMounted = action.payload;
-    },
-    updateASlide: (
-      state,
-      action: PayloadAction<{
-        position: number;
-        slide: SlideType;
-      }>,
-    ) => {
-      const theSlides = [...state.slides];
-
-      const editedSlide = {
-        ...action.payload.slide,
-      } as SlideType;
-
-      editSlideOperation(editedSlide.filepath, state);
-
-      if (theSlides.length > action.payload.position) {
-        theSlides[action.payload.position] = editedSlide;
-        state.slides = theSlides;
-        state.dirtyReason = 'update slide';
-        state.dirtyDisplay += 1;
-      } else {
-        console.log('no slide at that index');
-      }
-    },
-    updateASlideContent: (
-      state,
-      action: PayloadAction<{
-        position: number;
-        content:
-          | string
-          | ScenarioContent
-          | QuizContent
-          | CTFContent
-          | CodeRunnerContent;
-        display?: string;
-        skipShouldDirty?: boolean;
-      }>,
-    ) => {
-      const theSlides = [...state.slides];
-
-      const slideIndex = Math.min(
-        action.payload.position,
-        state.slides.length - 1,
-      );
-      theSlides[slideIndex].content = action.payload.content.toString();
-      state.slides = theSlides;
-      if (!action.payload.skipShouldDirty) {
-        state.dirtyReason = 'update slide content';
-        state.dirtyDisplay += 1;
-      }
     },
     saveSlideContent: (
       state,
@@ -477,42 +423,6 @@ export const courseBuilderSlice = createSlice({
 
       // For now we are just assuming that the file was edited, this must be fixed in the future
       editSlideOperation(slide.filepath, state);
-    },
-    updateASlideTitle: (
-      state,
-      action: PayloadAction<{ position: number; title: string }>,
-    ) => {
-      const theSlides = [...state.slides];
-      theSlides[action.payload.position].slideTitle = action.payload.title;
-
-      const slide =
-        state.courseData.blocks[state.currentBlockIndex].aus[
-          state.currentAuIndex
-        ].slides[action.payload.position];
-
-      editSlideOperation(slide.filepath, state);
-
-      state.slides = theSlides;
-      state.dirtyReason = 'update slide title';
-      state.dirtyDisplay += 1;
-    },
-    updateASlideType: (
-      state,
-      action: PayloadAction<{ position: number; type: SlideTypeEnum }>,
-    ) => {
-      const theSlides = [...state.slides];
-      theSlides[action.payload.position].type = action.payload.type;
-
-      const slide =
-        state.courseData.blocks[state.currentBlockIndex].aus[
-          state.currentAuIndex
-        ].slides[action.payload.position];
-
-      state.courseOperations[slide.filepath] = Operation.Edit;
-
-      state.slides = theSlides;
-      state.dirtyReason = 'update slide type';
-      state.dirtyDisplay += 1;
     },
     updateCourseData: (state, action: PayloadAction<CourseData>) => {
       state.courseData = action.payload;
@@ -556,9 +466,6 @@ export const courseBuilderSlice = createSlice({
 
       state.courseData.blocks[blockIndex].aus.splice(lessonIndex, 1);
     },
-    updateCurrentCourse: (state, action: PayloadAction<string>) => {
-      state.currentCourse = action.payload;
-    },
     updateDirtyDisplay: (state, action: PayloadAction<tDirtyState>) => {
       state.dirtyReason = action.payload.reason || '';
       if (typeof action.payload.counter === 'undefined') {
@@ -578,17 +485,8 @@ export const courseBuilderSlice = createSlice({
       state.expandedFileTreeNodes[action.payload.repoName] =
         action.payload.nodeList;
     },
-    setIsFileExplorerExpanded: (state, action: PayloadAction<boolean>) => {
-      state.isFileExplorerExpanded = action.payload;
-    },
     setIsFileTreeOpen: (state, action: PayloadAction<boolean>) => {
       state.isFileTreeOpen = action.payload;
-    },
-    setIsRepoViewInit: (state, action: PayloadAction<boolean>) => {
-      state.isRepoViewInit = action.payload;
-    },
-    setIsVersionControlExpanded: (state, action: PayloadAction<boolean>) => {
-      state.isVersionControlExpanded = action.payload;
     },
     setRepoViewScrollTop: (state, action: PayloadAction<number>) => {
       state.repoViewScrollTop = action.payload;
@@ -636,29 +534,8 @@ export const courseBuilderSlice = createSlice({
     ) => {
       state.teamScenario = action.payload.scenario;
     },
-    updateSlideDeck: (
-      state,
-      action: PayloadAction<{
-        slides: SlideType[];
-        shouldDirty?: boolean;
-      }>,
-    ) => {
-      state.slides = action.payload.slides;
-      if (action.payload.shouldDirty) {
-        state.dirtyReason = 'slide deck updated';
-        state.dirtyDisplay += 1;
-      }
-      //replaced entire deck
-    },
     updateDisplayText: (state, action: PayloadAction<string>) => {
       state.displayData = action.payload;
-    },
-    updateSlideDeckText: (state, action: PayloadAction<string>) => {
-      state.slideDeckText = action.payload;
-    },
-    saveSlideDeckText: (state, action: PayloadAction<string>) => {
-      //debugLog('saveSlidesCache', action.payload);
-      state.slideDeckText = action.payload;
     },
     updateAuAndSlideIndex: (state, action: PayloadAction<number[]>) => {
       if (action.payload.length === 2) {
@@ -898,40 +775,29 @@ export const {
   resetCourseOperations,
   addCourseOperation,
   addASlide,
-  cacheSandbox,
   changeViewMode,
   deleteASlide,
   deleteSlide,
   navigateSlide,
   saveSlideContent,
   setGitViewCurrentTab,
-  setIsFileExplorerExpanded,
   setIsFileTreeOpen,
   setIsLessonMounted,
-  setIsRepoViewInit,
-  setIsVersionControlExpanded,
   setRepoViewScrollTop,
   toggleRepoFolderChange,
-  updateASlide,
   reorderSlide,
   reorderLesson,
-  updateASlideContent,
-  updateASlideTitle,
-  updateASlideType,
   updateAuAndSlideIndex,
   updateCourseData,
   updateCourseSlideData,
   updateCourseAuData,
   setDefaultLessonTheme,
-  updateCurrentCourse,
   updateDisplayText,
   updateExpandedFileTreeNodes,
   updateScenario,
   updateTeamScenario,
-  updateSlideDeck,
   updateDirtyDisplay,
   loadCourse,
-  saveSlideDeckText,
   updateAuIndex,
   updateAuPath,
   updateBlockIndex,
