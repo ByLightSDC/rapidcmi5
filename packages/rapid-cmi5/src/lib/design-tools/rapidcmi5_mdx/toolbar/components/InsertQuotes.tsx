@@ -6,7 +6,7 @@ import {
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
-import { $getSelection, $isRangeSelection } from 'lexical';
+import { $getSelection, $isRangeSelection, $createParagraphNode } from 'lexical';
 import type { LexicalEditor } from 'lexical';
 
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
@@ -54,8 +54,17 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
       // then run the insert inside that callback.
       editor.focus(() => {
         editor.update(() => {
-          const selection = $getSelection();
+          let selection = $getSelection();
           if (!$isRangeSelection(selection) || !selection.isCollapsed()) return;
+
+          const anchorNode = selection.anchor.getNode();
+          const topLevel = anchorNode.getTopLevelElement();
+          if (topLevel && topLevel.getType() !== 'paragraph') {
+            const paragraph = $createParagraphNode();
+            topLevel.insertAfter(paragraph);
+            paragraph.select();
+            selection = $getSelection() as typeof selection;
+          }
 
           // create child quotes content
           const theChildMDast = convertMarkdownToMdast(

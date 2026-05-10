@@ -6,7 +6,7 @@ import {
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
-import { $getSelection, $isRangeSelection } from 'lexical';
+import { $getSelection, $isRangeSelection, $createParagraphNode } from 'lexical';
 import type { LexicalEditor } from 'lexical';
 
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
@@ -88,13 +88,20 @@ export const InsertGrid = ({ isDrawer }: { isDrawer?: boolean }) => {
     }
 
     editor.update(() => {
-      const selection = $getSelection();
+      let selection = $getSelection();
       if (!$isRangeSelection(selection)) return;
 
-      if (selection.isCollapsed()) {
-        // Continue
-      } else {
+      if (!selection.isCollapsed()) {
         return; // No applying grid to selection
+      }
+
+      const anchorNode = selection.anchor.getNode();
+      const topLevel = anchorNode.getTopLevelElement();
+      if (topLevel && topLevel.getType() !== 'paragraph') {
+        const paragraph = $createParagraphNode();
+        topLevel.insertAfter(paragraph);
+        paragraph.select();
+        selection = $getSelection() as typeof selection;
       }
 
       // Create children grid cell nodes

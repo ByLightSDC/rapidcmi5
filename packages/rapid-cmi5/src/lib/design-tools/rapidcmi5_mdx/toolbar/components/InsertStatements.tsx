@@ -5,7 +5,7 @@ import {
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
-import { $getSelection, $isRangeSelection } from 'lexical';
+import { $getSelection, $isRangeSelection, $createParagraphNode } from 'lexical';
 import type { LexicalEditor } from 'lexical';
 
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
@@ -47,8 +47,17 @@ export const InsertStatements = ({ isDrawer }: { isDrawer?: boolean }) => {
 
       editor.focus(() => {
         editor.update(() => {
-          const selection = $getSelection();
+          let selection = $getSelection();
           if (!$isRangeSelection(selection) || !selection.isCollapsed()) return;
+
+          const anchorNode = selection.anchor.getNode();
+          const topLevel = anchorNode.getTopLevelElement();
+          if (topLevel && topLevel.getType() !== 'paragraph') {
+            const paragraph = $createParagraphNode();
+            topLevel.insertAfter(paragraph);
+            paragraph.select();
+            selection = $getSelection() as typeof selection;
+          }
 
           // create statements node
           const mdastStatements: ContainerDirective = {

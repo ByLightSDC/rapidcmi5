@@ -5,7 +5,11 @@ import {
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
-import { $getSelection, $isRangeSelection } from 'lexical';
+import {
+  $getSelection,
+  $isRangeSelection,
+  $createParagraphNode,
+} from 'lexical';
 import type { LexicalEditor } from 'lexical';
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 import type { BlockContent } from 'mdast';
@@ -58,22 +62,32 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
     if (!editor) return;
 
     editor.update(() => {
-      const selection = $getSelection();
+      let selection = $getSelection();
       if (!$isRangeSelection(selection)) return;
 
-      if (selection.isCollapsed()) {
-        //continue
-      } else {
-        return; //no applying tab to selection
+      if (!selection.isCollapsed()) {
+        return; //no applying accordion to selection
       }
 
-      // create children tabs content nodes
+      // TOCHeadingNode.insertAfter calls getParentOrThrow(), which throws when
+      // Lexical's insertNodes tries to splice a block next to a heading node.
+      // If the anchor's top-level block is not a plain paragraph, insert a
+      // paragraph after it and move the selection there first, so the accordion
+      // lands in the right place without triggering the heading's insertAfter.
+      const anchorNode = selection.anchor.getNode();
+      const topLevel = anchorNode.getTopLevelElement();
+      if (topLevel && topLevel.getType() !== 'paragraph') {
+        const paragraph = $createParagraphNode();
+        topLevel.insertAfter(paragraph);
+        paragraph.select();
+        selection = $getSelection() as typeof selection;
+      }
+
       const theChildMDast = convertMarkdownToMdast(
         DEFAULT_ACCORDION,
         syntaxExtensions,
       );
 
-      // create accordion node
       const mdastAccordion: ContainerDirective = {
         type: 'containerDirective',
         name: 'accordion',
