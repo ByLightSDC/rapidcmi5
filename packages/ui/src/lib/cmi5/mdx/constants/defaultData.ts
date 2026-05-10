@@ -174,7 +174,7 @@ export const defaultDownloadFilesContent: DownloadFilesContent = {
 export const defaultScenarioContentData: RC5ScenarioContent = {
   uuid: '',
   name: '',
-  promptClass: true,
+  promptClass: false,
   moveOnCriteria: MoveOnCriteriaEnum.Completed,
 };
 
