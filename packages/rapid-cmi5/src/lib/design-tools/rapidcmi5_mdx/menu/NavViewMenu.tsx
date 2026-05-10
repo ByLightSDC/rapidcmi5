@@ -1,6 +1,6 @@
 import { Box, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 
-import { useContext, useEffect, useMemo } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   changeViewMode,
@@ -47,7 +47,7 @@ export const NavViewMenu = ({
     useContext(GitContext);
   const { saveSlide } = useContext(RC5Context);
   const { promptNavAway } = useRC5Prompts();
-
+  const [isToggleTooltipShowing, setIsToggleTooltipShowing] = useState(false);
   const theme = useTheme();
   const { palette } = theme;
 
@@ -122,6 +122,17 @@ export const NavViewMenu = ({
   }, [isRepoConnectedToRemote, unpushedCommits]);
 
   /**
+   * Ensure tooltip is hiding before transition starts
+   * Otherwise, the tooltip flickers on top of the RapidCMI5 logog
+   */
+  const onToggleClicked = () => {
+    setIsToggleTooltipShowing(false);
+    if (onToggleLeftPanel) {
+      onToggleLeftPanel();
+    }
+  };
+
+  /**
    * UE hides breadcrumbs
    */
   useEffect(() => {
@@ -145,38 +156,33 @@ export const NavViewMenu = ({
       }}
       spacing={0}
     >
-      {onToggleLeftPanel && (
+      {showHomeButton && (
         <IconButton
-          aria-label="toggle-left-panel"
-          data-testid="toggle-left-panel-button"
+          aria-label="repo-selection-button"
+          data-testid="repo-selection-button"
           color="inherit"
           size={iconButtonSize}
-          sx={buildIconButtonSx(false)}
+          sx={buildIconButtonSx(viewMode === ViewModeEnum.RepoSelector)}
           disableRipple
-          onClick={onToggleLeftPanel}
+          onClick={() => {
+            if (viewMode === ViewModeEnum.Designer) {
+              saveSlide();
+              promptNavAway(ViewModeEnum.RepoSelector);
+            } else {
+              dispatch(changeViewMode(ViewModeEnum.RepoSelector));
+            }
+          }}
         >
-          <Tooltip
-            arrow
-            placement="right"
-            title={isLeftPanelCollapsed ? 'Expand panel' : 'Collapse panel'}
-          >
-            {isLeftPanelCollapsed ? (
-              <PanelLeftOpen
-                color={palette.text.hint}
-                strokeWidth={1.25}
-                style={navIconStyle}
-              />
-            ) : (
-              <PanelLeftClose
-                color={palette.text.hint}
-                strokeWidth={1.25}
-                style={navIconStyle}
-              />
-            )}
+          <Tooltip arrow placement="right" title="All Projects">
+            <ArrowLeft
+              color={iconColor}
+              strokeWidth={1.25}
+              style={navIconStyle}
+            />
           </Tooltip>
         </IconButton>
       )}
-
+      <Box sx={{ height: '2px' }} />
       <IconButton
         aria-label="select-design"
         color="inherit"
@@ -266,7 +272,47 @@ export const NavViewMenu = ({
           </Stack>
         </Tooltip>
       </IconButton>
-      {showHomeButton && (
+      <Box sx={{ flexGrow: 1 }} />
+      {onToggleLeftPanel && (
+        <IconButton
+          aria-label="toggle-left-panel"
+          data-testid="toggle-left-panel-button"
+          color="inherit"
+          size={iconButtonSize}
+          sx={buildIconButtonSx(false)}
+          disableRipple
+          onClick={onToggleClicked}
+        >
+          <Tooltip
+            arrow
+            enterDelay={1000}
+            enterNextDelay={1000}
+            open={isToggleTooltipShowing}
+            onOpen={() => setIsToggleTooltipShowing(true)}
+            onClose={() => setIsToggleTooltipShowing(false)}
+            placement="right"
+            title={isLeftPanelCollapsed ? 'Expand panel' : 'Collapse panel'}
+            slotProps={{
+              transition: { exit: false }
+            }}
+          >
+            {isLeftPanelCollapsed ? (
+              <PanelLeftOpen
+                color={palette.text.hint}
+                strokeWidth={1.25}
+                style={navIconStyle}
+              />
+            ) : (
+              <PanelLeftClose
+                color={palette.text.hint}
+                strokeWidth={1.25}
+                style={navIconStyle}
+              />
+            )}
+          </Tooltip>
+        </IconButton>
+      )}
+      {/* {showHomeButton && (
         <IconButton
           aria-label="repo-selection-button"
           data-testid="repo-selection-button"
@@ -291,7 +337,8 @@ export const NavViewMenu = ({
             />
           </Tooltip>
         </IconButton>
-      )}
+      )} */}
+      <Box sx={{ height: '32px' }} />
     </Stack>
   );
 };

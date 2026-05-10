@@ -5,6 +5,14 @@
   "directories": {
     "output": "dist/executables"
   },
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "ByLightSDC",
+      "repo": "rapidcmi5",
+      "releaseType": "release"
+    }
+  ],
   "files": [
     "**/*",
     "!openapitools.json",
@@ -26,16 +34,31 @@
     "target": [
       {
         "target": "nsis",
-        "arch": ["x64", "arm64"]
+        "arch": [
+          "x64",
+          "arm64"
+        ]
       }
     ],
-    "icon": "dist/apps/rapid-cmi5-electron/assets/icon.ico"
+    "icon": "dist/apps/rapid-cmi5-electron/assets/icon.ico",
+    "azureSignOptions": {
+      "publisherName": "CN=Aaron Crawford, O=Aaron Crawford, L=Loxahatchee, S=Florida, C=US",
+      "endpoint": "https://eus.codesigning.azure.net/",
+      "certificateProfileName": "RapidCmi5",
+      "codeSigningAccountName": "RapidCmi5",
+      "timestampRfc3161": "http://timestamp.acs.microsoft.com",
+      "timestampDigest": "SHA256",
+      "fileDigest": "SHA256"
+    }
   },
   "linux": {
     "target": [
       {
         "target": "AppImage",
-        "arch": ["x64", "arm64"]
+        "arch": [
+          "x64",
+          "arm64"
+        ]
       }
     ],
     "category": "Education",
@@ -45,7 +68,17 @@
     "target": [
       {
         "target": "dmg",
-        "arch": ["x64", "arm64"]
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      },
+      {
+        "target": "zip",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
       }
     ],
     "category": "public.app-category.education",

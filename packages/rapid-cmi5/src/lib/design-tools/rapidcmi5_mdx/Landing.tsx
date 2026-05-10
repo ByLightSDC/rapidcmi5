@@ -175,7 +175,10 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
                 collapsedSize={0}
                 onCollapse={() => setIsLeftPanelCollapsed(true)}
                 onExpand={() => setIsLeftPanelCollapsed(false)}
-                style={{ overflow: 'hidden' }}
+                style={{
+                  overflow: 'hidden',
+                  transition: 'flex 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
               >
                 <Stack
                   direction="row"

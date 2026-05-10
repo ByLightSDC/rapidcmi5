@@ -111,7 +111,7 @@ export const RapidCmi5Toolbar: React.FC<{
   const theme = useTheme();
 
   const disabledIconColor = alpha((theme as any).palette.divider, 0.25);
-  const activeIconColor = theme.palette.text.primary; //REFtheme.palette.primary.main;
+  const activeIconColor = theme.palette.text.primary;
 
   const { promptTestInPlayer } = useRC5Prompts();
 
@@ -337,10 +337,10 @@ export const RapidCmi5Toolbar: React.FC<{
               direction="row"
               spacing={1}
               sx={{
-                backgroundColor: 'background.default',
-                borderColor: 'divider',
+                background: alpha(theme.palette.primary.light, .10), //'background.default',
                 borderRadius: '24px',
-                borderStyle: 'solid',
+                 border: `1px solid ${alpha(theme.palette.primary.main, 0.50)}`,
+                height: '34px',
                 display: 'flex',
                 justifyContent: 'center',
               }}
@@ -356,7 +356,6 @@ export const RapidCmi5Toolbar: React.FC<{
                 justifyContent: 'flex-end',
                 alignItems: 'center',
                 flexGrow: 1,
-                maxHeight: '32px',
               }}
             >
               <Stack
@@ -365,8 +364,7 @@ export const RapidCmi5Toolbar: React.FC<{
                   borderRadius: 4,
                   paddingLeft: 0.5,
                   paddingRight: 0.5,
-                  height: '32px',
-                  border: `1px solid ${disabledIconColor}`,
+                  height: '34px',
                   transition:
                     'transform 120ms ease, background-color 120ms ease',
                 }}
