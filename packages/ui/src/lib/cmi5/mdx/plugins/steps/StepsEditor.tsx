@@ -3,7 +3,6 @@ import {
   insertMarkdown$,
   NestedLexicalEditor,
   readOnly$,
-  syntaxExtensions$,
   useCellValues,
   usePublisher,
 } from '@mdxeditor/editor';
@@ -24,8 +23,6 @@ import {
   Paper,
   Stack,
   SxProps,
-  Tab,
-  Tabs,
   Tooltip,
   Typography,
   TypographyOwnProps,
@@ -36,13 +33,10 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-//REF import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import DeleteIconButton from '../../components/DeleteIconButton';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-//REF import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
 import PaletteIcon from '@mui/icons-material/Palette';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
@@ -51,7 +45,7 @@ import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
 import { StepsContext } from './StepsContext';
 import { StepContentDirectiveNode, StepDirectiveNode } from './types';
 
-import { $isElementNode } from 'lexical';
+
 import { DEFAULT_STEP } from './constants';
 import ModalDialog from '../../../../modals/ModalDialog';
 import {
@@ -62,7 +56,6 @@ import {
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import {
-  convertMarkdownToMdast,
   convertMdastToMarkdown,
 } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
@@ -119,16 +112,6 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
     resolvedThemeCSS,
     blockMaxWidth,
   );
-
-  // const [backgroundColor, setBackgroundColor] = useState<string>(
-  //   mdastNode?.attributes?.backgroundColor ?? '',
-  // );
-  // const [colorPickerAnchor, setColorPickerAnchor] =
-  //   useState<HTMLButtonElement | null>(null);
-  // const [pendingColor, setPendingColor] = useState<string>(
-  //   mdastNode?.attributes?.backgroundColor ?? '',
-  // );
-  // const pendingColorRef = useRef(pendingColor);
 
   const {
     backgroundColor,
@@ -713,8 +696,6 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
         lastColor={pendingColor}
         palette={SHAPE_PRESET_COLORS}
         onPickColor={(color) => {
-          // pendingColorRef.current = color;
-          // setPendingColor(color);
           setPendingColorAndRef(color);
         }}
         onClear={handleClearColor}
