@@ -1,15 +1,18 @@
-import { IconButton } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import { tooltipStyle } from '../../styles/styles';
 
 /**
  * Editor Settings
  * @param param0
  * @returns
  */
-function SettingsIconButton({ onConfigure }: { onConfigure: () => void }) {
+function SettingsIconButton({ tooltipText, onConfigure }: { tooltipText?: string; onConfigure: () => void }) {
   return (
     <IconButton aria-label="configure" onClick={onConfigure}>
-     <EditIcon/>
+      <Tooltip arrow title={tooltipText}  {...tooltipStyle}>
+        <EditIcon />
+      </Tooltip>
     </IconButton>
   );
 }
