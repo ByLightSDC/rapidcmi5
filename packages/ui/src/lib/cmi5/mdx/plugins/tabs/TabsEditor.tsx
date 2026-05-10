@@ -45,7 +45,6 @@ import DeleteIconButton from '../../components/DeleteIconButton';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PaletteIcon from '@mui/icons-material/Palette';
-import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
@@ -101,20 +100,9 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     structuredClone(mdastNode.children),
   );
   const insertMarkdown = usePublisher(insertMarkdown$);
-  const [editor] = useLexicalComposerContext();
   const [isConfiguring, setIsConfiguring] = useState(false);
-  const [boxStyle, setBoxStyle] = useState<string | undefined>(
-    mdastNode?.attributes.style,
-  );
   const [sxProps, setSxProps] = useState<SxProps>({});
-  // const [backgroundColor, setBackgroundColor] = useState<string>(
-  //   mdastNode?.attributes.backgroundColor ?? '',
-  // );
-  // const [colorPickerAnchor, setColorPickerAnchor] =
-  //   useState<HTMLButtonElement | null>(null);
-  // const [pendingColor, setPendingColor] = useState<string>(
-  //   mdastNode?.attributes.backgroundColor ?? '',
-  // );
+
   const {
     backgroundColor,
     colorPickerAnchor,
@@ -139,7 +127,6 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   );
   // Set to true when handleClearColor already rebuilt, so onClose skips its rebuild.
   const skipNextCloseRebuildRef = useRef(false);
-  const colorPickerOpen = Boolean(colorPickerAnchor);
   const [isPlayback, readOnly, syntaxExtensions] = useCellValues(
     editorInPlayback$,
     readOnly$,
@@ -504,21 +491,6 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
               right: menuRight,
             }}
           >
-            {/* <Tooltip title="Background Color">
-              <IconButton
-                onClick={(e) => {
-                  pendingColorRef.current = backgroundColor;
-                  setPendingColor(backgroundColor);
-                  setColorPickerAnchor(e.currentTarget);
-                }}
-                size="small"
-              >
-                <PaletteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip> */}
-
-
-
             <Tooltip title="Edit Tabs Settings">
               <IconButton onClick={handleConfigure}>
                 <EditIcon />
@@ -589,10 +561,6 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
         lastColor={pendingColor}
         palette={SHAPE_PRESET_COLORS}
         onPickColor={(color) => {
-          // Track locally; rebuild happens in onClose (once) to avoid repeated
-          // lexical node removal when MuiColorInput fires on every keystroke.
-          // pendingColorRef.current = color;
-          // setPendingColor(color);
           setPendingColorAndRef(color);
         }}
         onClear={handleClearColor}

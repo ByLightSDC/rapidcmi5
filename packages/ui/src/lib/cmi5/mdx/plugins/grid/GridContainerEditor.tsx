@@ -78,7 +78,7 @@ export const GridContainerEditor: React.FC<
   );
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
-  const { menuRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
+  const { containerRef, menuRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
 
   const [sxProps, setSxProps] = useState<SxProps>({});
   const [formData, setFormData] = useState<Array<GridCellDirectiveNode>>(
@@ -369,18 +369,6 @@ export const GridContainerEditor: React.FC<
               right: menuRight,
             }}
           >
-            {/* <Tooltip title="Background Color">
-              <IconButton
-                onClick={(e) => {
-                  pendingColorRef.current = backgroundColor;
-                  setPendingColor(backgroundColor);
-                  setColorPickerAnchor(e.currentTarget);
-                }}
-                size="small"
-              >
-                <PaletteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip> */}
             <Tooltip title="Edit Grid Layout">
               <IconButton onClick={handleConfigure}>
                 <EditIcon />

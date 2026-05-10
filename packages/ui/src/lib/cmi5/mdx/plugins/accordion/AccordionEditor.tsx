@@ -115,7 +115,7 @@ export const AccordionEditor: React.FC<
     resolvedThemeCSS,
     blockMaxWidth,
   );
-  const colorPickerOpen = Boolean(colorPickerAnchor);
+
   const [isPlayback, readOnly, syntaxExtensions] = useCellValues(
     editorInPlayback$,
     readOnly$,
