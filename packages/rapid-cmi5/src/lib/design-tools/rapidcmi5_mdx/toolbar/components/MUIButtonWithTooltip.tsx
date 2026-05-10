@@ -2,6 +2,7 @@ import {
   alpha,
   ButtonProps,
   IconButton,
+  SxProps,
   Tooltip,
   useTheme,
 } from '@mui/material';
@@ -20,7 +21,8 @@ export const MUIButtonWithTooltip = ({
   title,
   onClick,
   sx,
-}: ButtonProps & { testId?: string }) => {
+  styles,
+}: ButtonProps & { styles?: any; testId?: string }) => {
   const theme = useTheme();
   return (
     <Tooltip title={title} {...tooltipStyle}>
@@ -28,7 +30,6 @@ export const MUIButtonWithTooltip = ({
         className={className}
         data-testid={testId}
         sx={{
-          //backgroundColor:'pink',
           height: '30px',
           ...sx,
           '&:hover': {
@@ -42,6 +43,17 @@ export const MUIButtonWithTooltip = ({
 
           /* ensure the icon itself matches disabled color */
           '&.Mui-disabled svg': {
+            fill: theme.palette.action.disabled,
+          },
+        }}
+        style={{
+          ...styles,
+          '&.disabled': {
+            color: theme.palette.action.disabled,
+          },
+
+          /* ensure the icon itself matches disabled color */
+          '&.disabled svg': {
             fill: theme.palette.action.disabled,
           },
         }}
