@@ -212,6 +212,7 @@ jobs:
       - name: Update package.json version
         run: |
           npm version ${{ needs.create-release.outputs.version }} --no-git-tag-version --allow-same-version
+          (cd apps/rapid-cmi5-electron && npm version ${{ needs.create-release.outputs.version }} --no-git-tag-version --allow-same-version)
 
       - name: Download cc-cmi5-player artifact
         uses: actions/download-artifact@v4
