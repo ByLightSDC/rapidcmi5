@@ -522,7 +522,10 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                 }}
                 component="nav"
               >
-                <Typography sx={{ marginLeft: '12px' }} variant="caption">
+                <Typography
+                  sx={{ marginLeft: '12px' }}
+                  variant="caption"
+                >
                   {element.name}
                 </Typography>
 

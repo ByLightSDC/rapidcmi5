@@ -44,7 +44,6 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PaletteIcon from '@mui/icons-material/Palette';
 import EditIcon from '@mui/icons-material/Edit';
-import SettingsIcon from '@mui/icons-material/Settings';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
 import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
@@ -66,9 +65,9 @@ import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
-import { toolbarRect$ } from '../toolbar/vars';
-import { useSignalEffect } from '@preact/signals-react';
 import { useGutterRight } from '../shared/useGutterRight';
+import { useBackgroundColors } from 'packages/ui/src/lib/hooks/useBackgroundColors';
+import { BackgroundColorTrigger } from 'packages/ui/src/lib/colors/BackgroundColorTrigger';
 /**
  * Accordion Editor for accordion directives
  * @param param0
@@ -92,16 +91,17 @@ export const AccordionEditor: React.FC<
   const insertMarkdown = usePublisher(insertMarkdown$);
   const [editor] = useLexicalComposerContext();
   const [isConfiguring, setIsConfiguring] = useState(false);
-  const [backgroundColor, setBackgroundColor] = useState<string>(
-    (mdastNode?.attributes as AccordionDirectiveNode['attributes'])
-      ?.backgroundColor ?? '',
-  );
-  const [colorPickerAnchor, setColorPickerAnchor] =
-    useState<HTMLButtonElement | null>(null);
-  const [pendingColor, setPendingColor] = useState<string>(
-    mdastNode?.attributes.backgroundColor ?? '',
-  );
-  const pendingColorRef = useRef(pendingColor);
+  const {
+    backgroundColor,
+    colorPickerAnchor,
+    openPicker,
+    pendingColor,
+    pendingColorRef,
+    setBackgroundColor,
+    setColorPickerAnchor,
+    setOverrideColor,
+    setPendingColorAndRef,
+  } = useBackgroundColors(mdastNode?.attributes?.['backgroundColor'] ?? '');
   const skipNextCloseRebuildRef = useRef(false);
   const [contentWidth, setContentWidth] = useState<
     ContentWidthEnum | undefined
@@ -115,7 +115,7 @@ export const AccordionEditor: React.FC<
     resolvedThemeCSS,
     blockMaxWidth,
   );
-  const colorPickerOpen = Boolean(colorPickerAnchor);
+
   const [isPlayback, readOnly, syntaxExtensions] = useCellValues(
     editorInPlayback$,
     readOnly$,
@@ -274,10 +274,8 @@ export const AccordionEditor: React.FC<
    */
   const handleClearColor = useCallback(() => {
     setColorPickerAnchor(null);
-    pendingColorRef.current = '';
     skipNextCloseRebuildRef.current = true;
-    setPendingColor('');
-    setBackgroundColor('');
+    setOverrideColor('');
     parentEditor.update(
       () => {
         const attrs = { ...mdastNode.attributes };
@@ -335,9 +333,7 @@ export const AccordionEditor: React.FC<
     const bgColor =
       (mdastNode.attributes as AccordionDirectiveNode['attributes'])
         ?.backgroundColor ?? '';
-    setBackgroundColor(bgColor);
-    pendingColorRef.current = bgColor;
-    setPendingColor(bgColor);
+    setOverrideColor(bgColor);
     setContentWidth(
       (mdastNode.attributes as AccordionDirectiveNode['attributes'])
         ?.contentWidth,
@@ -347,12 +343,12 @@ export const AccordionEditor: React.FC<
   // Outer box: full-width background color band when backgroundColor is set.
   const outerSx: SxProps = backgroundColor
     ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
+      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+      clipPath: `inset(0 -100vmax 0)`,
+      backgroundColor,
+      paddingTop: blockPadding,
+      paddingBottom: blockPadding,
+    }
     : {};
 
   const innerSx: SxProps = blockMaxWidth
@@ -373,10 +369,10 @@ export const AccordionEditor: React.FC<
           : {})}
         {...(contentWidth !== undefined
           ? {
-              style: {
-                '--block-max-width': blockMaxWidth ?? 'none',
-              } as CSSProperties,
-            }
+            style: {
+              '--block-max-width': blockMaxWidth ?? 'none',
+            } as CSSProperties,
+          }
           : {})}
         sx={{
           padding: 0,
@@ -406,61 +402,47 @@ export const AccordionEditor: React.FC<
             ref={gutterRef as any}
             id="context-menu"
             sx={{
-              //backgroundColor: 'pink',
               backgroundColor:
                 muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
               display: 'flex',
               position: 'absolute',
               top: backgroundColor ? blockPadding : 0,
               right: menuRight,
-              //width:0,
             }}
           >
-            {/* <Box sx={{ position: 'absolute', right:'15px' }}> */}
-              <Tooltip title="Background Color">
-                <IconButton
-                  onClick={(e) => {
-                    pendingColorRef.current = backgroundColor;
-                    setPendingColor(backgroundColor);
-                    setColorPickerAnchor(e.currentTarget);
-                  }}
-                  size="small"
-                >
-                  <PaletteIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title="Block Appearance">
-                <IconButton
-                  onClick={() => setBlockAppearanceOpen(true)}
-                  size="small"
-                >
-                  <SettingsIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title="Edit Sections">
-                <IconButton onClick={handleConfigure}>
-                  <EditIcon />
-                </IconButton>
-              </Tooltip>
-              <InsertLineReturnButton
-                parentEditor={parentEditor}
-                lexicalNode={lexicalNode}
-              />
-              <DeleteIconButton
-                onDelete={() => {
-                  parentEditor.update(() => {
-                    if (lexicalNode.getPreviousSibling()) {
-                      lexicalNode.selectPrevious();
-                    } else {
-                      lexicalNode.selectNext();
-                    }
-                    lexicalNode.remove();
-                  });
-                }}
-              />
-            {/* </Box> */}
+            <Tooltip title="Edit Sections">
+              <IconButton onClick={handleConfigure}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Block Appearance">
+              <IconButton
+                onClick={() => setBlockAppearanceOpen(true)}
+                size="small"
+              >
+                <PaletteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <BackgroundColorTrigger
+              currentColor={backgroundColor ? { color: pendingColor } : undefined}
+              onTrigger={openPicker}
+            />
+            <InsertLineReturnButton
+              parentEditor={parentEditor}
+              lexicalNode={lexicalNode}
+            />
+            <DeleteIconButton
+              onDelete={() => {
+                parentEditor.update(() => {
+                  if (lexicalNode.getPreviousSibling()) {
+                    lexicalNode.selectPrevious();
+                  } else {
+                    lexicalNode.selectNext();
+                  }
+                  lexicalNode.remove();
+                });
+              }}
+            />
           </Box>
         )}
       </Box>
@@ -494,8 +476,7 @@ export const AccordionEditor: React.FC<
         lastColor={pendingColor}
         palette={SHAPE_PRESET_COLORS}
         onPickColor={(color) => {
-          pendingColorRef.current = color;
-          setPendingColor(color);
+          setPendingColorAndRef(color);
         }}
         onClear={handleClearColor}
         noneLabel="No background"

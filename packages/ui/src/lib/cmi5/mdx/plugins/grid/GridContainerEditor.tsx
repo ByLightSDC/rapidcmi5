@@ -38,7 +38,6 @@ import Grid from '@mui/material/Grid2';
 import DeleteIconButton from '../../components/DeleteIconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import PaletteIcon from '@mui/icons-material/Palette';
-import SettingsIcon from '@mui/icons-material/Settings';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
 import {
@@ -55,6 +54,8 @@ import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
+import { BackgroundColorTrigger } from 'packages/ui/src/lib/colors/BackgroundColorTrigger';
+import { useBackgroundColors } from 'packages/ui/src/lib/hooks/useBackgroundColors';
 
 /**
  * Grid Container Editor for grid layout directive.
@@ -77,7 +78,7 @@ export const GridContainerEditor: React.FC<
   );
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
-  const { menuRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
+  const { containerRef, menuRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
 
   const [sxProps, setSxProps] = useState<SxProps>({});
   const [formData, setFormData] = useState<Array<GridCellDirectiveNode>>(
@@ -87,15 +88,19 @@ export const GridContainerEditor: React.FC<
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [isPlayback] = useCellValues(editorInPlayback$);
 
-  const [backgroundColor, setBackgroundColor] = useState<string>(
-    mdastNode?.attributes?.backgroundColor ?? '',
-  );
-  const [colorPickerAnchor, setColorPickerAnchor] =
-    useState<HTMLButtonElement | null>(null);
-  const [pendingColor, setPendingColor] = useState<string>(
-    mdastNode?.attributes?.backgroundColor ?? '',
-  );
-  const pendingColorRef = useRef(pendingColor);
+
+  const {
+    backgroundColor,
+    colorPickerAnchor,
+    openPicker,
+    pendingColor,
+    pendingColorRef,
+    setBackgroundColor,
+    setColorPickerAnchor,
+    setOverrideColor,
+    setPendingColorAndRef,
+  } = useBackgroundColors(mdastNode?.attributes?.['backgroundColor'] ?? '');
+
   const skipNextCloseRebuildRef = useRef(false);
 
   /**
@@ -236,8 +241,7 @@ export const GridContainerEditor: React.FC<
     setColorPickerAnchor(null);
     pendingColorRef.current = '';
     skipNextCloseRebuildRef.current = true;
-    setPendingColor('');
-    setBackgroundColor('');
+    setOverrideColor('');
     parentEditor.update(
       () => {
         const attrs = { ...mdastNode.attributes };
@@ -271,9 +275,7 @@ export const GridContainerEditor: React.FC<
     }
 
     const bgColor = mdastNode?.attributes?.backgroundColor ?? '';
-    setBackgroundColor(bgColor);
-    pendingColorRef.current = bgColor;
-    setPendingColor(bgColor);
+    setOverrideColor(bgColor);
     setContentWidth(mdastNode?.attributes?.contentWidth);
   }, [mdastNode]);
 
@@ -290,12 +292,12 @@ export const GridContainerEditor: React.FC<
   // Outer box: full-width background color band when backgroundColor is set.
   const outerSx: SxProps = backgroundColor
     ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
+      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+      clipPath: `inset(0 -100vmax 0)`,
+      backgroundColor,
+      paddingTop: blockPadding,
+      paddingBottom: blockPadding,
+    }
     : {};
 
   return (
@@ -357,7 +359,7 @@ export const GridContainerEditor: React.FC<
         {/* Gutter buttons — absolutely positioned outside decorator at S/M, inside at L/None */}
         {!isPlayback && (
           <Box
-            
+
             sx={{
               backgroundColor:
                 muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
@@ -367,16 +369,9 @@ export const GridContainerEditor: React.FC<
               right: menuRight,
             }}
           >
-            <Tooltip title="Background Color">
-              <IconButton
-                onClick={(e) => {
-                  pendingColorRef.current = backgroundColor;
-                  setPendingColor(backgroundColor);
-                  setColorPickerAnchor(e.currentTarget);
-                }}
-                size="small"
-              >
-                <PaletteIcon fontSize="small" />
+            <Tooltip title="Edit Grid Layout">
+              <IconButton onClick={handleConfigure}>
+                <EditIcon />
               </IconButton>
             </Tooltip>
             <Tooltip title="Block Appearance">
@@ -384,14 +379,13 @@ export const GridContainerEditor: React.FC<
                 onClick={() => setBlockAppearanceOpen(true)}
                 size="small"
               >
-                <SettingsIcon fontSize="small" />
+                <PaletteIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Edit Grid Layout">
-              <IconButton onClick={handleConfigure}>
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
+            <BackgroundColorTrigger
+              currentColor={backgroundColor ? { color: pendingColor } : undefined}
+              onTrigger={openPicker}
+            />
             <InsertLineReturnButton
               parentEditor={parentEditor}
               lexicalNode={lexicalNode}
@@ -441,8 +435,7 @@ export const GridContainerEditor: React.FC<
         lastColor={pendingColor}
         palette={SHAPE_PRESET_COLORS}
         onPickColor={(color) => {
-          pendingColorRef.current = color;
-          setPendingColor(color);
+          setPendingColorAndRef(color);
         }}
         onClear={handleClearColor}
         noneLabel="No background"
