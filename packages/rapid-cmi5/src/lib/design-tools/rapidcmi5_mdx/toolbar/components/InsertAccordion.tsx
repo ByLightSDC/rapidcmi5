@@ -27,6 +27,7 @@ import {
   placeCaretInsideDirective,
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
+import { useSelectionHelper } from 'packages/rapid-cmi5/src/lib/hooks/useSelectionHelper';
 
 /** The first line return is REQUIRED!!!! */
 const DEFAULT_ACCORDION = `
@@ -54,6 +55,7 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
   const editor = useCellValue(rootEditor$) as LexicalEditor | null;
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const theme = useTheme();
+  const selectionHelper = useSelectionHelper();
   /**
    * Inserts default Accordion at the current selection
    * If it is NOT empty, nothing is inserted
@@ -69,19 +71,7 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
         return; //no applying accordion to selection
       }
 
-      // TOCHeadingNode.insertAfter calls getParentOrThrow(), which throws when
-      // Lexical's insertNodes tries to splice a block next to a heading node.
-      // If the anchor's top-level block is not a plain paragraph, insert a
-      // paragraph after it and move the selection there first, so the accordion
-      // lands in the right place without triggering the heading's insertAfter.
-      const anchorNode = selection.anchor.getNode();
-      const topLevel = anchorNode.getTopLevelElement();
-      if (topLevel && topLevel.getType() !== 'paragraph') {
-        const paragraph = $createParagraphNode();
-        topLevel.insertAfter(paragraph);
-        paragraph.select();
-        selection = $getSelection() as typeof selection;
-      }
+      selection = selectionHelper.getInsertSelection(selection);
 
       const theChildMDast = convertMarkdownToMdast(
         DEFAULT_ACCORDION,

@@ -31,6 +31,7 @@ import {
   placeCaretInsideDirective,
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
+import { useSelectionHelper } from 'packages/rapid-cmi5/src/lib/hooks/useSelectionHelper';
 
 const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
   listItemIndent: 'one',
@@ -38,7 +39,7 @@ const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
 
 export const InsertLayoutBox = () => {
   const editor = useCellValue(rootEditor$) as LexicalEditor | null;
-
+  const selectionHelper = useSelectionHelper();
   const [
     exportVisitors,
     jsxComponentDescriptors,

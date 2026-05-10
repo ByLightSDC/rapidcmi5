@@ -10,7 +10,7 @@ import type { LexicalEditor } from 'lexical';
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { convertMarkdownToMdast, DEFAULT_STEPS, ButtonMinorUi} from '@rapid-cmi5/ui';
+import { convertMarkdownToMdast, DEFAULT_STEPS, ButtonMinorUi } from '@rapid-cmi5/ui';
 import { useTheme } from '@emotion/react';
 
 /**
@@ -19,6 +19,7 @@ import { useTheme } from '@emotion/react';
 import AddIcon from '@mui/icons-material/Add';
 import InputIcon from '@mui/icons-material/Input';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
+import { useSelectionHelper } from 'packages/rapid-cmi5/src/lib/hooks/useSelectionHelper';
 
 /**
  * A toolbar button component that inserts a stepper structure into the editor.
@@ -29,6 +30,7 @@ export const InsertSteps = ({ isDrawer }: { isDrawer?: boolean }) => {
   const editor = useCellValue(rootEditor$) as LexicalEditor | null;
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const theme: any = useTheme();
+  const selectionHelper = useSelectionHelper();
 
   /**
    * Inserts default Tabs at the current selection
@@ -45,14 +47,7 @@ export const InsertSteps = ({ isDrawer }: { isDrawer?: boolean }) => {
         return; //no applying tab to selection
       }
 
-      const anchorNode = selection.anchor.getNode();
-      const topLevel = anchorNode.getTopLevelElement();
-      if (topLevel && topLevel.getType() !== 'paragraph') {
-        const paragraph = $createParagraphNode();
-        topLevel.insertAfter(paragraph);
-        paragraph.select();
-        selection = $getSelection() as typeof selection;
-      }
+      selection = selectionHelper.getInsertSelection(selection);
 
       // create children tabs content nodes
       const theChildMDast = convertMarkdownToMdast(

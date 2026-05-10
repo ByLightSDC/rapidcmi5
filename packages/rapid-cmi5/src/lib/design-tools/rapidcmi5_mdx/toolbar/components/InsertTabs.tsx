@@ -27,6 +27,7 @@ import {
   DEFAULT_TABS,
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
+import { useSelectionHelper } from 'packages/rapid-cmi5/src/lib/hooks/useSelectionHelper';
 
 /**
  * A toolbar button component that inserts a tab structure into the editor.
@@ -37,7 +38,7 @@ export const InsertTabs = ({ isDrawer }: { isDrawer?: boolean }) => {
   const editor = useCellValue(rootEditor$) as LexicalEditor | null;
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const theme: any = useTheme();
-
+  const selectionHelper = useSelectionHelper();
   /**
    * Inserts default Tabs at the current selection
    * If it is NOT empty, nothing is inserted
@@ -53,14 +54,7 @@ export const InsertTabs = ({ isDrawer }: { isDrawer?: boolean }) => {
         return; //no applying tab to selection
       }
 
-      const anchorNode = selection.anchor.getNode();
-      const topLevel = anchorNode.getTopLevelElement();
-      if (topLevel && topLevel.getType() !== 'paragraph') {
-        const paragraph = $createParagraphNode();
-        topLevel.insertAfter(paragraph);
-        paragraph.select();
-        selection = $getSelection() as typeof selection;
-      }
+      selection = selectionHelper.getInsertSelection(selection);
 
       // create children tabs content nodes
       const theChildMDast = convertMarkdownToMdast(

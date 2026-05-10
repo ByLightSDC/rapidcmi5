@@ -25,6 +25,7 @@ import { ButtonMinorUi, DEFAULT_GRID } from '@rapid-cmi5/ui';
 import AddIcon from '@mui/icons-material/Add';
 import { useTheme } from '@mui/material';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
+import { useSelectionHelper } from 'packages/rapid-cmi5/src/lib/hooks/useSelectionHelper';
 
 /**
  * Checks if the current selection is inside a grid container or grid cell.
@@ -73,7 +74,7 @@ export const InsertGrid = ({ isDrawer }: { isDrawer?: boolean }) => {
   const editor = useCellValue(rootEditor$) as LexicalEditor | null;
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const theme = useTheme();
-
+  const selectionHelper = useSelectionHelper();
   /**
    * Inserts default Grid at the current selection.
    * If selection is not collapsed or inside an existing grid, nothing is inserted.
@@ -95,14 +96,7 @@ export const InsertGrid = ({ isDrawer }: { isDrawer?: boolean }) => {
         return; // No applying grid to selection
       }
 
-      const anchorNode = selection.anchor.getNode();
-      const topLevel = anchorNode.getTopLevelElement();
-      if (topLevel && topLevel.getType() !== 'paragraph') {
-        const paragraph = $createParagraphNode();
-        topLevel.insertAfter(paragraph);
-        paragraph.select();
-        selection = $getSelection() as typeof selection;
-      }
+      selection = selectionHelper.getInsertSelection(selection);
 
       // Create children grid cell nodes
       const theChildMDast = convertMarkdownToMdast(
