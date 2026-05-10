@@ -1,3 +1,23 @@
+## 0.13.7 (2026-05-10)
+
+This was a version bump only, there were no code changes.
+
+## 0.13.6 (2026-05-10)
+
+This was a version bump only, there were no code changes.
+
+## 0.13.5 (2026-05-09)
+
+This was a version bump only, there were no code changes.
+
+## 0.13.4 (2026-05-08)
+
+This was a version bump only, there were no code changes.
+
+## 0.13.3 (2026-05-08)
+
+This was a version bump only, there were no code changes.
+
 ## 0.13.2 (2026-05-08)
 
 This was a version bump only, there were no code changes.

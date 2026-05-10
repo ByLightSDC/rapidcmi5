@@ -1,69 +1,81 @@
-import { app, autoUpdater, dialog, MessageBoxOptions } from 'electron';
-import { platform, arch } from 'os';
-import { updateServerUrl } from '../constants';
+import { app, dialog, MessageBoxOptions } from 'electron';
+import { autoUpdater, type UpdateInfo } from 'electron-updater';
 import App from '../app';
 
 export default class UpdateEvents {
-  // initialize auto update service - most be invoked only in production
   static initAutoUpdateService() {
-    const platform_arch =
-      platform() === 'win32' ? platform() : platform() + '_' + arch();
-    const version = app.getVersion();
-    const feed: Electron.FeedURLOptions = {
-      url: `${updateServerUrl}/update/${platform_arch}/${version}`,
+    if (App.isDevelopmentMode()) {
+      console.log('Auto update skipped in development mode.');
+      return;
+    }
+
+    autoUpdater.autoDownload = true;
+    autoUpdater.autoInstallOnAppQuit = true;
+    autoUpdater.allowPrerelease = false;
+
+    const checkForUpdates = () => {
+      console.log('Initializing GitHub release auto update service...');
+      UpdateEvents.checkForUpdates();
     };
 
-    if (!App.isDevelopmentMode()) {
-      console.log('Initializing auto update service...\n');
-
-      autoUpdater.setFeedURL(feed);
-      UpdateEvents.checkForUpdates();
+    if (app.isReady()) {
+      checkForUpdates();
+    } else {
+      app
+        .whenReady()
+        .then(checkForUpdates)
+        .catch((error) => {
+          console.error('Failed to initialize auto update service:', error);
+        });
     }
   }
 
-  // check for updates - most be invoked after initAutoUpdateService() and only in production
   static checkForUpdates() {
-    if (!App.isDevelopmentMode() && autoUpdater.getFeedURL() !== '') {
-      autoUpdater.checkForUpdates();
+    if (App.isDevelopmentMode()) {
+      return;
     }
+
+    autoUpdater.checkForUpdates().catch((error) => {
+      console.error('Failed to check for updates:', error);
+    });
   }
 }
 
-autoUpdater.on(
-  'update-downloaded',
-  (event, releaseNotes, releaseName, releaseDate) => {
-    const dialogOpts: MessageBoxOptions = {
-      type: 'info' as const,
-      buttons: ['Restart', 'Later'],
-      title: 'Application Update',
-      message: process.platform === 'win32' ? releaseNotes : releaseName,
-      detail:
-        'A new version has been downloaded. Restart the application to apply the updates.',
-    };
-
-    dialog.showMessageBox(dialogOpts).then((returnValue) => {
-      if (returnValue.response === 0) autoUpdater.quitAndInstall();
-    });
-  },
-);
-
 autoUpdater.on('checking-for-update', () => {
-  console.log('Checking for updates...\n');
+  console.log('Checking for updates...');
 });
 
-autoUpdater.on('update-available', () => {
-  console.log('New update available!\n');
+autoUpdater.on('update-available', (info: UpdateInfo) => {
+  console.log(`Update available: ${info.version}`);
 });
 
-autoUpdater.on('update-not-available', () => {
-  console.log('Up to date!\n');
+autoUpdater.on('update-not-available', (info: UpdateInfo) => {
+  console.log(`Application is up to date: ${info.version}`);
 });
 
-autoUpdater.on('before-quit-for-update', () => {
-  console.log('Application update is about to begin...\n');
+autoUpdater.on('download-progress', (progress) => {
+  console.log(
+    `Update download progress: ${progress.percent.toFixed(1)}% ` +
+      `(${progress.transferred}/${progress.total})`,
+  );
 });
 
-autoUpdater.on('error', (message) => {
-  console.error('There was a problem updating the application');
-  console.error(message, '\n');
+autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
+  const dialogOpts: MessageBoxOptions = {
+    type: 'info',
+    buttons: ['Restart', 'Later'],
+    title: 'Application Update',
+    message: `RapidCMI5 ${info.version} has been downloaded.`,
+    detail: 'Restart the application to apply the update.',
+  };
+
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {
+    if (returnValue.response === 0) {
+      autoUpdater.quitAndInstall();
+    }
+  });
+});
+
+autoUpdater.on('error', (error) => {
+  console.error('There was a problem updating the application:', error);
 });
