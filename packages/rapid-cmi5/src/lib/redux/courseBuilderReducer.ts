@@ -298,61 +298,6 @@ export const courseBuilderSlice = createSlice({
         newAuIndex,
       );
     },
-    deleteASlide: (state, action: PayloadAction<number>) => {
-      const theSlides = [
-        ...state.courseData.blocks[state.currentBlockIndex].aus[
-          state.currentAuIndex
-        ].slides,
-      ];
-
-      const slide =
-        state.courseData.blocks[state.currentBlockIndex].aus[
-          state.currentAuIndex
-        ].slides[action.payload];
-      deleteSlideOperation(slide.filepath, state);
-
-      //remove scenario if slide with scenario is deleted
-      const wasContent: string = theSlides[action.payload].content as string;
-      if (wasContent.indexOf(':::scenario') >= 0) {
-        //remove scenario from project
-        state.scenario = undefined;
-        state.courseData = {
-          ...state.courseData,
-          blocks: state.courseData.blocks.map((block, blockIndex) =>
-            blockIndex === state.currentBlockIndex
-              ? {
-                  ...block,
-                  aus: block.aus.map((au, auIndex) =>
-                    auIndex === state.currentAuIndex
-                      ? {
-                          ...au,
-                          rangeosScenarioName: undefined,
-                          rangeosScenarioUUID: undefined,
-                        }
-                      : au,
-                  ),
-                }
-              : block,
-          ),
-        };
-      }
-      debugLog('updateTeamScenario (delete slide)');
-      if (wasContent.indexOf(':::consoles') >= 0) {
-        //remove scenario from project
-        state.teamScenario = undefined;
-      }
-
-      //remove
-      theSlides.splice(action.payload, 1);
-      state.courseData.blocks[state.currentBlockIndex].aus[
-        state.currentAuIndex
-      ].slides = theSlides;
-
-      state.currentSlideIndex = Math.max(state.currentSlideIndex - 1, 0);
-      state.dirtyReason = 'delete slide';
-      state.dirtyDisplay += 1;
-      updateLastSlidePath(state);
-    },
     deleteSlide: (
       state,
       action: PayloadAction<{ lessonIndex: number; slideIndex: number }>,
@@ -371,10 +316,9 @@ export const courseBuilderSlice = createSlice({
           // Clear global scenario state
           state.scenario = undefined;
 
-          // Clear scenario fields directly on current AU
-          const currentAU = block.aus[state.currentAuIndex];
-          currentAU.rangeosScenarioName = undefined;
-          currentAU.rangeosScenarioUUID = undefined;
+          // Clear scenario fields directly on the AU that owned the deleted slide
+          au.rangeosScenarioName = undefined;
+          au.rangeosScenarioUUID = undefined;
         }
         if (slide.content.includes(':::consoles')) {
           // Clear global scenario state
@@ -384,10 +328,17 @@ export const courseBuilderSlice = createSlice({
 
       slides.splice(slideIndex, 1);
 
-      state.currentSlideIndex = Math.max(state.currentSlideIndex - 1, 0);
+      if (lessonIndex === state.currentAuIndex) {
+        // if the delete was below the current slide, we need to reindex
+        if (slideIndex <= state.currentSlideIndex) {
+          // Might as well insure we dont go lower than zero
+          state.currentSlideIndex = Math.max(state.currentSlideIndex - 1, 0);
+          updateLastSlidePath(state);
+        }
+      }
+
       state.dirtyReason = 'delete slide';
       state.dirtyDisplay += 1;
-      updateLastSlidePath(state);
     },
     navigateSlide: (state, action: PayloadAction<number>) => {
       state.currentSlideIndex = action.payload;
@@ -776,7 +727,6 @@ export const {
   addCourseOperation,
   addASlide,
   changeViewMode,
-  deleteASlide,
   deleteSlide,
   navigateSlide,
   saveSlideContent,
