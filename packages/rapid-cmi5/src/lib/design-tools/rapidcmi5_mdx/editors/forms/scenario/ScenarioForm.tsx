@@ -56,7 +56,7 @@ export const ScenarioForm = ({
 
   const validationSchema = yup.object().shape({
     uuid: UUID_GROUP,
-    name: META_LABEL_GROUP,
+    name: NAME_GROUP_OPT,
     defaultClassId: yup.string().when('promptClass', {
       is: true,
       then: () => META_LABEL_GROUP,
