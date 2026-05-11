@@ -5,7 +5,7 @@ import {
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
-import { $getSelection, $isRangeSelection } from 'lexical';
+import { $getSelection, $isRangeSelection, $createParagraphNode } from 'lexical';
 import type { LexicalEditor } from 'lexical';
 
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
@@ -24,6 +24,7 @@ import {
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 import { useCallback, useState } from 'react';
+import { useSelectionHelper } from 'packages/rapid-cmi5/src/lib/hooks/useSelectionHelper';
 
 /**
  * A toolbar button component that inserts a statements block into the editor.
@@ -34,6 +35,7 @@ export const InsertStatements = ({ isDrawer }: { isDrawer?: boolean }) => {
   const editor = useCellValue(rootEditor$) as LexicalEditor | null;
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const theme: any = useTheme();
+  const selectionHelper = useSelectionHelper();
   const [isConfiguring, setIsConfiguring] = useState(false);
 
   /**
@@ -47,8 +49,10 @@ export const InsertStatements = ({ isDrawer }: { isDrawer?: boolean }) => {
 
       editor.focus(() => {
         editor.update(() => {
-          const selection = $getSelection();
+          let selection = $getSelection();
           if (!$isRangeSelection(selection) || !selection.isCollapsed()) return;
+
+          selection = selectionHelper.getInsertSelection(selection);
 
           // create statements node
           const mdastStatements: ContainerDirective = {
