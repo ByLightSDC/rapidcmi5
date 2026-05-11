@@ -11,11 +11,13 @@ import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
 import SettingsIconButton from '../../components/SettingsIconButton';
 import NotInterestedIcon from '@mui/icons-material/NotInterested';
+import DeleteIconButton from '../../components/DeleteIconButton';
 
 interface AlignmentToolbarProps {
   handleJustificationChange: (justification: string) => void;
   handleAlignmentChange: (alignment: string) => void;
   handleClearLayout: () => void;
+  onDelete: () => void;
   onOpenStyleDialog?: () => void;
 }
 
@@ -31,6 +33,7 @@ export function LayoutBoxToolbar({
   handleJustificationChange,
   handleAlignmentChange,
   handleClearLayout,
+  onDelete,
   onOpenStyleDialog,
 }: AlignmentToolbarProps): JSX.Element {
   const [readOnly] = useCellValues(readOnly$);
@@ -87,18 +90,7 @@ export function LayoutBoxToolbar({
           />
         </Tooltip>
       </IconButton>
-
-      {/* <IconButton
-        aria-label="styles"
-        disabled={readOnly}
-        onClick={() => onOpenStyleDialog?.()}
-      >
-        <Tooltip arrow title={`Edit Styles`} {...tooltipStyle}>
-          <SettingsIcon fontSize='small' />
-        </Tooltip>
-      </IconButton> */}
-      <SettingsIconButton onConfigure={() => onOpenStyleDialog?.()} />
-
+      <SettingsIconButton tooltipText='Edit Layout' onConfigure={() => onOpenStyleDialog?.()} />
       <IconButton
         aria-label="clear"
         disabled={readOnly}
@@ -106,10 +98,18 @@ export function LayoutBoxToolbar({
           handleClearLayout();
         }}
       >
-        <Tooltip arrow title={`Clear Layout Box`} {...tooltipStyle}>
+        <Tooltip arrow title={`Clear Layout (Keep Content)`} {...tooltipStyle}>
           <NotInterestedIcon fontSize="small" />
         </Tooltip>
       </IconButton>
+
+      <DeleteIconButton
+        tooltipText='Delete Layout Box'
+        onDelete={() => {
+          onDelete();
+        }}
+      />
+
     </RightMenuContainer>
   );
 }

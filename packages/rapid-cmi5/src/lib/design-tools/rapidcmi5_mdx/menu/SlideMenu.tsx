@@ -1,4 +1,11 @@
-import { Stack, Typography, useTheme } from '@mui/material';
+import {
+  alpha,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -46,6 +53,8 @@ export const SlideMenu = () => {
   const { currentRepo, handleGetUniqueFilePath } = useContext(GitContext);
   const { saveSlide, lessonSlides } = useContext(RC5Context);
   const repoAccessObject = useSelector(currentRepoAccessObjectSel);
+
+
 
   const onAddSlide = async () => {
     if (!currentRepo) return;
@@ -123,6 +132,7 @@ export const SlideMenu = () => {
         direction="row"
         sx={{
           backgroundColor: 'transparent',
+
           borderRadius: '6px',
           justifyContent: 'center',
           alignItems: 'center',
@@ -140,16 +150,16 @@ export const SlideMenu = () => {
             onDeleteSlide();
           }}
         >
-          <DeleteForeverIcon color="inherit" />
+          <DeleteForeverIcon color="inherit" style={{ fill: lessonSlides.length <= 1 ? theme.palette.action.disabled : theme.palette.primary.main }}/>
         </MUIButtonWithTooltip>
         <MUIButtonWithTooltip
           disabled={currentSlideIndex <= 0}
-          sx={{ color: 'secondary' }}
+          sx={{ color: 'primary' }}
           title="Previous Slide"
           aria-label="prev-slide"
           onClick={onPrevSlide}
         >
-          <ArrowBackIcon color="inherit" />
+          <ArrowBackIcon color="inherit" style={{ fill: currentSlideIndex <= 0 ? theme.palette.action.disabled : theme.palette.primary.main }}/>
         </MUIButtonWithTooltip>
         <Typography
           sx={{
@@ -161,12 +171,12 @@ export const SlideMenu = () => {
         </Typography>
         <MUIButtonWithTooltip
           disabled={currentSlideIndex >= lessonSlides.length - 1}
-          sx={{ color: 'secondary' }}
+          sx={{ color: 'primary' }}
           title="Next Slide"
           aria-label="next-slide"
           onClick={onNextSlide}
         >
-          <ArrowForwardIcon color="inherit" />
+          <ArrowForwardIcon color="inherit" style={{ fill: currentSlideIndex >= lessonSlides.length - 1 ? theme.palette.action.disabled : theme.palette.primary.main }}/>
         </MUIButtonWithTooltip>
         <MUIButtonWithTooltip
           data-testid="add-markdown-slide-button"
@@ -176,7 +186,10 @@ export const SlideMenu = () => {
           aria-label="add-markdown-slide"
           onClick={() => onAddSlide()}
         >
-          <NoteAddIcon color="primary" />
+          <NoteAddIcon
+            color="inherit"
+            style={{ fill: lessonSlides.length < 1 ? theme.palette.action.disabled : theme.palette.primary.main }}
+          />
         </MUIButtonWithTooltip>
       </Stack>
     </Stack>

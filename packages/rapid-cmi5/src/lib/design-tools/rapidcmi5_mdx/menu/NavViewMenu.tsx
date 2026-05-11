@@ -1,6 +1,6 @@
 import { Box, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 
-import { useContext, useEffect, useMemo } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   changeViewMode,
@@ -47,7 +47,7 @@ export const NavViewMenu = ({
     useContext(GitContext);
   const { saveSlide } = useContext(RC5Context);
   const { promptNavAway } = useRC5Prompts();
-
+  const [isToggleTooltipShowing, setIsToggleTooltipShowing] = useState(false);
   const theme = useTheme();
   const { palette } = theme;
 
@@ -120,6 +120,17 @@ export const NavViewMenu = ({
       </Stack>
     );
   }, [isRepoConnectedToRemote, unpushedCommits]);
+
+  /**
+   * Ensure tooltip is hiding before transition starts
+   * Otherwise, the tooltip flickers on top of the RapidCMI5 logog
+   */
+  const onToggleClicked = () => {
+    setIsToggleTooltipShowing(false);
+    if (onToggleLeftPanel) {
+      onToggleLeftPanel();
+    }
+  };
 
   /**
    * UE hides breadcrumbs
@@ -270,12 +281,20 @@ export const NavViewMenu = ({
           size={iconButtonSize}
           sx={buildIconButtonSx(false)}
           disableRipple
-          onClick={onToggleLeftPanel}
+          onClick={onToggleClicked}
         >
           <Tooltip
             arrow
+            enterDelay={1000}
+            enterNextDelay={1000}
+            open={isToggleTooltipShowing}
+            onOpen={() => setIsToggleTooltipShowing(true)}
+            onClose={() => setIsToggleTooltipShowing(false)}
             placement="right"
             title={isLeftPanelCollapsed ? 'Expand panel' : 'Collapse panel'}
+            slotProps={{
+              transition: { exit: false }
+            }}
           >
             {isLeftPanelCollapsed ? (
               <PanelLeftOpen

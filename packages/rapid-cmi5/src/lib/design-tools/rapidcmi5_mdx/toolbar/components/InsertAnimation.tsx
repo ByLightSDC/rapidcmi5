@@ -4,6 +4,7 @@ import MotionPhotosAutoIcon from '@mui/icons-material/MotionPhotosAuto';
 import { animationDrawerOpen$ } from '../../plugins/animation';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 import { animationShowSeq$ } from './drawers';
+import { useTheme } from '@mui/material';
 
 /**
  * Toolbar button to open animation drawer (always opens, never toggles off)
@@ -12,6 +13,7 @@ export const InsertAnimation = () => {
   const publishOpen = usePublisher(animationDrawerOpen$);
   const publishShowSeq = usePublisher(animationShowSeq$);
   const showSeq = useCellValue(animationShowSeq$);
+  const theme = useTheme();
 
   const handleClick = useCallback(() => {
     publishOpen(true);
@@ -24,7 +26,9 @@ export const InsertAnimation = () => {
       onClick={handleClick}
       aria-label="Toggle Animation Library"
     >
-      <MotionPhotosAutoIcon fontSize="medium" />
+      <MotionPhotosAutoIcon
+        fontSize="medium"
+      />
     </MUIButtonWithTooltip>
   );
 };
