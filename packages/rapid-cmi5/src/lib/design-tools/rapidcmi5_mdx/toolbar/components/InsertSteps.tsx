@@ -5,12 +5,12 @@ import {
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
-import { $getSelection, $isRangeSelection } from 'lexical';
+import { $getSelection, $isRangeSelection, $createParagraphNode } from 'lexical';
 import type { LexicalEditor } from 'lexical';
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 import type { BlockContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { convertMarkdownToMdast, DEFAULT_STEPS, ButtonMinorUi} from '@rapid-cmi5/ui';
+import { convertMarkdownToMdast, DEFAULT_STEPS, ButtonMinorUi } from '@rapid-cmi5/ui';
 import { useTheme } from '@emotion/react';
 
 /**
@@ -19,6 +19,7 @@ import { useTheme } from '@emotion/react';
 import AddIcon from '@mui/icons-material/Add';
 import InputIcon from '@mui/icons-material/Input';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
+import { useSelectionHelper } from 'packages/rapid-cmi5/src/lib/hooks/useSelectionHelper';
 
 /**
  * A toolbar button component that inserts a stepper structure into the editor.
@@ -29,6 +30,7 @@ export const InsertSteps = ({ isDrawer }: { isDrawer?: boolean }) => {
   const editor = useCellValue(rootEditor$) as LexicalEditor | null;
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const theme: any = useTheme();
+  const selectionHelper = useSelectionHelper();
 
   /**
    * Inserts default Tabs at the current selection
@@ -38,14 +40,14 @@ export const InsertSteps = ({ isDrawer }: { isDrawer?: boolean }) => {
     if (!editor) return;
 
     editor.update(() => {
-      const selection = $getSelection();
+      let selection = $getSelection();
       if (!$isRangeSelection(selection)) return;
 
-      if (selection.isCollapsed()) {
-        //continue
-      } else {
+      if (!selection.isCollapsed()) {
         return; //no applying tab to selection
       }
+
+      selection = selectionHelper.getInsertSelection(selection);
 
       // create children tabs content nodes
       const theChildMDast = convertMarkdownToMdast(

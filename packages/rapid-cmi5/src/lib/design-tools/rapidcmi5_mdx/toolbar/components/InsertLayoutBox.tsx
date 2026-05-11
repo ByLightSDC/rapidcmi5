@@ -10,8 +10,10 @@ import {
 
 import {
   $getSelection,
+  $getRoot,
   $setSelection,
   $isRangeSelection,
+  $createParagraphNode,
   LexicalNode,
 } from 'lexical';
 import type { LexicalEditor } from 'lexical';
@@ -29,6 +31,7 @@ import {
   placeCaretInsideDirective,
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
+import { useSelectionHelper } from 'packages/rapid-cmi5/src/lib/hooks/useSelectionHelper';
 
 const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
   listItemIndent: 'one',
@@ -36,7 +39,7 @@ const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
 
 export const InsertLayoutBox = () => {
   const editor = useCellValue(rootEditor$) as LexicalEditor | null;
-
+  const selectionHelper = useSelectionHelper();
   const [
     exportVisitors,
     jsxComponentDescriptors,
@@ -68,7 +71,15 @@ export const InsertLayoutBox = () => {
       const selection = $getSelection();
       if (!$isRangeSelection(selection)) return;
 
-      const block = selection.anchor.getNode().getTopLevelElementOrThrow();
+      const anchorNode = selection.anchor.getNode();
+      let block = anchorNode.getTopLevelElement();
+      if (!block) {
+        // Anchor is the RootNode itself (empty editor). Append a paragraph so
+        // we have a real block to wrap.
+        const paragraph = $createParagraphNode();
+        $getRoot().append(paragraph);
+        block = paragraph;
+      }
 
       let theNodes: LexicalNode[] = [];
       let replaceBlock = false;

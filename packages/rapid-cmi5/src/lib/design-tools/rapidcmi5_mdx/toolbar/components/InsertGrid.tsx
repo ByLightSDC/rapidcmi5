@@ -6,7 +6,7 @@ import {
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
-import { $getSelection, $isRangeSelection } from 'lexical';
+import { $getSelection, $isRangeSelection, $createParagraphNode } from 'lexical';
 import type { LexicalEditor } from 'lexical';
 
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
@@ -25,6 +25,7 @@ import { ButtonMinorUi, DEFAULT_GRID } from '@rapid-cmi5/ui';
 import AddIcon from '@mui/icons-material/Add';
 import { useTheme } from '@mui/material';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
+import { useSelectionHelper } from 'packages/rapid-cmi5/src/lib/hooks/useSelectionHelper';
 
 /**
  * Checks if the current selection is inside a grid container or grid cell.
@@ -73,7 +74,7 @@ export const InsertGrid = ({ isDrawer }: { isDrawer?: boolean }) => {
   const editor = useCellValue(rootEditor$) as LexicalEditor | null;
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const theme = useTheme();
-
+  const selectionHelper = useSelectionHelper();
   /**
    * Inserts default Grid at the current selection.
    * If selection is not collapsed or inside an existing grid, nothing is inserted.
@@ -88,14 +89,14 @@ export const InsertGrid = ({ isDrawer }: { isDrawer?: boolean }) => {
     }
 
     editor.update(() => {
-      const selection = $getSelection();
+      let selection = $getSelection();
       if (!$isRangeSelection(selection)) return;
 
-      if (selection.isCollapsed()) {
-        // Continue
-      } else {
+      if (!selection.isCollapsed()) {
         return; // No applying grid to selection
       }
+
+      selection = selectionHelper.getInsertSelection(selection);
 
       // Create children grid cell nodes
       const theChildMDast = convertMarkdownToMdast(
