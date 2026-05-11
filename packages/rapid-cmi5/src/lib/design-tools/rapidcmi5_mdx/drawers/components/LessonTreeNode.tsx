@@ -319,7 +319,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
         display: 'flex',
         justifyContent: 'space-between', //makes action icons align far right
         width: '100%',
-        height: '28px', //no other way to trim vertical padding on folder icons
+        minHeight: '28px', //no other way to trim vertical padding on folder icons
         color: 'text.hint',
       }}
     >
@@ -377,6 +377,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
         <Typography
           sx={{
             ...fontStyle,
+            lineHeight: 1.2,
             color: (theme: any) =>
               `${element.isBranch ? (isCurrentLessonFolder ? focusColor : theme.palette.text.hint) : isCurrentSlide ? focusColor : theme.palette.text.hint}`,
           }}
@@ -523,7 +524,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                 component="nav"
               >
                 <Typography
-                  sx={{ marginLeft: '12px' }}
+                  sx={{ marginLeft: '12px', lineHeight: 1.5, height: 'auto' }}
                   variant="caption"
                 >
                   {element.name}
