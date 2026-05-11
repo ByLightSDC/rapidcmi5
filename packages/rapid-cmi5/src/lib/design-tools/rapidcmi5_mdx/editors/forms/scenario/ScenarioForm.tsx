@@ -7,6 +7,7 @@ import {
   FormControlUIProvider,
   FormCrudType,
   FormStateType,
+  META_LABEL_GROUP,
   MiniForm,
   NAME_GROUP_OPT,
   UUID_GROUP,
@@ -28,6 +29,7 @@ import { useRapidCmi5Opts } from '../../../../course-builder/GitViewer/session/R
 import { ScenarioCard } from './ScenarioCard';
 import { NoScenarioCard } from './NoScenarioCard';
 import { toTitleCase } from '../formUtils';
+import { useEffect } from 'react';
 
 export const ScenarioForm = ({
   contextMenu,
@@ -54,8 +56,12 @@ export const ScenarioForm = ({
 
   const validationSchema = yup.object().shape({
     uuid: UUID_GROUP,
-    name: NAME_GROUP_OPT,
-    defaultClassId: NAME_GROUP_OPT,
+    name: META_LABEL_GROUP,
+    defaultClassId: yup.string().when('promptClass', {
+      is: true,
+      then: () => META_LABEL_GROUP,
+      otherwise: (schema) => schema.nullable().optional(),
+    }),
   });
 
   const onSaveAction = (data: any) => {
@@ -94,6 +100,15 @@ export const ScenarioForm = ({
       setValue('name', item.name, { shouldDirty: true });
       trigger('uuid');
     };
+
+    /**
+    * UE triggers validation on the class id field if should prompt is turned on
+    */
+    useEffect(() => {
+      if (watchPromptClass) {
+        trigger('defaultClassId');
+      }
+    }, [watchPromptClass]);
 
     return (
       // <Grid container>
