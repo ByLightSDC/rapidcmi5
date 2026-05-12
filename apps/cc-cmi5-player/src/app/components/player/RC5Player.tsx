@@ -262,6 +262,7 @@ function RC5Player() {
       themeClass,
       currentLessonTheme,
       slideWidthSel,
+      true,
     );
     return css;
   }, [themeClass, currentLessonTheme, slideWidthSel]);
