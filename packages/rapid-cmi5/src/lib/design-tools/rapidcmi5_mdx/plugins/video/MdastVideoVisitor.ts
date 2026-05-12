@@ -34,16 +34,19 @@ export const MdastHtmlVideoVisitor: MdastImportVisitor<Mdast.Html> = {
     const title = video.title;
     const width = video.width;
     const height = video.height;
-    const videoId = video.getAttribute('data-video-id') || undefined; // ✅ Extract videoId from HTML
+    const videoId = video.getAttribute('data-video-id') || undefined;
     const autoplay = video.hasAttribute('autoplay');
+    const track = video.querySelector('track[kind="captions"]');
+    const captionSrc = track?.getAttribute('src') || undefined;
 
     const videoNode = $createVideoNode({
       src: src || '',
       title,
       width,
       height,
-      videoId, // ✅ Pass videoId to preserve GUID
+      videoId,
       autoplay,
+      captionSrc,
     });
 
     if (lexicalParent.getType() === 'root') {

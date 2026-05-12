@@ -91,6 +91,7 @@ export interface SrcVideoParameters extends BaseVideoParameters {
   width?: number;
   height?: number;
   autoplay?: boolean;
+  captionSrc?: string;
 }
 
 /**
@@ -108,6 +109,8 @@ export interface SaveVideoParameters extends BaseVideoParameters {
   width?: number; // undefined means 'inherit'
   height?: number; // undefined means 'inherit'
   autoplay?: boolean;
+  captionSrc?: string;
+  captionFile?: FileList;
 }
 
 /**
@@ -133,7 +136,7 @@ export interface NewVideoDialogState {
 export interface EditingVideoDialogState {
   type: 'editing';
   nodeKey: string;
-  initialValues: Omit<SaveVideoParameters, 'file'> & {
+  initialValues: Omit<SaveVideoParameters, 'file' | 'captionFile'> & {
     width?: number | 'inherit';
     height?: number | 'inherit';
   };
@@ -151,6 +154,7 @@ const internalInsertVideo$ = Signal<SrcVideoParameters>((r) => {
           width: values.width,
           height: values.height,
           autoplay: values.autoplay,
+          captionSrc: values.captionSrc,
         });
 
         $insertNodes([videoNode]);
@@ -262,37 +266,48 @@ export const videoDialogState$ = Cell<
       withLatestFrom(activeEditor$, videoUploadHandler$, videoDialogState$),
     ),
     ([values, theEditor, videoUploadHandler, dialogState]) => {
-      const handler =
-        dialogState.type === 'editing'
-          ? (src: string) => {
-              theEditor?.update(() => {
-                const { nodeKey } = dialogState;
-                const videoNode = $getNodeByKey(nodeKey)! as VideoNode;
+      const applyVideoNode = (src: string, captionSrc: string | undefined) => {
+        if (dialogState.type === 'editing') {
+          theEditor?.update(() => {
+            const { nodeKey } = dialogState;
+            const videoNode = $getNodeByKey(nodeKey)! as VideoNode;
 
-                videoNode.setTitle(values.title);
-                videoNode.setSrc(src);
-                videoNode.setRest(values.rest);
-                videoNode.setWidthAndHeight(
-                  values.width ?? 'inherit',
-                  values.height ?? 'inherit',
-                );
-                videoNode.setAutoplay(values.autoplay ?? false);
-              });
-              r.pub(videoDialogState$, { type: 'inactive' });
-            }
-          : (src: string) => {
-              r.pub(internalInsertVideo$, { ...values, src });
-              r.pub(videoDialogState$, { type: 'inactive' });
-            };
+            videoNode.setTitle(values.title);
+            videoNode.setSrc(src);
+            videoNode.setRest(values.rest);
+            videoNode.setWidthAndHeight(
+              values.width ?? 'inherit',
+              values.height ?? 'inherit',
+            );
+            videoNode.setAutoplay(values.autoplay ?? false);
+            videoNode.setCaptionSrc(captionSrc);
+          });
+          r.pub(videoDialogState$, { type: 'inactive' });
+        } else {
+          r.pub(internalInsertVideo$, { ...values, src, captionSrc });
+          r.pub(videoDialogState$, { type: 'inactive' });
+        }
+      };
+
+      const resolveCaption = async (src: string) => {
+        if (values.captionFile && values.captionFile.length > 0 && videoUploadHandler) {
+          const captionSrc = await videoUploadHandler(values.captionFile.item(0)!);
+          applyVideoNode(src, captionSrc);
+        } else {
+          applyVideoNode(src, values.captionSrc);
+        }
+      };
 
       if (values.file && values.file.length > 0) {
         videoUploadHandler?.(values.file.item(0)!)
-          .then(handler)
+          .then(resolveCaption)
           .catch((e: unknown) => {
             throw e;
           });
       } else if (values.src) {
-        handler(values.src);
+        resolveCaption(values.src).catch((e: unknown) => {
+          throw e;
+        });
       }
     },
   );

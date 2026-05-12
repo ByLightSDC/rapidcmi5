@@ -36,6 +36,7 @@ export type SerializedVideoNode = Spread<
     rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
     videoId?: string; // Unique persistent ID for animation targeting
     autoplay?: boolean;
+    captionSrc?: string;
     type: 'video';
     version: 1;
   },
@@ -59,6 +60,8 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
   __videoId: string; // Unique persistent ID for animation targeting
   /** @internal */
   __autoplay: boolean;
+  /** @internal */
+  __captionSrc: string | undefined;
 
   /** @internal */
   __rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
@@ -79,6 +82,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
       node.__key,
       undefined,
       node.__autoplay,
+      node.__captionSrc,
     );
     cloned.__videoId = node.__videoId; // Preserve videoId on clone
     return cloned;
@@ -86,15 +90,16 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
 
   /** @internal */
   static override importJSON(serializedNode: SerializedVideoNode): VideoNode {
-    const { title, src, width, rest, height, videoId, autoplay } = serializedNode;
+    const { title, src, width, rest, height, videoId, autoplay, captionSrc } = serializedNode;
     const node = $createVideoNode({
       title,
       src,
       height,
       width,
       rest,
-      videoId, // Restore videoId from saved state
+      videoId,
       autoplay,
+      captionSrc,
     });
     return node;
   }
@@ -116,6 +121,15 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
     if (this.__autoplay) {
       element.setAttribute('autoplay', 'true');
       element.setAttribute('muted', 'true');
+    }
+    if (this.__captionSrc) {
+      const track = document.createElement('track');
+      track.setAttribute('kind', 'captions');
+      track.setAttribute('src', this.__captionSrc);
+      track.setAttribute('srclang', 'en');
+      track.setAttribute('label', 'English');
+      track.setAttribute('default', '');
+      element.appendChild(track);
     }
     return { element };
   }
@@ -143,6 +157,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
     key?: NodeKey,
     videoId?: string,
     autoplay?: boolean,
+    captionSrc?: string,
   ) {
     super(key);
     this.__src = src;
@@ -153,6 +168,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
     // Generate or restore unique videoId for animation targeting
     this.__videoId = videoId || this.generateVideoId();
     this.__autoplay = autoplay ?? false;
+    this.__captionSrc = captionSrc;
   }
 
   /** @internal */
@@ -173,8 +189,9 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
       width: this.__width === 'inherit' ? 0 : this.__width,
       src: this.getSrc(),
       rest: this.__rest,
-      videoId: this.__videoId, // Save videoId for persistence
+      videoId: this.__videoId,
       autoplay: this.__autoplay,
+      captionSrc: this.__captionSrc,
       type: 'video',
       version: 1,
     };
@@ -254,6 +271,14 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
     this.getWritable().__autoplay = autoplay;
   }
 
+  getCaptionSrc(): string | undefined {
+    return this.__captionSrc;
+  }
+
+  setCaptionSrc(captionSrc: string | undefined): void {
+    this.getWritable().__captionSrc = captionSrc;
+  }
+
   /** @internal */
   shouldBeSerializedAsElement(): boolean {
     // ALWAYS serialize as HTML element to preserve videoId for animations!
@@ -274,6 +299,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
         rest={this.__rest}
         videoId={this.__videoId}
         autoplay={this.__autoplay}
+        captionSrc={this.__captionSrc}
       />
     );
   }
@@ -292,6 +318,7 @@ export interface CreateVideoNodeParameters {
   src: string;
   videoId?: string;
   autoplay?: boolean;
+  captionSrc?: string;
 }
 
 /**
@@ -300,8 +327,8 @@ export interface CreateVideoNodeParameters {
  * @group Video
  */
 export function $createVideoNode(params: CreateVideoNodeParameters): VideoNode {
-  const { title, src, key, width, height, rest, videoId, autoplay } = params;
-  return new VideoNode(src, title, width, height, rest, key, videoId, autoplay);
+  const { title, src, key, width, height, rest, videoId, autoplay, captionSrc } = params;
+  return new VideoNode(src, title, width, height, rest, key, videoId, autoplay, captionSrc);
 }
 
 /**

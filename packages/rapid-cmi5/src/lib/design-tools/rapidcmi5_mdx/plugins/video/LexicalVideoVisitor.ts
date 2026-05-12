@@ -39,6 +39,17 @@ export const LexicalVideoVisitor: LexicalExportVisitor<VideoNode, Mdast.Html> =
         video.setAttribute('muted', 'true');
       }
 
+      const captionSrc = lexicalNode.getCaptionSrc();
+      if (captionSrc) {
+        const track = document.createElement('track');
+        track.setAttribute('kind', 'captions');
+        track.setAttribute('src', captionSrc);
+        track.setAttribute('srclang', 'en');
+        track.setAttribute('label', 'English');
+        track.setAttribute('default', '');
+        video.appendChild(track);
+      }
+
       for (const attr of lexicalNode.getRest()) {
         if (attr.type === 'mdxJsxAttribute') {
           if (typeof attr.value === 'string') {

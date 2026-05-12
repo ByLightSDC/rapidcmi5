@@ -59,6 +59,10 @@ export const VideoDialog: React.FC = () => {
   const [width, setWidth] = useState<string>('');
   const [height, setHeight] = useState<string>('');
   const [autoplay, setAutoplay] = useState<boolean>(false);
+  const [captionSrc, setCaptionSrc] = useState<string>('');
+  const [selectedCaptionFiles, setSelectedCaptionFiles] = useState<FileList | null>(null);
+  const [captionFileOptions, setCaptionFileOptions] = useState<string[]>([]);
+  const [dialogOpenCount, setDialogOpenCount] = useState(0);
   const { handleGetFolderStructure } = useContext(GitContext);
 
   // get the state from Gurx
@@ -78,6 +82,8 @@ export const VideoDialog: React.FC = () => {
       setWidth(state.initialValues.width?.toString() ?? '');
       setHeight(state.initialValues.height?.toString() ?? '');
       setAutoplay(state.initialValues.autoplay ?? false);
+      setCaptionSrc(state.initialValues.captionSrc ?? '');
+      setDialogOpenCount((c) => c + 1);
       if (state.initialValues.rest) {
         const styleAttribute = state.initialValues.rest.find(
           //@ts-ignore
@@ -95,10 +101,13 @@ export const VideoDialog: React.FC = () => {
       setWidth('');
       setHeight('');
       setAutoplay(false);
+      setCaptionSrc('');
+      setDialogOpenCount((c) => c + 1);
     }
 
-    // clear the file regardless of the editing state
+    // clear the files regardless of the editing state
     setSelectedFiles(null);
+    setSelectedCaptionFiles(null);
   }, [state]);
 
   // set up publishers, etc.
@@ -131,6 +140,8 @@ export const VideoDialog: React.FC = () => {
       width: width ? parseInt(width, 10) : undefined,
       height: height ? parseInt(height, 10) : undefined,
       autoplay: autoplay,
+      captionSrc: captionSrc || undefined,
+      captionFile: selectedCaptionFiles,
     };
 
     saveVideo(videoParams);
@@ -168,6 +179,32 @@ export const VideoDialog: React.FC = () => {
 
     fetchData();
   }, [videoFilePath, src, state.type]);
+
+  // fetch available .vtt caption files from the same video directory
+  useEffect(() => {
+    async function fetchCaptionFiles() {
+      try {
+        const treeData = await handleGetFolderStructure(videoFilePath, true);
+        const vttOptions: string[] = [];
+
+        if (state.type === 'editing' && state.initialValues.captionSrc) {
+          vttOptions.push(state.initialValues.captionSrc.replace(VIDEO_DIR, ''));
+        }
+
+        for (let i = 0; i < treeData.length; i++) {
+          const fileName = treeData[i].name as string;
+          if (fileName.endsWith('.vtt') && vttOptions[0] !== fileName) {
+            vttOptions.push(fileName);
+          }
+        }
+        setCaptionFileOptions(vttOptions);
+      } catch {
+        setCaptionFileOptions([]);
+      }
+    }
+
+    fetchCaptionFiles();
+  }, [videoFilePath, state.type]);
 
   // handle file selection
   const handleFileSelected = (e: ChangeEvent<HTMLInputElement>) => {
@@ -345,6 +382,57 @@ export const VideoDialog: React.FC = () => {
               }
               label="Autoplay"
             />
+
+            {/* Captions section */}
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Stack spacing={2}>
+                <Typography variant="subtitle2">Captions (WCAG 1.2.2)</Typography>
+                <Stack direction="row" spacing={2}>
+                  <ButtonModalMainUi
+                    component="label"
+                    role={undefined}
+                    tabIndex={-1}
+                    startIcon={<UploadFileIcon />}
+                  >
+                    Upload .vtt File
+                    <VisuallyHiddenInput
+                      type="file"
+                      accept=".vtt"
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                        const fileList = e.target.files;
+                        if (fileList && fileList.length > 0) {
+                          setSelectedCaptionFiles(fileList);
+                          setCaptionSrc(`${VIDEO_DIR}${fileList[0].name}`);
+                        } else {
+                          setSelectedCaptionFiles(null);
+                        }
+                      }}
+                    />
+                  </ButtonModalMainUi>
+                </Stack>
+                <ComboBoxSelectorUi
+                  key={dialogOpenCount}
+                  label="Caption File (.vtt)"
+                  id="caption-src"
+                  options={captionFileOptions}
+                  defaultValue={captionSrc.replace(VIDEO_DIR, '')}
+                  showAllOptions={true}
+                  autocompleteProps={{
+                    freeSolo: true,
+                  }}
+                  onSelect={(selectionValue: any) => {
+                    if (!selectionValue) {
+                      setCaptionSrc('');
+                    } else if (selectionValue.startsWith('http') || selectionValue.startsWith('./')) {
+                      setCaptionSrc(selectionValue);
+                    } else {
+                      setCaptionSrc(`${VIDEO_DIR}${selectionValue}`);
+                    }
+                  }}
+                  infoText="Select or specify a WebVTT (.vtt) caption file for accessibility."
+                />
+              </Stack>
+            </Paper>
           </Stack>
         </>
       </ModalDialog>
