@@ -1,12 +1,12 @@
 /* CMI5 Flavor */
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Alert } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { rangeConsoleDataSel, rangeDataSel } from '../../redux/auReducer';
 import { useGetRangeResourceConsolesGraph } from '@rangeos-nx/frontend/clients/hooks';
-import { LoadingUi, useQueryDetails } from '@rapid-cmi5/ui';
+import { config, debugLog, LoadingUi, useQueryDetails } from '@rapid-cmi5/ui';
 import ConsolePopup from './console/ConsolePopup';
 
 export const routeDelim = 'A';
@@ -31,8 +31,8 @@ export function ScenarioConsoleTab() {
   const [isConsoleInitialized, setIsConsoleInitialized] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const consoleRef: any = useRef(null);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState<string | undefined>(undefined);
+  const [password, setPassword] = useState<string | undefined>(undefined);
 
   //console.log('Console Tab Query');
   //console.log('rangeId', rangeId);
@@ -72,26 +72,32 @@ export function ScenarioConsoleTab() {
     shouldDisplayToaster: false,
   });
 
-  /**
-   * UE forces render when rangeData updates
-   */
-  useEffect(() => {
-    const isDisabled =
+  const getBasicAuthConsoleDisabled = useCallback(() => {
+    return Boolean(
       rangeData?.rangeId &&
-      rangeData.deployedScenarios &&
-      rangeData.deployedScenarios.length > 0 &&
-      rangeConsoleData?.credentials &&
-      rangeConsoleData.credentials.length > 0
+        rangeData.deployedScenarios &&
+        rangeData.deployedScenarios.length > 0 &&
+        rangeConsoleData?.credentials &&
+        rangeConsoleData.credentials.length > 0
         ? false
-        : true;
-    setAccessDisabled(isDisabled);
+        : true,
+    );
+  }, [
+    rangeData.rangeId,
+    rangeData.deployedScenarios,
+    rangeConsoleData.credentials,
+  ]);
 
-    if (!isDisabled) {
-      console.log(
+  const getCredentials = useCallback(() => {
+    if (config.CMI5_SSO_ENABLED) {
+      setUsername(undefined);
+      setPassword(undefined);
+    } else {
+      debugLog(
         'rangeConsoleData?.credentials[0].username',
         rangeConsoleData?.credentials[0].username,
       );
-      console.log(
+      debugLog(
         'rangeConsoleData?.credentials[0].password',
         rangeConsoleData?.credentials[0].password,
       );
@@ -107,6 +113,21 @@ export function ScenarioConsoleTab() {
         setUsername(rangeConsoleData.credentials[0].username);
         setPassword(rangeConsoleData.credentials[0].password);
       }
+    }
+  }, []);
+
+  /**
+   * UE forces render when rangeData updates
+   * handles basic auth and sso consoles
+   */
+  useEffect(() => {
+    const isDisabled = config.CMI5_SSO_ENABLED
+      ? false
+      : getBasicAuthConsoleDisabled();
+    setAccessDisabled(isDisabled);
+
+    if (!isDisabled) {
+      getCredentials();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [

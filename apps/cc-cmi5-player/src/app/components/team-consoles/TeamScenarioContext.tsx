@@ -10,14 +10,10 @@ import {
 } from 'react';
 import { defaultScenarioResourceData, ScenarioResources } from './types';
 import {
-
   defaultSortOrder,
   getErrorMessageDetail,
-
   infiniteRecordLimit,
-
   queryHooksConfig,
-
   Topic,
 } from '@rangeos-nx/frontend/clients/hooks';
 
@@ -32,7 +28,12 @@ import { debugLog, debugLogError, logger } from '../../debug';
 
 import { useCellValue } from '@mdxeditor/editor';
 import { AuManagerContext } from '../../session/AuManager';
-import { TeamConsolesContent, ScenarioSubmitResponse, ActivityScore, RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import {
+  TeamConsolesContent,
+  ScenarioSubmitResponse,
+  ActivityScore,
+  RC5ActivityTypeEnum,
+} from '@rapid-cmi5/cmi5-build-common';
 import { ConsoleProvider } from '../scenario/console/ConsoleContext';
 import ConsolesDisplay from '../scenario/console/ConsolesDisplay';
 
@@ -128,7 +129,7 @@ export const TeamScenarioContextProvider: any = (props: tProviderProps) => {
 
   const [isContextInitialized, setIsContextInitialized] = useState(false);
 
-  const placeHolderScenarioId = 'team';
+  const placeHolderScenarioId = ''; //used in testing
 
   /**
    * Registry method for listening to update notifications
@@ -479,10 +480,12 @@ export const TeamScenarioContextProvider: any = (props: tProviderProps) => {
             scenarios.current.push(newScenario);
           }
 
+          // be sure to pass skipCounter false so that it will notify listeners of the new scenario and trigger loading of resources
           setUpdate(
             deployedScenarioId,
             matchingDeployedScenarios.data.data[0],
             Topic.Scenario,
+            false
           );
         } else {
           console.log(
@@ -699,9 +702,6 @@ export const TeamScenarioContextProvider: any = (props: tProviderProps) => {
 
   const firstLoadedScenario = useMemo(() => {
     if (scenarios.current.length > 0) {
-      if (scenarios.current[0].deployedScenarioId) {
-        return scenarios.current[0];
-      }
       return scenarios.current[0];
     }
 
@@ -738,7 +738,7 @@ export const TeamScenarioContextProvider: any = (props: tProviderProps) => {
       <ConsoleProvider
         isRouteRelative={true}
         routeDelim={routeDelim}
-        key={placeHolderScenarioId}
+        key={firstLoadedScenario?.deployedScenarioId || placeHolderScenarioId}
         rangeId={'placeholder'}
         scenarioId={
           firstLoadedScenario?.deployedScenarioId || placeHolderScenarioId

@@ -28,14 +28,19 @@ export default function Auth(props: AuthProps) {
   const isConfigInitialized = useSelector(auConfigInitializedSel);
   const dispatch = useDispatch();
 
+  console.log('config', config);
+  console.log('isConfigInitialized', isConfigInitialized);
 
-  const shouldDisplayKeyCloak =
-    isConfigInitialized &&
-    config.CMI5_SSO_ENABLED &&
-    config.KEYCLOAK_URL &&
-    config.KEYCLOAK_REALM &&
-    config.KEYCLOAK_CLIENT_ID &&
-    config.KEYCLOAK_SCOPE;
+  const shouldDisplayKeyCloak = useMemo(() => {
+    return Boolean(
+      isConfigInitialized &&
+        config.CMI5_SSO_ENABLED &&
+        config.KEYCLOAK_URL &&
+        config.KEYCLOAK_REALM &&
+        config.KEYCLOAK_CLIENT_ID &&
+        config.KEYCLOAK_SCOPE,
+    );
+  }, [isConfigInitialized]);
 
   const authorNoAuth = useMemo(() => {
     logger.debug('check auth config', config, 'auth');
