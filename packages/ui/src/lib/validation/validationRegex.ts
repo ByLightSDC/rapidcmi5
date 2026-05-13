@@ -5,7 +5,8 @@ export const accessKeySecretRegex = /^[a-zA-Z0-9+/]{40}$/;
 export const amazonMachineIdRegex = /^ami-[0-9a-fA-F]{17}$/;
 export const macAddressErrorMessage = 'ex: 11:22:33:44:55:66';
 export const macAddressRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
-
+export const metaDataLabelRegex =
+  /^(([a-zA-z0-9][-a-zA-z0-9_.]*)?[a-za-z0-9])?$/;
 export const alphaNumericDashUnderscoreRegex = /^[a-zA-Z0-9\-_]*$/;
 
 export const cpeFieldRegex =

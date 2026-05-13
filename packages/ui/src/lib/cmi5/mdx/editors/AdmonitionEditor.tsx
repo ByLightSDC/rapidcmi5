@@ -20,15 +20,23 @@ import {
   AccordionSummary,
   Box,
   IconButton,
+  Popover,
   SxProps,
   Tooltip,
   useTheme,
 } from '@mui/material';
 import PaletteIcon from '@mui/icons-material/Palette';
 import WidthFullIcon from '@mui/icons-material/WidthFull';
-
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { toMarkdown } from 'mdast-util-to-markdown';
 
 import {
@@ -49,12 +57,18 @@ import { debugLogError } from '../../../utility/logger';
 import { editorInPlayback$ } from '../state/vars';
 import { convertMarkdownToMdast } from '../util/conversion';
 import { LessonThemeContext } from '../contexts/LessonThemeContext';
-import { resolveLessonThemeCSS, resolveBlockMaxWidth } from '../../../styles/lessonThemeStyles';
+import {
+  resolveLessonThemeCSS,
+  resolveBlockMaxWidth,
+} from '../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../plugins/shared/useGutterRight';
 import { BlockAppearanceForm } from '../plugins/shared/BlockAppearanceForm';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../constants/colors';
+import { useBackgroundColors } from '../../../hooks/useBackgroundColors';
+import EditIcon from '@mui/icons-material/Edit';
+import { BackgroundColorTrigger } from '../../../colors/BackgroundColorTrigger';
 
 export declare interface AdmonitionDirectiveEditorProps<
   T extends Directives = Directives,
@@ -91,7 +105,9 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   const muiTheme = useTheme();
   const { lessonTheme } = useContext(LessonThemeContext);
   const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
-  const blockPadding = resolvedThemeCSS ? (resolvedThemeCSS.blockPadding ?? '0px') : '32px';
+  const blockPadding = resolvedThemeCSS
+    ? (resolvedThemeCSS.blockPadding ?? '0px')
+    : '32px';
 
   //REF const markdownSourceEditorValue = useCellValue(markdownSourceEditorValue$);
   const [defaultCollapseSel, setDefaultCollapseSel] = useState<
@@ -100,7 +116,9 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   const removeNode = useLexicalNodeRemove();
   const updateMdastNode = useMdastNodeUpdater();
   const [isCollapsible, setIsCollapsible] = useState(false);
-  const [isConfiguring, setIsConfiguring] = useState(false);
+
+  const [configureAnchor, setConfigureAnchor] =
+    useState<HTMLButtonElement | null>(null);
   const [isFocused, setIsFocused] = useState(false); //editor focused
   const [isPlaceholderAllowed, setIsPlaceholderAllowed] = useState(false); //editor focused
 
@@ -113,22 +131,26 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   const [adType, setAdType] = useState<AdmonitionTypeEnum>(
     AdmonitionTypeEnum.note,
   );
-  const [backgroundColor, setBackgroundColor] = useState<string>(
-    mdastNode?.attributes?.['backgroundColor'] ?? '',
-  );
-  const [colorPickerAnchor, setColorPickerAnchor] =
-    useState<HTMLButtonElement | null>(null);
-  const [pendingColor, setPendingColor] = useState<string>(
-    mdastNode?.attributes?.['backgroundColor'] ?? '',
-  );
-  const pendingColorRef = useRef(pendingColor);
+
+  const {
+    backgroundColor,
+    colorPickerAnchor,
+    openPicker,
+    pendingColor,
+    pendingColorRef,
+    setBackgroundColor,
+    setColorPickerAnchor,
+    setOverrideColor,
+    setPendingColorAndRef,
+  } = useBackgroundColors(mdastNode?.attributes?.['backgroundColor'] ?? '');
+
   const skipNextCloseRebuildRef = useRef(false);
-  const [contentWidth, setContentWidth] = useState<ContentWidthEnum | undefined>(
-    mdastNode?.attributes?.['contentWidth'] as ContentWidthEnum | undefined,
-  );
+  const [contentWidth, setContentWidth] = useState<
+    ContentWidthEnum | undefined
+  >(mdastNode?.attributes?.['contentWidth'] as ContentWidthEnum | undefined);
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
-  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
+  const { containerRef, menuRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
 
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const [adColor, setAdColor] = useState<
@@ -154,13 +176,10 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
     }
   }
 
-  const [currentSelection, activeEditor, editorInFocus, isPlayback] =
-    useCellValues(
-      currentSelection$,
-      activeEditor$,
-      editorInFocus$,
-      editorInPlayback$,
-    );
+  const [editorInFocus, isPlayback] = useCellValues(
+    editorInFocus$,
+    editorInPlayback$,
+  );
 
   /**
    * Stores expanded state in local state
@@ -173,17 +192,12 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
    * delete mdast node
    */
   const onDelete = useCallback(
-    (event?: any) => {
-      event?.stopImmediatePropagation();
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
       removeNode();
     },
     [removeNode],
   );
-
-  const onConfigure = useCallback(() => {
-    onFocusHandler();
-    setIsConfiguring(!isConfiguring);
-  }, [isConfiguring]);
 
   const getTitle = (attributes?: any) => {
     if (
@@ -220,16 +234,10 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
         ...mdastNode,
         attributes: theAttributes,
       });
+      setConfigureAnchor(null);
     },
     [mdastNode, updateMdastNode],
   );
-
-  /**
-   *
-   */
-  const onFocusHandler = React.useCallback(() => {
-    lexicalNode.select();
-  }, [lexicalNode]);
 
   /**
    * Rebuilds the admonition node with a new background color.
@@ -307,21 +315,20 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   // Sync backgroundColor and contentWidth from mdastNode
   useEffect(() => {
     const bgColor = mdastNode?.attributes?.['backgroundColor'] ?? '';
-    setBackgroundColor(bgColor);
-    pendingColorRef.current = bgColor;
-    setPendingColor(bgColor);
-    setContentWidth(mdastNode?.attributes?.['contentWidth'] as ContentWidthEnum | undefined);
+    setOverrideColor(bgColor);
+    setContentWidth(
+      mdastNode?.attributes?.['contentWidth'] as ContentWidthEnum | undefined,
+    );
   }, [mdastNode]);
-
 
   const outerSx: SxProps = backgroundColor
     ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
+      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+      clipPath: `inset(0 -100vmax 0)`,
+      backgroundColor,
+      paddingTop: blockPadding,
+      paddingBottom: blockPadding,
+    }
     : {};
 
   const expandIcon = useMemo(() => {
@@ -339,11 +346,20 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
     return <ExpandCircleDownIcon color={adColor} />;
   }, [adHexColor, adColor, isCollapsible]);
 
+  const isConfigureOpen = Boolean(configureAnchor);
+
   return (
     <Box
+      ref={containerRef}
       {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
       {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
-      {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as React.CSSProperties } : {})}
+      {...(contentWidth !== undefined
+        ? {
+          style: {
+            '--block-max-width': blockMaxWidth ?? 'none',
+          } as React.CSSProperties,
+        }
+        : {})}
       sx={{
         margin: 0,
         padding: 0,
@@ -351,31 +367,18 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
         ...outerSx,
       }}
     >
-      <Box sx={{
-        width: '100%',
-        ...(blockMaxWidth ? { maxWidth: blockMaxWidth, marginLeft: 'auto', marginRight: 'auto' } : {}),
-      }}>
-        {isConfiguring && !isPlayback && (
-          <SelectorMainUi
-            defaultValue={defaultCollapseSel}
-            divProps={{ marginLeft: -24 }}
-            key="select-collapse"
-            isTransient={false}
-            listItemProps={{
-              color: 'primary',
-              fontSize: 'small',
-              fontWeight: 'lighter',
-            }}
-            options={[
-              'Collapse Start Open',
-              'Collapse Start Closed',
-              'No Collapse',
-            ]}
-            sxProps={{ minWidth: '100px', height: '30px' }}
-            isFormStyle={false}
-            onSelect={onSelectCollapsible}
-          />
-        )}
+      <Box
+        sx={{
+          width: '100%',
+          ...(blockMaxWidth
+            ? {
+              maxWidth: blockMaxWidth,
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }
+            : {}),
+        }}
+      >
         <Accordion
           expanded={isCollapsible ? isOpen : true}
           onChange={onAccordionChange}
@@ -468,37 +471,41 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
       {/* Gutter buttons — absolutely positioned outside decorator at S/M, inside at L/None */}
       {!isPlayback && (
         <Box
-          ref={gutterRef as any}
           sx={{
             backgroundColor:
               muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
             display: 'flex',
             position: 'absolute',
             top: backgroundColor ? blockPadding : 0,
-            right: gutterRight,
+            right: menuRight,
+            zIndex: 100,
           }}
         >
-          <Tooltip title="Background Color">
+          <Tooltip title="Edit Settings">
             <IconButton
-              onClick={(e) => {
-                pendingColorRef.current = backgroundColor;
-                setPendingColor(backgroundColor);
-                setColorPickerAnchor(e.currentTarget);
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.stopPropagation();
+                setConfigureAnchor(e.currentTarget);
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Block Appearance">
+            <IconButton
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.stopPropagation();
+                setBlockAppearanceOpen(true);
               }}
               size="small"
             >
               <PaletteIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Block Appearance">
-            <IconButton
-              onClick={() => setBlockAppearanceOpen(true)}
-              size="small"
-            >
-              <WidthFullIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <SettingsIconButton onConfigure={onConfigure} />
+          <BackgroundColorTrigger
+            currentColor={backgroundColor ? { color: pendingColor } : undefined}
+            onTrigger={openPicker}
+          />
           <InsertLineReturnButton
             parentEditor={parentEditor}
             lexicalNode={lexicalNode}
@@ -507,6 +514,34 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
         </Box>
       )}
 
+      {/* Options Popover */}
+      <Popover
+        open={isConfigureOpen}
+        anchorEl={configureAnchor}
+        onClose={() => {
+          setConfigureAnchor(null);
+        }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      >
+        <SelectorMainUi
+          defaultValue={defaultCollapseSel}
+          key="select-collapse"
+          isTransient={false}
+          listItemProps={{
+            color: 'primary',
+            fontSize: 'small',
+            fontWeight: 'lighter',
+          }}
+          options={[
+            'Collapse Start Open',
+            'Collapse Start Closed',
+            'No Collapse',
+          ]}
+          sxProps={{ minWidth: '120px', height: '30px' }}
+          isFormStyle={false}
+          onSelect={onSelectCollapsible}
+        />
+      </Popover>
       {/* Background Color Popover */}
       <ColorSelectionPopover
         anchorEl={colorPickerAnchor}
@@ -519,34 +554,41 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
           const latest = pendingColorRef.current;
           if (latest !== backgroundColor) {
             setBackgroundColor(latest);
-            parentEditor.update(() => {
-              const attrs = { ...(mdastNode.attributes as Record<string, string>) };
-              if (latest) {
-                attrs['backgroundColor'] = latest;
-              } else {
-                delete attrs['backgroundColor'];
-              }
-              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-            }, { discrete: true });
+            parentEditor.update(
+              () => {
+                const attrs = {
+                  ...(mdastNode.attributes as Record<string, string>),
+                };
+                if (latest) {
+                  attrs['backgroundColor'] = latest;
+                } else {
+                  delete attrs['backgroundColor'];
+                }
+                lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+              },
+              { discrete: true },
+            );
           }
         }}
         lastColor={pendingColor}
         palette={SHAPE_PRESET_COLORS}
         onPickColor={(color) => {
-          pendingColorRef.current = color;
-          setPendingColor(color);
+          setPendingColorAndRef(color);
         }}
         onClear={() => {
           setColorPickerAnchor(null);
-          pendingColorRef.current = '';
           skipNextCloseRebuildRef.current = true;
-          setPendingColor('');
-          setBackgroundColor('');
-          parentEditor.update(() => {
-            const attrs = { ...(mdastNode.attributes as Record<string, string>) };
-            delete attrs['backgroundColor'];
-            lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-          }, { discrete: true });
+          setOverrideColor('');
+          parentEditor.update(
+            () => {
+              const attrs = {
+                ...(mdastNode.attributes as Record<string, string>),
+              };
+              delete attrs['backgroundColor'];
+              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+            },
+            { discrete: true },
+          );
         }}
         noneLabel="No background"
       />
@@ -557,15 +599,20 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
         onClose={() => setBlockAppearanceOpen(false)}
         onSave={(newContentWidth) => {
           setContentWidth(newContentWidth);
-          parentEditor.update(() => {
-            const attrs = { ...(mdastNode.attributes as Record<string, string>) };
-            if (newContentWidth) {
-              attrs['contentWidth'] = newContentWidth;
-            } else {
-              delete attrs['contentWidth'];
-            }
-            lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-          }, { discrete: true });
+          parentEditor.update(
+            () => {
+              const attrs = {
+                ...(mdastNode.attributes as Record<string, string>),
+              };
+              if (newContentWidth) {
+                attrs['contentWidth'] = newContentWidth;
+              } else {
+                delete attrs['contentWidth'];
+              }
+              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+            },
+            { discrete: true },
+          );
         }}
       />
     </Box>

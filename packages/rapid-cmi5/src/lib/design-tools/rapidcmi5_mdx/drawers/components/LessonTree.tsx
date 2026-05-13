@@ -180,7 +180,6 @@ function LessonTree({
               blockIndex: element.block,
               slide: {
                 content: defaultSlideContent,
-                display: defaultSlideContent,
                 slideTitle: slideTitle,
                 type: SlideTypeEnum.Markdown,
                 filepath,
@@ -213,6 +212,7 @@ function LessonTree({
               .length || 0) > 1
           ) {
             if (element.slide !== undefined && element.lesson !== undefined) {
+              saveSlide();
               dispatch(
                 deleteSlide({
                   slideIndex: element.slide,

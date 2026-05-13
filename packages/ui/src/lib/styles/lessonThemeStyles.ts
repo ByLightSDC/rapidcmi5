@@ -101,9 +101,9 @@ export function generateLessonThemeStyleTag(
   scopedClass: string,
   theme?: LessonTheme,
   slideWidth?: number,
+  isPlayback?: boolean,
 ): string {
   const css = resolveLessonThemeCSS(theme);
-
 
   // Always-emitted rules — must fire regardless of lesson theme settings.
   // Image block overrides must work even when no lesson content width is set.
@@ -125,6 +125,11 @@ export function generateLessonThemeStyleTag(
       max-width: 100%;
       height: auto;
     }
+    ${isPlayback ? `.${scopedClass} .mdxeditor-root-contenteditable video {
+      display: block;
+      width: 100%;
+      height: auto;
+    }` : ''}
     .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-block-expand] img {
       display: block;
     }
@@ -149,7 +154,8 @@ export function generateLessonThemeStyleTag(
   .${scopedClass} .mdxeditor-root-contenteditable {
     overflow: visible;
   }
-  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:not(:has(.paper-activity)) {
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator],
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > video {
     max-width: ${css.maxWidth};
     margin-left: auto;
     margin-right: auto;
@@ -169,15 +175,7 @@ export function generateLessonThemeStyleTag(
     margin-left: auto;
     margin-right: auto;
   }
-  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator]:has(.paper-activity) {
-    width: calc(98vw - var(--panel-width));
-    max-width: calc(98vw - var(--panel-width));
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-    overflow: visible;
-  }
-  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] [data-lexical-editor="true"] [data-lexical-decorator]:not(:has(.paper-activity)) {
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator] [data-lexical-editor="true"] [data-lexical-decorator] {
     max-width: none;
     margin-left: unset;
     margin-right: unset;

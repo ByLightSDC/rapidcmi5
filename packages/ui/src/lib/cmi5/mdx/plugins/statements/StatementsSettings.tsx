@@ -94,7 +94,7 @@ export const StatementsSettings = ({
                     <img
                       width={preset.thumbnailWidth}
                       height={preset.thumbnailHeight}
-                      src={`/assets/images/statement_preset_${preset.id}.png`}
+                      src={`./assets/images/statement_preset_${preset.id}.png`}
                       alt={`${preset.name} image`}
                     />
                   </Box>

@@ -26,6 +26,7 @@ import Form from './Form';
 import { FormCrudType } from '../redux/utils/types';
 import { useToaster } from '../utility/useToaster';
 import { ButtonLoadingUi } from '../utility/buttons';
+import { OuterStyle } from '@rapid-cmi5/cmi5-build-common';
 
 /**
 * @typedef {Object} MiniFormProps
@@ -54,6 +55,7 @@ import { ButtonLoadingUi } from '../utility/buttons';
 export type MiniFormProps = {
   autoSaveDebounceTime?: number;
   className?: string;
+  contextMenu?: JSX.Element;
   crudType?: FormCrudType;
   dataCache?: any;
   doAction?: (data: any) => Promise<void> | void;
@@ -69,6 +71,7 @@ export type MiniFormProps = {
   formTitle?: string;
   loadingButtonText?: string;
   outerSx?: SxProps;
+  outerStyle?: OuterStyle;
   savingButtonText?: string;
   shouldAutoSave?: boolean;
   shouldDisplaySave?: boolean;
@@ -88,15 +91,15 @@ export type MiniFormProps = {
   onResponse?: (isSuccess: boolean, data: any, message: string) => void;
 };
 export function MiniForm({
-  autoSaveDebounceTime = 3000,
+  autoSaveDebounceTime = 500,
   className,
+  contextMenu,
   crudType = FormCrudType.edit,
   dataCache,
   doAction,
   getFormFields,
   formTitle,
   formWidth,
-  formMaxWidth,
   formSxProps = { margin: '12px' },
   instructions,
   loadingButtonText = 'Loading',
@@ -107,7 +110,8 @@ export function MiniForm({
   shouldOverrideIsSubmitting = false,
   submitButtonText = 'Save',
   failToasterMessage,
-  outerSx = {},
+  outerSx,
+  outerStyle,
   savingButtonText = 'Saving',
   shouldAutoSave = false,
   shouldDisplaySave = true,
@@ -141,15 +145,8 @@ export function MiniForm({
     resolver: yupResolver(validationSchema),
   });
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    getValues,
-    setValue,
-    trigger,
-    formState,
-  } = methods;
+  const { control, handleSubmit, reset, getValues, trigger, formState } =
+    methods;
   const { isValid, isDirty } = formState;
 
   //#region handlers
@@ -179,9 +176,14 @@ export function MiniForm({
   const autoSave = useCallback(() => {
     if (doAction) {
       doAction(getValues());
+      // Reset with the form's actual current values (not the snapshot we passed
+      // to doAction, which callers may mutate). keepValues keeps inputs as-is;
+      // updating defaultValues to match clears isDirty so the autosave effect
+      // doesn't re-fire when doAction's identity churns upstream.
+      reset(getValues(), { keepValues: true });
       setIsSubmitting(false);
     }
-  }, [getValues, doAction]);
+  }, [getValues, doAction, reset]);
 
   const hasSubmittedSuccessfully = useRef(false);
 
@@ -347,9 +349,11 @@ export function MiniForm({
           overflow: 'hidden', // so only form will have scrollbar
           ...outerSx,
         }}
+        {...outerStyle}
       >
         {isLoaded && (
           <Form
+            contextMenu={contextMenu}
             instructions={instructions}
             title={formTitle}
             subTitle=""
@@ -360,23 +364,25 @@ export function MiniForm({
             showPaper={showPaper}
             // 8px below fixes top row getting clipped in Blueprint and VM Image forms
             formFields={
-              <Grid
-                container
-                spacing={2}
-                sx={{ paddingTop: '8px', width: '100%' }}
-              >
-                {children}
-                {showInternalError && submitError && (
-                  <Alert
-                    onClose={() => {
-                      setSubmitError('');
-                    }}
-                    color="error"
-                  >
-                    {submitError}
-                  </Alert>
-                )}
-              </Grid>
+              <>
+                <Grid
+                  container
+                  spacing={2}
+                  sx={{ paddingTop: '8px', width: '100%' }}
+                >
+                  {children}
+                  {showInternalError && submitError && (
+                    <Alert
+                      onClose={() => {
+                        setSubmitError('');
+                      }}
+                      color="error"
+                    >
+                      {submitError}
+                    </Alert>
+                  )}
+                </Grid>
+              </>
             }
             formButtons={
               //test for additional buttons requires empty react element to wrap
@@ -449,6 +455,7 @@ export function MiniForm({
             onCloseAlert={() => setSubmitError('')}
           />
         )}
+        {/* {contextMenu} */}
       </Box>
     </>
   );

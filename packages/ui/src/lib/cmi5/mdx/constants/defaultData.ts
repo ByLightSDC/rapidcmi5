@@ -1,5 +1,21 @@
-import { SlideTypeEnum, CourseAU, CodeRunnerContent, MoveOnCriteriaEnum, QuestionResponse, QuestionGrading, ScenarioContent, CourseData, QuizContent, QuizCompletionEnum, CTFContent, DownloadFilesContent, RC5ScenarioContent, TeamConsolesContent, RC5ActivityTypeEnum } from "@rapid-cmi5/cmi5-build-common";
-
+import {
+  SlideTypeEnum,
+  CourseAU,
+  CodeRunnerContent,
+  MoveOnCriteriaEnum,
+  QuestionResponse,
+  QuestionGrading,
+  ScenarioContent,
+  CourseData,
+  QuizContent,
+  QuizCompletionEnum,
+  CTFContent,
+  DownloadFilesContent,
+  RC5ScenarioContent,
+  TeamConsolesContent,
+  RC5ActivityTypeEnum,
+  ContentWidthEnum,
+} from '@rapid-cmi5/cmi5-build-common';
 
 export const jsonFormatSpaces = 1;
 
@@ -87,7 +103,7 @@ export const defaultCodeRunnerContent: CodeRunnerContent = {
   cmi5QuizId: 'code-runner-activity-1',
   moveOnCriteria: MoveOnCriteriaEnum.Completed,
   languageVersion: '3.12.3',
-  programmingLanguage: 'python3'
+  programmingLanguage: 'python3',
 };
 
 export const defaultQuestion = {
@@ -122,9 +138,6 @@ export const defaultCourseData: CourseData = {
       aus: [
         {
           auName: '',
-          assetsPath: '',
-          backgroundImage: '',
-          rangeosScenarioName: '',
           slides: [{ ...defaultEmptySlide }],
           dirPath: '',
         },
@@ -161,7 +174,7 @@ export const defaultDownloadFilesContent: DownloadFilesContent = {
 export const defaultScenarioContentData: RC5ScenarioContent = {
   uuid: '',
   name: '',
-  promptClass: true,
+  promptClass: false,
   moveOnCriteria: MoveOnCriteriaEnum.Completed,
 };
 
@@ -229,5 +242,25 @@ export const getDefaultData = (activity: RC5ActivityTypeEnum) => {
     case RC5ActivityTypeEnum.codeRunner:
       return defaultCodeRunnerContentStr;
   }
-  return null;
+};
+
+/**
+ * Retrieved default content width
+ */
+
+export const getDefaultContentWidth = (activity: RC5ActivityTypeEnum) => {
+  switch (activity) {
+    case RC5ActivityTypeEnum.scenario:
+      return ContentWidthEnum.Medium;
+    case RC5ActivityTypeEnum.consoles:
+      return ContentWidthEnum.Medium;
+    case RC5ActivityTypeEnum.quiz:
+      return ContentWidthEnum.Medium;
+    case RC5ActivityTypeEnum.ctf:
+      return ContentWidthEnum.Large;
+    case RC5ActivityTypeEnum.download:
+      return ContentWidthEnum.Small;
+    case RC5ActivityTypeEnum.codeRunner:
+      return ContentWidthEnum.Medium;
+  }
 };

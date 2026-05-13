@@ -37,6 +37,8 @@ import { findMatchingStatementPreset } from './methods';
 
 import { StatementsContextProvider } from './StatementsContext';
 import StatementsSettings from './StatementsSettings';
+import { useBackgroundColors } from 'packages/ui/src/lib/hooks/useBackgroundColors';
+import { BackgroundColorTrigger } from 'packages/ui/src/lib/colors/BackgroundColorTrigger';
 
 /**
  * Statements Container Editor for the statements layout directive.
@@ -57,16 +59,18 @@ export const StatementsContainerEditor: React.FC<
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';
-  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
-  const [backgroundColor, setBackgroundColor] = useState<string>(
-    mdastNode?.attributes?.backgroundColor ?? '',
-  );
-  const [colorPickerAnchor, setColorPickerAnchor] =
-    useState<HTMLButtonElement | null>(null);
-  const [pendingColor, setPendingColor] = useState<string>(
-    mdastNode?.attributes?.backgroundColor ?? '',
-  );
-  const pendingColorRef = useRef(pendingColor);
+  const { menuRight } = useGutterRight(resolvedThemeCSS);
+  const {
+    backgroundColor,
+    colorPickerAnchor,
+    openPicker,
+    pendingColor,
+    pendingColorRef,
+    setBackgroundColor,
+    setColorPickerAnchor,
+    setOverrideColor,
+    setPendingColorAndRef,
+  } = useBackgroundColors(mdastNode?.attributes?.['backgroundColor'] ?? '');
   const skipNextCloseRebuildRef = useRef(false);
   const [sxProps, setSxProps] = useState<SxProps>({});
   //#endregion
@@ -77,7 +81,7 @@ export const StatementsContainerEditor: React.FC<
   const currentPreset = useMemo(() => {
     return mdastNode?.attributes?.preset
       ? findMatchingStatementPreset(mdastNode?.attributes?.preset) ||
-          STATEMENT_PRESETS[0]
+      STATEMENT_PRESETS[0]
       : STATEMENT_PRESETS[0];
   }, [mdastNode?.attributes?.preset]);
 
@@ -130,7 +134,7 @@ export const StatementsContainerEditor: React.FC<
 
       await new Promise((resolve) => setTimeout(resolve, 500));
       setSelectedPreset(newPreset);
-  
+
     },
     [mdastNode, updateMdastNode, carouselIndex],
   );
@@ -142,8 +146,7 @@ export const StatementsContainerEditor: React.FC<
     setColorPickerAnchor(null);
     pendingColorRef.current = '';
     skipNextCloseRebuildRef.current = true;
-    setPendingColor('');
-    setBackgroundColor('');
+    setOverrideColor('');
     parentEditor.update(
       () => {
         const attrs = { ...mdastNode.attributes };
@@ -175,19 +178,17 @@ export const StatementsContainerEditor: React.FC<
     }
 
     const bgColor = mdastNode?.attributes?.backgroundColor ?? '';
-    setBackgroundColor(bgColor);
-    pendingColorRef.current = bgColor;
-    setPendingColor(bgColor);
+    setOverrideColor(bgColor);
   }, [mdastNode]);
 
   const outerSx: SxProps = backgroundColor
     ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
+      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+      clipPath: `inset(0 -100vmax 0)`,
+      backgroundColor,
+      paddingTop: blockPadding,
+      paddingBottom: blockPadding,
+    }
     : {};
 
   return (
@@ -235,33 +236,26 @@ export const StatementsContainerEditor: React.FC<
         {/* Gutter buttons */}
         {!isPlayback && (
           <Box
-            ref={gutterRef as any}
+
             sx={{
               backgroundColor:
                 muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
               position: 'absolute',
               display: 'flex',
               top: backgroundColor ? blockPadding : 0,
-              right: gutterRight,
+              right: menuRight,
             }}
           >
-            <Tooltip title="Background Color">
-              <IconButton
-                onClick={(e) => {
-                  pendingColorRef.current = backgroundColor;
-                  setPendingColor(backgroundColor);
-                  setColorPickerAnchor(e.currentTarget);
-                }}
-                size="small"
-              >
-                <PaletteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
+
             <Tooltip title="Edit Statement Layout">
               <IconButton onClick={handleConfigure}>
                 <EditIcon />
               </IconButton>
             </Tooltip>
+            <BackgroundColorTrigger
+              currentColor={backgroundColor ? { color: pendingColor } : undefined}
+              onTrigger={openPicker}
+            />
             <InsertLineReturnButton
               parentEditor={parentEditor}
               lexicalNode={lexicalNode}
@@ -312,7 +306,7 @@ export const StatementsContainerEditor: React.FC<
         palette={SHAPE_PRESET_COLORS}
         onPickColor={(color) => {
           pendingColorRef.current = color;
-          setPendingColor(color);
+           setPendingColorAndRef(color);
         }}
         onClear={handleClearColor}
         noneLabel="No background"

@@ -20,3 +20,4 @@ export const drawerMode$ = Cell<DRAWER_TYPE>(DRAWER_TYPE.NONE);
 export const blockShowSeq$ = Cell<number>(0);
 export const stylesShowSeq$ = Cell<number>(0);
 export const animationShowSeq$ = Cell<number>(0);
+export const aiShowSeq$ = Cell<number>(0);

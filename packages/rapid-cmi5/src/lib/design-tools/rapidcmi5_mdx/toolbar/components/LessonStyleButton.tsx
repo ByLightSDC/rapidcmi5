@@ -6,6 +6,7 @@ import { toggleAnimationDrawer$ } from '../../plugins/animation';
 import PaletteIcon from '@mui/icons-material/Palette';
 import { DRAWER_TYPE, drawerMode$, stylesShowSeq$ } from './drawers';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
+import { useTheme } from '@mui/material';
 
 /**
  * Toolbar button to toggle Lesson Style Drawer
@@ -14,7 +15,7 @@ export const LessonStyleButton = () => {
   const changeViewMode = usePublisher(drawerMode$);
   const publishShowSeq = usePublisher(stylesShowSeq$);
   const showSeq = useCellValue(stylesShowSeq$);
-
+const theme = useTheme();
   const handleClick = useCallback(() => {
     changeViewMode(DRAWER_TYPE.STYLES);
     publishShowSeq(showSeq + 1);
@@ -26,7 +27,7 @@ export const LessonStyleButton = () => {
       onClick={handleClick}
       aria-label="Lesson Appearance"
     >
-      <PaletteIcon fontSize="medium" />
+      <PaletteIcon fontSize="medium"  />
     </MUIButtonWithTooltip>
   );
 };

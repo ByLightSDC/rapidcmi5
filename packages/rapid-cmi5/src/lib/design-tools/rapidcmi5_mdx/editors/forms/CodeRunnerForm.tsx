@@ -3,8 +3,7 @@ import { toTitleCase } from './formUtils';
 import Grid from '@mui/material/Grid2';
 import MenuItem from '@mui/material/MenuItem';
 import * as yup from 'yup';
-import { useContext, useEffect, useMemo, useState } from 'react';
-import { SxProps } from '@mui/system';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Alert } from '@mui/material';
 import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
@@ -24,23 +23,28 @@ import {
   FormControlSelectField,
   FormControlUIProvider,
   MiniForm,
-  LessonThemeContext,
-  maxFormWidths,
-  useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 
 export const CodeRunnerForm = ({
+  contextMenu,
   crudType,
   defaultFormData,
   deleteButton,
+  innerSx,
+  outerSx,
+  outerStyle,
   onSave,
 }: {
+  contextMenu?: JSX.Element;
   crudType: FormCrudType;
   defaultFormData: CodeRunnerContent;
   deleteButton?: JSX.Element;
   handleCloseModal?: () => void;
+  innerSx?: any;
+  outerSx?: any;
+  outerStyle?: any;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
   const rc5id = defaultFormData?.rc5id;
@@ -49,12 +53,6 @@ export const CodeRunnerForm = ({
     'Bearer',
     apiUrls?.codeRunnerUrl,
     userAuth?.token,
-  );
-
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const { outerActivitySxWithConstrainedWidthForm } = useLessonThemeStyles(
-    lessonTheme,
-    maxFormWidths.codeRunnerEditor,
   );
 
   const [runtimeMap, setRuntimeMap] = useState<LanguagesResponseApi>({});
@@ -305,18 +303,15 @@ export const CodeRunnerForm = ({
     <FormControlUIProvider>
       <MiniForm
         className="paper-activity"
-        outerSx={outerActivitySxWithConstrainedWidthForm}
+        contextMenu={contextMenu}
+        outerSx={outerSx}
+        outerStyle={outerStyle}
         dataCache={defaultFormData}
         titleEndChildren={deleteButton}
         doAction={onSaveAction}
         formTitle="Code Runner"
         formWidth={null}
-        formSxProps={
-          {
-            flexGrow: 1,
-            maxWidth: outerActivitySxWithConstrainedWidthForm.maxWidth,
-          } as SxProps
-        }
+        formSxProps={{ width: '100%', flexGrow: 1, ...innerSx, margin: 0 }}
         getFormFields={getFormFields}
         loadingButtonText="Saving"
         shouldAutoSave={true}

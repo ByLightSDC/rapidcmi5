@@ -1,7 +1,4 @@
-import {
-  debugLog,
-  debugLogError,
-} from '@rapid-cmi5/ui';
+import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import {
   addCourseOperation,
   courseDataCache,
@@ -237,7 +234,6 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
       }
       dispatch(updateBlockIndex(blockIndex));
       dispatch(setIsLessonMounted(false));
-      dispatch(updateDirtyDisplay({ counter: 0 }));
     },
     [courseData, dispatch, saveSlide],
   );

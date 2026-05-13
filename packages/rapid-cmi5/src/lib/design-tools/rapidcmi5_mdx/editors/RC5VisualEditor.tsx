@@ -112,6 +112,7 @@ import { RC5Context } from '../contexts/RC5Context';
 import { RapidCmi5Toolbar } from '../toolbar/RapidCmi5Toolbar';
 import { ErrorBoundary } from './ErrorBoundary';
 import { linkDialogPlugin } from '../plugins/link-dialog';
+import { draggableBlockPlugin } from '../plugins/draggable-block';
 import { gutterClickPlugin } from '../plugins/gutter-click/GutterClickPlugin';
 
 /**
@@ -454,6 +455,7 @@ function RC5VisualEditor() {
       );
     } else {
       return initialList.concat(
+        draggableBlockPlugin(),
         diffSourcePlugin({
           //diffMarkdown: 'placeholder markdown',
           readOnlyDiff: true,
@@ -462,7 +464,9 @@ function RC5VisualEditor() {
         }),
         toolbarPlugin({
           toolbarClassName: 'mdxeditor-editor-toolbar',
-          toolbarContents: () => <RapidCmi5Toolbar lessonTheme={currentLessonTheme} />,
+          toolbarContents: () => (
+            <RapidCmi5Toolbar lessonTheme={currentLessonTheme} />
+          ),
         }),
       );
     }

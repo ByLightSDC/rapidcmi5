@@ -20,5 +20,8 @@
   "rangeosScenarioUUID": "558a535d-6087-4bb3-b341-9683a3594328",
   "promptClassId": false,
   "defaultClassId": "net_a",
-  "ksats": []
+  "ksats": [],
+  "metadata": {
+    "rc5Version" : "1.0.0"
+  }
 }

@@ -3,7 +3,6 @@ import {
   insertMarkdown$,
   NestedLexicalEditor,
   readOnly$,
-  syntaxExtensions$,
   useCellValues,
   usePublisher,
 } from '@mdxeditor/editor';
@@ -12,8 +11,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import { CSSProperties, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { toMarkdown } from 'mdast-util-to-markdown';
-import { $getRoot } from 'lexical';
+
 
 import {
   Box,
@@ -25,8 +23,6 @@ import {
   Paper,
   Stack,
   SxProps,
-  Tab,
-  Tabs,
   Tooltip,
   Typography,
   TypographyOwnProps,
@@ -37,13 +33,10 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-//REF import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import DeleteIconButton from '../../components/DeleteIconButton';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-//REF import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
 import PaletteIcon from '@mui/icons-material/Palette';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
@@ -52,7 +45,7 @@ import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
 import { StepsContext } from './StepsContext';
 import { StepContentDirectiveNode, StepDirectiveNode } from './types';
 
-import { $isElementNode } from 'lexical';
+
 import { DEFAULT_STEP } from './constants';
 import ModalDialog from '../../../../modals/ModalDialog';
 import {
@@ -63,7 +56,6 @@ import {
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import {
-  convertMarkdownToMdast,
   convertMdastToMarkdown,
 } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
@@ -76,6 +68,8 @@ import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { useGutterRight } from '../shared/useGutterRight';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { useBackgroundColors } from 'packages/ui/src/lib/hooks/useBackgroundColors';
+import { BackgroundColorTrigger } from 'packages/ui/src/lib/colors/BackgroundColorTrigger';
 
 /**
  * Steps Editor for steps directive
@@ -114,20 +108,23 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   >(mdastNode.attributes.contentWidth);
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
-  const { gutterRef, gutterRight } = useGutterRight(
+  const { containerRef, menuRight } = useGutterRight(
     resolvedThemeCSS,
     blockMaxWidth,
   );
 
-  const [backgroundColor, setBackgroundColor] = useState<string>(
-    mdastNode?.attributes?.backgroundColor ?? '',
-  );
-  const [colorPickerAnchor, setColorPickerAnchor] =
-    useState<HTMLButtonElement | null>(null);
-  const [pendingColor, setPendingColor] = useState<string>(
-    mdastNode?.attributes?.backgroundColor ?? '',
-  );
-  const pendingColorRef = useRef(pendingColor);
+  const {
+    backgroundColor,
+    colorPickerAnchor,
+    openPicker,
+    pendingColor,
+    pendingColorRef,
+    setBackgroundColor,
+    setColorPickerAnchor,
+    setOverrideColor,
+    setPendingColorAndRef,
+  } = useBackgroundColors(mdastNode?.attributes?.['backgroundColor'] ?? '');
+
   const skipNextCloseRebuildRef = useRef(false);
 
   const a11yStepProps = (index: number) => ({
@@ -277,10 +274,8 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
 
   const handleClearColor = useCallback(() => {
     setColorPickerAnchor(null);
-    pendingColorRef.current = '';
     skipNextCloseRebuildRef.current = true;
-    setPendingColor('');
-    setBackgroundColor('');
+    setOverrideColor('');
     parentEditor.update(
       () => {
         const attrs = { ...mdastNode.attributes };
@@ -403,9 +398,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   // Sync backgroundColor from mdastNode
   useEffect(() => {
     const bgColor = mdastNode?.attributes?.backgroundColor ?? '';
-    setBackgroundColor(bgColor);
-    pendingColorRef.current = bgColor;
-    setPendingColor(bgColor);
+    setOverrideColor(bgColor);
   }, [mdastNode]);
 
   // Sync contentWidth from mdastNode
@@ -415,12 +408,12 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
 
   const outerSx: SxProps = backgroundColor
     ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
+      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+      clipPath: `inset(0 -100vmax 0)`,
+      backgroundColor,
+      paddingTop: blockPadding,
+      paddingBottom: blockPadding,
+    }
     : {};
 
   /**
@@ -429,6 +422,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   return (
     <>
       <Box
+        ref={containerRef}
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
         {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as CSSProperties } : {})}
@@ -439,10 +433,10 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
           ...sxProps,
           ...(blockMaxWidth
             ? {
-                maxWidth: blockMaxWidth,
-                marginLeft: 'auto',
-                marginRight: 'auto',
-              }
+              maxWidth: blockMaxWidth,
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }
             : {}),
           marginTop: 0,
           marginBottom: 0,
@@ -488,7 +482,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
               <div>
                 {!isPlayback && (
                   <Box
-                    ref={gutterRef as any}
+
                     sx={{
                       backgroundColor:
                         muiTheme.palette.mode === 'dark'
@@ -497,19 +491,14 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                       position: 'absolute',
                       display: 'flex',
                       top: backgroundColor ? blockPadding : 0,
-                      right: gutterRight,
+                      right: menuRight,
                     }}
                   >
-                    <Tooltip title="Background Color">
-                      <IconButton
-                        onClick={(e) => {
-                          pendingColorRef.current = backgroundColor;
-                          setPendingColor(backgroundColor);
-                          setColorPickerAnchor(e.currentTarget);
-                        }}
-                        size="small"
-                      >
-                        <PaletteIcon fontSize="small" />
+
+
+                    <Tooltip title="Edit Steps Settings">
+                      <IconButton onClick={handleConfigure}>
+                        <EditIcon />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Block Appearance">
@@ -517,14 +506,13 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                         onClick={() => setBlockAppearanceOpen(true)}
                         size="small"
                       >
-                        <SettingsIcon fontSize="small" />
+                        <PaletteIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Edit Steps Settings">
-                      <IconButton onClick={handleConfigure}>
-                        <EditIcon />
-                      </IconButton>
-                    </Tooltip>
+                    <BackgroundColorTrigger
+                      currentColor={backgroundColor ? { color: pendingColor } : undefined}
+                      onTrigger={openPicker}
+                    />
                     <InsertLineReturnButton
                       parentEditor={parentEditor}
                       lexicalNode={lexicalNode}
@@ -708,8 +696,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
         lastColor={pendingColor}
         palette={SHAPE_PRESET_COLORS}
         onPickColor={(color) => {
-          pendingColorRef.current = color;
-          setPendingColor(color);
+          setPendingColorAndRef(color);
         }}
         onClear={handleClearColor}
         noneLabel="No background"

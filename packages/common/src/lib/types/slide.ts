@@ -105,33 +105,6 @@ export type AuAutoGrader = {
 };
 
 /**
- * @typedef {Object} SourceDocContent
- * @property {string} [introContent] Slide Content that appears above source doc
- * @property {string} [sourceDoc] iFrame Source Doc
- * @property {any} [styleProps] iFrame Styles If iFrame content sizes itself based on parent, we need to pass min dimensions in
- */
-export type SourceDocContent = {
-  introContent?: string;
-  sourceDoc: string;
-  styleProps?: SxProps;
-};
-
-/**
- * @typedef {Object} SlideType
- * @property {SlideTypeEnum} type Slide Type
- * @property {string} slideTitle  Slide Title
- * @property {string | ScenarioContent} Slide Content
- */
-export type SlideType = {
-  type: SlideTypeEnum;
-  slideTitle: string;
-  display?:string;
-  content?:string
-  filepath: string;
-};
-
-
-/**
 
  */
 export type SlideDevContent = {

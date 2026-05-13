@@ -22,6 +22,7 @@ import {
   longitudeRegex,
   macAddressErrorMessage,
   macAddressRegex,
+  metaDataLabelRegex,
   nameRegex,
   preferencedDomainNameRegex,
   resourceQuantityErrorMessage,
@@ -920,7 +921,7 @@ export const GIT_URL_GROUP = (isRequired = true) => {
     ? yup
         .string()
         .required(REQUIRED_ERROR)
-        .url(URL_BASE.urlError)
+        .url('Must be Valid URL starting with https:// and ending with .git')
         .test(
           'test-git-url',
           'Must be Valid URL starting with https:// and ending with .git',
@@ -935,7 +936,9 @@ export const GIT_URL_GROUP = (isRequired = true) => {
           ? yup.string().nullable()
           : yup
               .string()
-              .url(URL_BASE.urlError)
+              .url(
+                'Must be Valid URL starting with https:// and ending with .git',
+              )
               .test(
                 'test-git-url',
                 'Must be Valid URL starting with https:// and ending with .git',
@@ -1277,6 +1280,14 @@ export const IP_GROUP = yup
     }
     return true;
   });
+
+/* Meta Label */
+export const META_LABEL_GROUP = yup
+  .string()
+  .matches(
+    metaDataLabelRegex,
+    'Entry must start and end with a letter or number, and may only contain letters, numbers, hyphens (-), underscores (_), and periods (.)',
+  );
 
 /* Resource Quantity with minimum value requirement */
 export const RESOURCE_QUANTITY_WITH_MINIMUM_GROUP = (

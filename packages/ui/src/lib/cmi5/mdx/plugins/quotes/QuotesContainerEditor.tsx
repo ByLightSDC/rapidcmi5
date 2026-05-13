@@ -38,6 +38,8 @@ import { findMatchingQuotePreset } from './methods';
 import { QuotesContextProvider } from './QuotesContext';
 import { useFocusWithin } from '../shared/useFocusWithin';
 import QuotesSettings from './QuotesSettings';
+import { useBackgroundColors } from 'packages/ui/src/lib/hooks/useBackgroundColors';
+import { BackgroundColorTrigger } from 'packages/ui/src/lib/colors/BackgroundColorTrigger';
 
 /**
  * Quotes Container Editor for grid layout directive.
@@ -59,27 +61,30 @@ export const QuotesContainerEditor: React.FC<
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';
-  const { gutterRef, gutterRight } = useGutterRight(resolvedThemeCSS);
-  const [backgroundColor, setBackgroundColor] = useState<string>(
-    mdastNode?.attributes?.backgroundColor ?? '',
-  );
-  const [colorPickerAnchor, setColorPickerAnchor] =
-    useState<HTMLButtonElement | null>(null);
-  const [pendingColor, setPendingColor] = useState<string>(
-    mdastNode?.attributes?.backgroundColor ?? '',
-  );
-  const pendingColorRef = useRef(pendingColor);
+  const { menuRight } = useGutterRight(resolvedThemeCSS);
+  const {
+    backgroundColor,
+    colorPickerAnchor,
+    openPicker,
+    pendingColor,
+    pendingColorRef,
+    setBackgroundColor,
+    setColorPickerAnchor,
+    setOverrideColor,
+    setPendingColorAndRef,
+  } = useBackgroundColors(mdastNode?.attributes?.['backgroundColor'] ?? '');
+
   const skipNextCloseRebuildRef = useRef(false);
   const [sxProps, setSxProps] = useState<SxProps>({});
   // Outer box: full-width background color band when backgroundColor is set.
   const outerSx: SxProps = backgroundColor
     ? {
-        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-        clipPath: `inset(0 -100vmax 0)`,
-        backgroundColor,
-        paddingTop: blockPadding,
-        paddingBottom: blockPadding,
-      }
+      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+      clipPath: `inset(0 -100vmax 0)`,
+      backgroundColor,
+      paddingTop: blockPadding,
+      paddingBottom: blockPadding,
+    }
     : {};
   //#endregion
 
@@ -89,7 +94,7 @@ export const QuotesContainerEditor: React.FC<
   const currentPreset = useMemo(() => {
     return mdastNode?.attributes?.preset
       ? findMatchingQuotePreset(mdastNode?.attributes?.preset) ||
-          QUOTE_PRESETS[0]
+      QUOTE_PRESETS[0]
       : QUOTE_PRESETS[0];
   }, [mdastNode?.attributes?.preset]);
 
@@ -139,9 +144,9 @@ export const QuotesContainerEditor: React.FC<
         children: mdastNode.children.map((child, i) =>
           i === carouselIndex
             ? {
-                ...child,
-                attributes: { ...child.attributes, avatar: newAvatar },
-              }
+              ...child,
+              attributes: { ...child.attributes, avatar: newAvatar },
+            }
             : child,
         ) as any,
       });
@@ -155,10 +160,8 @@ export const QuotesContainerEditor: React.FC<
    */
   const handleClearColor = useCallback(() => {
     setColorPickerAnchor(null);
-    pendingColorRef.current = '';
     skipNextCloseRebuildRef.current = true;
-    setPendingColor('');
-    setBackgroundColor('');
+    setOverrideColor('');
     parentEditor.update(
       () => {
         const attrs = { ...mdastNode.attributes };
@@ -190,9 +193,7 @@ export const QuotesContainerEditor: React.FC<
     }
 
     const bgColor = mdastNode?.attributes?.backgroundColor ?? '';
-    setBackgroundColor(bgColor);
-    pendingColorRef.current = bgColor;
-    setPendingColor(bgColor);
+    setOverrideColor(bgColor);
   }, [mdastNode]);
 
   return (
@@ -218,58 +219,50 @@ export const QuotesContainerEditor: React.FC<
             borderStyle: 'solid',
             borderRadius: 1,
             boxShadow: 2,
-            backgroundColor: (theme) => `${alpha(theme.palette.background.default, muiTheme.palette.mode === 'light' ? 0:0.50)}`,
+            backgroundColor: (theme) => `${theme.palette.background.paper}`,
             paddingTop: blockPadding,
             paddingBottom: blockPadding,
           }}
-        >
-          <QuotesContextProvider
-            carouselIndex={carouselIndex}
-            preset={currentPreset.id}
-            avatar={selectedAvatar}
-          >
-            <NestedLexicalEditor<ContainerDirective>
-              block={true}
-              getContent={(node) => node.children}
-              getUpdatedMdastNode={(node, children: any) => ({
-                ...node,
-                children,
-              })}
-              contentEditableProps={{ 'aria-label': 'Quote layout sections' }}
-            />
-          </QuotesContextProvider>
+        ><Box sx={{ backgroundColor: (theme) => `${alpha(theme.palette.background.default, muiTheme.palette.mode === 'light' ? 0 : 0.50)}`, }}>
+            <QuotesContextProvider
+              carouselIndex={carouselIndex}
+              preset={currentPreset.id}
+              avatar={selectedAvatar}
+            >
+              <NestedLexicalEditor<ContainerDirective>
+                block={true}
+                getContent={(node) => node.children}
+                getUpdatedMdastNode={(node, children: any) => ({
+                  ...node,
+                  children,
+                })}
+                contentEditableProps={{ 'aria-label': 'Quote layout sections' }}
+              />
+            </QuotesContextProvider>
+          </Box>
         </Box>
 
         {/* Gutter buttons — absolutely positioned outside decorator at S/M, inside at L/None */}
         {!isPlayback && (
           <Box
-            ref={gutterRef as any}
             sx={{
               backgroundColor:
                 muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
               position: 'absolute',
               display: 'flex',
               top: backgroundColor ? blockPadding : 0,
-              right: gutterRight,
+              right: menuRight,
             }}
           >
-            <Tooltip title="Background Color">
-              <IconButton
-                onClick={(e) => {
-                  pendingColorRef.current = backgroundColor;
-                  setPendingColor(backgroundColor);
-                  setColorPickerAnchor(e.currentTarget);
-                }}
-                size="small"
-              >
-                <PaletteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
             <Tooltip title="Edit Quotes Layout">
               <IconButton onClick={handleConfigure}>
                 <EditIcon />
               </IconButton>
             </Tooltip>
+            <BackgroundColorTrigger
+              currentColor={backgroundColor ? { color: pendingColor } : undefined}
+              onTrigger={openPicker}
+            />
             <InsertLineReturnButton
               parentEditor={parentEditor}
               lexicalNode={lexicalNode}
@@ -319,8 +312,7 @@ export const QuotesContainerEditor: React.FC<
         lastColor={pendingColor}
         palette={SHAPE_PRESET_COLORS}
         onPickColor={(color) => {
-          pendingColorRef.current = color;
-          setPendingColor(color);
+          setPendingColorAndRef(color);
         }}
         onClear={handleClearColor}
         noneLabel="No background"

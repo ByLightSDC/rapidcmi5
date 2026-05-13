@@ -1,8 +1,7 @@
 import { RC5ActivityTypeEnum } from './activity';
-import { Cmi5Scenario, CourseAU, CourseData } from './course';
-import { AnswerType, QuizState } from './quiz';
+import { Cmi5Scenario, CourseAU, CourseData, SlideType } from './course';
+import { QuizState } from './quiz';
 import { ActivityScore } from './score';
-import { SlideType } from './slide';
 
 export type SetCmi5ProgressHandler = (progress: boolean) => void;
 export type SubmitCmiScoreHandler = (data: ActivityScore) => void;

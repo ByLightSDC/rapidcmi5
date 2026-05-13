@@ -1,4 +1,4 @@
-import { CircularProgress, IconButton, Tooltip } from '@mui/material';
+import { CircularProgress, IconButton, Tooltip, useTheme } from '@mui/material';
 
 import { useSelector } from 'react-redux';
 import {
@@ -29,7 +29,7 @@ export const SaveSlideButton = () => {
   const isDirty = useSelector(isDisplayDirty);
   const { promptSaveCourseFile } = useRC5Prompts();
   const { saveSlide } = useContext(RC5Context);
-
+  const theme = useTheme();
   return (
     <>
       {isGitLoaded ? (
@@ -50,7 +50,14 @@ export const SaveSlideButton = () => {
             });
           }}
         >
-          <SaveIcon color="inherit" />
+          <SaveIcon
+            color="inherit"
+            style={{
+              fill: !isDirty
+                ? theme.palette.action.disabled
+                : theme.palette.primary.main,
+            }}
+          />
         </MUIButtonWithTooltip>
       ) : (
         <Tooltip title="Initializing Git repository - save functionality will be enabled soon.">

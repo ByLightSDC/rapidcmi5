@@ -14,15 +14,16 @@ import {
   useTheme,
 } from '@mui/material';
 
-import {
-  ButtonOptions,
-  RowAction,
-  setModal,
-} from '@rapid-cmi5/ui';
+import { ButtonOptions, RowAction, setModal } from '@rapid-cmi5/ui';
 
 /** Data */
 import { LessonDrawer } from './drawers/LessonDrawer';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import {
+  ImperativePanelHandle,
+  Panel,
+  PanelGroup,
+  PanelResizeHandle,
+} from 'react-resizable-panels';
 import { NavViewMenu } from './menu/NavViewMenu';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -38,7 +39,14 @@ import RC5GitEditor from './editors/RC5GitEditor';
 import { GitDrawer } from './drawers/GitDrawer';
 import { dividerColor } from '@rapid-cmi5/ui';
 import SelectProjectHomePage from './ProjectSelection/SelectProject';
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { GitContext } from '../course-builder/GitViewer/session/GitContext';
 
 /**
@@ -74,6 +82,19 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
   const { promptDeleteRepo, promptGitConfig } = useRC5Prompts();
 
   const theme = useTheme();
+
+  const leftPanelRef = useRef<ImperativePanelHandle>(null);
+  const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
+
+  const toggleLeftPanel = useCallback(() => {
+    const panel = leftPanelRef.current;
+    if (!panel) return;
+    if (panel.isCollapsed()) {
+      panel.expand();
+    } else {
+      panel.collapse();
+    }
+  }, []);
 
   const gitIcon = useMemo(() => {
     return getSvgStyleIcon(StyleIconTypeEnum.GIT, {
@@ -139,10 +160,26 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
               minHeight: 0,
             }}
           >
-            <NavViewMenu showHomeButton={showHomeButton} />
+            <NavViewMenu
+              showHomeButton={showHomeButton}
+              isLeftPanelCollapsed={isLeftPanelCollapsed}
+              onToggleLeftPanel={toggleLeftPanel}
+            />
             <Divider orientation="vertical" />
             <PanelGroup direction="horizontal">
-              <Panel defaultSize={26} minSize={10}>
+              <Panel
+                ref={leftPanelRef}
+                defaultSize={26}
+                minSize={0}
+                collapsible
+                collapsedSize={0}
+                onCollapse={() => setIsLeftPanelCollapsed(true)}
+                onExpand={() => setIsLeftPanelCollapsed(false)}
+                style={{
+                  overflow: 'hidden',
+                  transition: 'flex 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+              >
                 <Stack
                   direction="row"
                   sx={{
@@ -208,7 +245,6 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
                         component="nav"
                       >
                         {repoActions.map((option: RowAction, index: number) => (
-                          // eslint-disable-next-line react/jsx-no-useless-fragment
                           <React.Fragment key={option.tooltip}>
                             {!option.hidden && (
                               <>
@@ -249,7 +285,8 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
               <PanelResizeHandle
                 style={{
                   backgroundColor: themedDividerColor,
-                  width: 4,
+                  opacity: 0.4,
+                  width: 1,
                 }}
               />
               <Panel>

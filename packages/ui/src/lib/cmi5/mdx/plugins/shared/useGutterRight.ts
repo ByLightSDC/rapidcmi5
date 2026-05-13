@@ -1,5 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
+import { toolbarRect$ } from '../toolbar/vars';
+import { useSignalEffect } from '@preact/signals-react';
+import { useLessonStyles } from 'packages/ui/src/lib/hooks/useLessonStyles';
 
 type ResolvedThemeCSS = ReturnType<typeof resolveLessonThemeCSS>;
 
@@ -21,13 +24,39 @@ export const useGutterRight = (
 ) => {
   const gutterRef = useRef<HTMLDivElement>(null);
   const [gutterRight, setGutterRight] = useState('-100px');
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [menuRight, setMenuRight] = useState('0px');
 
   useEffect(() => {
     if (gutterRef.current) {
       const w = gutterRef.current.offsetWidth;
-      setGutterRight(`-${w + 15}px`);
+      setGutterRight(`-${w + 30}px`);
     }
   }, []);
+
+  const calculateMenuRight = useCallback(() => {
+    const appRight = toolbarRect$.value?.right;
+    if (appRight == null || !containerRef.current) {
+
+      return;
+    }
+    const containerRight = containerRef.current.getBoundingClientRect().right;
+    setMenuRight(`${containerRight - appRight + 30}px`);
+  }, []);
+
+  useSignalEffect(() => {
+    if (toolbarRect$.value) {
+      calculateMenuRight();
+    }
+  });
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      calculateMenuRight();
+    }, 100); // adjust delay as needed
+
+    return () => clearTimeout(timeout);
+  }, [blockMaxWidth || resolvedThemeCSS?.maxWidth]);
 
   // When a block-level override is active, the inner box is centered within the
   // outer (full-lesson-width) box — buttons at right:0 of the outer box already
@@ -39,5 +68,10 @@ export const useGutterRight = (
     !!resolvedThemeCSS?.maxWidth &&
     resolvedThemeCSS.maxWidth !== '100%';
 
-  return { gutterRef, gutterRight: hasLessonGutter ? gutterRight : '0px' };
+  return {
+    containerRef,
+    menuRight,
+    gutterRef,
+    gutterRight: hasLessonGutter ? gutterRight : '0px',
+  };
 };

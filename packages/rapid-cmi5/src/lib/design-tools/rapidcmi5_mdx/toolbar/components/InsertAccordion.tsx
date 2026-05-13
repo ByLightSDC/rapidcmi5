@@ -5,7 +5,11 @@ import {
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
-import { $getSelection, $isRangeSelection } from 'lexical';
+import {
+  $getSelection,
+  $isRangeSelection,
+  $createParagraphNode,
+} from 'lexical';
 import type { LexicalEditor } from 'lexical';
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
 import type { BlockContent } from 'mdast';
@@ -23,6 +27,7 @@ import {
   placeCaretInsideDirective,
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
+import { useSelectionHelper } from 'packages/rapid-cmi5/src/lib/hooks/useSelectionHelper';
 
 /** The first line return is REQUIRED!!!! */
 const DEFAULT_ACCORDION = `
@@ -50,6 +55,7 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
   const editor = useCellValue(rootEditor$) as LexicalEditor | null;
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const theme = useTheme();
+  const selectionHelper = useSelectionHelper();
   /**
    * Inserts default Accordion at the current selection
    * If it is NOT empty, nothing is inserted
@@ -58,22 +64,20 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
     if (!editor) return;
 
     editor.update(() => {
-      const selection = $getSelection();
+      let selection = $getSelection();
       if (!$isRangeSelection(selection)) return;
 
-      if (selection.isCollapsed()) {
-        //continue
-      } else {
-        return; //no applying tab to selection
+      if (!selection.isCollapsed()) {
+        return; //no applying accordion to selection
       }
 
-      // create children tabs content nodes
+      selection = selectionHelper.getInsertSelection(selection);
+
       const theChildMDast = convertMarkdownToMdast(
         DEFAULT_ACCORDION,
         syntaxExtensions,
       );
 
-      // create accordion node
       const mdastAccordion: ContainerDirective = {
         type: 'containerDirective',
         name: 'accordion',

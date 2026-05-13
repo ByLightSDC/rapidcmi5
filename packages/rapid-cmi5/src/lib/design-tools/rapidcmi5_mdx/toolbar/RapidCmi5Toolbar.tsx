@@ -60,7 +60,6 @@ import { InsertImage } from './components/InsertImage';
 import { InsertSteps } from './components/InsertSteps';
 import { InsertTabs } from './components/InsertTabs';
 import { InsertVideo } from './components/InsertVideo';
-//REF import { InsertLayoutBox } from './components/InsertLayoutBox';
 import { InsertLayoutBox } from './components/InsertLayoutBox';
 import { InsertLink } from './components/InsertLink';
 import { InsertThematicBreak } from './components/InsertThematicBreak';
@@ -81,11 +80,8 @@ import { useRC5Prompts } from '../modals/useRC5Prompts';
  * Layout Constants
  *
  */
-const leftToolWidthContainer = 582;
-const rightToolWidthContainer = 131;
-const toolIconWidth = 32.0;
-const rightToolbarMargin = 24;
-const moreTextToolWidth = 100;
+const rightToolbarMargin = 25;
+
 
 /**
  * A toolbar component that includes all toolbar components.
@@ -93,7 +89,9 @@ const moreTextToolWidth = 100;
  * You'll probably want to create your own toolbar component that includes only the buttons that you need.
  * @group Toolbar Components
  */
-export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5-build-common').LessonTheme }> = ({ lessonTheme }) => {
+export const RapidCmi5Toolbar: React.FC<{
+  lessonTheme?: import('@rapid-cmi5/cmi5-build-common').LessonTheme;
+}> = ({ lessonTheme }) => {
   const changeViewMode = usePublisher(viewMode$);
   const { getMarkdownData } = useContext(RC5Context);
   const realm = useRealm();
@@ -102,10 +100,8 @@ export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5
   const content = useSelector(displayData);
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const extraToolbarRef = useRef<HTMLDivElement>(null);
   const [leftToolbarPos, setLeftToolbarPos] = useState<number | 0>(0);
-
-  const [minExtraToolsWidth, setMinExtraToolsWidth] = useState(0);
-  const [maxExtraToolsWidth, setMaxExtraToolsWidth] = useState(0);
 
   const [isMoreTextTools, setIsMoreTextTools] = useState(false);
 
@@ -115,7 +111,7 @@ export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5
   const theme = useTheme();
 
   const disabledIconColor = alpha((theme as any).palette.divider, 0.25);
-  const activeIconColor = theme.palette.text.primary; //REFtheme.palette.primary.main;
+  const activeIconColor = theme.palette.text.primary;
 
   const { promptTestInPlayer } = useRC5Prompts();
 
@@ -171,20 +167,6 @@ export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5
         // Calculate the absolute position relative to the document
         const left = rect.left + window.scrollX;
 
-        // calculate extra width where additional tools can be injected
-        const extraWidth =
-          window.innerWidth -
-          (left + leftToolWidthContainer + rightToolWidthContainer);
-
-        // avoid partial display
-        setMinExtraToolsWidth(
-          Math.floor((extraWidth - moreTextToolWidth) / toolIconWidth) *
-            toolIconWidth,
-        );
-        setMaxExtraToolsWidth(
-          Math.floor(extraWidth / toolIconWidth) * toolIconWidth,
-        );
-
         //tool bar left plus 24 px right margin
         setLeftToolbarPos(left + rightToolbarMargin);
 
@@ -207,9 +189,6 @@ export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5
     // Ensure the ref is attached to a DOM element and that element exists
   }, []);
 
-  const currentExtraToolWidth = isMoreTextTools
-    ? minExtraToolsWidth
-    : maxExtraToolsWidth;
 
   return (
     <Box
@@ -218,7 +197,7 @@ export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5
         backgroundColor: 'background.default',
         width: '100%',
         minHeight: '40px',
-        borderBottom: `1px solid ${themedDividerColor}`,
+        borderBottom: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
         position: 'sticky',
         top: 0,
         left: 0,
@@ -236,7 +215,7 @@ export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5
         <Stack direction="column" spacing={1} sx={{ padding: 1 }}>
           {viewmode === 'rich-text' && !isPlayback && (
             <Stack direction="row" spacing={1}>
-              <Stack direction="row" spacing={0} sx={{ flexGrow: 1 }}>
+              <Stack direction="row" spacing={0} sx={{ flexGrow: 1, minWidth: 0 }}>
                 <BoldItalicUnderlineToggles />
                 <ColorTextSplitButton />
                 <HighlightSplitButton />
@@ -279,45 +258,43 @@ export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5
                 <Separator />
                 <BlockTypeSelect />
                 <Separator />
-                {currentExtraToolWidth > 0 && (
-                  <Stack
-                    direction="row"
-                    sx={{
-                      flexGrow: 1,
-                      display: 'flex',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Stack
-                      direction="row"
-                      sx={{
-                        width: `${currentExtraToolWidth}px`,
-                        flexWrap: 'nowrap',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      <InsertImage />
-                      <InsertVideo />
-                      <InsertAudio />
-                      <InsertFile />
-                      <InsertCodeBlock />
-                      <InsertGrid />
-                      <InsertLayoutBox />
-                      <InsertAccordion />
-                      <InsertQuotes />
-                      <InsertStatements />
-                      <InsertSteps />
-                      <InsertTable />
-                      <InsertTabs />
-                      <InsertThematicBreak />
-                    </Stack>
-                  </Stack>
-                )}
                 <Stack
+                  id="mask-buttons"
+                  ref={extraToolbarRef}
+                  direction="row"
+                  sx={{
+                    display: 'flex',
+                    flexGrow: 1,
+                    minWidth: 0,
+                    position: 'relative',
+                    flexWrap: 'nowrap',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <InsertImage />
+                  <InsertVideo />
+                  <InsertAudio />
+                  <InsertFile />
+                  <InsertCodeBlock />
+                  <InsertGrid />
+                  <InsertLayoutBox />
+                  <InsertAccordion />
+                  <InsertQuotes />
+                  <InsertStatements />
+                  <InsertSteps />
+                  <InsertTable />
+                  <InsertTabs />
+                  <InsertThematicBreak />
+                </Stack>
+                <Stack
+                  id="static"
                   direction="row"
                   sx={{
                     display: 'flex',
                     justifyContent: 'flex-end',
+                    minWidth: '104px',
+                    flexGrow: 0,
+                    flexShrink: 0,
                   }}
                 >
                   <Separator />
@@ -330,15 +307,15 @@ export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5
           )}
           {(viewmode === 'source' ||
             (viewmode === 'rich-text' && isPlayback)) && (
-            <Box sx={{ minHeight: '32px' }}></Box>
-          )}
+              <Box sx={{ minHeight: '32px' }}></Box>
+            )}
           <Stack
             direction="row"
             spacing={1}
             sx={{
               display: 'flex',
               alignItems: 'flex-end',
-              width: `calc(100vw - ${leftToolbarPos}px)`,
+              width: '100%',
             }}
           >
             <Stack
@@ -360,10 +337,10 @@ export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5
               direction="row"
               spacing={1}
               sx={{
-                backgroundColor: 'background.default',
-                borderColor: 'divider',
+                background: alpha(theme.palette.primary.light, .10), //'background.default',
                 borderRadius: '24px',
-                borderStyle: 'solid',
+                 border: `1px solid ${alpha(theme.palette.primary.main, 0.50)}`,
+                height: '34px',
                 display: 'flex',
                 justifyContent: 'center',
               }}
@@ -379,7 +356,6 @@ export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5
                 justifyContent: 'flex-end',
                 alignItems: 'center',
                 flexGrow: 1,
-                maxHeight: '32px',
               }}
             >
               <Stack
@@ -388,8 +364,7 @@ export const RapidCmi5Toolbar: React.FC<{ lessonTheme?: import('@rapid-cmi5/cmi5
                   borderRadius: 4,
                   paddingLeft: 0.5,
                   paddingRight: 0.5,
-                  height: '32px',
-                  border: `1px solid ${disabledIconColor}`,
+                  height: '34px',
                   transition:
                     'transform 120ms ease, background-color 120ms ease',
                 }}

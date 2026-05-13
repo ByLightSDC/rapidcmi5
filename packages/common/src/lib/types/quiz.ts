@@ -1,30 +1,8 @@
 // Ensure that whenever the types change ./utils/ajv-schema-generator.sh is ran
 
-import { BaseActivity } from './activity';
-
-export type QuizContent = BaseActivity & {
-  title?: string;
-  questions: Array<QuizQuestion>;
-  cmi5QuizId: string; //TODO move this to the slide level and make it optional (rename activityId, completionId, eventId )
-  completionRequired?: QuizCompletionEnum; // Optional for backward compatibility; synced with moveOnCriteria
-  passingScore: number;
-  // For course editor data
-  metadata?: string;
-};
-
-export type QuizState = {
-  currentQuestion?: number;
-  answers?: Array<AnswerType>;
-  quizId: string;
-  slideNumber: number;
-};
-
-export type QuizQuestion = {
-  question: string;
-  type: QuestionResponse;
-  typeAttributes: BasicResponse; //TODO typeAttributes = answer
-  cmi5QuestionId: string;
-};
+import { z } from 'zod/v4';
+import { MoveOnCriteriaEnum } from './activity';
+import { KSATElementSchema } from './course';
 
 export enum QuestionResponse {
   FreeResponse = 'freeResponse',
@@ -37,29 +15,12 @@ export enum QuestionResponse {
 
 export const responseOptions = Object.values(QuestionResponse);
 
-export type BasicResponse = {
-  correctAnswer: string | number;
-  grading: QuestionGrading;
-  options?: Array<QuizOption> | undefined;
-  matching?: Array<MatchingOption> | undefined;
-  shuffleAnswers?: boolean;
-};
-
 export enum QuestionGrading {
   None = 'none',
   Exact = 'exact',
 }
+
 export const gradingOptions = Object.values(QuestionGrading);
-
-export type QuizOption = {
-  text: string;
-  correct: boolean;
-};
-
-export type MatchingOption = {
-  option: string;
-  response: string;
-};
 
 export enum QuizCompletionEnum {
   Attempted = 'attempted',
@@ -71,13 +32,78 @@ export enum QuizCompletionEnum {
 
 export const completionOptions = Object.values(QuizCompletionEnum);
 
-export type AnswerType = number | number[] | string | string[] | null;
+export const AnswerSchema = z.union([
+  z.number(),
+  z.array(z.number()),
+  z.string(),
+  z.array(z.string()),
+  z.null(),
+]);
 
-export type QuizScore = {
-  allAnswers: AnswerType[];
-};
+export const QuizOptionSchema = z.object({
+  text: z.string(),
+  correct: z.boolean(),
+});
 
-export interface ReviewProps {
-  question: QuizQuestion;
-  answer: AnswerType;
-}
+export const MatchingOptionSchema = z.object({
+  option: z.string(),
+  response: z.string(),
+});
+
+export const BasicResponseSchema = z.object({
+  correctAnswer: z.union([z.string(), z.number()]),
+  grading: z.enum(QuestionGrading),
+  options: z.array(QuizOptionSchema).optional(),
+  matching: z.array(MatchingOptionSchema).optional(),
+  shuffleAnswers: z.boolean().optional(),
+});
+
+export const QuizQuestionSchema = z.object({
+  question: z.string(),
+  type: z.enum(QuestionResponse),
+  typeAttributes: BasicResponseSchema,
+  cmi5QuestionId: z.string(),
+});
+
+export const QuizContentSchemaZod = z.object({
+  // BaseActivity fields
+  rc5id: z.string().optional(),
+  ksats: z.array(KSATElementSchema).optional(),
+  moveOnCriteria: z.enum(MoveOnCriteriaEnum).optional(),
+  // QuizContent fields
+  title: z.string().optional(),
+  questions: z.array(QuizQuestionSchema),
+  // TODO move this to the slide level and make it optional (rename activityId, completionId, eventId)
+  cmi5QuizId: z.string(),
+  // Optional for backward compatibility; synced with moveOnCriteria
+  completionRequired: z.enum(QuizCompletionEnum).optional(),
+  passingScore: z.number(),
+  metadata: z.string().optional(),
+});
+export const QuizContentSchema = z.toJSONSchema(QuizContentSchemaZod);
+
+export const QuizStateSchema = z.object({
+  currentQuestion: z.number().optional(),
+  answers: z.array(AnswerSchema).optional(),
+  quizId: z.string(),
+  slideNumber: z.number(),
+});
+
+export const QuizScoreSchema = z.object({
+  allAnswers: z.array(AnswerSchema),
+});
+
+export const ReviewPropsSchema = z.object({
+  question: QuizQuestionSchema,
+  answer: AnswerSchema,
+});
+
+export type AnswerType = z.infer<typeof AnswerSchema>;
+export type QuizOption = z.infer<typeof QuizOptionSchema>;
+export type MatchingOption = z.infer<typeof MatchingOptionSchema>;
+export type BasicResponse = z.infer<typeof BasicResponseSchema>;
+export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
+export type QuizContent = z.infer<typeof QuizContentSchemaZod>;
+export type QuizState = z.infer<typeof QuizStateSchema>;
+export type QuizScore = z.infer<typeof QuizScoreSchema>;
+export type ReviewProps = z.infer<typeof ReviewPropsSchema>;

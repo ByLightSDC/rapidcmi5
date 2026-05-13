@@ -172,8 +172,8 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
                   width={220}
                   src={
                     appThemeColor === 'light'
-                      ? '/assets/images/RapidCMI5_Logo_Light.png'
-                      : '/assets/images/RapidCMI5_Logo_Dark.png'
+                      ? './assets/images/RapidCMI5_Logo_Light.png'
+                      : './assets/images/RapidCMI5_Logo_Dark.png'
                   }
                   alt="Rapid CMI5 Logo"
                 />
