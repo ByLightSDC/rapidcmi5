@@ -15,25 +15,6 @@ Element.prototype.scrollIntoView = jest.fn();
 Jest can't handle ES6 modules without turning on experimental feature
 Mocking the module is easier if you don't need to test it with jest
 */
-jest.mock('cidr-tools', () => ({
-  __esModule: true,
-  default: 'cidr-tools',
-  namedExport: jest.fn(),
-  containsCidr: () => true,
-}));
-
-jest.mock('d3-transition', () => ({
-  __esModule: true,
-  default: 'd3-transition',
-  namedExport: jest.fn(),
-}));
-
-jest.mock('ip-bigint', () => ({
-  __esModule: true,
-  default: 'ip-bigint',
-  namedExport: jest.fn(),
-  stringifyIp: () => '10.10.10.10',
-}));
 
 /**
  * MDX stuff
@@ -177,7 +158,6 @@ jest.mock('mdast-util-gfm-table', () => ({
   gfmTableToMarkdown: jest.fn(),
 }));
 
-
 jest.mock('mdast-util-to-hast', () => ({
   __esModule: true,
   toHast: jest.fn(),
@@ -187,7 +167,6 @@ jest.mock('hast-util-to-html', () => ({
   __esModule: true,
   toHtml: jest.fn(),
 }));
-
 
 /**
  * MDX stuff

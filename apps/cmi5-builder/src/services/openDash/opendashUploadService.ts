@@ -2,7 +2,6 @@ import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { AuMappingService } from '../auMappingService';
 import { CourseData } from '@rapid-cmi5/cmi5-build-common';
-import { AllowedNamespaces, UploadService } from './multiPartUploadService';
 import FormData from 'form-data';
 import fs from 'fs';
 export interface OpendashCmi5Course {
@@ -43,16 +42,11 @@ export class OpendashUploadService {
   private status = 'published';
   private countryOfOrigin = 'US';
   private pacing = 'SelfPaced';
-  private uploadService: UploadService;
   private useRealAuid: boolean;
 
   constructor({ jwt, baseUrl, useRealAuid }: OpendashUploadServiceDeps) {
     this.jwt = jwt;
     this.baseUrl = baseUrl.replace(/\/$/, ''); // remove trailing slash if any
-    this.uploadService = new UploadService({
-      baseUrl: this.baseUrl,
-      token: jwt,
-    });
 
     this.useRealAuid = useRealAuid;
   }
@@ -166,77 +160,23 @@ export class OpendashUploadService {
     );
   }
 
-  private async uploadOldOpendash(courseData: CourseData, zipPath: string) {
-    const newUUID = uuidv4();
+  private async uploadNewOpendash(zipPath: string) {
+    await this.uploadCmi5(zipPath);
 
-    let cmsData = await this.getCourse(newUUID);
-
-    if (!cmsData) {
-      console.log('Creating new course in OpenDash...');
-
-      cmsData = {
-        identifier: newUUID,
-        name: courseData.courseTitle,
-        description: courseData.courseTitle,
-        provider: this.provider,
-        enrollmentType: this.enrollmentType,
-        venue: this.venue,
-        publisher: this.publisher,
-        classification: this.classification,
-        status: this.status,
-        countryOfOrigin: this.countryOfOrigin,
-        pacing: this.pacing,
-      };
-      await this.createCourse(cmsData);
-    }
-
-    await this.publishCourse(newUUID);
-
-    const uploadResults = await this.uploadService.upload({
-      filePaths: [zipPath],
-      namespace: AllowedNamespaces.UPLOADS,
-      labId: 'ros-cbtc',
-    });
-
-    await Promise.all(
-      uploadResults.map(async (course: any) => {
-        try {
-          await this.importCmi5Archive({
-            dirpath: course.dirpath,
-            filename: course.filename,
-            courseId: newUUID,
-            moduleIndex: 0,
-          });
-        } catch (err) {
-          console.error('❌ Import error:', err);
-        }
-      }),
-    );
-
-    console.log('✅ Uploaded and imported. Course UUID:', newUUID);
-    return newUUID;
+    console.log('Successfully uploaded course');
   }
-
-  private async uploadNewOpendash(zipPath : string) {
-
-    await this.uploadCmi5(zipPath)
-
-    console.log("Successfully uploaded course")
-  }
-
 
   private async uploadCmi5(zipPath: string) {
-
     try {
       const url = `${this.baseUrl}/service-arch-api/v2/lms/courses/import/cmi5`;
       const form = new FormData();
       form.append('file', fs.createReadStream(zipPath));
-      form.append('overwrite', "false");
+      form.append('overwrite', 'false');
       await axios.post(url, form, {
         headers: { ...this.headers, ...form.getHeaders() },
       });
     } catch (error) {
-      new Error(`Error uploading file to opendash failed. ${error}`,); 
+      new Error(`Error uploading file to opendash failed. ${error}`);
     }
   }
 
@@ -258,7 +198,6 @@ export class OpendashUploadService {
         this.jwt,
         this.baseUrl,
         courseData.courseTitle,
-      
       );
       return;
     }
@@ -279,16 +218,9 @@ export class OpendashUploadService {
       return;
     }
 
-    if (this.useRealAuid) {
-      this.uploadNewOpendash(zipPath);
-      if (applyAuMappings) {
-        await auMappingService.resolveAllAus(courseData, this.baseUrl);
-      }
-    } else {
-      const newUUID = await this.uploadOldOpendash(courseData, zipPath);
-      if (applyAuMappings) {
-        await auMappingService.resolveAllAus(courseData, this.baseUrl, newUUID);
-      }
+    this.uploadNewOpendash(zipPath);
+    if (applyAuMappings) {
+      await auMappingService.resolveAllAus(courseData, this.baseUrl);
     }
   }
 }

@@ -9,7 +9,6 @@ export default {
   },
   transformIgnorePatterns: [
     'node_modules/(?!ol)*',
-    'node_modules/(?!cidr-tools)*',
     'node_modules/(?!@mdxeditor)*',
   ],
 
