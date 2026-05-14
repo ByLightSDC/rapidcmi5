@@ -104,7 +104,6 @@ function NoAuManager() {
       setNoAuManagerState(NoAuManagerState.loadingContent);
       return;
     } else if (noAuManagerState === NoAuManagerState.loadingContent) {
-      console.log('loading content', isContentLoaded);
       if (isContentLoaded) {
         debugLog('auHasScenario ' + auHasScenario, auJson.rangeosScenarioName);
         debugLog('auHasTeamScenario ', auJson.teamSSOEnabled);
@@ -118,7 +117,6 @@ function NoAuManager() {
         }
         //flag config file is finalized with all env variables needed
         if (!config.CMI5_SSO_ENABLED) {
-          //VERIFY NOT NEEDED setIsDisplayInitialized
           debugLog('[AU] basic auth configured', 'auth');
         } else {
           debugLog('[AU] waiting for SSO token', 'auth');
