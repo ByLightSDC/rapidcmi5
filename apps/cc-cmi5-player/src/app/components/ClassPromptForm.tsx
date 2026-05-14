@@ -63,6 +63,15 @@ export default function ClassPromptForm(props: tFormProps) {
     endDate: yup.date(),
   });
 
+  const formSxProps = {
+    position: 'relative',
+    color: 'text.secondary',
+    width: '360px',
+    height: 'auto',
+    minHeight: 0,
+    padding: 4,
+  };
+
   /**
    * Returns form fields unique to this form
    * @param {UseFormReturn} formMethods React hook form methods
@@ -77,7 +86,7 @@ export default function ClassPromptForm(props: tFormProps) {
     const { errors } = formState;
 
     return (
-      <Grid size={6}>
+      <Grid size={12}>
         <FormControlTextField
           control={control}
           error={Boolean(errors?.name)}
@@ -94,6 +103,7 @@ export default function ClassPromptForm(props: tFormProps) {
   return (
     <SharedFormWithProvider<ClassEntry, ClassEntry, ClassEntry>
       {...props}
+      formSxProps={formSxProps}
       crudLabel="Enter"
       featureNameOverride="Class"
       isRoutable={false}

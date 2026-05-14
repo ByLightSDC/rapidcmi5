@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import IconButton from '@mui/material/IconButton';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import SettingsIcon from '@mui/icons-material/Settings';
 import {
   Box,
   Divider,
@@ -45,10 +46,9 @@ export default function BuildInfoButton() {
         <IconButton
           aria-label="Build Information"
           color="primary"
-          size="small"
           onClick={(e) => setAnchor(e.currentTarget)}
         >
-          <InfoOutlinedIcon fontSize="small" />
+          <SettingsIcon />
         </IconButton>
       </Tooltip>
       <Popover
