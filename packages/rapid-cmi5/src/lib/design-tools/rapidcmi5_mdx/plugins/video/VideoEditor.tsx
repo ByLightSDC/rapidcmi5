@@ -59,6 +59,7 @@ interface LazyVideoProps {
   height: 'inherit' | number;
   resizable: boolean;
   videoId: string;
+  captionSrc?: string;
 }
 
 function LazyVideo({
@@ -69,6 +70,7 @@ function LazyVideo({
   height,
   resizable,
   videoId,
+  captionSrc,
 }: LazyVideoProps): JSX.Element {
   useSuspenseImage(src);
   return (
@@ -80,6 +82,7 @@ function LazyVideo({
       height={height}
       resizable={resizable}
       videoId={videoId}
+      captionSrc={captionSrc}
     />
   );
 }
@@ -92,6 +95,7 @@ interface VideoComponentProps {
   height: 'inherit' | number;
   resizable: boolean;
   videoId: string;
+  captionSrc?: string;
 }
 
 function VideoComponent({
@@ -102,6 +106,7 @@ function VideoComponent({
   height,
   resizable,
   videoId,
+  captionSrc,
 }: VideoComponentProps): JSX.Element {
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
   const [isSelected, setSelected, clearSelection] =
@@ -292,7 +297,12 @@ function VideoComponent({
             muted={false}
             draggable={false}
             data-video-id={videoId}
-          />
+            data-caption-src={captionSrc}
+          >
+            {captionSrc && (
+              <track kind="captions" src={captionSrc} srcLang="en" label="English" default />
+            )}
+          </video>
           {resizable && isFocused && (
             <VideoResizer
               editor={editor}
@@ -363,6 +373,7 @@ export function VideoEditor({
           height={height}
           resizable={!disableResize}
           videoId={videoId}
+          captionSrc={captionSrc}
         />
         {isSelected && !disableSettingsButton && EditVideoToolbar && (
           <EditVideoToolbar

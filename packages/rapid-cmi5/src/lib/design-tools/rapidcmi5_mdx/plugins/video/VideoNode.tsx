@@ -122,15 +122,6 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
       element.setAttribute('autoplay', 'true');
       element.setAttribute('muted', 'true');
     }
-    if (this.__captionSrc) {
-      const track = document.createElement('track');
-      track.setAttribute('kind', 'captions');
-      track.setAttribute('src', this.__captionSrc);
-      track.setAttribute('srclang', 'en');
-      track.setAttribute('label', 'English');
-      track.setAttribute('default', '');
-      element.appendChild(track);
-    }
     return { element };
   }
 

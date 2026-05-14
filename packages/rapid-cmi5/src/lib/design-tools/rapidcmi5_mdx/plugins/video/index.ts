@@ -254,6 +254,13 @@ export const videoPreviewHandler$ = Cell<VideoPreviewHandler>(null);
 export const videoPlaceholder$ = Cell<typeof VideoPlaceholder | null>(null);
 
 /**
+ * Optional callback invoked after a video node is inserted or updated.
+ * Use this to mark the editor dirty in the host application.
+ * @group Video
+ */
+export const onVideoSaved$ = Cell<(() => void) | null>(null);
+
+/**
  * Holds the current state of the video dialog.
  * @group Video
  */
@@ -287,6 +294,7 @@ export const videoDialogState$ = Cell<
           r.pub(internalInsertVideo$, { ...values, src, captionSrc });
           r.pub(videoDialogState$, { type: 'inactive' });
         }
+        r.getValue(onVideoSaved$)?.();
       };
 
       const resolveCaption = async (src: string) => {
@@ -459,6 +467,7 @@ export const videoPlugin = realmPlugin<{
   EditVideoToolbar?: (() => JSX.Element) | React.FC;
   videoPlaceholder?: (() => JSX.Element) | null;
   videoFilePath?: string;
+  onVideoSaved?: () => void;
 }>({
   init(realm, params) {
     realm.pubIn({
@@ -478,6 +487,7 @@ export const videoPlugin = realmPlugin<{
         params?.EditVideoToolbar ?? EditVideoToolbar,
       [videoPlaceholder$]: params?.videoPlaceholder ?? VideoPlaceholder,
       [videoFilePath$]: params?.videoFilePath,
+      [onVideoSaved$]: params?.onVideoSaved ?? null,
     });
   },
 
@@ -492,6 +502,7 @@ export const videoPlugin = realmPlugin<{
         params?.EditVideoToolbar ?? EditVideoToolbar,
       [videoPlaceholder$]: params?.videoPlaceholder ?? VideoPlaceholder,
       [videoFilePath$]: params?.videoFilePath,
+      [onVideoSaved$]: params?.onVideoSaved ?? null,
     });
   },
 });
