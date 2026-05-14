@@ -28,9 +28,6 @@ export default function Auth(props: AuthProps) {
   const isConfigInitialized = useSelector(auConfigInitializedSel);
   const dispatch = useDispatch();
 
-  console.log('config', config);
-  console.log('isConfigInitialized', isConfigInitialized);
-
   const shouldDisplayKeyCloak = useMemo(() => {
     return Boolean(
       isConfigInitialized &&

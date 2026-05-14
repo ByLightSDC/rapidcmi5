@@ -34,7 +34,7 @@ import TerminalIcon from '@mui/icons-material/Terminal';
 
 import TimeClock from '../scenario/TimeClock';
 import RangeResources from './list-views/RangeResources';
-import { TeamConsolesContext } from './TeamScenarioContext';
+import { TeamScenarioContext } from './TeamScenarioContext';
 import { ScenarioResources } from './types';
 import TeamVMUpdates from './queries/TeamVMUpdates';
 import TeamContainerUpdates from './queries/TeamContainerUpdates';
@@ -105,7 +105,7 @@ function TeamScenarioExercise({
     scenarioStatusChangeCounter,
     setUpdate,
     setUpdates,
-  } = useContext(TeamConsolesContext);
+  } = useContext(TeamScenarioContext);
 
   const getScenarioStatusChild = (data: Partial<DeployedScenario>) => {
     // don't want to display icon when Running

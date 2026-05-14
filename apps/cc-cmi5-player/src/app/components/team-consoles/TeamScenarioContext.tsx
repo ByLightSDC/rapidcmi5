@@ -37,7 +37,7 @@ import {
 import { ConsoleProvider } from '../scenario/console/ConsoleContext';
 import ConsolesDisplay from '../scenario/console/ConsolesDisplay';
 
-interface iTeamConsolesContext {
+interface iTeamScenarioContext {
   isContextInitialized: boolean;
   isEnabled: boolean;
   addListener: (
@@ -86,8 +86,8 @@ interface iTeamConsolesContext {
   //setInitializationCounter: (counter: number) => void;
 }
 
-export const TeamConsolesContext = createContext<iTeamConsolesContext>(
-  {} as iTeamConsolesContext,
+export const TeamScenarioContext = createContext<iTeamScenarioContext>(
+  {} as iTeamScenarioContext,
 );
 
 /**
@@ -367,13 +367,13 @@ export const TeamScenarioContextProvider: any = (props: tProviderProps) => {
   const loadScenario = useCallback(
     async (scenarioId: string, scenarioName: string, rc5Id: string) => {
       if (!queryHooksConfig.headers.Authorization) {
-        debugLogError('Missing creds');
+        debugLogError('Missing creds, enable SSO to load scenarios');
         return;
       }
 
-      //console.log('loadScenario', scenarios.current);
       const loadedScenario = getScenario(scenarioId, scenarioName);
       if (loadedScenario !== null) {
+        //already loaded, nothing to do
         return;
       }
 
@@ -485,7 +485,7 @@ export const TeamScenarioContextProvider: any = (props: tProviderProps) => {
             deployedScenarioId,
             matchingDeployedScenarios.data.data[0],
             Topic.Scenario,
-            false
+            false,
           );
         } else {
           console.log(
@@ -700,21 +700,12 @@ export const TeamScenarioContextProvider: any = (props: tProviderProps) => {
     }
   };
 
-  const firstLoadedScenario = useMemo(() => {
-    if (scenarios.current.length > 0) {
-      return scenarios.current[0];
-    }
-
-    return null;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scenarioStatusChangeCounter]);
-
   useEffect(() => {
     debugLog('Team Consoles Context');
   }, []);
 
   return (
-    <TeamConsolesContext.Provider
+    <TeamScenarioContext.Provider
       value={{
         addListener,
         getAutogradersPercentComplete,
@@ -738,11 +729,9 @@ export const TeamScenarioContextProvider: any = (props: tProviderProps) => {
       <ConsoleProvider
         isRouteRelative={true}
         routeDelim={routeDelim}
-        key={firstLoadedScenario?.deployedScenarioId || placeHolderScenarioId}
-        rangeId={'placeholder'}
-        scenarioId={
-          firstLoadedScenario?.deployedScenarioId || placeHolderScenarioId
-        }
+        key='team-exercise-consoles'
+        rangeId={undefined}
+        scenarioId={undefined} // because one slide can have more than one scenario
         onScenarioEvent={async (eventType, scenarioIdParam, metadata) => {
           // Send LRS statement
           if (scenarioIdParam) {
@@ -761,6 +750,6 @@ export const TeamScenarioContextProvider: any = (props: tProviderProps) => {
         <ConsolesDisplay>{children}</ConsolesDisplay>
       </ConsoleProvider>
       )
-    </TeamConsolesContext.Provider>
+    </TeamScenarioContext.Provider>
   );
 };

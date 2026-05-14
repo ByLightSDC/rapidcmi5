@@ -147,7 +147,7 @@ export default function TeamRangeResourceContainerActionRow(props: Props) {
                 marginBottom: '4px', //not sure why buttons dont align
               }}
             >
-              <ConsoleList consoles={consoles} overrideRangeId={rangeId} />
+              <ConsoleList consoles={consoles} overrideRangeId={rangeId} overrideScenarioId={scenarioId} />
             </div>
           </div>
         </div>

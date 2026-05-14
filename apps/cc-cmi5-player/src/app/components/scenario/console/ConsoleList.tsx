@@ -16,6 +16,7 @@ type Props = {
   consoles: Partial<DeployedRangeConsole>[];
   buttonSxProps?: SxProps;
   overrideRangeId?: string;
+  overrideScenarioId?: string;
 };
 
 /**
@@ -24,7 +25,8 @@ type Props = {
  * @returns {React.ReactElement}
  */
 export function ConsoleList(props: Props) {
-  const { consoles, buttonSxProps, overrideRangeId } = props;
+  const { consoles, buttonSxProps, overrideRangeId, overrideScenarioId } =
+    props;
   const { addConsoleWindow, isConsoleReady } = useContext(ConsoleContext);
   return (
     <>
@@ -39,6 +41,7 @@ export function ConsoleList(props: Props) {
                   isConsoleReady={isConsoleReady}
                   rangeOSConsole={console}
                   overrideRangeId={overrideRangeId}
+                  overrideScenarioId={overrideScenarioId}
                   sxProps={buttonSxProps}
                 />
               );
