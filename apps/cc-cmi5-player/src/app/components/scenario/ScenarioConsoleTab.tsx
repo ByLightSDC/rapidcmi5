@@ -93,28 +93,29 @@ export function ScenarioConsoleTab() {
       setUsername(undefined);
       setPassword(undefined);
     } else {
-      debugLog(
-        'rangeConsoleData?.credentials[0].username',
-        rangeConsoleData?.credentials[0].username,
-      );
-      debugLog(
-        'rangeConsoleData?.credentials[0].password',
-        rangeConsoleData?.credentials[0].password,
-      );
-      const found = rangeConsoleData?.credentials.find(
-        (creds) => creds.scenarioUUID === rangeData?.deployedScenarios[0],
-      );
+      if (rangeConsoleData?.credentials?.length > 0) {
+        debugLog(
+          'rangeConsoleData?.credentials',
+          rangeConsoleData?.credentials,
+        );
 
-      // work around for older version of api in pcte
-      if (found) {
-        setUsername(found.username);
-        setPassword(found.password);
-      } else {
-        setUsername(rangeConsoleData.credentials[0].username);
-        setPassword(rangeConsoleData.credentials[0].password);
+        const found = rangeConsoleData?.credentials.find(
+          (creds) => creds.scenarioUUID === rangeData?.deployedScenarios[0],
+        );
+
+        // work around for older version of api in pcte
+        if (found) {
+          debugLog('found creds for scenario in deployed scenario', found);
+          setUsername(found.username);
+          setPassword(found.password);
+        } else {
+          debugLog('found creds for scenario in console data');
+          setUsername(rangeConsoleData.credentials[0].username);
+          setPassword(rangeConsoleData.credentials[0].password);
+        }
       }
     }
-  }, []);
+  }, [rangeConsoleData?.credentials, rangeData?.deployedScenarios]);
 
   /**
    * UE forces render when rangeData updates
