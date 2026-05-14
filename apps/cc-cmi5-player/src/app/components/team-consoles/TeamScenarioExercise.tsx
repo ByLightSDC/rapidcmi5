@@ -232,7 +232,7 @@ function TeamScenarioExercise({
           loadedScenario.current = getScenario(content.uuid, content.name);
           //display error if it missing
           if (loadedScenario.current === null) {
-            setErrorDetails(`No Scenario Found name=${content.name}`);
+            setErrorDetails(`No deployed scenario found with the name ${content.name}`);
             setRangeId('');
             setScenarioId('');
           } else {
