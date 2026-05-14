@@ -22,7 +22,6 @@ export function useScenarioApi(url?: string, token?: string) {
             baseHeaders: {
               Authorization: `Bearer ${token}`,
             },
-            credentials: 'include',
           })
         : undefined,
     [url, token],
