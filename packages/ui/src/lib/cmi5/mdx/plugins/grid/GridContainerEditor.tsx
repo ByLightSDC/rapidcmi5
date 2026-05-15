@@ -48,14 +48,16 @@ import {
 import { createGridCell, findMatchingPreset, GRID_PRESETS } from './constants';
 import { GridContextProvider } from './GridContext';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
-import { resolveLessonThemeCSS, resolveBlockMaxWidth } from '../../../../styles/lessonThemeStyles';
+import {
+  resolveLessonThemeCSS,
+  resolveBlockMaxWidth,
+} from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
 import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
-import { BackgroundColorTrigger } from 'packages/ui/src/lib/colors/BackgroundColorTrigger';
-import { useBackgroundColors } from 'packages/ui/src/lib/hooks/useBackgroundColors';
+import { BackgroundColorTrigger, useBackgroundColors } from '@rapid-cmi5/ui';
 
 /**
  * Grid Container Editor for grid layout directive.
@@ -73,12 +75,15 @@ export const GridContainerEditor: React.FC<
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';
-  const [contentWidth, setContentWidth] = useState<ContentWidthEnum | undefined>(
-    mdastNode?.attributes?.contentWidth,
-  );
+  const [contentWidth, setContentWidth] = useState<
+    ContentWidthEnum | undefined
+  >(mdastNode?.attributes?.contentWidth);
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
-  const { containerRef, menuRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
+  const { containerRef, menuRight } = useGutterRight(
+    resolvedThemeCSS,
+    blockMaxWidth,
+  );
 
   const [sxProps, setSxProps] = useState<SxProps>({});
   const [formData, setFormData] = useState<Array<GridCellDirectiveNode>>(
@@ -87,7 +92,6 @@ export const GridContainerEditor: React.FC<
   const insertMarkdown = usePublisher(insertMarkdown$);
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [isPlayback] = useCellValues(editorInPlayback$);
-
 
   const {
     backgroundColor,
@@ -166,7 +170,11 @@ export const GridContainerEditor: React.FC<
    * Used by both handleSubmit (layout changes) and color picker.
    */
   const rebuildNode = useCallback(
-    async (cells: GridCellDirectiveNode[], bgColor: string, blockContentWidth?: ContentWidthEnum) => {
+    async (
+      cells: GridCellDirectiveNode[],
+      bgColor: string,
+      blockContentWidth?: ContentWidthEnum,
+    ) => {
       if (!parentEditor) return;
 
       parentEditor.update(() => {
@@ -232,7 +240,14 @@ export const GridContainerEditor: React.FC<
     setIsConfiguring(false);
     const newCells = migrateContent(formData, selectedPreset);
     await rebuildNode(newCells, backgroundColor, contentWidth);
-  }, [rebuildNode, migrateContent, formData, selectedPreset, backgroundColor, contentWidth]);
+  }, [
+    rebuildNode,
+    migrateContent,
+    formData,
+    selectedPreset,
+    backgroundColor,
+    contentWidth,
+  ]);
 
   /**
    * Clears the background color
@@ -292,20 +307,28 @@ export const GridContainerEditor: React.FC<
   // Outer box: full-width background color band when backgroundColor is set.
   const outerSx: SxProps = backgroundColor
     ? {
-      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-      clipPath: `inset(0 -100vmax 0)`,
-      backgroundColor,
-      paddingTop: blockPadding,
-      paddingBottom: blockPadding,
-    }
+        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+        clipPath: `inset(0 -100vmax 0)`,
+        backgroundColor,
+        paddingTop: blockPadding,
+        paddingBottom: blockPadding,
+      }
     : {};
 
   return (
     <>
       <Box
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
-        {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
-        {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as CSSProperties } : {})}
+        {...(contentWidth !== undefined
+          ? { 'data-block-override': 'true' }
+          : {})}
+        {...(contentWidth !== undefined
+          ? {
+              style: {
+                '--block-max-width': blockMaxWidth ?? 'none',
+              } as CSSProperties,
+            }
+          : {})}
         sx={{
           position: 'relative',
           padding: 0,
@@ -328,7 +351,13 @@ export const GridContainerEditor: React.FC<
             borderColor: 'divider',
             borderRadius: 1,
             backgroundColor: (theme) => theme.palette.background.paper,
-            ...(blockMaxWidth ? { maxWidth: blockMaxWidth, marginLeft: 'auto', marginRight: 'auto' } : {}),
+            ...(blockMaxWidth
+              ? {
+                  maxWidth: blockMaxWidth,
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                }
+              : {}),
           }}
         >
           {/* Grid layout using CSS Grid - equal-width columns based on cell count */}
@@ -359,7 +388,6 @@ export const GridContainerEditor: React.FC<
         {/* Gutter buttons — absolutely positioned outside decorator at S/M, inside at L/None */}
         {!isPlayback && (
           <Box
-
             sx={{
               backgroundColor:
                 muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
@@ -383,7 +411,9 @@ export const GridContainerEditor: React.FC<
               </IconButton>
             </Tooltip>
             <BackgroundColorTrigger
-              currentColor={backgroundColor ? { color: pendingColor } : undefined}
+              currentColor={
+                backgroundColor ? { color: pendingColor } : undefined
+              }
               onTrigger={openPicker}
             />
             <InsertLineReturnButton
@@ -447,15 +477,21 @@ export const GridContainerEditor: React.FC<
         onClose={() => setBlockAppearanceOpen(false)}
         onSave={(newContentWidth) => {
           setContentWidth(newContentWidth);
-          parentEditor.update(() => {
-            const attrs = { ...mdastNode.attributes } as Record<string, string>;
-            if (newContentWidth) {
-              attrs['contentWidth'] = newContentWidth;
-            } else {
-              delete attrs['contentWidth'];
-            }
-            lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-          }, { discrete: true });
+          parentEditor.update(
+            () => {
+              const attrs = { ...mdastNode.attributes } as Record<
+                string,
+                string
+              >;
+              if (newContentWidth) {
+                attrs['contentWidth'] = newContentWidth;
+              } else {
+                delete attrs['contentWidth'];
+              }
+              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+            },
+            { discrete: true },
+          );
         }}
       />
 
