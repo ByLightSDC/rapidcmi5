@@ -9,7 +9,6 @@ import { Resizable, ResizeCallbackData } from 'react-resizable';
 import Guacamole from 'guacamole-common-js';
 import 'react-resizable/css/styles.css';
 
-
 /** MUI */
 import { Box } from '@mui/material';
 import { Backdrop, Typography, AppBar, IconButton } from '@mui/material';
@@ -32,7 +31,12 @@ import ConnectionAttemptDisplay from './ConnectionAttemptDisplay';
 import { getTunnelErrorMessage } from './constants';
 import { ConsoleContext } from './ConsoleContext';
 import { authIdToken, isSSOEnabled } from '@rapid-cmi5/keycloak';
-import { useToaster, debugLogSuccess, debugLogError, debugLog } from '@rapid-cmi5/ui';
+import {
+  useToaster,
+  debugLogSuccess,
+  debugLogError,
+  debugLog,
+} from '@rapid-cmi5/ui';
 
 // guacamole connection settings
 const guacProtocol = 'wss';
@@ -328,6 +332,14 @@ export function ConsolePopup(props: tProps) {
 
   const handleLaunch = () => {
     if (connectionUrlRef.current) {
+      if (!rangeId) {
+        debugLogError(`Missing rangeIdfor console launch`);
+        return;
+      }
+      if (!scenarioId) {
+        debugLogError(`Missing scenarioId for console launch`);
+        return;
+      }
       handleClose();
 
       setTimeout(() => {

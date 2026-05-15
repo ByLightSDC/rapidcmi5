@@ -357,7 +357,7 @@ export const useCMI5Session = () => {
    * delay if the response contains no deployed scenarios.
    *
    * On success: persists the assigned `classId` to localStorage, dispatches it to Redux,
-   * clears any existing errors, and shows a success toast.
+   * clears  any existing errors, and shows a success toast.
    * On failure: dispatches the error message to Redux and retries if attempts remain.
    */
   const initializeScenarios = useCallback(async () => {
