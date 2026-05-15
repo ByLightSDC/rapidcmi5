@@ -1,12 +1,11 @@
 import {
-  ButtonWithTooltip,
   rootEditor$,
   $createDirectiveNode,
   DirectiveNode,
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
-import { $getSelection, $isRangeSelection, $createParagraphNode } from 'lexical';
+import { $getSelection, $isRangeSelection } from 'lexical';
 import type { LexicalEditor } from 'lexical';
 
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
@@ -24,13 +23,21 @@ import {
   convertMarkdownToMdast,
   ButtonMinorUi,
   QuotesSettings,
-  debugLogWarning,
   DEFAULT_QUOTES,
   QuotePreset,
+  placeholderAvatar,
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
-import { useCallback, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import { useSelectionHelper } from 'packages/rapid-cmi5/src/lib/hooks/useSelectionHelper';
+import { join } from 'path-browserify';
+import { useSelector } from 'react-redux';
+import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
+import { currentAuPath } from '../../../../redux/courseBuilderReducer';
+
+const PLACEHOLDER_AVATAR_DIR = 'Assets/Images';
+const PLACEHOLDER_AVATAR_FILENAME = 'quoteAuthorPlaceholder.png';
+const PLACEHOLDER_AVATAR_REL = `./${PLACEHOLDER_AVATAR_DIR}/${PLACEHOLDER_AVATAR_FILENAME}`;
 
 /**
  * A toolbar button component that inserts a quotes into the editor.
@@ -43,6 +50,31 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
   const theme: any = useTheme();
   const selectionHelper = useSelectionHelper();
   const [isConfiguring, setIsConfiguring] = useState(false);
+  const auPath = useSelector(currentAuPath);
+  const { handleCreateFile, handlePathExists, handleStageFile } =
+    useContext(GitContext);
+
+  /**
+   * If the user didn't pick an avatar, write the bundled placeholder PNG into
+   * the current lesson's Assets/Images/ folder (only when it isn't there yet)
+   * and return the lesson-relative path to reference from MDX.
+   */
+  const ensureDefaultAvatar = useCallback(async (): Promise<string> => {
+    if (!auPath) return PLACEHOLDER_AVATAR_REL;
+    const relPath = join(
+      auPath,
+      PLACEHOLDER_AVATAR_DIR,
+      PLACEHOLDER_AVATAR_FILENAME,
+    );
+    const exists = await handlePathExists(relPath);
+    if (!exists) {
+      const res = await fetch(placeholderAvatar);
+      const buf = await res.arrayBuffer();
+      await handleCreateFile(relPath, false, new Uint8Array(buf));
+      await handleStageFile(relPath);
+    }
+    return PLACEHOLDER_AVATAR_REL;
+  }, [auPath, handlePathExists, handleCreateFile, handleStageFile]);
 
   /**
    * Inserts default Quotes at the current selection
@@ -100,10 +132,14 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
   /**
    * Saves changes by inserting new node and removing original.
    */
-  const handleSelect = useCallback((preset: QuotePreset, avatar: string) => {
-    insertAtSelection(preset.id, avatar);
-    setIsConfiguring(false);
-  }, [insertAtSelection]);
+  const handleSelect = useCallback(
+    async (preset: QuotePreset, avatar: string) => {
+      const finalAvatar = avatar || (await ensureDefaultAvatar());
+      insertAtSelection(preset.id, finalAvatar);
+      setIsConfiguring(false);
+    },
+    [insertAtSelection, ensureDefaultAvatar],
+  );
 
   /**
    * Set flag for configuring layout

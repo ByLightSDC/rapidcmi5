@@ -1,17 +1,12 @@
 import { ChangeEvent, useEffect, useState } from 'react';
-import { placeholderAvatar } from '../quotes/constants';
 
 const IMAGE_DIR = './Assets/Images/';
 /**
  * Convenience methods for updating images
- * @param param0 
- * @returns 
+ * @param param0
+ * @returns
  */
-export function useImageDialog({
-  defaultSrc = placeholderAvatar,
-}: {
-  defaultSrc?: string;
-}) {
+export function useImageDialog({ defaultSrc = '' }: { defaultSrc?: string }) {
   const [src, setSrc] = useState<string>(defaultSrc);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [altText, setAltText] = useState<string>('');
