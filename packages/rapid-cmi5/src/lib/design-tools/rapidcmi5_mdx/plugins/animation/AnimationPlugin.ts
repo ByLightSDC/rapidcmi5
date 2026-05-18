@@ -1,5 +1,6 @@
 import { realmPlugin, addComposerChild$ } from '@mdxeditor/editor';
 import { AnimationDrawer } from './components/AnimationDrawer';
+import { AnimationPastePlugin } from './components/AnimationPastePlugin';
 import { AnimationResolver } from './components/AnimationResolver';
 import { AnimationConfig } from './types/Animation.types';
 import {
@@ -55,7 +56,7 @@ export const animationPlugin = realmPlugin<AnimationPluginParams>({
 
     // Add components first
     realm.pubIn({
-      [addComposerChild$]: [AnimationDrawer, AnimationResolver, BlockLibraryDrawer, LessonStyleDrawer],
+      [addComposerChild$]: [AnimationDrawer, AnimationPastePlugin, AnimationResolver, BlockLibraryDrawer, LessonStyleDrawer],
       [getMarkdownFn$]: params?.getMarkdown ?? null,
       [setMarkdownFn$]: params?.setMarkdown ?? null,
       [currentSlideIndex$]: slideIndex,
