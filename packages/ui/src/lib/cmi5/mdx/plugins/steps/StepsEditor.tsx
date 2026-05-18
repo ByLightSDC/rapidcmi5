@@ -10,8 +10,14 @@ import * as Mdast from 'mdast';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { CSSProperties, useCallback, useContext, useEffect, useRef, useState } from 'react';
-
+import {
+  CSSProperties,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import {
   Box,
@@ -45,7 +51,6 @@ import { TextFieldMainUi } from '../../../../inputs/textfields/textfields';
 import { StepsContext } from './StepsContext';
 import { StepContentDirectiveNode, StepDirectiveNode } from './types';
 
-
 import { DEFAULT_STEP } from './constants';
 import ModalDialog from '../../../../modals/ModalDialog';
 import {
@@ -55,9 +60,7 @@ import {
 } from '../../../../utility/buttons';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
-import {
-  convertMdastToMarkdown,
-} from '../../util/conversion';
+import { convertMdastToMarkdown } from '../../util/conversion';
 import { LessonThemeContext } from '../../contexts/LessonThemeContext';
 import {
   resolveLessonThemeCSS,
@@ -68,8 +71,7 @@ import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { useGutterRight } from '../shared/useGutterRight';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
-import { useBackgroundColors } from 'packages/ui/src/lib/hooks/useBackgroundColors';
-import { BackgroundColorTrigger } from 'packages/ui/src/lib/colors/BackgroundColorTrigger';
+import { BackgroundColorTrigger, useBackgroundColors } from '@rapid-cmi5/ui';
 
 /**
  * Steps Editor for steps directive
@@ -408,12 +410,12 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
 
   const outerSx: SxProps = backgroundColor
     ? {
-      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-      clipPath: `inset(0 -100vmax 0)`,
-      backgroundColor,
-      paddingTop: blockPadding,
-      paddingBottom: blockPadding,
-    }
+        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+        clipPath: `inset(0 -100vmax 0)`,
+        backgroundColor,
+        paddingTop: blockPadding,
+        paddingBottom: blockPadding,
+      }
     : {};
 
   /**
@@ -424,8 +426,16 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
       <Box
         ref={containerRef}
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
-        {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
-        {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as CSSProperties } : {})}
+        {...(contentWidth !== undefined
+          ? { 'data-block-override': 'true' }
+          : {})}
+        {...(contentWidth !== undefined
+          ? {
+              style: {
+                '--block-max-width': blockMaxWidth ?? 'none',
+              } as CSSProperties,
+            }
+          : {})}
         sx={{
           padding: 0,
           position: 'relative',
@@ -433,10 +443,10 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
           ...sxProps,
           ...(blockMaxWidth
             ? {
-              maxWidth: blockMaxWidth,
-              marginLeft: 'auto',
-              marginRight: 'auto',
-            }
+                maxWidth: blockMaxWidth,
+                marginLeft: 'auto',
+                marginRight: 'auto',
+              }
             : {}),
           marginTop: 0,
           marginBottom: 0,
@@ -482,7 +492,6 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
               <div>
                 {!isPlayback && (
                   <Box
-
                     sx={{
                       backgroundColor:
                         muiTheme.palette.mode === 'dark'
@@ -494,8 +503,6 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                       right: menuRight,
                     }}
                   >
-
-
                     <Tooltip title="Edit Steps Settings">
                       <IconButton onClick={handleConfigure}>
                         <EditIcon />
@@ -510,7 +517,9 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                       </IconButton>
                     </Tooltip>
                     <BackgroundColorTrigger
-                      currentColor={backgroundColor ? { color: pendingColor } : undefined}
+                      currentColor={
+                        backgroundColor ? { color: pendingColor } : undefined
+                      }
                       onTrigger={openPicker}
                     />
                     <InsertLineReturnButton

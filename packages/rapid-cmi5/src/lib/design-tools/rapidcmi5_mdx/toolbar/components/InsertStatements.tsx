@@ -1,11 +1,10 @@
 import {
   rootEditor$,
   $createDirectiveNode,
-  DirectiveNode,
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
-import { $getSelection, $isRangeSelection, $createParagraphNode } from 'lexical';
+import { $getSelection, $isRangeSelection } from 'lexical';
 import type { LexicalEditor } from 'lexical';
 
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
@@ -24,7 +23,7 @@ import {
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 import { useCallback, useState } from 'react';
-import { useSelectionHelper } from 'packages/rapid-cmi5/src/lib/hooks/useSelectionHelper';
+import { useSelectionHelper } from '../../../../hooks/useSelectionHelper';
 
 /**
  * A toolbar button component that inserts a statements block into the editor.
