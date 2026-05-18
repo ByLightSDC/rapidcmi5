@@ -28,7 +28,6 @@ import {
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 import { useCallback, useContext, useState } from 'react';
-import { useSelectionHelper } from 'packages/rapid-cmi5/src/lib/hooks/useSelectionHelper';
 import { join } from 'path-browserify';
 import { useSelector } from 'react-redux';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
@@ -38,6 +37,7 @@ import quoteAuthorPlaceholder from './assets/quoteAuthorPlaceholder.png';
 const PLACEHOLDER_AVATAR_DIR = 'Assets/Images';
 const PLACEHOLDER_AVATAR_FILENAME = 'quoteAuthorPlaceholder.png';
 const PLACEHOLDER_AVATAR_REL = `./${PLACEHOLDER_AVATAR_DIR}/${PLACEHOLDER_AVATAR_FILENAME}`;
+import { useSelectionHelper } from '../../../../hooks/useSelectionHelper';
 
 /**
  * A toolbar button component that inserts a quotes into the editor.

@@ -72,8 +72,7 @@ import { getDirectiveBlockShadow } from '../../../../styles/directiveStyles';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { DIRECTIVE_INNER_BOX_SHADOW } from '../../constants/directiveLayout';
-import { useBackgroundColors } from 'packages/ui/src/lib/hooks/useBackgroundColors';
-import { BackgroundColorTrigger } from 'packages/ui/src/lib/colors/BackgroundColorTrigger';
+import { BackgroundColorTrigger, useBackgroundColors } from '@rapid-cmi5/ui';
 
 /**
  * Tabs Editor for tabs directive
@@ -372,12 +371,12 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   // trailing <p>'s margin-top so the band fills flush to the next block.
   const outerSx: SxProps = backgroundColor
     ? {
-      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-      clipPath: `inset(0 -100vmax 0)`,
-      backgroundColor,
-      paddingTop: blockPadding,
-      paddingBottom: blockPadding,
-    }
+        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+        clipPath: `inset(0 -100vmax 0)`,
+        backgroundColor,
+        paddingTop: blockPadding,
+        paddingBottom: blockPadding,
+      }
     : {};
 
   // Inner box: fills all available width (lesson content width applies to text
@@ -390,14 +389,14 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     : {};
   const innerSx: SxProps = backgroundColor
     ? {
-      backgroundColor: muiTheme.palette.background.paper,
-      boxShadow: DIRECTIVE_INNER_BOX_SHADOW,
-      ...widthOverrideSx,
-    }
+        backgroundColor: muiTheme.palette.background.paper,
+        boxShadow: DIRECTIVE_INNER_BOX_SHADOW,
+        ...widthOverrideSx,
+      }
     : {
-      boxShadow: dropShadow,
-      ...widthOverrideSx,
-    };
+        boxShadow: dropShadow,
+        ...widthOverrideSx,
+      };
 
   /**
    * Render Tabs and Nested Content
@@ -412,10 +411,10 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
           : {})}
         {...(contentWidth !== undefined
           ? {
-            style: {
-              '--block-max-width': blockMaxWidth ?? 'none',
-            } as CSSProperties,
-          }
+              style: {
+                '--block-max-width': blockMaxWidth ?? 'none',
+              } as CSSProperties,
+            }
           : {})}
         sx={{
           padding: 0,
@@ -505,7 +504,9 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
               </IconButton>
             </Tooltip>
             <BackgroundColorTrigger
-              currentColor={backgroundColor ? { color: pendingColor } : undefined}
+              currentColor={
+                backgroundColor ? { color: pendingColor } : undefined
+              }
               onTrigger={openPicker}
             />
             <InsertLineReturnButton

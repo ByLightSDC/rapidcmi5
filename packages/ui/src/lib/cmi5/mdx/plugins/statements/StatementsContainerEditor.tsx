@@ -37,8 +37,7 @@ import { findMatchingStatementPreset } from './methods';
 
 import { StatementsContextProvider } from './StatementsContext';
 import StatementsSettings from './StatementsSettings';
-import { useBackgroundColors } from 'packages/ui/src/lib/hooks/useBackgroundColors';
-import { BackgroundColorTrigger } from 'packages/ui/src/lib/colors/BackgroundColorTrigger';
+import { BackgroundColorTrigger, useBackgroundColors } from '@rapid-cmi5/ui';
 
 /**
  * Statements Container Editor for the statements layout directive.
@@ -81,7 +80,7 @@ export const StatementsContainerEditor: React.FC<
   const currentPreset = useMemo(() => {
     return mdastNode?.attributes?.preset
       ? findMatchingStatementPreset(mdastNode?.attributes?.preset) ||
-      STATEMENT_PRESETS[0]
+          STATEMENT_PRESETS[0]
       : STATEMENT_PRESETS[0];
   }, [mdastNode?.attributes?.preset]);
 
@@ -101,7 +100,6 @@ export const StatementsContainerEditor: React.FC<
     }
     return undefined;
   }, [mdastNode.children[0].attributes.avatar]);
-
 
   /**
    * Reverts changes and closes modal
@@ -134,7 +132,6 @@ export const StatementsContainerEditor: React.FC<
 
       await new Promise((resolve) => setTimeout(resolve, 500));
       setSelectedPreset(newPreset);
-
     },
     [mdastNode, updateMdastNode, carouselIndex],
   );
@@ -183,12 +180,12 @@ export const StatementsContainerEditor: React.FC<
 
   const outerSx: SxProps = backgroundColor
     ? {
-      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-      clipPath: `inset(0 -100vmax 0)`,
-      backgroundColor,
-      paddingTop: blockPadding,
-      paddingBottom: blockPadding,
-    }
+        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+        clipPath: `inset(0 -100vmax 0)`,
+        backgroundColor,
+        paddingTop: blockPadding,
+        paddingBottom: blockPadding,
+      }
     : {};
 
   return (
@@ -209,8 +206,9 @@ export const StatementsContainerEditor: React.FC<
         <Box
           sx={{
             width: '100%',
-            boxShadow: selectedPreset.id === "3" ? 2 : undefined,
-            backgroundColor: (theme) => `${selectedPreset.id === "3" ? theme.palette.background.paper : "transparent"}`,
+            boxShadow: selectedPreset.id === '3' ? 2 : undefined,
+            backgroundColor: (theme) =>
+              `${selectedPreset.id === '3' ? theme.palette.background.paper : 'transparent'}`,
             paddingTop: blockPadding,
             paddingBottom: blockPadding,
           }}
@@ -236,7 +234,6 @@ export const StatementsContainerEditor: React.FC<
         {/* Gutter buttons */}
         {!isPlayback && (
           <Box
-
             sx={{
               backgroundColor:
                 muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
@@ -246,14 +243,15 @@ export const StatementsContainerEditor: React.FC<
               right: menuRight,
             }}
           >
-
             <Tooltip title="Edit Statement Layout">
               <IconButton onClick={handleConfigure}>
                 <EditIcon />
               </IconButton>
             </Tooltip>
             <BackgroundColorTrigger
-              currentColor={backgroundColor ? { color: pendingColor } : undefined}
+              currentColor={
+                backgroundColor ? { color: pendingColor } : undefined
+              }
               onTrigger={openPicker}
             />
             <InsertLineReturnButton
@@ -306,7 +304,7 @@ export const StatementsContainerEditor: React.FC<
         palette={SHAPE_PRESET_COLORS}
         onPickColor={(color) => {
           pendingColorRef.current = color;
-           setPendingColorAndRef(color);
+          setPendingColorAndRef(color);
         }}
         onClear={handleClearColor}
         noneLabel="No background"

@@ -20,6 +20,7 @@ import { ButtonMinorUi } from '@rapid-cmi5/ui';
  * @property {any} [sxProps] Props to override sx properties for button
  * @property {boolean} [isListItem=false] Whether button is in a list and border should be removed...
  * @property {string} [overrideRangeId] Range id to use when adding console
+ * @property {string} [overrideScenarioId] Scenario id to use when adding console
  */
 type tProps = {
   addConsoleWindow: (
@@ -30,6 +31,7 @@ type tProps = {
     resizeMethod: string | null | undefined,
     protocol: string | null,
     overrideRangeId?: string,
+    overrideScenarioId?: string,
   ) => void;
   isConsoleReady: (status?: DeployedRangeConsoleStatusEnum) => boolean;
   rangeOSConsole: Partial<DeployedRangeConsole>;
@@ -38,6 +40,7 @@ type tProps = {
   isListItem?: boolean;
   allowClickPropagation?: boolean;
   overrideRangeId?: string;
+  overrideScenarioId?: string;
 };
 
 /**
@@ -54,6 +57,7 @@ export function ConsoleButton(props: tProps) {
     tooltipText,
     allowClickPropagation = false,
     overrideRangeId,
+    overrideScenarioId,
     sxProps = {
       //make button more compact
       margin: '4px',
@@ -98,6 +102,7 @@ export function ConsoleButton(props: tProps) {
         parameters?.resizeMethod,
         protocol,
         overrideRangeId,
+        overrideScenarioId,
       );
     }
   };

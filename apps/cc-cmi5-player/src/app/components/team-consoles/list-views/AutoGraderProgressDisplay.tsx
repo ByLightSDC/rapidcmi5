@@ -1,6 +1,6 @@
 import { Gauge } from '@mui/x-charts/Gauge';
 import { useContext, useMemo } from 'react';
-import { TeamConsolesContext } from '../TeamScenarioContext';
+import { TeamScenarioContext } from '../TeamScenarioContext';
 import { Alert } from '@mui/material';
 import { Topic } from '@rangeos-nx/frontend/clients/hooks';
 import { LoadingUi } from '@rapid-cmi5/ui';
@@ -19,9 +19,8 @@ export default function AutoGraderProgressDisplay({
   const {
     autoGraderStatusChangeCounter,
     getAutogradersPercentComplete,
-    getInitialized,
-    setUpdate,
-  } = useContext(TeamConsolesContext);
+    getInitialized
+  } = useContext(TeamScenarioContext);
 
   /**
    * Percent Complete

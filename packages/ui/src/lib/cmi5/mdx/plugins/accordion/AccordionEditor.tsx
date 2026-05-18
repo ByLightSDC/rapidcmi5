@@ -66,8 +66,8 @@ import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { useGutterRight } from '../shared/useGutterRight';
-import { useBackgroundColors } from 'packages/ui/src/lib/hooks/useBackgroundColors';
-import { BackgroundColorTrigger } from 'packages/ui/src/lib/colors/BackgroundColorTrigger';
+import { BackgroundColorTrigger, useBackgroundColors } from '@rapid-cmi5/ui';
+
 /**
  * Accordion Editor for accordion directives
  * @param param0
@@ -343,12 +343,12 @@ export const AccordionEditor: React.FC<
   // Outer box: full-width background color band when backgroundColor is set.
   const outerSx: SxProps = backgroundColor
     ? {
-      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-      clipPath: `inset(0 -100vmax 0)`,
-      backgroundColor,
-      paddingTop: blockPadding,
-      paddingBottom: blockPadding,
-    }
+        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+        clipPath: `inset(0 -100vmax 0)`,
+        backgroundColor,
+        paddingTop: blockPadding,
+        paddingBottom: blockPadding,
+      }
     : {};
 
   const innerSx: SxProps = blockMaxWidth
@@ -369,10 +369,10 @@ export const AccordionEditor: React.FC<
           : {})}
         {...(contentWidth !== undefined
           ? {
-            style: {
-              '--block-max-width': blockMaxWidth ?? 'none',
-            } as CSSProperties,
-          }
+              style: {
+                '--block-max-width': blockMaxWidth ?? 'none',
+              } as CSSProperties,
+            }
           : {})}
         sx={{
           padding: 0,
@@ -424,7 +424,9 @@ export const AccordionEditor: React.FC<
               </IconButton>
             </Tooltip>
             <BackgroundColorTrigger
-              currentColor={backgroundColor ? { color: pendingColor } : undefined}
+              currentColor={
+                backgroundColor ? { color: pendingColor } : undefined
+              }
               onTrigger={openPicker}
             />
             <InsertLineReturnButton

@@ -162,7 +162,7 @@ export default function TeamRangeResourceVMActionRow(props: Props) {
                 marginBottom: '4px', //not sure why buttons dont align
               }}
             >
-              <ConsoleList consoles={vmConsoles} overrideRangeId={rangeId} />
+              <ConsoleList consoles={vmConsoles} overrideRangeId={rangeId} overrideScenarioId={scenarioId}/>
             </div>
           </div>
         </div>

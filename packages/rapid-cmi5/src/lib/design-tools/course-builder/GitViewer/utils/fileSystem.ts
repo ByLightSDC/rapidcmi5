@@ -144,9 +144,15 @@ export class GitFS {
 
     for (const filename of ['index.html', 'cfg.json', 'favicon.ico']) {
       const res = await fetch(`${base}/${filename}`);
-      if (!res.ok) throw new Error(`Failed to fetch ${filename} from player dev server (${res.status})`);
+      if (!res.ok)
+        throw new Error(
+          `Failed to fetch ${filename} from player dev server (${res.status})`,
+        );
       const buf = await res.arrayBuffer();
-      await this.fs.promises.writeFile(join(cmi5BuildCache, filename), new Uint8Array(buf));
+      await this.fs.promises.writeFile(
+        join(cmi5BuildCache, filename),
+        new Uint8Array(buf),
+      );
     }
   };
 
@@ -664,17 +670,15 @@ export class GitFS {
       await this.fs.promises.rmdir(`${repoPath}/.git`);
     } catch {}
 
-    // For local filesystem repos in the browser, the root WebAccess mount point
-    // cannot be deleted via removeEntry (browser throws "Name is not allowed").
-    // Instead, unmount the zenFs path so the name can be reused immediately.
+    await this.fs.promises.rmdir(repoPath);
+
     if (!this.isElectron && r.fileSystemType === fsType.localFileSystem) {
       try {
         zenFs.umount(repoPath);
-      } catch {}
-      return;
+      } catch (error) {
+        console.error('Could not unmount path for zenfFS', error);
+      }
     }
-
-    await this.fs.promises.rmdir(repoPath);
   };
 
   /**

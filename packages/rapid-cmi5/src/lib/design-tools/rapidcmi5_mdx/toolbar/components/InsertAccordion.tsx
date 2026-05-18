@@ -22,12 +22,9 @@ import { ButtonMinorUi } from '@rapid-cmi5/ui';
 import AddIcon from '@mui/icons-material/Add';
 import ViewStreamIcon from '@mui/icons-material/ViewStream';
 import { useTheme } from '@mui/material';
-import {
-  convertMarkdownToMdast,
-  placeCaretInsideDirective,
-} from '@rapid-cmi5/ui';
+import { convertMarkdownToMdast } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
-import { useSelectionHelper } from 'packages/rapid-cmi5/src/lib/hooks/useSelectionHelper';
+import { useSelectionHelper } from '../../../../hooks/useSelectionHelper';
 
 /** The first line return is REQUIRED!!!! */
 const DEFAULT_ACCORDION = `

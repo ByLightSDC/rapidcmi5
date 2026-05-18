@@ -1,18 +1,24 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { useOverrideConfigs } from '../hooks/useOverrideConfig';
-import { debugLog } from '@rapid-cmi5/ui';
-
+import { config, debugLog } from '@rapid-cmi5/ui';
 import { Alert, AlertTitle, CircularProgress, Typography } from '@mui/material';
 
 import ScenarioConsoleTab from '../components/scenario/ScenarioConsoleTab';
 import { useCMI5Session } from '../hooks/useCMI5Session';
 import { checkForDevMode } from '../utils/DevMode';
+import { useDispatch, useSelector } from 'react-redux';
+import { auJsonSel, setIsConfigInitialized } from '../redux/auReducer';
+import { useAuContent } from '../hooks/useAuContent';
+import { refreshLoggingConfig } from '../debug';
+import { authToken, isAuthenticated } from '@rapid-cmi5/keycloak';
 
 enum NoAuManagerState {
   waiting = 'Loading...',
+  loadingContent = 'Loading Content...',
   loadingOverrides = 'Loading Config...',
   authenticating = 'Authenticating...',
+  authenticatingSSO = 'Authenticating via SSO...',
   loadingScenario = 'Loading Scenario...',
   ready = 'Ready',
   error = 'Error',
@@ -27,6 +33,9 @@ function NoAuManager() {
     NoAuManagerState.waiting,
   );
   const [loadingMessage, setLoadingMessage] = useState('');
+  const auJson = useSelector(auJsonSel);
+  const token = useSelector(authToken);
+  const dispatch = useDispatch();
 
   const {
     initializeCmi5WithRange,
@@ -38,6 +47,7 @@ function NoAuManager() {
   } = useCMI5Session();
 
   const { isOverridesLoaded, loadOverrides } = useOverrideConfigs();
+  const { isContentLoaded, contentErrorMessage, loadContent } = useAuContent();
 
   const getReadyDisplay = useCallback(() => {
     if (noAuManagerState === NoAuManagerState.error) {
@@ -72,6 +82,10 @@ function NoAuManager() {
     return null;
   }, [noAuManagerState, loadingMessage]);
 
+  const auHasScenario =
+    auJson.rangeosScenarioUUID || auJson.rangeosScenarioName ? true : false;
+  const auHasTeamScenario = auJson.teamSSOEnabled ? true : false;
+
   /**
    * UE Manages Session State
    */
@@ -86,41 +100,87 @@ function NoAuManager() {
     }
 
     if (noAuManagerState === NoAuManagerState.waiting) {
-      if (checkForDevMode()) {
-        debugLog('[NoAU] test mode');
-        testCmi5(true);
-        setNoAuManagerState(NoAuManagerState.ready);
-      } else {
-        initializeSessionCmi5();
+      loadContent('./config.json');
+      setNoAuManagerState(NoAuManagerState.loadingContent);
+      return;
+    } else if (noAuManagerState === NoAuManagerState.loadingContent) {
+      if (isContentLoaded) {
+        debugLog('auHasScenario ' + auHasScenario, auJson.rangeosScenarioName);
+        debugLog('auHasTeamScenario ', auJson.teamSSOEnabled);
+
+        if (auHasScenario) {
+          config.CMI5_SSO_ENABLED = false;
+        } else if (auHasTeamScenario) {
+          config.CMI5_SSO_ENABLED = true;
+        } else {
+          config.CMI5_SSO_ENABLED = false;
+        }
+        //flag config file is finalized with all env variables needed
+        if (!config.CMI5_SSO_ENABLED) {
+          debugLog('[AU] basic auth configured', 'auth');
+        } else {
+          debugLog('[AU] waiting for SSO token', 'auth');
+        }
+
+        if (checkForDevMode()) {
+          debugLog('[NoAU] test mode');
+          testCmi5(true);
+        } else {
+          initializeSessionCmi5();
+        }
         setNoAuManagerState(NoAuManagerState.authenticating);
+      }
+      if (contentErrorMessage) {
+        setLoadingMessage(contentErrorMessage);
+        setNoAuManagerState(NoAuManagerState.error);
       }
       return;
     } else if (noAuManagerState === NoAuManagerState.authenticating) {
-      if (isInitSessionCmi5Complete) {
+      if (checkForDevMode() || isInitSessionCmi5Complete) {
         loadOverrides('./cfg.json');
         setNoAuManagerState(NoAuManagerState.loadingOverrides);
       }
       return;
     } else if (noAuManagerState === NoAuManagerState.loadingOverrides) {
       if (isOverridesLoaded) {
-        setNoAuManagerState(NoAuManagerState.loadingScenario);
+        // Refresh logging configuration after overrides are applied
+        refreshLoggingConfig();
+        //this kicks off SSO token retrieval if needed, but also signals to the rest of the app that config is finalized and content can be rendered
+        dispatch(setIsConfigInitialized(true));
+        if (config.CMI5_SSO_ENABLED) {
+          setNoAuManagerState(NoAuManagerState.authenticatingSSO);
+        } else {
+          setNoAuManagerState(NoAuManagerState.loadingScenario);
+        }
       }
       return;
+    } else if (noAuManagerState === NoAuManagerState.authenticatingSSO) {
+      if (token) {
+        debugLog('token set, continue to scenario');
+        setNoAuManagerState(NoAuManagerState.loadingScenario);
+      }
     } else if (noAuManagerState === NoAuManagerState.loadingScenario) {
-      if (isCmi5RangeConnectionComplete) {
+      if (checkForDevMode() || isCmi5RangeConnectionComplete) {
+        debugLog('[NoAU] CMI5 connection complete');
         setNoAuManagerState(NoAuManagerState.ready);
       } else {
-        initializeCmi5WithRange(false, true);
+        // we may need to check more than once
+        initializeCmi5WithRange(false, auHasScenario);
       }
       return;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    isAuthenticated,
+    isContentLoaded,
     isOverridesLoaded,
     isCmi5RangeConnectionComplete,
+    contentErrorMessage,
+    auJson,
     isInitSessionCmi5Complete,
     cmi5ErrorMessage,
     noAuManagerState,
+    token,
   ]);
 
   return (

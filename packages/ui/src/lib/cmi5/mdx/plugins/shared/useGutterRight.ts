@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
 import { toolbarRect$ } from '../toolbar/vars';
 import { useSignalEffect } from '@preact/signals-react';
-import { useLessonStyles } from 'packages/ui/src/lib/hooks/useLessonStyles';
 
 type ResolvedThemeCSS = ReturnType<typeof resolveLessonThemeCSS>;
 
@@ -37,7 +36,6 @@ export const useGutterRight = (
   const calculateMenuRight = useCallback(() => {
     const appRight = toolbarRect$.value?.right;
     if (appRight == null || !containerRef.current) {
-
       return;
     }
     const containerRight = containerRef.current.getBoundingClientRect().right;

@@ -18,7 +18,14 @@ import {
 import { editorInPlayback$ } from '../../state/vars';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 
-import { alpha, Box, IconButton, SxProps, Tooltip, useTheme } from '@mui/material';
+import {
+  alpha,
+  Box,
+  IconButton,
+  SxProps,
+  Tooltip,
+  useTheme,
+} from '@mui/material';
 
 import DeleteIconButton from '../../components/DeleteIconButton';
 import EditIcon from '@mui/icons-material/Edit';
@@ -38,8 +45,7 @@ import { findMatchingQuotePreset } from './methods';
 import { QuotesContextProvider } from './QuotesContext';
 import { useFocusWithin } from '../shared/useFocusWithin';
 import QuotesSettings from './QuotesSettings';
-import { useBackgroundColors } from 'packages/ui/src/lib/hooks/useBackgroundColors';
-import { BackgroundColorTrigger } from 'packages/ui/src/lib/colors/BackgroundColorTrigger';
+import { BackgroundColorTrigger, useBackgroundColors } from '@rapid-cmi5/ui';
 
 /**
  * Quotes Container Editor for grid layout directive.
@@ -79,12 +85,12 @@ export const QuotesContainerEditor: React.FC<
   // Outer box: full-width background color band when backgroundColor is set.
   const outerSx: SxProps = backgroundColor
     ? {
-      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-      clipPath: `inset(0 -100vmax 0)`,
-      backgroundColor,
-      paddingTop: blockPadding,
-      paddingBottom: blockPadding,
-    }
+        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+        clipPath: `inset(0 -100vmax 0)`,
+        backgroundColor,
+        paddingTop: blockPadding,
+        paddingBottom: blockPadding,
+      }
     : {};
   //#endregion
 
@@ -94,7 +100,7 @@ export const QuotesContainerEditor: React.FC<
   const currentPreset = useMemo(() => {
     return mdastNode?.attributes?.preset
       ? findMatchingQuotePreset(mdastNode?.attributes?.preset) ||
-      QUOTE_PRESETS[0]
+          QUOTE_PRESETS[0]
       : QUOTE_PRESETS[0];
   }, [mdastNode?.attributes?.preset]);
 
@@ -144,9 +150,9 @@ export const QuotesContainerEditor: React.FC<
         children: mdastNode.children.map((child, i) =>
           i === carouselIndex
             ? {
-              ...child,
-              attributes: { ...child.attributes, avatar: newAvatar },
-            }
+                ...child,
+                attributes: { ...child.attributes, avatar: newAvatar },
+              }
             : child,
         ) as any,
       });
@@ -223,7 +229,13 @@ export const QuotesContainerEditor: React.FC<
             paddingTop: blockPadding,
             paddingBottom: blockPadding,
           }}
-        ><Box sx={{ backgroundColor: (theme) => `${alpha(theme.palette.background.default, muiTheme.palette.mode === 'light' ? 0 : 0.50)}`, }}>
+        >
+          <Box
+            sx={{
+              backgroundColor: (theme) =>
+                `${alpha(theme.palette.background.default, muiTheme.palette.mode === 'light' ? 0 : 0.5)}`,
+            }}
+          >
             <QuotesContextProvider
               carouselIndex={carouselIndex}
               preset={currentPreset.id}
@@ -260,7 +272,9 @@ export const QuotesContainerEditor: React.FC<
               </IconButton>
             </Tooltip>
             <BackgroundColorTrigger
-              currentColor={backgroundColor ? { color: pendingColor } : undefined}
+              currentColor={
+                backgroundColor ? { color: pendingColor } : undefined
+              }
               onTrigger={openPicker}
             />
             <InsertLineReturnButton
