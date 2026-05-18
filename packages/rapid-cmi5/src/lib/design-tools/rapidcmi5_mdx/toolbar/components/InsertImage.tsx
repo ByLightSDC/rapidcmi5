@@ -1,9 +1,5 @@
 import { openNewImageDialog$ } from '../../plugins/image';
-import {
-  iconComponentFor$,
-  readOnly$,
-} from '@mdxeditor/editor';
-import { useCellValues, usePublisher } from '@mdxeditor/gurx';
+import { usePublisher } from '@mdxeditor/gurx';
 /**
  * Icons
  */

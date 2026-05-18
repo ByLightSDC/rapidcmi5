@@ -1,4 +1,10 @@
-import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  ChangeEvent,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import {
   closeImageDialog$,
@@ -10,7 +16,14 @@ import {
 import { useCellValues, usePublisher } from '@mdxeditor/gurx';
 
 // MUI
-import { Box, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
+import {
+  Box,
+  IconButton,
+  Paper,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import LockIcon from '@mui/icons-material/Lock';
@@ -19,6 +32,7 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import {
   ButtonModalMainUi,
   ComboBoxSelectorUi,
+  debugLogError,
   ModalDialog,
   TextFieldMainUi,
 } from '@rapid-cmi5/ui';
@@ -86,18 +100,26 @@ export const ImageDialog: React.FC = () => {
       setImageStyle('');
       // If the image has no stored px dimensions, we'll populate from natural dims
       // once the image loads (see effect below). Set empty for now.
-      const storedWidth = typeof state.initialValues.width === 'number' ? state.initialValues.width.toString() : '';
-      const storedHeight = typeof state.initialValues.height === 'number' ? state.initialValues.height.toString() : '';
+      const storedWidth =
+        typeof state.initialValues.width === 'number'
+          ? state.initialValues.width.toString()
+          : '';
+      const storedHeight =
+        typeof state.initialValues.height === 'number'
+          ? state.initialValues.height.toString()
+          : '';
       setWidth(storedWidth);
       setHeight(storedHeight);
       if (state.initialValues.rest) {
-        const styleAttribute = state.initialValues.rest.find(
-          //@ts-ignore
-          (attribute) => attribute.name === 'style',
-        );
+        const styleAttribute = state.initialValues.rest.find((attribute) => {
+          if (attribute.type === 'mdxJsxAttribute') {
+            return attribute.name === 'style';
+          } else {
+            return false;
+          }
+        });
         if (styleAttribute) {
-          //@ts-ignore
-          setImageStyle(styleAttribute.value);
+          setImageStyle(styleAttribute.value as string);
         }
       }
     } else {
@@ -122,14 +144,19 @@ export const ImageDialog: React.FC = () => {
   // If no stored px dims, also pre-populate the width/height fields.
   useEffect(() => {
     if (state.type !== 'editing') return;
-    const urlToLoad = state.initialValues.resolvedSrc ?? state.initialValues.src;
+    const urlToLoad =
+      state.initialValues.resolvedSrc ?? state.initialValues.src;
     if (!urlToLoad) return;
     const img = new Image();
     img.onload = () => {
-      naturalDimsRef.current = { width: img.naturalWidth, height: img.naturalHeight };
+      naturalDimsRef.current = {
+        width: img.naturalWidth,
+        height: img.naturalHeight,
+      };
       const storedW = state.initialValues.width;
       const storedH = state.initialValues.height;
-      const hasBothDims = typeof storedW === 'number' && typeof storedH === 'number';
+      const hasBothDims =
+        typeof storedW === 'number' && typeof storedH === 'number';
       if (hasBothDims) {
         // If the stored ratio differs from the natural ratio by more than 1%, the
         // user intentionally broke the aspect ratio — open the dialog unlocked.
@@ -190,7 +217,10 @@ export const ImageDialog: React.FC = () => {
     async function fetchData() {
       try {
         const exists = await handlePathExists(path);
-        if (!exists) return;
+        if (!exists) {
+          setFileOptions([]);
+          return;
+        }
 
         const treeData = await handleGetFolderStructure(path, true);
         const fileOptions = [];
@@ -217,7 +247,9 @@ export const ImageDialog: React.FC = () => {
     }
 
     if (isFsLoaded) {
-      fetchData();
+      fetchData().catch((err) => {
+        debugLogError(`Could not fetch data ${err}`);
+      });
     }
   }, [imageFilePath, src, state.type, isFsLoaded]);
 
@@ -381,24 +413,42 @@ export const ImageDialog: React.FC = () => {
                   value={width}
                   onChange={(textValue: string) => {
                     setWidth(textValue);
-                    if (aspectLocked && naturalDimsRef.current && textValue !== '') {
-                      const ratio = naturalDimsRef.current.height / naturalDimsRef.current.width;
-                      const computed = Math.round(parseInt(textValue, 10) * ratio);
+                    if (
+                      aspectLocked &&
+                      naturalDimsRef.current &&
+                      textValue !== ''
+                    ) {
+                      const ratio =
+                        naturalDimsRef.current.height /
+                        naturalDimsRef.current.width;
+                      const computed = Math.round(
+                        parseInt(textValue, 10) * ratio,
+                      );
                       setHeight(isNaN(computed) ? '' : String(computed));
                     }
                   }}
                   infoText={'Optional image width in pixels'}
                 />
               </Box>
-              <Tooltip title={aspectLocked ? 'Unlock aspect ratio' : 'Lock aspect ratio'}>
+              <Tooltip
+                title={
+                  aspectLocked ? 'Unlock aspect ratio' : 'Lock aspect ratio'
+                }
+              >
                 <IconButton
                   size="small"
                   onClick={() => setAspectLocked((prev) => !prev)}
                   color={aspectLocked ? 'primary' : 'default'}
-                  aria-label={aspectLocked ? 'Unlock aspect ratio' : 'Lock aspect ratio'}
+                  aria-label={
+                    aspectLocked ? 'Unlock aspect ratio' : 'Lock aspect ratio'
+                  }
                   sx={{ mt: '4px', flexShrink: 0 }}
                 >
-                  {aspectLocked ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />}
+                  {aspectLocked ? (
+                    <LockIcon fontSize="small" />
+                  ) : (
+                    <LockOpenIcon fontSize="small" />
+                  )}
                 </IconButton>
               </Tooltip>
               <Box sx={{ flex: '1 1 0', minWidth: 0 }}>
@@ -411,9 +461,17 @@ export const ImageDialog: React.FC = () => {
                   value={height}
                   onChange={(textValue: string) => {
                     setHeight(textValue);
-                    if (aspectLocked && naturalDimsRef.current && textValue !== '') {
-                      const ratio = naturalDimsRef.current.width / naturalDimsRef.current.height;
-                      const computed = Math.round(parseInt(textValue, 10) * ratio);
+                    if (
+                      aspectLocked &&
+                      naturalDimsRef.current &&
+                      textValue !== ''
+                    ) {
+                      const ratio =
+                        naturalDimsRef.current.width /
+                        naturalDimsRef.current.height;
+                      const computed = Math.round(
+                        parseInt(textValue, 10) * ratio,
+                      );
                       setWidth(isNaN(computed) ? '' : String(computed));
                     }
                   }}
