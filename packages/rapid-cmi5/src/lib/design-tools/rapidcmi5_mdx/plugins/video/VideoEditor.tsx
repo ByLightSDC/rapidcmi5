@@ -347,6 +347,9 @@ export function VideoEditor({
   const [disableSettingsButton] = useCellValues(disableVideoSettingsButton$);
   const [videoPreviewHandler] = useCellValues(videoPreviewHandler$);
   const [previewSrc, setPreviewSrc] = React.useState(src);
+  const [previewCaptionSrc, setPreviewCaptionSrc] = React.useState<
+    string | undefined
+  >(captionSrc);
   const [isSelected, setSelected, clearSelection] =
     useLexicalNodeSelection(nodeKey);
 
@@ -357,6 +360,18 @@ export function VideoEditor({
       setPreviewSrc(src);
     }
   }, [src, videoPreviewHandler]);
+
+  React.useEffect(() => {
+    if (!captionSrc) {
+      setPreviewCaptionSrc(undefined);
+      return;
+    }
+    if (videoPreviewHandler && captionSrc.startsWith('./')) {
+      videoPreviewHandler(captionSrc).then(setPreviewCaptionSrc);
+    } else {
+      setPreviewCaptionSrc(captionSrc);
+    }
+  }, [captionSrc, videoPreviewHandler]);
 
   const isLocal = src.startsWith('./');
   const initialVideoPath = isLocal ? src : null;
@@ -373,7 +388,7 @@ export function VideoEditor({
           height={height}
           resizable={!disableResize}
           videoId={videoId}
-          captionSrc={captionSrc}
+          captionSrc={previewCaptionSrc}
         />
         {isSelected && !disableSettingsButton && EditVideoToolbar && (
           <EditVideoToolbar
