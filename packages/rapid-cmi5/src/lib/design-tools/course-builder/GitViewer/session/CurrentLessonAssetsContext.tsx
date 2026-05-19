@@ -29,7 +29,7 @@ const ASSET_DIRS: Record<AssetType, string> = {
 export const AUDIO_DIR = ASSET_DIRS.audio;
 export const FILE_DIR = ASSET_DIRS.file;
 
-interface IFsAssetsContext {
+interface CurrentLessonAssetsContext {
   getAsset: (type: AssetType, fileName: string) => Promise<string | undefined>;
   uploadAsset: (
     type: AssetType,
@@ -39,7 +39,6 @@ interface IFsAssetsContext {
   getAllAssets: (type: AssetType) => Promise<string[]>;
   getLocalFileBlob: (
     filePath: string,
-    slidePath: string,
     fileType?: string,
   ) => Promise<Blob | MediaSource | null>;
   getLocalFileBlobUrl: (
@@ -48,7 +47,7 @@ interface IFsAssetsContext {
   ) => Promise<string | null>;
 }
 
-const defaultFsAssetsContext: IFsAssetsContext = {
+const defaultFsAssetsContext: CurrentLessonAssetsContext = {
   getAsset: async () => undefined,
   uploadAsset: async () => '',
   getAllAssets: async () => [],
@@ -56,15 +55,14 @@ const defaultFsAssetsContext: IFsAssetsContext = {
   getLocalFileBlobUrl: async () => null,
 };
 
-export const CurrentLessonAssetsContext = createContext<IFsAssetsContext>(
-  defaultFsAssetsContext,
-);
+export const CurrentLessonAssetsContext =
+  createContext<CurrentLessonAssetsContext>(defaultFsAssetsContext);
 
 interface tProviderProps {
   children?: JSX.Element;
 }
 
-export const FsAssetsContextProvider = (props: tProviderProps) => {
+export const CurrentLessonAssetsContextProvider = (props: tProviderProps) => {
   const { children } = props;
 
   const currentAuPathSel = useSelector(currentAuPath);

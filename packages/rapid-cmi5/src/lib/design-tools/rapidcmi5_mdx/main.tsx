@@ -10,7 +10,6 @@ import Landing from './Landing';
 import { Provider } from 'react-redux';
 import { persistor, store } from '../../redux/store';
 import { PersistGate } from 'redux-persist/integration/react';
-import { FsAssetsContextProvider } from '../course-builder/GitViewer/session/CurrentLessonAssetsContext';
 
 export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {
   return (
@@ -18,13 +17,11 @@ export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {
       <PersistGate loading={null} persistor={persistor}>
         <RapidCmi5OptsProvider opts={rapidCmi5Opts}>
           <GitContextProvider>
-            <FsAssetsContextProvider>
-              <RC5ContextProvider>
-                <ElectronEventsBridge />
-                <RC5Modals />
-                <Landing showHomeButton={rapidCmi5Opts.showHomeButton} />
-              </RC5ContextProvider>
-            </FsAssetsContextProvider>
+            <RC5ContextProvider>
+              <ElectronEventsBridge />
+              <RC5Modals />
+              <Landing showHomeButton={rapidCmi5Opts.showHomeButton} />
+            </RC5ContextProvider>
           </GitContextProvider>
         </RapidCmi5OptsProvider>
       </PersistGate>

@@ -108,18 +108,12 @@ function LazyImage({
   const [url, setUrl] = useState<string>(src);
 
   const { getLocalFileBlobUrl } = useFsAssets();
-  const imageDir = useSelector(currentAuPath);
 
   // if images are local, handle that situation
   useEffect(() => {
     setUrl(src);
 
     if (!src.startsWith('./') && !src.startsWith('../')) {
-      return;
-    }
-
-    if (!imageDir) {
-      debugLogError('No lesson au path dir');
       return;
     }
 
@@ -130,7 +124,7 @@ function LazyImage({
     // before the upload exists locally. Thus, it is necessary to do another
     // attempt in loading the local image.
     const loadImage = async () => {
-      const blobUrl = await getLocalFileBlobUrl(imageDir);
+      const blobUrl = await getLocalFileBlobUrl(src);
       if (!blobUrl && loadAttemptCtr < MAX_LOAD_ATTEMPTS) {
         setTimeout(() => {
           // console.log('load image attempt', loadAttemptCtr);
@@ -145,7 +139,7 @@ function LazyImage({
     loadImage().catch((err) => {
       debugLogError(`Could not load image ${err}`);
     });
-  }, [imageDir, src]);
+  }, [src]);
 
   // Build dimension styles that work correctly with the CSS max-width: 100% rule.
   // - width only: cap at that pixel value, height auto (natural AR preserved)

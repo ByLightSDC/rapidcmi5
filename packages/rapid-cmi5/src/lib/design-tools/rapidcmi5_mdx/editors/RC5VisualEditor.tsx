@@ -114,6 +114,7 @@ import { ErrorBoundary } from './ErrorBoundary';
 import { linkDialogPlugin } from '../plugins/link-dialog';
 import { draggableBlockPlugin } from '../plugins/draggable-block';
 import { gutterClickPlugin } from '../plugins/gutter-click/GutterClickPlugin';
+import { CurrentLessonAssetsContextProvider } from '../../course-builder/GitViewer/session/CurrentLessonAssetsContext';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -763,7 +764,8 @@ function RC5VisualEditor() {
     debugLog('error src', payload, undefined, 'editor');
   };
   return (
-    <>
+    // Visual editor will be able to access Images and Assets from the file system
+    <CurrentLessonAssetsContextProvider>
       {thePlugins && thePlugins.length > 0 && currentCourse ? (
         <Box
           className={themeClass}
@@ -810,7 +812,7 @@ function RC5VisualEditor() {
         </Box>
       )}
       {/* <SharedFormModals isModal={false} /> */}
-    </>
+    </CurrentLessonAssetsContextProvider>
   );
 }
 

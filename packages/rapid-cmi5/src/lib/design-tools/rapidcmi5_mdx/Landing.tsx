@@ -58,6 +58,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { useRC5Prompts } from './modals/useRC5Prompts';
 import { listItemProps } from './drawers/components/LessonTreeNode';
 import { getSvgStyleIcon, StyleIconTypeEnum } from './styles/styleSvgConstants';
+import { CurrentLessonAssetsContextProvider } from '../course-builder/GitViewer/session/CurrentLessonAssetsContext';
 
 enum RepoActionEnum {
   Config,
