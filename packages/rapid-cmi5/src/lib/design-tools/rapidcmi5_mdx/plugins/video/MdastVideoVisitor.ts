@@ -34,16 +34,18 @@ export const MdastHtmlVideoVisitor: MdastImportVisitor<Mdast.Html> = {
     const title = video.title;
     const width = video.width;
     const height = video.height;
-    const videoId = video.getAttribute('data-video-id') || undefined; // ✅ Extract videoId from HTML
+    const videoId = video.getAttribute('data-video-id') || undefined;
     const autoplay = video.hasAttribute('autoplay');
+    const captionSrc = video.getAttribute('data-caption-src') || undefined;
 
     const videoNode = $createVideoNode({
       src: src || '',
       title,
       width,
       height,
-      videoId, // ✅ Pass videoId to preserve GUID
+      videoId,
       autoplay,
+      captionSrc,
     });
 
     if (lexicalParent.getType() === 'root') {
@@ -75,9 +77,10 @@ export const MdastJsxVideoVisitor: MdastImportVisitor<
     const title = getAttributeValue(mdastNode, 'title');
     const height = getAttributeValue(mdastNode, 'height');
     const width = getAttributeValue(mdastNode, 'width');
-    const videoId = getAttributeValue(mdastNode, 'data-video-id'); // ✅ Extract videoId
+    const videoId = getAttributeValue(mdastNode, 'data-video-id');
     const autoplayAttr = getAttributeValue(mdastNode, 'autoplay');
     const autoplay = autoplayAttr !== undefined;
+    const captionSrc = getAttributeValue(mdastNode, 'data-caption-src');
 
     const rest = mdastNode.attributes.filter((a) => {
       return (
@@ -89,6 +92,7 @@ export const MdastJsxVideoVisitor: MdastImportVisitor<
           'width',
           'controls',
           'data-video-id',
+          'data-caption-src',
           'autoplay',
           'muted',
         ].includes(a.name)
@@ -101,8 +105,9 @@ export const MdastJsxVideoVisitor: MdastImportVisitor<
       width: width ? parseInt(width, 10) : undefined,
       height: height ? parseInt(height, 10) : undefined,
       rest,
-      videoId, // ✅ Pass videoId to preserve GUID
+      videoId,
       autoplay,
+      captionSrc: captionSrc || undefined,
     });
 
     if (lexicalParent.getType() === 'root') {

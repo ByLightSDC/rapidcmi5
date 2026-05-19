@@ -18,7 +18,7 @@ import {
   Switch,
   Typography,
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { alpha, styled, useTheme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid2';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 
@@ -27,6 +27,7 @@ import {
   ComboBoxSelectorUi,
   ModalDialog,
   TextFieldMainUi,
+  ViewExpander,
 } from '@rapid-cmi5/ui';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 
@@ -59,7 +60,13 @@ export const VideoDialog: React.FC = () => {
   const [width, setWidth] = useState<string>('');
   const [height, setHeight] = useState<string>('');
   const [autoplay, setAutoplay] = useState<boolean>(false);
+  const [captionSrc, setCaptionSrc] = useState<string>('');
+  const [selectedCaptionFiles, setSelectedCaptionFiles] =
+    useState<FileList | null>(null);
+  const [captionFileOptions, setCaptionFileOptions] = useState<string[]>([]);
+  const [dialogOpenCount, setDialogOpenCount] = useState(0);
   const { handleGetFolderStructure } = useContext(GitContext);
+  const theme = useTheme();
 
   // get the state from Gurx
   const [state, videoFilePath] = useCellValues(
@@ -78,6 +85,8 @@ export const VideoDialog: React.FC = () => {
       setWidth(state.initialValues.width?.toString() ?? '');
       setHeight(state.initialValues.height?.toString() ?? '');
       setAutoplay(state.initialValues.autoplay ?? false);
+      setCaptionSrc(state.initialValues.captionSrc ?? '');
+      setDialogOpenCount((c) => c + 1);
       if (state.initialValues.rest) {
         const styleAttribute = state.initialValues.rest.find(
           //@ts-ignore
@@ -95,10 +104,13 @@ export const VideoDialog: React.FC = () => {
       setWidth('');
       setHeight('');
       setAutoplay(false);
+      setCaptionSrc('');
+      setDialogOpenCount((c) => c + 1);
     }
 
-    // clear the file regardless of the editing state
+    // clear the files regardless of the editing state
     setSelectedFiles(null);
+    setSelectedCaptionFiles(null);
   }, [state]);
 
   // set up publishers, etc.
@@ -131,6 +143,8 @@ export const VideoDialog: React.FC = () => {
       width: width ? parseInt(width, 10) : undefined,
       height: height ? parseInt(height, 10) : undefined,
       autoplay: autoplay,
+      captionSrc: captionSrc || undefined,
+      captionFile: selectedCaptionFiles,
     };
 
     saveVideo(videoParams);
@@ -169,6 +183,34 @@ export const VideoDialog: React.FC = () => {
     fetchData();
   }, [videoFilePath, src, state.type]);
 
+  // fetch available .vtt caption files from the same video directory
+  useEffect(() => {
+    async function fetchCaptionFiles() {
+      try {
+        const treeData = await handleGetFolderStructure(videoFilePath, true);
+        const vttOptions: string[] = [];
+
+        if (state.type === 'editing' && state.initialValues.captionSrc) {
+          vttOptions.push(
+            state.initialValues.captionSrc.replace(VIDEO_DIR, ''),
+          );
+        }
+
+        for (let i = 0; i < treeData.length; i++) {
+          const fileName = treeData[i].name as string;
+          if (fileName.endsWith('.vtt') && vttOptions[0] !== fileName) {
+            vttOptions.push(fileName);
+          }
+        }
+        setCaptionFileOptions(vttOptions);
+      } catch {
+        setCaptionFileOptions([]);
+      }
+    }
+
+    fetchCaptionFiles();
+  }, [videoFilePath, state.type]);
+
   // handle file selection
   const handleFileSelected = (e: ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
@@ -205,147 +247,224 @@ export const VideoDialog: React.FC = () => {
         }}
       >
         <>
-          <Stack spacing={2}>
-            <Paper
-              variant="outlined"
-              sx={{
-                p: 2,
-              }}
-            >
-              <Stack spacing={2}>
-                {/* Files upload section */}
-                <Stack direction="row" spacing={2}>
-                  <ButtonModalMainUi
-                    component="label"
-                    role={undefined}
-                    tabIndex={-1}
-                    startIcon={<UploadFileIcon />}
+          {/* <Stack spacing={2}> */}
+          <Grid container alignItems="center" sx={{ width: '100%' }}>
+            <Grid size={12} sx={{ mb: 1}}>
+              {/* Files upload section */}
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 2,
+                  mb: 1,
+                  borderRadius: 2,
+                  backgroundColor: alpha((theme as any).input.fill, 1.0),
+                }}
+              >
+                <Stack direction="column">
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    sx={{ mb: 2, width: '100%' }}
                   >
-                    Upload File
-                    <VisuallyHiddenInput
-                      type="file"
-                      accept="video/*" // restrict to video files only
-                      onChange={handleFileSelected}
-                    />
-                  </ButtonModalMainUi>
-                  <Box /* vertically center the text */
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
+                    <ButtonModalMainUi
+                      component="label"
+                      role={undefined}
+                      tabIndex={-1}
+                      startIcon={<UploadFileIcon />}
+                    >
+                      Upload File
+                      <VisuallyHiddenInput
+                        type="file"
+                        accept="video/*" // restrict to video files only
+                        onChange={handleFileSelected}
+                      />
+                    </ButtonModalMainUi>
+                    <Box /* vertically center the text */
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Typography variant="caption" align="center">
+                        {selectedFiles && selectedFiles.length > 0 ? (
+                          <Box component="span">
+                            {Array.from(selectedFiles).map(
+                              (file: File, index: number) => (
+                                <span key={file.name}>
+                                  {file.name}
+                                  {index < selectedFiles.length - 1 && ', '}
+                                </span>
+                              ),
+                            )}
+                          </Box>
+                        ) : (
+                          'No video file chosen'
+                        )}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                  {/* URL section */}
+                  <ComboBoxSelectorUi
+                    label="Video"
+                    id="video"
+                    options={fileOptions}
+                    defaultValue={src.replace(VIDEO_DIR, '')}
+                    showAllOptions={true}
+                    autocompleteProps={{
+                      freeSolo: true,
                     }}
-                  >
-                    <Typography variant="caption" align="center">
-                      {selectedFiles && selectedFiles.length > 0 ? (
-                        <Box component="span">
-                          {Array.from(selectedFiles).map(
-                            (file: File, index: number) => (
-                              <span key={file.name}>
-                                {file.name}
-                                {index < selectedFiles.length - 1 && ', '}
-                              </span>
-                            ),
-                          )}
-                        </Box>
-                      ) : (
-                        'No video file chosen'
-                      )}
-                    </Typography>
-                  </Box>
+                    onSelect={(selectionValue: any) => {
+                      if (selectionValue.startsWith('http')) {
+                        // if this is not a file system video
+                        setSrc(selectionValue);
+                      } else {
+                        setSrc(`${VIDEO_DIR}${selectionValue}`);
+                        setTitle(selectionValue.replace(/\.[^/.]+$/, '')); // removes file extension
+                      }
+                    }}
+                    infoText={`Specify URL or choose from uploaded files. Videos that appear here can be found in Course Files. Expand the lesson folder and look for 'Assets/Videos'.`}
+                  />
                 </Stack>
-              </Stack>
-            </Paper>
-
-            {/* URL section */}
-            <ComboBoxSelectorUi
-              label="Video"
-              id="video"
-              options={fileOptions}
-              defaultValue={src.replace(VIDEO_DIR, '')}
-              showAllOptions={true}
-              autocompleteProps={{
-                freeSolo: true,
-              }}
-              onSelect={(selectionValue: any) => {
-                if (selectionValue.startsWith('http')) {
-                  // if this is not a file system video
-                  setSrc(selectionValue);
-                } else {
-                  setSrc(`${VIDEO_DIR}${selectionValue}`);
-                  setTitle(selectionValue.replace(/\.[^/.]+$/, '')); // removes file extension
-                }
-              }}
-              infoText={`Specify URL or choose from uploaded files. Videos that appear here can be found in Course Files. Expand the lesson folder and look for 'Assets/Videos'.`}
-            />
-
-            {/* Title section */}
-            <TextFieldMainUi
-              autoFocus
-              margin="dense"
-              label="Title"
-              name="video-title"
-              type="text"
-              fullWidth
-              value={title}
-              onChange={(textValue: string) => setTitle(textValue)}
-              infoText={'Video Tooltip Text'}
-            />
-
-            {/* Width/Height section */}
-            <Grid container alignItems="center" sx={{ width: '100%' }}>
-              <Grid size={6}>
-                <TextFieldMainUi
-                  margin="dense"
-                  label="Width (px)"
-                  name="video-width"
-                  type="number"
-                  fullWidth
-                  value={width}
-                  onChange={(textValue: string) => setWidth(textValue)}
-                  infoText={'Optional video width in pixels'}
-                />
-              </Grid>
-              <Grid size={6}>
-                <TextFieldMainUi
-                  margin="dense"
-                  label="Height (px)"
-                  name="video-height"
-                  type="number"
-                  fullWidth
-                  value={height}
-                  onChange={(textValue: string) => setHeight(textValue)}
-                  infoText={'Optional video height in pixels'}
-                />
-              </Grid>
+              </Paper>
             </Grid>
 
-            {/* Style section */}
-            <Grid container alignItems="center" sx={{ width: '100%' }}>
-              <Grid size={12}>
-                <TextFieldMainUi
-                  margin="dense"
-                  label="Styles"
-                  name="video-styles"
-                  type="text"
-                  fullWidth
-                  value={videoStyle}
-                  onChange={(textValue: string) => setVideoStyle(textValue)}
-                  infoText="Inline styles Ex. border-radius:8px;"
-                />
-              </Grid>
-            </Grid>
-
+            <Grid size={0.2} />
             {/* Autoplay section */}
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={autoplay}
-                  onChange={(e) => setAutoplay(e.target.checked)}
-                  name="video-autoplay"
-                />
-              }
-              label="Autoplay"
-            />
-          </Stack>
+            <Grid size={2.6}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={autoplay}
+                    onChange={(e) => setAutoplay(e.target.checked)}
+                    name="video-autoplay"
+                  />
+                }
+                label="Autoplay"
+              />
+            </Grid>
+            {/* Width/Height section */}
+
+            <Grid size={4.5}>
+              <TextFieldMainUi
+                margin="dense"
+                label="Width (px)"
+                name="video-width"
+                type="number"
+                value={width}
+                onChange={(textValue: string) => setWidth(textValue)}
+                infoText={'Optional video width in pixels'}
+              />
+            </Grid>
+            <Grid size={4.5}>
+              <TextFieldMainUi
+                margin="dense"
+                label="Height (px)"
+                name="video-height"
+                type="number"
+                value={height}
+                onChange={(textValue: string) => setHeight(textValue)}
+                infoText={'Optional video height in pixels'}
+              />
+            </Grid>
+
+            {/* Captions section */}
+            <Grid size={12} sx={{ mt: 2 }}>
+              <ViewExpander
+                headerSxProps={{ p: '2px', mt: '2px' }}
+                title="Accessibility"
+                titleVariant="body1"
+                //titleSxProps={{ fontWeight: 600 }}
+                defaultIsExpanded={false}
+              >
+                <Paper
+                  variant="outlined"
+                  sx={{
+                    p: 0,
+                    borderRadius: 2,
+                    backgroundColor: alpha((theme as any).input.fill, 1.0),
+                    // backgroundColor: alpha(theme.palette.background.paper, .8),
+                    mb: 2,
+                  }}
+                >
+                  <Stack spacing={2} sx={{ p: 2 }}>
+                    <Stack direction="row" spacing={2}>
+                      <ButtonModalMainUi
+                        component="label"
+                        role={undefined}
+                        tabIndex={-1}
+                        startIcon={<UploadFileIcon />}
+                      >
+                        Upload .vtt File
+                        <VisuallyHiddenInput
+                          type="file"
+                          accept=".vtt"
+                          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                            const fileList = e.target.files;
+                            if (fileList && fileList.length > 0) {
+                              setSelectedCaptionFiles(fileList);
+                              setCaptionSrc(`${VIDEO_DIR}${fileList[0].name}`);
+                            } else {
+                              setSelectedCaptionFiles(null);
+                            }
+                          }}
+                        />
+                      </ButtonModalMainUi>
+                    </Stack>
+                    <ComboBoxSelectorUi
+                      key={dialogOpenCount}
+                      label="Captions File (.vtt)"
+                      id="caption-src"
+                      options={captionFileOptions}
+                      defaultValue={captionSrc.replace(VIDEO_DIR, '')}
+                      showAllOptions={true}
+                      autocompleteProps={{
+                        freeSolo: true,
+                      }}
+                      onSelect={(selectionValue: any) => {
+                        if (!selectionValue) {
+                          setCaptionSrc('');
+                        } else if (
+                          selectionValue.startsWith('http') ||
+                          selectionValue.startsWith('./')
+                        ) {
+                          setCaptionSrc(selectionValue);
+                        } else {
+                          setCaptionSrc(`${VIDEO_DIR}${selectionValue}`);
+                        }
+                      }}
+                      infoText="Select or specify a WebVTT (.vtt) caption file for accessibility."
+                    />
+
+                    {/* Title section */}
+                    <TextFieldMainUi
+                      autoFocus
+                      margin="dense"
+                      label="Video Tooltip Title"
+                      name="video-title"
+                      type="text"
+                      fullWidth
+                      value={title}
+                      onChange={(textValue: string) => setTitle(textValue)}
+                      //infoText={'Video Tooltip Text'}
+                    />
+                  </Stack>
+                </Paper>
+              </ViewExpander>
+            </Grid>
+            {/* Style section */}
+            <Grid size={12} sx={{ mt: 2 }}>
+              <TextFieldMainUi
+                margin="dense"
+                label="Styles"
+                name="video-styles"
+                type="text"
+                fullWidth
+                value={videoStyle}
+                onChange={(textValue: string) => setVideoStyle(textValue)}
+                infoText="Inline styles Ex. border-radius:8px;"
+              />
+            </Grid>
+          </Grid>
         </>
       </ModalDialog>
     </>
