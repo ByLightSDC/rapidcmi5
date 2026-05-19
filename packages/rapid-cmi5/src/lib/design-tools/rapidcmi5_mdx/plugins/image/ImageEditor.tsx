@@ -68,7 +68,7 @@ import {
   imagePreviewHandler$,
   resolveBlockMaxWidth,
 } from '@rapid-cmi5/ui';
-import { currentAuPath } from '@rapid-cmi5/react-editor';
+import { currentAuPath } from '../../../../redux/courseBuilderReducer';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 export interface ImageEditorProps {
@@ -259,7 +259,11 @@ export function ImageEditor({
     (item): item is MdxJsxAttribute =>
       item.type === 'mdxJsxAttribute' && item.name === 'textAlign',
   );
-  const imageTextAlign = textAlignAttr?.value as 'left' | 'center' | 'right' | undefined;
+  const imageTextAlign = textAlignAttr?.value as
+    | 'left'
+    | 'center'
+    | 'right'
+    | undefined;
   if (imageTextAlign) {
     wrapperStyle.textAlign = imageTextAlign;
   }
@@ -688,10 +692,20 @@ export function ImageEditor({
         <div
           className={styles['imageWrapper']}
           data-editor-block-type="image"
-          {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
+          {...(contentWidth !== undefined
+            ? { 'data-block-override': 'true' }
+            : {})}
           {...(blockMaxWidth === null ? { 'data-block-expand': 'true' } : {})}
-          {...(blockMaxWidth === null && imageTextAlign ? { 'data-image-align': imageTextAlign } : {})}
-          {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as React.CSSProperties } : {})}
+          {...(blockMaxWidth === null && imageTextAlign
+            ? { 'data-image-align': imageTextAlign }
+            : {})}
+          {...(contentWidth !== undefined
+            ? {
+                style: {
+                  '--block-max-width': blockMaxWidth ?? 'none',
+                } as React.CSSProperties,
+              }
+            : {})}
         >
           <div
             id={`image-labels-${id}`}

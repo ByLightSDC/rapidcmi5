@@ -27,17 +27,13 @@ import {
   QuotePreset,
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
-import { useCallback, useContext, useState } from 'react';
-import { join } from 'path-browserify';
-import { useSelector } from 'react-redux';
-import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
-import { currentAuPath } from '../../../../redux/courseBuilderReducer';
-import quoteAuthorPlaceholder from './assets/quoteAuthorPlaceholder.png';
+import { useCallback, useState } from 'react';
 
-const PLACEHOLDER_AVATAR_DIR = 'Assets/Images';
-const PLACEHOLDER_AVATAR_FILENAME = 'quoteAuthorPlaceholder.png';
-const PLACEHOLDER_AVATAR_REL = `./${PLACEHOLDER_AVATAR_DIR}/${PLACEHOLDER_AVATAR_FILENAME}`;
+import quoteAuthorPlaceholder from './assets/quoteAuthorPlaceholder.png';
 import { useSelectionHelper } from '../../../../hooks/useSelectionHelper';
+import { useFsAssets } from '../../../course-builder/GitViewer/session/CurrentLessonAssetsContext';
+
+const PLACEHOLDER_AVATAR_FILENAME = 'quoteAuthorPlaceholder.png';
 
 /**
  * A toolbar button component that inserts a quotes into the editor.
@@ -50,35 +46,7 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
   const theme: any = useTheme();
   const selectionHelper = useSelectionHelper();
   const [isConfiguring, setIsConfiguring] = useState(false);
-  const auPath = useSelector(currentAuPath);
-  const { handleCreateFile, handlePathExists, handleStageFile } =
-    useContext(GitContext);
-
-  /**
-   * If the user didn't pick an avatar, write the bundled placeholder PNG into
-   * the current lesson's Assets/Images/ folder (only when it isn't there yet)
-   * and return the lesson-relative path to reference from MDX.
-   */
-  const ensureDefaultAvatar = useCallback(async (): Promise<string> => {
-    if (!auPath) throw Error('No AU Path was found.');
-
-    // The location of where the default avatar will be placed
-    const relPath = join(
-      auPath,
-      PLACEHOLDER_AVATAR_DIR,
-      PLACEHOLDER_AVATAR_FILENAME,
-    );
-
-    const exists = await handlePathExists(relPath);
-    if (!exists) {
-      // download from assets folder and upload to the local file system
-      const res = await fetch(quoteAuthorPlaceholder);
-      const buf = await res.arrayBuffer();
-      await handleCreateFile(relPath, false, new Uint8Array(buf));
-      await handleStageFile(relPath);
-    }
-    return PLACEHOLDER_AVATAR_REL;
-  }, [auPath, handlePathExists, handleCreateFile, handleStageFile]);
+  const { getAsset, uploadAsset } = useFsAssets();
 
   /**
    * Inserts default Quotes at the current selection
@@ -138,15 +106,21 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
    */
   const handleSelect = useCallback(
     async (preset: QuotePreset, avatar: string) => {
-      let finalAvatar = avatar;
-      // Inject the default quote image if none was selected
+      let finalAvatar =
+        avatar || (await getAsset('image', PLACEHOLDER_AVATAR_FILENAME));
+      // ensure the defualt avatar is uploaded if no avatar was supplied
       if (!finalAvatar) {
-        finalAvatar = await ensureDefaultAvatar();
+        const res = await fetch(quoteAuthorPlaceholder);
+        finalAvatar = await uploadAsset(
+          'image',
+          PLACEHOLDER_AVATAR_FILENAME,
+          new Uint8Array(await res.arrayBuffer()),
+        );
       }
       insertAtSelection(preset.id, finalAvatar);
       setIsConfiguring(false);
     },
-    [insertAtSelection, ensureDefaultAvatar],
+    [insertAtSelection, getAsset, uploadAsset],
   );
 
   /**

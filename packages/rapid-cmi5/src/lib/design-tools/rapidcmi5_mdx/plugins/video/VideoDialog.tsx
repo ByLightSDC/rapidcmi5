@@ -25,10 +25,11 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import {
   ButtonModalMainUi,
   ComboBoxSelectorUi,
+  debugLogError,
   ModalDialog,
   TextFieldMainUi,
 } from '@rapid-cmi5/ui';
-import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
+import { useFsAssets } from '../../../course-builder/GitViewer/session/CurrentLessonAssetsContext';
 
 // used for uploading files
 const VisuallyHiddenInput = styled('input')({
@@ -59,7 +60,7 @@ export const VideoDialog: React.FC = () => {
   const [width, setWidth] = useState<string>('');
   const [height, setHeight] = useState<string>('');
   const [autoplay, setAutoplay] = useState<boolean>(false);
-  const { handleGetFolderStructure } = useContext(GitContext);
+  const { getAllAssets } = useFsAssets();
 
   // get the state from Gurx
   const [state, videoFilePath] = useCellValues(
@@ -142,23 +143,13 @@ export const VideoDialog: React.FC = () => {
 
     async function fetchData() {
       try {
-        const treeData = await handleGetFolderStructure(path, true);
-        const fileOptions = [];
-
         // add the current source value
         if (state.type === 'editing' && state.initialValues.src) {
           fileOptions.push(state.initialValues.src.replace(VIDEO_DIR, ''));
         }
 
-        // add the list of files
-        for (let i = 0; i < treeData.length; i++) {
-          const videoName = treeData[i].name;
-          if (fileOptions[0] !== videoName) {
-            // don't add if already added as initial value
-            fileOptions.push(videoName);
-          }
-        }
-        setFileOptions(fileOptions);
+        const files = await getAllAssets('video');
+        setFileOptions(files);
       } catch (error) {
         // Directory doesn't exist yet - this is okay, it will be created when first video is uploaded
         console.debug('Video directory does not exist yet:', path);
@@ -166,7 +157,9 @@ export const VideoDialog: React.FC = () => {
       }
     }
 
-    fetchData();
+    fetchData().catch((err) => {
+      debugLogError(`Could not fetch video data ${err}`);
+    });
   }, [videoFilePath, src, state.type]);
 
   // handle file selection

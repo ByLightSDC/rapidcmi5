@@ -1,16 +1,18 @@
-import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 
-import {
-  closeImageDialog$,
-  saveImage$,
-  imageDialogState$,
-  imageFilePath$,
-} from './index';
+import { closeImageDialog$, saveImage$, imageDialogState$ } from './index';
 
 import { useCellValues, usePublisher } from '@mdxeditor/gurx';
 
 // MUI
-import { Box, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
+import {
+  Box,
+  IconButton,
+  Paper,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import LockIcon from '@mui/icons-material/Lock';
@@ -19,11 +21,12 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import {
   ButtonModalMainUi,
   ComboBoxSelectorUi,
+  debugLogError,
   ModalDialog,
   TextFieldMainUi,
 } from '@rapid-cmi5/ui';
 
-import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
+import { useFsAssets } from '../../../course-builder/GitViewer/session/CurrentLessonAssetsContext';
 
 // used for uploading files
 const VisuallyHiddenInput = styled('input')({
@@ -63,14 +66,10 @@ export const ImageDialog: React.FC = () => {
   // natural dims of the current image — loaded from the resolved blob URL
   const naturalDimsRef = useRef<{ width: number; height: number } | null>(null);
 
-  const { isFsLoaded, handleGetFolderStructure, handlePathExists } =
-    useContext(GitContext);
+  const { getAllAssets } = useFsAssets();
 
   // get the state from Gurx
-  const [state, imageFilePath] = useCellValues(
-    imageDialogState$,
-    imageFilePath$,
-  );
+  const [state] = useCellValues(imageDialogState$);
 
   // set the initial values based on if the user is inserting a new image or
   // editing an existing image
@@ -86,8 +85,14 @@ export const ImageDialog: React.FC = () => {
       setImageStyle('');
       // If the image has no stored px dimensions, we'll populate from natural dims
       // once the image loads (see effect below). Set empty for now.
-      const storedWidth = typeof state.initialValues.width === 'number' ? state.initialValues.width.toString() : '';
-      const storedHeight = typeof state.initialValues.height === 'number' ? state.initialValues.height.toString() : '';
+      const storedWidth =
+        typeof state.initialValues.width === 'number'
+          ? state.initialValues.width.toString()
+          : '';
+      const storedHeight =
+        typeof state.initialValues.height === 'number'
+          ? state.initialValues.height.toString()
+          : '';
       setWidth(storedWidth);
       setHeight(storedHeight);
       if (state.initialValues.rest) {
@@ -122,14 +127,19 @@ export const ImageDialog: React.FC = () => {
   // If no stored px dims, also pre-populate the width/height fields.
   useEffect(() => {
     if (state.type !== 'editing') return;
-    const urlToLoad = state.initialValues.resolvedSrc ?? state.initialValues.src;
+    const urlToLoad =
+      state.initialValues.resolvedSrc ?? state.initialValues.src;
     if (!urlToLoad) return;
     const img = new Image();
     img.onload = () => {
-      naturalDimsRef.current = { width: img.naturalWidth, height: img.naturalHeight };
+      naturalDimsRef.current = {
+        width: img.naturalWidth,
+        height: img.naturalHeight,
+      };
       const storedW = state.initialValues.width;
       const storedH = state.initialValues.height;
-      const hasBothDims = typeof storedW === 'number' && typeof storedH === 'number';
+      const hasBothDims =
+        typeof storedW === 'number' && typeof storedH === 'number';
       if (hasBothDims) {
         // If the stored ratio differs from the natural ratio by more than 1%, the
         // user intentionally broke the aspect ratio — open the dialog unlocked.
@@ -185,14 +195,9 @@ export const ImageDialog: React.FC = () => {
 
   // fill in the list of file options
   useEffect(() => {
-    const path = imageFilePath;
-
     async function fetchData() {
       try {
-        const exists = await handlePathExists(path);
-        if (!exists) return;
-
-        const treeData = await handleGetFolderStructure(path, true);
+        const files = await getAllAssets('image');
         const fileOptions = [];
 
         // add the current source value
@@ -200,26 +205,19 @@ export const ImageDialog: React.FC = () => {
           fileOptions.push(state.initialValues.src.replace(IMAGE_DIR, ''));
         }
 
-        // add the list of files
-        for (let i = 0; i < treeData.length; i++) {
-          const imageName = treeData[i].name;
-          if (fileOptions[0] !== imageName) {
-            // don't add if already added as initial value
-            fileOptions.push(imageName);
-          }
-        }
-        setFileOptions(fileOptions);
+        console.log(files);
+        setFileOptions(files);
       } catch (error) {
         // Directory doesn't exist yet - this is okay, it will be created when first image is uploaded
-        console.debug('Image directory does not exist yet:', path);
+        console.debug('Image directory does not exist yet or fs is not ready');
         setFileOptions([]);
       }
     }
 
-    if (isFsLoaded) {
-      fetchData();
-    }
-  }, [imageFilePath, src, state.type, isFsLoaded]);
+    fetchData().catch((err) => {
+      debugLogError(`"Could not fetch images ${err}`);
+    });
+  }, [src, state.type]);
 
   // handle file selection
   const handleFileSelected = (e: ChangeEvent<HTMLInputElement>) => {
@@ -381,24 +379,42 @@ export const ImageDialog: React.FC = () => {
                   value={width}
                   onChange={(textValue: string) => {
                     setWidth(textValue);
-                    if (aspectLocked && naturalDimsRef.current && textValue !== '') {
-                      const ratio = naturalDimsRef.current.height / naturalDimsRef.current.width;
-                      const computed = Math.round(parseInt(textValue, 10) * ratio);
+                    if (
+                      aspectLocked &&
+                      naturalDimsRef.current &&
+                      textValue !== ''
+                    ) {
+                      const ratio =
+                        naturalDimsRef.current.height /
+                        naturalDimsRef.current.width;
+                      const computed = Math.round(
+                        parseInt(textValue, 10) * ratio,
+                      );
                       setHeight(isNaN(computed) ? '' : String(computed));
                     }
                   }}
                   infoText={'Optional image width in pixels'}
                 />
               </Box>
-              <Tooltip title={aspectLocked ? 'Unlock aspect ratio' : 'Lock aspect ratio'}>
+              <Tooltip
+                title={
+                  aspectLocked ? 'Unlock aspect ratio' : 'Lock aspect ratio'
+                }
+              >
                 <IconButton
                   size="small"
                   onClick={() => setAspectLocked((prev) => !prev)}
                   color={aspectLocked ? 'primary' : 'default'}
-                  aria-label={aspectLocked ? 'Unlock aspect ratio' : 'Lock aspect ratio'}
+                  aria-label={
+                    aspectLocked ? 'Unlock aspect ratio' : 'Lock aspect ratio'
+                  }
                   sx={{ mt: '4px', flexShrink: 0 }}
                 >
-                  {aspectLocked ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />}
+                  {aspectLocked ? (
+                    <LockIcon fontSize="small" />
+                  ) : (
+                    <LockOpenIcon fontSize="small" />
+                  )}
                 </IconButton>
               </Tooltip>
               <Box sx={{ flex: '1 1 0', minWidth: 0 }}>
@@ -411,9 +427,17 @@ export const ImageDialog: React.FC = () => {
                   value={height}
                   onChange={(textValue: string) => {
                     setHeight(textValue);
-                    if (aspectLocked && naturalDimsRef.current && textValue !== '') {
-                      const ratio = naturalDimsRef.current.width / naturalDimsRef.current.height;
-                      const computed = Math.round(parseInt(textValue, 10) * ratio);
+                    if (
+                      aspectLocked &&
+                      naturalDimsRef.current &&
+                      textValue !== ''
+                    ) {
+                      const ratio =
+                        naturalDimsRef.current.width /
+                        naturalDimsRef.current.height;
+                      const computed = Math.round(
+                        parseInt(textValue, 10) * ratio,
+                      );
                       setWidth(isNaN(computed) ? '' : String(computed));
                     }
                   }}

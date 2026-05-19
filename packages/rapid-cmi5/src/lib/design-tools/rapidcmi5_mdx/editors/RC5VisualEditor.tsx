@@ -98,7 +98,7 @@ import {
 } from '../../../redux/courseBuilderReducer';
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
 
-import { useImageFile } from '../data-hooks/useImageFile';
+import { useAssetUploadHandlers } from '../data-hooks/useImageFile';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
 import { directiveLinter } from './code/codeMirrorUtils';
@@ -255,13 +255,10 @@ function RC5VisualEditor() {
   );
 
   const {
-    imageFilePath,
-    imageUploadHandler,
-    videoFilePath,
-    videoUploadHandler,
-    audioFilePath,
-    audioUploadHandler,
-  } = useImageFile();
+    image: imageUploadHandler,
+    video: videoUploadHandler,
+    audio: audioUploadHandler,
+  } = useAssetUploadHandlers();
 
   // Preview handlers convert GitFS paths to blob URLs for browser display
   const imagePreviewHandler = useCallback(
@@ -394,17 +391,14 @@ function RC5VisualEditor() {
       animationDirectivePlugin(),
       imagePlugin({
         imageUploadHandler: imageUploadHandler,
-        imageFilePath: imageFilePath,
         imagePreviewHandler: imagePreviewHandler,
       }),
       videoPlugin({
         videoUploadHandler: videoUploadHandler,
-        videoFilePath: videoFilePath,
         videoPreviewHandler: videoPreviewHandler,
       }),
       audioPlugin({
         audioUploadHandler: audioUploadHandler,
-        audioFilePath: audioFilePath,
         audioPreviewHandler: audioPreviewHandler,
       }),
       animationPlugin({
@@ -472,14 +466,11 @@ function RC5VisualEditor() {
     }
   }, [
     isEditing,
-    imageFilePath,
     imageUploadHandler,
     imagePreviewHandler,
-    videoFilePath,
     videoUploadHandler,
     videoPreviewHandler,
     muiTheme.palette.mode,
-    audioFilePath,
     audioUploadHandler,
     audioPreviewHandler,
     // NOTE: currentAnimations is intentionally NOT in the dependency array
@@ -772,7 +763,6 @@ function RC5VisualEditor() {
     debugLog('error src', payload, undefined, 'editor');
   };
   return (
-    // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
       {thePlugins && thePlugins.length > 0 && currentCourse ? (
         <Box

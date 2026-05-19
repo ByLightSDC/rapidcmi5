@@ -18,9 +18,10 @@ import { useState, useContext } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
-import { useImageFile } from '../../data-hooks/useImageFile';
+import { useAssetUploadHandlers } from '../../data-hooks/useImageFile';
 import * as yup from 'yup';
-import { currentAuPath } from '@rapid-cmi5/react-editor';
+import { currentAuPath } from '../../../../redux/courseBuilderReducer';
+import { FILE_DIR } from '../../../course-builder/GitViewer/session/CurrentLessonAssetsContext';
 
 /**
  * Form course creators can use to attack files to a Lesson AU
@@ -49,13 +50,12 @@ export const DownloadFilesForm = ({
   outerSx?: SxProps;
   outerStyle?: OuterStyle;
 }) => {
-  const { fileUploadHandler } = useImageFile();
+  const { file: fileUploadHandler } = useAssetUploadHandlers();
   const validationSchema = yup.object().shape({});
   const auDir = useSelector(currentAuPath);
 
   const [formHeadTitle, setFormHeadTitle] = useState<string>('Files');
   const { getLocalFileBlob, getLocalFileBlobUrl } = useContext(GitContext);
-  const { defaultDownloadFilePath } = useImageFile();
   const isDebugId = false;
 
   /**
@@ -68,7 +68,7 @@ export const DownloadFilesForm = ({
       return null;
     }
     const theBlob = await getLocalFileBlob?.(
-      `./${defaultDownloadFilePath}/${fileData.path}`,
+      `./${FILE_DIR}/${fileData.path}`,
       auDir,
       fileData.type,
     );
@@ -123,7 +123,7 @@ export const DownloadFilesForm = ({
               <FileDownloadLink
                 fileData={fileData}
                 auDir={auDir}
-                filePath={`./${defaultDownloadFilePath}/${fileData.path}`}
+                filePath={`./${FILE_DIR}/${fileData.path}`}
                 getLinkUrl={getLocalFileBlobUrl}
               />
             );

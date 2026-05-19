@@ -187,11 +187,6 @@ export const insertImage$ = Signal<InsertImageParameters>((r) => {
 });
 
 /**
- * Holds the path for local file reading and writing.
- */
-export const imageFilePath$ = Cell<string>('');
-
-/**
  * Holds the autocomplete suggestions for image sources.
  * @group Image
  */
@@ -409,7 +404,6 @@ export const imagePlugin = realmPlugin<{
   ImageDialog?: (() => JSX.Element) | React.FC;
   EditImageToolbar?: (() => JSX.Element) | React.FC;
   imagePlaceholder?: (() => JSX.Element) | null;
-  imageFilePath?: string;
 }>({
   init(realm, params) {
     realm.pubIn({
@@ -434,7 +428,6 @@ export const imagePlugin = realmPlugin<{
       [editImageToolbarComponent$]:
         params?.EditImageToolbar ?? EditImageToolbar,
       [imagePlaceholder$]: params?.imagePlaceholder ?? ImagePlaceholder,
-      [imageFilePath$]: params?.imageFilePath,
     });
   },
 
@@ -448,7 +441,6 @@ export const imagePlugin = realmPlugin<{
       [editImageToolbarComponent$]:
         params?.EditImageToolbar ?? EditImageToolbar,
       [imagePlaceholder$]: params?.imagePlaceholder ?? ImagePlaceholder,
-      [imageFilePath$]: params?.imageFilePath,
     });
   },
 });
