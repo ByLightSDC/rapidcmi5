@@ -30,12 +30,7 @@ import {
 } from '../../CourseBuilderApiTypes';
 
 import { ViewModeEnum } from '../../CourseBuilderTypes';
-import {
-  debugLog,
-  debugLogError,
-  defaultCourseData,
-  hasModal,
-} from '@rapid-cmi5/ui';
+import { debugLog, debugLogError, defaultCourseData } from '@rapid-cmi5/ui';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import { ReadCommitResult } from 'isomorphic-git';
 import { sandboxIntro } from '../../../rapidcmi5_mdx/constants/sandboxIntro';
@@ -44,15 +39,11 @@ import { useGitOperations } from './useGitOperations';
 import { sandBoxName } from './constants';
 import { useCourseOperations } from './useCourseOperations';
 import { usePublishActions } from './usePublishActions';
-import { useImageCache } from './useImageCache';
 import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 import { INode } from 'react-accessible-treeview';
 import { FileContent, getRepoPath } from '../utils/fileSystem';
 import { GitOperations } from '../utils/gitOperations';
-import JSZip from 'jszip';
-import { FolderStruct } from '@rapid-cmi5/cmi5-build-common';
 import {
-  currentSlideNum,
   updateCourseData,
   setIsLessonMounted,
   setRepoViewScrollTop,
@@ -161,17 +152,6 @@ interface IGitContext {
   handleRenameFile: (oldFilepath: string, newName: string) => Promise<void>;
   handleGetFileContents: (filepath: string) => Promise<FileContent | null>;
   handleCopyFile: (src: string, dest: string) => Promise<void>;
-  getLocalFileBlob: (
-    filePath: string,
-    slidePath: string,
-    fileType?: string,
-  ) => Promise<Blob | MediaSource | null>;
-  getLocalFileBlobUrl: (
-    filePath: string,
-    slidePath: string,
-    fileType?: string,
-    shouldNotCache?: boolean,
-  ) => Promise<string | null>;
   handleNavToDesigner: () => void;
   handleNavToGitView: () => Promise<void>;
   handleNavToFile: (filePath: string) => void;
@@ -291,8 +271,6 @@ const defaultGitContext: IGitContext = {
   handleRemoveFile: () => {},
   syncCurrentCourseWithGit: async () => [],
   handleCreateCourse: async () => {},
-  getLocalFileBlob: async () => null,
-  getLocalFileBlobUrl: async () => null,
   handlePushRepo: async () => {},
   resolvePCTEProjects: async () => [],
   publishToPCTE: () => {},
@@ -348,7 +326,6 @@ export const GitContextProvider = (props: tProviderProps) => {
   const availableCourses = fileState?.availableCourses ?? [];
   const currentCourse = fileState.selectedCourse;
   const directoryTree = fileState.directoryTree;
-  const slideNumber = useSelector(currentSlideNum);
 
   const currentRepo = repoAccessObject?.repoName || null;
   const [localFileSystemLoaded, setLocalFileSystemLoaded] = useState(false);
@@ -370,13 +347,6 @@ export const GitContextProvider = (props: tProviderProps) => {
       rapidCmi5Opts.downloadCmi5Player,
       rapidCmi5Opts.processAu,
     );
-
-  const { getLocalFileBlob, getLocalFileBlobUrl } = useImageCache(
-    repoAccessObject,
-    currentCourse,
-    slideNumber,
-    gitFs,
-  );
 
   const {
     modifiedFiles,
@@ -1208,8 +1178,6 @@ export const GitContextProvider = (props: tProviderProps) => {
         handleRenameFile,
         handleGitCommitReset,
         handlePushRepo,
-        getLocalFileBlob,
-        getLocalFileBlobUrl,
         syncCurrentCourseWithGit,
         handleLoadCourse,
         currentRepo,

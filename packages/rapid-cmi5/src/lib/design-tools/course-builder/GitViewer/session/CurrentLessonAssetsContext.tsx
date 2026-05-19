@@ -3,14 +3,19 @@
   The purpose of the context is to upload and retrieve assets based on your current AU while in design mode.
 */
 
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useEffect, useRef } from 'react';
 
 import { useSelector } from 'react-redux';
 import { getFsInstance } from '../utils/gitFsInstance';
 import { join } from 'path-browserify';
 import { currentRepoAccessObjectSel } from '../../../../redux/repoManagerReducer';
-import { currentAuPath } from '../../../../redux/courseBuilderReducer';
+import {
+  currentAuPath,
+  currentSlideNum,
+} from '../../../../redux/courseBuilderReducer';
 import { useGitOperations } from './useGitOperations';
+import { getRepoPath } from '../utils/fileSystem';
+import { debugLog } from '@rapid-cmi5/ui';
 
 export type AssetType = 'image' | 'video' | 'audio' | 'file';
 
@@ -32,12 +37,23 @@ interface IFsAssetsContext {
     data: Uint8Array<ArrayBuffer>,
   ) => Promise<string>;
   getAllAssets: (type: AssetType) => Promise<string[]>;
+  getLocalFileBlob: (
+    filePath: string,
+    slidePath: string,
+    fileType?: string,
+  ) => Promise<Blob | MediaSource | null>;
+  getLocalFileBlobUrl: (
+    filePath: string,
+    fileType?: string,
+  ) => Promise<string | null>;
 }
 
 const defaultFsAssetsContext: IFsAssetsContext = {
   getAsset: async () => undefined,
   uploadAsset: async () => '',
   getAllAssets: async () => [],
+  getLocalFileBlob: async () => null,
+  getLocalFileBlobUrl: async () => null,
 };
 
 export const CurrentLessonAssetsContext = createContext<IFsAssetsContext>(
@@ -53,9 +69,12 @@ export const FsAssetsContextProvider = (props: tProviderProps) => {
 
   const currentAuPathSel = useSelector(currentAuPath);
   const currentRepoAccessObject = useSelector(currentRepoAccessObjectSel);
+  const slideNumber = useSelector(currentSlideNum);
 
   const gitFs = getFsInstance();
   const { stageFile } = useGitOperations(gitFs, currentRepoAccessObject);
+
+  const imageCache = useRef<Map<string, string>>(new Map());
 
   const getAsset = async (
     type: AssetType,
@@ -94,12 +113,72 @@ export const FsAssetsContextProvider = (props: tProviderProps) => {
     return await gitFs.listDirectoryFiles(currentRepoAccessObject, path);
   };
 
+  const getLocalFileBlob = async (
+    filePath: string,
+    fileType?: string,
+  ): Promise<Blob | MediaSource | null> => {
+    if (!currentAuPathSel) throw Error('No au path');
+    if (!currentRepoAccessObject) throw Error('No Repo Access Object');
+
+    const pathto = join(currentAuPathSel, filePath);
+    return await gitFs.blobImageFile(
+      currentRepoAccessObject,
+      pathto,
+      fileType || 'image/png',
+    );
+  };
+
+  const getLocalFileBlobUrl = async (
+    filePath: string,
+    fileType?: string,
+  ): Promise<string | null> => {
+    if (!currentAuPathSel) throw Error('No au path');
+    if (!currentRepoAccessObject) throw Error('No Repo Access Object');
+
+    const repoPath = getRepoPath(currentRepoAccessObject);
+    const pathto = join(currentAuPathSel, filePath);
+    const cacheKey = `${repoPath}/${pathto}`;
+    const cached = imageCache.current.get(cacheKey);
+
+    if (cached) return cached;
+
+    const theBlob = await gitFs.blobImageFile(
+      currentRepoAccessObject,
+      pathto,
+      fileType || 'image/png',
+    );
+
+    if (theBlob !== null) {
+      const blobUrl = URL.createObjectURL(theBlob as Blob);
+      imageCache.current.set(cacheKey, blobUrl);
+
+      return blobUrl;
+    }
+
+    return null;
+  };
+
+  useEffect(() => {
+    if (!currentRepoAccessObject) return;
+    debugLog('clean up image cache');
+    imageCache.current.forEach((url) => URL.revokeObjectURL(url));
+    imageCache.current = new Map();
+
+    return () => {
+      if (imageCache.current) {
+        imageCache.current.forEach((url) => URL.revokeObjectURL(url));
+      }
+    };
+  }, [slideNumber]);
+
   return (
     <CurrentLessonAssetsContext.Provider
       value={{
         getAsset,
         uploadAsset,
         getAllAssets,
+        getLocalFileBlob,
+        getLocalFileBlobUrl,
       }}
     >
       {children}

@@ -14,14 +14,16 @@ import {
   FormControlUIProvider,
   MiniForm,
 } from '@rapid-cmi5/ui';
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { useSelector } from 'react-redux';
-import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
 import { useAssetUploadHandlers } from '../../data-hooks/useImageFile';
 import * as yup from 'yup';
 import { currentAuPath } from '../../../../redux/courseBuilderReducer';
-import { FILE_DIR } from '../../../course-builder/GitViewer/session/CurrentLessonAssetsContext';
+import {
+  FILE_DIR,
+  useFsAssets,
+} from '../../../course-builder/GitViewer/session/CurrentLessonAssetsContext';
 
 /**
  * Form course creators can use to attack files to a Lesson AU
@@ -55,7 +57,7 @@ export const DownloadFilesForm = ({
   const auDir = useSelector(currentAuPath);
 
   const [formHeadTitle, setFormHeadTitle] = useState<string>('Files');
-  const { getLocalFileBlob, getLocalFileBlobUrl } = useContext(GitContext);
+  const { getLocalFileBlob, getLocalFileBlobUrl } = useFsAssets();
   const isDebugId = false;
 
   /**
@@ -67,9 +69,8 @@ export const DownloadFilesForm = ({
     if (!auDir) {
       return null;
     }
-    const theBlob = await getLocalFileBlob?.(
+    const theBlob = await getLocalFileBlob(
       `./${FILE_DIR}/${fileData.path}`,
-      auDir,
       fileData.type,
     );
 

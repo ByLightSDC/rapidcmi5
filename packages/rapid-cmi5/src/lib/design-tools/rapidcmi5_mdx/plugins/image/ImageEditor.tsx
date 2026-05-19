@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { BaseSelection, LexicalEditor } from 'lexical';
 import { $isLinkNode } from '@lexical/link';
@@ -46,7 +40,7 @@ import {
 } from '@mdxeditor/editor';
 import { $isImageNode, ImageNode } from './ImageNode';
 import ImageResizer from './ImageResizer';
-import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
+import { useFsAssets } from '../../../course-builder/GitViewer/session/CurrentLessonAssetsContext';
 import { useSelector } from 'react-redux';
 
 import RC5LinkEditor from '../link/RC5LinkEditor';
@@ -113,8 +107,7 @@ function LazyImage({
 }) {
   const [url, setUrl] = useState<string>(src);
 
-  const { getLocalFileBlobUrl, isFsLoaded } = useContext(GitContext);
-
+  const { getLocalFileBlobUrl } = useFsAssets();
   const imageDir = useSelector(currentAuPath);
 
   // if images are local, handle that situation
@@ -137,7 +130,7 @@ function LazyImage({
     // before the upload exists locally. Thus, it is necessary to do another
     // attempt in loading the local image.
     const loadImage = async () => {
-      const blobUrl = await getLocalFileBlobUrl?.(src, imageDir);
+      const blobUrl = await getLocalFileBlobUrl(imageDir);
       if (!blobUrl && loadAttemptCtr < MAX_LOAD_ATTEMPTS) {
         setTimeout(() => {
           // console.log('load image attempt', loadAttemptCtr);
@@ -149,10 +142,10 @@ function LazyImage({
       }
     };
 
-    if (isFsLoaded) {
-      loadImage();
-    }
-  }, [imageDir, src, getLocalFileBlobUrl]);
+    loadImage().catch((err) => {
+      debugLogError(`Could not load image ${err}`);
+    });
+  }, [imageDir, src]);
 
   // Build dimension styles that work correctly with the CSS max-width: 100% rule.
   // - width only: cap at that pixel value, height auto (natural AR preserved)
