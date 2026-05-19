@@ -1,3 +1,13 @@
+## 0.15.0 (2026-05-19)
+
+### 🩹 Fixes
+
+- Correct eslint paths and fix absolute imports ([#177](https://github.com/ByLightSDC/rapidcmi5/pull/177))
+
+### ❤️ Thank You
+
+- Aaron Crawford @aaiirr123
+
 ## 0.14.0 (2026-05-11)
 
 ### 🩹 Fixes

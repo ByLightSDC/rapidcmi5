@@ -59,6 +59,7 @@ interface LazyVideoProps {
   height: 'inherit' | number;
   resizable: boolean;
   videoId: string;
+  captionSrc?: string;
 }
 
 function LazyVideo({
@@ -69,6 +70,7 @@ function LazyVideo({
   height,
   resizable,
   videoId,
+  captionSrc,
 }: LazyVideoProps): JSX.Element {
   useSuspenseImage(src);
   return (
@@ -80,6 +82,7 @@ function LazyVideo({
       height={height}
       resizable={resizable}
       videoId={videoId}
+      captionSrc={captionSrc}
     />
   );
 }
@@ -92,6 +95,7 @@ interface VideoComponentProps {
   height: 'inherit' | number;
   resizable: boolean;
   videoId: string;
+  captionSrc?: string;
 }
 
 function VideoComponent({
@@ -102,6 +106,7 @@ function VideoComponent({
   height,
   resizable,
   videoId,
+  captionSrc,
 }: VideoComponentProps): JSX.Element {
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
   const [isSelected, setSelected, clearSelection] =
@@ -292,7 +297,12 @@ function VideoComponent({
             muted={false}
             draggable={false}
             data-video-id={videoId}
-          />
+            data-caption-src={captionSrc}
+          >
+            {captionSrc && (
+              <track kind="captions" src={captionSrc} srcLang="en" label="English" default />
+            )}
+          </video>
           {resizable && isFocused && (
             <VideoResizer
               editor={editor}
@@ -316,6 +326,7 @@ export interface VideoEditorProps {
   rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   videoId: string;
   autoplay: boolean;
+  captionSrc?: string;
 }
 
 export function VideoEditor({
@@ -327,6 +338,7 @@ export function VideoEditor({
   rest,
   videoId,
   autoplay,
+  captionSrc,
 }: VideoEditorProps): JSX.Element {
   const [videoFilePath] = useCellValues(videoFilePath$);
   const [Placeholder] = useCellValues(videoPlaceholder$);
@@ -335,6 +347,9 @@ export function VideoEditor({
   const [disableSettingsButton] = useCellValues(disableVideoSettingsButton$);
   const [videoPreviewHandler] = useCellValues(videoPreviewHandler$);
   const [previewSrc, setPreviewSrc] = React.useState(src);
+  const [previewCaptionSrc, setPreviewCaptionSrc] = React.useState<
+    string | undefined
+  >(captionSrc);
   const [isSelected, setSelected, clearSelection] =
     useLexicalNodeSelection(nodeKey);
 
@@ -345,6 +360,18 @@ export function VideoEditor({
       setPreviewSrc(src);
     }
   }, [src, videoPreviewHandler]);
+
+  React.useEffect(() => {
+    if (!captionSrc) {
+      setPreviewCaptionSrc(undefined);
+      return;
+    }
+    if (videoPreviewHandler && captionSrc.startsWith('./')) {
+      videoPreviewHandler(captionSrc).then(setPreviewCaptionSrc);
+    } else {
+      setPreviewCaptionSrc(captionSrc);
+    }
+  }, [captionSrc, videoPreviewHandler]);
 
   const isLocal = src.startsWith('./');
   const initialVideoPath = isLocal ? src : null;
@@ -361,6 +388,7 @@ export function VideoEditor({
           height={height}
           resizable={!disableResize}
           videoId={videoId}
+          captionSrc={previewCaptionSrc}
         />
         {isSelected && !disableSettingsButton && EditVideoToolbar && (
           <EditVideoToolbar
@@ -372,6 +400,7 @@ export function VideoEditor({
             width={typeof width === 'number' ? width : undefined}
             height={typeof height === 'number' ? height : undefined}
             autoplay={autoplay}
+            captionSrc={captionSrc}
           />
         )}
       </div>
