@@ -35,6 +35,7 @@ export function RapidCmi5Wrapper() {
     fetchScenario: webFetchScenario,
     processAu: webProcessAu,
     listScenarios: webListScenarios,
+    createAuMapping: webCreateAuMapping,
   } = useScenarioApi(rangeURL, token);
 
   const fetchScenario = useMemo(() => {
@@ -95,6 +96,7 @@ export function RapidCmi5Wrapper() {
         return response;
       }}
       processAu={processAu}
+      createAuMapping={webCreateAuMapping}
       fetchScenario={fetchScenario}
       GetScenariosForm={
         listScenarios

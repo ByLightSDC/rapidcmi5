@@ -69,19 +69,13 @@ export const handleListScenarios = async (
   }
   throw new Error(`Failed to list scenarios (status: ${response.status})`);
 };
-
-export const handleProcessAu = async (
-  au: CourseAU,
-  blockId: string,
+export const handleCreateAuMapping = async (
+  auId: string,
+  scenarioUUID: string,
   apiClient: ScenarioClient,
 ) => {
-  const scenarioUUID = await handleGetAuScenarioUUID(au, apiClient);
-  if (!scenarioUUID) return;
-
-  const auId = generateAuId({ blockId, auName: au.auName });
-  // ts-rest does not encodeURIComponent path params; auId can be a URL with
-  // slashes that would break server-side path routing if not encoded first.
   const encodedAuId = encodeURIComponent(auId);
+
   let existingMapping: Awaited<ReturnType<typeof apiClient.getAuMapping>>;
   try {
     existingMapping = await apiClient.getAuMapping({
@@ -115,4 +109,18 @@ export const handleProcessAu = async (
   } else {
     throw existingMapping.body;
   }
+};
+
+export const handleProcessAu = async (
+  au: CourseAU,
+  blockId: string,
+  apiClient: ScenarioClient,
+) => {
+  const scenarioUUID = await handleGetAuScenarioUUID(au, apiClient);
+  if (!scenarioUUID) return;
+
+  const auId = generateAuId({ blockId, auName: au.auName });
+  // ts-rest does not encodeURIComponent path params; auId can be a URL with
+  // slashes that would break server-side path routing if not encoded first.
+  return await handleCreateAuMapping(auId, scenarioUUID, apiClient);
 };

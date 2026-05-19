@@ -5,6 +5,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   FormControlLabel,
   Switch,
   TextField,
@@ -14,17 +15,27 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useSelector, useDispatch } from 'react-redux';
 import { useContext, useState } from 'react';
-import { modal, setModal } from '@rapid-cmi5/ui';
+import { useForm } from 'react-hook-form';
+import { debugLogError, FormCrudType, modal, setModal } from '@rapid-cmi5/ui';
+import { ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
 import {
   courseDataCache,
   currentAu,
   currentBlock,
-} from '../../../../redux/courseBuilderReducer';
-import { currentRepoAccessObjectSel } from '../../../../redux/repoManagerReducer';
-import { testInPlayerModalId } from '../../../rapidcmi5_mdx/modals/constants';
+} from '../../../../../redux/courseBuilderReducer';
+import { currentRepoAccessObjectSel } from '../../../../../redux/repoManagerReducer';
+import { testInPlayerModalId } from '../../../../rapidcmi5_mdx/modals/constants';
 import { ModalDialog } from '@rapid-cmi5/ui';
-import { getFsInstance } from '../../GitViewer/utils/gitFsInstance';
-import { GitContext } from '../../GitViewer/session/GitContext';
+import { getFsInstance } from '../../../GitViewer/utils/gitFsInstance';
+import { GitContext } from '../../../GitViewer/session/GitContext';
+import { useRapidCmi5Opts } from '../../../GitViewer/session/RapidCmi5OptsContext';
+import {
+  fetchLaunchUrl,
+  randomUuid,
+  rewriteLaunchHost,
+  fetchFirstAuId,
+} from './cmi5LaunchLinks';
+import { writeConfigViaIpc, writeConfigViaHttp } from './writeConfig';
 
 const DEFAULT_PLAYER_URL = 'http://localhost:4201';
 // Electron IPC fallback: path relative to repo root
@@ -51,40 +62,14 @@ async function loadLessonViaZip(
   }
 }
 
-async function writeConfigViaHttp(
-  playerUrl: string,
-  auJson: string,
-): Promise<void> {
-  const endpoint = `${playerUrl.replace(/\/$/, '')}/test-config`;
-  const res = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: auJson,
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => res.statusText);
-    throw new Error(`Player dev server responded ${res.status}: ${text}`);
-  }
-  const json = await res.json().catch(() => ({ success: false }));
-  if (!json.success) {
-    throw new Error(json.error ?? 'Player dev server returned success:false');
-  }
-}
+const ENV_LMS_API_BASE = process.env['NX_PUBLIC_CPT_PLAYER_URL'];
+const ENV_LMS_COURSE_ID = process.env['NX_PUBLIC_CPT_COURSE_ID'];
+const ENV_LMS_TOKEN = process.env['NX_PUBLIC_CPT_TOKEN'];
 
-async function writeConfigViaIpc(
-  auJson: string,
-  playerUrl: string,
-  configPath: string,
-): Promise<void> {
-  const result = await (window as any).ipc.testInPlayer(
-    auJson,
-    playerUrl,
-    configPath,
-  );
-  if (!result?.success) {
-    throw new Error(result?.error ?? 'IPC call returned success:false');
-  }
-}
+const DEFAULT_LMS_API_BASE =
+  ENV_LMS_API_BASE || 'https://cpt-player.develop-cp.rangeos.engineering';
+const DEFAULT_ACTOR_HOMEPAGE = 'https://moodle.com';
+const DEFAULT_RETURN_URL = 'https://lms.example.com/return';
 
 export function TestInPlayerDialog() {
   const dispatch = useDispatch();
@@ -94,11 +79,25 @@ export function TestInPlayerDialog() {
   const courseData = useSelector(courseDataCache);
   const currentAuIndex = useSelector(currentAu);
   const currentBlockIndex = useSelector(currentBlock);
+  const { GetScenariosForm, userAuth, createAuMapping } = useRapidCmi5Opts();
+  const scenarioFormMethods = useForm();
 
   const [playerUrl, setPlayerUrl] = useState(DEFAULT_PLAYER_URL);
   const [configPath, setConfigPath] = useState(DEFAULT_CONFIG_PATH);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [rebuildPlayerZip, setRebuildPlayerZip] = useState(false);
+  const [useRealLaunchLink, setUseRealLaunchLink] = useState(false);
+  const [lmsApiBase, setLmsApiBase] = useState(DEFAULT_LMS_API_BASE);
+  const [lmsCourseId, setLmsCourseId] = useState(ENV_LMS_COURSE_ID ?? '');
+  const [lmsToken, setLmsToken] = useState(ENV_LMS_TOKEN ?? '');
+  const [actorName, setActorName] = useState(
+    () => userAuth?.userName || userAuth?.userEmail || '',
+  );
+  const [actorHomePage, setActorHomePage] = useState(DEFAULT_ACTOR_HOMEPAGE);
+  const [returnUrl, setReturnUrl] = useState(DEFAULT_RETURN_URL);
+  const [selectedScenario, setSelectedScenario] = useState<ScenarioApi | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -106,6 +105,8 @@ export function TestInPlayerDialog() {
   const selectedBlock = courseData?.blocks?.[currentBlockIndex];
   const currentLesson = selectedBlock?.aus?.[currentAuIndex];
   const hasIpc = typeof (window as any).ipc?.testInPlayer === 'function';
+  const resolvedActorName =
+    actorName || userAuth?.userName || userAuth?.userEmail || '';
 
   const handleClose = () => {
     setError(null);
@@ -156,6 +157,62 @@ export function TestInPlayerDialog() {
         // Fallback: content-only (no assets)
         const auJson = JSON.stringify(currentLesson, null, 2);
         await writeConfigViaHttp(playerUrl, auJson);
+      }
+
+      if (useRealLaunchLink) {
+        if (!lmsToken.trim()) {
+          setError('LMS bearer token is required for real launch link.');
+          return;
+        }
+        if (!lmsCourseId.trim()) {
+          setError('LMS course ID is required for real launch link.');
+          return;
+        }
+        if (!resolvedActorName.trim()) {
+          setError('Actor name is required for real launch link.');
+          return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+        setStatusMsg('Requesting launch URL from LMS…');
+        try {
+          const launchUrl = await fetchLaunchUrl({
+            lmsApiBase,
+            courseId: lmsCourseId.trim(),
+            auIndex: currentAuIndex,
+            token: lmsToken.trim(),
+            actorName: resolvedActorName.trim(),
+            actorHomePage: actorHomePage.trim() || DEFAULT_ACTOR_HOMEPAGE,
+            registration: randomUuid(),
+            returnUrl: returnUrl.trim() || DEFAULT_RETURN_URL,
+          });
+          const localUrl = rewriteLaunchHost(launchUrl, playerUrl);
+
+          // Associate the selected scenario with the first AU before opening
+          if (selectedScenario && createAuMapping) {
+            setStatusMsg('Mapping scenario to AU…');
+            try {
+              const auId = await fetchFirstAuId({
+                lmsApiBase,
+                courseId: lmsCourseId.trim(),
+                token: lmsToken.trim(),
+              });
+              await createAuMapping(auId, selectedScenario.uuid);
+            } catch (err: unknown) {
+              debugLogError(err instanceof Error ? err.message : String(err));
+            }
+          }
+
+          window.open(localUrl, '_blank');
+          handleClose();
+        } catch (err: any) {
+          setError(err?.message ?? String(err));
+        } finally {
+          setIsLoading(false);
+          setStatusMsg(null);
+        }
+        return;
       }
 
       window.open(playerUrl, '_blank');
@@ -290,6 +347,131 @@ export function TestInPlayerDialog() {
                   </Box>
                 }
               />
+
+              <Divider sx={{ my: 0.5 }} />
+
+              <FormControlLabel
+                control={
+                  <Switch
+                    size="small"
+                    checked={useRealLaunchLink}
+                    onChange={(e) => setUseRealLaunchLink(e.target.checked)}
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
+                      Use real cmi5 launch link
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      display="block"
+                      color="text.secondary"
+                    >
+                      Requests a real launch URL from the LMS and opens it
+                      against the local player.
+                    </Typography>
+                  </Box>
+                }
+              />
+
+              {useRealLaunchLink && (
+                <Box
+                  sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}
+                >
+                  <TextField
+                    label="LMS API base URL"
+                    value={lmsApiBase}
+                    onChange={(e) => setLmsApiBase(e.target.value)}
+                    size="small"
+                    fullWidth
+                  />
+                  <TextField
+                    label="LMS course ID"
+                    value={lmsCourseId}
+                    onChange={(e) => setLmsCourseId(e.target.value)}
+                    size="small"
+                    fullWidth
+                    required
+                    helperText="Numeric course id (e.g. 1606)"
+                  />
+                  <TextField
+                    label="Bearer token"
+                    value={lmsToken}
+                    onChange={(e) => setLmsToken(e.target.value)}
+                    type="password"
+                    size="small"
+                    fullWidth
+                    required
+                    autoComplete="off"
+                  />
+                  <TextField
+                    label="Actor name"
+                    value={actorName}
+                    onChange={(e) => setActorName(e.target.value)}
+                    size="small"
+                    fullWidth
+                    placeholder={
+                      userAuth?.userName || userAuth?.userEmail || 'learner'
+                    }
+                    helperText="Defaults to signed-in user when blank"
+                  />
+                  <TextField
+                    label="Actor account home page"
+                    value={actorHomePage}
+                    onChange={(e) => setActorHomePage(e.target.value)}
+                    size="small"
+                    fullWidth
+                  />
+                  <TextField
+                    label="Return URL"
+                    value={returnUrl}
+                    onChange={(e) => setReturnUrl(e.target.value)}
+                    size="small"
+                    fullWidth
+                  />
+                  <Typography variant="caption" color="text.secondary">
+                    Launches AU index <code>{currentAuIndex}</code>. The host in
+                    the LMS response is rewritten to the Player URL above.
+                  </Typography>
+                </Box>
+              )}
+
+              {GetScenariosForm && useRealLaunchLink && (
+                <Box>
+                  <Typography
+                    variant="caption"
+                    display="block"
+                    sx={{ fontWeight: 'bold', mb: 0.5 }}
+                  >
+                    Scenario to launch with
+                  </Typography>
+                  <GetScenariosForm
+                    submitForm={(scenario: ScenarioApi) =>
+                      setSelectedScenario(scenario ?? null)
+                    }
+                    formType={FormCrudType.edit}
+                    errors={scenarioFormMethods.formState.errors}
+                    formMethods={scenarioFormMethods}
+                  />
+                  {selectedScenario && (
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        mt: 1,
+                        px: 1.5,
+                        py: 1,
+                        borderRadius: 1,
+                        bgcolor: 'action.hover',
+                        fontFamily: 'monospace',
+                        fontSize: '0.8rem',
+                      }}
+                    >
+                      {selectedScenario.name}
+                    </Typography>
+                  )}
+                </Box>
+              )}
             </Box>
           </Collapse>
 

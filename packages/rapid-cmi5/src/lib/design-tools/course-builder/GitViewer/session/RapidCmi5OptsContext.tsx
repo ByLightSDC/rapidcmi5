@@ -73,6 +73,7 @@ export interface RapidCmi5Opts {
   userAuth?: UserAuth;
   downloadCmi5Player?: () => Promise<any>;
   processAu?: (au: CourseAU, blockId: string) => Promise<void>;
+  createAuMapping?: (auId: string, scenerioUUID: string) => Promise<void>;
   GetScenariosForm?: React.ComponentType<GetScenarioFormProps>;
   fetchScenario?: (uuid: string) => Promise<ScenarioApi>;
   QuizBankSearchModal?: React.ComponentType<GetQuizBankSearchModalProps>;

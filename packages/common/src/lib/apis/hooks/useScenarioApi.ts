@@ -6,8 +6,9 @@ import {
   ScenarioQuery,
   PaginatedScenariosResponse,
 } from '../scenarioContract';
-import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
+import { CourseAU } from '../../types/course';
 import {
+  handleCreateAuMapping,
   handleFetchScenario,
   handleListScenarios,
   handleProcessAu,
@@ -51,9 +52,18 @@ export function useScenarioApi(url?: string, token?: string) {
     [apiClient],
   );
 
+  const creatAuMappingCb = useCallback(
+    async (auId: string, scenarioUUID: string): Promise<void> => {
+      if (!apiClient) throw new Error('API client is not set');
+      return await handleCreateAuMapping(auId, scenarioUUID, apiClient);
+    },
+    [apiClient],
+  );
+
   const fetchScenario = apiClient ? fetchScenarioCb : undefined;
   const listScenarios = apiClient ? listScenariosCb : undefined;
   const processAu = apiClient ? processAuCb : undefined;
+  const createAuMapping = apiClient ? creatAuMappingCb : undefined;
 
-  return { fetchScenario, listScenarios, processAu };
+  return { fetchScenario, listScenarios, processAu, createAuMapping };
 }
