@@ -28,7 +28,12 @@ import {
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 import { useCallback, useState } from 'react';
+
+import quoteAuthorPlaceholder from './assets/quoteAuthorPlaceholder.png';
 import { useSelectionHelper } from '../../../../hooks/useSelectionHelper';
+import { useLessonAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
+
+const PLACEHOLDER_AVATAR_FILENAME = 'quoteAuthorPlaceholder.png';
 
 /**
  * A toolbar button component that inserts a quotes into the editor.
@@ -41,6 +46,7 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
   const theme: any = useTheme();
   const selectionHelper = useSelectionHelper();
   const [isConfiguring, setIsConfiguring] = useState(false);
+  const { getAsset, uploadAsset } = useLessonAssets();
 
   /**
    * Inserts default Quotes at the current selection
@@ -99,11 +105,22 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
    * Saves changes by inserting new node and removing original.
    */
   const handleSelect = useCallback(
-    (preset: QuotePreset, avatar: string) => {
-      insertAtSelection(preset.id, avatar);
+    async (preset: QuotePreset, avatar: string) => {
+      let finalAvatar =
+        avatar || (await getAsset('image', PLACEHOLDER_AVATAR_FILENAME));
+      // ensure the defualt avatar is uploaded if no avatar was supplied
+      if (!finalAvatar) {
+        const res = await fetch(quoteAuthorPlaceholder);
+        finalAvatar = await uploadAsset(
+          'image',
+          PLACEHOLDER_AVATAR_FILENAME,
+          new Uint8Array(await res.arrayBuffer()),
+        );
+      }
+      insertAtSelection(preset.id, finalAvatar);
       setIsConfiguring(false);
     },
-    [insertAtSelection],
+    [insertAtSelection, getAsset, uploadAsset],
   );
 
   /**

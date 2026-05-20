@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 
 import {
   closeVideoDialog$,
@@ -25,11 +25,12 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import {
   ButtonModalMainUi,
   ComboBoxSelectorUi,
+  debugLogError,
   ModalDialog,
   TextFieldMainUi,
   ViewExpander,
 } from '@rapid-cmi5/ui';
-import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
+import { useLessonAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
 
 // used for uploading files
 const VisuallyHiddenInput = styled('input')({
@@ -60,12 +61,12 @@ export const VideoDialog: React.FC = () => {
   const [width, setWidth] = useState<string>('');
   const [height, setHeight] = useState<string>('');
   const [autoplay, setAutoplay] = useState<boolean>(false);
+  const { getAllAssets } = useLessonAssets();
   const [captionSrc, setCaptionSrc] = useState<string>('');
   const [selectedCaptionFiles, setSelectedCaptionFiles] =
     useState<FileList | null>(null);
   const [captionFileOptions, setCaptionFileOptions] = useState<string[]>([]);
   const [dialogOpenCount, setDialogOpenCount] = useState(0);
-  const { handleGetFolderStructure } = useContext(GitContext);
   const theme = useTheme();
 
   // get the state from Gurx
@@ -152,63 +153,52 @@ export const VideoDialog: React.FC = () => {
 
   // fill in the list of file options
   useEffect(() => {
-    const path = videoFilePath;
-
     async function fetchData() {
       try {
-        const treeData = await handleGetFolderStructure(path, true);
-        const fileOptions = [];
-
+        const files = await getAllAssets('video');
         // add the current source value
         if (state.type === 'editing' && state.initialValues.src) {
-          fileOptions.push(state.initialValues.src.replace(VIDEO_DIR, ''));
+          files.push(state.initialValues.src.replace(VIDEO_DIR, ''));
         }
 
-        // add the list of files
-        for (let i = 0; i < treeData.length; i++) {
-          const videoName = treeData[i].name;
-          if (fileOptions[0] !== videoName) {
-            // don't add if already added as initial value
-            fileOptions.push(videoName);
-          }
-        }
-        setFileOptions(fileOptions);
+        // ensure unique
+        const videoFiles = [...new Set(files)];
+        setFileOptions(videoFiles);
       } catch (error) {
         // Directory doesn't exist yet - this is okay, it will be created when first video is uploaded
-        console.debug('Video directory does not exist yet:', path);
         setFileOptions([]);
       }
     }
 
-    fetchData();
-  }, [videoFilePath, src, state.type]);
+    fetchData().catch((err) => {
+      debugLogError(`Could not fetch video data ${err}`);
+    });
+  }, [src, state.type]);
 
   // fetch available .vtt caption files from the same video directory
   useEffect(() => {
     async function fetchCaptionFiles() {
       try {
-        const treeData = await handleGetFolderStructure(videoFilePath, true);
-        const vttOptions: string[] = [];
+        const files = await getAllAssets('video');
 
         if (state.type === 'editing' && state.initialValues.captionSrc) {
-          vttOptions.push(
-            state.initialValues.captionSrc.replace(VIDEO_DIR, ''),
-          );
+          files.push(state.initialValues.captionSrc.replace(VIDEO_DIR, ''));
         }
 
-        for (let i = 0; i < treeData.length; i++) {
-          const fileName = treeData[i].name as string;
-          if (fileName.endsWith('.vtt') && vttOptions[0] !== fileName) {
-            vttOptions.push(fileName);
-          }
-        }
-        setCaptionFileOptions(vttOptions);
+        // ensure files are unique
+        const vttFiles = [
+          ...new Set(files.filter((name) => name.endsWith('.vtt'))),
+        ];
+
+        setCaptionFileOptions(vttFiles);
       } catch {
         setCaptionFileOptions([]);
       }
     }
 
-    fetchCaptionFiles();
+    fetchCaptionFiles().catch((err) => {
+      debugLogError(`Could not fetch video caption data ${err}`);
+    });
   }, [videoFilePath, state.type]);
 
   // handle file selection
@@ -249,7 +239,7 @@ export const VideoDialog: React.FC = () => {
         <>
           {/* <Stack spacing={2}> */}
           <Grid container alignItems="center" sx={{ width: '100%' }}>
-            <Grid size={12} sx={{ mb: 1}}>
+            <Grid size={12} sx={{ mb: 1 }}>
               {/* Files upload section */}
               <Paper
                 variant="outlined"
