@@ -98,7 +98,7 @@ export default function LessonToolbar({
           <ReorderIcon />
         </IconButton>
       </Tooltip>
-
+      <StudentInfoButton />
       <Tooltip
         title={
           currentTheme === 'dark'
@@ -149,7 +149,6 @@ export default function LessonToolbar({
         />
       </Tooltip>
 
-      <StudentInfoButton />
       <BuildInfoButton />
       <Box
         id="error-portal"

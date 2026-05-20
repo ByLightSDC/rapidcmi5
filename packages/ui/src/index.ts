@@ -4,6 +4,8 @@ export { config } from './lib/environments/FrontendEnvironment.env';
 
 export * from './lib/navigation/paging/paginationFiltersConstants';
 export * from './lib/apps/AppLogo';
+export * from './lib/apps/RapidCmi5Icon';
+export * from './lib/apps/RapidCmi5Title';
 export * from './lib/cmi5/markdown/MarkDownParser';
 export * from './lib/cmi5/markdown/MarkDownSlide';
 export * from './lib/cmi5/markdown/constants/SlideEvents';
