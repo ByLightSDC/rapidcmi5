@@ -40,7 +40,7 @@ import {
 } from '@mdxeditor/editor';
 import { $isImageNode, ImageNode } from './ImageNode';
 import ImageResizer from './ImageResizer';
-import { useFsAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
+import { useLessonAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
 import { useSelector } from 'react-redux';
 
 import RC5LinkEditor from '../link/RC5LinkEditor';
@@ -106,7 +106,7 @@ function LazyImage({
 }) {
   const [url, setUrl] = useState<string>(src);
 
-  const { getLocalFileBlobUrl } = useFsAssets();
+  const { getLocalFileBlobUrl } = useLessonAssets();
 
   // if images are local, handle that situation
   useEffect(() => {

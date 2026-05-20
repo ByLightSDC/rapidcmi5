@@ -28,7 +28,7 @@ import {
   ModalDialog,
   TextFieldMainUi,
 } from '@rapid-cmi5/ui';
-import { useFsAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
+import { useLessonAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
 
 // used for uploading files
 const VisuallyHiddenInput = styled('input')({
@@ -57,7 +57,7 @@ export const AudioDialog: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [fileOptions, setFileOptions] = useState<string[]>([]);
   const [autoplay, setAutoplay] = useState<boolean>(false);
-  const { getAllAssets } = useFsAssets();
+  const { getAllAssets } = useLessonAssets();
 
   // get the state from Gurx
   const [state, audioFilePath] = useCellValues(
@@ -140,8 +140,10 @@ export const AudioDialog: React.FC = () => {
         if (state.type === 'editing' && state.initialValues.src) {
           files.push(state.initialValues.src.replace(AUDIO_DIR, ''));
         }
+        // ensure unique
+        const audioFiles = [...new Set(files)];
 
-        setFileOptions(files);
+        setFileOptions(audioFiles);
       } catch (error) {
         // Directory doesn't exist yet - this is okay, it will be created when first audio is uploaded
         console.debug('Audio directory does not exist yet:', path);

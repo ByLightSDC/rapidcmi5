@@ -30,7 +30,7 @@ import {
   TextFieldMainUi,
   ViewExpander,
 } from '@rapid-cmi5/ui';
-import { useFsAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
+import { useLessonAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
 
 // used for uploading files
 const VisuallyHiddenInput = styled('input')({
@@ -61,7 +61,7 @@ export const VideoDialog: React.FC = () => {
   const [width, setWidth] = useState<string>('');
   const [height, setHeight] = useState<string>('');
   const [autoplay, setAutoplay] = useState<boolean>(false);
-  const { getAllAssets } = useFsAssets();
+  const { getAllAssets } = useLessonAssets();
   const [captionSrc, setCaptionSrc] = useState<string>('');
   const [selectedCaptionFiles, setSelectedCaptionFiles] =
     useState<FileList | null>(null);
@@ -161,7 +161,9 @@ export const VideoDialog: React.FC = () => {
           files.push(state.initialValues.src.replace(VIDEO_DIR, ''));
         }
 
-        setFileOptions(files);
+        // ensure unique
+        const videoFiles = [...new Set(files)];
+        setFileOptions(videoFiles);
       } catch (error) {
         // Directory doesn't exist yet - this is okay, it will be created when first video is uploaded
         setFileOptions([]);
@@ -183,7 +185,10 @@ export const VideoDialog: React.FC = () => {
           files.push(state.initialValues.captionSrc.replace(VIDEO_DIR, ''));
         }
 
-        const vttFiles = files.filter((name) => name.endsWith('.vtt'));
+        // ensure files are unique
+        const vttFiles = [
+          ...new Set(files.filter((name) => name.endsWith('.vtt'))),
+        ];
 
         setCaptionFileOptions(vttFiles);
       } catch {

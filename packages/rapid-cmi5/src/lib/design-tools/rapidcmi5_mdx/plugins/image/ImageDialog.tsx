@@ -26,7 +26,7 @@ import {
   TextFieldMainUi,
 } from '@rapid-cmi5/ui';
 
-import { useFsAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
+import { useLessonAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
 
 // used for uploading files
 const VisuallyHiddenInput = styled('input')({
@@ -66,7 +66,7 @@ export const ImageDialog: React.FC = () => {
   // natural dims of the current image — loaded from the resolved blob URL
   const naturalDimsRef = useRef<{ width: number; height: number } | null>(null);
 
-  const { getAllAssets } = useFsAssets();
+  const { getAllAssets } = useLessonAssets();
 
   // get the state from Gurx
   const [state] = useCellValues(imageDialogState$);
@@ -202,8 +202,9 @@ export const ImageDialog: React.FC = () => {
         if (state.type === 'editing' && state.initialValues.src) {
           files.push(state.initialValues.src.replace(IMAGE_DIR, ''));
         }
-
-        setFileOptions(files);
+        // ensure unique
+        const imageFiles = [...new Set(files)];
+        setFileOptions(imageFiles);
       } catch (error) {
         // Directory doesn't exist yet - this is okay, it will be created when first image is uploaded
         console.debug('Image directory does not exist yet or fs is not ready');

@@ -31,7 +31,7 @@ import { useCallback, useState } from 'react';
 
 import quoteAuthorPlaceholder from './assets/quoteAuthorPlaceholder.png';
 import { useSelectionHelper } from '../../../../hooks/useSelectionHelper';
-import { useFsAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
+import { useLessonAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
 
 const PLACEHOLDER_AVATAR_FILENAME = 'quoteAuthorPlaceholder.png';
 
@@ -46,7 +46,7 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
   const theme: any = useTheme();
   const selectionHelper = useSelectionHelper();
   const [isConfiguring, setIsConfiguring] = useState(false);
-  const { getAsset, uploadAsset } = useFsAssets();
+  const { getAsset, uploadAsset } = useLessonAssets();
 
   /**
    * Inserts default Quotes at the current selection

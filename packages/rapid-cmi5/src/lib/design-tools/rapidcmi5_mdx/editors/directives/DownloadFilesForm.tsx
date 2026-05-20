@@ -21,8 +21,8 @@ import { useAssetUploadHandlers } from '../../data-hooks/useUploadFile';
 import * as yup from 'yup';
 import { currentAuPath } from '../../../../redux/courseBuilderReducer';
 import {
-  FILE_DIR,
-  useFsAssets,
+  ASSET_DIRS,
+  useLessonAssets,
 } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
 
 /**
@@ -57,7 +57,7 @@ export const DownloadFilesForm = ({
   const auDir = useSelector(currentAuPath);
 
   const [formHeadTitle, setFormHeadTitle] = useState<string>('Files');
-  const { getLocalFileBlob, getLocalFileBlobUrl } = useFsAssets();
+  const { getLocalFileBlob, getLocalFileBlobUrl } = useLessonAssets();
   const isDebugId = false;
 
   /**
@@ -67,7 +67,7 @@ export const DownloadFilesForm = ({
    */
   const fileDownloadHandler = async (fileData: DownloadFileData) => {
     const theBlob = await getLocalFileBlob(
-      `./${FILE_DIR}/${fileData.path}`,
+      `./${ASSET_DIRS.file}/${fileData.path}`,
       fileData.type,
     );
 
@@ -121,7 +121,7 @@ export const DownloadFilesForm = ({
               <FileDownloadLink
                 fileData={fileData}
                 auDir={auDir}
-                filePath={`./${FILE_DIR}/${fileData.path}`}
+                filePath={`./${ASSET_DIRS.file}/${fileData.path}`}
                 getLinkUrl={getLocalFileBlobUrl}
               />
             );

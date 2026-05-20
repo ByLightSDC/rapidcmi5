@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import {
   AssetType,
-  useFsAssets,
+  useLessonAssets,
 } from '../../course-builder/GitViewer/session/LessonAssetsContext';
+import { debugLogError } from '@rapid-cmi5/ui';
 
 export type AssetUploadHandler = (file: File) => Promise<string>;
 
@@ -32,7 +33,7 @@ export const useAssetUploadHandlers = (): Record<
   AssetType,
   AssetUploadHandler
 > => {
-  const { uploadAsset } = useFsAssets();
+  const { uploadAsset } = useLessonAssets();
 
   return useMemo(() => {
     const make =
@@ -42,7 +43,7 @@ export const useAssetUploadHandlers = (): Record<
           const data = await readFileAsBytes(file);
           return await uploadAsset(type, file.name, data);
         } catch (error) {
-          console.error('[useAssetUploadHandlers] Error saving file:', error);
+          debugLogError(`[useAssetUploadHandlers] Error saving file: ${error}`);
           return '';
         }
       };

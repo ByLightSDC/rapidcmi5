@@ -8,7 +8,7 @@ import {
   slideDeck,
 } from '../../../redux/courseBuilderReducer';
 import { useDispatch, useSelector } from 'react-redux';
-import { useFsAssets } from '../../course-builder/GitViewer/session/LessonAssetsContext';
+import { useLessonAssets } from '../../course-builder/GitViewer/session/LessonAssetsContext';
 import { AuContextProps } from '@rapid-cmi5/cmi5-build-common';
 
 /**
@@ -25,7 +25,7 @@ export const useAuContext = (): AuContextProps => {
 
   const dispatch = useDispatch();
 
-  const { getLocalFileBlobUrl } = useFsAssets();
+  const { getLocalFileBlobUrl } = useLessonAssets();
 
   //RC5 removal
   const getSlide = (props: AuContextProps) => {
