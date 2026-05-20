@@ -677,90 +677,82 @@ function RC5VisualEditor() {
    * UE injects markdown from lesson into editor and resets focus
    */
   useEffect(() => {
-    if (ref.current) {
-      if (typeof content !== 'string') {
-        debugLogError('Attempting to inject non string data into MdxEditor');
-        ref.current.setMarkdown('This slide data could not be presented ');
-      } else {
-        if (content !== ref.current.getMarkdown()) {
+    if (!ref.current) return;
+    if (typeof content !== 'string') {
+      debugLogError('Attempting to inject non string data into MdxEditor');
+      ref.current.setMarkdown('This slide data could not be presented ');
+      return;
+    }
+    if (content === ref.current.getMarkdown()) {
+      ref.current.focus();
+      return;
+    }
+    try {
+      debugLog('updateTeamScenario (load slide)');
+      const teamScenario =
+        content.indexOf(':consoles') > 0
+          ? { scenario: { uuid: 'unknown' } }
+          : { scenario: undefined };
+      dispatch(updateTeamScenario(teamScenario));
+
+      // Parse animations from frontmatter before setting markdown.
+      // If we already have unsaved animations in memory for this slide, keep them
+      // when the frontmatter is empty so navigating away/back does not drop them.
+      const parsedAnimations = parseAnimationsFromFrontmatter(content);
+      const existingAnimations =
+        slideAnimationsRef.current.get(currentSlideIndex) || [];
+
+      const shouldKeepExisting =
+        existingAnimations.length > 0 && parsedAnimations.length === 0;
+
+      const animationsToUse = shouldKeepExisting
+        ? existingAnimations
+        : parsedAnimations;
+
+      // Only update if animations actually changed to avoid unnecessary plugin rebuilds
+      const animationsChanged = !areAnimationsEqual(
+        existingAnimations,
+        animationsToUse,
+      );
+
+      if (animationsChanged) {
+        slideAnimationsRef.current.set(currentSlideIndex, animationsToUse);
+        setAnimationsVersion((v) => {
+          const newVersion = v + 1;
           debugLog(
-            'sees content !== ref.current.getMarkdown()',
+            `🔢 animationsVersion: ${v} → ${newVersion} (loading slide ${currentSlideIndex}, ${animationsToUse.length} animations, keepExisting=${shouldKeepExisting})`,
             undefined,
             undefined,
-            'editor',
+            'plugin',
           );
-          try {
-            debugLog('updateTeamScenario (load slide)');
-            const teamScenario =
-              content.indexOf(':consoles') > 0
-                ? { scenario: { uuid: 'unknown' } }
-                : { scenario: undefined };
-            dispatch(updateTeamScenario(teamScenario));
-
-            // Parse animations from frontmatter before setting markdown.
-            // If we already have unsaved animations in memory for this slide, keep them
-            // when the frontmatter is empty so navigating away/back does not drop them.
-            const parsedAnimations = parseAnimationsFromFrontmatter(content);
-            const existingAnimations =
-              slideAnimationsRef.current.get(currentSlideIndex) || [];
-
-            const shouldKeepExisting =
-              existingAnimations.length > 0 && parsedAnimations.length === 0;
-
-            const animationsToUse = shouldKeepExisting
-              ? existingAnimations
-              : parsedAnimations;
-
-            // Only update if animations actually changed to avoid unnecessary plugin rebuilds
-            const animationsChanged = !areAnimationsEqual(
-              existingAnimations,
-              animationsToUse,
-            );
-
-            if (animationsChanged) {
-              slideAnimationsRef.current.set(
-                currentSlideIndex,
-                animationsToUse,
-              );
-              setAnimationsVersion((v) => {
-                const newVersion = v + 1;
-                debugLog(
-                  `🔢 animationsVersion: ${v} → ${newVersion} (loading slide ${currentSlideIndex}, ${animationsToUse.length} animations, keepExisting=${shouldKeepExisting})`,
-                  undefined,
-                  undefined,
-                  'plugin',
-                );
-                return newVersion;
-              });
-            } else {
-              debugLog(
-                `⏭️ Skipping animationsVersion update - animations unchanged for slide ${currentSlideIndex}`,
-                undefined,
-                undefined,
-                'plugin',
-              );
-            }
-
-            debugLog(
-              `Loaded animations for slide ${currentSlideIndex}:`,
-              animationsToUse,
-            );
-            if (shouldKeepExisting) {
-              debugLog(
-                '↩️  Keeping in-memory animations because parsed frontmatter was empty',
-              );
-            }
-
-            debugLog('setting markdown to', content, undefined, 'editor');
-            ref.current.setMarkdown(content);
-          } catch (error: any) {
-            debugLog('Could not set markdown', error, undefined, 'editor');
-          }
-        }
+          return newVersion;
+        });
+      } else {
+        debugLog(
+          `⏭️ Skipping animationsVersion update - animations unchanged for slide ${currentSlideIndex}`,
+          undefined,
+          undefined,
+          'plugin',
+        );
       }
 
-      ref.current?.focus();
+      debugLog(
+        `Loaded animations for slide ${currentSlideIndex}:`,
+        animationsToUse,
+      );
+      if (shouldKeepExisting) {
+        debugLog(
+          '↩️  Keeping in-memory animations because parsed frontmatter was empty',
+        );
+      }
+
+      debugLog('setting markdown to', content, undefined, 'editor');
+      ref.current.setMarkdown(content);
+    } catch (error: any) {
+      debugLog('Could not set markdown', error, undefined, 'editor');
     }
+
+    ref.current.focus();
   }, [content, currentSlideIndex, currentCourse]); //DO NOT REMOVE currentSlideIndex
 
   /**
