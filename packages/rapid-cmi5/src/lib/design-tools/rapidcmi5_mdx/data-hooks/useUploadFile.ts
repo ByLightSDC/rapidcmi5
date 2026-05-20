@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import {
   AssetType,
   useFsAssets,
-} from '../../course-builder/GitViewer/session/CurrentLessonAssetsContext';
+} from '../../course-builder/GitViewer/session/LessonAssetsContext';
 
 export type AssetUploadHandler = (file: File) => Promise<string>;
 

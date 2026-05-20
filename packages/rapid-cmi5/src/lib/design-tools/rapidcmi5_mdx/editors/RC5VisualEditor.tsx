@@ -98,7 +98,7 @@ import {
 } from '../../../redux/courseBuilderReducer';
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
 
-import { useAssetUploadHandlers } from '../data-hooks/useImageFile';
+import { useAssetUploadHandlers } from '../data-hooks/useUploadFile';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
 import { directiveLinter } from './code/codeMirrorUtils';
@@ -114,7 +114,7 @@ import { ErrorBoundary } from './ErrorBoundary';
 import { linkDialogPlugin } from '../plugins/link-dialog';
 import { draggableBlockPlugin } from '../plugins/draggable-block';
 import { gutterClickPlugin } from '../plugins/gutter-click/GutterClickPlugin';
-import { CurrentLessonAssetsContextProvider } from '../../course-builder/GitViewer/session/CurrentLessonAssetsContext';
+import { CurrentLessonAssetsContextProvider } from '../../course-builder/GitViewer/session/LessonAssetsContext';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -765,54 +765,51 @@ function RC5VisualEditor() {
   };
   return (
     // Visual editor will be able to access Images and Assets from the file system
-    <CurrentLessonAssetsContextProvider>
-      {thePlugins && thePlugins.length > 0 && currentCourse ? (
-        <Box
-          className={themeClass}
-          sx={{ height: `calc(100vh - ${pixelTop}px)` }}
-          ref={editorContainerRef}
-        >
-          {currentLessonTheme && <style>{lessonStyleCss}</style>}
+    thePlugins && thePlugins.length > 0 && currentCourse ? (
+      <Box
+        className={themeClass}
+        sx={{ height: `calc(100vh - ${pixelTop}px)` }}
+        ref={editorContainerRef}
+      >
+        {currentLessonTheme && <style>{lessonStyleCss}</style>}
 
-          <ErrorBoundary>
-            <LessonThemeContext.Provider
-              value={{ lessonTheme: currentLessonTheme }}
-            >
-              <MDXEditor
-                className={mdxTheme}
-                onChange={onChange}
-                ref={ref}
-                markdown={''}
-                plugins={thePlugins}
-                readOnly={!isEditing}
-                onError={onErrorHelper}
-              />
-            </LessonThemeContext.Provider>
-          </ErrorBoundary>
-        </Box>
-      ) : (
-        <Box
+        <ErrorBoundary>
+          <LessonThemeContext.Provider
+            value={{ lessonTheme: currentLessonTheme }}
+          >
+            <MDXEditor
+              className={mdxTheme}
+              onChange={onChange}
+              ref={ref}
+              markdown={''}
+              plugins={thePlugins}
+              readOnly={!isEditing}
+              onError={onErrorHelper}
+            />
+          </LessonThemeContext.Provider>
+        </ErrorBoundary>
+      </Box>
+    ) : (
+      <Box
+        sx={{
+          height: `calc(100vh - ${pixelTop}px)`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography
+          variant="h6"
           sx={{
-            height: `calc(100vh - ${pixelTop}px)`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            color: 'text.secondary',
+            fontWeight: 400,
+            letterSpacing: '0.02em',
           }}
         >
-          <Typography
-            variant="h6"
-            sx={{
-              color: 'text.secondary',
-              fontWeight: 400,
-              letterSpacing: '0.02em',
-            }}
-          >
-            Please create or open a course to begin editing
-          </Typography>
-        </Box>
-      )}
-      {/* <SharedFormModals isModal={false} /> */}
-    </CurrentLessonAssetsContextProvider>
+          Please create or open a course to begin editing
+        </Typography>
+      </Box>
+    )
   );
 }
 

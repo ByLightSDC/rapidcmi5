@@ -14,7 +14,6 @@ import {
   currentSlideNum,
 } from '../../../../redux/courseBuilderReducer';
 import { useGitOperations } from './useGitOperations';
-import { getRepoPath } from '../utils/fileSystem';
 import { debugLog } from '@rapid-cmi5/ui';
 
 export type AssetType = 'image' | 'video' | 'audio' | 'file';
@@ -74,18 +73,27 @@ export const CurrentLessonAssetsContextProvider = (props: tProviderProps) => {
 
   const imageCache = useRef<Map<string, string>>(new Map());
 
+  // A custom guard to check current context for each transaction
+  const getRequiredContext = () => {
+    if (!currentAuPathSel) throw new Error('No au path');
+    if (!currentRepoAccessObject) throw new Error('No Repo Access Object');
+
+    return {
+      auPath: currentAuPathSel,
+      repo: currentRepoAccessObject,
+    };
+  };
+
   const getAsset = async (
     type: AssetType,
     fileName: string,
   ): Promise<string | undefined> => {
-    if (!currentAuPathSel) throw Error('No au path');
-    if (!currentRepoAccessObject) throw Error('No Repo Access Object');
+    const { auPath, repo } = getRequiredContext();
+
     const dir = ASSET_DIRS[type];
-    const files = await gitFs
-      .listDirectoryFiles(currentRepoAccessObject, join(currentAuPathSel, dir))
-      .catch(() => [] as string[]);
-    if (!files.includes(fileName)) return undefined;
-    return `./${dir}/${fileName}`;
+    const exists = await gitFs.fileExists(repo, join(auPath, dir, fileName));
+    if (exists) return `./${dir}/${fileName}`;
+    return undefined;
   };
 
   const uploadAsset = async (
@@ -93,67 +101,44 @@ export const CurrentLessonAssetsContextProvider = (props: tProviderProps) => {
     fileName: string,
     data: Uint8Array<ArrayBuffer>,
   ): Promise<string> => {
-    console.log('uploadAsset', type, fileName);
-    if (!currentAuPathSel) throw Error('No au path');
-    if (!currentRepoAccessObject) throw Error('No Repo Access Object');
+    const { auPath, repo } = getRequiredContext();
+
     const dir = ASSET_DIRS[type];
-    const relativePath = join(currentAuPathSel, dir, fileName);
-    await gitFs.createFile(currentRepoAccessObject, relativePath, data);
+    const relativePath = join(auPath, dir, fileName);
+    await gitFs.createFile(repo, relativePath, data);
     await stageFile(relativePath);
     return `./${dir}/${fileName}`;
   };
 
   const getAllAssets = async (type: AssetType): Promise<string[]> => {
-    console.log('getAllAssets', type);
-    if (!currentAuPathSel) throw Error('No au path');
-    if (!currentRepoAccessObject) throw Error('No Repo Access Object');
-    const path = join(currentAuPathSel, ASSET_DIRS[type]);
-    return await gitFs.listDirectoryFiles(currentRepoAccessObject, path);
+    const { auPath, repo } = getRequiredContext();
+    const path = join(auPath, ASSET_DIRS[type]);
+    return await gitFs.listDirectoryFiles(repo, path);
   };
 
   const getLocalFileBlob = async (
     filePath: string,
     fileType?: string,
   ): Promise<Blob | MediaSource | null> => {
-    if (!currentAuPathSel) throw Error('No au path');
-    if (!currentRepoAccessObject) throw Error('No Repo Access Object');
+    const { auPath, repo } = getRequiredContext();
 
-    const pathto = join(currentAuPathSel, filePath);
-    return await gitFs.blobImageFile(
-      currentRepoAccessObject,
-      pathto,
-      fileType || 'image/png',
-    );
+    const pathto = join(auPath, filePath);
+    return await gitFs.blobImageFile(repo, pathto, fileType || 'image/png');
   };
 
   const getLocalFileBlobUrl = async (
     filePath: string,
     fileType?: string,
   ): Promise<string | null> => {
-    if (!currentAuPathSel) throw Error('No au path');
-    if (!currentRepoAccessObject) throw Error('No Repo Access Object');
-
-    const repoPath = getRepoPath(currentRepoAccessObject);
-    const pathto = join(currentAuPathSel, filePath);
-    const cacheKey = `${repoPath}/${pathto}`;
-    const cached = imageCache.current.get(cacheKey);
-
+    const cached = imageCache.current.get(filePath);
     if (cached) return cached;
 
-    const theBlob = await gitFs.blobImageFile(
-      currentRepoAccessObject,
-      pathto,
-      fileType || 'image/png',
-    );
+    const theBlob = await getLocalFileBlob(filePath, fileType);
+    if (theBlob === null) return null;
 
-    if (theBlob !== null) {
-      const blobUrl = URL.createObjectURL(theBlob as Blob);
-      imageCache.current.set(cacheKey, blobUrl);
-
-      return blobUrl;
-    }
-
-    return null;
+    const blobUrl = URL.createObjectURL(theBlob as Blob);
+    imageCache.current.set(filePath, blobUrl);
+    return blobUrl;
   };
 
   useEffect(() => {
@@ -167,7 +152,7 @@ export const CurrentLessonAssetsContextProvider = (props: tProviderProps) => {
         imageCache.current.forEach((url) => URL.revokeObjectURL(url));
       }
     };
-  }, [slideNumber]);
+  }, [slideNumber, currentAuPathSel, currentRepoAccessObject]);
 
   return (
     <CurrentLessonAssetsContext.Provider

@@ -17,13 +17,13 @@ import {
 import { useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { useSelector } from 'react-redux';
-import { useAssetUploadHandlers } from '../../data-hooks/useImageFile';
+import { useAssetUploadHandlers } from '../../data-hooks/useUploadFile';
 import * as yup from 'yup';
 import { currentAuPath } from '../../../../redux/courseBuilderReducer';
 import {
   FILE_DIR,
   useFsAssets,
-} from '../../../course-builder/GitViewer/session/CurrentLessonAssetsContext';
+} from '../../../course-builder/GitViewer/session/LessonAssetsContext';
 
 /**
  * Form course creators can use to attack files to a Lesson AU
@@ -66,9 +66,6 @@ export const DownloadFilesForm = ({
    * @returns Blob
    */
   const fileDownloadHandler = async (fileData: DownloadFileData) => {
-    if (!auDir) {
-      return null;
-    }
     const theBlob = await getLocalFileBlob(
       `./${FILE_DIR}/${fileData.path}`,
       fileData.type,

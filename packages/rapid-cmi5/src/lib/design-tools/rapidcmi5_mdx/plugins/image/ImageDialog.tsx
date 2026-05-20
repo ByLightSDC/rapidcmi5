@@ -26,7 +26,7 @@ import {
   TextFieldMainUi,
 } from '@rapid-cmi5/ui';
 
-import { useFsAssets } from '../../../course-builder/GitViewer/session/CurrentLessonAssetsContext';
+import { useFsAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
 
 // used for uploading files
 const VisuallyHiddenInput = styled('input')({
@@ -198,14 +198,11 @@ export const ImageDialog: React.FC = () => {
     async function fetchData() {
       try {
         const files = await getAllAssets('image');
-        const fileOptions = [];
-
         // add the current source value
         if (state.type === 'editing' && state.initialValues.src) {
-          fileOptions.push(state.initialValues.src.replace(IMAGE_DIR, ''));
+          files.push(state.initialValues.src.replace(IMAGE_DIR, ''));
         }
 
-        console.log(files);
         setFileOptions(files);
       } catch (error) {
         // Directory doesn't exist yet - this is okay, it will be created when first image is uploaded

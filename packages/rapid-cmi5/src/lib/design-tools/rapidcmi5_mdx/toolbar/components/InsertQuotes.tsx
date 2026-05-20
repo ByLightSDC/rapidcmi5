@@ -31,7 +31,7 @@ import { useCallback, useState } from 'react';
 
 import quoteAuthorPlaceholder from './assets/quoteAuthorPlaceholder.png';
 import { useSelectionHelper } from '../../../../hooks/useSelectionHelper';
-import { useFsAssets } from '../../../course-builder/GitViewer/session/CurrentLessonAssetsContext';
+import { useFsAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
 
 const PLACEHOLDER_AVATAR_FILENAME = 'quoteAuthorPlaceholder.png';
 

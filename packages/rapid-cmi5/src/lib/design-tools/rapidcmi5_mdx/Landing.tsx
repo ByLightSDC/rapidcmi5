@@ -58,7 +58,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { useRC5Prompts } from './modals/useRC5Prompts';
 import { listItemProps } from './drawers/components/LessonTreeNode';
 import { getSvgStyleIcon, StyleIconTypeEnum } from './styles/styleSvgConstants';
-import { CurrentLessonAssetsContextProvider } from '../course-builder/GitViewer/session/CurrentLessonAssetsContext';
+import { CurrentLessonAssetsContextProvider } from '../course-builder/GitViewer/session/LessonAssetsContext';
 
 enum RepoActionEnum {
   Config,
@@ -291,7 +291,12 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
                 }}
               />
               <Panel>
-                {viewMode === ViewModeEnum.Designer && <RC5VisualEditor />}
+                {viewMode === ViewModeEnum.Designer && (
+                  // Only the visual editor uses current lesson asset context
+                  <CurrentLessonAssetsContextProvider>
+                    <RC5VisualEditor />
+                  </CurrentLessonAssetsContextProvider>
+                )}
                 {viewMode === ViewModeEnum.CodeEditor && <RC5FileEditor />}
                 {viewMode === ViewModeEnum.GitEditor && <RC5GitEditor />}
               </Panel>

@@ -28,7 +28,7 @@ import {
   ModalDialog,
   TextFieldMainUi,
 } from '@rapid-cmi5/ui';
-import { useFsAssets } from '../../../course-builder/GitViewer/session/CurrentLessonAssetsContext';
+import { useFsAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
 
 // used for uploading files
 const VisuallyHiddenInput = styled('input')({

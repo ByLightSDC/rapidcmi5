@@ -1450,6 +1450,19 @@ export class GitFS {
     }
   };
 
+  fileExists = async (
+    r: RepoAccessObject,
+    filePath: string,
+  ): Promise<boolean> => {
+    try {
+      const fullPath = join(getRepoPath(r), filePath);
+      const stat = await this.fs.promises.stat(fullPath);
+      return stat.isFile();
+    } catch {
+      return false;
+    }
+  };
+
   /**
    * Lists the names of all files (non-directory entries) in a directory
    * within the given repository.

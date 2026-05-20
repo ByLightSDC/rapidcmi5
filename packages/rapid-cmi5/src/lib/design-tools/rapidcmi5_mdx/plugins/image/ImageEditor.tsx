@@ -40,7 +40,7 @@ import {
 } from '@mdxeditor/editor';
 import { $isImageNode, ImageNode } from './ImageNode';
 import ImageResizer from './ImageResizer';
-import { useFsAssets } from '../../../course-builder/GitViewer/session/CurrentLessonAssetsContext';
+import { useFsAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
 import { useSelector } from 'react-redux';
 
 import RC5LinkEditor from '../link/RC5LinkEditor';
@@ -62,7 +62,6 @@ import {
   imagePreviewHandler$,
   resolveBlockMaxWidth,
 } from '@rapid-cmi5/ui';
-import { currentAuPath } from '../../../../redux/courseBuilderReducer';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 export interface ImageEditorProps {
