@@ -206,7 +206,7 @@ function ScenarioConsoles({
         )}
 
         {rangeDataError && numRangeDataAttempts === numRetries && (
-          <Alert severity="error">
+          <Alert  sx={{ backgroundColor: 'transparent', borderStyle: 'none' }} severity="error">
             <AlertTitle>{rangeDataError}</AlertTitle>
             <ButtonMainUi
               startIcon={<ReplayIcon />}
@@ -237,7 +237,7 @@ function ScenarioConsoles({
         {!rangeDataError &&
           rangeConsoleDataError &&
           numRangeConsoleDataAttempts === numRetries && (
-            <Alert severity="error">
+            <Alert  sx={{ backgroundColor: 'transparent', borderStyle: 'none' }} severity="error">
               <AlertTitle>{rangeConsoleDataError}</AlertTitle>
               <ButtonMinorUi
                 onClick={() => {
@@ -278,7 +278,7 @@ function ScenarioConsoles({
                 severity="info"
                 sx={{
                   backgroundColor: 'transparent',
-                  borderWidth: '0px',
+                  borderStyle: 'none',
                   width: 'auto',
                   height: '48px',
                 }}

@@ -1,4 +1,11 @@
-import { createContext, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   auDisplayInitializedSel,
@@ -17,7 +24,14 @@ import { useCMI5Session } from '../hooks/useCMI5Session';
 import { useOverrideConfigs } from '../hooks/useOverrideConfig';
 import { logger, refreshLoggingConfig } from '../debug';
 import { useAuContent } from '../hooks/useAuContent';
-import { Alert, AlertTitle, CircularProgress, Typography } from '@mui/material';
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  CircularProgress,
+  Stack,
+  Typography,
+} from '@mui/material';
 import {
   ActivityCacheGetState,
   ActivityCacheSetState,
@@ -29,7 +43,7 @@ import {
 } from '@rapid-cmi5/cmi5-build-common';
 import MenuLayout from '../components/Menu/MenuLayout';
 
-import { modal, setModal } from '@rapid-cmi5/ui';
+import { ButtonInfoField, modal, setModal } from '@rapid-cmi5/ui';
 import {
   classChangeModalId,
   classPromptModalId,
@@ -39,6 +53,9 @@ import { config } from '@rapid-cmi5/ui';
 import { useActivitySession } from '../hooks/useActivitySession';
 import { handleActivityScoring } from '../utils/LmsStatementManager';
 import { debugLog } from '@rapid-cmi5/ui';
+import { CustomTheme } from '../styles/createPalette';
+import ErrorIcon from '@mui/icons-material/Error';
+import { createPortal } from 'react-dom';
 
 /**
  * Context for Building CMI5 Course
@@ -77,7 +94,7 @@ function AuManager() {
 
   const isInitializedProgressData = useRef(false);
   const [auManagerState, setAuManagerState] = useState(AuManagerState.waiting);
-
+  const [portalTarget, setPortalTarget] = useState<any>(null);
   const [loadingMessage, setLoadingMessage] = useState('');
   const [cmi5ReadyAttempts, setCmi5ReadyAttempts] = useState(0);
 
@@ -232,20 +249,19 @@ function AuManager() {
 
   const getReadyDisplay = useCallback(() => {
     if (auManagerState === AuManagerState.error) {
-      return (
-        <Alert
-          sx={{
-            position: 'absolute',
-            left: 400,
-            top: -4,
-            zIndex: 9999,
-            backgroundColor: '#0000004D',
-          }}
-          severity="error"
-        >
-          <AlertTitle>{loadingMessage}</AlertTitle>
-        </Alert>
-      );
+      if (portalTarget) {
+        return createPortal(
+          <Stack direction="row" sx={{ padding: 1, width: '70%' }}>
+            <Alert severity="error">
+              <AlertTitle>{loadingMessage}</AlertTitle>
+            </Alert>
+            <Box sx={{ minWidth: '48px' }} />
+          </Stack>,
+          portalTarget, // Render the children into the portalTarget DOM node
+        );
+      } else {
+        return null;
+      }
     }
     if (auManagerState !== AuManagerState.ready) {
       return (
@@ -266,7 +282,7 @@ function AuManager() {
       );
     }
     return null;
-  }, [auManagerState, loadingMessage]);
+  }, [auManagerState, loadingMessage, portalTarget]);
 
   const shouldRequireClassId = auJson.promptClassId
     ? auJson.promptClassId
@@ -275,6 +291,7 @@ function AuManager() {
   const auHasScenario =
     auJson.rangeosScenarioUUID || auJson.rangeosScenarioName ? true : false;
   const auHasTeamScenario = auJson.teamSSOEnabled ? true : false;
+
   /**
    * UE Manages Session State
    */
@@ -328,9 +345,8 @@ function AuManager() {
           if (auHasScenario && shouldRequireClassId) {
             dispatch(setModal({ type: classPromptModalId, id: '', name: '' }));
             logger.debug('[AuManager] prompt class id', undefined, 'auth');
-          } else {
-            setAuManagerState(AuManagerState.loadingOverrides);
           }
+          setAuManagerState(AuManagerState.loadingOverrides);
         } else {
           initializeSessionCmi5();
           setAuManagerState(AuManagerState.authenticating);
@@ -507,6 +523,21 @@ function AuManager() {
       }
     }
   }, [modalObj.type, auJson, shouldRequireClassId, dispatch]);
+
+  /**
+   * Find toolbar div to port errors into
+   * Retrieved with imageId
+   */
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const el = document.getElementById('error-portal');
+      if (el) {
+        setPortalTarget(el);
+        clearInterval(interval);
+      }
+    }, 50);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <AuManagerContext.Provider

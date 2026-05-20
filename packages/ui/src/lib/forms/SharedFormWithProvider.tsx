@@ -3,13 +3,7 @@
  *   All rights reserved.
  */
 
-import {
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router';
 import { UseFormReturn, useForm, useWatch } from 'react-hook-form';
@@ -43,7 +37,9 @@ import { useNavigateAlias } from '../hooks/useNavigateAlias';
 import { FormStateType } from '../types/form';
 import { iListItemType } from '../dashboards/constants';
 import { debugLog } from '../utility/logger';
-import AuthoringInfoFields, { tAuthoringInfoFieldProps } from './AuthoringInfoFields';
+import AuthoringInfoFields, {
+  tAuthoringInfoFieldProps,
+} from './AuthoringInfoFields';
 import Form from './Form';
 import { modal, setLoader } from '../redux/commonAppReducer';
 import { FormCrudType } from '../redux/utils/types';
@@ -51,6 +47,7 @@ import ErrorMessageDetail from '../validation/ErrorMessageDetail';
 import { sanitizePayload } from '../validation/utility';
 import { ButtonLoadingUi } from '../utility/buttons';
 import { useQueryDetails } from '../utility/useQueryDetails';
+import { Stack, SxProps } from '@mui/material';
 
 const defaultFormWidth = 800;
 
@@ -148,6 +145,7 @@ export function SharedFormWithProvider<
   validationSchema,
   defaultPostData,
   defaultPutData,
+  formSxProps = {},
   forceSubmitDisabled = false,
   shouldForceStep = false,
   stepToForce,
@@ -166,6 +164,7 @@ export function SharedFormWithProvider<
   defaultCache?: tFormCreateType;
   designer?: any; // TODO change to IDesignerContext;
   featureNameOverride?: string;
+  formSxProps?: SxProps;
   formWidth?: number | string;
   fileButtonTitle?: string;
   fileTypes?: string;
@@ -235,6 +234,8 @@ export function SharedFormWithProvider<
   const [percentComplete, setPercentComplete] = useState(0);
   const [submitError, setSubmitError] = useState<string | JSX.Element>('');
   const abortController = useRef<any>(new AbortController());
+
+
 
   /**
    * Form Constants & Validation
@@ -912,15 +913,11 @@ export function SharedFormWithProvider<
                   ? '12px'
                   : '0px'
                 : '12px',
+              ...formSxProps,
             }}
             showBorder={!isModal}
-            // 8px below fixes top row getting clipped in Blueprint and VM Image forms
             formFields={
-              <Grid
-                container
-                spacing={2}
-                sx={{ paddingTop: '8px', width: '100%' }}
-              >
+              <Grid container spacing={2} sx={{ width: '100%' }}>
                 {hasFile && crudType === FormCrudType.create ? (
                   <Grid size={12}>
                     <FileUpload
@@ -1035,7 +1032,14 @@ export function SharedFormWithProvider<
                 ) : (
                   //test for crud type requires empty react element to wrap
                   // eslint-disable-next-line react/jsx-no-useless-fragment
-                  <>
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
                     {crudType !== FormCrudType.view ? (
                       <>
                         <ButtonModalCancelUi
@@ -1095,7 +1099,7 @@ export function SharedFormWithProvider<
                         </ButtonModalMainUi>
                       </>
                     )}
-                  </>
+                  </Stack>
                 )}
               </>
             }

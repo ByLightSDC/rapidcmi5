@@ -71,9 +71,14 @@ export default function StudentInfoButton() {
         infoIcon={<AccountCircleIcon fontSize="inherit" color="primary" />}
         name="account-info-icon"
         message={
-          <Stack direction="column" sx={{ display: 'flex', marginLeft: '8px' }}>
+          <Stack
+            direction="column"
+            sx={{ display: 'flex', marginLeft: '8px', padding: 2 }}
+          >
             {studentId && (
-              <Typography variant="caption">Student Id: {studentId}</Typography>
+              <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
+                Student Id: {studentId}
+              </Typography>
             )}
             <Typography variant="caption">Registration Id: {regId}</Typography>
             {classId && (

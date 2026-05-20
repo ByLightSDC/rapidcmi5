@@ -8,6 +8,7 @@ import {
   setTheme,
   resetPersistance,
   ModalDialog,
+  RapidCmi5Icon,
 } from '@rapid-cmi5/ui';
 
 /* Material */
@@ -253,6 +254,25 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
         onClose={onClose}
         sx={{ zIndex: 9999 }}
       >
+        <MenuItem
+          onClick={() => {
+            dispatch(
+              setModal({
+                id: null,
+                meta: undefined,
+                name: null,
+                type: showVersionModalId,
+              }),
+            );
+            onClose();
+          }}
+        >
+          <ListItemIcon>
+
+            <RapidCmi5Icon />
+          </ListItemIcon>
+          <MenuItemText label="About RapidCMI5" />
+        </MenuItem>
         <MenuItem onClick={handleThemeToggle}>
           <ListItemIcon>
             <Brightness6Icon />
@@ -323,24 +343,7 @@ export default function UserInfoBox({ anchorEl, onClose }: UserInfoBoxProps) {
               ))}
           </>
         )}
-        <MenuItem
-          onClick={() => {
-            dispatch(
-              setModal({
-                id: null,
-                meta: undefined,
-                name: null,
-                type: showVersionModalId,
-              }),
-            );
-            onClose();
-          }}
-        >
-          <ListItemIcon>
-            <InfoIcon sx={{ transform: 'scaleX(-1)' }} />
-          </ListItemIcon>
-          <MenuItemText label="Version" />
-        </MenuItem>
+
         <MenuItem
           onClick={() => {
             dispatch(
