@@ -38,7 +38,7 @@ import CourseSelector from '../../selectors/CourseSelector';
 import CreateCourseForm from '../courses/CreateCourseForm';
 import CreateLessonForm from '../courses/CreateLessonForm';
 import DownloadCmi5ZipForm from '../courses/DownloadCmi5ZipForm';
-import TestInPlayerDialog from '../courses/TestInPlayerDialog';
+import TestInPlayerDialog from '../courses/cmi5PlayerTests/TestInPlayerDialog';
 import ImportRepoZipForm from '../courses/ImportRepoZipForm';
 import CloneRepoForm from './CloneRepoForm';
 import CommitForm from './CommitForm';
