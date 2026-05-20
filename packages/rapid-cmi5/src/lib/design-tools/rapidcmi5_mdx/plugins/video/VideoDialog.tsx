@@ -155,12 +155,12 @@ export const VideoDialog: React.FC = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        // add the current source value
-        // if (state.type === 'editing' && state.initialValues.src) {
-        //   fileOptions.push(state.initialValues.src.replace(VIDEO_DIR, ''));
-        // }
-
         const files = await getAllAssets('video');
+        // add the current source value
+        if (state.type === 'editing' && state.initialValues.src) {
+          files.push(state.initialValues.src.replace(VIDEO_DIR, ''));
+        }
+
         setFileOptions(files);
       } catch (error) {
         // Directory doesn't exist yet - this is okay, it will be created when first video is uploaded
@@ -177,13 +177,11 @@ export const VideoDialog: React.FC = () => {
   useEffect(() => {
     async function fetchCaptionFiles() {
       try {
-        // if (state.type === 'editing' && state.initialValues.captionSrc) {
-        //   vttOptions.push(
-        //     state.initialValues.captionSrc.replace(VIDEO_DIR, ''),
-        //   );
-        // }
-
         const files = await getAllAssets('video');
+
+        if (state.type === 'editing' && state.initialValues.captionSrc) {
+          files.push(state.initialValues.captionSrc.replace(VIDEO_DIR, ''));
+        }
 
         const vttFiles = files.filter((name) => name.endsWith('.vtt'));
 

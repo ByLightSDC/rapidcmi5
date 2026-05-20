@@ -135,11 +135,12 @@ export const AudioDialog: React.FC = () => {
     async function fetchData() {
       try {
         // add the current source value
+        const files = await getAllAssets('audio');
+
         if (state.type === 'editing' && state.initialValues.src) {
-          fileOptions.push(state.initialValues.src.replace(AUDIO_DIR, ''));
+          files.push(state.initialValues.src.replace(AUDIO_DIR, ''));
         }
 
-        const files = await getAllAssets('audio');
         setFileOptions(files);
       } catch (error) {
         // Directory doesn't exist yet - this is okay, it will be created when first audio is uploaded
