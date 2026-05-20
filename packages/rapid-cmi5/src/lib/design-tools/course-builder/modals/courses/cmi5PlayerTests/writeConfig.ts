@@ -32,3 +32,24 @@ export async function writeConfigViaIpc(
     throw new Error(result?.error ?? 'IPC call returned success:false');
   }
 }
+
+export async function loadLessonViaZip(
+  playerUrl: string,
+  zipBlob: Blob,
+  lessonDirPath: string,
+): Promise<void> {
+  const endpoint = `${playerUrl.replace(/\/$/, '')}/upload-lesson-zip?lessonDirPath=${encodeURIComponent(lessonDirPath)}`;
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/octet-stream' },
+    body: zipBlob,
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => res.statusText);
+    throw new Error(`Player dev server responded ${res.status}: ${text}`);
+  }
+  const json = await res.json().catch(() => ({ success: false }));
+  if (!json.success) {
+    throw new Error(json.error ?? 'Player dev server returned success:false');
+  }
+}

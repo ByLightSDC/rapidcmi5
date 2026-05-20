@@ -16,7 +16,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useSelector, useDispatch } from 'react-redux';
 import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { debugLogError, FormCrudType, modal, setModal } from '@rapid-cmi5/ui';
+import { FormCrudType, modal, setModal } from '@rapid-cmi5/ui';
 import { ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
 import {
   courseDataCache,
@@ -26,41 +26,17 @@ import {
 import { currentRepoAccessObjectSel } from '../../../../../redux/repoManagerReducer';
 import { testInPlayerModalId } from '../../../../rapidcmi5_mdx/modals/constants';
 import { ModalDialog } from '@rapid-cmi5/ui';
-import { getFsInstance } from '../../../GitViewer/utils/gitFsInstance';
 import { GitContext } from '../../../GitViewer/session/GitContext';
 import { useRapidCmi5Opts } from '../../../GitViewer/session/RapidCmi5OptsContext';
 import {
-  fetchLaunchUrl,
-  randomUuid,
-  rewriteLaunchHost,
-  fetchFirstAuId,
-} from './cmi5LaunchLinks';
-import { writeConfigViaIpc, writeConfigViaHttp } from './writeConfig';
+  DEFAULT_ACTOR_HOMEPAGE,
+  DEFAULT_RETURN_URL,
+  useLaunchInPlayer,
+} from './useLaunchInPlayer';
 
 const DEFAULT_PLAYER_URL = 'http://localhost:4201';
 // Electron IPC fallback: path relative to repo root
 const DEFAULT_CONFIG_PATH = 'apps/cc-cmi5-player/src/test/config.json';
-
-async function loadLessonViaZip(
-  playerUrl: string,
-  zipBlob: Blob,
-  lessonDirPath: string,
-): Promise<void> {
-  const endpoint = `${playerUrl.replace(/\/$/, '')}/upload-lesson-zip?lessonDirPath=${encodeURIComponent(lessonDirPath)}`;
-  const res = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/octet-stream' },
-    body: zipBlob,
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => res.statusText);
-    throw new Error(`Player dev server responded ${res.status}: ${text}`);
-  }
-  const json = await res.json().catch(() => ({ success: false }));
-  if (!json.success) {
-    throw new Error(json.error ?? 'Player dev server returned success:false');
-  }
-}
 
 const ENV_LMS_API_BASE = process.env['NX_PUBLIC_CPT_PLAYER_URL'];
 const ENV_LMS_COURSE_ID = process.env['NX_PUBLIC_CPT_COURSE_ID'];
@@ -68,8 +44,6 @@ const ENV_LMS_TOKEN = process.env['NX_PUBLIC_CPT_TOKEN'];
 
 const DEFAULT_LMS_API_BASE =
   ENV_LMS_API_BASE || 'https://cpt-player.develop-cp.rangeos.engineering';
-const DEFAULT_ACTOR_HOMEPAGE = 'https://moodle.com';
-const DEFAULT_RETURN_URL = 'https://lms.example.com/return';
 
 export function TestInPlayerDialog() {
   const dispatch = useDispatch();
@@ -98,9 +72,8 @@ export function TestInPlayerDialog() {
   const [selectedScenario, setSelectedScenario] = useState<ScenarioApi | null>(
     null,
   );
-  const [isLoading, setIsLoading] = useState(false);
-  const [statusMsg, setStatusMsg] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+
+  const { launch, isLoading, statusMsg, error, reset } = useLaunchInPlayer();
 
   const selectedBlock = courseData?.blocks?.[currentBlockIndex];
   const currentLesson = selectedBlock?.aus?.[currentAuIndex];
@@ -109,121 +82,32 @@ export function TestInPlayerDialog() {
     actorName || userAuth?.userName || userAuth?.userEmail || '';
 
   const handleClose = () => {
-    setError(null);
-    setStatusMsg(null);
+    reset();
     dispatch(setModal({ type: '', id: null, name: null }));
   };
 
-  const handleLaunch = async () => {
-    if (!currentLesson) {
-      setError('No lesson selected.');
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-    setStatusMsg(null);
-
-    try {
-      const fsInstance = getFsInstance();
-
-      if (hasIpc) {
-        // Electron: write config via IPC (no assets in this path)
-        const auJson = JSON.stringify(currentLesson, null, 2);
-        await writeConfigViaIpc(auJson, playerUrl, configPath);
-      } else if (repoAccessObject && currentCourse?.basePath) {
-        // Browser: build zip in-memory, ship to player dev server (includes assets)
-        if (rebuildPlayerZip && downloadCmi5Player) {
-          setStatusMsg('Downloading player zip…');
-          await fsInstance.downloadCmi5PlayerIfNeeded(downloadCmi5Player);
-        } else {
-          setStatusMsg('Seeding player cache from dev server…');
-          await fsInstance.seedPlayerCacheFromDevServer(playerUrl);
-        }
-
-        setStatusMsg('Building course zip…');
-
-        // dirPath on the AU is relative (e.g. "sandbox/intro")
-        const lessonDirPath = `compiled_course/blocks/${currentLesson.dirPath}`;
-
-        const zipBlob = await fsInstance.buildCmi5CourseBlob(
-          repoAccessObject,
-          currentCourse.basePath,
-        );
-
-        setStatusMsg('Uploading to player…');
-        await loadLessonViaZip(playerUrl, zipBlob, lessonDirPath);
-      } else {
-        // Fallback: content-only (no assets)
-        const auJson = JSON.stringify(currentLesson, null, 2);
-        await writeConfigViaHttp(playerUrl, auJson);
-      }
-
-      if (useRealLaunchLink) {
-        if (!lmsToken.trim()) {
-          setError('LMS bearer token is required for real launch link.');
-          return;
-        }
-        if (!lmsCourseId.trim()) {
-          setError('LMS course ID is required for real launch link.');
-          return;
-        }
-        if (!resolvedActorName.trim()) {
-          setError('Actor name is required for real launch link.');
-          return;
-        }
-
-        setIsLoading(true);
-        setError(null);
-        setStatusMsg('Requesting launch URL from LMS…');
-        try {
-          const launchUrl = await fetchLaunchUrl({
-            lmsApiBase,
-            courseId: lmsCourseId.trim(),
-            auIndex: currentAuIndex,
-            token: lmsToken.trim(),
-            actorName: resolvedActorName.trim(),
-            actorHomePage: actorHomePage.trim() || DEFAULT_ACTOR_HOMEPAGE,
-            registration: randomUuid(),
-            returnUrl: returnUrl.trim() || DEFAULT_RETURN_URL,
-          });
-          const localUrl = rewriteLaunchHost(launchUrl, playerUrl);
-
-          // Associate the selected scenario with the first AU before opening
-          if (selectedScenario && createAuMapping) {
-            setStatusMsg('Mapping scenario to AU…');
-            try {
-              const auId = await fetchFirstAuId({
-                lmsApiBase,
-                courseId: lmsCourseId.trim(),
-                token: lmsToken.trim(),
-              });
-              await createAuMapping(auId, selectedScenario.uuid);
-            } catch (err: unknown) {
-              debugLogError(err instanceof Error ? err.message : String(err));
-            }
-          }
-
-          window.open(localUrl, '_blank');
-          handleClose();
-        } catch (err: any) {
-          setError(err?.message ?? String(err));
-        } finally {
-          setIsLoading(false);
-          setStatusMsg(null);
-        }
-        return;
-      }
-
-      window.open(playerUrl, '_blank');
-      handleClose();
-    } catch (err: any) {
-      setError(err?.message ?? String(err));
-    } finally {
-      setIsLoading(false);
-      setStatusMsg(null);
-    }
-  };
+  const handleLaunch = () =>
+    launch({
+      currentLesson,
+      hasIpc,
+      playerUrl,
+      configPath,
+      rebuildPlayerZip,
+      repoAccessObject,
+      currentCourse,
+      downloadCmi5Player,
+      useRealLaunchLink,
+      lmsApiBase,
+      lmsCourseId,
+      lmsToken,
+      resolvedActorName,
+      actorHomePage,
+      returnUrl,
+      currentAuIndex,
+      selectedScenario,
+      createAuMapping,
+      onSuccess: handleClose,
+    });
 
   const lessonLabel = currentLesson
     ? `${selectedBlock?.blockName ?? ''} / ${currentLesson.auName}`
