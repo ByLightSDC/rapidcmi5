@@ -24,7 +24,7 @@ import {
   createRepo,
   selectRecentRepo,
   PUBLIC_TEST_REPO,
-} from '../e2e-utils.';
+} from '../e2e-utils';
 
 // ============================================================================
 // Test Fixtures and Setup

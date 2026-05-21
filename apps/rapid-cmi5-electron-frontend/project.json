@@ -80,7 +80,8 @@
       "executor": "@nx/webpack:dev-server",
       "options": {
         "buildTarget": "rapid-cmi5-electron-frontend:build",
-        "hmr": true
+        "hmr": true,
+        "host": "127.0.0.1"
       },
       "configurations": {
         "production": {
@@ -164,6 +165,37 @@
       ],
       "options": {
         "config": "apps/rapid-cmi5-electron-frontend/playwright.config.ts"
+      },
+      "configurations": {
+        "chromium": {
+          "project": ["chromium"]
+        },
+        "electron": {
+          "project": ["electron"]
+        },
+        "chromium-debug": {
+          "project": ["chromium"],
+          "headed": true,
+          "workers": 1,
+          "reporter": "list"
+        },
+        "chromium-ui": {
+          "project": ["chromium"],
+          "ui": true
+        }
+      },
+      "metadata": {
+        "description": "Run Playwright E2E tests (both chromium + electron projects)",
+        "technologies": ["playwright"]
+      }
+    },
+    "e2e-report": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "playwright show-report dist/.playwright/apps/rapid-cmi5-electron-frontend/playwright-report"
+      },
+      "metadata": {
+        "description": "Open the most recent Playwright HTML report in a browser"
       }
     }
   }

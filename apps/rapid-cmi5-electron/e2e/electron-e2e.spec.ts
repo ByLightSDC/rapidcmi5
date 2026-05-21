@@ -22,7 +22,7 @@ import {
   cloneRepo,
   verifyRepoName,
   createRepo,
-} from './e2e-utils.';
+} from './e2e-utils';
 
 const PUBLIC_TEST_REPO =
   'https://github.com/aaiirr123/rapid-cmi5-test-course.git';
