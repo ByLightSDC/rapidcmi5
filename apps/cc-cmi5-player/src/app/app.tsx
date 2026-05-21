@@ -6,12 +6,10 @@ import AppRoutes from './AppRoutes';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useOverrideTheme } from './hooks/useOverrideTheme';
-import { useEffect } from 'react';
 
 export function App() {
   const { currentTheme } = useOverrideTheme();
 
-  
   return (
     <ThemeProvider theme={currentTheme}>
       <LocalizationProvider dateAdapter={AdapterDateFns}>

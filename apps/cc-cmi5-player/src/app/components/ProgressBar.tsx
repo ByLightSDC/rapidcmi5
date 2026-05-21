@@ -5,9 +5,16 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { useSelector } from 'react-redux';
 import { courseAUProgressSel } from '../redux/auReducer';
+import { SxProps } from '@mui/system';
 
 function LinearProgressWithLabel(
-  props: LinearProgressProps & { value: number },
+  props: LinearProgressProps & {
+    fillColor?: string;
+    completeFillColor?: string;
+    sxProps?: SxProps;
+    textProps?: SxProps;
+    value: number;
+  },
 ) {
   return (
     <Box
@@ -17,20 +24,34 @@ function LinearProgressWithLabel(
         ml: 1,
       }}
     >
-      <Box sx={{ width: '90%', mr: 1 }}>
+      <Box
+        sx={{
+          width: '90%',
+          mr: 1,
+          color:
+            props.value === 100
+              ? (props.completeFillColor ?? 'success')
+              : (props.fillColor ?? 'primary'),
+        }}
+      >
         <LinearProgress
           variant="determinate"
-          color={props.value === 100 ? 'success' : 'primary'}
-          aria-label='Course Progress'
+          aria-label="Course Progress"
           {...props}
           sx={{
             borderRadius: 5,
+            color: 'inherit',
             height: 10,
+            ...props.sxProps,
           }}
         />
       </Box>
       <Box sx={{ minWidth: 35 }}>
-        <Typography aria-hidden="true" variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+        <Typography
+          aria-hidden="true"
+          variant="body2"
+          sx={{ fontWeight: 700, color: 'text.primary', ...props.textProps }}
+        >
           {`${Math.round(props.value)}%`}
         </Typography>
       </Box>
@@ -38,7 +59,17 @@ function LinearProgressWithLabel(
   );
 }
 
-export default function LinearWithValueLabel() {
+export default function ProgressBar({
+  fillColor,
+  completeFillColor,
+  sxProps,
+  textProps,
+}: {
+  fillColor?: string;
+  completeFillColor?: string;
+  sxProps?: SxProps;
+  textProps?: SxProps;
+}) {
   const courseAUProgress = useSelector(courseAUProgressSel);
   const auProgress = courseAUProgress?.progress?.auProgress ?? 0;
 
@@ -52,7 +83,14 @@ export default function LinearWithValueLabel() {
         marginBottom: '1rem',
       }}
     >
-      <LinearProgressWithLabel value={auProgress} />
+     <Box sx={{minHeight:'8px'}}/>
+      <LinearProgressWithLabel
+        fillColor={fillColor}
+        completeFillColor={completeFillColor}
+        sxProps={sxProps}
+        textProps={textProps}
+        value={80} //{auProgress}
+      />
     </Box>
   );
 }

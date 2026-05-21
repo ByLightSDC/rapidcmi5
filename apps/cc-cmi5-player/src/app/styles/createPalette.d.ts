@@ -55,6 +55,19 @@ declare module '@mui/material/styles' {
       iconSelected: React.CSSProperties['color'];
       border: React.CSSProperties['color'];
       borderSelected: React.CSSProperties['color'];
+      currentTabIndicator: React.CSSProperties['color'];
+      deselectedTab: React.CSSProperties['color'];
+      selectedTab: React.CSSProperties['color'];
+      deselectedTabText: React.CSSProperties['color'];
+      selectedTabText: React.CSSProperties['color'];
+      deselectedTabBorder: React.CSSProperties['color'];
+      selectedTabBorder: React.CSSProperties['color'];
+      shouldColorTabIndicator: boolean;
+      progressBar: React.CSSProperties['color'];
+      progressBarFill: React.CSSProperties['color'];
+      tabHover: React.CSSProperties['color'];
+      tabPanel: React.CSSProperties['color'];
+      tabPanel: React.CSSProperties['color'];
     };
   }
   interface ThemeOptions {
@@ -106,6 +119,18 @@ declare module '@mui/material/styles' {
       iconSelected: React.CSSProperties['color'];
       border: React.CSSProperties['color'];
       borderSelected: React.CSSProperties['color'];
+      currentTabIndicator: React.CSSProperties['color'];
+      deselectedTab: React.CSSProperties['color'];
+      selectedTab: React.CSSProperties['color'];
+      deselectedTabText: React.CSSProperties['color'];
+      selectedTabText: React.CSSProperties['color'];
+      shouldColorTabIndicator: boolean;
+      deselectedTabBorder: React.CSSProperties['color'];
+      selectedTabBorder: React.CSSProperties['color'];
+      progressBarFill: React.CSSProperties['color'];
+      progressBar: React.CSSProperties['color'];
+      tabHover: React.CSSProperties['color'];
+      tabPanel: React.CSSProperties['color'];
     };
   }
 }

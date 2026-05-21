@@ -93,6 +93,20 @@ export const lightTheme = createTheme({
     iconSelected: '#071285',
     border: '#071285',
     borderSelected: '#071285',
+
+    currentTabIndicator: '#6F96FF', //'#D3D8E7', //90% '#3C86CB', //primary info main
+    deselectedTab: '#3C59A2', //primary 80%
+    deselectedTabText: '#ffffff', //'#323232D9',
+    deselectedTabBorder: '#2A3F75', //60%
+    selectedTab: '#2A3F75',
+    selectedTabBorder: '#4a6bc0',
+    selectedTabText: '#ffffff',
+    shouldColorTabIndicator: false,
+    progressBar: '#4a4a4a',
+    progressBarFill: '#6F96FF',
+    tabHover: '#4a6bc0',
+    tabPanel: '#1e2d54',
+
   },
   typography: {
     fontFamily: [

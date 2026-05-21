@@ -100,6 +100,19 @@ export const darkTheme = createTheme({
     iconSelected: '#FFC840',
     border: '#FFC840d0',
     borderSelected: '#FFC840',
+    currentTabIndicator: '#6F96FF', //'#E8943A', //'#D3D8E7', //90% '#3C86CB', //primary info main
+    deselectedTab: '#3C59A2', //primary 80%
+    deselectedTabText: '#ffffff', //'#323232D9',
+    deselectedTabBorder: '#2A3F75', //60%
+    selectedTab: '#2A3F75',
+    selectedTabBorder: '#4a6bc0',
+    selectedTabText: '#ffffff',
+    shouldColorTabIndicator: false,
+    progressBar: '#4a4a4a',
+    progressBarFill: '#6F96FF',
+    tabHover: '#4a6bc0',
+    tabPanel: '#282b30', //'#1a1a1a',
+
   },
   typography: {
     fontFamily: [

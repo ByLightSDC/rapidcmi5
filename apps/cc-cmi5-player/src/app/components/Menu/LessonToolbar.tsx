@@ -31,7 +31,7 @@ export default function LessonToolbar({
 }: LessonToolbarProps) {
   const dispatch = useDispatch();
   const currentTheme = useSelector(themeColor);
-  const { palette } = useTheme();
+  const { button, palette } = useTheme();
 
   return (
     <Stack
@@ -129,6 +129,7 @@ export default function LessonToolbar({
                 borderRadius: '12px',
                 borderStyle: 1,
               }}
+              style={{ fill: button.iconColor }}
             />
           }
           checkedIcon={
@@ -141,6 +142,7 @@ export default function LessonToolbar({
                 borderRadius: '12px',
                 borderStyle: 1,
               }}
+              style={{ fill: button.iconColor }}
             />
           }
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,7 +151,7 @@ export default function LessonToolbar({
         />
       </Tooltip>
 
-      <BuildInfoButton />
+      <BuildInfoButton color={button.iconColor}/>
       <Box
         id="error-portal"
         sx={{
