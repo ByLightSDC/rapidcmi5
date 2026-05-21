@@ -1,6 +1,7 @@
 // e2e/web-app.web.spec.ts
 
-import { test, expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
+import { test, expect } from '../fixtures/web-fixtures';
 import {
   createRepo,
   selectRecentRepo,
@@ -42,13 +43,16 @@ async function setupPage(page: Page): Promise<void> {
 // Tests
 // ============================================================================
 
-// FIXME(CCUI-XXXX): Web (chromium) e2e suite hits Keycloak redirect on
-// page.goto('/') and fails in setupPage because Keycloak rejects the
-// 127.0.0.1:4200 redirect_uri ("We are sorry... Invalid parameter:
-// redirect_uri"). The Electron e2e suite works because it bypasses
-// this flow. Tracked as part of Phase 1 (auth-bypass investigation).
-// Remove `.fixme` once a local auth-bypass mechanism is in place.
-test.describe.fixme('Web App', () => {
+// @legacy — These tests exercise the full Production Mode repo-creation
+// flow (Create Repo / Clone Repo modals, real form submissions). They were
+// designed for the electron filesystem-backed flow and re-purposed for
+// chromium when Phase 0 re-enabled the web project. They are *not* the
+// primary signal going forward — Sandbox-mode tests under e2e/web/sandbox/
+// cover directive and UI regressions much faster and without any
+// filesystem dependency. Excluded from default chromium runs via
+// `grepInvert` in project.json; run explicitly with the
+// `e2e:chromium-legacy` configuration.
+test.describe('Web App @legacy', () => {
   test.beforeEach(async ({ page }) => {
     await setupPage(page);
   });

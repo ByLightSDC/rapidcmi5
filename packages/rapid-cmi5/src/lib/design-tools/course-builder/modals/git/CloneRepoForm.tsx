@@ -161,6 +161,7 @@ export function CloneRepoForm({
           </Grid>
 
           <ViewExpander
+            expandTestId="expand-git-credentials"
             rightMenuChildren={
               hasRequiredErrors ? (
                 <ReportProblemIcon color="error" fontSize="medium" />

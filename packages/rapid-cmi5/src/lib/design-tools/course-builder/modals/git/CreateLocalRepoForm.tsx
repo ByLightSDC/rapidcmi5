@@ -146,6 +146,7 @@ export function CreateLocalRepoForm({
           />
         </Grid>
         <ViewExpander
+          expandTestId="expand-git-credentials"
           rightMenuChildren={
             hasRequiredErrors ? (
               <ReportProblemIcon color="error" fontSize="medium" />

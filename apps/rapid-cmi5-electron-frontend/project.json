@@ -168,13 +168,19 @@
       },
       "configurations": {
         "chromium": {
-          "project": ["chromium"]
+          "project": ["chromium"],
+          "grepInvert": "@legacy"
+        },
+        "chromium-legacy": {
+          "project": ["chromium"],
+          "grep": "@legacy"
         },
         "electron": {
           "project": ["electron"]
         },
         "chromium-debug": {
           "project": ["chromium"],
+          "grepInvert": "@legacy",
           "headed": true,
           "workers": 1,
           "reporter": "list"

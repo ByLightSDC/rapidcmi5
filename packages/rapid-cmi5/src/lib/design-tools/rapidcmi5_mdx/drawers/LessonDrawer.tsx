@@ -175,6 +175,7 @@ export const LessonDrawer = () => {
 
   return (
     <Stack
+      data-testid="visual-designer-drawer"
       spacing={1}
       sx={{
         backgroundColor: 'background.default',

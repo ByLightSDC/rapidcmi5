@@ -62,27 +62,40 @@ let CLIENT_LOG =
 CLIENT_LOG = checkEnv(CLIENT_LOG, 'NX_PUBLIC_CLIENT_LOG');
 
 // keycloak settings
-// fallback on values used when running cypress tests
-let KEYCLOAK_URL =
-  window._env_?.NX_PUBLIC_KEYCLOAK_URL || process.env['NX_PUBLIC_KEYCLOAK_URL'];
+// Resolution: window._env_ wins when the key is *defined* (even as an empty
+// string), so an e2e harness can set window._env_.NX_PUBLIC_KEYCLOAK_URL=''
+// to disable SSO without rebuilding. Falls back to process.env (baked in at
+// build time via .env files) otherwise.
+const pickEnv = (
+  runtimeValue: string | undefined,
+  buildValue: string | undefined,
+) => (runtimeValue !== undefined ? runtimeValue : buildValue);
+
+let KEYCLOAK_URL = pickEnv(
+  window._env_?.NX_PUBLIC_KEYCLOAK_URL,
+  process.env['NX_PUBLIC_KEYCLOAK_URL'],
+);
 KEYCLOAK_URL = checkEnv(KEYCLOAK_URL, 'NX_PUBLIC_KEYCLOAK_URL');
 
-let KEYCLOAK_REALM =
-  window._env_?.NX_PUBLIC_KEYCLOAK_REALM ||
-  process.env['NX_PUBLIC_KEYCLOAK_REALM'];
+let KEYCLOAK_REALM = pickEnv(
+  window._env_?.NX_PUBLIC_KEYCLOAK_REALM,
+  process.env['NX_PUBLIC_KEYCLOAK_REALM'],
+);
 KEYCLOAK_REALM = checkEnv(KEYCLOAK_REALM, 'NX_PUBLIC_KEYCLOAK_REALM');
 
-let KEYCLOAK_CLIENT_ID =
-  window._env_?.NX_PUBLIC_KEYCLOAK_CLIENT_ID ||
-  process.env['NX_PUBLIC_KEYCLOAK_CLIENT_ID'];
+let KEYCLOAK_CLIENT_ID = pickEnv(
+  window._env_?.NX_PUBLIC_KEYCLOAK_CLIENT_ID,
+  process.env['NX_PUBLIC_KEYCLOAK_CLIENT_ID'],
+);
 KEYCLOAK_CLIENT_ID = checkEnv(
   KEYCLOAK_CLIENT_ID,
   'NX_PUBLIC_KEYCLOAK_CLIENT_ID',
 );
 
-let KEYCLOAK_SCOPE =
-  window._env_?.NX_PUBLIC_KEYCLOAK_SCOPE ||
-  process.env['NX_PUBLIC_KEYCLOAK_SCOPE'];
+let KEYCLOAK_SCOPE = pickEnv(
+  window._env_?.NX_PUBLIC_KEYCLOAK_SCOPE,
+  process.env['NX_PUBLIC_KEYCLOAK_SCOPE'],
+);
 KEYCLOAK_SCOPE = checkEnv(KEYCLOAK_SCOPE, 'NX_PUBLIC_KEYCLOAK_SCOPE');
 
 let DEVOPS_GQL_SUBSCRIPTIONS_URL =

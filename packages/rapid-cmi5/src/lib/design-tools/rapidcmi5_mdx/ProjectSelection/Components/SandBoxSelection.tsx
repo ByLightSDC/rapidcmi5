@@ -34,6 +34,7 @@ export default function SandBoxSelection({
       </Typography>
 
       <Button
+        data-testid="launch-sandbox-button"
         variant="contained"
         size="large"
         fullWidth

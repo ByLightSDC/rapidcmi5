@@ -128,6 +128,10 @@ export const createRepo = async (
 
   await window.getByTestId('field-repoDirName').fill(repoName);
   await window.getByTestId('field-repoBranch').fill(branch);
+
+  // Author fields live under a "Git Credentials" expander that is
+  // collapsed by default. Expand it before filling.
+  await expandGitCredentials(window);
   await window.getByTestId('field-authorName').fill(authorName);
   await window.getByTestId('field-authorEmail').fill(authorEmail);
 
@@ -140,6 +144,19 @@ export const createRepo = async (
   // Verify course was created
   // const courseSelector = window.getByTestId('courses-selector');
   // await expect(courseSelector).toHaveText(courseName);
+};
+
+/**
+ * Expands the "Git Credentials" accordion in the create/clone repo dialog.
+ * Mirror of the frontend helper. Idempotent.
+ */
+export const expandGitCredentials = async (window: Page) => {
+  const authorField = window.getByTestId('field-authorName');
+  if (await authorField.count() > 0 && await authorField.isVisible().catch(() => false)) {
+    return;
+  }
+  await window.getByTestId('expand-git-credentials').click();
+  await expect(authorField).toBeVisible();
 };
 
 export const createCourse = async (
@@ -218,6 +235,9 @@ export const cloneRepo = async (
   await repoNameField.fill(repoUrl);
   await window.getByTestId('field-repoDirName').fill(repoName);
   await window.getByTestId('field-repoBranch').fill(branch);
+
+  // Credentials live under the same "Git Credentials" expander as createRepo.
+  await expandGitCredentials(window);
   await window.getByTestId('field-repoUsername').fill(username);
   await window.getByTestId('field-repoPassword').fill(password);
   await window.getByTestId('field-authorName').fill(authorName);

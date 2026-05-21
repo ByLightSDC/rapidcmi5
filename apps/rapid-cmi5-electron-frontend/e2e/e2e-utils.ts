@@ -2,6 +2,42 @@ import { expect, Page } from '@playwright/test';
 import { join } from 'path-browserify';
 export const PUBLIC_TEST_REPO =
   'https://github.com/aaiirr123/rapid-cmi5-test-course.git';
+
+// ============================================================================
+// Helper Functions - Sandbox launch (preferred entry point for UI tests)
+// ============================================================================
+
+/**
+ * Navigates from cold load to the Visual Designer with the seeded sandbox
+ * course open. Idempotent — if the Visual Designer is already showing,
+ * this is a no-op.
+ *
+ * This is the preferred entry point for UI / directive / theme tests
+ * because it sidesteps the entire Production-Mode filesystem-and-git
+ * setup (create-repo, clone-repo, author-credentials, etc.) that the
+ * legacy `createRepo` flow exercises. Use the sandbox fixture in
+ * `e2e/fixtures/sandbox-fixtures.ts` to get this called automatically
+ * in `beforeEach`.
+ */
+export async function launchSandbox(window: Page): Promise<void> {
+  const designer = window.getByTestId('visual-designer-drawer');
+  if (await designer.isVisible().catch(() => false)) {
+    return; // Already in the designer
+  }
+
+  await window.goto('/');
+  await window.waitForLoadState('domcontentloaded');
+
+  const launchButton = window.getByTestId('launch-sandbox-button');
+  await expect(launchButton).toBeVisible({ timeout: 15_000 });
+  await launchButton.click();
+
+  // After clicking, the app initializes the in-memory filesystem and
+  // mounts the Visual Designer. The drawer mount is the load-complete
+  // signal we wait on.
+  await expect(designer).toBeVisible({ timeout: 30_000 });
+}
+
 // ============================================================================
 // Helper Functions - Navigation
 // ============================================================================
@@ -131,6 +167,10 @@ export const createRepo = async (
 
   await window.getByTestId('field-repoDirName').fill(repoName);
   await window.getByTestId('field-repoBranch').fill(branch);
+
+  // Author fields live under a "Git Credentials" expander that is
+  // collapsed by default. Expand it before filling.
+  await expandGitCredentials(window);
   await window.getByTestId('field-authorName').fill(authorName);
   await window.getByTestId('field-authorEmail').fill(authorEmail);
 
@@ -143,6 +183,22 @@ export const createRepo = async (
   await waitForModalToClose(window);
 
   await createCourse(window, 'introduction', 'https://intro', '');
+};
+
+/**
+ * Expands the "Git Credentials" accordion in the create/clone repo dialog.
+ * The author/email/username/password inputs are hidden inside this
+ * ViewExpander (defaultIsExpanded=false) since CCUI-XXXX. Idempotent:
+ * if already expanded, this is a no-op (clicking re-collapses it, so
+ * we only click when the author field isn't already attached).
+ */
+export const expandGitCredentials = async (window: Page) => {
+  const authorField = window.getByTestId('field-authorName');
+  if (await authorField.count() > 0 && await authorField.isVisible().catch(() => false)) {
+    return;
+  }
+  await window.getByTestId('expand-git-credentials').click();
+  await expect(authorField).toBeVisible();
 };
 
 export const selectRecentRepo = async (window: Page, projectName: string) => {
@@ -248,6 +304,9 @@ export const cloneRepo = async (
   await repoNameField.fill(repoUrl);
   await window.getByTestId('field-repoDirName').fill(repoName);
   await window.getByTestId('field-repoBranch').fill(branch);
+
+  // Credentials live under the same "Git Credentials" expander as createRepo.
+  await expandGitCredentials(window);
   await window.getByTestId('field-repoUsername').fill(username);
   await window.getByTestId('field-repoPassword').fill(password);
   await window.getByTestId('field-authorName').fill(authorName);
