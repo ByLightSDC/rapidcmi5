@@ -5,12 +5,15 @@ import { useDispatch } from 'react-redux';
 import { setAuLogo } from '../redux/auReducer';
 import { overrideDevOpsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
 import { cmi5Instance } from '../session/cmi5';
+import { CustomTheme } from '../styles/createPalette';
 
 interface ThemeConfig {
   SLIDE_BACKGROUND?: string;
   LOGO_DARK?: string;
   LOGO_LIGHT?: string;
   LOGO_WIDTH?: string;
+  LIGHT?: CustomTheme;
+  DARK?: CustomTheme;
 }
 
 interface LocationConfig {
@@ -43,9 +46,12 @@ const applyConfig = (cfg: LocationConfig) => {
     config.KEYCLOAK_CLIENT_ID = cfg.KEYCLOAK_CLIENT_ID;
   if (cfg.KEYCLOAK_SCOPE != null) config.KEYCLOAK_SCOPE = cfg.KEYCLOAK_SCOPE;
   if (cfg.THEME != null) {
+    if (cfg.THEME.LIGHT) config.THEME.LIGHT = cfg.THEME.LIGHT;
+    if (cfg.THEME.DARK) config.THEME.DARK = cfg.THEME.DARK;
     if (cfg.THEME.LOGO_DARK) config.THEME.LOGO_DARK = cfg.THEME.LOGO_DARK;
     if (cfg.THEME.LOGO_LIGHT) config.THEME.LOGO_LIGHT = cfg.THEME.LOGO_LIGHT;
     if (cfg.THEME.LOGO_WIDTH) config.THEME.LOGO_WIDTH = cfg.THEME.LOGO_WIDTH;
+
     if (cfg.THEME.SLIDE_BACKGROUND)
       config.THEME.SLIDE_BACKGROUND = cfg.THEME.SLIDE_BACKGROUND;
   }

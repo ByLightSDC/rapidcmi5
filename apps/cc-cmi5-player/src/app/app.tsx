@@ -1,21 +1,19 @@
 /* Material */
 import { ThemeProvider } from '@mui/material';
-import { useEffect } from 'react';
 import { NotificationsProvider } from '@toolpad/core';
 import AppRoutes from './AppRoutes';
-import { debugLog } from './debug';
+
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { useSelector } from 'react-redux';
-import { themeColor } from '@rapid-cmi5/ui';
-import { darkTheme } from './styles/muiThemeDark';
-import { lightTheme } from './styles/muiTheme';
+import { useOverrideTheme } from './hooks/useOverrideTheme';
+import { useEffect } from 'react';
 
 export function App() {
-  const theme = useSelector(themeColor);
+  const { currentTheme } = useOverrideTheme();
 
+  
   return (
-    <ThemeProvider theme={theme === 'dark' ? darkTheme : lightTheme}>
+    <ThemeProvider theme={currentTheme}>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <NotificationsProvider
           slotProps={{
