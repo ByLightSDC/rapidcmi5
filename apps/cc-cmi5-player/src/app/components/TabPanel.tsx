@@ -63,17 +63,8 @@ export default function TabPanel() {
       passed: slideStatus?.passed || false,
       failed: slideStatus?.failed || false,
     };
-
-    const r = Math.floor(Math.random() * (1 - 0 + 1)) + 0;
-
-    return {
-      viewed: true,
-      completed: true,
-      passed: r === 0 ? false : true,
-      failed: r === 0 ? true : false,
-    };
-
-    //TEMP return status;
+ 
+    return status;
   };
 
   // Helper function to get status icon for accessibility
