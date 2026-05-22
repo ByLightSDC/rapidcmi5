@@ -1,9 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import CheckIcon from '@mui/icons-material/Check';
+
 import { Check } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -19,6 +17,7 @@ import { CustomTheme } from '../styles/createPalette';
 import { Box, Divider, Stack, Typography, useTheme } from '@mui/material';
 import { useTabStyles } from './useTabStyles';
 import CloseIcon from '@mui/icons-material/Close';
+
 export default function TabPanel() {
   const auJson = useSelector(auJsonSel);
   const auLogoDark = useSelector(auLogoDarkSel);
@@ -37,11 +36,9 @@ export default function TabPanel() {
   const [isExitTabVisible, setIsExitTabVisible] = useState(true);
 
   const currentLogo = useMemo(() => {
-    if (currentTheme.palette.mode === 'light') {
-      return auLogoLight;
-    }
     return auLogoDark;
-  }, [currentTheme.palette.mode, auLogoDark, auLogoLight]);
+  }, [currentTheme.palette.mode, auLogoDark]);
+  const iconDimension = '20px';
 
   const tabClicked = (_: React.SyntheticEvent, newValue: number) => {
     dispatch(setActiveTab(newValue));
@@ -88,31 +85,19 @@ export default function TabPanel() {
         <Box
           sx={{
             borderRadius: '12px',
-            height: '20px', // Fixed height
-            width: '20px', // Fixed width
+            height: iconDimension,
+            width: iconDimension,
             backgroundColor: currentTheme.nav.deselectedTabText,
-            //backgroundColor: 'common.black',
-            //opacity: 0.5,
           }}
         >
-          {/* <CancelIcon
-            sx={{
-              color: currentTheme.nav.shouldColorTabIndicator
-                ? currentTheme.palette.error.main
-                : currentTheme.nav.textIconColor,
-              fontSize: '20px',
-              height: '20px', // Fixed height
-              width: '20px', // Fixed width
-            }}
-          /> */}
           <CloseIcon
             sx={{
               color: currentTheme.nav.shouldColorTabIndicator
                 ? currentTheme.palette.error.main
-                : currentTheme.nav.deselectedTabText,
-              fontSize: '20px',
-              height: '20px', // Fixed height
-              width: '20px', // Fixed width
+                : currentTheme.nav.selectedTab,
+              fontSize: iconDimension,
+              height: iconDimension,
+              width: iconDimension,
             }}
           />
         </Box>
@@ -122,21 +107,19 @@ export default function TabPanel() {
         <Box
           sx={{
             borderRadius: '12px',
-            height: '20px', // Fixed height
-            width: '20px', // Fixed width
+            height: iconDimension,
+            width: iconDimension,
             backgroundColor: currentTheme.nav.deselectedTabText,
-            //backgroundColor: 'common.black',
-            //opacity: 0.8,
           }}
         >
           <Check
             style={{
               color: currentTheme.nav.shouldColorTabIndicator
                 ? currentTheme.palette.success.main
-                : currentTheme.nav.textIconColor,
-              fontSize: '20px',
-              height: '20px', // Fixed height
-              width: '20px', // Fixed width
+                : currentTheme.nav.selectedTab,
+              fontSize: iconDimension,
+              height: iconDimension,
+              width: iconDimension,
             }}
           />
         </Box>

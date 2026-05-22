@@ -109,7 +109,7 @@ export const darkTheme = createTheme({
     selectedTab: '#2A3F75',
     selectedTabBorder: '#4a6bc0',
     selectedTabText: '#ffffff',
-    shouldColorTabIndicator: false,
+    shouldColorTabIndicator: true,
     progressBar: '#4a4a4a',
     progressBarFill: '#6F96FF',
     tabHover: '#4a6bc0',
