@@ -3,7 +3,7 @@ import {
   QuestionBankApi,
   QuestionBankApiCreate,
   quizBankContract,
-} from '../quizBankContract';
+} from '../contracts/quizBankContract';
 import { RC5ActivityTypeEnum } from '../../types/activity';
 
 type QuizBankClient = InitClientReturn<

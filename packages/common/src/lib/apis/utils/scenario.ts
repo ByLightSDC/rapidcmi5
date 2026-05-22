@@ -1,6 +1,6 @@
 import { InitClientReturn } from '@ts-rest/core';
 import { CourseAU } from '../../types/course';
-import { scenarioContract, ScenarioQuery } from '../scenarioContract';
+import { scenarioContract, ScenarioQuery } from '../contracts/scenarioContract';
 import { generateAuId } from '../../generateCmi5Xml';
 import { createAuMappingNameWithAuId } from '../../generateAuConfigs';
 

@@ -16,47 +16,10 @@ import { FormCrudType } from '@rapid-cmi5/ui';
 import { createContext, useContext } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 
-export type SubmitScenarioFormFn<T = any> = (item: T) => void;
-
-// A user can pass in their own scenario search modal
-export interface ScenarioFormProps extends GetScenarioFormProps {
-  listScenarios: (query: ScenarioQuery) => Promise<PaginatedScenariosResponse>;
-}
-
-export interface GetScenarioFormProps {
-  submitForm: SubmitScenarioFormFn;
-  formMethods: UseFormReturn;
-  formType: FormCrudType;
-  errors: any;
-}
-
-export interface GetQuizBankSearchModalProps {
-  submitForm: SubmitScenarioFormFn;
-  closeModal: () => void;
-  activityType: RC5ActivityTypeEnum;
-}
-
-// A user can pass in their own quiz bank search modal
-export interface QuizBankSearchModalProps extends GetQuizBankSearchModalProps {
-  url: string;
-  token: string;
-  currentUserEmail?: string;
-}
-
-export interface GetQuizBankAddModalProps {
-  closeModal: () => void;
-  question: any;
-}
-
-// A user can pass in their own quiz bank add modal
-export interface QuizBankAddModalProps extends GetQuizBankAddModalProps {
-  url: string;
-  token: string;
-}
-
 export type ApiUrls = {
   quizBankUrl?: string;
   codeRunnerUrl?: string;
+  rangeUrl?: string;
 };
 
 export type UserAuth = {
@@ -74,13 +37,7 @@ export interface RapidCmi5Opts {
   downloadCmi5Player?: () => Promise<any>;
   processAu?: (au: CourseAU, blockId: string) => Promise<void>;
   createAuMapping?: (auId: string, scenerioUUID: string) => Promise<void>;
-  GetScenariosForm?: React.ComponentType<GetScenarioFormProps>;
   fetchScenario?: (uuid: string) => Promise<ScenarioApi>;
-  QuizBankSearchModal?: React.ComponentType<GetQuizBankSearchModalProps>;
-  QuizBankAddModal?: React.ComponentType<GetQuizBankAddModalProps>;
-  clearData?: () => void;
-  showHomeButton?: boolean;
-  clearCache?: () => void;
   handleOverrideGlobalGitConfig?: (
     config?: GitUserConfig,
     creds?: Credentials,

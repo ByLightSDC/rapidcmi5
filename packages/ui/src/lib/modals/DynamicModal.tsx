@@ -46,11 +46,11 @@ export interface DynamicModalProps<T> {
   /** Called with the selected item (single-select mode) */
   onSelect: (item: T) => void;
   /** Fetches a page of items — called on open, page change, or search change */
-  fetchItems: (
-    page: number,
-    search: string,
-    itemsPerPage: number,
-  ) => Promise<PagedResult<T>>;
+  fetchItems: (query: {
+    offset: number;
+    search: string;
+    limit: number;
+  }) => Promise<PagedResult<T>>;
   /** Returns a stable unique ID for each item */
   getItemId: (item: T) => string;
   /**
@@ -190,10 +190,14 @@ export function DynamicModal<T>({
   };
 
   const loadItems = useCallback(
-    async (page: number, search: string) => {
+    async (offset: number, search: string) => {
       try {
         setIsLoading(true);
-        const result = await fetchItems(page, search, itemsPerPage);
+        const result = await fetchItems({
+          offset,
+          search,
+          limit: itemsPerPage,
+        });
         setItems(result.data ?? []);
         setTotalCount(result.totalCount ?? 0);
         setTotalPages(result.totalPages ?? 0);

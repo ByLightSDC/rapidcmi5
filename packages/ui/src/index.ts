@@ -112,3 +112,4 @@ export * from './lib/colors/ColorSelectionPopover';
 export * from './lib/cmi5/mdx/plugins/shared/BlockAppearanceForm';
 export * from './lib/cmi5/mdx/components/AlignmentToolbarControls';
 export * from './lib/colors/BackgroundColorTrigger';
+export * from './lib/contexts/ApiContext';

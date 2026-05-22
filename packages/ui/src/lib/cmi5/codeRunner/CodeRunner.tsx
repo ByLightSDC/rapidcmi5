@@ -18,7 +18,6 @@ import {
   RC5ActivityTypeEnum,
   CodeRunnerContent,
   CodeRunnerSubmitResponse,
-  useCodeRunnerApi,
   OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 
@@ -28,6 +27,7 @@ import {
   maxFormWidths,
   useLessonThemeStyles,
 } from '../../hooks/useLessonThemeStyles';
+import { useCodeRunnerClient } from '../../contexts/ApiContext';
 
 type CodeRunnerProps = {
   auProps: Partial<AuContextProps>;
@@ -77,9 +77,6 @@ function buildActivityContent(content: CodeRunnerContent): CodeRunnerContent {
 export function CodeRunner({
   auProps,
   content,
-  authType,
-  url,
-  token,
   innerSx,
   outerSx,
   outerStyle,
@@ -87,7 +84,7 @@ export function CodeRunner({
   const { setProgress, submitScore, isAuthenticated, isTestMode } = auProps;
   const { lessonTheme } = useContext(LessonThemeContext);
 
-  const { executeCode } = useCodeRunnerApi(authType, url, token);
+  const codeRunnerClient = useCodeRunnerClient();
 
   const monacoLanguage = resolveMonacoLanguage(
     content.programmingLanguage ?? 'javascript',
@@ -130,25 +127,26 @@ export function CodeRunner({
     setSuccessStr('');
     setErrorStr('');
     setCompileStr('');
-    if (!executeCode) return;
+    if (!codeRunnerClient) return;
 
     const activityContent = buildActivityContent(content);
 
     try {
-      const response = await executeCode({
-        submissionContent: `${submissionStr}${content.evaluator}`,
-        language: content.programmingLanguage,
-        languageVersion: content.languageVersion,
+      const { status, body } = await codeRunnerClient.execute.mutate({
+        body: {
+          submissionContent: `${submissionStr}${content.evaluator}`,
+          language: content.programmingLanguage,
+          languageVersion: content.languageVersion,
+        },
       });
 
-      const stdout = response.stdout?.trim() ?? '';
-      const stderr = response.stderr?.trim() ?? '';
+      if (status != 200) throw Error('failed code runner');
+      const stdout = body.stdout?.trim() ?? '';
+      const stderr = body.stderr?.trim() ?? '';
       const cmpinfo =
+        (body as { cmpinfo?: string; compileinfo?: string }).cmpinfo?.trim() ??
         (
-          response as { cmpinfo?: string; compileinfo?: string }
-        ).cmpinfo?.trim() ??
-        (
-          response as { cmpinfo?: string; compileinfo?: string }
+          body as { cmpinfo?: string; compileinfo?: string }
         ).compileinfo?.trim() ??
         '';
 
@@ -160,7 +158,7 @@ export function CodeRunner({
       }
 
       // Full success
-      if (response.success) {
+      if (body.success) {
         setSuccessStr(stdout || 'Submission passed successfully.');
         setProgress?.(true);
         submitActivityScore(true, stdout || 'Success', activityContent);
@@ -185,7 +183,7 @@ export function CodeRunner({
     }
   };
 
-  if (!isTestMode && (!isAuthenticated || !executeCode))
+  if (!isTestMode && (!isAuthenticated || !codeRunnerClient))
     return (
       <Box
         sx={{
@@ -217,8 +215,8 @@ export function CodeRunner({
       }}
       {...outerStyle}
     >
-      <Box sx={{ padding:2, ...innerSx }}>
-        {isTestMode && !executeCode && (
+      <Box sx={{ padding: 2, ...innerSx }}>
+        {isTestMode && !codeRunnerClient && (
           <Alert severity="info" sx={{ mb: 1.5 }}>
             Test mode active: no submission will be sent.
           </Alert>

@@ -4,16 +4,20 @@
  **/
 
 import { useCallback } from 'react';
-import axios from 'axios';
 import { Typography, Stack, Box, alpha, useTheme } from '@mui/material';
+import Grid from '@mui/material/Grid2';
+
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 
-import { DynamicModal } from '@rapid-cmi5/ui';
-import { ScenarioFormProps } from '@rapid-cmi5/react-editor';
 import { ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
+import {
+  FormControlTextField,
+  DynamicModal,
+  useRangeClient,
+} from '@rapid-cmi5/ui';
 
 const ITEMS_PER_PAGE = 50;
 
@@ -124,29 +128,67 @@ function ScenarioCard({
   );
 }
 
+export type SubmitScenarioFormFn<T = any> = (item: T) => void;
+
 export function ScenarioSelectionForm({
   submitForm,
-  listScenarios,
-}: ScenarioFormProps) {
-  const fetchItems = useCallback(
-    async (page: number, search: string) => {
-      const offset = (page - 1) * ITEMS_PER_PAGE;
+  errors,
+  control,
+}: {
+  submitForm: SubmitScenarioFormFn;
+  errors: any;
+  control: any;
+}) {
+  const rangeClient = useRangeClient();
 
-      const response = await listScenarios({
-        offset,
-        limit: ITEMS_PER_PAGE,
-        sortBy: 'dateEdited',
-        sort: 'desc',
-        search: search.trim(),
+  if (!rangeClient) {
+    return (
+      <>
+        <Grid size={6}>
+          <FormControlTextField
+            control={control}
+            name={'name'}
+            required
+            label="Scenario Name"
+            error={Boolean(errors?.name)}
+            helperText={errors?.name?.message}
+          />
+        </Grid>
+        <Grid size={6}>
+          <FormControlTextField
+            control={control}
+            name={'uuid'}
+            required
+            label="Scenario UUID"
+            error={Boolean(errors?.uuid)}
+            helperText={errors?.uuid?.message}
+          />
+        </Grid>
+      </>
+    );
+  }
+  const fetchItems = useCallback(
+    async (query: { offset: number; search: string; limit: number }) => {
+      if (!rangeClient) throw Error('No client');
+
+      const response = await rangeClient.listScenarios.query({
+        query: {
+          ...query,
+          limit: ITEMS_PER_PAGE,
+          sortBy: 'dateEdited',
+          sort: 'desc',
+        },
       });
 
+      if (response.status != 200) throw Error('Request failed');
+
       return {
-        data: response.data ?? [],
-        totalCount: response.totalCount ?? 0,
-        totalPages: response.totalPages ?? 0,
+        data: response.body.data ?? [],
+        totalCount: response.body.totalCount ?? 0,
+        totalPages: response.body.totalPages ?? 0,
       };
     },
-    [listScenarios],
+    [rangeClient],
   );
 
   return (

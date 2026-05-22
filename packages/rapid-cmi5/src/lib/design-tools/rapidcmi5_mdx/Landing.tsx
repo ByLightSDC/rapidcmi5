@@ -71,7 +71,7 @@ enum RepoActionEnum {
  *
  * @returns
  */
-export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
+export function Landing() {
   const viewMode = useSelector(currentViewMode);
   const themedDividerColor = useSelector(dividerColor);
 
@@ -162,7 +162,6 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
             }}
           >
             <NavViewMenu
-              showHomeButton={showHomeButton}
               isLeftPanelCollapsed={isLeftPanelCollapsed}
               onToggleLeftPanel={toggleLeftPanel}
             />

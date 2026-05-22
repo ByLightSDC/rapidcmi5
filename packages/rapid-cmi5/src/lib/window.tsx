@@ -192,5 +192,6 @@ declare global {
     codexApi: PtyApi;
     terminalApi: PtyApi;
     electronEvents: any;
+    electronAPI: any;
   }
 }

@@ -6,7 +6,11 @@
 
 import { initContract } from '@ts-rest/core';
 import { z } from 'zod';
-import { QuestionGrading, QuestionResponse, QuizQuestion } from '../types/quiz';
+import {
+  QuestionGrading,
+  QuestionResponse,
+  QuizQuestion,
+} from '../../types/quiz';
 
 const c = initContract();
 
@@ -76,6 +80,7 @@ export const QuestionBankQuerySchema = z.object({
   dateCreated: z.string().optional(),
   dateEdited: z.string().optional(),
   author: z.string().optional(),
+  tag: z.string().optional(),
   questionType: QuestionResponseApiSchema.optional(),
   offset: z.coerce.number().int().min(0).default(0),
   limit: z.coerce.number().int().min(1).default(10),

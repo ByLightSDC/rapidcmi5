@@ -12,7 +12,7 @@ import {
   NAME_GROUP_OPT,
   UUID_GROUP,
 } from '@rapid-cmi5/ui';
-import { Alert, MenuItem, SxProps, Typography, useTheme } from '@mui/material';
+import { Alert, MenuItem, SxProps, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import * as yup from 'yup';
@@ -25,11 +25,11 @@ import {
 import { getInfoText } from '../../../../../utils/infoButtonText';
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import LrsHeaderWithDetails from '../LrsStatementHelper';
-import { useRapidCmi5Opts } from '../../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
-import { ScenarioCard } from './ScenarioCard';
-import { NoScenarioCard } from './NoScenarioCard';
+
 import { toTitleCase } from '../formUtils';
 import { useEffect } from 'react';
+import { ScenarioSelectionForm } from '../../../../../components/modals/ScenarioSelectionModal';
+import { ScenarioCard } from './ScenarioCard';
 
 export const ScenarioForm = ({
   contextMenu,
@@ -51,7 +51,6 @@ export const ScenarioForm = ({
   outerStyle?: OuterStyle;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const { GetScenariosForm, fetchScenario } = useRapidCmi5Opts();
   const gridSize = 12;
 
   const validationSchema = yup.object().shape({
@@ -102,8 +101,8 @@ export const ScenarioForm = ({
     };
 
     /**
-    * UE triggers validation on the class id field if should prompt is turned on
-    */
+     * UE triggers validation on the class id field if should prompt is turned on
+     */
     useEffect(() => {
       if (watchPromptClass) {
         trigger('defaultClassId');
@@ -136,52 +135,17 @@ export const ScenarioForm = ({
             SSO.
           </Alert>
         </Grid>
-        {GetScenariosForm ? (
-          <Grid size={gridSize}>
-            <GetScenariosForm
-              submitForm={onApplyScenario}
-              formType={crudType}
-              errors={errors}
-              formMethods={formMethods}
-            />
-
-            {/* Selected Scenario Display */}
-            {scenarioName ? (
-              <ScenarioCard
-                fetchScenario={fetchScenario}
-                scenarioUUID={scenarioUuid}
-                scenarioName={scenarioName}
-              />
-            ) : (
-              <NoScenarioCard />
-            )}
-          </Grid>
-        ) : (
-          <>
-            <Grid size={6}>
-              <FormControlTextField
-                control={control}
-                name={'name'}
-                required
-                label="Scenario Name"
-                error={Boolean(errors?.name)}
-                helperText={errors?.name?.message}
-                readOnly={crudType === FormCrudType.view}
-              />
-            </Grid>
-            <Grid size={6}>
-              <FormControlTextField
-                control={control}
-                name={'uuid'}
-                required
-                label="Scenario UUID"
-                error={Boolean(errors?.uuid)}
-                helperText={errors?.uuid?.message}
-                readOnly={crudType === FormCrudType.view}
-              />
-            </Grid>
-          </>
-        )}
+        <Grid size={gridSize}>
+          <ScenarioSelectionForm
+            submitForm={onApplyScenario}
+            errors={errors}
+            control={control}
+          />
+          <ScenarioCard
+            scenarioUUID={scenarioUuid}
+            scenarioName={scenarioName}
+          />
+        </Grid>
 
         <Grid size={3.2}>
           <FormControlSelectField

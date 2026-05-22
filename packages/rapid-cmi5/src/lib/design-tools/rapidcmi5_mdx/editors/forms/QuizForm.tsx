@@ -23,7 +23,7 @@ import {
   QuizQuestion,
   QuestionBankApi,
   convertFromApi,
-  OuterStyle
+  OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   ENUM_GROUP,
@@ -46,7 +46,8 @@ import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 
 import { useState } from 'react';
 
-import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
+import QuizBankSearchForm from '../../../../components/modals/quizBank/SearchQuizBankForm';
+import AddToQuizBankForm from '../../../../components/modals/quizBank/AddToQuizBankForm';
 
 export function requireField<T>(value: T | undefined | null, field: string): T {
   if (value === undefined || value === null) {
@@ -77,8 +78,6 @@ export const QuizForm = ({
   outerStyle?: OuterStyle;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const { QuizBankSearchModal, QuizBankAddModal, userAuth } =
-    useRapidCmi5Opts();
   const slideType =
     activityKind === RC5ActivityTypeEnum.quiz
       ? SlideTypeEnum.Quiz
@@ -256,14 +255,14 @@ export const QuizForm = ({
           />
         </Grid>
 
-        {bankQuestion && QuizBankAddModal && (
-          <QuizBankAddModal
+        {bankQuestion && (
+          <AddToQuizBankForm
             closeModal={() => setBankQuestion(null)}
             question={bankQuestion}
           />
         )}
-        {isSearchBankOpen && QuizBankSearchModal && (
-          <QuizBankSearchModal
+        {isSearchBankOpen && (
+          <QuizBankSearchForm
             submitForm={handleModalResponse}
             closeModal={() => setIsSearchBankOpen(false)}
             activityType={activityKind}
@@ -276,19 +275,15 @@ export const QuizForm = ({
             allowSingleItemView={true}
             arrayFieldName={`questions`}
             additionalButtons={[
-              ...(QuizBankSearchModal
-                ? [
-                    <ButtonModalMinorUi
-                      aria-label="search-question-bank"
-                      id="search-question-bank-button"
-                      size="small"
-                      onClick={() => setIsSearchBankOpen(true)}
-                      startIcon={<SearchIcon fontSize="small" />}
-                    >
-                      Quiz Bank
-                    </ButtonModalMinorUi>,
-                  ]
-                : []),
+              <ButtonModalMinorUi
+                aria-label="search-question-bank"
+                id="search-question-bank-button"
+                size="small"
+                onClick={() => setIsSearchBankOpen(true)}
+                startIcon={<SearchIcon fontSize="small" />}
+              >
+                Quiz Bank
+              </ButtonModalMinorUi>,
             ]}
             arrayRenderItem={(props: tFormFieldRendererProps) => {
               return (
@@ -296,9 +291,9 @@ export const QuizForm = ({
                   crudType={crudType}
                   formProps={props}
                   slideType={slideType}
-                  onAddToBank={
-                    QuizBankAddModal ? (q) => setBankQuestion(q) : undefined
-                  }
+                  // onAddToBank={
+                  //   QuizBankAddModal ? (q) => setBankQuestion(q) : undefined
+                  // }
                 />
               );
             }}

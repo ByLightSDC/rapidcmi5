@@ -13,11 +13,12 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { alpha } from '@mui/material';
 import { ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
+import { NoScenarioCard } from './NoScenarioCard';
+import { useRangeClient } from '@rapid-cmi5/ui';
 
 interface ScenarioCardProps {
-  scenarioUUID: string;
-  scenarioName: string;
-  fetchScenario?: (uuid: string) => Promise<ScenarioApi>;
+  scenarioUUID?: string;
+  scenarioName?: string;
 }
 
 type ValidationState = 'loading' | 'valid' | 'not-found' | 'not-connected';
@@ -25,10 +26,11 @@ type ValidationState = 'loading' | 'valid' | 'not-found' | 'not-connected';
 export function ScenarioCard({
   scenarioUUID,
   scenarioName,
-  fetchScenario,
 }: ScenarioCardProps) {
   const [state, setState] = useState<ValidationState>('loading');
   const [scenario, setScenario] = useState<ScenarioApi | null>(null);
+
+  const scenarioClient = useRangeClient();
 
   const getAlertMeta = () => {
     switch (state) {
@@ -84,7 +86,7 @@ export function ScenarioCard({
   };
 
   useEffect(() => {
-    if (!fetchScenario) {
+    if (!scenarioClient) {
       setState('not-connected');
       setScenario(null);
       return;
@@ -99,10 +101,12 @@ export function ScenarioCard({
     setState('loading');
     let cancelled = false;
 
-    fetchScenario(scenarioUUID)
-      .then((data) => {
+    scenarioClient.getScenario
+      .query({ params: { uuid: scenarioUUID } })
+      .then((res) => {
         if (!cancelled) {
-          setScenario(data);
+          if (res.status !== 200) throw Error('Call failed');
+          setScenario(res.body);
           setState('valid');
         }
       })
@@ -116,10 +120,17 @@ export function ScenarioCard({
     return () => {
       cancelled = true;
     };
-  }, [scenarioUUID, fetchScenario]);
+  }, [scenarioUUID, scenarioClient]);
 
   const displayName = scenario?.name ?? scenarioName;
   const alert = getAlertMeta();
+
+  if (!scenarioClient) {
+    return;
+  }
+  if (!scenarioName || !scenarioUUID) {
+    return <NoScenarioCard />;
+  }
 
   return (
     <Card

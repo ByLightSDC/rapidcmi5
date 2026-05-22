@@ -12,7 +12,6 @@ import {
   LanguagesResponseApi,
   moveOnCriteriaOptions,
   RC5ActivityTypeEnum,
-  useCodeRunnerApi,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   FormCrudType,
@@ -23,9 +22,10 @@ import {
   FormControlSelectField,
   FormControlUIProvider,
   MiniForm,
+  debugLogError,
+  useCodeRunnerClient,
 } from '@rapid-cmi5/ui';
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
-import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 
 export const CodeRunnerForm = ({
   contextMenu,
@@ -48,12 +48,7 @@ export const CodeRunnerForm = ({
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
   const rc5id = defaultFormData?.rc5id;
-  const { apiUrls, userAuth } = useRapidCmi5Opts();
-  const { getLanguages } = useCodeRunnerApi(
-    'Bearer',
-    apiUrls?.codeRunnerUrl,
-    userAuth?.token,
-  );
+  const codeRunnerClient = useCodeRunnerClient();
 
   const [runtimeMap, setRuntimeMap] = useState<LanguagesResponseApi>({});
   const [useRuntimeDropdowns, setUseRuntimeDropdowns] = useState(false);
@@ -74,11 +69,13 @@ export const CodeRunnerForm = ({
 
   useEffect(() => {
     const fetchRuntimes = async () => {
-      if (!getLanguages) return;
+      if (!codeRunnerClient) return;
 
       try {
-        const runtimes = await getLanguages();
+        const { body: runtimes, status } =
+          await codeRunnerClient.listLanguages.query();
 
+        if (status != 200) throw Error('Failed to get languages');
         if (!Object.keys(runtimes).length) {
           setRuntimeMap({});
           setUseRuntimeDropdowns(false);
@@ -95,8 +92,8 @@ export const CodeRunnerForm = ({
         setRuntimeError(message);
       }
     };
-    fetchRuntimes();
-  }, [getLanguages]);
+    fetchRuntimes().catch((err) => debugLogError(err));
+  }, [codeRunnerClient]);
 
   const onSaveAction = (data: any) => {
     if (onSave) {

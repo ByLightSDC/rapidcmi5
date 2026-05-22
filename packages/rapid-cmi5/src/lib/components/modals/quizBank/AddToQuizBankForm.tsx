@@ -4,6 +4,7 @@ import {
   FormStateType,
   MiniForm,
   ModalDialog,
+  useQuizBankClient,
 } from '@rapid-cmi5/ui';
 import * as yup from 'yup';
 import Box from '@mui/material/Box';
@@ -23,13 +24,8 @@ import {
   UseFormSetValue,
   useWatch,
 } from 'react-hook-form';
-import {
-  QuizBankAddModalProps,
-} from '@rapid-cmi5/react-editor';
-import {
-  currentQuizBankApiVersion,
-  useQuizBankApi,
-} from '@rapid-cmi5/cmi5-build-common';
+
+import { currentQuizBankApiVersion } from '@rapid-cmi5/cmi5-build-common';
 import { FormatQuestionOptions, QuestionTypeChip } from './QuestionCard';
 
 function TagInput({
@@ -100,10 +96,11 @@ function TagInput({
 export function AddToQuizBankForm({
   question,
   closeModal,
-  token,
-  url,
-}: QuizBankAddModalProps) {
-  const { addQuestion } = useQuizBankApi(url, token);
+}: {
+  question: any;
+  closeModal: any;
+}) {
+  const quizBankClient = useQuizBankClient();
 
   const validationSchema = yup.object().shape({
     public: yup.boolean(),
@@ -115,19 +112,21 @@ export function AddToQuizBankForm({
 
   const doAction = async (data: { public: boolean; tags: string[] }) => {
     if (!question.type) throw Error('Question type not defined');
-    if (!addQuestion) throw Error('Add question to quiz bank is undefined');
-    await addQuestion({
-      publicQuestion: data.public ?? true,
-      questionType: question.type,
-      question: question.question,
-      cmi5QuestionId: question.cmi5QuestionId,
-      correctAnswer: question.typeAttributes.correctAnswer,
-      grading: question.typeAttributes.grading,
-      options: question.typeAttributes.options ?? undefined,
-      matching: question.typeAttributes.matching ?? undefined,
-      shuffleAnswers: question.typeAttributes.shuffleAnswers ?? undefined,
-      rc5QuizBankApiVersion: currentQuizBankApiVersion,
-      tags: data.tags,
+    if (!quizBankClient) throw Error('Add question to quiz bank is undefined');
+    await quizBankClient.createQuestion.mutate({
+      body: {
+        publicQuestion: data.public ?? true,
+        questionType: question.type,
+        question: question.question,
+        cmi5QuestionId: question.cmi5QuestionId,
+        correctAnswer: question.typeAttributes.correctAnswer,
+        grading: question.typeAttributes.grading,
+        options: question.typeAttributes.options ?? undefined,
+        matching: question.typeAttributes.matching ?? undefined,
+        shuffleAnswers: question.typeAttributes.shuffleAnswers ?? undefined,
+        rc5QuizBankApiVersion: currentQuizBankApiVersion,
+        tags: data.tags,
+      },
     });
     closeModal();
   };

@@ -18,9 +18,11 @@ import {
   setDividerColor,
   setIconColor,
   maxSlideWidth$,
+  ApiProviders,
 } from '@rapid-cmi5/ui';
 import { CustomTheme } from '../../styles/createPalette';
 import LessonToolbar from './LessonToolbar';
+import { cmi5Instance } from '../../session/cmi5';
 
 export default function MenuLayout() {
   const [isMenuDrawerOpen, setIsMenuDrawerOpen] = useState(true);
@@ -77,7 +79,11 @@ export default function MenuLayout() {
   }, []);
 
   return (
-    <>
+    <ApiProviders
+      token={cmi5Instance.getAuthToken()}
+      rangeUrl={config.DEVOPS_API_URL}
+      cmi5Enabled={true}
+    >
       <Drawer
         sx={{
           width: isMenuDrawerOpen ? DRAWER_WIDTH : 0,
@@ -140,6 +146,6 @@ export default function MenuLayout() {
           </>
         )}
       </PanelGroup>
-    </>
+    </ApiProviders>
   );
 }

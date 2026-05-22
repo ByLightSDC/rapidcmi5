@@ -33,6 +33,7 @@ import {
   DEFAULT_RETURN_URL,
   useLaunchInPlayer,
 } from './useLaunchInPlayer';
+import { ScenarioSelectionForm } from '@rapid-cmi5/react-editor';
 
 const DEFAULT_PLAYER_URL = 'http://localhost:4201';
 // Electron IPC fallback: path relative to repo root
@@ -53,7 +54,7 @@ export function TestInPlayerDialog() {
   const courseData = useSelector(courseDataCache);
   const currentAuIndex = useSelector(currentAu);
   const currentBlockIndex = useSelector(currentBlock);
-  const { GetScenariosForm, userAuth, createAuMapping } = useRapidCmi5Opts();
+  const { userAuth, createAuMapping } = useRapidCmi5Opts();
   const scenarioFormMethods = useForm();
 
   const [playerUrl, setPlayerUrl] = useState(DEFAULT_PLAYER_URL);
@@ -321,7 +322,7 @@ export function TestInPlayerDialog() {
                 </Box>
               )}
 
-              {GetScenariosForm && useRealLaunchLink && (
+              {useRealLaunchLink && (
                 <Box>
                   <Typography
                     variant="caption"
@@ -330,13 +331,12 @@ export function TestInPlayerDialog() {
                   >
                     Scenario to launch with
                   </Typography>
-                  <GetScenariosForm
+                  <ScenarioSelectionForm
                     submitForm={(scenario: ScenarioApi) =>
                       setSelectedScenario(scenario ?? null)
                     }
-                    formType={FormCrudType.edit}
                     errors={scenarioFormMethods.formState.errors}
-                    formMethods={scenarioFormMethods}
+                    control={scenarioFormMethods.control}
                   />
                   {selectedScenario && (
                     <Typography

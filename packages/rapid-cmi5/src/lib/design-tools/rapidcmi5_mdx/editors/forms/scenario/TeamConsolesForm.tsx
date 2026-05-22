@@ -2,7 +2,6 @@ import { UseFormReturn } from 'react-hook-form';
 import { toTitleCase } from '../formUtils';
 import {
   FormControlSelectField,
-  FormControlTextField,
   FormControlUIProvider,
   FormStateType,
   MiniForm,
@@ -23,8 +22,8 @@ import { FormCrudType } from '@rapid-cmi5/ui';
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 
 import LrsHeaderWithDetails from '../LrsStatementHelper';
-import { useRapidCmi5Opts } from '../../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
-import { NoScenarioCard } from './NoScenarioCard';
+
+import { ScenarioSelectionForm } from '../../../../../components/modals/ScenarioSelectionModal';
 import { ScenarioCard } from './ScenarioCard';
 
 export const TeamConsolesForm = ({
@@ -47,8 +46,6 @@ export const TeamConsolesForm = ({
   outerStyle?: any;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const { GetScenariosForm, fetchScenario } = useRapidCmi5Opts();
-
   const validationSchema = yup.object().shape({
     uuid: UUID_GROUP,
     name: NAME_GROUP_OPT,
@@ -102,69 +99,33 @@ export const TeamConsolesForm = ({
             authenticated via Basic Auth.
           </Alert>
         </Grid>
-        {GetScenariosForm ? (
-          <Grid size={11}>
-            <GetScenariosForm
-              submitForm={onApplyScenario}
-              formType={crudType}
-              errors={errors}
-              formMethods={formMethods}
-            />
+        <ScenarioSelectionForm
+          submitForm={onApplyScenario}
+          errors={errors}
+          control={control}
+        />
 
-            {/* Selected Scenario Display */}
-            {scenarioName ? (
-              <ScenarioCard
-                fetchScenario={fetchScenario}
-                scenarioUUID={scenarioUuid}
-                scenarioName={scenarioName}
-              />
-            ) : (
-              <NoScenarioCard />
-            )}
-          </Grid>
-        ) : (
-          <>
-            <Grid size={6}>
-              <FormControlTextField
-                control={control}
-                name={'name'}
-                required
-                label="Scenario Name"
-                error={Boolean(errors?.name)}
-                helperText={errors?.name?.message}
-                readOnly={crudType === FormCrudType.view}
-              />
-            </Grid>
-            <Grid size={6}>
-              <FormControlTextField
-                control={control}
-                name={'uuid'}
-                required
-                label="Scenario UUID"
-                error={Boolean(errors?.uuid)}
-                helperText={errors?.uuid?.message}
-                readOnly={crudType === FormCrudType.view}
-              />
-            </Grid>
-            <Grid size={4.5}>
-              <FormControlSelectField
-                control={control}
-                name={'moveOnCriteria'}
-                required
-                label="Move On Criteria"
-                error={Boolean(errors?.moveOnCriteria)}
-                helperText={errors?.moveOnCriteria?.message}
-                readOnly={crudType === FormCrudType.view}
-              >
-                {moveOnCriteriaOptions.map((item) => (
-                  <MenuItem key={item} value={item}>
-                    {toTitleCase(item)}
-                  </MenuItem>
-                ))}
-              </FormControlSelectField>
-            </Grid>
-          </>
-        )}
+        {/* Selected Scenario Display */}
+        <ScenarioCard scenarioUUID={scenarioUuid} scenarioName={scenarioName} />
+
+        <Grid size={4.5}>
+          <FormControlSelectField
+            control={control}
+            name={'moveOnCriteria'}
+            required
+            label="Move On Criteria"
+            error={Boolean(errors?.moveOnCriteria)}
+            helperText={errors?.moveOnCriteria?.message}
+            readOnly={crudType === FormCrudType.view}
+          >
+            {moveOnCriteriaOptions.map((item) => (
+              <MenuItem key={item} value={item}>
+                {toTitleCase(item)}
+              </MenuItem>
+            ))}
+          </FormControlSelectField>
+        </Grid>
+
         {/* <Grid size={11.5}>
           <KSATsFieldGroup formMethods={formMethods} crudType={crudType} />
         </Grid> */}

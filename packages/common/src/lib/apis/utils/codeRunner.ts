@@ -4,7 +4,7 @@ import {
   ExecuteCodeBodyApi,
   ExecuteCodeResponseApi,
   LanguagesResponseApi,
-} from '../codeRunnerContract';
+} from '../contracts/codeRunnerContract';
 
 type CodeRunnerClient = InitClientReturn<
   typeof codeRunnerContract,
