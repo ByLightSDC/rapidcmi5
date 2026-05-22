@@ -107,11 +107,13 @@ export function ButtonModalMinorUi(props: ButtonProps) {
   );
 }
 
-export function ButtonModalCancelUi(props: ButtonProps) {
+export function ButtonModalCancelUi(
+  props: ButtonProps & { 'data-testid'?: string },
+) {
   return (
     <StyledButton
       id={props?.id ?? 'modal-minor-button'}
-      data-testid={props?.id ?? 'modal-minor-button'}
+      data-testid={props['data-testid'] ?? props?.id ?? 'modal-minor-button'}
       role="button"
       type="button"
       variant="outlined"

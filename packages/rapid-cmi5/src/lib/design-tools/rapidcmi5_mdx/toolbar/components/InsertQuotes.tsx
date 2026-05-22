@@ -128,6 +128,7 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
     <>
       {isDrawer ? (
         <ButtonMinorUi
+          data-testid="block-library-quotes"
           title="Insert Tabs"
           aria-label="insert-tabs"
           startIcon={
@@ -161,6 +162,7 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
         </ButtonMinorUi>
       ) : (
         <MUIButtonWithTooltip
+          data-testid="insert-quotes"
           title="Insert Quotes"
           aria-label="insert-quotes"
           onClick={() => {

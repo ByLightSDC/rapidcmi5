@@ -214,7 +214,11 @@ export const LayoutBoxEditor: React.FC<
   // };
 
   return (
-    <div ref={contentRef} style={containerStyles}>
+    <div
+      data-testid="directive-layout-box"
+      ref={contentRef}
+      style={containerStyles}
+    >
       {/* <ButtonMainUi onClick={onTest}>Test</ButtonMainUi> */}
       {/* Scoped CSS: nested LayoutBoxes tile, text blocks new-line and obey text-align */}
       <style>{`

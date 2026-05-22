@@ -84,6 +84,7 @@ export const InsertTabs = ({ isDrawer }: { isDrawer?: boolean }) => {
     <>
       {isDrawer ? (
         <ButtonMinorUi
+          data-testid="block-library-tabs"
           title="Insert Tabs"
           aria-label="insert-tabs"
           startIcon={
@@ -117,6 +118,7 @@ export const InsertTabs = ({ isDrawer }: { isDrawer?: boolean }) => {
         </ButtonMinorUi>
       ) : (
         <MUIButtonWithTooltip
+          data-testid="insert-tabs"
           title="Insert Tabs"
           aria-label="insert-tabs"
           onClick={() => {

@@ -318,6 +318,7 @@ export const GridContainerEditor: React.FC<
   return (
     <>
       <Box
+        data-testid="directive-grid"
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         {...(contentWidth !== undefined
           ? { 'data-block-override': 'true' }

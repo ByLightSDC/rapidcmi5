@@ -18,17 +18,22 @@ export const MUIButtonWithTooltip = ({
   className,
   disabled,
   testId,
+  'data-testid': dataTestId,
   title,
   onClick,
   sx,
   styles,
-}: ButtonProps & { styles?: any; testId?: string }) => {
+}: ButtonProps & {
+  styles?: any;
+  testId?: string;
+  'data-testid'?: string;
+}) => {
   const theme = useTheme();
   return (
     <Tooltip title={title} {...tooltipStyle}>
       <IconButton
         className={className}
-        data-testid={testId}
+        data-testid={testId ?? dataTestId}
         sx={{
           height: '30px',
           ...sx,

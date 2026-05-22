@@ -424,6 +424,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   return (
     <>
       <Box
+        data-testid="directive-steps"
         ref={containerRef}
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         {...(contentWidth !== undefined

@@ -404,6 +404,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   return (
     <>
       <Box
+        data-testid="directive-tabs"
         ref={containerRef}
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         {...(contentWidth !== undefined

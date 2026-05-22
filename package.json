@@ -25,7 +25,9 @@
     "nxe:e2e:chromium:ui": "cross-env PW_PROJECT=chromium nx e2e rapid-cmi5-electron-frontend -- --project=chromium --ui",
     "nxe:e2e:electron": "nx e2e rapid-cmi5-electron-frontend -- --project=electron",
     "nxe:e2e:all": "nx e2e rapid-cmi5-electron-frontend",
-    "nxe:e2e:report": "playwright show-report dist/.playwright/apps/rapid-cmi5-electron-frontend/playwright-report"
+    "nxe:e2e:report": "playwright show-report dist/.playwright/apps/rapid-cmi5-electron-frontend/playwright-report",
+    "nxe:e2e:codegen": "playwright codegen --target=playwright-test http://127.0.0.1:4200",
+    "nxe:e2e:record": "cross-env PW_PROJECT=chromium nx e2e rapid-cmi5-electron-frontend -- --project=chromium --headed --workers=1 -g \"recording stub\""
   },
   "browserslist": [
     "last 2 chrome versions",

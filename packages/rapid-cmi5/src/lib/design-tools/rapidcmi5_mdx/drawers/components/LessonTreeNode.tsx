@@ -469,6 +469,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
             {isCurrentLessonFolder && (
               <Tooltip title="Add Slide">
                 <IconButton
+                  data-testid="lesson-add-slide-button"
                   aria-label="add slide"
                   className="nodrag"
                   sx={{
@@ -492,6 +493,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                   <Tooltip title="Lesson Options">
                     <span>
                       <IconButton
+                        data-testid="lesson-options-button"
                         aria-label="lesson options"
                         className="nodrag"
                         sx={{
@@ -534,10 +536,15 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                   if (option.hidden) return null;
                   // only allow add slide on current lesson
 
+                  const actionTestId = `lesson-action-${option.tooltip
+                    .toLowerCase()
+                    .replace(/\s+/g, '-')}`;
+
                   return (
                     <React.Fragment key={option.tooltip}>
                       {index > 0 && <Divider />}
                       <ListItemButton
+                        data-testid={actionTestId}
                         sx={{ height: 30 }}
                         onClick={(event) => {
                           if (onAction) {

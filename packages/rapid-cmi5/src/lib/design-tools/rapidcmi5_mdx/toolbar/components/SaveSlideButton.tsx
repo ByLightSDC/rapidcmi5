@@ -34,6 +34,7 @@ export const SaveSlideButton = () => {
     <>
       {isGitLoaded ? (
         <MUIButtonWithTooltip
+          data-testid="save-files-button"
           className={isDirty ? 'blink-animation' : undefined}
           disabled={!isDirty}
           sx={{

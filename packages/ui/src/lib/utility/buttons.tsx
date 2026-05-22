@@ -291,8 +291,17 @@ export function ButtonMainUi(props: BrandedButtonProps) {
   );
 }
 
-export function ButtonMinorUi(props: BrandedButtonProps) {
-  const { sxProps, tooltip, variant = 'outlined', ...buttonProps } = props;
+export function ButtonMinorUi(
+  props: BrandedButtonProps & { 'data-testid'?: string },
+) {
+  const {
+    sxProps,
+    tooltip,
+    variant = 'outlined',
+    'data-testid': dataTestId,
+    ...buttonProps
+  } = props;
+  const resolvedTestId = dataTestId ?? props?.id ?? 'minor-button';
   return (
     //button method to retrieve injected option OR default requires empty react element to wrap
     // eslint-disable-next-line react/jsx-no-useless-fragment
@@ -302,7 +311,7 @@ export function ButtonMinorUi(props: BrandedButtonProps) {
           <span>
             <StyledButton
               id={props?.id ?? 'minor-button'}
-              data-testid={props?.id ?? 'minor-button'}
+              data-testid={resolvedTestId}
               role="button"
               type="button"
               variant={variant}
@@ -342,7 +351,7 @@ export function ButtonMinorUi(props: BrandedButtonProps) {
       ) : (
         <StyledButton
           id={props?.id ?? 'minor-button'}
-          data-testid={props?.id ?? 'minor-button'}
+          data-testid={resolvedTestId}
           role="button"
           type="button"
           variant="outlined"
@@ -449,11 +458,13 @@ export function ButtonChipUi(props: BrandedChipProps) {
   );
 }
 
-export function ButtonLoadingUi(props: BrandedButtonProps) {
+export function ButtonLoadingUi(
+  props: BrandedButtonProps & { 'data-testid'?: string },
+) {
   return (
     <StyledLoadingButton
       id={props?.id ?? 'loading-button'}
-      data-testid={props?.id ?? 'loading-button'}
+      data-testid={props['data-testid'] ?? props?.id ?? 'loading-button'}
       type={props?.type || 'submit'}
       disableElevation
       variant="outlined"

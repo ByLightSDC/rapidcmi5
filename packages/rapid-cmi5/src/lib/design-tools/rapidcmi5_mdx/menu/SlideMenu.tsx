@@ -145,6 +145,7 @@ export const SlideMenu = () => {
         }}
       >
         <MUIButtonWithTooltip
+          data-testid="delete-slide-button"
           disabled={lessonSlides.length <= 1}
           sx={{ color: 'secondary' }}
           title="Delete Slide"
@@ -164,6 +165,7 @@ export const SlideMenu = () => {
           />
         </MUIButtonWithTooltip>
         <MUIButtonWithTooltip
+          data-testid="prev-slide-button"
           disabled={currentSlideIndex <= 0}
           sx={{ color: 'primary' }}
           title="Previous Slide"
@@ -181,6 +183,7 @@ export const SlideMenu = () => {
           />
         </MUIButtonWithTooltip>
         <Typography
+          data-testid="slide-counter"
           sx={{
             height: '20px',
             color: palette.text.secondary,
@@ -189,6 +192,7 @@ export const SlideMenu = () => {
           {`${currentSlideIndex + 1} / ${lessonSlides.length}`}
         </Typography>
         <MUIButtonWithTooltip
+          data-testid="next-slide-button"
           disabled={currentSlideIndex >= lessonSlides.length - 1}
           sx={{ color: 'primary' }}
           title="Next Slide"

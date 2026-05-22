@@ -169,7 +169,7 @@
       "configurations": {
         "chromium": {
           "project": ["chromium"],
-          "grepInvert": "@legacy"
+          "grepInvert": "@legacy|@recording"
         },
         "chromium-legacy": {
           "project": ["chromium"],
@@ -180,7 +180,7 @@
         },
         "chromium-debug": {
           "project": ["chromium"],
-          "grepInvert": "@legacy",
+          "grepInvert": "@legacy|@recording",
           "headed": true,
           "workers": 1,
           "reporter": "list"

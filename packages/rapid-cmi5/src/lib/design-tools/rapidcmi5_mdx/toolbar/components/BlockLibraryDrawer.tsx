@@ -165,6 +165,7 @@ export function BlockLibraryDrawer() {
     >
       <Stack
         id="block-library"
+        data-testid="block-library-drawer"
         direction="column"
         sx={{ height: '100%' }}
         spacing={0}

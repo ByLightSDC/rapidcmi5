@@ -250,6 +250,7 @@ export function ModalDialog(props: ModalDialogProps) {
                 return (
                   <ButtonLoadingUi
                     key={'button_' + index}
+                    data-testid={`modal_button_${button}`}
                     startIcon={buttonIcon}
                     onClick={(event) => {
                       //  solves issue where click on modal button fires an action row click
@@ -268,6 +269,7 @@ export function ModalDialog(props: ModalDialogProps) {
               return (
                 <Fragment key={`button_${index}`}>
                   <ButtonModalCancelUi
+                    data-testid={`modal_button_${button}`}
                     startIcon={buttonIcon}
                     disabled={disableButtons}
                     onClick={(event) => {

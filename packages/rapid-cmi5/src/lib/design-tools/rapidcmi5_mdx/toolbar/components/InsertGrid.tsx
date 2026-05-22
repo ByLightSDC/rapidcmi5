@@ -126,6 +126,7 @@ export const InsertGrid = ({ isDrawer }: { isDrawer?: boolean }) => {
     <>
       {isDrawer ? (
         <ButtonMinorUi
+          data-testid="block-library-grid"
           title="Insert Layout Grid"
           aria-label="insert-layout"
           startIcon={
@@ -159,6 +160,7 @@ export const InsertGrid = ({ isDrawer }: { isDrawer?: boolean }) => {
         </ButtonMinorUi>
       ) : (
         <MUIButtonWithTooltip
+          data-testid="insert-grid"
           title="Insert Layout Grid"
           aria-label="insert-layout-grid"
           onClick={() => {

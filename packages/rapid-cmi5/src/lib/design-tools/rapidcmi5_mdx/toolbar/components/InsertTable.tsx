@@ -59,6 +59,7 @@ export const InsertTable = ({ isDrawer }: { isDrawer?: boolean }) => {
     <>
       {isDrawer ? (
         <ButtonMinorUi
+          data-testid="block-library-table"
           title="Insert Table"
           aria-label="insert-table"
           //startIcon={iconComponentFor('table')}
@@ -92,6 +93,7 @@ export const InsertTable = ({ isDrawer }: { isDrawer?: boolean }) => {
         </ButtonMinorUi>
       ) : (
         <MUIButtonWithTooltip
+          data-testid="insert-table"
           title={t('toolbar.table', 'Insert Table')}
           onClick={() => {
             insertTable({ rows: 3, columns: 3 });

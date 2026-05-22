@@ -82,6 +82,7 @@ export const InsertSteps = ({ isDrawer }: { isDrawer?: boolean }) => {
     <>
       {isDrawer ? (
         <ButtonMinorUi
+          data-testid="block-library-steps"
           title="Insert Steps"
           aria-label="insert-steps"
           startIcon={
@@ -114,6 +115,7 @@ export const InsertSteps = ({ isDrawer }: { isDrawer?: boolean }) => {
         </ButtonMinorUi>
       ) : (
         <MUIButtonWithTooltip
+          data-testid="insert-steps"
           title="Insert Steps"
           aria-label="insert-steps"
           onClick={() => {

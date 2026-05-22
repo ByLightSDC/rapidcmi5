@@ -49,12 +49,17 @@ export default defineConfig({
     [process.env.CI ? 'github' : 'list'],
     ['html', { open: 'never', outputFolder: HTML_REPORT_DIR }],
   ],
+  // Local runs default to headless + 4 workers to avoid 20+ browser windows
+  // popping up and saturating the dev server. CI gets full parallelism on its
+  // dedicated runner. Use `:debug` / `:ui` scripts (which pass `--headed
+  // --workers=1`) when you want to actually watch a test run.
+  workers: process.env.CI ? undefined : 4,
   use: {
     baseURL,
     trace: 'on-first-retry',
     video: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    headless: !!process.env.CI, // Headed in dev, headless in CI
+    headless: true,
   },
   webServer,
   projects: [

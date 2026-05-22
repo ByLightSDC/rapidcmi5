@@ -95,6 +95,7 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
     <>
       {isDrawer ? (
         <ButtonMinorUi
+          data-testid="block-library-accordion"
           title="Insert Accordion"
           aria-label="insert-accordion"
           startIcon={
@@ -128,6 +129,7 @@ export const InsertAccordion = ({ isDrawer }: { isDrawer?: boolean }) => {
         </ButtonMinorUi>
       ) : (
         <MUIButtonWithTooltip
+          data-testid="insert-accordion"
           title="Insert Accordion"
           aria-label="insert-accordion"
           onClick={() => {

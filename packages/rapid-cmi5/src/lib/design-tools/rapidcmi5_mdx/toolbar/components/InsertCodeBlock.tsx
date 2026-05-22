@@ -30,6 +30,7 @@ export const InsertCodeBlock = ({ isDrawer }: { isDrawer?: boolean }) => {
     <>
       {isDrawer ? (
         <ButtonMinorUi
+          data-testid="block-library-code-block"
           title="Insert Code Block"
           aria-label="insert-code-block"
           startIcon={
@@ -61,6 +62,7 @@ export const InsertCodeBlock = ({ isDrawer }: { isDrawer?: boolean }) => {
         </ButtonMinorUi>
       ) : (
         <MUIButtonWithTooltip
+          data-testid="insert-code-block"
           title="Insert Code Block"
           aria-label="insert-code-block"
           onClick={() => {

@@ -776,6 +776,7 @@ function RC5VisualEditor() {
     <>
       {thePlugins && thePlugins.length > 0 && currentCourse ? (
         <Box
+          data-testid="rc5-visual-editor"
           className={themeClass}
           sx={{ height: `calc(100vh - ${pixelTop}px)` }}
           ref={editorContainerRef}

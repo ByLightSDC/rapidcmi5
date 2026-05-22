@@ -22,6 +22,7 @@ export const InsertBlockMenu = () => {
 
   return (
     <MUIButtonWithTooltip
+      data-testid="block-library-toggle"
       title="Block Library"
       onClick={handleClick}
       aria-label="Toggle Block Library"

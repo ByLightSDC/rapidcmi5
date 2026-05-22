@@ -124,6 +124,7 @@ export const InsertStatements = ({ isDrawer }: { isDrawer?: boolean }) => {
     <>
       {isDrawer ? (
         <ButtonMinorUi
+          data-testid="block-library-statements"
           title="Insert Statements"
           aria-label="insert-statements"
           startIcon={

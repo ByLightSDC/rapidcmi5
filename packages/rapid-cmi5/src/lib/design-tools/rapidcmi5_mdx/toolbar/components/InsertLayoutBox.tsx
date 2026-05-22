@@ -155,6 +155,7 @@ export const InsertLayoutBox = () => {
 
   return (
     <MUIButtonWithTooltip
+      data-testid="insert-layout-box"
       title="Layout Box"
       onClick={() => {
         wrapSelectionOrBlock();

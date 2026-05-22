@@ -25,6 +25,7 @@ export const InsertThematicBreak = ({ isDrawer }: { isDrawer?: boolean }) => {
     <>
       {isDrawer ? (
         <ButtonMinorUi
+          data-testid="block-library-thematic-break"
           title="Insert Thematic Break"
           aria-label="insert-thematic-break"
           startIcon={
@@ -57,6 +58,7 @@ export const InsertThematicBreak = ({ isDrawer }: { isDrawer?: boolean }) => {
         </ButtonMinorUi>
       ) : (
         <MUIButtonWithTooltip
+          data-testid="insert-thematic-break"
           title="Insert Thematic Break"
           aria-label="insert-thematic-break"
           onClick={() => {
