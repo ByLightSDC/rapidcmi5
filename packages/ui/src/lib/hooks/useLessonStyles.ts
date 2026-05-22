@@ -146,8 +146,6 @@ export const useLessonStyles = (
     return darken(muiTheme.palette.background.paper, 0.1);
   }, [muiTheme.palette.mode, muiTheme.palette.background.paper]);
 
-  // console.log('muiTheme', muiTheme);
-
   const innerActivitySx = useMemo(() => {
     return {
       ...innerSx,
