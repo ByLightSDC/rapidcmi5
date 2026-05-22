@@ -1,20 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  auJsonSel,
-  auLogoDarkSel,
-  auLogoLightSel,
-  auLogoWidthSel,
-  courseAUProgressSel,
-} from '../redux/auReducer';
-import { activeTabSel, setActiveTab } from '../redux/navigationReducer';
-import ProgressBar from './ProgressBar';
-import { alpha, Box, Stack, Typography, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import { CustomTheme } from '../styles/createPalette';
+import { useMemo } from 'react';
 
 export const useTabStyles = (
   activeTab: number,
@@ -50,7 +36,7 @@ export const useTabStyles = (
   // Helper function to get the color for the active tab indicator (overrides MUI default)
   const getActiveTabIndicatorColor = () => {
     if (!currentTheme.nav.shouldColorTabIndicator) {
-      return currentTheme.nav.currentTabIndicator;
+     return currentTheme.nav.currentTabIndicator;
     }
 
     const status = getSlideStatus(activeTab);
@@ -69,7 +55,6 @@ export const useTabStyles = (
 
   const baseTabsStyle = {
     width: '100%',
-    //TABS background color
     backgroundColor: deselectedColor, //works tints 'orange',
     bgcolor: deselectedColor, //'background.default', //this gets applied  as a tint
     color: 'white',
@@ -112,8 +97,8 @@ export const useTabStyles = (
     '&:not(.Mui-selected)': {
       opacity: 0.75,
     },
+    backgroundColor: deselectedColor,
     borderStyle: 'solid',
-    //border: `2px solid #db20cf`,
     '&:hover': {
       backgroundColor: currentTheme.nav.tabHover,
       color: '#FFFFFF',
@@ -154,7 +139,5 @@ export const useTabStyles = (
     deselectedColor,
     selectedTextIconColor,
     deselectedTextIconColor,
-    getActiveTabIndicatorColor,
-    getSlideRightBorder,
   };
 };
