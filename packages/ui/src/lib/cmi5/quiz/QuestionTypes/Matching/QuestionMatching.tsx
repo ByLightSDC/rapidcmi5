@@ -115,9 +115,9 @@ function Matching({
           {isCorrect ? (
             <Typography
               align="center"
-              sx={{ width: '100%' }}
+              sx={{ width: '100%', paddingRight: '24px', textAlign: 'center' }}
               variant="body2"
-              color="palette.grey.50"
+              color="text.primary"
             >
               Your Answer is Correct
             </Typography>

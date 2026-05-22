@@ -217,13 +217,7 @@ export function CodeRunner({
       }}
       {...outerStyle}
     >
-      <Box sx={{ padding:2, ...innerSx }}>
-        {isTestMode && !executeCode && (
-          <Alert severity="info" sx={{ mb: 1.5 }}>
-            Test mode active: no submission will be sent.
-          </Alert>
-        )}
-
+      <Box sx={{ padding: 2, ...innerSx }}>
         {content.title && (
           <Typography
             color="text.primary"
@@ -236,13 +230,13 @@ export function CodeRunner({
         )}
 
         {content.description && (
-          <Typography color="text.primary" sx={{ fontWeight: 800, pb: 1 }}>
+          <Typography color="text.primary" sx={{ fontWeight: 800, p: 1 }}>
             {content.description}
           </Typography>
         )}
 
         {content.evaluator ? (
-          <Box sx={{ overflow: 'hidden', m: 0.5 }}>
+          <Box sx={{ overflow: 'hidden', m: 1 }}>
             <MonacoEditor
               height={400}
               language={monacoLanguage}
@@ -262,10 +256,14 @@ export function CodeRunner({
             CodeRunner is missing an evaluation script.
           </Alert>
         )}
-
+        {isTestMode && !executeCode && (
+          <Alert severity="info" sx={{ m: 1 }}>
+            Test mode active: no submission will be sent.
+          </Alert>
+        )}
         {successStr && (
           <Alert
-            sx={{ m: 1.5, whiteSpace: 'pre-wrap' }}
+            sx={{ m: 1, whiteSpace: 'pre-wrap' }}
             icon={<CheckIcon fontSize="inherit" />}
             severity="success"
           >
@@ -275,20 +273,28 @@ export function CodeRunner({
         )}
 
         {compileStr && (
-          <Alert sx={{ m: 1.5, whiteSpace: 'pre-wrap' }} severity="warning">
+          <Alert sx={{ m: 1, whiteSpace: 'pre-wrap' }} severity="warning">
             <AlertTitle>Compilation Error</AlertTitle>
             {compileStr}
           </Alert>
         )}
 
         {errorStr && (
-          <Alert sx={{ m: 1.5, whiteSpace: 'pre-wrap' }} severity="error">
+          <Alert sx={{ m: 1, whiteSpace: 'pre-wrap' }} severity="error">
             <AlertTitle>Execution Failed</AlertTitle>
             {errorStr}
           </Alert>
         )}
         {content.evaluator && (
-          <Box sx={{ m: 0.5, mt: 1.5 }}>
+          <Box
+            sx={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              m: 0.5,
+              mt: 1.5,
+            }}
+          >
             <ButtonMainUi onClick={handleSubmit}>Submit</ButtonMainUi>
           </Box>
         )}

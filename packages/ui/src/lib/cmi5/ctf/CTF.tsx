@@ -62,6 +62,7 @@ import { isAnswerInputEnabled$, shouldCheckAnswer$ } from './vars';
 import { FlagEffect } from './FlagEffect';
 import { useToaster } from '../../utility/useToaster';
 import { submitScoreMessage } from './constants';
+import { ThemeProvider } from '@emotion/react';
 
 const answerBoxGridSize = 3.8;
 const attemptedLabel = '#Attempted';
@@ -370,7 +371,7 @@ export function AuCTF({
         }}
         {...outerStyle}
       >
-        <Box sx={{ padding:2, ...innerSx }}>
+        <Box sx={{ padding: 2, ...innerSx }}>
           {ctfContent.title && (
             <Typography
               color="text.primary"
@@ -379,6 +380,7 @@ export function AuCTF({
               style={{
                 fontWeight: 800,
                 paddingBottom: '8px',
+                paddingTop: '12px',
               }}
             >
               {ctfContent.title}
@@ -410,7 +412,7 @@ export function AuCTF({
                 <ScoreLabel
                   label={accuracyLabel}
                   value={`${numCorrect}`}
-                  startIconDisplay={<OutlinedFlagIcon />}
+                  startIconDisplay={<OutlinedFlagIcon color="success" />}
                 />
 
                 <ScoreLabel label="Score" value={`${accuracy}%`}>
@@ -508,10 +510,10 @@ export function AuCTF({
                 </ButtonMainUi>
               </Stack>
               <Typography
+                color="text.primary"
                 variant="caption"
                 id="keyboard-hint"
                 sx={{
-                  margin: 1,
                   display: 'flex',
                   justifyContent: 'center',
                   flexGrow: 1,
@@ -564,7 +566,7 @@ export function AuCTF({
                           color:
                             currentQuestionIndex === index && isFocused
                               ? 'common.white'
-                              : 'text.primaryContrast',
+                              : 'text.primary',
                           '&:disabled': {
                             backgroundColor: 'pink',
                             background: 'none',
@@ -581,10 +583,16 @@ export function AuCTF({
                       >
                         {option.title && (
                           <div
-                            style={{ display: 'flex', flexDirection: 'column' }}
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                            }}
                           >
                             <div
-                              style={{ display: 'flex', flexDirection: 'row' }}
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                              }}
                             >
                               {ctfContent.display?.shouldNumberQuestions && (
                                 <Typography
@@ -655,6 +663,7 @@ export function AuCTF({
               </Alert>
             </Box>
           )}
+          <Box sx={{minHeight:'12px'}}/>
         </Box>
       </Box>
     )
