@@ -9,8 +9,8 @@ const tooltipColor = '#3C59A2'; //'#505050';
 const tooltipOutline = '0px solid #707070';
 const tooltipPadding = '4px 16px';
 
-const mainColor = '#3C59A2'; //icons, button fills
-const hoverMainColor = '#8AA6D0'; //button hover
+const mainColor = '#e4002B'; //icons, button fills
+const hoverMainColor = '#EF002C'; //button hover
 
 export const lightTheme = createTheme({
   palette: {
@@ -25,7 +25,7 @@ export const lightTheme = createTheme({
       main: '#D2042D',
       dark: '#D2042D',
       light: '#D2042D',
-      contrastText: '#3C59A2',
+      contrastText: '#FFFFFF',
     },
     text: {
       primary: 'rgba(0, 0, 0, 0.9)', //unusable
@@ -46,12 +46,12 @@ export const lightTheme = createTheme({
     titleBackgroundColor: '#EEEEEE',
   },
   button: {
-    disabledBackgroundColor: '#7f8cb9',
+    disabledBackgroundColor: 'transparent',
     disabledColor: '#C1C9DB',
-    gradient: 'linear-gradient(180deg, #405CA7 0%, #2C4B93 100%)',
-    minorBackgroundColor: '#3C59A2',
-    indicatorColor: mainColor,
-    iconColor: mainColor,
+    gradient: 'linear-gradient(180deg, #e4002B 0%, #e4002B 100%)',
+    minorBackgroundColor: '#213157',
+    indicatorColor: '#3B414B',
+    iconColor: '#3B414B',
   },
   breadcrumbs: {
     default: '#202020',
@@ -93,20 +93,19 @@ export const lightTheme = createTheme({
     iconSelected: '#071285',
     border: '#071285',
     borderSelected: '#071285',
-
-    currentTabIndicator: '#6F96FF', //'#D3D8E7', //90% '#3C86CB', //primary info main
-    deselectedTab: '#3C59A2', //primary 80%
-    deselectedTabText: '#ffffff', //'#323232D9',
-    deselectedTabBorder: '#2A3F75', //60%
-    selectedTab: '#2A3F75',
-    selectedTabBorder: '#4a6bc0',
+    currentTabIndicator: '#ff6680',
+    currentTabIndicatorText: '#1a1a1a',
+    deselectedTab: '#4a4a4a',
+    deselectedTabText: '#ffffff',
+    deselectedTabBorder: '#2f2f2f',
+    selectedTab: '#e4002b',
+    selectedTabBorder: '#ff6680',
     selectedTabText: '#ffffff',
-    shouldColorTabIndicator: true,
+    shouldColorTabIndicator: false,
     progressBar: '#4a4a4a',
-    progressBarFill: '#6F96FF',
-    tabHover: '#4a6bc0',
-    tabPanel: '#1e2d54',
-
+    progressBarFill: '#ff6680',
+    tabHover: '#6a6a6a',
+    tabPanel: '#1a1a1a',
   },
   typography: {
     fontFamily: [
@@ -280,7 +279,7 @@ export const lightTheme = createTheme({
       styleOverrides: {
         root: {
           padding: '4px',
-          color: '#3C59A2', // text.interactable
+          color: '#3B414B', // text.interactable
           '&:hover': {
             backgroundColor: '#8AA6D020',
             cursor: 'pointer',
@@ -303,26 +302,21 @@ export const lightTheme = createTheme({
           minWidth: 144,
           borderRadius: 4,
           color: 'white',
-          backgroundColor: '#3C59A2',
-          border: '1px solid #07128525',
+          backgroundColor: '#4a4a4a',
+          border: '1px solid #2f2f2f',
           fontSize: '14px',
           '&.Mui-selected': {
-            border: '0px solid #07128590',
-            backgroundColor: '#7f8cb9',
+            border: '0px solid #ff6680',
+            backgroundColor: '#e4002b',
             color: 'white',
             '&:hover': {
-              //border: '0px solid #07128590',
-              //backgroundColor: '#07128590',
-              //color: '#FFFFFF',
-              border: '0px solid #07128590',
-              backgroundColor: '#7f8cb9',
+              backgroundColor: '#6a6a6a',
               color: 'white',
               cursor: 'default',
             },
           },
           '&:hover': {
-            border: '1px solid #8AA6D0',
-            backgroundColor: '#8AA6D0',
+            backgroundColor: '#6a6a6a',
             color: '#FFFFFF',
             cursor: 'pointer',
           },

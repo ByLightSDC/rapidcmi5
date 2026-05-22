@@ -104,6 +104,7 @@ export const darkTheme = createTheme({
     border: '#666666', // Package Menu
     borderSelected: '#FFC840', //unused
     currentTabIndicator: '#6F96FF', //'#E8943A', //'#D3D8E7', //90% '#3C86CB', //primary info main
+    currentTabIndicatorText: '#1e2d54',
     deselectedTab: '#3C59A2', //primary 80%
     deselectedTabText: '#ffffff', //'#323232D9',
     deselectedTabBorder: '#2A3F75', //60%
@@ -114,8 +115,7 @@ export const darkTheme = createTheme({
     progressBar: '#4a4a4a',
     progressBarFill: '#6F96FF',
     tabHover: '#4a6bc0',
-    // tabPanel: '#282b30', //'#1a1a1a',
-    tabPanel: '#1a1a1a',
+    tabPanel: '#1e2d54',
   },
   scenarioDesigner: {
     toolIcon: mainColor,

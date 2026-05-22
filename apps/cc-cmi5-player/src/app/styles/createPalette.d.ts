@@ -56,6 +56,7 @@ declare module '@mui/material/styles' {
       border: React.CSSProperties['color'];
       borderSelected: React.CSSProperties['color'];
       currentTabIndicator: React.CSSProperties['color'];
+      currentTabIndicatorText: React.CSSProperties['color'];
       deselectedTab: React.CSSProperties['color'];
       selectedTab: React.CSSProperties['color'];
       deselectedTabText: React.CSSProperties['color'];

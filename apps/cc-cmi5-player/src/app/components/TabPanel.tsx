@@ -94,7 +94,7 @@ export default function TabPanel() {
             sx={{
               color: currentTheme.nav.shouldColorTabIndicator
                 ? currentTheme.palette.error.main
-                : currentTheme.nav.selectedTab,
+                : currentTheme.palette.primary.contrastText,
               fontSize: iconDimension,
               height: iconDimension,
               width: iconDimension,
@@ -116,7 +116,7 @@ export default function TabPanel() {
             style={{
               color: currentTheme.nav.shouldColorTabIndicator
                 ? currentTheme.palette.success.main
-                : currentTheme.nav.selectedTab,
+                : currentTheme.palette.primary.contrastText,
               fontSize: iconDimension,
               height: iconDimension,
               width: iconDimension,

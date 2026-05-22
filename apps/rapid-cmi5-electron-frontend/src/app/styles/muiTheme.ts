@@ -95,7 +95,8 @@ export const lightTheme = createTheme({
     iconSelected: '#071285',
     border: '#071285', // Package Menu
     borderSelected: '#071285',
-    currentTabIndicator: '#6F96FF', //'#D3D8E7', //90% '#3C86CB', //primary info main
+    currentTabIndicator: '#6F96FF',
+    currentTabIndicatorText: '#1e2d54',
     deselectedTab: '#3C59A2', //primary 80%
     deselectedTabText: '#ffffff', //'#323232D9',
     deselectedTabBorder: '#2A3F75', //60%
