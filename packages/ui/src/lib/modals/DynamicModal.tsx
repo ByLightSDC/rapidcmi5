@@ -1,9 +1,11 @@
 /*
-  This modal is for using with dynamic search data, most likely interacting with an API
+  This modal is for allowing a user to search through data and select one or multiple items.
+  Additional functions allow for the item to be expanded or modified.
+  No API methods should be included in this, it is purely a UI component.
 */
 
 import { useForm, Controller } from 'react-hook-form';
-import { useState, useEffect, useCallback, useRef, ReactNode } from 'react';
+import { useEffect, useCallback, useRef, useState, ReactNode } from 'react';
 /* MUI */
 import {
   Button,
@@ -28,29 +30,44 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { SearchBar } from '../inputs/SearchBar';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
-import { ButtonMinorUi } from '../utility/buttons';
+import { getErrorMessage } from '../utility/errors';
+import { useDebounce } from '../utility/debounce';
 
-export interface PagedResult<T> {
-  data: T[];
-  totalCount: number;
-  totalPages: number;
+export interface PaginatedItemsResult<T> {
+  body?: {
+    data?: T[];
+    totalCount?: number;
+    totalPages?: number;
+  };
+  error: unknown;
+  isPending: boolean;
 }
 
 export interface DynamicModalProps<T> {
+  /** Controls whether the dialog is open. The parent owns this state. */
+  open: boolean;
+  /** Called when the dialog should close (cancel, backdrop click, or after submit). */
+  onClose: () => void;
   /** Called with the selected item (single-select mode) */
-  onSelect: (item: T) => void;
-  /** Fetches a page of items — called on open, page change, or search change */
-  fetchItems: (query: {
-    offset: number;
-    search: string;
-    limit: number;
-  }) => Promise<PagedResult<T>>;
+  onSelect: (items: T[]) => void;
+  /**
+   * Called by the modal each render with the current search/pagination state.
+   * Should return the paginated query result — the modal derives items,
+   * totalCount, totalPages, isLoading, and error from this.
+   */
+  fetchItems: (
+    search: string,
+    limit: number,
+    offset: number,
+  ) => PaginatedItemsResult<T>;
+
   /** Returns a stable unique ID for each item */
   getItemId: (item: T) => string;
   /**
@@ -63,9 +80,7 @@ export interface DynamicModalProps<T> {
     isSelected: boolean,
     isExpanded: boolean,
     onToggleExpand: (e: React.MouseEvent) => void,
-    onDelete?: (id: string) => Promise<void>,
   ) => ReactNode;
-
   // --- Text / labels ---
   /** Dialog title (default: "Select Item") */
   title?: string;
@@ -77,37 +92,22 @@ export interface DynamicModalProps<T> {
   emptyDescription?: string;
   /** Noun used in count labels, e.g. "scenario" → "42 scenarios" (default: "item") */
   itemLabel?: string;
-  /** Label for the trigger / confirm button (default: "Select") */
-  triggerLabel?: string;
-  /** Icon to display at the start of the trigger button */
-  triggerStartIcon?: ReactNode;
+  /** Label for the single-select confirm button (default: "Select") */
+  confirmLabel?: string;
   /** Items per page (default: 50) */
   itemsPerPage?: number;
-
   // --- Multi-select ---
   /** Enable checkbox-style multi-selection */
   multiSelect?: boolean;
-  /** Called with all selected items when the user confirms in multi-select mode */
-  onMultiSelect?: (items: T[]) => void;
-
-  // --- Controlled open (skips the trigger button) ---
-  /** When provided the dialog is controlled externally; the trigger button is hidden */
-  open?: boolean;
-  /** Called when the dialog should close (required when `open` is provided) */
-  onClose?: () => void;
-
-  /** Called when the user is allowed to delete an item **/
-  onDelete?: (id: string) => Promise<void>;
 }
 
 interface SelectionFormData {
   selectedId: string;
 }
 
-const SEARCH_DEBOUNCE_MS = 400;
-const ROW_HEIGHT = 42;
-
 export function DynamicModal<T>({
+  open,
+  onClose,
   onSelect,
   fetchItems,
   getItemId,
@@ -117,35 +117,31 @@ export function DynamicModal<T>({
   emptyTitle = 'No items',
   emptyDescription = 'No items to display',
   itemLabel = 'item',
-  triggerLabel = 'Select',
-  triggerStartIcon,
-  itemsPerPage = 50,
+  confirmLabel = 'Select',
+  itemsPerPage = 25,
   multiSelect = false,
-  onMultiSelect,
-  open: controlledOpen,
-  onClose: controlledOnClose,
-  onDelete,
 }: DynamicModalProps<T>) {
   const theme = useTheme();
-  const isControlled = controlledOpen !== undefined;
 
-  // --- Open state ---
-  const [internalOpen, setInternalOpen] = useState(false);
-  const isOpen = isControlled ? controlledOpen! : internalOpen;
-
-  const handleClose = useCallback(() => {
-    if (isControlled) controlledOnClose?.();
-    else setInternalOpen(false);
-  }, [isControlled, controlledOnClose]);
-
-  // --- Data ---
-  const [items, setItems] = useState<T[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  // --- Search & pagination (managed internally) ---
   const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 500);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
+
+  // --- Fetch ---
+  const {
+    body,
+    error,
+    isPending: isLoading,
+  } = fetchItems(
+    debouncedSearch,
+    itemsPerPage,
+    (currentPage - 1) * itemsPerPage,
+  );
+
+  const items = body?.data ?? [];
+  const totalCount = body?.totalCount ?? 0;
+  const totalPages = body?.totalPages ?? 0;
 
   // --- Selection ---
   const [multiSelectedIds, setMultiSelectedIds] = useState<Set<string>>(
@@ -155,8 +151,12 @@ export function DynamicModal<T>({
   // --- Expand ---
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  // Reset to first page whenever the search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
 
   // Single-select form
   const {
@@ -167,14 +167,6 @@ export function DynamicModal<T>({
     formState: { errors },
   } = useForm<SelectionFormData>({ defaultValues: { selectedId: '' } });
   const selectedId = watch('selectedId');
-
-  const handleDeleteItem = onDelete
-    ? async (id: string) => {
-        await onDelete(id);
-        setItems((prev) => prev.filter((item) => getItemId(item) !== id));
-        setTotalCount((prev) => prev - 1);
-      }
-    : undefined;
 
   const colors = {
     background: theme.palette.background.default,
@@ -189,59 +181,16 @@ export function DynamicModal<T>({
     textTertiary: alpha(theme.palette.text.secondary, 0.7),
   };
 
-  const loadItems = useCallback(
-    async (offset: number, search: string) => {
-      try {
-        setIsLoading(true);
-        const result = await fetchItems({
-          offset,
-          search,
-          limit: itemsPerPage,
-        });
-        setItems(result.data ?? []);
-        setTotalCount(result.totalCount ?? 0);
-        setTotalPages(result.totalPages ?? 0);
-      } catch (e) {
-        console.error('DynamicModal: fetchItems failed', e);
-        setItems([]);
-        setTotalCount(0);
-        setTotalPages(0);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [fetchItems],
-  );
-
-  // Debounce search
+  // Reset local UI state on close (query data stays cached for next open)
   useEffect(() => {
-    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-    searchTimeoutRef.current = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-      setCurrentPage(1);
-    }, SEARCH_DEBOUNCE_MS);
-    return () => {
-      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-    };
-  }, [searchQuery]);
-
-  // Fetch on open / page / search change
-  useEffect(() => {
-    if (isOpen) loadItems(currentPage, debouncedSearch);
-  }, [isOpen, currentPage, debouncedSearch, loadItems]);
-
-  // Reset all local state on close
-  useEffect(() => {
-    if (!isOpen) {
+    if (!open) {
       reset({ selectedId: '' });
       setSearchQuery('');
-      setDebouncedSearch('');
       setCurrentPage(1);
-      setItems([]);
       setMultiSelectedIds(new Set());
       setExpandedIds(new Set());
     }
-  }, [isOpen, reset]);
+  }, [open, reset]);
 
   // Scroll to top on page change
   useEffect(() => {
@@ -249,20 +198,20 @@ export function DynamicModal<T>({
   }, [currentPage]);
 
   // --- Handlers ---
-  const onSubmit = (data: SelectionFormData) => {
-    const found = items.find((item) => getItemId(item) === data.selectedId);
+  const onSubmit = (formData: SelectionFormData) => {
+    const found = items.find((item) => getItemId(item) === formData.selectedId);
     if (!found) return;
-    onSelect(found);
-    handleClose();
+    onSelect([found]);
+    onClose();
   };
 
   const onMultiSubmit = () => {
-    if (!onMultiSelect) return;
+    if (!multiSelect) return;
     const chosen = items.filter((item) =>
       multiSelectedIds.has(getItemId(item)),
     );
-    onMultiSelect(chosen);
-    handleClose();
+    onSelect(chosen);
+    onClose();
   };
 
   const handleMultiToggle = (id: string) => {
@@ -298,547 +247,556 @@ export function DynamicModal<T>({
       : 0;
 
   return (
-    <Box sx={{ my: isControlled ? 0 : 1 }}>
-      {/* Trigger button — only in uncontrolled mode */}
-      {!isControlled && (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth={false}
+      TransitionComponent={Fade}
+      transitionDuration={200}
+      PaperProps={{
+        sx: {
+          width: { xs: '95vw', sm: '80vw', md: '700px', lg: '800px' },
+          height: '85vh',
+          maxHeight: '900px',
+          borderRadius: 3,
+          bgcolor: colors.background,
+          backgroundImage: 'none',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        },
+      }}
+    >
+      {/* Header */}
+      <DialogTitle
+        sx={{
+          p: 0,
+          borderBottom: `1px solid ${colors.border}`,
+          bgcolor: colors.surface,
+          flexShrink: 0,
+        }}
+      >
         <Box
           sx={{
             display: 'flex',
-            alignItems: 'stretch',
-            gap: 1.5,
-            width: '100%',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            px: 3,
+            py: 2,
           }}
         >
-          <ButtonMinorUi
-            onClick={() => setInternalOpen(true)}
-            fullWidth
-            startIcon={triggerStartIcon}
-            sx={{ height: ROW_HEIGHT, boxSizing: 'border-box' }}
+          <Box sx={{ width: 40 }} />
+          <Typography
+            variant="subtitle1"
+            fontWeight={600}
+            letterSpacing="-0.01em"
+            sx={{ color: colors.textPrimary }}
           >
-            {triggerLabel}
-          </ButtonMinorUi>
+            {title}
+          </Typography>
+          <IconButton
+            aria-label="Close"
+            onClick={onClose}
+            sx={{
+              color: colors.textSecondary,
+              '&:hover': { bgcolor: colors.surfaceHover },
+            }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
         </Box>
-      )}
 
-      <Dialog
-        open={isOpen}
-        onClose={handleClose}
-        fullWidth
-        maxWidth={false}
-        TransitionComponent={Fade}
-        transitionDuration={200}
-        PaperProps={{
-          sx: {
-            width: { xs: '95vw', sm: '80vw', md: '700px', lg: '800px' },
-            height: '85vh',
-            maxHeight: '900px',
-            borderRadius: 3,
-            bgcolor: colors.background,
-            backgroundImage: 'none',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
+        {/* Search Bar */}
+        <Box sx={{ px: 3, pb: 2 }}>
+          <SearchBar
+            searchQuery={searchQuery}
+            isDisabled={isLoading}
+            isLoading={isLoading}
+            fullWidth
+            placeholder={searchPlaceholder}
+            handleSearchChange={(e) => setSearchQuery(e.target.value)}
+            handleClearSearch={() => setSearchQuery('')}
+          />
+        </Box>
+      </DialogTitle>
+
+      {/* Content */}
+      <DialogContent
+        ref={contentRef}
+        sx={{
+          p: 0,
+          bgcolor: colors.background,
+          flex: 1,
+          overflow: 'auto',
+          '&::-webkit-scrollbar': { width: 8 },
+          '&::-webkit-scrollbar-track': { bgcolor: 'transparent' },
+          '&::-webkit-scrollbar-thumb': {
+            bgcolor: colors.border,
+            borderRadius: 4,
+            '&:hover': { bgcolor: colors.borderHover },
           },
         }}
       >
-        {/* Header */}
-        <DialogTitle
-          sx={{
-            p: 0,
-            borderBottom: `1px solid ${colors.border}`,
-            bgcolor: colors.surface,
-            flexShrink: 0,
-          }}
-        >
+        {/* Results Summary */}
+        {!isLoading && totalCount > 0 && (
           <Box
             sx={{
               display: 'flex',
-              alignItems: 'center',
               justifyContent: 'space-between',
+              alignItems: 'center',
               px: 3,
-              py: 2,
+              py: 1.5,
+              borderBottom: `1px solid ${colors.border}`,
+              bgcolor: colors.surface,
+              flexShrink: 0,
             }}
           >
-            <Box sx={{ width: 40 }} />
             <Typography
-              variant="subtitle1"
-              fontWeight={600}
-              letterSpacing="-0.01em"
-              sx={{ color: colors.textPrimary }}
-            >
-              {title}
-            </Typography>
-            <IconButton
-              aria-label="Close"
-              onClick={handleClose}
+              variant="caption"
               sx={{
                 color: colors.textSecondary,
-                '&:hover': { bgcolor: colors.surfaceHover },
+                fontWeight: 500,
+                letterSpacing: '0.02em',
               }}
             >
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          </Box>
-
-          {/* Search Bar */}
-          <Box sx={{ px: 3, pb: 2 }}>
-            <SearchBar
-              searchQuery={searchQuery}
-              isDisabled={isLoading}
-              isLoading={isLoading}
-              fullWidth
-              placeholder={searchPlaceholder}
-              handleSearchChange={(e) => setSearchQuery(e.target.value)}
-              handleClearSearch={() => setSearchQuery('')}
-            />
-          </Box>
-        </DialogTitle>
-
-        {/* Content */}
-        <DialogContent
-          ref={contentRef}
-          sx={{
-            p: 0,
-            bgcolor: colors.background,
-            flex: 1,
-            overflow: 'auto',
-            '&::-webkit-scrollbar': { width: 8 },
-            '&::-webkit-scrollbar-track': { bgcolor: 'transparent' },
-            '&::-webkit-scrollbar-thumb': {
-              bgcolor: colors.border,
-              borderRadius: 4,
-              '&:hover': { bgcolor: colors.borderHover },
-            },
-          }}
-        >
-          {/* Results Summary */}
-          {!isLoading && totalCount > 0 && (
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                px: 3,
-                py: 1.5,
-                borderBottom: `1px solid ${colors.border}`,
-                bgcolor: colors.surface,
-                flexShrink: 0,
-              }}
-            >
-              <Typography
-                variant="caption"
+              {totalCount}
+            </Typography>
+            {selectionCount > 0 && (
+              <Chip
+                icon={<CheckCircleIcon sx={{ fontSize: 14 }} />}
+                label={`${selectionCount} selected`}
+                size="small"
                 sx={{
-                  color: colors.textSecondary,
+                  height: 24,
+                  fontSize: '0.75rem',
                   fontWeight: 500,
-                  letterSpacing: '0.02em',
+                  bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  color: theme.palette.primary.main,
+                  border: 'none',
+                  '& .MuiChip-icon': { color: 'inherit' },
                 }}
-              >
-                {debouncedSearch
-                  ? `${totalCount} result${totalCount !== 1 ? 's' : ''} for "${debouncedSearch}"`
-                  : `${totalCount} ${pluralLabel}`}
-              </Typography>
-              {selectionCount > 0 && (
-                <Chip
-                  icon={<CheckCircleIcon sx={{ fontSize: 14 }} />}
-                  label={`${selectionCount} selected`}
-                  size="small"
-                  sx={{
-                    height: 24,
-                    fontSize: '0.75rem',
-                    fontWeight: 500,
-                    bgcolor: alpha(theme.palette.primary.main, 0.1),
-                    color: theme.palette.primary.main,
-                    border: 'none',
-                    '& .MuiChip-icon': { color: 'inherit' },
-                  }}
-                />
-              )}
-            </Box>
-          )}
+              />
+            )}
+          </Box>
+        )}
 
-          {/* Loading State */}
-          {isLoading ? (
-            <Box sx={{ p: 3 }}>
-              <Stack spacing={2}>
-                {[...Array(5)].map((_, i) => (
-                  <Box
-                    key={i}
-                    sx={{
-                      p: 2.5,
-                      borderRadius: 2,
-                      bgcolor: colors.surface,
-                      border: `1px solid ${colors.border}`,
-                    }}
-                  >
-                    <Stack spacing={1.5}>
+        {/* Loading State */}
+        {isLoading ? (
+          <Box sx={{ p: 3 }}>
+            <Stack spacing={2}>
+              {[...Array(5)].map((_, i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 2,
+                    bgcolor: colors.surface,
+                    border: `1px solid ${colors.border}`,
+                  }}
+                >
+                  <Stack spacing={1.5}>
+                    <Skeleton
+                      variant="text"
+                      width="60%"
+                      height={24}
+                      sx={{ bgcolor: colors.surfaceHover }}
+                    />
+                    <Stack direction="row" spacing={2}>
                       <Skeleton
                         variant="text"
-                        width="60%"
-                        height={24}
+                        width={100}
+                        height={16}
                         sx={{ bgcolor: colors.surfaceHover }}
                       />
-                      <Stack direction="row" spacing={2}>
-                        <Skeleton
-                          variant="text"
-                          width={100}
-                          height={16}
-                          sx={{ bgcolor: colors.surfaceHover }}
-                        />
-                        <Skeleton
-                          variant="text"
-                          width={80}
-                          height={16}
-                          sx={{ bgcolor: colors.surfaceHover }}
-                        />
-                      </Stack>
                       <Skeleton
                         variant="text"
-                        width="90%"
+                        width={80}
                         height={16}
                         sx={{ bgcolor: colors.surfaceHover }}
                       />
                     </Stack>
-                  </Box>
-                ))}
-              </Stack>
-            </Box>
-          ) : items.length === 0 ? (
+                    <Skeleton
+                      variant="text"
+                      width="90%"
+                      height={16}
+                      sx={{ bgcolor: colors.surfaceHover }}
+                    />
+                  </Stack>
+                </Box>
+              ))}
+            </Stack>
+          </Box>
+        ) : error ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              py: 12,
+              px: 4,
+            }}
+          >
             <Box
               sx={{
+                width: 80,
+                height: 80,
+                borderRadius: '50%',
+                bgcolor: alpha(theme.palette.error.main, 0.1),
                 display: 'flex',
-                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                py: 12,
-                px: 4,
+                mb: 3,
               }}
             >
-              <Box
-                sx={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: '50%',
-                  bgcolor: colors.surfaceHover,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mb: 3,
-                }}
-              >
-                <FolderOpenIcon
-                  sx={{ fontSize: 36, color: colors.textTertiary }}
-                />
-              </Box>
-              <Typography
-                variant="h6"
-                fontWeight={600}
-                sx={{ color: colors.textPrimary, mb: 1 }}
-              >
-                {debouncedSearch ? 'No results found' : emptyTitle}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: colors.textSecondary, textAlign: 'center' }}
-              >
-                {debouncedSearch
-                  ? 'Try adjusting your search terms'
-                  : emptyDescription}
-              </Typography>
+              <ErrorOutlineIcon
+                sx={{ fontSize: 36, color: theme.palette.error.main }}
+              />
             </Box>
-          ) : multiSelect ? (
-            /* ── Multi-select list ── */
-            <Box sx={{ p: 3 }}>
-              <Stack spacing={1.5}>
-                {items.map((item, index) => {
-                  const id = getItemId(item);
-                  const isSelected = multiSelectedIds.has(id);
-                  const isExpanded = expandedIds.has(id);
-                  return (
-                    <Grow key={id} in timeout={150 + index * 30}>
-                      <Box
-                        sx={{
-                          position: 'relative',
-                          border: '1px solid',
+            <Typography
+              variant="h6"
+              fontWeight={600}
+              sx={{ color: colors.textPrimary, mb: 1 }}
+            >
+              Something went wrong
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ color: colors.textSecondary, textAlign: 'center' }}
+            >
+              {getErrorMessage(error)}
+            </Typography>
+          </Box>
+        ) : items.length === 0 ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              py: 12,
+              px: 4,
+            }}
+          >
+            <Box
+              sx={{
+                width: 80,
+                height: 80,
+                borderRadius: '50%',
+                bgcolor: colors.surfaceHover,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mb: 3,
+              }}
+            >
+              <FolderOpenIcon
+                sx={{ fontSize: 36, color: colors.textTertiary }}
+              />
+            </Box>
+            <Typography
+              variant="h6"
+              fontWeight={600}
+              sx={{ color: colors.textPrimary, mb: 1 }}
+            >
+              {searchQuery ? 'No results found' : emptyTitle}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ color: colors.textSecondary, textAlign: 'center' }}
+            >
+              {emptyDescription}
+            </Typography>
+          </Box>
+        ) : multiSelect ? (
+          /* ── Multi-select list ── */
+          <Box sx={{ p: 3 }}>
+            <Stack spacing={1.5}>
+              {items.map((item, index) => {
+                const id = getItemId(item);
+                const isSelected = multiSelectedIds.has(id);
+                const isExpanded = expandedIds.has(id);
+                return (
+                  <Grow key={id} in timeout={150 + index * 30}>
+                    <Box
+                      sx={{
+                        position: 'relative',
+                        border: '1px solid',
+                        borderColor: isSelected
+                          ? colors.borderSelected
+                          : colors.border,
+                        borderRadius: 2,
+                        bgcolor: isSelected
+                          ? colors.surfaceSelected
+                          : colors.surface,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                        overflow: 'hidden',
+                        '&:hover': {
                           borderColor: isSelected
                             ? colors.borderSelected
-                            : colors.border,
-                          borderRadius: 2,
+                            : colors.borderHover,
                           bgcolor: isSelected
                             ? colors.surfaceSelected
-                            : colors.surface,
-                          cursor: 'pointer',
-                          transition: 'all 0.15s ease',
-                          overflow: 'hidden',
-                          '&:hover': {
-                            borderColor: isSelected
-                              ? colors.borderSelected
-                              : colors.borderHover,
-                            bgcolor: isSelected
-                              ? colors.surfaceSelected
-                              : colors.surfaceHover,
-                            transform: 'translateY(-1px)',
-                            boxShadow: isSelected
-                              ? `0 4px 12px ${alpha(theme.palette.primary.main, 0.15)}`
-                              : `0 2px 8px ${alpha('#000', 0.06)}`,
-                          },
-                          '&:active': { transform: 'translateY(0)' },
-                        }}
-                        onClick={() => handleMultiToggle(id)}
-                      >
-                        {renderItem(
-                          item,
-                          isSelected,
-                          isExpanded,
-                          (e) => handleToggleExpand(id, e),
-                          handleDeleteItem,
-                        )}
-                      </Box>
-                    </Grow>
-                  );
-                })}
-              </Stack>
-            </Box>
-          ) : (
-            /* ── Single-select list ── */
-            <Box sx={{ p: 3 }}>
-              <FormControl error={!!errors.selectedId} fullWidth>
-                <Controller
-                  name="selectedId"
-                  control={control}
-                  rules={{ required: 'Please select an item' }}
-                  render={({ field }) => (
-                    <RadioGroup {...field}>
-                      <Stack spacing={1.5}>
-                        {items.map((item, index) => {
-                          const id = getItemId(item);
-                          const isSelected = selectedId === id;
-                          const isExpanded = expandedIds.has(id);
-                          return (
-                            <Grow key={id} in timeout={150 + index * 30}>
-                              <Box
-                                sx={{
-                                  position: 'relative',
-                                  border: '1px solid',
+                            : colors.surfaceHover,
+                          transform: 'translateY(-1px)',
+                          boxShadow: isSelected
+                            ? `0 4px 12px ${alpha(theme.palette.primary.main, 0.15)}`
+                            : `0 2px 8px ${alpha('#000', 0.06)}`,
+                        },
+                        '&:active': { transform: 'translateY(0)' },
+                      }}
+                      onClick={() => handleMultiToggle(id)}
+                    >
+                      {renderItem(item, isSelected, isExpanded, (e) =>
+                        handleToggleExpand(id, e),
+                      )}
+                    </Box>
+                  </Grow>
+                );
+              })}
+            </Stack>
+          </Box>
+        ) : (
+          /* ── Single-select list ── */
+          <Box sx={{ p: 3 }}>
+            <FormControl error={!!errors.selectedId} fullWidth>
+              <Controller
+                name="selectedId"
+                control={control}
+                rules={{ required: 'Please select an item' }}
+                render={({ field }) => (
+                  <RadioGroup {...field}>
+                    <Stack spacing={1.5}>
+                      {items.map((item, index) => {
+                        const id = getItemId(item);
+                        const isSelected = selectedId === id;
+                        const isExpanded = expandedIds.has(id);
+                        return (
+                          <Grow key={id} in timeout={150 + index * 30}>
+                            <Box
+                              sx={{
+                                position: 'relative',
+                                border: '1px solid',
+                                borderColor: isSelected
+                                  ? colors.borderSelected
+                                  : colors.border,
+                                borderRadius: 2,
+                                bgcolor: isSelected
+                                  ? colors.surfaceSelected
+                                  : colors.surface,
+                                cursor: 'pointer',
+                                transition: 'all 0.15s ease',
+                                overflow: 'hidden',
+                                '&:hover': {
                                   borderColor: isSelected
                                     ? colors.borderSelected
-                                    : colors.border,
-                                  borderRadius: 2,
+                                    : colors.borderHover,
                                   bgcolor: isSelected
                                     ? colors.surfaceSelected
-                                    : colors.surface,
-                                  cursor: 'pointer',
-                                  transition: 'all 0.15s ease',
-                                  overflow: 'hidden',
-                                  '&:hover': {
-                                    borderColor: isSelected
-                                      ? colors.borderSelected
-                                      : colors.borderHover,
-                                    bgcolor: isSelected
-                                      ? colors.surfaceSelected
-                                      : colors.surfaceHover,
-                                    transform: 'translateY(-1px)',
-                                    boxShadow: isSelected
-                                      ? `0 4px 12px ${alpha(theme.palette.primary.main, 0.15)}`
-                                      : `0 2px 8px ${alpha('#000', 0.06)}`,
-                                  },
-                                  '&:active': { transform: 'translateY(0)' },
-                                }}
-                                onClick={() => field.onChange(id)}
-                              >
-                                <FormControlLabel
-                                  value={id}
-                                  control={<Radio sx={{ display: 'none' }} />}
-                                  sx={{ m: 0, width: '100%' }}
-                                  label={renderItem(
-                                    item,
-                                    isSelected,
-                                    isExpanded,
-                                    (e) => handleToggleExpand(id, e),
-                                    handleDeleteItem,
-                                  )}
-                                />
-                              </Box>
-                            </Grow>
-                          );
-                        })}
-                      </Stack>
-                    </RadioGroup>
-                  )}
-                />
-                {!!errors.selectedId?.message && (
-                  <Typography
-                    variant="caption"
-                    color="error"
-                    sx={{ mt: 2, display: 'block' }}
-                  >
-                    {errors.selectedId.message}
-                  </Typography>
+                                    : colors.surfaceHover,
+                                  transform: 'translateY(-1px)',
+                                  boxShadow: isSelected
+                                    ? `0 4px 12px ${alpha(theme.palette.primary.main, 0.15)}`
+                                    : `0 2px 8px ${alpha('#000', 0.06)}`,
+                                },
+                                '&:active': { transform: 'translateY(0)' },
+                              }}
+                              onClick={() => field.onChange(id)}
+                            >
+                              <FormControlLabel
+                                value={id}
+                                control={<Radio sx={{ display: 'none' }} />}
+                                sx={{ m: 0, width: '100%' }}
+                                label={renderItem(
+                                  item,
+                                  isSelected,
+                                  isExpanded,
+                                  (e) => handleToggleExpand(id, e),
+                                )}
+                              />
+                            </Box>
+                          </Grow>
+                        );
+                      })}
+                    </Stack>
+                  </RadioGroup>
                 )}
-              </FormControl>
-            </Box>
-          )}
-        </DialogContent>
-
-        {/* Footer */}
-        <DialogActions
-          sx={{
-            px: 3,
-            py: 2,
-            borderTop: `1px solid ${colors.border}`,
-            bgcolor: colors.surface,
-            justifyContent: 'space-between',
-            flexShrink: 0,
-          }}
-        >
-          {/* Pagination — only shown in single-select / paginated mode */}
-          {totalPages > 1 ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography
-                variant="caption"
-                sx={{ color: colors.textSecondary, mr: 1 }}
-              >
-                {startItem}–{endItem} of {totalCount}
-              </Typography>
-              <IconButton
-                aria-label="Show First Page"
-                size="small"
-                onClick={() => handlePageChange(1)}
-                disabled={currentPage === 1 || isLoading}
-                sx={{
-                  color: colors.textSecondary,
-                  '&:hover': { bgcolor: colors.surfaceHover },
-                  '&.Mui-disabled': { color: colors.textTertiary },
-                }}
-              >
-                <FirstPageIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                aria-label="Show Previous Page"
-                size="small"
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1 || isLoading}
-                sx={{
-                  color: colors.textSecondary,
-                  '&:hover': { bgcolor: colors.surfaceHover },
-                  '&.Mui-disabled': { color: colors.textTertiary },
-                }}
-              >
-                <KeyboardArrowLeftIcon fontSize="small" />
-              </IconButton>
-              <Box
-                sx={{
-                  px: 1.5,
-                  py: 0.5,
-                  borderRadius: 1,
-                  bgcolor: colors.background,
-                  minWidth: 60,
-                  textAlign: 'center',
-                }}
-              >
+              />
+              {!!errors.selectedId?.message && (
                 <Typography
                   variant="caption"
-                  fontWeight={600}
-                  sx={{ color: colors.textPrimary }}
+                  color="error"
+                  sx={{ mt: 2, display: 'block' }}
                 >
-                  {currentPage} / {totalPages}
+                  {errors.selectedId.message}
                 </Typography>
-              </Box>
-              <IconButton
-                aria-label="Show Next Page"
-                size="small"
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages || isLoading}
-                sx={{
-                  color: colors.textSecondary,
-                  '&:hover': { bgcolor: colors.surfaceHover },
-                  '&.Mui-disabled': { color: colors.textTertiary },
-                }}
-              >
-                <KeyboardArrowRightIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                aria-label="Show Last Page"
-                size="small"
-                onClick={() => handlePageChange(totalPages)}
-                disabled={currentPage === totalPages || isLoading}
-                sx={{
-                  color: colors.textSecondary,
-                  '&:hover': { bgcolor: colors.surfaceHover },
-                  '&.Mui-disabled': { color: colors.textTertiary },
-                }}
-              >
-                <LastPageIcon fontSize="small" />
-              </IconButton>
-            </Box>
-          ) : (
-            <Box />
-          )}
+              )}
+            </FormControl>
+          </Box>
+        )}
+      </DialogContent>
 
-          <Stack direction="row" spacing={1.5}>
+      {/* Footer */}
+      <DialogActions
+        sx={{
+          px: 3,
+          py: 2,
+          borderTop: `1px solid ${colors.border}`,
+          bgcolor: colors.surface,
+          justifyContent: 'space-between',
+          flexShrink: 0,
+        }}
+      >
+        {/* Pagination — only shown in single-select / paginated mode */}
+        {totalPages > 1 ? (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography
+              variant="caption"
+              sx={{ color: colors.textSecondary, mr: 1 }}
+            >
+              {startItem}–{endItem} of {totalCount}
+            </Typography>
+            <IconButton
+              aria-label="Show First Page"
+              size="small"
+              onClick={() => handlePageChange(1)}
+              disabled={currentPage === 1 || isLoading}
+              sx={{
+                color: colors.textSecondary,
+                '&:hover': { bgcolor: colors.surfaceHover },
+                '&.Mui-disabled': { color: colors.textTertiary },
+              }}
+            >
+              <FirstPageIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              aria-label="Show Previous Page"
+              size="small"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1 || isLoading}
+              sx={{
+                color: colors.textSecondary,
+                '&:hover': { bgcolor: colors.surfaceHover },
+                '&.Mui-disabled': { color: colors.textTertiary },
+              }}
+            >
+              <KeyboardArrowLeftIcon fontSize="small" />
+            </IconButton>
+            <Box
+              sx={{
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 1,
+                bgcolor: colors.background,
+                minWidth: 60,
+                textAlign: 'center',
+              }}
+            >
+              <Typography
+                variant="caption"
+                fontWeight={600}
+                sx={{ color: colors.textPrimary }}
+              >
+                {currentPage} / {totalPages}
+              </Typography>
+            </Box>
+            <IconButton
+              aria-label="Show Next Page"
+              size="small"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages || isLoading}
+              sx={{
+                color: colors.textSecondary,
+                '&:hover': { bgcolor: colors.surfaceHover },
+                '&.Mui-disabled': { color: colors.textTertiary },
+              }}
+            >
+              <KeyboardArrowRightIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              aria-label="Show Last Page"
+              size="small"
+              onClick={() => handlePageChange(totalPages)}
+              disabled={currentPage === totalPages || isLoading}
+              sx={{
+                color: colors.textSecondary,
+                '&:hover': { bgcolor: colors.surfaceHover },
+                '&.Mui-disabled': { color: colors.textTertiary },
+              }}
+            >
+              <LastPageIcon fontSize="small" />
+            </IconButton>
+          </Box>
+        ) : (
+          <Box />
+        )}
+
+        <Stack direction="row" spacing={1.5}>
+          <Button
+            onClick={onClose}
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 500,
+              px: 2.5,
+              color: colors.textSecondary,
+              '&:hover': { bgcolor: colors.surfaceHover },
+            }}
+          >
+            Cancel
+          </Button>
+
+          {multiSelect ? (
             <Button
-              onClick={handleClose}
+              variant="contained"
+              onClick={onMultiSubmit}
+              disabled={isLoading || multiSelectedIds.size === 0}
+              startIcon={<CheckCircleIcon />}
               sx={{
                 borderRadius: 2,
                 textTransform: 'none',
-                fontWeight: 500,
-                px: 2.5,
-                color: colors.textSecondary,
-                '&:hover': { bgcolor: colors.surfaceHover },
+                fontWeight: 600,
+                px: 3,
+                boxShadow: 'none',
+                '&:hover': {
+                  boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                },
+                '&:disabled': {
+                  bgcolor: colors.surfaceHover,
+                  color: colors.textTertiary,
+                },
               }}
             >
-              Cancel
+              Add {multiSelectedIds.size} {itemLabel}
+              {multiSelectedIds.size !== 1 ? 's' : ''}
             </Button>
-
-            {multiSelect ? (
-              <Button
-                variant="contained"
-                onClick={onMultiSubmit}
-                disabled={isLoading || multiSelectedIds.size === 0}
-                startIcon={<CheckCircleIcon />}
-                sx={{
-                  borderRadius: 2,
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  px: 3,
-                  boxShadow: 'none',
-                  '&:hover': {
-                    boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
-                  },
-                  '&:disabled': {
-                    bgcolor: colors.surfaceHover,
-                    color: colors.textTertiary,
-                  },
-                }}
-              >
-                Add {multiSelectedIds.size} {itemLabel}
-                {multiSelectedIds.size !== 1 ? 's' : ''}
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                onClick={handleSubmit(onSubmit)}
-                disabled={isLoading || !selectedId}
-                sx={{
-                  borderRadius: 2,
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  px: 3,
-                  boxShadow: 'none',
-                  '&:hover': {
-                    boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
-                  },
-                  '&:disabled': {
-                    bgcolor: colors.surfaceHover,
-                    color: colors.textTertiary,
-                  },
-                }}
-              >
-                {triggerLabel}
-              </Button>
-            )}
-          </Stack>
-        </DialogActions>
-      </Dialog>
-    </Box>
+          ) : (
+            <Button
+              variant="contained"
+              onClick={handleSubmit(onSubmit)}
+              disabled={isLoading || !selectedId}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 600,
+                px: 3,
+                boxShadow: 'none',
+                '&:hover': {
+                  boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                },
+                '&:disabled': {
+                  bgcolor: colors.surfaceHover,
+                  color: colors.textTertiary,
+                },
+              }}
+            >
+              {confirmLabel}
+            </Button>
+          )}
+        </Stack>
+      </DialogActions>
+    </Dialog>
   );
 }

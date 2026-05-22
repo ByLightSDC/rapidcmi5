@@ -28,7 +28,7 @@ import LrsHeaderWithDetails from '../LrsStatementHelper';
 
 import { toTitleCase } from '../formUtils';
 import { useEffect } from 'react';
-import { ScenarioSelectionForm } from '../../../../../components/modals/ScenarioSelectionModal';
+import { ScenarioSelectionForm } from '../../../../../components/modals/scenarios/ScenarioSelectionModal';
 import { ScenarioCard } from './ScenarioCard';
 
 export const ScenarioForm = ({

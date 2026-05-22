@@ -46,8 +46,8 @@ import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 
 import { useState } from 'react';
 
-import QuizBankSearchForm from '../../../../components/modals/quizBank/SearchQuizBankForm';
-import AddToQuizBankForm from '../../../../components/modals/quizBank/AddToQuizBankForm';
+import QuizBankSearchForm from '../../../../components/modals/quizBank/SearchQuizBankModal';
+import AddToQuizBankForm from '../../../../components/modals/quizBank/AddToQuizBankModal';
 
 export function requireField<T>(value: T | undefined | null, field: string): T {
   if (value === undefined || value === null) {

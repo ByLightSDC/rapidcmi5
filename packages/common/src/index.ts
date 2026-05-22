@@ -36,8 +36,4 @@ export * from './lib/apis/contracts/codeRunnerContract';
 export * from './lib/utils/dateAndTime';
 export * from './lib/apis/contracts/quizBankContract';
 export * from './lib/apis/contracts/scenarioContract';
-export * from './lib/apis/utils/scenario';
-export * from './lib/apis/utils/codeRunner';
-export * from './lib/apis/utils/quizBank';
-
 export * from './lib/versions';

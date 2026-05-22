@@ -23,7 +23,7 @@ import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 
 import LrsHeaderWithDetails from '../LrsStatementHelper';
 
-import { ScenarioSelectionForm } from '../../../../../components/modals/ScenarioSelectionModal';
+import { ScenarioSelectionForm } from '../../../../../components/modals/scenarios/ScenarioSelectionModal';
 import { ScenarioCard } from './ScenarioCard';
 
 export const TeamConsolesForm = ({
