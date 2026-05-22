@@ -109,29 +109,6 @@ export const useTabStyles = (
     },
   };
 
-  // Helper function to get right border for each slide's pass/fail status
-  const getSlideRightBorder = (slideIndex: number) => {
-    // if (!currentTheme.nav.shouldColorTabIndicator) {
-    //   return currentTheme.palette.primary.main;
-    // }
-
-    const status = getSlideStatus(slideIndex);
-
-    let border;
-    // Don't add border to active slide (MUI indicator handles it)
-    if (slideIndex === activeTab) {
-      border = 'none'; // Let MUI indicator handle active slide
-    } else if (status.failed) {
-      border = `4px solid ${currentTheme.palette.error.main}`; // Red right border for failed slides
-    } else if (status.passed && !status.failed) {
-      border = `4px solid ${currentTheme.palette.success.main} `; // #4caf50 Green right border for passed slides (MUI success color)
-    } else {
-      border = 'none'; // No border for inactive, incomplete slides
-    }
-
-    return border;
-  };
-
   return {
     baseTabStyle,
     baseTabsStyle,

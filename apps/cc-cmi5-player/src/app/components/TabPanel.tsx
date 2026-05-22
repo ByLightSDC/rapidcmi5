@@ -152,7 +152,7 @@ export default function TabPanel() {
         width: '100%',
         height: '100vh',
         //left panel background
-        bgcolor: currentTheme.nav.tabPanel, //'#1e2d54', //
+        bgcolor: currentTheme.nav.tabPanel,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',

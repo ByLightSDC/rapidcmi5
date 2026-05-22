@@ -103,7 +103,7 @@ export const darkTheme = createTheme({
     iconSelected: '#FFC840', //unused
     border: '#666666', // Package Menu
     borderSelected: '#FFC840', //unused
-    currentTabIndicator: '#6F96FF', //'#E8943A', //'#D3D8E7', //90% '#3C86CB', //primary info main
+    currentTabIndicator: '#6F96FF', 
     currentTabIndicatorText: '#1e2d54',
     deselectedTab: '#3C59A2', //primary 80%
     deselectedTabText: '#ffffff', //'#323232D9',

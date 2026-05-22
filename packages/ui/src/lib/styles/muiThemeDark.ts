@@ -102,9 +102,9 @@ export const darkTheme = createTheme({
     iconSelected: '#FFC840',
     border: '#FFC840d0',
     borderSelected: '#FFC840',
-    currentTabIndicator: '#6F96FF', //'#E8943A', //'#D3D8E7', //90% '#3C86CB', //primary info main
-    deselectedTab: '#3C59A2', //primary 80%
-    deselectedTabText: '#ffffff', //'#323232D9',
+    currentTabIndicator: '#6F96FF', 
+    deselectedTab: '#3C59A2', //80%
+    deselectedTabText: '#ffffff', 
     deselectedTabBorder: '#2A3F75', //60%
     selectedTab: '#2A3F75',
     selectedTabBorder: '#4a6bc0',
