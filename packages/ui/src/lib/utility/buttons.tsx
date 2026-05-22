@@ -92,6 +92,10 @@ export function ButtonInfoField({
     return alpha(theme.palette.info.light, 0.15);
   }, [theme.palette.info.light]);
 
+  const bgColorPopper = useMemo(() => {
+    return alpha(theme.palette.info.light, 0.25);
+  }, [theme.palette.info.light]);
+
   const handleClick = (event: any) => {
     event.stopPropagation();
     if (triggerOnClick) {
@@ -163,36 +167,39 @@ export function ButtonInfoField({
         style={{ zIndex: zOrderAboveDialog }}
       >
         <ClickAwayListener onClickAway={handleCloseAlert}>
-          <Alert
-            severity="info"
-            sx={{
-              maxWidth: '480px',
-              whiteSpace: 'pre-wrap',
-              wordWrap: 'break-word',
-              margin: '4px',
-              ...alertSxProps,
-            }}
-            {...alertProps}
-            action={
-              <>
-                {triggerOnClick ? (
-                  <IconButton
-                    sx={{ position: 'absolute', right: '12px' }}
-                    aria-label="close"
-                    color="inherit"
-                    size="small"
-                    onClick={(evt) => {
-                      handleCloseAlert(evt);
-                    }}
-                  >
-                    <CloseIcon fontSize="inherit" />
-                  </IconButton>
-                ) : undefined}
-              </>
-            }
-          >
-            {message}
-          </Alert>
+          <Box sx={{ backgroundColor: 'black', margin: '4px' }}>
+            <Alert
+              severity="info"
+              sx={{
+                backgroundColor: bgColorPopper,
+                maxWidth: '480px',
+                whiteSpace: 'pre-wrap',
+                wordWrap: 'break-word',
+
+                ...alertSxProps,
+              }}
+              {...alertProps}
+              action={
+                <>
+                  {triggerOnClick ? (
+                    <IconButton
+                      sx={{ position: 'absolute', right: '12px' }}
+                      aria-label="close"
+                      color="inherit"
+                      size="small"
+                      onClick={(evt) => {
+                        handleCloseAlert(evt);
+                      }}
+                    >
+                      <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                  ) : undefined}
+                </>
+              }
+            >
+              {message}
+            </Alert>
+          </Box>
         </ClickAwayListener>
       </Popper>
     </Box>
