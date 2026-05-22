@@ -111,8 +111,7 @@ export const darkTheme = createTheme({
     progressBar: '#4a4a4a',
     progressBarFill: '#6F96FF',
     tabHover: '#4a6bc0',
-    tabPanel: '#282b30', //'#1a1a1a',
-
+    tabPanel: '#1e2d54',
   },
   typography: {
     fontFamily: [

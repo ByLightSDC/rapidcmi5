@@ -15,7 +15,7 @@ const mainColor = '#3C59A2'; //icons, button fills
 const hoverMainColor = '#8AA6D0'; //button hover
 
 export const lightTheme = createTheme({
- palette: {
+  palette: {
     mode: 'light',
     primary: {
       main: mainColor,
@@ -94,6 +94,18 @@ export const lightTheme = createTheme({
     iconSelected: '#071285',
     border: '#071285',
     borderSelected: '#071285',
+    currentTabIndicator: '#6F96FF', //'#D3D8E7', //90% '#3C86CB', //primary info main
+    deselectedTab: '#3C59A2', //primary 80%
+    deselectedTabText: '#ffffff', //'#323232D9',
+    deselectedTabBorder: '#2A3F75', //60%
+    selectedTab: '#2A3F75',
+    selectedTabBorder: '#4a6bc0',
+    selectedTabText: '#ffffff',
+    shouldColorTabIndicator: false,
+    progressBar: '#4a4a4a',
+    progressBarFill: '#6F96FF',
+    tabHover: '#4a6bc0',
+    tabPanel: '#1e2d54',
   },
   scenarioDesigner: {
     toolIcon: mainColor,
@@ -148,13 +160,13 @@ export const lightTheme = createTheme({
           },
           '*::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb': {
             borderRadius: '4px',
-            backgroundColor: '#6dea3f',//'#3C59A2',
+            backgroundColor: '#6dea3f', //'#3C59A2',
             border: '2px solid #dd6fff00', //inset thumb on track background color
             minHeight: '48px',
           },
           '*::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover':
             {
-              backgroundColor: '#c61895',//'#5871AF',
+              backgroundColor: '#c61895', //'#5871AF',
               borderLeft: '4px solid #f8f8f8',
               cursor: 'pointer',
             },

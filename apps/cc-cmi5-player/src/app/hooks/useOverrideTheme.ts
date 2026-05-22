@@ -32,5 +32,19 @@ export const useOverrideTheme = () => {
     return overriddenTheme;
   }, [themeSel, isConfigInitialized]);
 
-  return { currentTheme };
+  /**
+   * update theme with overrides from cfg file
+   */
+  const activityTheme = useMemo(() => {
+    const base = darkTheme;
+    if (!isConfigInitialized) {
+      return base;
+    }
+
+    const overrides: CustomTheme = config.THEME.DARK;
+    const overriddenTheme = deepmerge(base, overrides);
+    return overriddenTheme;
+  }, [isConfigInitialized]);
+
+  return { currentTheme, activityTheme };
 };
