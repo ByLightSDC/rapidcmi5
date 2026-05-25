@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { SELECTION_CHANGE_COMMAND, COMMAND_PRIORITY_NORMAL } from 'lexical';
 import { usePublisher, useCellValue } from '@mdxeditor/gurx';
+import { selectionInsideAnimDirective$ } from '@rapid-cmi5/ui';
 import {
   selectedElement$,
   slideAnimations$,
@@ -32,6 +33,7 @@ export function useLexicalSelection() {
     null,
   );
   const [isAnimatable, setIsAnimatable] = useState(false);
+  const publishInsideAnim = usePublisher(selectionInsideAnimDirective$);
   const currentAnimationsRef = useRef(currentAnimations);
   const isDrawerOpenRef = useRef(isDrawerOpen);
 
@@ -87,7 +89,10 @@ export function useLexicalSelection() {
 
     setSelectedInfo(info);
     setIsAnimatable(animatable);
-  }, [editor, isDrawerOpen]);
+    // Outer editor authoritative: clear "inside anim" — the nested bridge will
+    // re-assert true on its own selection-change if focus is in an anim.
+    publishInsideAnim(false);
+  }, [editor, isDrawerOpen, publishInsideAnim]);
 
   useEffect(() => {
     debugLog(
@@ -157,6 +162,8 @@ export function useLexicalSelection() {
 
         setSelectedInfo(info);
         setIsAnimatable(animatable);
+        // Outer-editor selection change — reset; nested bridge re-asserts if needed.
+        publishInsideAnim(false);
         debugLog('animatable', animatable, undefined, 'selection');
 
         // Publish to Gurx state
@@ -216,7 +223,7 @@ export function useLexicalSelection() {
       // clearInterval(cleanupInterval);
       unregister();
     };
-  }, [editor, publishSelectedElement, setAnimations, setSelectedAnimation]);
+  }, [editor, publishSelectedElement, setAnimations, setSelectedAnimation, publishInsideAnim]);
 
   return {
     selectedInfo,
