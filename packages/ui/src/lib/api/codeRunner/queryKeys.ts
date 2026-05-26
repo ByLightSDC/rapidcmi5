@@ -1,1 +1,1 @@
-export const questionKey = 'question';
+export const languages = 'codeRunnerLanguages';

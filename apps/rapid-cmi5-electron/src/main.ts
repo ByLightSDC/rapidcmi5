@@ -798,9 +798,13 @@ ipcMain.handle(
   async (_event, { url, method, headers, body }) => {
     console.log('proxy, url', url);
     const response = await net.fetch(url, { method, headers, body });
+    const responseHeaders: Record<string, string> = {};
+    response.headers.forEach((value, key) => {
+      responseHeaders[key] = value;
+    });
     return {
       status: response.status,
-      headers: Object.fromEntries(response.headers.entries()),
+      headers: responseHeaders,
       body: await response.text(),
     };
   },

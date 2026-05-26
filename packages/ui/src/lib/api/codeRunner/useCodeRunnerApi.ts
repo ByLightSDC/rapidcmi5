@@ -1,12 +1,13 @@
 import { CodeRunnerContent } from '@rapid-cmi5/cmi5-build-common';
 import { useCodeRunnerClient } from '../../contexts/ApiContext';
+import { languages } from './queryKeys';
 
 export function useCodeRunnerApi() {
   const { enabled, client } = useCodeRunnerClient();
 
   const getLanguages = () => {
     return client.listLanguages.useQuery({
-      queryKey: ['codeRunnerLanguages'],
+      queryKey: [languages],
       enabled,
     });
   };
