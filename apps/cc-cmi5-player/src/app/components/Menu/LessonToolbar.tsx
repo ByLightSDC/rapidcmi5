@@ -122,7 +122,6 @@ export default function LessonToolbar({
           icon={
             <LightModeIcon
               name="Light Mode"
-              //color="primary"
               fontSize="small"
               sx={{
                 backgroundColor: 'background.default',
@@ -135,7 +134,6 @@ export default function LessonToolbar({
           checkedIcon={
             <DarkModeIcon
               name="Dark Mode"
-              //color="primary"
               fontSize="small"
               sx={{
                 backgroundColor: 'background.default',

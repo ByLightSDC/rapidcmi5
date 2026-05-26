@@ -43,21 +43,6 @@ export const darkTheme = createTheme({
       default: '#282b30',
     },
   },
-  // accordion: {
-  //   borderBottom: `1px solid #36393e`,
-  //   backgroundColor: '#282b30',
-  //   borderColor: '#36393e',
-  //   titleBackgroundColor: '#282b30',
-  // },
-  // card: {
-  //   default: 'linear-gradient(180deg, #3E5BA5BF 0%, #2E4C94BF 100%)',
-  //   borderColor: '#8AA6D0',
-  //   defaultHover: 'linear-gradient(180deg, #8AA6D0 0%, #8AA6D0 100%)',
-
-  //   titleColor: '#FFFFFF', // white
-  //   instructionsColor: colorPop ? '#edb445' : '#edb445',
-  //   formInstructionsColor: '#212125',
-  // },
   activity: { backgroundColor: '#1e2d54' },
   breadcrumbs: {
     default: '#C8C8C8', //disabled breadcrumb text
@@ -78,15 +63,7 @@ export const darkTheme = createTheme({
     backgroundColor: '#282b30',
   },
   header: {
-    // border: '#ffffffb0',
-    // buttonColor: '#C5C5C5',
-    // selColor: '#A5BEFF', //'#a4c9eb', //selColor: '#A5BEFF',
-    // default: '#282b30',
-    // hoverColor: '#FFFFFF',
-    // light: '#9AA8CD', //loading bar color
-    // dark: '#333',
     title: '#ffffffc0', // white @ 80% opacity
-    //underline: '#666666'//'DarkGray', //divider OR parting line
   },
   input: {
     outlineColor: '#464646', //see overrides below MuiFilledInput, MuiFilledInput+MuiOutlinedInput
