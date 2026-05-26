@@ -42,6 +42,7 @@ import { InsertTable } from './InsertTable';
 import { InsertVideo } from './InsertVideo';
 import { InsertAudio } from './InsertAudio';
 import { InsertImage } from './InsertImage';
+import { InsertYoutube } from './InsertYoutube';
 import { InsertCodeBlock } from './InsertCodeBlock';
 import { InsertThematicBreak } from './InsertThematicBreak';
 import { InsertFile } from './InsertFile';
@@ -311,6 +312,7 @@ export function BlockLibraryDrawer() {
                 <InsertFile isDrawer={true} />
                 <InsertImage isDrawer={true} />
                 <InsertVideo isDrawer={true} />
+                <InsertYoutube isDrawer={true} />
               </Stack>
             </ViewExpander>
           </Stack>

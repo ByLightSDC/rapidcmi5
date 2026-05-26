@@ -30,12 +30,7 @@ import {
 } from '../../CourseBuilderApiTypes';
 
 import { ViewModeEnum } from '../../CourseBuilderTypes';
-import {
-  debugLog,
-  debugLogError,
-  defaultCourseData,
-  hasModal,
-} from '@rapid-cmi5/ui';
+import { debugLog, debugLogError, defaultCourseData } from '@rapid-cmi5/ui';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import { ReadCommitResult } from 'isomorphic-git';
 import { sandboxIntro } from '../../../rapidcmi5_mdx/constants/sandboxIntro';
@@ -44,15 +39,11 @@ import { useGitOperations } from './useGitOperations';
 import { sandBoxName } from './constants';
 import { useCourseOperations } from './useCourseOperations';
 import { usePublishActions } from './usePublishActions';
-import { useImageCache } from './useImageCache';
 import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 import { INode } from 'react-accessible-treeview';
 import { FileContent, getRepoPath } from '../utils/fileSystem';
 import { GitOperations } from '../utils/gitOperations';
-import JSZip from 'jszip';
-import { FolderStruct } from '@rapid-cmi5/cmi5-build-common';
 import {
-  currentSlideNum,
   updateCourseData,
   setIsLessonMounted,
   setRepoViewScrollTop,
@@ -113,11 +104,7 @@ interface IGitContext {
     filePath: string,
     fileType: string,
   ) => Promise<Blob | MediaSource | null>;
-  handleGetFolderStructure: (
-    dir: string,
-    getContents?: boolean,
-    zip?: JSZip | null,
-  ) => Promise<FolderStruct[]>;
+
   handleStageAll: (
     useCache?: boolean,
     changedFiles?: string[],
@@ -165,17 +152,6 @@ interface IGitContext {
   handleRenameFile: (oldFilepath: string, newName: string) => Promise<void>;
   handleGetFileContents: (filepath: string) => Promise<FileContent | null>;
   handleCopyFile: (src: string, dest: string) => Promise<void>;
-  getLocalFileBlob: (
-    filePath: string,
-    slidePath: string,
-    fileType?: string,
-  ) => Promise<Blob | MediaSource | null>;
-  getLocalFileBlobUrl: (
-    filePath: string,
-    slidePath: string,
-    fileType?: string,
-    shouldNotCache?: boolean,
-  ) => Promise<string | null>;
   handleNavToDesigner: () => void;
   handleNavToGitView: () => Promise<void>;
   handleNavToFile: (filePath: string) => void;
@@ -228,38 +204,37 @@ const defaultGitContext: IGitContext = {
   gitRepoCommits: [],
   handlePathExists: async () => false,
   handleBlobImageFile: async (r, filePath, fileType) => null,
-  handleGetFolderStructure: async () => [],
-  handleDeleteCurrentRepo: async () => { },
-  handleDeleteCourse: () => { },
-  handleGitStashChanges: async () => { },
-  handleGitStashPopChanges: async () => { },
-  handleGitCommitReset: () => { },
-  handleChangeRepo: () => { },
-  handleChangeFileSystem: () => { },
-  handleChangeRepoName: () => { },
-  handleGitSetConfig: () => { },
-  handleCloneRepo: async (): Promise<void> => { },
-  handleCommit: async () => { },
-  handleResolveMerge: async () => { },
-  handleLoadCourse: async (): Promise<void> => { },
-  handleCheckoutBranch: async () => { },
-  handlePull: async (): Promise<void> => { },
-  handleDownloadCmi5Zip: async (): Promise<void> => { },
-  handleNavToDesigner: () => { },
-  handleNavToGitView: async () => { },
-  handleNavToFile: () => { },
-  handleStageAll: async () => { },
+  handleDeleteCurrentRepo: async () => {},
+  handleDeleteCourse: () => {},
+  handleGitStashChanges: async () => {},
+  handleGitStashPopChanges: async () => {},
+  handleGitCommitReset: () => {},
+  handleChangeRepo: () => {},
+  handleChangeFileSystem: () => {},
+  handleChangeRepoName: () => {},
+  handleGitSetConfig: () => {},
+  handleCloneRepo: async (): Promise<void> => {},
+  handleCommit: async () => {},
+  handleResolveMerge: async () => {},
+  handleLoadCourse: async (): Promise<void> => {},
+  handleCheckoutBranch: async () => {},
+  handlePull: async (): Promise<void> => {},
+  handleDownloadCmi5Zip: async (): Promise<void> => {},
+  handleNavToDesigner: () => {},
+  handleNavToGitView: async () => {},
+  handleNavToFile: () => {},
+  handleStageAll: async () => {},
   handleGetDiff: async (_filePath: string): Promise<any> => {
     oldFile: '';
     newFile: '';
   },
-  handleUnstageAll: () => { },
+  handleUnstageAll: () => {},
   modifiedFiles: [],
   isElectron: false,
   isInMerge: false,
   stashFiles: [],
-  handleStageFile: async () => { },
-  handleUnStageFile: () => { },
+  handleStageFile: async () => {},
+  handleUnStageFile: () => {},
   handleGetUniqueFilePath: async (
     r: RepoAccessObject,
     slideTitle: string,
@@ -274,44 +249,42 @@ const defaultGitContext: IGitContext = {
   handleRenameFile: async (
     _oldpath: string,
     _newname: string,
-  ): Promise<void> => { },
+  ): Promise<void> => {},
   handleUpdateFile: async (
     _filePath: string,
     _data: string,
-  ): Promise<void> => { },
+  ): Promise<void> => {},
   handleCreateFile: async (
     _filePath: string,
     _isDir: boolean,
     _data?: string | Uint8Array,
-  ): Promise<void> => { },
+  ): Promise<void> => {},
   handleDeleteFile: async (
     _filePath: string,
     _isDir: boolean,
-  ): Promise<void> => { },
+  ): Promise<void> => {},
   handleGetFileContents: async (
     _filePath: string,
   ): Promise<FileContent | null> => null,
-  handleCopyFile: async (_src: string, _dest: string): Promise<void> => { },
-  handleRevertFile: () => { },
-  handleRemoveFile: () => { },
+  handleCopyFile: async (_src: string, _dest: string): Promise<void> => {},
+  handleRevertFile: () => {},
+  handleRemoveFile: () => {},
   syncCurrentCourseWithGit: async () => [],
-  handleCreateCourse: async () => { },
-  getLocalFileBlob: async () => null,
-  getLocalFileBlobUrl: async () => null,
-  handlePushRepo: async () => { },
+  handleCreateCourse: async () => {},
+  handlePushRepo: async () => {},
   resolvePCTEProjects: async () => [],
-  publishToPCTE: () => { },
+  publishToPCTE: () => {},
   handleGetCourseData: async (_coursePath: string): Promise<CourseData> =>
     defaultCourseData,
   directoryTree: [],
-  handleRenameCourse: () => { },
-  handleImportRepoZip: () => { },
-  handleCreateLocalRepo: async () => { },
+  handleRenameCourse: () => {},
+  handleImportRepoZip: () => {},
+  handleCreateLocalRepo: async () => {},
   numStaged: 0,
   getLocalFolders: async (): Promise<DirMeta[]> => [],
-  openSandbox: async (): Promise<void> => { },
-  openLocalRepo: async (): Promise<void> => { },
-  deleteRecentProject: async (): Promise<void> => { },
+  openSandbox: async (): Promise<void> => {},
+  openLocalRepo: async (): Promise<void> => {},
+  deleteRecentProject: async (): Promise<void> => {},
   getDirHandle: async (): Promise<FileSystemDirectoryHandle | null> => null,
   gettingRepoStatus: false,
 };
@@ -353,7 +326,6 @@ export const GitContextProvider = (props: tProviderProps) => {
   const availableCourses = fileState?.availableCourses ?? [];
   const currentCourse = fileState.selectedCourse;
   const directoryTree = fileState.directoryTree;
-  const slideNumber = useSelector(currentSlideNum);
 
   const currentRepo = repoAccessObject?.repoName || null;
   const [localFileSystemLoaded, setLocalFileSystemLoaded] = useState(false);
@@ -375,13 +347,6 @@ export const GitContextProvider = (props: tProviderProps) => {
       rapidCmi5Opts.downloadCmi5Player,
       rapidCmi5Opts.processAu,
     );
-
-  const { getLocalFileBlob, getLocalFileBlobUrl } = useImageCache(
-    repoAccessObject,
-    currentCourse,
-    slideNumber,
-    gitFs,
-  );
 
   const {
     modifiedFiles,
@@ -482,7 +447,10 @@ export const GitContextProvider = (props: tProviderProps) => {
   useEffect(() => {
     if (!repoAccessObject) return;
     const r = getRepoAccess(repoAccessObject);
-    setUpCourseData(r);
+    setUpCourseData(r).catch((err) => {
+      debugLogError('Error in use effect for setup course data');
+      throw err;
+    });
   }, [currentCourse?.basePath, repoAccessObject]);
 
   const handleDeleteCurrentRepo = async () => {
@@ -494,7 +462,7 @@ export const GitContextProvider = (props: tProviderProps) => {
     // Electron will remove its own recent projects in the backend
     if (!isElectron && recentProjectIOd) {
       gitFs.currentProjectRecentsId = undefined;
-      gitFs.removeRecentProject(recentProjectIOd);
+      await gitFs.removeRecentProject(recentProjectIOd);
     }
 
     await resetRepoStatus();
@@ -507,7 +475,7 @@ export const GitContextProvider = (props: tProviderProps) => {
   };
 
   const handleStageAll = useCallback(
-    async (useCache: boolean = false, changedFiles?: string[]) => {
+    async (useCache = false, changedFiles?: string[]) => {
       try {
         const r = getRepoAccess(repoAccessObject);
 
@@ -550,12 +518,8 @@ export const GitContextProvider = (props: tProviderProps) => {
   };
 
   const handleDeleteCourse = async (courseName: string) => {
-    try {
-      const r = getRepoAccess(repoAccessObject);
-      await deleteCourse(r, courseName);
-    } catch (error: any) {
-      throw error;
-    }
+    const r = getRepoAccess(repoAccessObject);
+    await deleteCourse(r, courseName);
   };
 
   const handleLoadCourse = async (coursePath: string) => {
@@ -578,9 +542,9 @@ export const GitContextProvider = (props: tProviderProps) => {
       const creds: Credentials | undefined =
         repoUsername && repoPassword
           ? {
-            username: repoUsername,
-            password: repoPassword,
-          }
+              username: repoUsername,
+              password: repoPassword,
+            }
           : undefined;
       rapidCmi5Opts.handleOverrideGlobalGitConfig(gitUserConfig, creds);
     }
@@ -650,15 +614,11 @@ export const GitContextProvider = (props: tProviderProps) => {
     courseName: string,
     getContents?: boolean,
   ): Promise<CourseData> => {
-    try {
-      const r = getRepoAccess(repoAccessObject);
+    const r = getRepoAccess(repoAccessObject);
 
-      const res = await getCourseData(r, courseName, getContents);
-      if (!res) throw Error('No course data retrieved');
-      return res;
-    } catch (error: any) {
-      throw error;
-    }
+    const res = await getCourseData(r, courseName, getContents);
+    if (!res) throw Error('No course data retrieved');
+    return res;
   };
 
   const handleChangeRepo = async (name: string) => {
@@ -751,7 +711,7 @@ export const GitContextProvider = (props: tProviderProps) => {
         });
         if (!dirHandle) return; // user canceled
 
-        gitFs.setDirHandle(dirHandle);
+        await gitFs.setDirHandle(dirHandle);
         await gitFs.openLocalDirectory(dirHandle);
 
         dispatch(setCurrentFileSystemType(newFsType));
@@ -795,7 +755,7 @@ export const GitContextProvider = (props: tProviderProps) => {
   const handleRemoveFile = async (filepath: string) => {
     const r = getRepoAccess(repoAccessObject);
 
-    gitFs.deleteFile(r, filepath);
+    await gitFs.deleteFile(r, filepath);
     await resolveFile(r, filepath);
     dispatch(recalculateFileTree(r));
   };
@@ -828,8 +788,6 @@ export const GitContextProvider = (props: tProviderProps) => {
         });
       }
       await pullRepo(req);
-    } catch (error: any) {
-      throw error;
     } finally {
       await resolveGitRepoStatus(r);
       await resolvePushStatus(r);
@@ -875,7 +833,7 @@ export const GitContextProvider = (props: tProviderProps) => {
     r: RepoAccessObject,
     slideTitle: string,
     currentAuDir: string,
-    extension: string = '.md',
+    extension = '.md',
   ) => {
     const repoPath = getRepoPath(r);
 
@@ -1009,7 +967,7 @@ export const GitContextProvider = (props: tProviderProps) => {
   const handleGitStashPopChanges = async () => {
     const r = getRepoAccess(repoAccessObject);
 
-    const changedFiles = await stashPopChanges();
+    await stashPopChanges();
     await resolveGitRepoStatus(r);
     dispatch(recalculateFileTree(r));
   };
@@ -1032,20 +990,6 @@ export const GitContextProvider = (props: tProviderProps) => {
     fileType: string,
   ) => {
     return await gitFs.blobImageFile(r, filePath, fileType);
-  };
-
-  const handleGetFolderStructure = async (
-    dir: string,
-    getContents = false,
-    zip: JSZip | null = null,
-  ) => {
-    try {
-      const r = getRepoAccess(repoAccessObject);
-      const repoPath = getRepoPath(r);
-      return await gitFs.getFolderStructure(dir, '', getContents, zip);
-    } catch {
-      return [];
-    }
   };
 
   // This function creates an environment where the user can test changes without being connected to a remote git repo
@@ -1219,7 +1163,6 @@ export const GitContextProvider = (props: tProviderProps) => {
         handleGetUniqueDirPath,
         handlePathExists,
         handleBlobImageFile,
-        handleGetFolderStructure,
         handleGitSetConfig,
         handleGitStashChanges,
         handleGitStashPopChanges,
@@ -1235,8 +1178,6 @@ export const GitContextProvider = (props: tProviderProps) => {
         handleRenameFile,
         handleGitCommitReset,
         handlePushRepo,
-        getLocalFileBlob,
-        getLocalFileBlobUrl,
         syncCurrentCourseWithGit,
         handleLoadCourse,
         currentRepo,

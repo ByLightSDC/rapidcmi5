@@ -5,7 +5,7 @@ import VerticalSplitIcon from '@mui/icons-material/VerticalSplit';
 import ReorderIcon from '@mui/icons-material/Reorder';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
-import { alpha, Stack, Switch, Tooltip, useTheme } from '@mui/material';
+import { alpha, Box, Stack, Switch, Tooltip, useTheme } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTheme, themeColor } from '@rapid-cmi5/ui';
 import StudentInfoButton from './StudentInfoButton';
@@ -44,6 +44,8 @@ export default function LessonToolbar({
         backgroundColor: alpha(palette.background.paper, 0.9),
         borderRadius: '6px',
         width: '100%',
+        display: 'flex',
+        alignItems: 'center',
       }}
     >
       <Tooltip
@@ -96,7 +98,7 @@ export default function LessonToolbar({
           <ReorderIcon />
         </IconButton>
       </Tooltip>
-
+      <StudentInfoButton />
       <Tooltip
         title={
           currentTheme === 'dark'
@@ -147,8 +149,13 @@ export default function LessonToolbar({
         />
       </Tooltip>
 
-      <StudentInfoButton />
       <BuildInfoButton />
+      <Box
+        id="error-portal"
+        sx={{
+          flexGrow: 1,
+        }}
+      />
     </Stack>
   );
 }

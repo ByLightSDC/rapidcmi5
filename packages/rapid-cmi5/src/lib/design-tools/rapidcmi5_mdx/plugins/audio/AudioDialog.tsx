@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 
 import {
   closeAudioDialog$,
@@ -24,10 +24,11 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import {
   ButtonModalMainUi,
   ComboBoxSelectorUi,
+  debugLogError,
   ModalDialog,
   TextFieldMainUi,
 } from '@rapid-cmi5/ui';
-import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
+import { useLessonAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
 
 // used for uploading files
 const VisuallyHiddenInput = styled('input')({
@@ -56,9 +57,7 @@ export const AudioDialog: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [fileOptions, setFileOptions] = useState<string[]>([]);
   const [autoplay, setAutoplay] = useState<boolean>(false);
-
-  const { isFsLoaded, handleGetFolderStructure } =
-    useContext(GitContext);
+  const { getAllAssets } = useLessonAssets();
 
   // get the state from Gurx
   const [state, audioFilePath] = useCellValues(
@@ -135,23 +134,16 @@ export const AudioDialog: React.FC = () => {
 
     async function fetchData() {
       try {
-        const treeData = await handleGetFolderStructure(path, true);
-        const fileOptions = [];
-
         // add the current source value
-        if (state.type === 'editing' && state.initialValues.src) {
-          fileOptions.push(state.initialValues.src.replace(AUDIO_DIR, ''));
-        }
+        const files = await getAllAssets('audio');
 
-        // add the list of files
-        for (let i = 0; i < treeData.length; i++) {
-          const audioName = treeData[i].name;
-          if (fileOptions[0] !== audioName) {
-            // don't add if already added as initial value
-            fileOptions.push(audioName);
-          }
+        if (state.type === 'editing' && state.initialValues.src) {
+          files.push(state.initialValues.src.replace(AUDIO_DIR, ''));
         }
-        setFileOptions(fileOptions);
+        // ensure unique
+        const audioFiles = [...new Set(files)];
+
+        setFileOptions(audioFiles);
       } catch (error) {
         // Directory doesn't exist yet - this is okay, it will be created when first audio is uploaded
         console.debug('Audio directory does not exist yet:', path);
@@ -159,7 +151,9 @@ export const AudioDialog: React.FC = () => {
       }
     }
 
-    fetchData();
+    fetchData().catch((err) => {
+      debugLogError(`Could not fetch audio data ${err}`);
+    });
   }, [audioFilePath, src, state.type]);
 
   // handle file selection

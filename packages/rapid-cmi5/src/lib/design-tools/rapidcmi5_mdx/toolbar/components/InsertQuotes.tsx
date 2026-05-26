@@ -1,12 +1,11 @@
 import {
-  ButtonWithTooltip,
   rootEditor$,
   $createDirectiveNode,
   DirectiveNode,
   syntaxExtensions$,
 } from '@mdxeditor/editor';
 
-import { $getSelection, $isRangeSelection, $createParagraphNode } from 'lexical';
+import { $getSelection, $isRangeSelection } from 'lexical';
 import type { LexicalEditor } from 'lexical';
 
 import { useCellValue, useCellValues } from '@mdxeditor/gurx';
@@ -24,13 +23,17 @@ import {
   convertMarkdownToMdast,
   ButtonMinorUi,
   QuotesSettings,
-  debugLogWarning,
   DEFAULT_QUOTES,
   QuotePreset,
 } from '@rapid-cmi5/ui';
 import { MUIButtonWithTooltip } from './MUIButtonWithTooltip';
 import { useCallback, useState } from 'react';
-import { useSelectionHelper } from 'packages/rapid-cmi5/src/lib/hooks/useSelectionHelper';
+
+import quoteAuthorPlaceholder from './assets/quoteAuthorPlaceholder.png';
+import { useSelectionHelper } from '../../../../hooks/useSelectionHelper';
+import { useLessonAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
+
+const PLACEHOLDER_AVATAR_FILENAME = 'quoteAuthorPlaceholder.png';
 
 /**
  * A toolbar button component that inserts a quotes into the editor.
@@ -43,6 +46,7 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
   const theme: any = useTheme();
   const selectionHelper = useSelectionHelper();
   const [isConfiguring, setIsConfiguring] = useState(false);
+  const { getAsset, uploadAsset } = useLessonAssets();
 
   /**
    * Inserts default Quotes at the current selection
@@ -100,10 +104,24 @@ export const InsertQuotes = ({ isDrawer }: { isDrawer?: boolean }) => {
   /**
    * Saves changes by inserting new node and removing original.
    */
-  const handleSelect = useCallback((preset: QuotePreset, avatar: string) => {
-    insertAtSelection(preset.id, avatar);
-    setIsConfiguring(false);
-  }, [insertAtSelection]);
+  const handleSelect = useCallback(
+    async (preset: QuotePreset, avatar: string) => {
+      let finalAvatar =
+        avatar || (await getAsset('image', PLACEHOLDER_AVATAR_FILENAME));
+      // ensure the defualt avatar is uploaded if no avatar was supplied
+      if (!finalAvatar) {
+        const res = await fetch(quoteAuthorPlaceholder);
+        finalAvatar = await uploadAsset(
+          'image',
+          PLACEHOLDER_AVATAR_FILENAME,
+          new Uint8Array(await res.arrayBuffer()),
+        );
+      }
+      insertAtSelection(preset.id, finalAvatar);
+      setIsConfiguring(false);
+    },
+    [insertAtSelection, getAsset, uploadAsset],
+  );
 
   /**
    * Set flag for configuring layout

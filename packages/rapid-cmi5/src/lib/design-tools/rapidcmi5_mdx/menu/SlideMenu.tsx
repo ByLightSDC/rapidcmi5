@@ -18,7 +18,7 @@ import {
   currentAuPath,
   currentBlock,
   currentSlideNum,
-  deleteASlide,
+  deleteSlide,
   navigateSlide,
 } from '../../../redux/courseBuilderReducer';
 import {
@@ -53,8 +53,6 @@ export const SlideMenu = () => {
   const { currentRepo, handleGetUniqueFilePath } = useContext(GitContext);
   const { saveSlide, lessonSlides } = useContext(RC5Context);
   const repoAccessObject = useSelector(currentRepoAccessObjectSel);
-
-
 
   const onAddSlide = async () => {
     if (!currentRepo) return;
@@ -94,9 +92,14 @@ export const SlideMenu = () => {
   };
 
   const onDeleteSlide = (slideIndex?: number) => {
-    const slideToDelete = slideIndex || currentSlideIndex;
+    const slideToDelete = slideIndex ?? currentSlideIndex;
     saveSlide();
-    dispatch(deleteASlide(slideToDelete));
+    dispatch(
+      deleteSlide({
+        lessonIndex: currentAuIndex,
+        slideIndex: slideToDelete,
+      }),
+    );
   };
 
   /**
@@ -150,7 +153,15 @@ export const SlideMenu = () => {
             onDeleteSlide();
           }}
         >
-          <DeleteForeverIcon color="inherit" style={{ fill: lessonSlides.length <= 1 ? theme.palette.action.disabled : theme.palette.primary.main }}/>
+          <DeleteForeverIcon
+            color="inherit"
+            style={{
+              fill:
+                lessonSlides.length <= 1
+                  ? theme.palette.action.disabled
+                  : theme.palette.primary.main,
+            }}
+          />
         </MUIButtonWithTooltip>
         <MUIButtonWithTooltip
           disabled={currentSlideIndex <= 0}
@@ -159,7 +170,15 @@ export const SlideMenu = () => {
           aria-label="prev-slide"
           onClick={onPrevSlide}
         >
-          <ArrowBackIcon color="inherit" style={{ fill: currentSlideIndex <= 0 ? theme.palette.action.disabled : theme.palette.primary.main }}/>
+          <ArrowBackIcon
+            color="inherit"
+            style={{
+              fill:
+                currentSlideIndex <= 0
+                  ? theme.palette.action.disabled
+                  : theme.palette.primary.main,
+            }}
+          />
         </MUIButtonWithTooltip>
         <Typography
           sx={{
@@ -176,7 +195,15 @@ export const SlideMenu = () => {
           aria-label="next-slide"
           onClick={onNextSlide}
         >
-          <ArrowForwardIcon color="inherit" style={{ fill: currentSlideIndex >= lessonSlides.length - 1 ? theme.palette.action.disabled : theme.palette.primary.main }}/>
+          <ArrowForwardIcon
+            color="inherit"
+            style={{
+              fill:
+                currentSlideIndex >= lessonSlides.length - 1
+                  ? theme.palette.action.disabled
+                  : theme.palette.primary.main,
+            }}
+          />
         </MUIButtonWithTooltip>
         <MUIButtonWithTooltip
           data-testid="add-markdown-slide-button"
@@ -188,7 +215,12 @@ export const SlideMenu = () => {
         >
           <NoteAddIcon
             color="inherit"
-            style={{ fill: lessonSlides.length < 1 ? theme.palette.action.disabled : theme.palette.primary.main }}
+            style={{
+              fill:
+                lessonSlides.length < 1
+                  ? theme.palette.action.disabled
+                  : theme.palette.primary.main,
+            }}
           />
         </MUIButtonWithTooltip>
       </Stack>

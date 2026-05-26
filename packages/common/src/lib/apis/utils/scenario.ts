@@ -9,6 +9,10 @@ type ScenarioClient = InitClientReturn<
   { baseUrl: string }
 >;
 
+/**
+ * Resolves a scenario UUID for an AU by UUID first, then by name.
+ * Throws if the configured UUID/name does not exist; returns null if neither is set.
+ */
 export const handleGetAuScenarioUUID = async (
   au: CourseAU,
   apiClient: ScenarioClient,
@@ -46,6 +50,9 @@ export const handleGetAuScenarioUUID = async (
   return null;
 };
 
+/**
+ * Fetches a single scenario by UUID. Throws on non-200 responses.
+ */
 export const handleFetchScenario = async (
   uuid: string,
   apiClient: ScenarioClient,
@@ -59,6 +66,9 @@ export const handleFetchScenario = async (
   );
 };
 
+/**
+ * Lists scenarios matching the given query. Throws on non-200 responses.
+ */
 export const handleListScenarios = async (
   query: ScenarioQuery,
   apiClient: ScenarioClient,
@@ -69,19 +79,19 @@ export const handleListScenarios = async (
   }
   throw new Error(`Failed to list scenarios (status: ${response.status})`);
 };
-
-export const handleProcessAu = async (
-  au: CourseAU,
-  blockId: string,
+/**
+ * Upserts an AU-to-scenario mapping: updates the existing mapping if one exists,
+ * otherwise creates a new one. Throws if the mapping cannot be created or updated.
+ */
+export const handleCreateAuMapping = async (
+  auId: string,
+  scenarioUUID: string,
   apiClient: ScenarioClient,
 ) => {
-  const scenarioUUID = await handleGetAuScenarioUUID(au, apiClient);
-  if (!scenarioUUID) return;
-
-  const auId = generateAuId({ blockId, auName: au.auName });
   // ts-rest does not encodeURIComponent path params; auId can be a URL with
   // slashes that would break server-side path routing if not encoded first.
   const encodedAuId = encodeURIComponent(auId);
+
   let existingMapping: Awaited<ReturnType<typeof apiClient.getAuMapping>>;
   try {
     existingMapping = await apiClient.getAuMapping({
@@ -115,4 +125,20 @@ export const handleProcessAu = async (
   } else {
     throw existingMapping.body;
   }
+};
+
+/**
+ * Resolves the AU's scenario and upserts its mapping. No-ops when the AU has
+ * no configured scenario UUID or name.
+ */
+export const handleProcessAu = async (
+  au: CourseAU,
+  blockId: string,
+  apiClient: ScenarioClient,
+) => {
+  const scenarioUUID = await handleGetAuScenarioUUID(au, apiClient);
+  if (!scenarioUUID) return;
+
+  const auId = generateAuId({ blockId, auName: au.auName });
+  return await handleCreateAuMapping(auId, scenarioUUID, apiClient);
 };

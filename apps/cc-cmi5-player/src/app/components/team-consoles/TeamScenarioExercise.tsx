@@ -34,7 +34,7 @@ import TerminalIcon from '@mui/icons-material/Terminal';
 
 import TimeClock from '../scenario/TimeClock';
 import RangeResources from './list-views/RangeResources';
-import { TeamConsolesContext } from './TeamScenarioContext';
+import { TeamScenarioContext } from './TeamScenarioContext';
 import { ScenarioResources } from './types';
 import TeamVMUpdates from './queries/TeamVMUpdates';
 import TeamContainerUpdates from './queries/TeamContainerUpdates';
@@ -58,7 +58,6 @@ import {
   maxFormWidths,
   useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
-
 
 /**
  * Activity displays a Deployed Scenario status, VMs, Containers, and Autograders
@@ -105,7 +104,7 @@ function TeamScenarioExercise({
     scenarioStatusChangeCounter,
     setUpdate,
     setUpdates,
-  } = useContext(TeamConsolesContext);
+  } = useContext(TeamScenarioContext);
 
   const getScenarioStatusChild = (data: Partial<DeployedScenario>) => {
     // don't want to display icon when Running
@@ -232,7 +231,9 @@ function TeamScenarioExercise({
           loadedScenario.current = getScenario(content.uuid, content.name);
           //display error if it missing
           if (loadedScenario.current === null) {
-            setErrorDetails(`No Scenario Found name=${content.name}`);
+            setErrorDetails(
+              `No deployed scenario found with the name ${content.name}`,
+            );
             setRangeId('');
             setScenarioId('');
           } else {
@@ -295,7 +296,14 @@ function TeamScenarioExercise({
       }}
     >
       <Typography variant="caption">Team Exercise</Typography>
-      {errorDetails && <Alert severity="error">{errorDetails}</Alert>}
+      {errorDetails && (
+        <Alert
+          sx={{ backgroundColor: 'transparent', borderStyle: 'none' }}
+          severity="error"
+        >
+          {errorDetails}
+        </Alert>
+      )}
       {scenarioId && (
         <>
           <Stack

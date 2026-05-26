@@ -4,6 +4,8 @@ export { config } from './lib/environments/FrontendEnvironment.env';
 
 export * from './lib/navigation/paging/paginationFiltersConstants';
 export * from './lib/apps/AppLogo';
+export * from './lib/apps/RapidCmi5Icon';
+export * from './lib/apps/RapidCmi5Title';
 export * from './lib/cmi5/markdown/MarkDownParser';
 export * from './lib/cmi5/markdown/MarkDownSlide';
 export * from './lib/cmi5/markdown/constants/SlideEvents';
@@ -109,3 +111,4 @@ export * from './lib/cmi5/mdx/util/conversion';
 export * from './lib/colors/ColorSelectionPopover';
 export * from './lib/cmi5/mdx/plugins/shared/BlockAppearanceForm';
 export * from './lib/cmi5/mdx/components/AlignmentToolbarControls';
+export * from './lib/colors/BackgroundColorTrigger';

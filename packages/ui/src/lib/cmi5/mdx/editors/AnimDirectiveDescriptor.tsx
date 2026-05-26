@@ -13,6 +13,7 @@ import {
   insertMarkdown$,
   $isFrontmatterNode,
 } from '@mdxeditor/editor';
+import { RC5NestedLexicalEditor } from '../plugins/shared/RC5NestedLexicalEditor';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import {
   $createParagraphNode,
@@ -331,7 +332,7 @@ export const AnimDirectiveDescriptor: DirectiveDescriptor<ContainerDirective> =
 
             {/* Nested content */}
             <Box sx={{ flex: 1 }}>
-              <NestedLexicalEditor<ContainerDirective>
+              <RC5NestedLexicalEditor<ContainerDirective>
                 block={true}
                 getContent={(node) => node.children}
                 getUpdatedMdastNode={(mdastNode, children: any) => ({

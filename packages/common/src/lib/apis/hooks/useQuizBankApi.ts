@@ -21,8 +21,7 @@ export function useQuizBankApi(url?: string, token?: string) {
             baseUrl: url,
             baseHeaders: {
               Authorization: `Bearer ${token}`,
-            },
-            credentials: 'include',
+            }
           })
         : undefined,
     [url, token],

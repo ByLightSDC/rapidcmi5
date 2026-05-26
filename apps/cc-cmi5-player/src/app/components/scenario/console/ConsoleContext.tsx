@@ -87,8 +87,8 @@ interface tProviderProps {
   guacUser?: string;
   guacPassword?: string;
   isEnabled?: boolean;
-  rangeId: string;
-  scenarioId: string;
+  rangeId?: string;
+  scenarioId?: string;
   onScenarioEvent?: (
     eventType: 'console_open' | 'copy_paste_change',
     scenarioId?: string,

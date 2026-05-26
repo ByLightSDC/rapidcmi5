@@ -14,13 +14,16 @@ import {
   FormControlUIProvider,
   MiniForm,
 } from '@rapid-cmi5/ui';
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { useSelector } from 'react-redux';
-import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
-import { useImageFile } from '../../data-hooks/useImageFile';
+import { useAssetUploadHandlers } from '../../data-hooks/useUploadFile';
 import * as yup from 'yup';
-import { currentAuPath } from '@rapid-cmi5/react-editor';
+import { currentAuPath } from '../../../../redux/courseBuilderReducer';
+import {
+  ASSET_DIRS,
+  useLessonAssets,
+} from '../../../course-builder/GitViewer/session/LessonAssetsContext';
 
 /**
  * Form course creators can use to attack files to a Lesson AU
@@ -49,13 +52,12 @@ export const DownloadFilesForm = ({
   outerSx?: SxProps;
   outerStyle?: OuterStyle;
 }) => {
-  const { fileUploadHandler } = useImageFile();
+  const { file: fileUploadHandler } = useAssetUploadHandlers();
   const validationSchema = yup.object().shape({});
   const auDir = useSelector(currentAuPath);
 
   const [formHeadTitle, setFormHeadTitle] = useState<string>('Files');
-  const { getLocalFileBlob, getLocalFileBlobUrl } = useContext(GitContext);
-  const { defaultDownloadFilePath } = useImageFile();
+  const { getLocalFileBlob, getLocalFileBlobUrl } = useLessonAssets();
   const isDebugId = false;
 
   /**
@@ -64,12 +66,8 @@ export const DownloadFilesForm = ({
    * @returns Blob
    */
   const fileDownloadHandler = async (fileData: DownloadFileData) => {
-    if (!auDir) {
-      return null;
-    }
-    const theBlob = await getLocalFileBlob?.(
-      `./${defaultDownloadFilePath}/${fileData.path}`,
-      auDir,
+    const theBlob = await getLocalFileBlob(
+      `./${ASSET_DIRS.file}/${fileData.path}`,
       fileData.type,
     );
 
@@ -123,7 +121,7 @@ export const DownloadFilesForm = ({
               <FileDownloadLink
                 fileData={fileData}
                 auDir={auDir}
-                filePath={`./${defaultDownloadFilePath}/${fileData.path}`}
+                filePath={`./${ASSET_DIRS.file}/${fileData.path}`}
                 getLinkUrl={getLocalFileBlobUrl}
               />
             );

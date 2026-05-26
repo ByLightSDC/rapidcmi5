@@ -15,6 +15,7 @@ export interface EditVideoToolbarProps {
   width?: number;
   height?: number;
   autoplay?: boolean;
+  captionSrc?: string;
 }
 
 export function EditVideoToolbar({
@@ -26,6 +27,7 @@ export function EditVideoToolbar({
   width,
   height,
   autoplay,
+  captionSrc,
 }: EditVideoToolbarProps): JSX.Element {
   const openEditVideoDialog = usePublisher(openEditVideoDialog$);
 
@@ -56,6 +58,7 @@ export function EditVideoToolbar({
                 width,
                 height,
                 autoplay,
+                captionSrc,
               },
             });
           }}

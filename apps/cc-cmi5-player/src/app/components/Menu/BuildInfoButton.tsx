@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import IconButton from '@mui/material/IconButton';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+
 import {
-  Box,
   Divider,
   Popover,
   Stack,
@@ -12,6 +11,7 @@ import {
 import { useSelector } from 'react-redux';
 import { auJsonSel } from '../../redux/auReducer';
 import { TOOLTIP_ENTER_DELAY, TOOLTIP_ENTER_NEXT_DELAY } from './shared';
+import { RapidCmi5Icon, RapidCmi5Title } from '@rapid-cmi5/ui';
 
 /*
   This allows course managers and developers to debug issues in their course.
@@ -38,17 +38,17 @@ export default function BuildInfoButton() {
   return (
     <>
       <Tooltip
-        title="Build Information"
+        title="About RapidCMI5"
         enterDelay={TOOLTIP_ENTER_DELAY}
         enterNextDelay={TOOLTIP_ENTER_NEXT_DELAY}
       >
         <IconButton
+          sx={{ width: '32px', height: '32px' }}
           aria-label="Build Information"
           color="primary"
-          size="small"
           onClick={(e) => setAnchor(e.currentTarget)}
         >
-          <InfoOutlinedIcon fontSize="small" />
+          <RapidCmi5Icon />
         </IconButton>
       </Tooltip>
       <Popover
@@ -63,6 +63,7 @@ export default function BuildInfoButton() {
               mt: 0.5,
               minWidth: 320,
               maxWidth: 480,
+              backgroundColor: (theme) => `${theme.palette.background.default}`,
               borderRadius: 2,
               border: '1px solid',
               borderColor: 'divider',
@@ -70,18 +71,10 @@ export default function BuildInfoButton() {
           },
         }}
       >
-        <Box sx={{ px: 2.5, pt: 2, pb: 0.5 }}>
-          <Typography
-            variant="overline"
-            sx={{
-              letterSpacing: 1.5,
-              color: 'text.secondary',
-              fontWeight: 600,
-            }}
-          >
-            Build Information
-          </Typography>
-        </Box>
+        <Stack direction="row" spacing={1} sx={{ px: 2.5, pt: 2, pb: 0.5 }}>
+          <RapidCmi5Icon />
+          <RapidCmi5Title textShouldContrast={false} />
+        </Stack>
         <Divider />
         <Stack direction="column" spacing={1.5} sx={{ px: 2.5, py: 2 }}>
           {rows.map(({ label, value }) => (
@@ -94,7 +87,6 @@ export default function BuildInfoButton() {
               <Typography
                 variant="caption"
                 sx={{
-                  color: 'text.secondary',
                   minWidth: 80,
                   pt: '1px',
                   fontWeight: 600,

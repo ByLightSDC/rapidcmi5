@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { BaseSelection, LexicalEditor } from 'lexical';
 import { $isLinkNode } from '@lexical/link';
@@ -46,7 +40,7 @@ import {
 } from '@mdxeditor/editor';
 import { $isImageNode, ImageNode } from './ImageNode';
 import ImageResizer from './ImageResizer';
-import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
+import { useLessonAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
 import { useSelector } from 'react-redux';
 
 import RC5LinkEditor from '../link/RC5LinkEditor';
@@ -68,7 +62,6 @@ import {
   imagePreviewHandler$,
   resolveBlockMaxWidth,
 } from '@rapid-cmi5/ui';
-import { currentAuPath } from '@rapid-cmi5/react-editor';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 
 export interface ImageEditorProps {
@@ -113,20 +106,13 @@ function LazyImage({
 }) {
   const [url, setUrl] = useState<string>(src);
 
-  const { getLocalFileBlobUrl, isFsLoaded } = useContext(GitContext);
-
-  const imageDir = useSelector(currentAuPath);
+  const { getLocalFileBlobUrl } = useLessonAssets();
 
   // if images are local, handle that situation
   useEffect(() => {
     setUrl(src);
 
     if (!src.startsWith('./') && !src.startsWith('../')) {
-      return;
-    }
-
-    if (!imageDir) {
-      debugLogError('No lesson au path dir');
       return;
     }
 
@@ -137,7 +123,7 @@ function LazyImage({
     // before the upload exists locally. Thus, it is necessary to do another
     // attempt in loading the local image.
     const loadImage = async () => {
-      const blobUrl = await getLocalFileBlobUrl?.(src, imageDir);
+      const blobUrl = await getLocalFileBlobUrl(src);
       if (!blobUrl && loadAttemptCtr < MAX_LOAD_ATTEMPTS) {
         setTimeout(() => {
           // console.log('load image attempt', loadAttemptCtr);
@@ -149,10 +135,10 @@ function LazyImage({
       }
     };
 
-    if (isFsLoaded) {
-      loadImage();
-    }
-  }, [imageDir, src, getLocalFileBlobUrl]);
+    loadImage().catch((err) => {
+      debugLogError(`Could not load image ${err}`);
+    });
+  }, [src]);
 
   // Build dimension styles that work correctly with the CSS max-width: 100% rule.
   // - width only: cap at that pixel value, height auto (natural AR preserved)
@@ -259,7 +245,11 @@ export function ImageEditor({
     (item): item is MdxJsxAttribute =>
       item.type === 'mdxJsxAttribute' && item.name === 'textAlign',
   );
-  const imageTextAlign = textAlignAttr?.value as 'left' | 'center' | 'right' | undefined;
+  const imageTextAlign = textAlignAttr?.value as
+    | 'left'
+    | 'center'
+    | 'right'
+    | undefined;
   if (imageTextAlign) {
     wrapperStyle.textAlign = imageTextAlign;
   }
@@ -688,10 +678,20 @@ export function ImageEditor({
         <div
           className={styles['imageWrapper']}
           data-editor-block-type="image"
-          {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
+          {...(contentWidth !== undefined
+            ? { 'data-block-override': 'true' }
+            : {})}
           {...(blockMaxWidth === null ? { 'data-block-expand': 'true' } : {})}
-          {...(blockMaxWidth === null && imageTextAlign ? { 'data-image-align': imageTextAlign } : {})}
-          {...(contentWidth !== undefined ? { style: { '--block-max-width': blockMaxWidth ?? 'none' } as React.CSSProperties } : {})}
+          {...(blockMaxWidth === null && imageTextAlign
+            ? { 'data-image-align': imageTextAlign }
+            : {})}
+          {...(contentWidth !== undefined
+            ? {
+                style: {
+                  '--block-max-width': blockMaxWidth ?? 'none',
+                } as React.CSSProperties,
+              }
+            : {})}
         >
           <div
             id={`image-labels-${id}`}

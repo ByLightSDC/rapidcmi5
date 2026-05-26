@@ -1,5 +1,8 @@
 import { GitContextProvider } from '../course-builder/GitViewer/session/GitContext';
-import { RapidCmi5Opts, RapidCmi5OptsProvider } from '../course-builder/GitViewer/session/RapidCmi5OptsContext';
+import {
+  RapidCmi5Opts,
+  RapidCmi5OptsProvider,
+} from '../course-builder/GitViewer/session/RapidCmi5OptsContext';
 import { RC5ContextProvider } from './contexts/RC5Context';
 import { ElectronEventsBridge } from '../../electron/ElectronEventBridge';
 import RC5Modals from './modals/RC5Modals';

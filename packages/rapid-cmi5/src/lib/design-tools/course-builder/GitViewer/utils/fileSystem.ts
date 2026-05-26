@@ -144,9 +144,15 @@ export class GitFS {
 
     for (const filename of ['index.html', 'cfg.json', 'favicon.ico']) {
       const res = await fetch(`${base}/${filename}`);
-      if (!res.ok) throw new Error(`Failed to fetch ${filename} from player dev server (${res.status})`);
+      if (!res.ok)
+        throw new Error(
+          `Failed to fetch ${filename} from player dev server (${res.status})`,
+        );
       const buf = await res.arrayBuffer();
-      await this.fs.promises.writeFile(join(cmi5BuildCache, filename), new Uint8Array(buf));
+      await this.fs.promises.writeFile(
+        join(cmi5BuildCache, filename),
+        new Uint8Array(buf),
+      );
     }
   };
 
@@ -664,17 +670,15 @@ export class GitFS {
       await this.fs.promises.rmdir(`${repoPath}/.git`);
     } catch {}
 
-    // For local filesystem repos in the browser, the root WebAccess mount point
-    // cannot be deleted via removeEntry (browser throws "Name is not allowed").
-    // Instead, unmount the zenFs path so the name can be reused immediately.
+    await this.fs.promises.rmdir(repoPath);
+
     if (!this.isElectron && r.fileSystemType === fsType.localFileSystem) {
       try {
         zenFs.umount(repoPath);
-      } catch {}
-      return;
+      } catch (error) {
+        console.error('Could not unmount path for zenfFS', error);
+      }
     }
-
-    await this.fs.promises.rmdir(repoPath);
   };
 
   /**
@@ -1444,6 +1448,56 @@ export class GitFS {
       console.error('Error blobbing image:', error);
       return null;
     }
+  };
+
+  fileExists = async (
+    r: RepoAccessObject,
+    filePath: string,
+  ): Promise<boolean> => {
+    try {
+      const fullPath = join(getRepoPath(r), filePath);
+      const stat = await this.fs.promises.stat(fullPath);
+      return stat.isFile();
+    } catch {
+      return false;
+    }
+  };
+
+  /**
+   * Lists the names of all files (non-directory entries) in a directory
+   * within the given repository.
+   *
+   * @param r - The repository access object identifying which repo to read from.
+   * @param path - The directory path relative to the repository root.
+   * @returns A promise resolving to an array of file names (not full paths)
+   * contained directly within the directory. Subdirectories are excluded.
+   *
+   * @throws Will throw an error if the directory does not exist or if the
+   * given path points to a file rather than a directory.
+   */
+  listDirectoryFiles = async (
+    r: RepoAccessObject,
+    path: string,
+  ): Promise<string[]> => {
+    const repoPath = getRepoPath(r);
+    const fullPath = join(repoPath, path);
+
+    if (!(await this.dirExists(fullPath))) {
+      throw new Error(`Directory does not exist: ${fullPath}`);
+    }
+
+    const items = await this.fs.promises.readdir(fullPath);
+    const files: string[] = [];
+
+    for (const item of items) {
+      const itemPath = `${fullPath}/${item}`;
+      const stat = await this.fs.promises.stat(itemPath);
+      if (stat.isFile()) {
+        files.push(item.toString());
+      }
+    }
+
+    return files;
   };
 
   getFileContent = async (

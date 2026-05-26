@@ -47,10 +47,16 @@ export const LexicalVideoVisitor: LexicalExportVisitor<VideoNode, Mdast.Html> =
         }
       }
 
-      // Now outerHTML will include all attributes properly (including data-video-id and original src)
+      const captionSrc = lexicalNode.getCaptionSrc();
+      if (captionSrc) {
+        video.setAttribute('data-caption-src', captionSrc);
+      }
+
+      const html = video.outerHTML;
+
       actions.appendToParent(mdastParent, {
         type: 'html',
-        value: video.outerHTML,
+        value: html,
       });
     },
   };

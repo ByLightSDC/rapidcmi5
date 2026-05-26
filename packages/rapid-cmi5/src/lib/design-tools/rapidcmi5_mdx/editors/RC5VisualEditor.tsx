@@ -98,7 +98,7 @@ import {
 } from '../../../redux/courseBuilderReducer';
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
 
-import { useImageFile } from '../data-hooks/useImageFile';
+import { useAssetUploadHandlers } from '../data-hooks/useUploadFile';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
 import { directiveLinter } from './code/codeMirrorUtils';
@@ -114,6 +114,7 @@ import { ErrorBoundary } from './ErrorBoundary';
 import { linkDialogPlugin } from '../plugins/link-dialog';
 import { draggableBlockPlugin } from '../plugins/draggable-block';
 import { gutterClickPlugin } from '../plugins/gutter-click/GutterClickPlugin';
+import { CurrentLessonAssetsContextProvider } from '../../course-builder/GitViewer/session/LessonAssetsContext';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -255,13 +256,10 @@ function RC5VisualEditor() {
   );
 
   const {
-    imageFilePath,
-    imageUploadHandler,
-    videoFilePath,
-    videoUploadHandler,
-    audioFilePath,
-    audioUploadHandler,
-  } = useImageFile();
+    image: imageUploadHandler,
+    video: videoUploadHandler,
+    audio: audioUploadHandler,
+  } = useAssetUploadHandlers();
 
   // Preview handlers convert GitFS paths to blob URLs for browser display
   const imagePreviewHandler = useCallback(
@@ -394,17 +392,14 @@ function RC5VisualEditor() {
       animationDirectivePlugin(),
       imagePlugin({
         imageUploadHandler: imageUploadHandler,
-        imageFilePath: imageFilePath,
         imagePreviewHandler: imagePreviewHandler,
       }),
       videoPlugin({
         videoUploadHandler: videoUploadHandler,
-        videoFilePath: videoFilePath,
         videoPreviewHandler: videoPreviewHandler,
       }),
       audioPlugin({
         audioUploadHandler: audioUploadHandler,
-        audioFilePath: audioFilePath,
         audioPreviewHandler: audioPreviewHandler,
       }),
       animationPlugin({
@@ -472,14 +467,11 @@ function RC5VisualEditor() {
     }
   }, [
     isEditing,
-    imageFilePath,
     imageUploadHandler,
     imagePreviewHandler,
-    videoFilePath,
     videoUploadHandler,
     videoPreviewHandler,
     muiTheme.palette.mode,
-    audioFilePath,
     audioUploadHandler,
     audioPreviewHandler,
     // NOTE: currentAnimations is intentionally NOT in the dependency array
@@ -772,55 +764,52 @@ function RC5VisualEditor() {
     debugLog('error src', payload, undefined, 'editor');
   };
   return (
-    // eslint-disable-next-line react/jsx-no-useless-fragment
-    <>
-      {thePlugins && thePlugins.length > 0 && currentCourse ? (
-        <Box
-          className={themeClass}
-          sx={{ height: `calc(100vh - ${pixelTop}px)` }}
-          ref={editorContainerRef}
-        >
-          {currentLessonTheme && <style>{lessonStyleCss}</style>}
+    // Visual editor will be able to access Images and Assets from the file system
+    thePlugins && thePlugins.length > 0 && currentCourse ? (
+      <Box
+        className={themeClass}
+        sx={{ height: `calc(100vh - ${pixelTop}px)` }}
+        ref={editorContainerRef}
+      >
+        {currentLessonTheme && <style>{lessonStyleCss}</style>}
 
-          <ErrorBoundary>
-            <LessonThemeContext.Provider
-              value={{ lessonTheme: currentLessonTheme }}
-            >
-              <MDXEditor
-                className={mdxTheme}
-                onChange={onChange}
-                ref={ref}
-                markdown={''}
-                plugins={thePlugins}
-                readOnly={!isEditing}
-                onError={onErrorHelper}
-              />
-            </LessonThemeContext.Provider>
-          </ErrorBoundary>
-        </Box>
-      ) : (
-        <Box
+        <ErrorBoundary>
+          <LessonThemeContext.Provider
+            value={{ lessonTheme: currentLessonTheme }}
+          >
+            <MDXEditor
+              className={mdxTheme}
+              onChange={onChange}
+              ref={ref}
+              markdown={''}
+              plugins={thePlugins}
+              readOnly={!isEditing}
+              onError={onErrorHelper}
+            />
+          </LessonThemeContext.Provider>
+        </ErrorBoundary>
+      </Box>
+    ) : (
+      <Box
+        sx={{
+          height: `calc(100vh - ${pixelTop}px)`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography
+          variant="h6"
           sx={{
-            height: `calc(100vh - ${pixelTop}px)`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            color: 'text.secondary',
+            fontWeight: 400,
+            letterSpacing: '0.02em',
           }}
         >
-          <Typography
-            variant="h6"
-            sx={{
-              color: 'text.secondary',
-              fontWeight: 400,
-              letterSpacing: '0.02em',
-            }}
-          >
-            Please create or open a course to begin editing
-          </Typography>
-        </Box>
-      )}
-      {/* <SharedFormModals isModal={false} /> */}
-    </>
+          Please create or open a course to begin editing
+        </Typography>
+      </Box>
+    )
   );
 }
 
