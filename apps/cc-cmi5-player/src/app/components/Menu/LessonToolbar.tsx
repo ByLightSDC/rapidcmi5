@@ -58,13 +58,13 @@ export default function LessonToolbar({
             isMenuDrawerOpen ? 'Collapse Navigation' : 'Open Navigation'
           }
           size="small"
-          color="primary"
+          sx={{ color: button.iconColor }}
           onClick={() => (isMenuDrawerOpen ? onDrawerClose() : onDrawerOpen())}
         >
           {isMenuDrawerOpen ? (
-            <KeyboardArrowLeftIcon />
+            <KeyboardArrowLeftIcon color="inherit" />
           ) : (
-            <KeyboardArrowRightIcon />
+            <KeyboardArrowRightIcon color="inherit" />
           )}
         </IconButton>
       </Tooltip>
@@ -76,11 +76,11 @@ export default function LessonToolbar({
       >
         <IconButton
           aria-label="Turn Split Screen On"
-          color="primary"
+          sx={{ color: button.iconColor }}
           disabled={isSplitPanelShown}
           onClick={() => (isSplitPanelShown ? onSplitOff() : onSplitOn())}
         >
-          <VerticalSplitIcon />
+          <VerticalSplitIcon color="inherit" />
         </IconButton>
       </Tooltip>
 
@@ -91,14 +91,14 @@ export default function LessonToolbar({
       >
         <IconButton
           aria-label="Turn Split Screen Off"
-          color="primary"
+          sx={{ color: button.iconColor }}
           disabled={!isSplitPanelShown}
           onClick={() => (isSplitPanelShown ? onSplitOff() : onSplitOn())}
         >
-          <ReorderIcon />
+          <ReorderIcon color="inherit" />
         </IconButton>
       </Tooltip>
-      <StudentInfoButton />
+      <StudentInfoButton color={button.iconColor} />
       <Tooltip
         title={
           currentTheme === 'dark'
@@ -122,7 +122,7 @@ export default function LessonToolbar({
           icon={
             <LightModeIcon
               name="Light Mode"
-              color="primary"
+              //color="primary"
               fontSize="small"
               sx={{
                 backgroundColor: 'background.default',
@@ -135,7 +135,7 @@ export default function LessonToolbar({
           checkedIcon={
             <DarkModeIcon
               name="Dark Mode"
-              color="primary"
+              //color="primary"
               fontSize="small"
               sx={{
                 backgroundColor: 'background.default',
@@ -151,7 +151,7 @@ export default function LessonToolbar({
         />
       </Tooltip>
 
-      <BuildInfoButton color={button.iconColor}/>
+      <BuildInfoButton color={button.iconColor} />
       <Box
         id="error-portal"
         sx={{

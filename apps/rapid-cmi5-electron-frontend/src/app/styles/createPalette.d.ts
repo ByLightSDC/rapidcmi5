@@ -6,6 +6,9 @@ declare module '@mui/material/styles' {
       borderColor: React.CSSProperties['color'];
       titleBackgroundColor: React.CSSProperties['color'];
     };
+    activity: {
+      backgroundColor: React.CSSProperties['color'];
+    };
     breadcrumbs: {
       default: React.CSSProperties['color'];
       underline: React.CSSProperties['color'];
@@ -63,6 +66,9 @@ declare module '@mui/material/styles' {
       borderBottom: React.CSSProperties['color'];
       borderColor: React.CSSProperties['color'];
       titleBackgroundColor: React.CSSProperties['color'];
+    };
+    activity: {
+      backgroundColor: React.CSSProperties['color'];
     };
     breadcrumbs: { default: React.CSSProperties['color'] };
     button: {

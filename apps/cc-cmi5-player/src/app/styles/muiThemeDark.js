@@ -58,6 +58,7 @@ export const darkTheme = createTheme({
   //   instructionsColor: colorPop ? '#edb445' : '#edb445',
   //   formInstructionsColor: '#212125',
   // },
+  activity: { backgroundColor: '#1e2d54' },
   breadcrumbs: {
     default: '#C8C8C8', //disabled breadcrumb text
     underline: mainColor,
@@ -65,13 +66,14 @@ export const darkTheme = createTheme({
     hoverBackground: '#FFC84020',
   },
   button: {
-    disabledBackgroundColor: '#293658', //'#07128580',
-    disabledColor: '#C1C9DB99',
-    gradient: 'linear-gradient(180deg, #405CA7 0%, #2C4B93 100%)',
-    minorBackgroundColor: '#213157', //'#333333',
+    disabledBackgroundColor: '#582936', //'#07128580',
+    disabledColor: '#dbc1ca99',
+    gradient: 'linear-gradient(180deg, #e4002b 0%, #94041f 100%)',
+    minorBackgroundColor: '#572130', //'#333333',
     indicatorColor: mainColor,
-    iconColor: mainColor,
+    iconColor: '#e4002b',
   },
+
   form: {
     backgroundColor: '#282b30',
   },

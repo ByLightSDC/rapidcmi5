@@ -45,6 +45,7 @@ export const lightTheme = createTheme({
     borderColor: '#D4D5DB',
     titleBackgroundColor: '#EEEEEE',
   },
+  activity: { backgroundColor: '#1e2d54' },
   button: {
     disabledBackgroundColor: '#7f8cb9',
     disabledColor: '#C1C9DB',

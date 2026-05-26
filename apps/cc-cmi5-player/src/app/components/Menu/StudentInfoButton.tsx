@@ -18,7 +18,7 @@ import { TOOLTIP_ENTER_DELAY, TOOLTIP_ENTER_NEXT_DELAY } from './shared';
 
 const featureFlagChangeClassRoom = false;
 
-export default function StudentInfoButton() {
+export default function StudentInfoButton({ color }: { color?: string }) {
   const dispatch = useDispatch();
   const classId = useSelector(classIdSel);
   const studentId = useSelector(studentIdSel);
@@ -68,7 +68,7 @@ export default function StudentInfoButton() {
           borderColor: (theme: CustomTheme) => `${theme.input.outlineColor}`,
           color: 'white',
         }}
-        infoIcon={<AccountCircleIcon fontSize="inherit" color="primary" />}
+        infoIcon={<AccountCircleIcon fontSize="inherit" color="inherit" />}
         name="account-info-icon"
         message={
           <Stack
@@ -111,14 +111,14 @@ export default function StudentInfoButton() {
   }
 
   return (
-    <IconButton aria-label="Student Information" color="primary">
+    <IconButton aria-label="Student Information" sx={{ color }}>
       <Tooltip
         enterDelay={TOOLTIP_ENTER_DELAY}
         enterNextDelay={TOOLTIP_ENTER_NEXT_DELAY}
         sx={{ maxWidth: '480px' }}
         title={infoRows}
       >
-        <AccountCircleIcon />
+        <AccountCircleIcon color="inherit" />
       </Tooltip>
     </IconButton>
   );

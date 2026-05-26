@@ -77,7 +77,7 @@ export const ActivityPlayback: React.FC<
     mdastNode?.attributes?.contentWidth,
     maxFormWidths.downloadsEditor,
     muiTheme.palette.background.paper,
-    muiTheme.nav.tabPanel,
+    muiTheme.activity.backgroundColor,
     true,
     true,
   );
