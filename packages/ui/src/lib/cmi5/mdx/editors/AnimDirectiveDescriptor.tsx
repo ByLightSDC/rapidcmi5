@@ -35,8 +35,6 @@ import {
 
 // MUI components for Accordion-style icons
 import { Box, IconButton, Stack, Tooltip } from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { debugLog } from '@rapid-cmi5/ui';
 
@@ -343,7 +341,7 @@ export const AnimDirectiveDescriptor: DirectiveDescriptor<ContainerDirective> =
               />
             </Box>
 
-            {/* Settings and Delete icons - matching Layout/Image style, 10px from badge */}
+            {/* Delete icon - matching Layout/Image style, 10px from badge */}
             {!isReadOnly && (isHovered || isSelected) && (
               <Box
                 sx={{
@@ -355,19 +353,6 @@ export const AnimDirectiveDescriptor: DirectiveDescriptor<ContainerDirective> =
                   borderRadius: '4px',
                 }}
               >
-                <Tooltip title="Edit Animation Settings">
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      // Open animation drawer/settings
-                      if (clickHandler && myAnimation) {
-                        clickHandler(animId);
-                      }
-                    }}
-                  >
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
                 <Tooltip
                   title={
                     isLastAnimation
@@ -740,7 +725,7 @@ export const InlineAnimDirectiveDescriptor: DirectiveDescriptor<TextDirective> =
             </div>
           )}
 
-          {/* Settings and Delete icons - compact for inline, 10px from badge */}
+          {/* Delete icon - compact for inline, 10px from badge */}
           {!isReadOnly && (isHovered || isSelected) && (
             <Box
               sx={{
@@ -753,19 +738,6 @@ export const InlineAnimDirectiveDescriptor: DirectiveDescriptor<TextDirective> =
                 zIndex: 100,
               }}
             >
-              <Tooltip title="Edit Animation Settings">
-                <IconButton
-                  size="small"
-                  onClick={() => {
-                    if (clickHandler) {
-                      clickHandler(animId);
-                    }
-                  }}
-                  sx={{ padding: '2px' }}
-                >
-                  <EditIcon sx={{ fontSize: '14px' }} />
-                </IconButton>
-              </Tooltip>
               <Tooltip
                 title={
                   isLastAnimation
