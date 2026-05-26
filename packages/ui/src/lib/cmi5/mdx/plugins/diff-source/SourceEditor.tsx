@@ -3,7 +3,7 @@ import { Compartment } from '@codemirror/state';
 import { EditorState, Extension } from '@codemirror/state';
 import { EditorView, lineNumbers } from '@codemirror/view';
 import { basicSetup } from 'codemirror';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { githubLight, githubDark } from '@uiw/codemirror-theme-github';
 import { useTheme } from '@mui/material';
 import { cmExtensions$ } from '.';
@@ -12,8 +12,9 @@ import {
   markdownSourceEditorValue$,
   onBlur$,
   readOnly$,
+  setMarkdown$,
 } from '@mdxeditor/editor';
-import { useCellValues, usePublisher } from '@mdxeditor/gurx';
+import { useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx';
 
 export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = [
   basicSetup,
@@ -24,6 +25,7 @@ export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = [
 ];
 
 export const SourceEditor = () => {
+  const realm = useRealm();
   const [markdown, readOnly, cmExtensions] = useCellValues(
     markdown$,
     readOnly$,
@@ -31,7 +33,7 @@ export const SourceEditor = () => {
   );
   const updateMarkdown = usePublisher(markdownSourceEditorValue$);
   const triggerOnBlur = usePublisher(onBlur$);
-  const editorViewRef = React.useRef<EditorView | null>(null);
+  const editorViewRef = useRef<EditorView | null>(null);
   const themeCompartment = useMemo(() => {
     return new Compartment();
   }, []);
@@ -71,15 +73,42 @@ export const SourceEditor = () => {
         editorViewRef.current = null;
       }
     },
-    [
-      markdown,
-      readOnly,
-      updateMarkdown,
-      cmExtensions,
-      editorViewRef,
-      triggerOnBlur,
-    ],
+    // `markdown` is intentionally omitted — we update doc content via the
+    // markdown$ subscription below instead of recreating the editor.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [readOnly, updateMarkdown, cmExtensions, triggerOnBlur],
   );
+
+  /**
+   * Push markdown changes into the existing editor view (e.g. on slide
+   * change) without tearing down and rebuilding the editor, so cursor,
+   * scroll, focus, and undo history are preserved.
+   *
+   * We subscribe to BOTH markdown$ and setMarkdown$ because MDXEditor's
+   * internal setMarkdown$ handler short-circuits when the new markdown
+   * trim-equals the current markdown$ value — meaning markdown$ never
+   * re-emits and Lexical is never updated. That breaks the source view
+   * when two slides share identical content but CodeMirror's doc has
+   * diverged via in-place source-mode edits. Subscribing to setMarkdown$
+   * directly bypasses that filter.
+   */
+  const replaceDoc = (next: string) => {
+    const view = editorViewRef.current;
+    if (!view) return;
+    if (view.state.doc.toString() === next) return;
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: next },
+    });
+  };
+
+  useEffect(() => {
+    const unsubMarkdown = realm.sub(markdown$, replaceDoc);
+    const unsubSetMarkdown = realm.sub(setMarkdown$, replaceDoc);
+    return () => {
+      unsubMarkdown();
+      unsubSetMarkdown();
+    };
+  }, [realm]);
 
   /**
    * Switch Themes

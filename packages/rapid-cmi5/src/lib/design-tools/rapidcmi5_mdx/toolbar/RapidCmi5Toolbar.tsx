@@ -37,7 +37,6 @@ import {
   editorInPlayback$,
   lessonTheme$,
   CONTENT_UPDATED_COMMAND,
-  dividerColor,
   toolbarRect$,
   maxSlideWidth$,
   debugLog,
@@ -75,13 +74,13 @@ import { UndoRedo } from './components/UndoRedo';
 import { InsertQuotes } from './components/InsertQuotes';
 import { InsertStatements } from './components/InsertStatements';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
+import { LessonTheme } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Layout Constants
  *
  */
 const rightToolbarMargin = 25;
-
 
 /**
  * A toolbar component that includes all toolbar components.
@@ -90,13 +89,12 @@ const rightToolbarMargin = 25;
  * @group Toolbar Components
  */
 export const RapidCmi5Toolbar: React.FC<{
-  lessonTheme?: import('@rapid-cmi5/cmi5-build-common').LessonTheme;
+  lessonTheme?: LessonTheme;
 }> = ({ lessonTheme }) => {
   const changeViewMode = usePublisher(viewMode$);
   const { getMarkdownData } = useContext(RC5Context);
   const realm = useRealm();
   const viewmode = useCellValue(viewMode$);
-  const themedDividerColor = useSelector(dividerColor);
   const content = useSelector(displayData);
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef<HTMLDivElement>(null);
@@ -189,7 +187,6 @@ export const RapidCmi5Toolbar: React.FC<{
     // Ensure the ref is attached to a DOM element and that element exists
   }, []);
 
-
   return (
     <Box
       ref={toolbarRef}
@@ -215,7 +212,11 @@ export const RapidCmi5Toolbar: React.FC<{
         <Stack direction="column" spacing={1} sx={{ padding: 1 }}>
           {viewmode === 'rich-text' && !isPlayback && (
             <Stack direction="row" spacing={1}>
-              <Stack direction="row" spacing={0} sx={{ flexGrow: 1, minWidth: 0 }}>
+              <Stack
+                direction="row"
+                spacing={0}
+                sx={{ flexGrow: 1, minWidth: 0 }}
+              >
                 <BoldItalicUnderlineToggles />
                 <ColorTextSplitButton />
                 <HighlightSplitButton />
@@ -307,8 +308,8 @@ export const RapidCmi5Toolbar: React.FC<{
           )}
           {(viewmode === 'source' ||
             (viewmode === 'rich-text' && isPlayback)) && (
-              <Box sx={{ minHeight: '32px' }}></Box>
-            )}
+            <Box sx={{ minHeight: '32px' }}></Box>
+          )}
           <Stack
             direction="row"
             spacing={1}
@@ -337,9 +338,9 @@ export const RapidCmi5Toolbar: React.FC<{
               direction="row"
               spacing={1}
               sx={{
-                background: alpha(theme.palette.primary.light, .10), //'background.default',
+                background: alpha(theme.palette.primary.light, 0.1), //'background.default',
                 borderRadius: '24px',
-                 border: `1px solid ${alpha(theme.palette.primary.main, 0.50)}`,
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.5)}`,
                 height: '34px',
                 display: 'flex',
                 justifyContent: 'center',
