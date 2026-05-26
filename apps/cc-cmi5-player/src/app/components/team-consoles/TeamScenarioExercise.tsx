@@ -68,6 +68,9 @@ import {
 function TeamScenarioExercise({
   auProps,
   content,
+  innerSx,
+  outerSx,
+  outerStyle,
 }: {
   auProps: Partial<AuContextProps>;
   content: TeamConsolesContent;
@@ -82,12 +85,6 @@ function TeamScenarioExercise({
   const [scenarioId, setScenarioId] = useState<string>('');
   const [errorDetails, setErrorDetails] = useState<string>('');
   const [isClockShowing, setIsClockShowing] = useState(false);
-  /* Lesson Theme */
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
-    lessonTheme,
-    maxFormWidths.scenarioPlayback,
-  );
 
   const {
     addListener,
@@ -287,168 +284,173 @@ function TeamScenarioExercise({
   ]);
 
   return (
-    <Paper
+    <Box
       className="paper-activity"
-      variant="outlined"
       sx={{
         backgroundColor: 'background.default',
-        ...outerActivitySxWithConstrainedWidth,
+        ...outerSx,
       }}
+      {...outerStyle}
     >
-      <Typography variant="caption">Team Exercise</Typography>
-      {errorDetails && (
-        <Alert
-          sx={{ backgroundColor: 'transparent', borderStyle: 'none' }}
-          severity="error"
-        >
-          {errorDetails}
-        </Alert>
-      )}
-      {scenarioId && (
-        <>
-          <Stack
-            direction="row"
-            sx={{
-              padding: 0,
-              position: 'relative',
-            }}
+      <Box sx={{ ...innerSx }}>
+        <Typography color="text.primary" variant="caption">
+          Team Exercise
+        </Typography>
+
+        {errorDetails && (
+          <Alert
+            sx={{ backgroundColor: 'transparent', borderStyle: 'none' }}
+            severity="error"
           >
-            {scenarioStatus}
+            {errorDetails}
+          </Alert>
+        )}
+        {scenarioId && (
+          <>
             <Stack
               direction="row"
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                minWidth: '132px',
+                padding: 0,
+                position: 'relative',
               }}
             >
-              <IconButton aria-label="toggle-clock" onClick={toggleClock}>
-                <Tooltip
-                  arrow
-                  enterDelay={500}
-                  enterNextDelay={500}
-                  title={isClockShowing ? 'Hide Clock' : 'Show Clock'}
-                  placement="bottom"
-                >
-                  <AccessTimeIcon />
-                </Tooltip>
-              </IconButton>
-              {isClockShowing && scenarioClock}
-            </Stack>
-            <Box
-              sx={{
-                height: '30px',
-                display: 'flex',
-                flexGrow: 1,
-                justifyContent: 'flex-end',
-                position: 'absolute', //force tabs to sit on divider
-                top: '0px',
-                right: 0,
-              }}
-            >
-              <Tabs
-                orientation="horizontal"
-                aria-label="Scenario Tabs"
-                sx={{ marginTop: 0 }}
-                value={currentTab}
-                onChange={handleChangeTab}
-                slotProps={{
-                  indicator: {
-                    sx: {
-                      height: 4,
-                      margin: '12px',
-                      marginLeft: '0px',
-                      marginBottom: 1,
-                    },
-                  },
+              {scenarioStatus}
+              <Stack
+                direction="row"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  minWidth: '132px',
                 }}
               >
-                <TabMainUi
-                  icon={<TerminalIcon color="inherit" fontSize="small" />}
-                  iconPosition="start"
-                  label="Consoles"
-                  style={{ marginBottom: 0 }}
+                <IconButton aria-label="toggle-clock" onClick={toggleClock}>
+                  <Tooltip
+                    arrow
+                    enterDelay={500}
+                    enterNextDelay={500}
+                    title={isClockShowing ? 'Hide Clock' : 'Show Clock'}
+                    placement="bottom"
+                  >
+                    <AccessTimeIcon />
+                  </Tooltip>
+                </IconButton>
+                {isClockShowing && scenarioClock}
+              </Stack>
+              <Box
+                sx={{
+                  height: '30px',
+                  display: 'flex',
+                  flexGrow: 1,
+                  justifyContent: 'flex-end',
+                  position: 'absolute', //force tabs to sit on divider
+                  top: '0px',
+                  right: 0,
+                }}
+              >
+                <Tabs
+                  orientation="horizontal"
+                  aria-label="Scenario Tabs"
+                  sx={{ marginTop: 0 }}
+                  value={currentTab}
+                  onChange={handleChangeTab}
+                  slotProps={{
+                    indicator: {
+                      sx: {
+                        height: 4,
+                        margin: '12px',
+                        marginLeft: '0px',
+                        marginBottom: 1,
+                      },
+                    },
+                  }}
+                >
+                  <TabMainUi
+                    icon={<TerminalIcon color="inherit" fontSize="small" />}
+                    iconPosition="start"
+                    label="Consoles"
+                    style={{ marginBottom: 0 }}
+                  />
+                  <TabMainUi
+                    icon={<AutoModeIcon color="inherit" fontSize="small" />}
+                    iconPosition="start"
+                    label="AutoGraders"
+                    style={{ marginBottom: 0 }}
+                  />
+                </Tabs>
+              </Box>
+            </Stack>
+            <Divider sx={{ margin: 1, marginLeft: 0 }} />
+            {currentTab === 0 && (
+              <>
+                <RangeResources
+                  consoleCounter={consoleStatusChangeCounter}
+                  counter={vmStatusChangeCounter}
+                  counter2={notificationsCounter}
+                  getConsolesByOwner={getConsolesByOwner}
+                  getUpdates={getUpdates}
+                  isContextInitialized={isContextInitialized}
+                  rangeId={rangeId}
+                  scenarioId={scenarioId}
                 />
-                <TabMainUi
-                  icon={<AutoModeIcon color="inherit" fontSize="small" />}
-                  iconPosition="start"
-                  label="AutoGraders"
-                  style={{ marginBottom: 0 }}
+                <RangeResources
+                  consoleCounter={consoleStatusChangeCounter}
+                  counter={containerStatusChangeCounter}
+                  counter2={notificationsCounter}
+                  getConsolesByOwner={getConsolesByOwner}
+                  getUpdates={getUpdates}
+                  isContextInitialized={isContextInitialized}
+                  rangeId={rangeId}
+                  scenarioId={scenarioId}
+                  queryKey={queryKeyRangeResourceContainers}
+                  title="Containers"
+                  topic={Topic.ResourceContainer}
                 />
-              </Tabs>
-            </Box>
-          </Stack>
-          <Divider sx={{ margin: 1, marginLeft: 0 }} />
-          {currentTab === 0 && (
-            <>
-              <RangeResources
-                consoleCounter={consoleStatusChangeCounter}
-                counter={vmStatusChangeCounter}
-                counter2={notificationsCounter}
-                getConsolesByOwner={getConsolesByOwner}
-                getUpdates={getUpdates}
-                isContextInitialized={isContextInitialized}
-                rangeId={rangeId}
-                scenarioId={scenarioId}
-              />
-              <RangeResources
-                consoleCounter={consoleStatusChangeCounter}
-                counter={containerStatusChangeCounter}
-                counter2={notificationsCounter}
-                getConsolesByOwner={getConsolesByOwner}
-                getUpdates={getUpdates}
-                isContextInitialized={isContextInitialized}
-                rangeId={rangeId}
-                scenarioId={scenarioId}
-                queryKey={queryKeyRangeResourceContainers}
-                title="Containers"
-                topic={Topic.ResourceContainer}
-              />
-            </>
-          )}
+              </>
+            )}
 
-          {currentTab === 1 && (
-            <RangeResources
-              consoleCounter={-1}
-              counter={autoGraderStatusChangeCounter}
-              counter2={notificationsCounter}
-              getConsolesByOwner={getConsolesByOwner}
-              getUpdates={getUpdates}
-              isContextInitialized={isContextInitialized}
+            {currentTab === 1 && (
+              <RangeResources
+                consoleCounter={-1}
+                counter={autoGraderStatusChangeCounter}
+                counter2={notificationsCounter}
+                getConsolesByOwner={getConsolesByOwner}
+                getUpdates={getUpdates}
+                isContextInitialized={isContextInitialized}
+                rangeId={rangeId}
+                scenarioId={scenarioId}
+                queryKey={queryKeyRangeResourceAutoGraders}
+                title="Tasks"
+                topic={Topic.ResourceAutoGrader}
+              />
+            )}
+            <TeamAutoGraderUpdates
               rangeId={rangeId}
               scenarioId={scenarioId}
-              queryKey={queryKeyRangeResourceAutoGraders}
-              title="Tasks"
-              topic={Topic.ResourceAutoGrader}
+              setUpdate={setUpdate}
+              setUpdates={setUpdates}
             />
-          )}
-          <TeamAutoGraderUpdates
-            rangeId={rangeId}
-            scenarioId={scenarioId}
-            setUpdate={setUpdate}
-            setUpdates={setUpdates}
-          />
-          <TeamConsoleUpdates
-            rangeId={rangeId}
-            scenarioId={scenarioId}
-            setUpdate={setUpdate}
-            setUpdates={setUpdates}
-          />
-          <TeamContainerUpdates
-            rangeId={rangeId}
-            scenarioId={scenarioId}
-            setUpdate={setUpdate}
-            setUpdates={setUpdates}
-          />
-          <TeamVMUpdates
-            rangeId={rangeId}
-            scenarioId={scenarioId}
-            setUpdate={setUpdate}
-            setUpdates={setUpdates}
-          />
-        </>
-      )}
-    </Paper>
+            <TeamConsoleUpdates
+              rangeId={rangeId}
+              scenarioId={scenarioId}
+              setUpdate={setUpdate}
+              setUpdates={setUpdates}
+            />
+            <TeamContainerUpdates
+              rangeId={rangeId}
+              scenarioId={scenarioId}
+              setUpdate={setUpdate}
+              setUpdates={setUpdates}
+            />
+            <TeamVMUpdates
+              rangeId={rangeId}
+              scenarioId={scenarioId}
+              setUpdate={setUpdate}
+              setUpdates={setUpdates}
+            />
+          </>
+        )}
+      </Box>
+    </Box>
   );
 }
 

@@ -128,7 +128,9 @@ export function QuizScore({
             color={maybePassingColor}
             sx={{ paddingRight: '4px' }}
           />
-          <Typography variant="h4">Your Score: {theScore}%</Typography>
+          <Typography color="text.primary" variant="h4">
+            Your Score: {theScore}%
+          </Typography>
           {quiz.completionRequired === QuizCompletionEnum.Passed &&
             quiz.passingScore &&
             theScore >= quiz.passingScore && (

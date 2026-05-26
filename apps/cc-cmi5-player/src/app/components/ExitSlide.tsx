@@ -79,6 +79,7 @@ export default function ExitSlide() {
             <ExitToAppIcon />
           )
         }
+        sxProps={{ padding: 1 }}
         onClick={handleExit}
         disabled={isExiting}
       >

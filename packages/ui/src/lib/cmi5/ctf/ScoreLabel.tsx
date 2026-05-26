@@ -27,17 +27,22 @@ export function ScoreLabel({
       }}
     >
       {label && value && (
-        <Typography variant="h5" noWrap>
+        <Typography variant="h5" noWrap color="text.primary">
           {label}
         </Typography>
       )}
       {startIconDisplay}
 
       {label && value && (
-        <Typography sx={{ marginLeft: '1px' }} variant="h5">{`:`}</Typography>
+        <Typography
+          color="text.primary"
+          sx={{ marginLeft: '1px' }}
+          variant="h5"
+        >{`:`}</Typography>
       )}
       {value && (
         <Typography
+          color="text.primary"
           sx={{ marginLeft: '4px' }}
           variant="h5"
           noWrap

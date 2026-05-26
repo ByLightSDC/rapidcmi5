@@ -125,6 +125,8 @@ export const config = {
   CMI5_SSO_ENABLED,
   MSW_MOCK,
   THEME: {
+    DARK: {},
+    LIGHT: {},
     SLIDE_BACKGROUND: '',
     LOGO_DARK: './assets/bylight/RapidCMI5_Logo_Dark.png',
     LOGO_LIGHT: './assets/bylight/RapidCMI5_Logo_Light.png',

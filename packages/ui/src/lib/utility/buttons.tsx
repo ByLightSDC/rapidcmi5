@@ -92,6 +92,10 @@ export function ButtonInfoField({
     return alpha(theme.palette.info.light, 0.15);
   }, [theme.palette.info.light]);
 
+  const bgColorPopper = useMemo(() => {
+    return alpha(theme.palette.info.light, 0.25);
+  }, [theme.palette.info.light]);
+
   const handleClick = (event: any) => {
     event.stopPropagation();
     if (triggerOnClick) {
@@ -163,36 +167,39 @@ export function ButtonInfoField({
         style={{ zIndex: zOrderAboveDialog }}
       >
         <ClickAwayListener onClickAway={handleCloseAlert}>
-          <Alert
-            severity="info"
-            sx={{
-              maxWidth: '480px',
-              whiteSpace: 'pre-wrap',
-              wordWrap: 'break-word',
-              margin: '4px',
-              ...alertSxProps,
-            }}
-            {...alertProps}
-            action={
-              <>
-                {triggerOnClick ? (
-                  <IconButton
-                    sx={{ position: 'absolute', right: '12px' }}
-                    aria-label="close"
-                    color="inherit"
-                    size="small"
-                    onClick={(evt) => {
-                      handleCloseAlert(evt);
-                    }}
-                  >
-                    <CloseIcon fontSize="inherit" />
-                  </IconButton>
-                ) : undefined}
-              </>
-            }
-          >
-            {message}
-          </Alert>
+          <Box sx={{ backgroundColor: 'black', margin: '4px' }}>
+            <Alert
+              severity="info"
+              sx={{
+                backgroundColor: bgColorPopper,
+                maxWidth: '480px',
+                whiteSpace: 'pre-wrap',
+                wordWrap: 'break-word',
+
+                ...alertSxProps,
+              }}
+              {...alertProps}
+              action={
+                <>
+                  {triggerOnClick ? (
+                    <IconButton
+                      sx={{ position: 'absolute', right: '12px' }}
+                      aria-label="close"
+                      color="inherit"
+                      size="small"
+                      onClick={(evt) => {
+                        handleCloseAlert(evt);
+                      }}
+                    >
+                      <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                  ) : undefined}
+                </>
+              }
+            >
+              {message}
+            </Alert>
+          </Box>
         </ClickAwayListener>
       </Popper>
     </Box>
@@ -249,7 +256,7 @@ export function ButtonMainUi(props: BrandedButtonProps) {
         borderStyle: 'solid',
         borderWidth: '1px',
         borderColor: 'primary.light',
-        background: 'linear-gradient(180deg, #405CA7 0%, #2C4B93 100%)', //mico to-do
+        background: (theme) => `${(theme as any).button.gradient}`,
         color: 'common.white',
         //Recent fix to make button fit child text
         minWidth: 'auto',
@@ -266,6 +273,7 @@ export function ButtonMainUi(props: BrandedButtonProps) {
             ? '6px'
             : '6px'
           : '0px',
+
         whiteSpace: 'nowrap',
         '&:hover': {
           background: 'transparent',
@@ -273,7 +281,7 @@ export function ButtonMainUi(props: BrandedButtonProps) {
           cursor: 'pointer',
         },
         '&:disabled': {
-          background: 'none', //mico to-do
+          background: 'none',
           borderColor: (theme: any) => `${theme.button.disabledColor}`,
           borderStyle: 'none',
           boxShadow: 2,
@@ -489,14 +497,10 @@ export function ButtonLoadingUi(props: BrandedButtonProps) {
       sx={{
         boxShadow: 1,
         border: '1px solid',
-        //borderColor: 'primary.light',
         borderColor: (theme: any) => `${theme.breadcrumbs.underline}`,
-        // background: 'linear-gradient(180deg, #405CA7 0%, #2C4B93 100%)', //mico to-do
-        backgroundColor: 'primary.dark', //'primary.main',
-        color: 'common.white', //'primary.contrastText',
+        backgroundColor: 'primary.dark',
+        color: 'common.white',
         minHeight: minButtonHeight,
-        //maxHeight: maxButtonHeight,
-
         paddingLeft: props?.startIcon ? '8px' : '12px',
         paddingRight: '12px',
         '&:hover': {
@@ -535,7 +539,7 @@ export function ButtonSelectUi(props: BrandedButtonProps) {
         borderStyle: 'solid',
         borderWidth: '1px',
         borderColor: 'primary.light',
-        background: 'linear-gradient(180deg, #405CA7 0%, #2C4B93 100%)', //mico to-do
+        background: (theme) => `${(theme as any).button.gradient}`,
         color: 'common.white',
         minWidth: 'auto',
         height: '36px',

@@ -7,6 +7,7 @@ import {
   Stack,
   Tooltip,
   Typography,
+  useTheme,
 } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { auJsonSel } from '../../redux/auReducer';
@@ -18,9 +19,11 @@ import { RapidCmi5Icon, RapidCmi5Title } from '@rapid-cmi5/ui';
   By adding in a simple way to check where a course came from and what version of 
   rapid cmi5 it is running we can quickly see if there is a version mismatch.
 */
-export default function BuildInfoButton() {
+export default function BuildInfoButton({ color }: { color?: string }) {
   const auJson = useSelector(auJsonSel);
   const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);
+  const theme = useTheme();
+
   if (!auJson?.metadata) return null;
 
   const rows = [
@@ -48,7 +51,7 @@ export default function BuildInfoButton() {
           color="primary"
           onClick={(e) => setAnchor(e.currentTarget)}
         >
-          <RapidCmi5Icon />
+          <RapidCmi5Icon overrideColor={color} />
         </IconButton>
       </Tooltip>
       <Popover

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { DirectiveEditorProps, useCellValues } from '@mdxeditor/editor';
 
 import ScenarioConsoles from '../../../scenario/ScenarioConsoles';
@@ -7,7 +7,8 @@ import { useSelector } from 'react-redux';
 import { activeTabSel } from '../../../../redux/navigationReducer';
 import { useCMI5Session } from '../../../../hooks/useCMI5Session';
 import { SlideActivityType } from '../../../../../app/types/SlideActivityStatusState';
-import { Box, useTheme } from '@mui/material';
+import { Box, ThemeProvider, useTheme } from '@mui/material';
+import { deepmerge } from '@mui/utils';
 import {
   AuContextProps,
   RC5ScenarioContent,
@@ -32,8 +33,10 @@ import {
   useLessonStyles,
   maxFormWidths,
   ActivityDirectiveNode,
+  darkTheme,
 } from '@rapid-cmi5/ui';
 import { cmi5Instance } from '../../../../session/cmi5';
+import { auConfigInitializedSel } from '../../../../redux/auReducer';
 
 /**
  * Non editable Activity View
@@ -74,7 +77,23 @@ export const ActivityPlayback: React.FC<
     mdastNode?.attributes?.contentWidth,
     maxFormWidths.downloadsEditor,
     muiTheme.palette.background.paper,
+    muiTheme.nav.tabPanel,
+    true,
+    true,
   );
+
+  /**
+   * update theme with overrides from cfg file
+   */
+  const isConfigInitialized = useSelector(auConfigInitializedSel);
+  const activityTheme = useMemo(() => {
+    const base = darkTheme;
+    if (!isConfigInitialized) {
+      return base;
+    }
+    const overriddenTheme = deepmerge(base, config.THEME.DARK);
+    return overriddenTheme;
+  }, [isConfigInitialized]);
 
   /** Get Default Form Data from MDAST Node */
   React.useEffect(() => {
@@ -114,80 +133,82 @@ export const ActivityPlayback: React.FC<
         width: '100%',
       }}
     >
-      {name === SlideActivityType.SCENARIO && fromJson && (
-        <ScenarioConsoles
-          auProps={auProps}
-          content={{
-            scenarioName: (fromJson as RC5ScenarioContent).name,
-            scenarioUUID: (fromJson as RC5ScenarioContent).uuid,
-            promptClassId: (fromJson as RC5ScenarioContent).promptClass,
-          }}
-          innerSx={innerActivitySx}
-          outerSx={outerSx}
-          outerStyle={outerStyle}
-        />
-      )}
-
-      {name === SlideActivityType.QUIZ && fromJson && (
-        <AuQuiz
-          auProps={auProps}
-          content={fromJson as QuizContent}
-          innerSx={innerActivitySx}
-          outerSx={outerSx}
-          outerStyle={outerStyle}
-        />
-      )}
-
-      {name === SlideActivityType.CTF && fromJson && (
-        <AuCTF
-          auProps={auProps}
-          content={fromJson as CTFContent}
-          innerSx={innerActivitySx}
-          outerSx={outerSx}
-          outerStyle={outerStyle}
-        />
-      )}
-      {name === SlideActivityType.CODE_RUNNER && fromJson && (
-        <CodeRunner
-          auProps={auProps}
-          content={fromJson as CodeRunnerContent}
-          authType="Basic"
-          url={config.DEVOPS_API_URL}
-          token={cmi5Instance.getAuthToken()}
-          innerSx={innerActivitySx}
-          outerSx={outerSx}
-          outerStyle={outerStyle}
-        />
-      )}
-      {name === SlideActivityType.CONSOLES && fromJson && (
-        <>
-          <TeamScenarioExercise
+      <ThemeProvider theme={activityTheme}>
+        {name === SlideActivityType.SCENARIO && fromJson && (
+          <ScenarioConsoles
             auProps={auProps}
-            content={fromJson as TeamConsolesContent}
+            content={{
+              scenarioName: (fromJson as RC5ScenarioContent).name,
+              scenarioUUID: (fromJson as RC5ScenarioContent).uuid,
+              promptClassId: (fromJson as RC5ScenarioContent).promptClass,
+            }}
             innerSx={innerActivitySx}
             outerSx={outerSx}
             outerStyle={outerStyle}
           />
-          {/* REF keep for testing individual scenario UI with a deployed scenario requires ScenarioWrapper, debugRangeId, debugScenarioId
+        )}
+
+        {name === SlideActivityType.QUIZ && fromJson && (
+          <AuQuiz
+            auProps={auProps}
+            content={fromJson as QuizContent}
+            innerSx={innerActivitySx}
+            outerSx={outerSx}
+            outerStyle={outerStyle}
+          />
+        )}
+
+        {name === SlideActivityType.CTF && fromJson && (
+          <AuCTF
+            auProps={auProps}
+            content={fromJson as CTFContent}
+            innerSx={innerActivitySx}
+            outerSx={outerSx}
+            outerStyle={outerStyle}
+          />
+        )}
+        {name === SlideActivityType.CODE_RUNNER && fromJson && (
+          <CodeRunner
+            auProps={auProps}
+            content={fromJson as CodeRunnerContent}
+            authType="Basic"
+            url={config.DEVOPS_API_URL}
+            token={cmi5Instance.getAuthToken()}
+            innerSx={innerActivitySx}
+            outerSx={outerSx}
+            outerStyle={outerStyle}
+          />
+        )}
+        {name === SlideActivityType.CONSOLES && fromJson && (
+          <>
+            <TeamScenarioExercise
+              auProps={auProps}
+              content={fromJson as TeamConsolesContent}
+              innerSx={innerActivitySx}
+              outerSx={outerSx}
+              outerStyle={outerStyle}
+            />
+            {/* REF keep for testing individual scenario UI with a deployed scenario requires ScenarioWrapper, debugRangeId, debugScenarioId
            <ScenarioConsoles
             auProps={auProps}
             content={fromJson as TeamConsolesContent}
           /> */}
-        </>
-      )}
-      {name === 'download' && fromJson && (
-        <Box>
-          {fromJson.files.map((fileData: DownloadFileData) => {
-            return (
-              <FileDownloadLink
-                fileData={fileData}
-                auDir=""
-                filePath={`./Assets/Downloads/${fileData.path}`}
-              />
-            );
-          })}
-        </Box>
-      )}
+          </>
+        )}
+        {name === 'download' && fromJson && (
+          <Box>
+            {fromJson.files.map((fileData: DownloadFileData) => {
+              return (
+                <FileDownloadLink
+                  fileData={fileData}
+                  auDir=""
+                  filePath={`./Assets/Downloads/${fileData.path}`}
+                />
+              );
+            })}
+          </Box>
+        )}
+      </ThemeProvider>
     </div>
   );
 };
