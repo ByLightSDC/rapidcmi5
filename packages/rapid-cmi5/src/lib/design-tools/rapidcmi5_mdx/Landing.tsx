@@ -59,6 +59,7 @@ import { useRC5Prompts } from './modals/useRC5Prompts';
 import { listItemProps } from './drawers/components/LessonTreeNode';
 import { getSvgStyleIcon, StyleIconTypeEnum } from './styles/styleSvgConstants';
 import { CurrentLessonAssetsContextProvider } from '../course-builder/GitViewer/session/LessonAssetsContext';
+import { CustomTheme } from './styles/createPalette';
 
 enum RepoActionEnum {
   Config,
@@ -82,7 +83,7 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
   const { currentRepo } = useContext(GitContext);
   const { promptDeleteRepo, promptGitConfig } = useRC5Prompts();
 
-  const theme = useTheme();
+  const theme:CustomTheme = useTheme();
 
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
@@ -187,7 +188,7 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
                     display: 'flex',
                     justifyContent: 'space-between',
                     width: '100%',
-                    background: alpha(theme.palette.primary.main, 0.15),
+                    background: theme.gradients.background,
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
                 >

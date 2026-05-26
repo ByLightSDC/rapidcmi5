@@ -164,7 +164,7 @@ function ScenarioConsoles({
       id="scenario-activity"
       className="paper-activity"
       sx={{
-        backgroundColor: 'background.default',
+        //REF backgroundColor: 'background.default',
         ...outerSx,
       }}
       {...outerStyle}

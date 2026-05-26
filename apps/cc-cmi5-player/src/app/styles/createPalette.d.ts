@@ -34,6 +34,12 @@ declare module '@mui/material/styles' {
     form: {
       backgroundColor: React.CSSProperties['color'];
     };
+    gradients: {
+      background: React.CSSProperties['color'];
+      backgroundHover: React.CSSProperties['color'];
+      backgroundGradient: React.CSSProperties['color'];
+      backgroundRadial: React.CSSProperties['color'];
+    };
     header: {
       border: React.CSSProperties['color'];
       buttonColor: React.CSSProperties['color'];
@@ -51,6 +57,7 @@ declare module '@mui/material/styles' {
       disabledFill: React.CSSProperties['color'];
       disabledOutlineColor: React.CSSProperties['color'];
     };
+
     nav: {
       fill: React.CSSProperties['color'];
       fillSelected: React.CSSProperties['color'];
@@ -117,6 +124,12 @@ declare module '@mui/material/styles' {
       fill: React.CSSProperties['color'];
       disabledFill: React.CSSProperties['color'];
       disabledOutlineColor: React.CSSProperties['color'];
+    };
+    gradients: {
+      background: React.CSSProperties['color'];
+      backgroundHover: React.CSSProperties['color'];
+      backgroundGradient: React.CSSProperties['color'];
+      backgroundRadial: React.CSSProperties['color'];
     };
     nav: {
       fill: React.CSSProperties['color'];

@@ -52,7 +52,8 @@ export const lightTheme = createTheme({
     disabledBackgroundColor: '#7f8cb9',
     disabledColor: '#C1C9DB',
     gradient: 'linear-gradient(180deg, #405CA7 0%, #2C4B93 100%)',
-    minorBackgroundColor: '#3C59A2',
+    minorBackgroundColor:
+      'radial-gradient(circle at 20% 30%, #3C59A259 0%, transparent 70%), radial-gradient(circle at 80% 70%, #3C59A24D 0%, transparent 60%)',
     indicatorColor: mainColor,
     iconColor: mainColor,
   },
@@ -72,6 +73,14 @@ export const lightTheme = createTheme({
   form: {
     backgroundColor: '#EEEEEE',
   },
+  gradients: {
+    background: '#3C59A226',
+    backgroundHover: '#3C59A22B',
+    backgroundGradient:
+      'linear-gradient(135deg, #EEEEEE 0%, #F8F8F8 50%, #EEEEEED9 100%)',
+    backgroundRadial:
+      'radial-gradient(circle at 20% 30%, #3C59A259 0%, transparent 70%), radial-gradient(circle at 80% 70%, #3C59A24D 0%, transparent 60%)',
+  },
   header: {
     border: '#ffffffc3', //active se
     buttonColor: '#C5C5C5',
@@ -89,6 +98,7 @@ export const lightTheme = createTheme({
     disabledFill: '#CBCBCB00',
     disabledOutlineColor: '#CBCBCB4D', //before making outline color match fill '#88888860',
   },
+
   nav: {
     fill: '',
     fillSelected: '#DDDDDD', // Package Menu

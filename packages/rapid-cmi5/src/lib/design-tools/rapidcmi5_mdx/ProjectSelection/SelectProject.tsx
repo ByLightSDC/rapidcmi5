@@ -11,6 +11,7 @@ import ElectronAppSelection from './Components/ElectronSelection';
 import CloneLoadingOverlay from './Components/LoadingOverlay';
 import { useToaster } from '@rapid-cmi5/ui';
 import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
+import { CustomTheme } from '../styles/createPalette';
 
 interface OptionDocumentation {
   title: string;
@@ -22,7 +23,7 @@ export default function SelectProjectHomePage({}: {}) {
   const [isSandboxLaunching, setIsSandboxLaunching] = useState(false);
   const [docDialogOpen, setDocDialogOpen] = useState(false);
 
-  const theme = useTheme();
+  const theme: CustomTheme = useTheme();
   const { palette } = theme;
 
   const displayToaster = useToaster();
@@ -143,12 +144,13 @@ export default function SelectProjectHomePage({}: {}) {
     }
   };
 
+  console.log('theme.gradients.backgroundGradient', theme.gradients.backgroundGradient);
   return (
     <Box
       sx={{
         height: '100vh',
         width: '100%',
-        background: backgroundGradient,
+        background: theme.gradients.backgroundGradient,
         position: 'relative',
         overflow: 'auto',
       }}
@@ -157,7 +159,7 @@ export default function SelectProjectHomePage({}: {}) {
         sx={{
           height: '100vh',
           width: '100%',
-          background: radialGradients,
+          background: theme.gradients.backgroundRadial,
           position: 'relative',
           overflow: 'auto',
         }}
