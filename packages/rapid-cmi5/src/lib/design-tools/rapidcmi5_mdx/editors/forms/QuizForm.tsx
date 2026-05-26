@@ -275,17 +275,21 @@ export const QuizForm = ({
             allowReOrder={true}
             allowSingleItemView={true}
             arrayFieldName={`questions`}
-            additionalButtons={[
-              <ButtonModalMinorUi
-                aria-label="search-question-bank"
-                id="search-question-bank-button"
-                size="small"
-                onClick={() => setIsSearchBankOpen(true)}
-                startIcon={<SearchIcon fontSize="small" />}
-              >
-                Quiz Bank
-              </ButtonModalMinorUi>,
-            ]}
+            additionalButtons={
+              isQuizBankEnabled
+                ? [
+                    <ButtonModalMinorUi
+                      aria-label="search-question-bank"
+                      id="search-question-bank-button"
+                      size="small"
+                      onClick={() => setIsSearchBankOpen(true)}
+                      startIcon={<SearchIcon fontSize="small" />}
+                    >
+                      Quiz Bank
+                    </ButtonModalMinorUi>,
+                  ]
+                : []
+            }
             arrayRenderItem={(props: tFormFieldRendererProps) => {
               return (
                 <QuizQuestionsFieldGroup

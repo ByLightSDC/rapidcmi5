@@ -4,26 +4,41 @@ import {
 } from '@rapid-cmi5/cmi5-build-common';
 import { useQuizBankClient } from '../../contexts/ApiContext';
 import { questionKey } from './queryKeys';
-import { useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQueryClient } from '@tanstack/react-query';
 
 export function useQuizBankApi() {
   const { enabled, client } = useQuizBankClient();
+  const queryClient = useQueryClient();
 
-  const searchQuestions = (search: string, limit: number, offset: number) => {
+  const searchQuestions = (
+    search: string,
+    limit: number,
+    offset: number,
+    questionType?: 'freeResponse',
+  ) => {
     return client.getQuestions.useQuery({
       queryKey: [
         questionKey,
-        { search, limit, offset, sortBy: 'dateEdited', sort: 'desc' },
+        {
+          search,
+          limit,
+          offset,
+          sortBy: 'dateEdited',
+          sort: 'desc',
+          questionType,
+        },
       ],
-      queryData: { query: { search, limit, offset } },
+      queryData: { query: { search, limit, offset, questionType } },
+      placeholderData: keepPreviousData,
     });
   };
 
   const deleteQuestion = async (uuid: string) => {
-    const queryClient = useQueryClient();
-    const { status } = await client.deleteQuestion.mutate({ params: { uuid } });
-    if (status !== 200) throw Error('Error deleting');
-    await queryClient.invalidateQueries({ queryKey: ['question'] });
+    const { status } = await client.deleteQuestion.mutate({
+      params: { uuid },
+    });
+    if (status !== 204) throw Error('Error deleting');
+    await queryClient.invalidateQueries({ queryKey: [questionKey] });
   };
 
   const createQuestion = async (

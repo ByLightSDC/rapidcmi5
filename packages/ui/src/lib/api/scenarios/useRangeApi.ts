@@ -5,6 +5,7 @@ import {
 } from '@rapid-cmi5/cmi5-build-common';
 import { useRangeClient } from '../../contexts/ApiContext';
 import { scenarioKey } from './queryKeys';
+import { keepPreviousData } from '@tanstack/react-query';
 
 export function useRangeApi() {
   const { enabled, client } = useRangeClient();
@@ -88,8 +89,12 @@ export function useRangeApi() {
 
   const searchScenarios = (search: string, limit: number, offset: number) => {
     return client.listScenarios.useQuery({
-      queryKey: [scenarioKey, { search, limit, offset }],
+      queryKey: [
+        scenarioKey,
+        { search, limit, offset, sortBy: 'dateEdited', sort: 'desc' },
+      ],
       queryData: { query: { search, limit, offset } },
+      placeholderData: keepPreviousData,
     });
   };
 

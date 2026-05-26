@@ -1,17 +1,22 @@
 import { DynamicModal, useQuizBankApi } from '@rapid-cmi5/ui';
 import QuestionCard from './QuestionCard';
-import { QuestionBankApi } from '@rapid-cmi5/cmi5-build-common';
+import {
+  QuestionBankApi,
+  RC5ActivityTypeEnum,
+} from '@rapid-cmi5/cmi5-build-common';
 import { useRapidCmi5Opts } from '../../design-tools/course-builder/GitViewer/session/RapidCmi5OptsContext';
+
+interface QuizBankSearchFormProps {
+  closeModal: () => void;
+  submitForm: (questions: QuestionBankApi[]) => void;
+  activityType: RC5ActivityTypeEnum;
+}
 
 export function QuizBankSearchForm({
   closeModal,
   submitForm,
   activityType,
-}: {
-  closeModal: any;
-  submitForm: any;
-  activityType: any;
-}) {
+}: QuizBankSearchFormProps) {
   const { userAuth } = useRapidCmi5Opts();
   const { searchQuestions, deleteQuestion } = useQuizBankApi();
 
@@ -24,13 +29,15 @@ export function QuizBankSearchForm({
       searchPlaceholder="Search question bank..."
       emptyTitle="No questions"
       emptyDescription="Add to the question bank to get started"
-      itemsPerPage={20}
       multiSelect={true}
       fetchItems={(search, limit, offset) => {
+        const questionType =
+          activityType === RC5ActivityTypeEnum.ctf ? 'freeResponse' : undefined;
         const { data, error, isPending } = searchQuestions(
           search,
           limit,
           offset,
+          questionType,
         );
 
         return {
@@ -41,7 +48,7 @@ export function QuizBankSearchForm({
       }}
       getItemId={(q) => q.uuid}
       onSelect={(q) => {
-        submitForm([q]);
+        submitForm(q);
         closeModal();
       }}
       renderItem={(q, isSelected, isExpanded, onToggleExpand) => (
@@ -54,7 +61,7 @@ export function QuizBankSearchForm({
           handleSelect={() => {
             return;
           }}
-          currentUser={userAuth?.userEmail}
+          currentUser={userAuth?.apiUser}
           onDelete={deleteQuestion}
         />
       )}

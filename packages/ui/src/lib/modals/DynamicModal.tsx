@@ -22,7 +22,6 @@ import {
   Stack,
   Box,
   Chip,
-  Skeleton,
   Fade,
   Grow,
   alpha,
@@ -40,6 +39,7 @@ import LastPageIcon from '@mui/icons-material/LastPage';
 import { getErrorMessage } from '../utility/errors';
 import { useDebounce } from '../utility/debounce';
 
+const itemsPerPage = 25;
 export interface PaginatedItemsResult<T> {
   body?: {
     data?: T[];
@@ -94,8 +94,6 @@ export interface DynamicModalProps<T> {
   itemLabel?: string;
   /** Label for the single-select confirm button (default: "Select") */
   confirmLabel?: string;
-  /** Items per page (default: 50) */
-  itemsPerPage?: number;
   // --- Multi-select ---
   /** Enable checkbox-style multi-selection */
   multiSelect?: boolean;
@@ -118,7 +116,6 @@ export function DynamicModal<T>({
   emptyDescription = 'No items to display',
   itemLabel = 'item',
   confirmLabel = 'Select',
-  itemsPerPage = 25,
   multiSelect = false,
 }: DynamicModalProps<T>) {
   const theme = useTheme();
@@ -339,7 +336,7 @@ export function DynamicModal<T>({
         }}
       >
         {/* Results Summary */}
-        {!isLoading && totalCount > 0 && (
+        {totalCount > 0 && (
           <Box
             sx={{
               display: 'flex',
@@ -352,16 +349,6 @@ export function DynamicModal<T>({
               flexShrink: 0,
             }}
           >
-            <Typography
-              variant="caption"
-              sx={{
-                color: colors.textSecondary,
-                fontWeight: 500,
-                letterSpacing: '0.02em',
-              }}
-            >
-              {totalCount}
-            </Typography>
             {selectionCount > 0 && (
               <Chip
                 icon={<CheckCircleIcon sx={{ fontSize: 14 }} />}
@@ -381,53 +368,7 @@ export function DynamicModal<T>({
           </Box>
         )}
 
-        {/* Loading State */}
-        {isLoading ? (
-          <Box sx={{ p: 3 }}>
-            <Stack spacing={2}>
-              {[...Array(5)].map((_, i) => (
-                <Box
-                  key={i}
-                  sx={{
-                    p: 2.5,
-                    borderRadius: 2,
-                    bgcolor: colors.surface,
-                    border: `1px solid ${colors.border}`,
-                  }}
-                >
-                  <Stack spacing={1.5}>
-                    <Skeleton
-                      variant="text"
-                      width="60%"
-                      height={24}
-                      sx={{ bgcolor: colors.surfaceHover }}
-                    />
-                    <Stack direction="row" spacing={2}>
-                      <Skeleton
-                        variant="text"
-                        width={100}
-                        height={16}
-                        sx={{ bgcolor: colors.surfaceHover }}
-                      />
-                      <Skeleton
-                        variant="text"
-                        width={80}
-                        height={16}
-                        sx={{ bgcolor: colors.surfaceHover }}
-                      />
-                    </Stack>
-                    <Skeleton
-                      variant="text"
-                      width="90%"
-                      height={16}
-                      sx={{ bgcolor: colors.surfaceHover }}
-                    />
-                  </Stack>
-                </Box>
-              ))}
-            </Stack>
-          </Box>
-        ) : error ? (
+        {error ? (
           <Box
             sx={{
               display: 'flex',
