@@ -341,13 +341,13 @@ export const AnimDirectiveDescriptor: DirectiveDescriptor<ContainerDirective> =
               />
             </Box>
 
-            {/* Delete icon - matching Layout/Image style, 10px from badge */}
+            {/* Delete icon, tucked tight against the badge */}
             {!isReadOnly && (isHovered || isSelected) && (
               <Box
                 sx={{
                   backgroundColor: '#EEEEEEe6',
                   position: 'absolute',
-                  left: '24px', // Badge at left:-10px + 24px width + 10px gap = 24px
+                  left: '16px', // Badge at left:-10px + 24px width + 2px gap = 16px
                   top: '-10px', // Align with badge top
                   display: 'flex',
                   borderRadius: '4px',
@@ -725,12 +725,12 @@ export const InlineAnimDirectiveDescriptor: DirectiveDescriptor<TextDirective> =
             </div>
           )}
 
-          {/* Delete icon - compact for inline, 10px from badge */}
+          {/* Delete icon, tucked tight against the badge */}
           {!isReadOnly && (isHovered || isSelected) && (
             <Box
               sx={{
                 position: 'absolute',
-                left: '20px', // Badge at left:-6px + 18px width + 8px gap ≈ 20px
+                left: '14px', // Badge at left:-6px + 18px width + 2px gap = 14px
                 top: '-12px', // Align with badge top
                 display: 'flex',
                 backgroundColor: '#EEEEEEe6',
