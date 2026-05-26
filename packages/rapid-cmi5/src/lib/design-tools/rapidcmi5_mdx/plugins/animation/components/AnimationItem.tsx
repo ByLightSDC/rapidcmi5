@@ -16,9 +16,16 @@ import {
 } from '@mui/material';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { usePublisher, useCellValue } from '@mdxeditor/gurx';
+import { usePublisher, useCellValue, useRealm } from '@mdxeditor/gurx';
 import { selectedAnimation$, updateAnimation$ } from '../state/animationCells';
-import { AnimationConfig, EntranceEffect, ExitEffect, AnimationTrigger, SelectorMainUi } from '@rapid-cmi5/ui';
+import {
+  AnimationConfig,
+  EntranceEffect,
+  ExitEffect,
+  AnimationTrigger,
+  SelectorMainUi,
+  animDeletePortalTargets$,
+} from '@rapid-cmi5/ui';
 
 
 interface Props {
@@ -30,9 +37,30 @@ export function AnimationItem({ animation }: Props) {
   const selectedId = useCellValue(selectedAnimation$);
   const selectAnimation = usePublisher(selectedAnimation$);
   const isSelected = selectedId === animation.id;
+  const realm = useRealm();
 
   // Ref for scrolling into view when selected
   const itemRef = useRef<HTMLDivElement>(null);
+  // Portal target — the anim directive descriptor renders its Delete button here.
+  const deletePortalRef = useRef<HTMLDivElement>(null);
+
+  // Register / unregister the portal target under this animation's directiveId
+  // so the matching anim directive (anywhere in the editor) can portal its
+  // Delete button here instead of rendering an inline overlay.
+  useEffect(() => {
+    const directiveId = animation.directiveId;
+    if (!directiveId) return;
+    const el = deletePortalRef.current;
+    if (!el) return;
+    const prev = realm.getValue(animDeletePortalTargets$);
+    realm.pub(animDeletePortalTargets$, { ...prev, [directiveId]: el });
+    return () => {
+      const current = realm.getValue(animDeletePortalTargets$);
+      if (current[directiveId] !== el) return; // already replaced by another mount
+      const { [directiveId]: _removed, ...rest } = current;
+      realm.pub(animDeletePortalTargets$, rest);
+    };
+  }, [realm, animation.directiveId]);
 
   // Auto-expand when selected, but allow manual control
   const [isExpanded, setIsExpanded] = useState(isSelected);
@@ -316,6 +344,16 @@ export function AnimationItem({ animation }: Props) {
                   sx={{ flex: 1 }}
                 />
               </Stack>
+
+              {/* Portal slot — anim directive editor renders its Delete button here. */}
+              <Box
+                ref={deletePortalRef}
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  marginTop: 1,
+                }}
+              />
             </Stack>
           </Box>
         </Collapse>

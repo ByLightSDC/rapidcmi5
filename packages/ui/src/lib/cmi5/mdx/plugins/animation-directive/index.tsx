@@ -57,6 +57,17 @@ export const onAnimDirectiveDelete$ = Signal<string>();
 export const animationToUnwrap$ = Cell<string | null>(null);
 
 /**
+ * Portal targets for the per-animation Delete button.
+ * Keyed by `directiveId`. The Animation Drawer's timeline row registers a slot
+ * element under its directiveId on mount and clears it on unmount. The anim
+ * directive descriptor reads the map and, when a target exists, portals its
+ * Delete button into the drawer row instead of rendering an inline overlay.
+ */
+export const animDeletePortalTargets$ = Cell<
+  Record<string, HTMLElement | null>
+>({});
+
+/**
  * Whether the active editor selection sits inside an :::anim directive.
  * Published by NestedAnimSelectionBridge (rendered inside every NestedLexicalEditor
  * but only active when its parent mdast node is name='anim'). The outer editor's
