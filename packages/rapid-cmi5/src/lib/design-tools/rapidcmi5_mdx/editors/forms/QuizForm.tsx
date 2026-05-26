@@ -41,13 +41,14 @@ import {
   MiniForm,
   tFormFieldRendererProps,
   ButtonModalMinorUi,
+  useQuizBankApi,
 } from '@rapid-cmi5/ui';
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 
 import { useState } from 'react';
 
-import QuizBankSearchForm from '../../../../components/modals/quizBank/SearchQuizBankModal';
-import AddToQuizBankForm from '../../../../components/modals/quizBank/AddToQuizBankModal';
+import QuizBankSearchForm from '../../../../features/quizBank/SearchQuizBankModal';
+import AddToQuizBankForm from '../../../../features/quizBank/AddToQuizBankModal';
 
 export function requireField<T>(value: T | undefined | null, field: string): T {
   if (value === undefined || value === null) {
@@ -84,8 +85,8 @@ export const QuizForm = ({
       : SlideTypeEnum.CTF;
 
   const [isSearchBankOpen, setIsSearchBankOpen] = useState(false);
-  const [bankQuestion, setBankQuestion] = useState<any>(null);
-
+  const [bankQuestion, setBankQuestion] = useState<QuizQuestion | null>(null);
+  const { isQuizBankEnabled } = useQuizBankApi();
   /* Lesson Theme */
   const validationSchema = yup.object().shape({
     //cmi5QuizId: read-only field auto populated/updated
@@ -255,13 +256,13 @@ export const QuizForm = ({
           />
         </Grid>
 
-        {bankQuestion && (
+        {bankQuestion && isQuizBankEnabled && (
           <AddToQuizBankForm
             closeModal={() => setBankQuestion(null)}
             question={bankQuestion}
           />
         )}
-        {isSearchBankOpen && (
+        {isSearchBankOpen && isQuizBankEnabled && (
           <QuizBankSearchForm
             submitForm={handleModalResponse}
             closeModal={() => setIsSearchBankOpen(false)}
@@ -291,9 +292,9 @@ export const QuizForm = ({
                   crudType={crudType}
                   formProps={props}
                   slideType={slideType}
-                  // onAddToBank={
-                  //   QuizBankAddModal ? (q) => setBankQuestion(q) : undefined
-                  // }
+                  onAddToBank={
+                    isQuizBankEnabled ? (q) => setBankQuestion(q) : undefined
+                  }
                 />
               );
             }}

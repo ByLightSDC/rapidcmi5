@@ -6,7 +6,7 @@ import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
-export default function ScenarioCard({
+export default function ScenarioOptionCard({
   scenario,
   isSelected,
 }: {

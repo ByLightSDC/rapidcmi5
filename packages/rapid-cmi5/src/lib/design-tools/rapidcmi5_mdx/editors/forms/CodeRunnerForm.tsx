@@ -3,13 +3,11 @@ import { toTitleCase } from './formUtils';
 import Grid from '@mui/material/Grid2';
 import MenuItem from '@mui/material/MenuItem';
 import * as yup from 'yup';
-import { useEffect, useMemo, useState } from 'react';
 
 import { Alert } from '@mui/material';
 import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
 import {
   CodeRunnerContent,
-  LanguagesResponseApi,
   moveOnCriteriaOptions,
   RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
@@ -22,8 +20,8 @@ import {
   FormControlSelectField,
   FormControlUIProvider,
   MiniForm,
-  debugLogError,
-  useCodeRunnerClient,
+  getErrorMessage,
+  useCodeRunnerApi,
 } from '@rapid-cmi5/ui';
 import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 
@@ -48,16 +46,9 @@ export const CodeRunnerForm = ({
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
   const rc5id = defaultFormData?.rc5id;
-  const codeRunnerClient = useCodeRunnerClient();
+  const { getLanguages } = useCodeRunnerApi();
 
-  const [runtimeMap, setRuntimeMap] = useState<LanguagesResponseApi>({});
-  const [useRuntimeDropdowns, setUseRuntimeDropdowns] = useState(false);
-  const [runtimeError, setRuntimeError] = useState('');
-
-  const programmingLanguageOptions = useMemo(
-    () => Object.keys(runtimeMap),
-    [runtimeMap],
-  );
+  const { error, data: runTimes } = getLanguages();
 
   const validationSchema = yup.object().shape({
     ksats: yup.array().of(
@@ -66,34 +57,6 @@ export const CodeRunnerForm = ({
       }),
     ),
   });
-
-  useEffect(() => {
-    const fetchRuntimes = async () => {
-      if (!codeRunnerClient) return;
-
-      try {
-        const { body: runtimes, status } =
-          await codeRunnerClient.listLanguages.query();
-
-        if (status != 200) throw Error('Failed to get languages');
-        if (!Object.keys(runtimes).length) {
-          setRuntimeMap({});
-          setUseRuntimeDropdowns(false);
-          return;
-        }
-
-        setRuntimeMap(runtimes);
-        setUseRuntimeDropdowns(true);
-      } catch (error) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : 'An unexpected error occurred.';
-        setRuntimeError(message);
-      }
-    };
-    fetchRuntimes().catch((err) => debugLogError(err));
-  }, [codeRunnerClient]);
 
   const onSaveAction = (data: any) => {
     if (onSave) {
@@ -105,52 +68,15 @@ export const CodeRunnerForm = ({
     formMethods: UseFormReturn,
     formState: FormStateType,
   ): JSX.Element => {
-    const { control, setValue, getValues, watch } = formMethods;
+    const { control, setValue, watch } = formMethods;
     const { errors } = formState;
 
     const selectedLanguage = watch('programmingLanguage');
+    const availableVersions: string[] = runTimes?.body[selectedLanguage] ?? [];
 
-    const versionOptions = runtimeMap[selectedLanguage];
-
-    const handleLanguageChange = (language: string) => {
-      const versions = runtimeMap[language] ?? [];
-
-      setValue('programmingLanguage', language);
-      setValue('languageVersion', versions[0] ?? '');
+    const handleLanguageChange = () => {
+      setValue('languageVersion', '', { shouldDirty: true });
     };
-
-    useEffect(() => {
-      if (!useRuntimeDropdowns || !runtimeMap.length) return;
-
-      const currentLanguage = getValues('programmingLanguage');
-      const currentVersion = getValues('languageVersion');
-
-      if (!currentLanguage) {
-        const firstLanguage = runtimeMap[0];
-        const firstVersion = runtimeMap[0][0] ?? '';
-
-        setValue('programmingLanguage', firstLanguage);
-        setValue('languageVersion', firstVersion);
-        return;
-      }
-
-      const matchingRuntime = runtimeMap[currentLanguage];
-
-      if (!matchingRuntime) {
-        const firstLanguage = runtimeMap[0];
-        const firstVersion = runtimeMap[0][0] ?? '';
-
-        setValue('programmingLanguage', firstLanguage);
-        setValue('languageVersion', firstVersion);
-        return;
-      }
-
-      if (currentVersion && matchingRuntime.includes(currentVersion)) {
-        return;
-      }
-
-      setValue('languageVersion', matchingRuntime[0] ?? '');
-    }, [getValues, runtimeMap, setValue]);
 
     return (
       <>
@@ -182,13 +108,13 @@ export const CodeRunnerForm = ({
           </FormControlSelectField>
         </Grid>
 
-        {runtimeError && (
+        {error && (
           <Grid size={11.5}>
-            <Alert severity="error">{runtimeError}</Alert>
+            <Alert severity="error">{getErrorMessage(error)}</Alert>
           </Grid>
         )}
 
-        {useRuntimeDropdowns ? (
+        {runTimes ? (
           <>
             <Grid size={5.5}>
               <FormControlSelectField
@@ -200,7 +126,7 @@ export const CodeRunnerForm = ({
                 readOnly={crudType === FormCrudType.view}
                 onSelect={handleLanguageChange}
               >
-                {programmingLanguageOptions.map((item) => (
+                {Object.keys(runTimes.body).map((item) => (
                   <MenuItem key={item} value={item}>
                     {item}
                   </MenuItem>
@@ -218,9 +144,9 @@ export const CodeRunnerForm = ({
                 readOnly={crudType === FormCrudType.view}
                 shouldDisableSelection={!selectedLanguage}
               >
-                {versionOptions.map((item) => (
-                  <MenuItem key={item} value={item}>
-                    {item}
+                {availableVersions.map((version) => (
+                  <MenuItem key={version} value={version}>
+                    {version}
                   </MenuItem>
                 ))}
               </FormControlSelectField>

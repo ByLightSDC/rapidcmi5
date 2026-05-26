@@ -20,13 +20,33 @@ type CodeRunnerClient = ReturnType<
   typeof initTsrReactQuery<typeof codeRunnerContract, { baseUrl: string }>
 >;
 
-type ApiClients = {
-  rangeClient?: RangeClient;
-  quizBankClient?: QuizBankClient;
-  codeRunnerClient?: CodeRunnerClient;
+type ClientWithStatus<T> = {
+  enabled: boolean;
+  client: T;
 };
 
-const ApiContext = createContext<ApiClients>({});
+type ApiClients = {
+  rangeClient: ClientWithStatus<RangeClient>;
+  quizBankClient: ClientWithStatus<QuizBankClient>;
+  codeRunnerClient: ClientWithStatus<CodeRunnerClient>;
+};
+
+const makeDefaultClients = (): ApiClients => ({
+  rangeClient: {
+    enabled: false,
+    client: initTsrReactQuery(scenarioContract, { baseUrl: '' }),
+  },
+  quizBankClient: {
+    enabled: false,
+    client: initTsrReactQuery(quizBankContract, { baseUrl: '' }),
+  },
+  codeRunnerClient: {
+    enabled: false,
+    client: initTsrReactQuery(codeRunnerContract, { baseUrl: '' }),
+  },
+});
+
+const ApiContext = createContext<ApiClients>(makeDefaultClients());
 
 export const useRangeClient = () => useContext(ApiContext).rangeClient;
 export const useQuizBankClient = () => useContext(ApiContext).quizBankClient;
@@ -51,60 +71,50 @@ export function ApiProviders({
   codeRunnerUrl?: string;
 }) {
   const clients = useMemo<ApiClients>(() => {
-    if (!token) return {};
-    const headers = {
-      Authorization: cmi5Enabled ? `Basic ${token}` : `Bearer ${token}`,
-    };
+    const headers: Record<string, string> = token
+      ? { Authorization: cmi5Enabled ? `Basic ${token}` : `Bearer ${token}` }
+      : {};
+    const apiOverride = isElectron ? { api: electronFetchApi } : {};
+
     return {
-      rangeClient: rangeUrl
-        ? initTsrReactQuery(scenarioContract, {
-            baseUrl: rangeUrl,
-            baseHeaders: headers,
-            ...(isElectron ? { api: electronFetchApi } : {}),
-          })
-        : undefined,
-      quizBankClient: quizBankUrl
-        ? initTsrReactQuery(quizBankContract, {
-            baseUrl: quizBankUrl,
-            baseHeaders: headers,
-            ...(isElectron ? { api: electronFetchApi } : {}),
-          })
-        : undefined,
-      codeRunnerClient: codeRunnerUrl
-        ? initTsrReactQuery(codeRunnerContract, {
-            baseUrl: codeRunnerUrl,
-            baseHeaders: headers,
-            ...(isElectron ? { api: electronFetchApi } : {}),
-          })
-        : undefined,
+      rangeClient: {
+        enabled: Boolean(rangeUrl),
+        client: initTsrReactQuery(scenarioContract, {
+          baseUrl: rangeUrl ?? '',
+          baseHeaders: headers,
+          ...apiOverride,
+        }),
+      },
+      quizBankClient: {
+        enabled: Boolean(quizBankUrl),
+        client: initTsrReactQuery(quizBankContract, {
+          baseUrl: quizBankUrl ?? '',
+          baseHeaders: headers,
+          ...apiOverride,
+        }),
+      },
+      codeRunnerClient: {
+        enabled: Boolean(codeRunnerUrl),
+        client: initTsrReactQuery(codeRunnerContract, {
+          baseUrl: codeRunnerUrl ?? '',
+          baseHeaders: headers,
+          ...apiOverride,
+        }),
+      },
     };
   }, [token, rangeUrl, quizBankUrl, codeRunnerUrl]);
 
-  let tree = (
-    <ApiContext.Provider value={clients}>{children}</ApiContext.Provider>
+  return (
+    <QueryClientProvider client={queryClient}>
+      <clients.rangeClient.client.ReactQueryProvider>
+        <clients.quizBankClient.client.ReactQueryProvider>
+          <clients.codeRunnerClient.client.ReactQueryProvider>
+            <ApiContext.Provider value={clients}>
+              {children}
+            </ApiContext.Provider>
+          </clients.codeRunnerClient.client.ReactQueryProvider>
+        </clients.quizBankClient.client.ReactQueryProvider>
+      </clients.rangeClient.client.ReactQueryProvider>
+    </QueryClientProvider>
   );
-
-  if (clients.codeRunnerClient) {
-    tree = (
-      <clients.codeRunnerClient.ReactQueryProvider>
-        {tree}
-      </clients.codeRunnerClient.ReactQueryProvider>
-    );
-  }
-  if (clients.quizBankClient) {
-    tree = (
-      <clients.quizBankClient.ReactQueryProvider>
-        {tree}
-      </clients.quizBankClient.ReactQueryProvider>
-    );
-  }
-  if (clients.rangeClient) {
-    tree = (
-      <clients.rangeClient.ReactQueryProvider>
-        {tree}
-      </clients.rangeClient.ReactQueryProvider>
-    );
-  }
-
-  return <QueryClientProvider client={queryClient}>{tree}</QueryClientProvider>;
 }

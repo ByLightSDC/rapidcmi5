@@ -1,16 +1,19 @@
 import { UseFormReturn } from 'react-hook-form';
-import { toTitleCase } from '../formUtils';
+import { toTitleCase } from './formUtils';
 import {
+  ButtonMinorUi,
   FormControlSelectField,
   FormControlUIProvider,
   FormStateType,
   MiniForm,
   NAME_GROUP_OPT,
   REQUIRED_ENTRY,
+  useRangeClient,
   UUID_GROUP,
 } from '@rapid-cmi5/ui';
 import { Alert, MenuItem, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
+import SearchIcon from '@mui/icons-material/Search';
 
 import * as yup from 'yup';
 import {
@@ -21,10 +24,12 @@ import { FormCrudType } from '@rapid-cmi5/ui';
 
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 
-import LrsHeaderWithDetails from '../LrsStatementHelper';
+import LrsHeaderWithDetails from './LrsStatementHelper';
 
-import { ScenarioSelectionForm } from '../../../../../components/modals/scenarios/ScenarioSelectionModal';
-import { ScenarioCard } from './ScenarioCard';
+import { ScenarioSelectionModal } from '../../../../features/scenarios/ScenarioSelectionModal';
+import ManualScenarioForm from '../../../../features/scenarios/ManualScenarioForm';
+import { ScenarioStatusCard } from '../../../../features/scenarios/ScenarioStatusCard';
+import { useState } from 'react';
 
 export const TeamConsolesForm = ({
   contextMenu,
@@ -74,8 +79,10 @@ export const TeamConsolesForm = ({
   ): JSX.Element => {
     const { control, setValue, trigger, watch } = formMethods;
     const { errors } = formState;
+    const { enabled: isRangeClientEnabled } = useRangeClient();
     const scenarioName = watch('name');
     const scenarioUuid = watch('uuid');
+    const [isScenarioModalOpen, setIsScenarioModalOpen] = useState(false);
 
     const onApplyScenario = (item: any) => {
       setValue('uuid', item.uuid, { shouldDirty: true });
@@ -99,14 +106,30 @@ export const TeamConsolesForm = ({
             authenticated via Basic Auth.
           </Alert>
         </Grid>
-        <ScenarioSelectionForm
-          submitForm={onApplyScenario}
-          errors={errors}
-          control={control}
-        />
-
-        {/* Selected Scenario Display */}
-        <ScenarioCard scenarioUUID={scenarioUuid} scenarioName={scenarioName} />
+        {isRangeClientEnabled ? (
+          <>
+            <ButtonMinorUi
+              onClick={() => setIsScenarioModalOpen(true)}
+              fullWidth
+              startIcon={<SearchIcon />}
+              sx={{ height: 42, boxSizing: 'border-box' }}
+            >
+              Select Scenario
+            </ButtonMinorUi>
+            <ScenarioSelectionModal
+              onSelect={onApplyScenario}
+              onClose={() => setIsScenarioModalOpen(false)}
+              open={isScenarioModalOpen}
+            />
+            {/* Selected Scenario Display */}
+            <ScenarioStatusCard
+              scenarioUUID={scenarioUuid}
+              scenarioName={scenarioName}
+            />
+          </>
+        ) : (
+          <ManualScenarioForm errors={errors} control={control} />
+        )}
 
         <Grid size={4.5}>
           <FormControlSelectField

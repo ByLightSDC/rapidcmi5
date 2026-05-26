@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CourseAU, ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
-import { debugLogError } from '@rapid-cmi5/ui';
+import { debugLogError, useRangeApi, useRangeClient } from '@rapid-cmi5/ui';
 import {
   fetchLaunchUrl,
   randomUuid,
@@ -39,7 +39,6 @@ export interface LaunchInPlayerOptions {
   returnUrl: string;
   currentAuIndex: number;
   selectedScenario: ScenarioApi | null;
-  createAuMapping?: (auId: string, scenarioUUID: string) => Promise<void>;
   onSuccess: () => void;
 }
 
@@ -51,7 +50,7 @@ export function useLaunchInPlayer() {
   const [isLoading, setIsLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
+  const { isRangeEnabled, createAuMapping } = useRangeApi();
   const reset = () => {
     setError(null);
     setStatusMsg(null);
@@ -76,7 +75,6 @@ export function useLaunchInPlayer() {
       returnUrl,
       currentAuIndex,
       selectedScenario,
-      createAuMapping,
       onSuccess,
     } = opts;
 
@@ -145,7 +143,7 @@ export function useLaunchInPlayer() {
         });
         const localUrl = rewriteLaunchHost(launchUrl, playerUrl);
 
-        if (selectedScenario && createAuMapping) {
+        if (selectedScenario) {
           setStatusMsg('Mapping scenario to AU…');
           try {
             const auId = await fetchFirstAuId({
@@ -153,6 +151,9 @@ export function useLaunchInPlayer() {
               courseId: lmsCourseId.trim(),
               token: lmsToken.trim(),
             });
+
+            if (!isRangeEnabled) throw Error('Range client was not enabled');
+
             await createAuMapping(auId, selectedScenario.uuid);
           } catch (err: unknown) {
             debugLogError(err instanceof Error ? err.message : String(err));

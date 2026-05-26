@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { darken, lighten } from '@mui/material/styles';
 
-import { ScenarioForm } from '../forms/scenario/ScenarioForm';
+import { ScenarioForm } from '../forms/ScenarioForm';
 import { CodeRunnerForm } from '../forms/CodeRunnerForm';
 
 import { QuizForm } from '../forms/QuizForm';
@@ -55,7 +55,7 @@ import {
 import { updateScenario, updateTeamScenario } from '@rapid-cmi5/react-editor';
 import ScenarioMock from './ScenarioMock';
 import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
-import { TeamConsolesForm } from '../forms/scenario/TeamConsolesForm';
+import { TeamConsolesForm } from '../forms/TeamConsolesForm';
 
 /**
  * MDX Editor for Activities

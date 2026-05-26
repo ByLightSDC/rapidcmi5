@@ -4,7 +4,7 @@ import {
   FormStateType,
   MiniForm,
   ModalDialog,
-  useQuizBankClient,
+  useQuizBankApi,
 } from '@rapid-cmi5/ui';
 import * as yup from 'yup';
 import Box from '@mui/material/Box';
@@ -25,7 +25,7 @@ import {
   useWatch,
 } from 'react-hook-form';
 
-import { currentQuizBankApiVersion } from '@rapid-cmi5/cmi5-build-common';
+import { QuizQuestion } from '@rapid-cmi5/cmi5-build-common';
 import { FormatQuestionOptions, QuestionTypeChip } from './QuestionCard';
 
 function TagInput({
@@ -97,10 +97,10 @@ export function AddToQuizBankForm({
   question,
   closeModal,
 }: {
-  question: any;
-  closeModal: any;
+  question: QuizQuestion;
+  closeModal: () => void;
 }) {
-  const quizBankClient = useQuizBankClient();
+  const { createQuestion } = useQuizBankApi();
 
   const validationSchema = yup.object().shape({
     public: yup.boolean(),
@@ -110,24 +110,8 @@ export function AddToQuizBankForm({
       .max(20, 'You can add up to 20 tags'),
   });
 
-  const doAction = async (data: { public: boolean; tags: string[] }) => {
-    if (!question.type) throw Error('Question type not defined');
-    if (!quizBankClient) throw Error('Add question to quiz bank is undefined');
-    await quizBankClient.createQuestion.mutate({
-      body: {
-        publicQuestion: data.public ?? true,
-        questionType: question.type,
-        question: question.question,
-        cmi5QuestionId: question.cmi5QuestionId,
-        correctAnswer: question.typeAttributes.correctAnswer,
-        grading: question.typeAttributes.grading,
-        options: question.typeAttributes.options ?? undefined,
-        matching: question.typeAttributes.matching ?? undefined,
-        shuffleAnswers: question.typeAttributes.shuffleAnswers ?? undefined,
-        rc5QuizBankApiVersion: currentQuizBankApiVersion,
-        tags: data.tags,
-      },
-    });
+  const doAction = async (data: { public?: boolean; tags?: string[] }) => {
+    await createQuestion(data.public ?? false, data.tags ?? [], question);
     closeModal();
   };
 
@@ -183,7 +167,6 @@ export function AddToQuizBankForm({
         <MiniForm
           dataCache={{
             public: true,
-            tags: question.tags ?? [],
           }}
           doAction={doAction}
           formTitle="Add to Quiz Bank"

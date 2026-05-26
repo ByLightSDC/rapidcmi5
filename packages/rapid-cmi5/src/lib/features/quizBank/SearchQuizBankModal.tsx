@@ -1,9 +1,7 @@
-import { useCallback } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { DynamicModal, useQuizBankClient } from '@rapid-cmi5/ui';
+import { DynamicModal, useQuizBankApi } from '@rapid-cmi5/ui';
 import QuestionCard from './QuestionCard';
 import { QuestionBankApi } from '@rapid-cmi5/cmi5-build-common';
-import { useRapidCmi5Opts } from '../../../design-tools/course-builder/GitViewer/session/RapidCmi5OptsContext';
+import { useRapidCmi5Opts } from '../../design-tools/course-builder/GitViewer/session/RapidCmi5OptsContext';
 
 export function QuizBankSearchForm({
   closeModal,
@@ -15,22 +13,7 @@ export function QuizBankSearchForm({
   activityType: any;
 }) {
   const { userAuth } = useRapidCmi5Opts();
-  const quizBankClient = useQuizBankClient();
-  const queryClient = useQueryClient();
-
-  if (!quizBankClient) throw Error('No quiz bank client');
-
-  const { mutateAsync: deleteQuestion } =
-    quizBankClient.deleteQuestion.useMutation();
-
-  const onDelete = useCallback(
-    async (uuid: string) => {
-      const { status } = await deleteQuestion({ params: { uuid } });
-      if (status !== 200) throw Error('Error deleting');
-      await queryClient.invalidateQueries({ queryKey: ['question'] });
-    },
-    [deleteQuestion, queryClient],
-  );
+  const { searchQuestions, deleteQuestion } = useQuizBankApi();
 
   return (
     <DynamicModal<QuestionBankApi>
@@ -44,14 +27,10 @@ export function QuizBankSearchForm({
       itemsPerPage={20}
       multiSelect={true}
       fetchItems={(search, limit, offset) => {
-        const { data, error, isPending } = quizBankClient.getQuestions.useQuery(
-          {
-            queryKey: [
-              'question',
-              { search, limit, offset, sortBy: 'dateEdited', sort: 'desc' },
-            ],
-            queryData: { query: { search, limit, offset } },
-          },
+        const { data, error, isPending } = searchQuestions(
+          search,
+          limit,
+          offset,
         );
 
         return {
@@ -76,7 +55,7 @@ export function QuizBankSearchForm({
             return;
           }}
           currentUser={userAuth?.userEmail}
-          onDelete={onDelete}
+          onDelete={deleteQuestion}
         />
       )}
     />

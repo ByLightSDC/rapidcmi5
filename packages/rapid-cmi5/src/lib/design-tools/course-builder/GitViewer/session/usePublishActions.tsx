@@ -2,7 +2,7 @@
 import { useCallback } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-import { config } from '@rapid-cmi5/ui';
+import { config, useRangeApi, useRangeClient } from '@rapid-cmi5/ui';
 import { debugLog } from '@rapid-cmi5/ui';
 import { DownloadCmi5Type } from '../../CourseBuilderApiTypes';
 import {
@@ -24,12 +24,12 @@ export const usePublishActions = (
   repoAccessObject: RepoAccessObject | null,
   token?: string,
   downloadCmi5Zip?: () => Promise<any>,
-  processAu?: (au: CourseAU, blockId: string) => Promise<void>,
 ) => {
   const { currentBranch, fileState }: RepoState = useSelector(
     (state: RootState) => state.repoManager,
   );
   const currentCourse = fileState.selectedCourse;
+  const { isRangeEnabled, processAu } = useRangeApi();
 
   const handleDownloadCmi5Zip = async (req: DownloadCmi5Type) => {
     const r = getRepoAccess(repoAccessObject);
@@ -69,7 +69,7 @@ export const usePublishActions = (
         );
       }
 
-      if (processAu) {
+      if (isRangeEnabled) {
         if (!courseData) {
           throw new Error('Course data was null');
         }

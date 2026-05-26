@@ -1,6 +1,7 @@
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import { UseFormReturn } from 'react-hook-form';
 import {
+  ButtonMinorUi,
   FormControlCheckboxField,
   FormControlSelectField,
   FormControlTextField,
@@ -10,6 +11,7 @@ import {
   META_LABEL_GROUP,
   MiniForm,
   NAME_GROUP_OPT,
+  useRangeClient,
   UUID_GROUP,
 } from '@rapid-cmi5/ui';
 import { Alert, MenuItem, SxProps, Typography } from '@mui/material';
@@ -20,16 +22,20 @@ import {
   moveOnCriteriaOptions,
   RC5ScenarioContent,
   OuterStyle,
+  ScenarioApi,
 } from '@rapid-cmi5/cmi5-build-common';
 
-import { getInfoText } from '../../../../../utils/infoButtonText';
+import { getInfoText } from '../../../../utils/infoButtonText';
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
-import LrsHeaderWithDetails from '../LrsStatementHelper';
+import LrsHeaderWithDetails from './LrsStatementHelper';
 
-import { toTitleCase } from '../formUtils';
-import { useEffect } from 'react';
-import { ScenarioSelectionForm } from '../../../../../components/modals/scenarios/ScenarioSelectionModal';
-import { ScenarioCard } from './ScenarioCard';
+import { toTitleCase } from './formUtils';
+import { useEffect, useState } from 'react';
+import SearchIcon from '@mui/icons-material/Search';
+
+import { ScenarioSelectionModal } from '../../../../features/scenarios/ScenarioSelectionModal';
+import ManualScenarioForm from '../../../../features/scenarios/ManualScenarioForm';
+import { ScenarioStatusCard } from '../../../../features/scenarios/ScenarioStatusCard';
 
 export const ScenarioForm = ({
   contextMenu,
@@ -81,23 +87,20 @@ export const ScenarioForm = ({
   ): JSX.Element => {
     const { control, setValue, trigger, watch } = formMethods;
     const { errors } = formState;
-
+    const { enabled: isRangeClientEnabled } = useRangeClient();
+    const [isScenarioModalOpen, setIsScenarioModalOpen] = useState(false);
     const watchPromptClass = watch('promptClass');
     const scenarioName = watch('name');
     const scenarioUuid = watch('uuid');
 
-    /**
-     *
-     * @param {string} topicId
-     * @param {any} item New value of field
-     */
-    const onApplyScenario = (item: any) => {
+    const onApplyScenario = (item: ScenarioApi) => {
       if (!item) {
         return;
       }
       setValue('uuid', item.uuid, { shouldDirty: true });
       setValue('name', item.name, { shouldDirty: true });
       trigger('uuid');
+      setIsScenarioModalOpen(false);
     };
 
     /**
@@ -123,7 +126,7 @@ export const ScenarioForm = ({
                 fontSize="small"
               />
               <b> CLASSES</b>
-            </span>{' '}
+            </span>
             dashboard in RangeOS. If left unchecked, an instance of this
             scenario will be automatically deployed.
           </Typography>
@@ -136,15 +139,31 @@ export const ScenarioForm = ({
           </Alert>
         </Grid>
         <Grid size={gridSize}>
-          <ScenarioSelectionForm
-            submitForm={onApplyScenario}
-            errors={errors}
-            control={control}
-          />
-          <ScenarioCard
-            scenarioUUID={scenarioUuid}
-            scenarioName={scenarioName}
-          />
+          {isRangeClientEnabled ? (
+            <>
+              <ButtonMinorUi
+                onClick={() => setIsScenarioModalOpen(true)}
+                fullWidth
+                startIcon={<SearchIcon />}
+                sx={{ height: 42, boxSizing: 'border-box' }}
+              >
+                Select Scenario
+              </ButtonMinorUi>
+
+              <ScenarioSelectionModal
+                onSelect={onApplyScenario}
+                onClose={() => setIsScenarioModalOpen(false)}
+                open={isScenarioModalOpen}
+              />
+              {/* Selected Scenario Display */}
+              <ScenarioStatusCard
+                scenarioUUID={scenarioUuid}
+                scenarioName={scenarioName}
+              />
+            </>
+          ) : (
+            <ManualScenarioForm errors={errors} control={control} />
+          )}
         </Grid>
 
         <Grid size={3.2}>

@@ -3,7 +3,6 @@ import {
   AlertTitle,
   Box,
   CircularProgress,
-  Paper,
   SxProps,
   Typography,
 } from '@mui/material';
@@ -27,7 +26,7 @@ import {
   maxFormWidths,
   useLessonThemeStyles,
 } from '../../hooks/useLessonThemeStyles';
-import { useCodeRunnerClient } from '../../contexts/ApiContext';
+import { useCodeRunnerApi } from '../../api/codeRunner/useCodeRunnerApi';
 
 type CodeRunnerProps = {
   auProps: Partial<AuContextProps>;
@@ -84,7 +83,7 @@ export function CodeRunner({
   const { setProgress, submitScore, isAuthenticated, isTestMode } = auProps;
   const { lessonTheme } = useContext(LessonThemeContext);
 
-  const codeRunnerClient = useCodeRunnerClient();
+  const { isCodeRunnerEnabled, executeCode } = useCodeRunnerApi();
 
   const monacoLanguage = resolveMonacoLanguage(
     content.programmingLanguage ?? 'javascript',
@@ -127,29 +126,14 @@ export function CodeRunner({
     setSuccessStr('');
     setErrorStr('');
     setCompileStr('');
-    if (!codeRunnerClient) return;
 
     const activityContent = buildActivityContent(content);
 
     try {
-      const { status, body } = await codeRunnerClient.execute.mutate({
-        body: {
-          submissionContent: `${submissionStr}${content.evaluator}`,
-          language: content.programmingLanguage,
-          languageVersion: content.languageVersion,
-        },
-      });
-
-      if (status != 200) throw Error('failed code runner');
-      const stdout = body.stdout?.trim() ?? '';
-      const stderr = body.stderr?.trim() ?? '';
-      const cmpinfo =
-        (body as { cmpinfo?: string; compileinfo?: string }).cmpinfo?.trim() ??
-        (
-          body as { cmpinfo?: string; compileinfo?: string }
-        ).compileinfo?.trim() ??
-        '';
-
+      const { cmpinfo, stderr, stdout, success } = await executeCode(
+        submissionStr,
+        content,
+      );
       // Compilation issue
       if (cmpinfo) {
         setCompileStr(cmpinfo);
@@ -158,7 +142,7 @@ export function CodeRunner({
       }
 
       // Full success
-      if (body.success) {
+      if (success) {
         setSuccessStr(stdout || 'Submission passed successfully.');
         setProgress?.(true);
         submitActivityScore(true, stdout || 'Success', activityContent);
@@ -183,7 +167,7 @@ export function CodeRunner({
     }
   };
 
-  if (!isTestMode && (!isAuthenticated || !codeRunnerClient))
+  if (!isTestMode && (!isAuthenticated || !isCodeRunnerEnabled))
     return (
       <Box
         sx={{
@@ -216,7 +200,7 @@ export function CodeRunner({
       {...outerStyle}
     >
       <Box sx={{ padding: 2, ...innerSx }}>
-        {isTestMode && !codeRunnerClient && (
+        {isTestMode && !isCodeRunnerEnabled && (
           <Alert severity="info" sx={{ mb: 1.5 }}>
             Test mode active: no submission will be sent.
           </Alert>

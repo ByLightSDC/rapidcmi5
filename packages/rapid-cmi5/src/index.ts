@@ -6,4 +6,3 @@ export * from './lib/design-tools/rapidcmi5_mdx/styles/useMDStyleIcons';
 export * from './lib/design-tools/course-builder/GitViewer/session/RapidCmi5OptsContext';
 export * from './lib/window';
 export { videoPlugin } from './lib/design-tools/rapidcmi5_mdx/plugins/video';
-export * from './lib/components/modals/scenarios/ScenarioSelectionModal';

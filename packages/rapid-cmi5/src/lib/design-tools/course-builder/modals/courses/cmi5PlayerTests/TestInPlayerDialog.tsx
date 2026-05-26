@@ -15,8 +15,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useSelector, useDispatch } from 'react-redux';
 import { useContext, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { FormCrudType, modal, setModal } from '@rapid-cmi5/ui';
+import SearchIcon from '@mui/icons-material/Search';
+import { ButtonMinorUi, modal, setModal } from '@rapid-cmi5/ui';
 import { ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
 import {
   courseDataCache,
@@ -33,7 +33,7 @@ import {
   DEFAULT_RETURN_URL,
   useLaunchInPlayer,
 } from './useLaunchInPlayer';
-import { ScenarioSelectionForm } from '@rapid-cmi5/react-editor';
+import { ScenarioSelectionModal } from '../../../../../features/scenarios/ScenarioSelectionModal';
 
 const DEFAULT_PLAYER_URL = 'http://localhost:4201';
 // Electron IPC fallback: path relative to repo root
@@ -54,8 +54,7 @@ export function TestInPlayerDialog() {
   const courseData = useSelector(courseDataCache);
   const currentAuIndex = useSelector(currentAu);
   const currentBlockIndex = useSelector(currentBlock);
-  const { userAuth, createAuMapping } = useRapidCmi5Opts();
-  const scenarioFormMethods = useForm();
+  const { userAuth } = useRapidCmi5Opts();
 
   const [playerUrl, setPlayerUrl] = useState(DEFAULT_PLAYER_URL);
   const [configPath, setConfigPath] = useState(DEFAULT_CONFIG_PATH);
@@ -81,6 +80,7 @@ export function TestInPlayerDialog() {
   const hasIpc = typeof (window as any).ipc?.testInPlayer === 'function';
   const resolvedActorName =
     actorName || userAuth?.userName || userAuth?.userEmail || '';
+  const [isScenarioModalOpen, setIsScenarioModalOpen] = useState(false);
 
   const handleClose = () => {
     reset();
@@ -106,7 +106,6 @@ export function TestInPlayerDialog() {
       returnUrl,
       currentAuIndex,
       selectedScenario,
-      createAuMapping,
       onSuccess: handleClose,
     });
 
@@ -331,12 +330,20 @@ export function TestInPlayerDialog() {
                   >
                     Scenario to launch with
                   </Typography>
-                  <ScenarioSelectionForm
-                    submitForm={(scenario: ScenarioApi) =>
+                  <ButtonMinorUi
+                    onClick={() => setIsScenarioModalOpen(true)}
+                    fullWidth
+                    startIcon={<SearchIcon />}
+                    sx={{ height: 42, boxSizing: 'border-box' }}
+                  >
+                    Select Scenario
+                  </ButtonMinorUi>
+                  <ScenarioSelectionModal
+                    onSelect={(scenario: ScenarioApi) =>
                       setSelectedScenario(scenario ?? null)
                     }
-                    errors={scenarioFormMethods.formState.errors}
-                    control={scenarioFormMethods.control}
+                    onClose={() => setIsScenarioModalOpen(false)}
+                    open={isScenarioModalOpen}
                   />
                   {selectedScenario && (
                     <Typography

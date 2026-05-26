@@ -115,3 +115,6 @@ export * from './lib/colors/BackgroundColorTrigger';
 export * from './lib/contexts/ApiContext';
 export * from './lib/utility/date';
 export * from './lib/utility/errors';
+export * from './lib/api/scenarios/useRangeApi';
+export * from './lib/api/quizBank/useQuizBankApi';
+export * from './lib/api/codeRunner/useCodeRunnerApi';

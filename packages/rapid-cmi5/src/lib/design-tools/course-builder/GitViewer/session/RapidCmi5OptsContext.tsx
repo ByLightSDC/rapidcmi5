@@ -3,18 +3,12 @@
  * When using via an npm package this is very important.
  */
 import {
-  RC5ActivityTypeEnum,
-  CourseAU,
   GitUserConfig,
   Credentials,
   ScenarioApi,
-  ScenarioQuery,
-  PaginatedScenariosResponse,
 } from '@rapid-cmi5/cmi5-build-common';
 
-import { FormCrudType } from '@rapid-cmi5/ui';
 import { createContext, useContext } from 'react';
-import { UseFormReturn } from 'react-hook-form';
 
 export type ApiUrls = {
   quizBankUrl?: string;
@@ -35,8 +29,6 @@ export type AiPanelMode = 'claude' | 'codex' | 'terminal';
 export interface RapidCmi5Opts {
   userAuth?: UserAuth;
   downloadCmi5Player?: () => Promise<any>;
-  processAu?: (au: CourseAU, blockId: string) => Promise<void>;
-  createAuMapping?: (auId: string, scenerioUUID: string) => Promise<void>;
   fetchScenario?: (uuid: string) => Promise<ScenarioApi>;
   handleOverrideGlobalGitConfig?: (
     config?: GitUserConfig,

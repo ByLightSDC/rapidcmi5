@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import {
   Box,
   Card,
@@ -6,15 +5,15 @@ import {
   Chip,
   CircularProgress,
   Divider,
+  Theme,
   Typography,
+  alpha,
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { alpha } from '@mui/material';
-import { ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
 import { NoScenarioCard } from './NoScenarioCard';
-import { useRangeClient } from '@rapid-cmi5/ui';
+import { useRangeApi } from '@rapid-cmi5/ui';
 
 interface ScenarioCardProps {
   scenarioUUID?: string;
@@ -23,114 +22,82 @@ interface ScenarioCardProps {
 
 type ValidationState = 'loading' | 'valid' | 'not-found' | 'not-connected';
 
-export function ScenarioCard({
+const getAlertMeta = (state: ValidationState) => {
+  switch (state) {
+    case 'loading':
+      return {
+        label: 'Checking…',
+        color: 'default' as const,
+        icon: <CircularProgress size={16} sx={{ flexShrink: 0 }} />,
+        borderColor: 'divider',
+        bgColor: 'background.paper',
+      };
+
+    case 'valid':
+      return {
+        label: 'Verified',
+        color: 'success' as const,
+        icon: (
+          <CheckCircleIcon
+            sx={{ fontSize: 18, color: 'success.main', flexShrink: 0 }}
+          />
+        ),
+        borderColor: 'success.main',
+        bgColor: (theme: Theme) => alpha(theme.palette.success.main, 0.05),
+      };
+
+    case 'not-connected':
+      return {
+        label: 'Unverified',
+        color: 'info' as const,
+        icon: (
+          <InfoOutlinedIcon
+            sx={{ fontSize: 18, color: 'info.main', flexShrink: 0 }}
+          />
+        ),
+        borderColor: 'info.main',
+        bgColor: (theme: any) => alpha(theme.palette.info.main, 0.05),
+      };
+
+    case 'not-found':
+    default:
+      return {
+        label: 'Not Found',
+        color: 'warning' as const,
+        icon: (
+          <WarningAmberIcon
+            sx={{ fontSize: 18, color: 'warning.main', flexShrink: 0 }}
+          />
+        ),
+        borderColor: 'warning.main',
+        bgColor: (theme: any) => alpha(theme.palette.warning.main, 0.05),
+      };
+  }
+};
+
+export function ScenarioStatusCard({
   scenarioUUID,
   scenarioName,
 }: ScenarioCardProps) {
-  const [state, setState] = useState<ValidationState>('loading');
-  const [scenario, setScenario] = useState<ScenarioApi | null>(null);
+  const { getScenario } = useRangeApi();
 
-  const scenarioClient = useRangeClient();
+  const { data, isPending } = getScenario(scenarioUUID);
 
-  const getAlertMeta = () => {
-    switch (state) {
-      case 'loading':
-        return {
-          label: 'Checking…',
-          color: 'default' as const,
-          icon: <CircularProgress size={16} sx={{ flexShrink: 0 }} />,
-          borderColor: 'divider',
-          bgColor: 'background.paper',
-        };
-
-      case 'valid':
-        return {
-          label: 'Verified',
-          color: 'success' as const,
-          icon: (
-            <CheckCircleIcon
-              sx={{ fontSize: 18, color: 'success.main', flexShrink: 0 }}
-            />
-          ),
-          borderColor: 'success.main',
-          bgColor: (theme: any) => alpha(theme.palette.success.main, 0.05),
-        };
-
-      case 'not-connected':
-        return {
-          label: 'Unverified',
-          color: 'info' as const,
-          icon: (
-            <InfoOutlinedIcon
-              sx={{ fontSize: 18, color: 'info.main', flexShrink: 0 }}
-            />
-          ),
-          borderColor: 'info.main',
-          bgColor: (theme: any) => alpha(theme.palette.info.main, 0.05),
-        };
-
-      case 'not-found':
-      default:
-        return {
-          label: 'Not Found',
-          color: 'warning' as const,
-          icon: (
-            <WarningAmberIcon
-              sx={{ fontSize: 18, color: 'warning.main', flexShrink: 0 }}
-            />
-          ),
-          borderColor: 'warning.main',
-          bgColor: (theme: any) => alpha(theme.palette.warning.main, 0.05),
-        };
-    }
-  };
-
-  useEffect(() => {
-    if (!scenarioClient) {
-      setState('not-connected');
-      setScenario(null);
-      return;
-    }
-
-    if (!scenarioUUID) {
-      setState('not-found');
-      setScenario(null);
-      return;
-    }
-
-    setState('loading');
-    let cancelled = false;
-
-    scenarioClient.getScenario
-      .query({ params: { uuid: scenarioUUID } })
-      .then((res) => {
-        if (!cancelled) {
-          if (res.status !== 200) throw Error('Call failed');
-          setScenario(res.body);
-          setState('valid');
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setScenario(null);
-          setState('not-found');
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [scenarioUUID, scenarioClient]);
-
-  const displayName = scenario?.name ?? scenarioName;
-  const alert = getAlertMeta();
-
-  if (!scenarioClient) {
-    return;
-  }
   if (!scenarioName || !scenarioUUID) {
     return <NoScenarioCard />;
   }
+
+  const state: ValidationState = !data
+    ? 'not-connected'
+    : isPending
+      ? 'loading'
+      : data?.status === 200
+        ? 'valid'
+        : 'not-found';
+
+  const scenario = data?.status === 200 ? data.body : null;
+  const displayName = scenario?.name ?? scenarioName;
+  const alert = getAlertMeta(state);
 
   return (
     <Card
