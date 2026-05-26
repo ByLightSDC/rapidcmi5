@@ -107,12 +107,15 @@ export function generateLessonThemeStyleTag(
 
   // Always-emitted rules — must fire regardless of lesson theme settings.
   // Image block overrides must work even when no lesson content width is set.
+  // NOTE: scoped to image-typed decorators only; inline `:anim[...]{}` and other
+  // textDirectives also render as `<p> > [data-lexical-decorator]` and must keep
+  // flowing inline with surrounding text.
   const imageBaseRule = `
-    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > [data-lexical-decorator] {
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > [data-lexical-decorator]:has([data-editor-block-type="image"]) {
       display: block;
       width: 100%;
     }
-    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > [data-lexical-decorator] > div {
+    .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > [data-lexical-decorator]:has([data-editor-block-type="image"]) > div {
       width: 100%;
     }
     .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"] {
