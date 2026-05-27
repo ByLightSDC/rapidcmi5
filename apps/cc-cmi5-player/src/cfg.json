@@ -63,6 +63,34 @@
     },
     {
       "name": "test",
+      "url": "http://localhost:4201",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.develop-cp.rangeos.engineering",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.develop-cp.rangeos.engineering/",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.develop-cp.rangeos.engineering",
+        "THEME": {
+          "SLIDE_BACKGROUND": "",
+          "LOGO_DARK": "./assets/bylight/RapidCMI5_Logo_Dark.png",
+          "LOGO_LIGHT": "./assets/bylight/RapidCMI5_Logo_Light.png"
+        }
+      }
+    },
+    {
+      "name": "test",
+      "url": "http://127.0.0.1:4201",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.develop-cp.rangeos.engineering",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.develop-cp.rangeos.engineering/",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.develop-cp.rangeos.engineering",
+        "THEME": {
+          "SLIDE_BACKGROUND": "",
+          "LOGO_DARK": "./assets/bylight/RapidCMI5_Logo_Dark.png",
+          "LOGO_LIGHT": "./assets/bylight/RapidCMI5_Logo_Light.png"
+        }
+      }
+    },
+    {
+      "name": "test",
       "url": "http://127.0.0.1:4300",
       "config": {
         "DEVOPS_API_URL": "https://rangeos-api.develop-cp.rangeos.engineering",

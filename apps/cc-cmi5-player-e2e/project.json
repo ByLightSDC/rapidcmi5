@@ -7,19 +7,40 @@
   "implicitDependencies": ["cc-cmi5-player"],
   "targets": {
     "e2e": {
-      "executor": "@nx/cypress:cypress",
+      "executor": "@nx/playwright:playwright",
+      "outputs": [
+        "{workspaceRoot}/dist/.playwright/apps/cc-cmi5-player-e2e"
+      ],
       "options": {
-        "cypressConfig": "apps/cc-cmi5-player-e2e/cypress.config.ts",
-        "devServerTarget": "cc-cmi5-player:serve:development",
-        "testingType": "e2e"
+        "config": "apps/cc-cmi5-player-e2e/playwright.config.ts"
       },
       "configurations": {
-        "production": {
-          "devServerTarget": "cc-cmi5-player:serve:production"
+        "chromium": {
+          "project": ["chromium"]
         },
-        "ci": {
-          "devServerTarget": "cc-cmi5-player:serve-static"
+        "chromium-debug": {
+          "project": ["chromium"],
+          "headed": true,
+          "workers": 1,
+          "reporter": "list"
+        },
+        "chromium-ui": {
+          "project": ["chromium"],
+          "ui": true
         }
+      },
+      "metadata": {
+        "description": "Run Playwright E2E tests against the CMI5 player",
+        "technologies": ["playwright"]
+      }
+    },
+    "e2e-report": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "playwright show-report dist/.playwright/apps/cc-cmi5-player-e2e/playwright-report"
+      },
+      "metadata": {
+        "description": "Open the most recent Playwright HTML report for the player suite"
       }
     },
     "lint": {
