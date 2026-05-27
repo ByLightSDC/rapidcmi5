@@ -83,7 +83,7 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
   const { currentRepo } = useContext(GitContext);
   const { promptDeleteRepo, promptGitConfig } = useRC5Prompts();
 
-  const theme:CustomTheme = useTheme();
+  const theme: CustomTheme = useTheme();
 
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
@@ -189,6 +189,7 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
                     justifyContent: 'space-between',
                     width: '100%',
                     background: theme.gradients.background,
+                    borderBottom: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
                 >
@@ -279,6 +280,7 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
                     </ButtonOptions>
                   </Stack>
                 </Stack>
+
                 {viewMode === ViewModeEnum.Designer && <LessonDrawer />}
                 {viewMode === ViewModeEnum.CodeEditor && <FileDrawer />}
                 {viewMode === ViewModeEnum.GitEditor && <GitDrawer />}

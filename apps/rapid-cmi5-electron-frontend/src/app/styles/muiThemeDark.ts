@@ -80,14 +80,13 @@ export const darkTheme = createTheme({
     backgroundColor: '#282b30',
   },
   gradients: {
-    background: 'transparent',
-    backgroundHover: '#e4002B',
+    background: '#3c59a24c',
+    backgroundHover: '#3C59A22B',
     backgroundGradient:
       'linear-gradient(135deg, #282b30 0%, #212125 50%, #282b30D9 100%)',
     backgroundRadial:
-      'radial-gradient(circle at 20% 30%, #e4002B59 0%, transparent 70%), radial-gradient(circle at 80% 70%, #e4002B4D 0%, transparent 60%)',
+      'radial-gradient(circle at 20% 30%, #3C59A259 0%, transparent 70%), radial-gradient(circle at 80% 70%, #3C59A24D 0%, transparent 60%)',
   },
-
   header: {
     border: '#ffffffb0',
     buttonColor: '#C5C5C5',
