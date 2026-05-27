@@ -1,6 +1,207 @@
 {
   "locations": [
     {
+      "name": "test-leonardo",
+      "url": "4200",
+      "config": {
+        "DEVOPS_API_URL": "https://rangeos-api.cp.leonardo.rangeos",
+        "DEVOPS_GQL_URL": "https://rangeos-graphql.cp.leonardo.rangeos/",
+        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.cp.leonardo.rangeos",
+        "THEME": {
+          "SLIDE_BACKGROUND": "",
+          "LOGO_DARK": "./assets/leonardo/logo.png",
+          "LOGO_LIGHT": "./assets/leonardo/logo.png",
+          "LIGHT": {
+            "palette": {
+              "mode": "light",
+              "primary": {
+                "main": "#e4002b",
+                "dark": "#e4002b",
+                "light": "#ff3354",
+                "contrastText": "#000"
+              },
+              "secondary": {
+                "main": "#D2042D",
+                "dark": "#D2042D",
+                "light": "#D2042D",
+                "contrastText": "#FFFFFF"
+              },
+              "text": {
+                "primary": "rgba(0, 0, 0, 0.9)",
+                "secondary": "#323232D9",
+                "disabled": "rgba(0, 0, 0, .6)",
+                "hint": "#656565",
+                "interactable": "#212121"
+              },
+              "background": {
+                "paper": "#F8F8F8",
+                "default": "#EEEEEE"
+              }
+            },
+            "activity": { "backgroundColor": "#1A1A1A" },
+            "button": {
+              "disabledBackgroundColor": "#582936",
+              "disabledColor": "#dbc1ca99",
+              "gradient": "linear-gradient(180deg, #e4002b 0%, #94041f 100%)",
+              "minorBackgroundColor": "#572130",
+              "indicatorColor": "#e4002b",
+              "iconColor": "#4b3b41"
+            },
+            "gradients": {
+              "background": "transparent",
+              "backgroundHover": "#e4002B",
+              "backgroundGradient": "transparent",
+              "backgroundRadial": "transparent"
+            },
+            "nav": {
+              "fill": "",
+              "fillSelected": "#DDDDDD",
+              "icon": "#071285d0",
+              "iconSelected": "#071285",
+              "border": "#071285",
+              "borderSelected": "#071285",
+              "currentTabIndicator": "#ff6680",
+              "currentTabIndicatorText": "#1a1a1a",
+              "deselectedTab": "#4a4a4a",
+              "deselectedTabText": "#ffffff",
+              "deselectedTabBorder": "#2f2f2f",
+              "selectedTab": "#e4002b",
+              "selectedTabBorder": "#ff6680",
+              "selectedTabText": "#ffffff",
+              "shouldColorTabIndicator": false,
+              "progressBar": "#4a4a4a",
+              "progressBarFill": "#ff6680",
+              "tabHover": "#6a6a6a",
+              "tabPanel": "#0A0A0A"
+            },
+            "components": {
+              "MuiIconButton": {
+                "styleOverrides": {
+                  "root": {
+                    "padding": "4px",
+                    "color": "#4b3b41",
+                    "&:hover": {
+                      "color": "#e4002b",
+                      "backgroundColor": "transparent"
+                    }
+                  }
+                }
+              },
+              "MuiTab": {
+                "styleOverrides": {
+                  "root": {
+                    "backgroundColor": "#4b3b41",
+                    "border": "1px solid #e4002b25",
+                    "fontSize": "14px",
+                    "&.Mui-selected": {
+                      "border": "1px solid transparent",
+                      "backgroundColor": "#e4002b",
+                      "&:hover": {
+                        "backgroundColor": "#ff3354"
+                      }
+                    },
+                    "&:hover": {
+                      "border": "1px solid #e4002b",
+                      "backgroundColor": "#e4002b"
+                    }
+                  }
+                }
+              },
+              "MuiTooltip": {
+                "styleOverrides": {
+                  "arrow": {
+                    "&:before": {
+                      "color": "#363132",
+                      "border": "1px solid #363132"
+                    }
+                  },
+                  "tooltip": {
+                    "backgroundColor": "#363132",
+                    "border": "1px solid #363132"
+                  }
+                }
+              }
+            }
+          },
+          "DARK": {
+            "palette": {
+              "mode": "dark",
+              "primary": {
+                "main": "#e4002b",
+                "dark": "#e4002b",
+                "light": "#ff3354"
+              },
+              "secondary": {
+                "main": "#D2042D",
+                "dark": "#D2042D",
+                "light": "#D2042D"
+              }
+            },
+            "activity": { "backgroundColor": "#1A1A1A" },
+            "button": {
+              "disabledBackgroundColor": "#582936",
+              "disabledColor": "#dbc1ca99",
+              "gradient": "linear-gradient(180deg, #e4002b 0%, #94041f 100%)",
+              "minorBackgroundColor": "#572130",
+              "indicatorColor": "#e4002b",
+              "iconColor": "#e4002b"
+            },
+            "nav": {
+              "fill": "",
+              "fillSelected": "#DDDDDD",
+              "icon": "#071285d0",
+              "iconSelected": "#071285",
+              "border": "#071285",
+              "borderSelected": "#071285",
+              "currentTabIndicator": "#ff6680",
+              "currentTabIndicatorText": "#1a1a1a",
+              "deselectedTab": "#4a4a4a",
+              "deselectedTabText": "#ffffff",
+              "deselectedTabBorder": "#2f2f2f",
+              "selectedTab": "#e4002b",
+              "selectedTabBorder": "#ff6680",
+              "selectedTabText": "#ffffff",
+              "shouldColorTabIndicator": false,
+              "progressBar": "#4a4a4a",
+              "progressBarFill": "#ff6680",
+              "tabHover": "#6a6a6a",
+              "tabPanel": "#1a1a1a"
+            },
+            "components": {
+              "MuiIconButton": {
+                "styleOverrides": {
+                  "root": {
+                    "padding": "4px",
+                    "color": "#4b3b41",
+                    "&:hover": {
+                      "color": "#fa0230",
+                      "backgroundColor": "transparent"
+                    }
+                  }
+                }
+              },
+              "MuiTooltip": {
+                "styleOverrides": {
+                  "arrow": {
+                    "&:before": {
+                      "color": "#363132",
+                      "border": "1px solid #363132"
+                    }
+                  },
+                  "tooltip": {
+                    "backgroundColor": "#363132",
+                    "border": "1px solid #363132"
+                  }
+                }
+              }
+            }
+          },
+          "TITLE": "Leonardo",
+          "FAV_ICON": "./assets/leonardo/favicon.ico"
+        }
+      }
+    },
+    {
       "name": "default",
       "url": "*",
       "config": {
@@ -412,7 +613,7 @@
     },
     {
       "name": "bylight-develop",
-      "url": "https://cpt-player.develop-cp.rangeos.engineering",
+      "url": "https://moodle.develop-cp.rangeos.engineering",
       "config": {
         "DEVOPS_API_URL": "https://rangeos-api.develop-cp.rangeos.engineering",
         "DEVOPS_GQL_URL": "https://rangeos-graphql.develop-cp.rangeos.engineering/",
@@ -443,7 +644,7 @@
     },
     {
       "name": "bylight-demo",
-      "url": "https://cpt-player.demo-cp.rangeos.engineering",
+      "url": "https://moodle.demo-cp.rangeos.engineering",
       "config": {
         "DEVOPS_API_URL": "https://rangeos-api.demo-cp.rangeos.engineering",
         "DEVOPS_GQL_URL": "https://rangeos-graphql.demo-cp.rangeos.engineering/",
@@ -457,7 +658,7 @@
     },
     {
       "name": "bylight-prod",
-      "url": "https://cpt-player.prod-cp.rangeos.engineering",
+      "url": "https://moodle.prod-cp.rangeos.engineering",
       "config": {
         "DEVOPS_API_URL": "https://rangeos-api.prod-cp.rangeos.engineering",
         "DEVOPS_GQL_URL": "https://rangeos-graphql.prod-cp.rangeos.engineering/",
@@ -471,7 +672,7 @@
     },
     {
       "name": "bylight-argos",
-      "url": "https://cpt-player.argos-cp.rangeos.engineering",
+      "url": "https://moodle.argos-cp.rangeos.engineering",
       "config": {
         "DEVOPS_API_URL": "https://rangeos-api.argos-cp.rangeos.engineering",
         "DEVOPS_GQL_URL": "https://rangeos-graphql.argos-cp.rangeos.engineering/",
@@ -484,22 +685,8 @@
       }
     },
     {
-      "name": "leonardo",
-      "url": "https://cpt-player.cp.leonardo.rangeos",
-      "config": {
-        "DEVOPS_API_URL": "https://rangeos-api.cp.leonardo.rangeos",
-        "DEVOPS_GQL_URL": "https://rangeos-graphql.cp.leonardo.rangeos/",
-        "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.cp.leonardo.rangeos",
-        "THEME": {
-          "SLIDE_BACKGROUND": "",
-          "LOGO_DARK": "./assets/bylight/RangeOS_Logo_Dark.png",
-          "LOGO_LIGHT": "./assets/bylight/RangeOS_Logo_Light.png"
-        }
-      }
-    },
-    {
       "name": "mci",
-      "url": "https://cpt-player.cp.mci.rangeos",
+      "url": "https://moodle.cp.mci.rangeos",
       "config": {
         "DEVOPS_API_URL": "https://rangeos-api.cp.mci.rangeos",
         "DEVOPS_GQL_URL": "https://rangeos-graphql.cp.mci.rangeos/",
@@ -513,7 +700,7 @@
     },
     {
       "name": "ccri",
-      "url": "https://cpt-player.cp.ccri.rangeos",
+      "url": "https://moodle.cp.ccri.rangeos",
       "config": {
         "DEVOPS_API_URL": "https://rangeos-api.cp.ccri.rangeos",
         "DEVOPS_GQL_URL": "https://rangeos-graphql.cp.ccri.rangeos/",
@@ -527,7 +714,7 @@
     },
     {
       "name": "leonardo",
-      "url": "https://cpt-player.cp.leonardo.rangeos",
+      "url": "https://moodle.cp.leonardo.rangeos",
       "config": {
         "DEVOPS_API_URL": "https://rangeos-api.cp.leonardo.rangeos",
         "DEVOPS_GQL_URL": "https://rangeos-graphql.cp.leonardo.rangeos/",
@@ -662,6 +849,7 @@
                 "light": "#D2042D"
               }
             },
+            "activity": { "backgroundColor": "#1A1A1A" },
             "button": {
               "disabledBackgroundColor": "#582936",
               "disabledColor": "#dbc1ca99",
@@ -719,7 +907,9 @@
                 }
               }
             }
-          }
+          },
+          "TITLE": "Leonardo",
+          "FAV_ICON": "./assets/leonardo/favicon.ico"
         }
       }
     }

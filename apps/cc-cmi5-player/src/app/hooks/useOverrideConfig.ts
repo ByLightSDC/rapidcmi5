@@ -1,4 +1,4 @@
-import { config } from '@rapid-cmi5/ui';
+import { config, debugLog } from '@rapid-cmi5/ui';
 import { logger } from '../debug';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -14,6 +14,8 @@ interface ThemeConfig {
   LOGO_WIDTH?: string;
   LIGHT?: CustomTheme;
   DARK?: CustomTheme;
+  TITLE?: string;
+  FAV_ICON?: string;
 }
 
 interface LocationConfig {
@@ -35,6 +37,24 @@ interface AppConfig {
   }[];
 }
 
+/**
+ * applies title and fav ico
+ */
+const applyThemeEffects = () => {
+  if (config.THEME.TITLE) {
+    document.title = config.THEME.TITLE;
+  }
+  if (config.THEME.FAV_ICON) {
+    let link = document.querySelector<HTMLLinkElement>("link[rel='icon']");
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.head.appendChild(link);
+    }
+    link.href = config.THEME.FAV_ICON;
+  }
+};
+
 const applyConfig = (cfg: LocationConfig) => {
   if (cfg.DEVOPS_API_URL != null) config.DEVOPS_API_URL = cfg.DEVOPS_API_URL;
   if (cfg.DEVOPS_GQL_URL != null) config.DEVOPS_GQL_URL = cfg.DEVOPS_GQL_URL;
@@ -51,9 +71,13 @@ const applyConfig = (cfg: LocationConfig) => {
     if (cfg.THEME.LOGO_DARK) config.THEME.LOGO_DARK = cfg.THEME.LOGO_DARK;
     if (cfg.THEME.LOGO_LIGHT) config.THEME.LOGO_LIGHT = cfg.THEME.LOGO_LIGHT;
     if (cfg.THEME.LOGO_WIDTH) config.THEME.LOGO_WIDTH = cfg.THEME.LOGO_WIDTH;
+    if (cfg.THEME.TITLE) config.THEME.TITLE = cfg.THEME.TITLE;
+    if (cfg.THEME.FAV_ICON) config.THEME.FAV_ICON = cfg.THEME.FAV_ICON;
 
     if (cfg.THEME.SLIDE_BACKGROUND)
       config.THEME.SLIDE_BACKGROUND = cfg.THEME.SLIDE_BACKGROUND;
+
+    applyThemeEffects();
   }
 };
 
@@ -80,9 +104,9 @@ export const useOverrideConfigs = () => {
       if (!cfg.locations)
         throw Error('No locations where found in the cfg.json');
 
-      const deployment =
-        cfg.locations.find((b) => b.url === window.location.origin) ??
-        cfg.locations.find((d) => d.name === 'default');
+        const deployment =
+          cfg.locations.find((b) => window.location.origin.indexOf(b.url) >= 0) ??
+          cfg.locations.find((d) => d.name === 'default');
 
       if (!deployment) throw Error('No default is defined in the cfg.json');
 

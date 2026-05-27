@@ -131,5 +131,7 @@ export const config = {
     LOGO_DARK: './assets/bylight/RapidCMI5_Logo_Dark.png',
     LOGO_LIGHT: './assets/bylight/RapidCMI5_Logo_Light.png',
     LOGO_WIDTH: '140px',
+    TITLE: '',
+    FAV_ICON: '',
   },
 };
