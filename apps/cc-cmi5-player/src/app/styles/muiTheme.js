@@ -75,6 +75,7 @@ export const lightTheme = createTheme({
     backgroundHover: '#3C59A22B',
     backgroundGradient:
       'linear-gradient(135deg, #EEEEEE 0%, #F8F8F8 50%, #EEEEEED9 100%)',
+    backgroundPanel: '#F8F8F8CC',
     backgroundRadial:
       'radial-gradient(circle at 20% 30%, #3C59A259 0%, transparent 70%), radial-gradient(circle at 80% 70%, #3C59A24D 0%, transparent 60%)',
   },

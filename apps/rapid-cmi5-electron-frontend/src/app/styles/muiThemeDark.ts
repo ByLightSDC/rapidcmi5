@@ -84,6 +84,7 @@ export const darkTheme = createTheme({
     backgroundHover: '#3C59A22B',
     backgroundGradient:
       'linear-gradient(135deg, #282b30 0%, #212125 50%, #282b30D9 100%)',
+    backgroundPanel: '#3a3e4480',
     backgroundRadial:
       'radial-gradient(circle at 20% 30%, #3C59A259 0%, transparent 70%), radial-gradient(circle at 80% 70%, #3C59A24D 0%, transparent 60%)',
   },

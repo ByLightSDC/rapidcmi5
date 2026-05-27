@@ -188,7 +188,7 @@ export function Landing({ showHomeButton }: { showHomeButton?: boolean }) {
                     display: 'flex',
                     justifyContent: 'space-between',
                     width: '100%',
-                    background: theme.gradients.background,
+                    background: theme.palette.background.default,
                     borderBottom: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}

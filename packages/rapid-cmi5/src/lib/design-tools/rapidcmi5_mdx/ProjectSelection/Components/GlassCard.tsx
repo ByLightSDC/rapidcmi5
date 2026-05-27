@@ -30,12 +30,11 @@ export function GlassCard({
     <Paper
       elevation={0}
       {...props}
-      
       sx={{
         display: 'flex',
         flexDirection: 'column',
         minHeight: 0,
-        background: alpha(theme.palette.background.paper, 0.8),
+        background: theme.gradients.backgroundPanel,
         backdropFilter: 'blur(10px)',
         border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
         borderRadius: 2,
@@ -70,9 +69,7 @@ export function GlassCard({
         >
           {title}
         </Typography>
-        {headerAction && (
-          <Box sx={{ ml: 'auto' }}>{headerAction}</Box>
-        )}
+        {headerAction && <Box sx={{ ml: 'auto' }}>{headerAction}</Box>}
       </Box>
       {children}
     </Paper>

@@ -55,6 +55,7 @@ declare module '@mui/material/styles' {
       background: React.CSSProperties['color'];
       backgroundHover: React.CSSProperties['color'];
       backgroundGradient: React.CSSProperties['color'];
+      backgroundPanel: React.CSSProperties['color'];
       backgroundRadial: React.CSSProperties['color'];
     };
     nav: {
@@ -113,6 +114,7 @@ declare module '@mui/material/styles' {
       background: React.CSSProperties['color'];
       backgroundHover: React.CSSProperties['color'];
       backgroundGradient: React.CSSProperties['color'];
+      backgroundPanel:React.CSSProperties['color'];
       backgroundRadial: React.CSSProperties['color'];
     };
     nav: {
