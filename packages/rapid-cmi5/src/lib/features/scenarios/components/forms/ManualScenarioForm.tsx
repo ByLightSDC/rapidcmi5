@@ -1,5 +1,6 @@
 import { FormControlTextField } from '@rapid-cmi5/ui';
 import Grid from '@mui/material/Grid2';
+import { SCENARIO_GRID } from './formSettings';
 
 export default function ManualScenarioForm({
   errors,
@@ -9,8 +10,8 @@ export default function ManualScenarioForm({
   control: any;
 }) {
   return (
-    <>
-      <Grid size={6}>
+    <Grid container spacing={1}>
+      <Grid size={SCENARIO_GRID.uuid}>
         <FormControlTextField
           control={control}
           name={'name'}
@@ -20,7 +21,7 @@ export default function ManualScenarioForm({
           helperText={errors?.name?.message}
         />
       </Grid>
-      <Grid size={6}>
+      <Grid size={SCENARIO_GRID.uuid}>
         <FormControlTextField
           control={control}
           name={'uuid'}
@@ -30,6 +31,6 @@ export default function ManualScenarioForm({
           helperText={errors?.uuid?.message}
         />
       </Grid>
-    </>
+    </Grid>
   );
 }

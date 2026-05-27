@@ -3,4 +3,5 @@ export const SCENARIO_GRID = {
   moveOnCriteria: 4.5,
   promptClass: 4.5,
   classId: 5.5,
+  uuid: 6,
 } as const;
