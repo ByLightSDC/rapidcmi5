@@ -33,7 +33,7 @@ import {
   DEFAULT_RETURN_URL,
   useLaunchInPlayer,
 } from './useLaunchInPlayer';
-import { ScenarioSelectionModal } from '../../../../../features/scenarios/components/ScenarioSelectionModal';
+import { ScenarioSelectionModal } from '../../../../../features/scenarios/components/modals/ScenarioSelectionModal';
 
 const DEFAULT_PLAYER_URL = 'http://localhost:4201';
 // Electron IPC fallback: path relative to repo root

@@ -1,5 +1,4 @@
 import SearchIcon from '@mui/icons-material/Search';
-import { toTitleCase } from './formUtils';
 import { MenuItem, SxProps } from '@mui/material';
 import { UseFormReturn } from 'react-hook-form';
 
@@ -8,9 +7,6 @@ import Grid from '@mui/material/Grid2';
 
 import * as yup from 'yup';
 
-import { QuizQuestionsFieldGroup } from '../../../course-builder/QuizQuestionsFieldGroup';
-import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
-import LrsHeaderWithDetails from './LrsStatementHelper';
 import {
   RC5ActivityTypeEnum,
   QuizContent,
@@ -43,12 +39,15 @@ import {
   ButtonModalMinorUi,
   useQuizBankApi,
 } from '@rapid-cmi5/ui';
-import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
 
 import { useState } from 'react';
-
-import QuizBankSearchForm from '../../../../features/quizBank/components/SearchQuizBankModal';
-import AddToQuizBankForm from '../../../../features/quizBank/components/AddToQuizBankModal';
+import { featureFlagShouldShowKSATs } from '../../../featureFlags';
+import { toTitleCase } from '../../../shared/forms/formUtils';
+import LrsHeaderWithDetails from '../../../shared/forms/LrsStatementHelper';
+import { KSATsFieldGroup } from '../../ksats/components/KSATsFieldGroup';
+import AddToQuizBankForm from '../../quizBank/components/AddToQuizBankModal';
+import QuizBankSearchForm from '../../quizBank/components/SearchQuizBankModal';
+import { QuizQuestionsFieldGroup } from './QuizQuestionsFieldGroup';
 
 export function requireField<T>(value: T | undefined | null, field: string): T {
   if (value === undefined || value === null) {

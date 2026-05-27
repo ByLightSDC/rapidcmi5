@@ -14,12 +14,10 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import { darken, lighten } from '@mui/material/styles';
 
-import { ScenarioForm } from '../forms/ScenarioForm';
-import { CodeRunnerForm } from '../forms/CodeRunnerForm';
+import { CodeRunnerForm } from '../../../../features/codeRunner/components/CodeRunnerForm';
 
-import { QuizForm } from '../forms/QuizForm';
+import { QuizForm } from '../../../../features/quiz/components/QuizForm';
 import { useAuContext } from '../../data-hooks/useAuContext';
 import DeleteIconButton from '../components/DeleteIconButton';
 import { useDispatch } from 'react-redux';
@@ -52,10 +50,14 @@ import {
   InsertLineReturnButton,
 } from '@rapid-cmi5/ui';
 
-import { updateScenario, updateTeamScenario } from '@rapid-cmi5/react-editor';
 import ScenarioMock from './ScenarioMock';
 import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
-import { TeamConsolesForm } from '../forms/TeamConsolesForm';
+import {
+  updateScenario,
+  updateTeamScenario,
+} from '../../../../redux/courseBuilderReducer';
+import { ScenarioForm } from '../../../../features/scenarios/components/forms/IndividualScenarioForm';
+import { TeamConsolesForm } from '../../../../features/scenarios/components/forms/TeamScenarioForm';
 
 /**
  * MDX Editor for Activities

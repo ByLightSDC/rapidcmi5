@@ -1,18 +1,19 @@
 /* Branded */
 
-// TODO 
+// TODO
 // pass in the form through the UI
 export const ElementElementTypeEnum = {
-    Category: 'category',
-    CompetencyArea: 'competency_area',
-    Knowledge: 'knowledge',
-    OpmCode: 'opm_code',
-    Skill: 'skill',
-    Sort: 'sort',
-    Task: 'task',
-    WorkRole: 'work_role'
+  Category: 'category',
+  CompetencyArea: 'competency_area',
+  Knowledge: 'knowledge',
+  OpmCode: 'opm_code',
+  Skill: 'skill',
+  Sort: 'sort',
+  Task: 'task',
+  WorkRole: 'work_role',
 } as const;
-export type ElementElementTypeEnum = typeof ElementElementTypeEnum[keyof typeof ElementElementTypeEnum];
+export type ElementElementTypeEnum =
+  (typeof ElementElementTypeEnum)[keyof typeof ElementElementTypeEnum];
 
 export interface Element {
   [key: string]: any;

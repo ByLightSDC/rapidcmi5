@@ -1,10 +1,15 @@
 import { UseFormReturn } from 'react-hook-form';
 import { useEffect } from 'react';
+import {
+  FormCrudType,
+  FormFieldArray,
+  tFormFieldRendererProps,
+  DynamicSelectorFieldGroup,
+} from '@rapid-cmi5/ui';
 import KsatFieldDetail from './KsatFieldDetail';
-import { FormCrudType, FormFieldArray, tFormFieldRendererProps, DynamicSelectorFieldGroup } from '@rapid-cmi5/ui';
 
-const queryKeyKSATs = 'ksats'
-const TopicKsat = 'KSAT'
+const queryKeyKSATs = 'ksats';
+const TopicKsat = 'KSAT';
 /**
  * @type tFieldGroupProps
  * @property {UseFormReturn} formMethods

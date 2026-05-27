@@ -1,7 +1,6 @@
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import { UseFormReturn } from 'react-hook-form';
 import {
-  ButtonMinorUi,
   FormControlCheckboxField,
   FormControlSelectField,
   FormControlTextField,
@@ -11,7 +10,6 @@ import {
   META_LABEL_GROUP,
   MiniForm,
   NAME_GROUP_OPT,
-  useRangeClient,
   UUID_GROUP,
 } from '@rapid-cmi5/ui';
 import { Alert, MenuItem, SxProps, Typography } from '@mui/material';
@@ -22,20 +20,17 @@ import {
   moveOnCriteriaOptions,
   RC5ScenarioContent,
   OuterStyle,
-  ScenarioApi,
 } from '@rapid-cmi5/cmi5-build-common';
 
 import { getInfoText } from '../../../../utils/infoButtonText';
 import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
-import LrsHeaderWithDetails from './LrsStatementHelper';
+import LrsHeaderWithDetails from '../../../../shared/forms/LrsStatementHelper';
 
-import { toTitleCase } from './formUtils';
-import { useEffect, useState } from 'react';
-import SearchIcon from '@mui/icons-material/Search';
+import { toTitleCase } from '../../../../shared/forms/formUtils';
+import { useEffect } from 'react';
 
-import { ScenarioSelectionModal } from '../../../../features/scenarios/components/ScenarioSelectionModal';
-import ManualScenarioForm from '../../../../features/scenarios/components/ManualScenarioForm';
-import { ScenarioStatusCard } from '../../../../features/scenarios/components/ScenarioStatusCard';
+import { ScenarioSelectorField } from './ScenarioSelectorField';
+import { SCENARIO_GRID } from './formSettings';
 
 export const ScenarioForm = ({
   contextMenu,
@@ -57,8 +52,6 @@ export const ScenarioForm = ({
   outerStyle?: OuterStyle;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const gridSize = 12;
-
   const validationSchema = yup.object().shape({
     uuid: UUID_GROUP,
     name: NAME_GROUP_OPT,
@@ -87,25 +80,10 @@ export const ScenarioForm = ({
   ): JSX.Element => {
     const { control, setValue, trigger, watch } = formMethods;
     const { errors } = formState;
-    const { enabled: isRangeClientEnabled } = useRangeClient();
-    const [isScenarioModalOpen, setIsScenarioModalOpen] = useState(false);
     const watchPromptClass = watch('promptClass');
     const scenarioName = watch('name');
     const scenarioUuid = watch('uuid');
 
-    const onApplyScenario = (item: ScenarioApi) => {
-      if (!item) {
-        return;
-      }
-      setValue('uuid', item.uuid, { shouldDirty: true });
-      setValue('name', item.name, { shouldDirty: true });
-      trigger('uuid');
-      setIsScenarioModalOpen(false);
-    };
-
-    /**
-     * UE triggers validation on the class id field if should prompt is turned on
-     */
     useEffect(() => {
       if (watchPromptClass) {
         trigger('defaultClassId');
@@ -113,9 +91,8 @@ export const ScenarioForm = ({
     }, [watchPromptClass]);
 
     return (
-      // <Grid container>
       <>
-        <Grid size={gridSize}>
+        <Grid size={SCENARIO_GRID.full}>
           <Typography variant="body2">
             This activity will present participants with console access to a
             deployed scenario. If <b>Prompt Student for Class Id</b> is
@@ -131,42 +108,25 @@ export const ScenarioForm = ({
             scenario will be automatically deployed.
           </Typography>
         </Grid>
-        <Grid size={gridSize}>
+        <Grid size={SCENARIO_GRID.full}>
           <Alert severity="warning" sx={{ maxWidth: '640px' }}>
             This activity requires Basic AUTH authentication and cannot be used
             in conjunction with a Team Exercise Scenario which authenticates via
             SSO.
           </Alert>
         </Grid>
-        <Grid size={gridSize}>
-          {isRangeClientEnabled ? (
-            <>
-              <ButtonMinorUi
-                onClick={() => setIsScenarioModalOpen(true)}
-                fullWidth
-                startIcon={<SearchIcon />}
-                sx={{ height: 42, boxSizing: 'border-box' }}
-              >
-                Select Scenario
-              </ButtonMinorUi>
-
-              <ScenarioSelectionModal
-                onSelect={onApplyScenario}
-                onClose={() => setIsScenarioModalOpen(false)}
-                open={isScenarioModalOpen}
-              />
-              {/* Selected Scenario Display */}
-              <ScenarioStatusCard
-                scenarioUUID={scenarioUuid}
-                scenarioName={scenarioName}
-              />
-            </>
-          ) : (
-            <ManualScenarioForm errors={errors} control={control} />
-          )}
+        <Grid size={SCENARIO_GRID.full}>
+          <ScenarioSelectorField
+            control={control}
+            errors={errors}
+            setValue={setValue}
+            trigger={trigger}
+            scenarioUuid={scenarioUuid}
+            scenarioName={scenarioName}
+          />
         </Grid>
 
-        <Grid size={3.2}>
+        <Grid size={SCENARIO_GRID.moveOnCriteria}>
           <FormControlSelectField
             control={control}
             name={'moveOnCriteria'}
@@ -183,7 +143,7 @@ export const ScenarioForm = ({
             ))}
           </FormControlSelectField>
         </Grid>
-        <Grid size={3.2}>
+        <Grid size={SCENARIO_GRID.promptClass}>
           <FormControlCheckboxField
             control={control}
             name="promptClass"
@@ -195,7 +155,7 @@ export const ScenarioForm = ({
           />
         </Grid>
         {watchPromptClass && (
-          <Grid size={5.6}>
+          <Grid size={SCENARIO_GRID.classId}>
             <FormControlTextField
               control={control}
               error={Boolean(errors?.defaultClassId)}
@@ -209,7 +169,7 @@ export const ScenarioForm = ({
         {/* <Grid item xs={11.5}>
           <KSATsFieldGroup formMethods={formMethods} crudType={crudType} />
         </Grid> */}
-        <Grid size={12}>
+        <Grid size={SCENARIO_GRID.full}>
           <LrsHeaderWithDetails activityType={RC5ActivityTypeEnum.scenario} />
         </Grid>
       </>

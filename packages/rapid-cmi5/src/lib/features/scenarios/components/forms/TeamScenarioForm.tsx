@@ -1,35 +1,28 @@
 import { UseFormReturn } from 'react-hook-form';
-import { toTitleCase } from './formUtils';
 import {
-  ButtonMinorUi,
   FormControlSelectField,
   FormControlUIProvider,
+  FormCrudType,
   FormStateType,
   MiniForm,
   NAME_GROUP_OPT,
   REQUIRED_ENTRY,
-  useRangeClient,
   UUID_GROUP,
 } from '@rapid-cmi5/ui';
 import { Alert, MenuItem, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import SearchIcon from '@mui/icons-material/Search';
 
 import * as yup from 'yup';
 import {
   moveOnCriteriaOptions,
   TeamConsolesContent,
+  RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
-import { FormCrudType } from '@rapid-cmi5/ui';
 
-import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
-
-import LrsHeaderWithDetails from './LrsStatementHelper';
-
-import { ScenarioSelectionModal } from '../../../../features/scenarios/components/ScenarioSelectionModal';
-import ManualScenarioForm from '../../../../features/scenarios/components/ManualScenarioForm';
-import { ScenarioStatusCard } from '../../../../features/scenarios/components/ScenarioStatusCard';
-import { useState } from 'react';
+import LrsHeaderWithDetails from '../../../../shared/forms/LrsStatementHelper';
+import { ScenarioSelectorField } from './ScenarioSelectorField';
+import { toTitleCase } from '../../../../shared/forms/formUtils';
+import { SCENARIO_GRID } from './formSettings';
 
 export const TeamConsolesForm = ({
   contextMenu,
@@ -79,59 +72,37 @@ export const TeamConsolesForm = ({
   ): JSX.Element => {
     const { control, setValue, trigger, watch } = formMethods;
     const { errors } = formState;
-    const { enabled: isRangeClientEnabled } = useRangeClient();
     const scenarioName = watch('name');
     const scenarioUuid = watch('uuid');
-    const [isScenarioModalOpen, setIsScenarioModalOpen] = useState(false);
-
-    const onApplyScenario = (item: any) => {
-      setValue('uuid', item.uuid, { shouldDirty: true });
-      setValue('name', item.name, { shouldDirty: true });
-      trigger('uuid');
-    };
 
     return (
       <>
-        <Grid size={11}>
+        <Grid size={SCENARIO_GRID.full}>
           <Typography variant="body2">
             This activity provides console access to VMs and Containers in a
             deployed RangeOS scenario. The instructor MUST deploy the scenario
             from the Manage Ranges dashboard in RangeOS.
           </Typography>
         </Grid>
-        <Grid size={11}>
+        <Grid size={SCENARIO_GRID.full}>
           <Alert severity="warning">
             This activity requires SSO authentication and cannot be used in
             conjunction with an Individual Training Scenario which is
             authenticated via Basic Auth.
           </Alert>
         </Grid>
-        {isRangeClientEnabled ? (
-          <>
-            <ButtonMinorUi
-              onClick={() => setIsScenarioModalOpen(true)}
-              fullWidth
-              startIcon={<SearchIcon />}
-              sx={{ height: 42, boxSizing: 'border-box' }}
-            >
-              Select Scenario
-            </ButtonMinorUi>
-            <ScenarioSelectionModal
-              onSelect={onApplyScenario}
-              onClose={() => setIsScenarioModalOpen(false)}
-              open={isScenarioModalOpen}
-            />
-            {/* Selected Scenario Display */}
-            <ScenarioStatusCard
-              scenarioUUID={scenarioUuid}
-              scenarioName={scenarioName}
-            />
-          </>
-        ) : (
-          <ManualScenarioForm errors={errors} control={control} />
-        )}
+        <Grid size={SCENARIO_GRID.full}>
+          <ScenarioSelectorField
+            control={control}
+            errors={errors}
+            setValue={setValue}
+            trigger={trigger}
+            scenarioUuid={scenarioUuid}
+            scenarioName={scenarioName}
+          />
+        </Grid>
 
-        <Grid size={4.5}>
+        <Grid size={SCENARIO_GRID.moveOnCriteria}>
           <FormControlSelectField
             control={control}
             name={'moveOnCriteria'}
@@ -152,7 +123,7 @@ export const TeamConsolesForm = ({
         {/* <Grid size={11.5}>
           <KSATsFieldGroup formMethods={formMethods} crudType={crudType} />
         </Grid> */}
-        <Grid size={11}>
+        <Grid size={SCENARIO_GRID.full}>
           <LrsHeaderWithDetails activityType={RC5ActivityTypeEnum.consoles} />
         </Grid>
       </>

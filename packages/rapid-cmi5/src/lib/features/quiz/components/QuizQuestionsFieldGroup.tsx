@@ -1,10 +1,10 @@
 import { useEffect, useMemo } from 'react';
-import { toTitleCase } from '../rapidcmi5_mdx/editors/forms/formUtils';
+import { toTitleCase } from '../../../shared/forms/formUtils';
 import { useWatch } from 'react-hook-form';
 
 /* MUI */
 import Grid from '@mui/material/Grid2';
-import { Box, MenuItem, Stack, Tooltip } from '@mui/material';
+import { Box, MenuItem, Stack } from '@mui/material';
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import {
   SlideTypeEnum,
@@ -264,7 +264,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           />
         </Box>
       )}
-   
+
       <Grid size={3}>
         <FormControlSelectField
           control={control}
@@ -284,7 +284,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           ))}
         </FormControlSelectField>
       </Grid>
-      <Grid size={3} >
+      <Grid size={3}>
         <FormControlSelectField
           control={control}
           name={`${indexedArrayField}.typeAttributes.grading`}
@@ -329,7 +329,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
             <ButtonInfoField message="Adding questions to the Quiz Bank allows you to reuse them in future quizzes, lessons, and courses." />
           </Stack>
         </Grid>
-      )} 
+      )}
     </Grid>
   );
 }

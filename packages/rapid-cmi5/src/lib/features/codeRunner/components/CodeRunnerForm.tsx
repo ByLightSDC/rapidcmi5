@@ -1,11 +1,10 @@
 import { UseFormReturn } from 'react-hook-form';
-import { toTitleCase } from './formUtils';
+import { toTitleCase } from '../../../shared/forms/formUtils';
 import Grid from '@mui/material/Grid2';
 import MenuItem from '@mui/material/MenuItem';
 import * as yup from 'yup';
 
 import { Alert } from '@mui/material';
-import { KSATsFieldGroup } from '../components/KSATsFieldGroup';
 import {
   CodeRunnerContent,
   moveOnCriteriaOptions,
@@ -23,7 +22,8 @@ import {
   getErrorMessage,
   useCodeRunnerApi,
 } from '@rapid-cmi5/ui';
-import { featureFlagShouldShowKSATs } from '../../../../featureFlags';
+import { featureFlagShouldShowKSATs } from '../../../featureFlags';
+import { KSATsFieldGroup } from '../../ksats/components/KSATsFieldGroup';
 
 export const CodeRunnerForm = ({
   contextMenu,

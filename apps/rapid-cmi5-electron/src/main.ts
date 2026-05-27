@@ -796,7 +796,6 @@ ipcMain.handle('userSettingsApi:removeCert', (_e, id: string) => {
 ipcMain.handle(
   'api:request',
   async (_event, { url, method, headers, body }) => {
-    console.log('proxy, url', url);
     const response = await net.fetch(url, { method, headers, body });
     const responseHeaders: Record<string, string> = {};
     response.headers.forEach((value, key) => {
