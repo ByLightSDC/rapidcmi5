@@ -443,12 +443,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
               ) {
                 return (
                   <Tab
-                    //force dark theme styling in RC5Player since CMI5 player does not support theme switching
-                    sx={
-                      readOnly
-                        ? { ...darkTab, borderRadius: 0 }
-                        : { borderRadius: 0 }
-                    }
+                    sx={{ borderRadius: 0 }}
                     label={item.attributes?.title}
                     {...a11yProps(index)}
                     key={index}

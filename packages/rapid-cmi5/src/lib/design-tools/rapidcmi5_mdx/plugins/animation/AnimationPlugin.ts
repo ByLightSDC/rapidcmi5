@@ -55,7 +55,12 @@ export const animationPlugin = realmPlugin<AnimationPluginParams>({
 
     // Add components first
     realm.pubIn({
-      [addComposerChild$]: [AnimationDrawer, AnimationResolver, BlockLibraryDrawer, LessonStyleDrawer],
+      [addComposerChild$]: [
+        AnimationDrawer,
+        AnimationResolver,
+        BlockLibraryDrawer,
+        LessonStyleDrawer,
+      ],
       [getMarkdownFn$]: params?.getMarkdown ?? null,
       [setMarkdownFn$]: params?.setMarkdown ?? null,
       [currentSlideIndex$]: slideIndex,
@@ -174,6 +179,30 @@ export const animationPlugin = realmPlugin<AnimationPluginParams>({
       debugLog(
         '[AnimationPlugin] update() incoming animations identical to current; skipping setAnimations$',
         undefined,
+        undefined,
+        'plugin',
+      );
+    } else if (
+      // GUARD: refuse to regress. MDXEditor's realm can invoke update() with a
+      // stale `initialAnimations` snapshot captured at the previous render —
+      // which would clobber a freshly-added animation. If the
+      // incoming payload is missing any directiveId currently in the cell,
+      // treat it as a stale params snapshot and skip the publish. Legitimate
+      // deletes flow through deleteAnimation$ directly, never through update().
+      currentResolved.some(
+        (cur) =>
+          cur.directiveId &&
+          !incoming.some((inc) => inc.directiveId === cur.directiveId),
+      )
+    ) {
+      debugLog(
+        '[AnimationPlugin] update() skipping STALE setAnimations$ (would drop existing directiveIds)',
+        {
+          currentCount: currentResolved.length,
+          incomingCount: incoming.length,
+          currentIds: currentResolved.map((a) => a.directiveId),
+          incomingIds: incoming.map((a) => a.directiveId),
+        },
         undefined,
         'plugin',
       );

@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
   DirectiveEditorProps,
   useCellValue,
@@ -10,10 +16,13 @@ import {
   Box,
   IconButton,
   Stack,
+  ThemeProvider,
   Tooltip,
   Typography,
   useTheme,
 } from '@mui/material';
+
+import { deepmerge } from '@mui/utils';
 
 import { CodeRunnerForm } from '../../../../features/codeRunner/components/CodeRunnerForm';
 
@@ -48,6 +57,8 @@ import {
   BlockAppearanceForm,
   ActivityDirectiveNode,
   InsertLineReturnButton,
+  darkTheme,
+  config,
 } from '@rapid-cmi5/ui';
 
 import ScenarioMock from './ScenarioMock';
@@ -76,11 +87,13 @@ export const ActivityEditor: React.FC<
   const updateMdastNode = useMdastNodeUpdater();
   const isEditable = parentEditor.isEditable();
   const isPlayback = useCellValue(editorInPlayback$);
+
   const auProps = useAuContext();
 
   const { userAuth, apiUrls } = useRapidCmi5Opts();
 
-  const muiTheme = useTheme();
+  const muiTheme: any = useTheme();
+
   const { lessonTheme } = useContext(LessonThemeContext);
   const {
     blockAppearanceOpen,
@@ -96,7 +109,9 @@ export const ActivityEditor: React.FC<
     mdastNode?.attributes?.contentWidth,
     maxFormWidths.downloadsEditor,
     muiTheme.palette.background.paper,
+    muiTheme.nav.tabPanel,
     isPlayback,
+    false,
   );
 
   /**
@@ -285,147 +300,148 @@ export const ActivityEditor: React.FC<
           width: '100%',
         }}
       >
-        {name === 'scenario' && fromJson && (
-          <>
-            {isPlayback && (
-              <ScenarioMock
-                activity={RC5ActivityTypeEnum.scenario}
-                scenarioName={fromJson?.name}
-                innerSx={innerActivitySx}
-                outerSx={outerSx}
-                outerStyle={outerStyle}
-              />
-            )}
-            {!isPlayback && (
-              <ScenarioForm
-                contextMenu={contextMenu}
-                crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
-                defaultFormData={fromJson}
-                innerSx={innerActivitySx}
-                outerSx={outerSx}
-                outerStyle={outerStyle}
-                onSave={onSave}
-              />
-            )}
-          </>
-        )}
-        {name === 'quiz' && fromJson && (
-          <>
-            {isPlayback && (
-              <AuQuiz
-                auProps={auProps}
-                content={fromJson as QuizContent}
-                innerSx={innerActivitySx}
-                outerSx={outerSx}
-                outerStyle={outerStyle}
-              />
-            )}
-            {!isPlayback && (
-              <QuizForm
-                activityKind={RC5ActivityTypeEnum.quiz}
-                contextMenu={contextMenu}
-                crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
-                defaultFormData={fromJson}
-                innerSx={innerSx}
-                outerSx={outerSx}
-                outerStyle={outerStyle}
-                onSave={onSave}
-              />
-            )}
-          </>
-        )}
-        {name === 'ctf' && fromJson && (
-          <>
-            {isPlayback && (
-              // eslint-disable-next-line react/jsx-no-useless-fragment
-              <>
-                {fromJson.questions.length === 0 ? (
-                  <Stack
-                    direction="column"
-                    sx={{ ...outerStyle }}
-                    {...outerStyle}
-                  >
-                    <Box sx={{ ...innerActivitySx }}>
-                      <Typography sx={{ fontWeight: 'bold' }}>CTF</Typography>
-                      <Typography>{'CTF has no questions.'}</Typography>
-                    </Box>
-                  </Stack>
-                ) : (
-                  <AuCTF
-                    auProps={auProps}
-                    content={fromJson as CTFContent}
-                    innerSx={innerActivitySx}
-                    outerSx={outerSx}
-                    outerStyle={outerStyle}
-                  />
-                )}
-              </>
-            )}
-            {!isPlayback && (
-              <QuizForm
-                activityKind={RC5ActivityTypeEnum.ctf}
-                contextMenu={contextMenu}
-                crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
-                defaultFormData={fromJson}
-                innerSx={innerActivitySx}
-                outerSx={outerSx}
-                outerStyle={outerStyle}
-                onSave={onSave}
-              />
-            )}
-          </>
-        )}
-        {name === 'codeRunner' && fromJson && (
-          <>
-            {isPlayback && (
-              <CodeRunner
-                auProps={auProps}
-                content={fromJson as CodeRunnerContent}
-                authType="Bearer"
-                token={userAuth?.token}
-                url={apiUrls?.codeRunnerUrl}
-                innerSx={innerActivitySx}
-                outerSx={outerSx}
-                outerStyle={outerStyle}
-              />
-            )}
-            {!isPlayback && (
-              <CodeRunnerForm
-                contextMenu={contextMenu}
-                crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
-                defaultFormData={fromJson}
-                innerSx={innerActivitySx}
-                outerSx={outerSx}
-                outerStyle={outerStyle}
-                onSave={onSave}
-              />
-            )}
-          </>
-        )}
-        {name === 'consoles' && fromJson && (
-          <>
-            {isPlayback && (
-              <ScenarioMock
-                activity={RC5ActivityTypeEnum.consoles}
-                scenarioName={fromJson?.name}
-                innerSx={innerActivitySx}
-                outerSx={outerSx}
-                outerStyle={outerStyle}
-              />
-            )}
-            {!isPlayback && (
-              <TeamConsolesForm
-                contextMenu={contextMenu}
-                crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
-                defaultFormData={fromJson}
-                innerSx={innerActivitySx}
-                outerSx={outerSx}
-                outerStyle={outerStyle}
-                onSave={onSave}
-              />
-            )}
-          </>
-        )}
+        <ActivityThemeWrapper isPlayback={isPlayback}>
+          {name === 'scenario' && fromJson && (
+            <>
+              {isPlayback && (
+                <ScenarioMock
+                  activity={RC5ActivityTypeEnum.scenario}
+                  scenarioName={fromJson?.name}
+                  innerSx={innerActivitySx}
+                  outerSx={outerSx}
+                  outerStyle={outerStyle}
+                />
+              )}
+              {!isPlayback && (
+                <ScenarioForm
+                  contextMenu={contextMenu}
+                  crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
+                  defaultFormData={fromJson}
+                  innerSx={innerActivitySx}
+                  outerSx={outerSx}
+                  outerStyle={outerStyle}
+                  onSave={onSave}
+                />
+              )}
+            </>
+          )}
+          {name === 'quiz' && fromJson && (
+            <>
+              {isPlayback && (
+                <AuQuiz
+                  auProps={auProps}
+                  content={fromJson as QuizContent}
+                  innerSx={innerActivitySx}
+                  outerSx={outerSx}
+                  outerStyle={outerStyle}
+                />
+              )}
+              {!isPlayback && (
+                <QuizForm
+                  activityKind={RC5ActivityTypeEnum.quiz}
+                  contextMenu={contextMenu}
+                  crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
+                  defaultFormData={fromJson}
+                  innerSx={innerSx}
+                  outerSx={outerSx}
+                  outerStyle={outerStyle}
+                  onSave={onSave}
+                />
+              )}
+            </>
+          )}
+          {name === 'ctf' && fromJson && (
+            <>
+              {isPlayback && (
+                <>
+                  {fromJson.questions.length === 0 ? (
+                    <Stack
+                      direction="column"
+                      sx={{ ...outerStyle }}
+                      {...outerStyle}
+                    >
+                      <Box sx={{ ...innerActivitySx }}>
+                        <Typography sx={{ fontWeight: 'bold' }}>CTF</Typography>
+                        <Typography>{'CTF has no questions.'}</Typography>
+                      </Box>
+                    </Stack>
+                  ) : (
+                    <AuCTF
+                      auProps={auProps}
+                      content={fromJson as CTFContent}
+                      innerSx={innerActivitySx}
+                      outerSx={outerSx}
+                      outerStyle={outerStyle}
+                    />
+                  )}
+                </>
+              )}
+              {!isPlayback && (
+                <QuizForm
+                  activityKind={RC5ActivityTypeEnum.ctf}
+                  contextMenu={contextMenu}
+                  crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
+                  defaultFormData={fromJson}
+                  innerSx={innerActivitySx}
+                  outerSx={outerSx}
+                  outerStyle={outerStyle}
+                  onSave={onSave}
+                />
+              )}
+            </>
+          )}
+          {name === 'codeRunner' && fromJson && (
+            <>
+              {isPlayback && (
+                <CodeRunner
+                  auProps={auProps}
+                  content={fromJson as CodeRunnerContent}
+                  authType="Bearer"
+                  token={userAuth?.token}
+                  url={apiUrls?.codeRunnerUrl}
+                  innerSx={innerActivitySx}
+                  outerSx={outerSx}
+                  outerStyle={outerStyle}
+                />
+              )}
+              {!isPlayback && (
+                <CodeRunnerForm
+                  contextMenu={contextMenu}
+                  crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
+                  defaultFormData={fromJson}
+                  innerSx={innerActivitySx}
+                  outerSx={outerSx}
+                  outerStyle={outerStyle}
+                  onSave={onSave}
+                />
+              )}
+            </>
+          )}
+          {name === 'consoles' && fromJson && (
+            <>
+              {isPlayback && (
+                <ScenarioMock
+                  activity={RC5ActivityTypeEnum.consoles}
+                  scenarioName={fromJson?.name}
+                  innerSx={innerActivitySx}
+                  outerSx={outerSx}
+                  outerStyle={outerStyle}
+                />
+              )}
+              {!isPlayback && (
+                <TeamConsolesForm
+                  contextMenu={contextMenu}
+                  crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
+                  defaultFormData={fromJson}
+                  innerSx={innerActivitySx}
+                  outerSx={outerSx}
+                  outerStyle={outerStyle}
+                  onSave={onSave}
+                />
+              )}
+            </>
+          )}
+        </ActivityThemeWrapper>
         {name === 'download' && fromJson && (
           <DownloadFilesForm
             contextMenu={contextMenu}
@@ -454,4 +470,26 @@ export const ActivityEditor: React.FC<
       />
     </>
   );
+};
+
+/**
+ * update theme with overrides from cfg file
+ */
+
+const ActivityThemeWrapper = ({
+  children,
+  isPlayback,
+}: {
+  children: JSX.Element | JSX.Element[];
+  isPlayback: boolean;
+}) => {
+  if (isPlayback) {
+    const overriddenTheme: any = deepmerge(darkTheme, config.THEME.DARK);
+
+    if (overriddenTheme?.palette?.info?.light) {
+      return <ThemeProvider theme={overriddenTheme}>{children}</ThemeProvider>;
+    }
+    return <>{children}</>;
+  }
+  return <>{children}</>;
 };

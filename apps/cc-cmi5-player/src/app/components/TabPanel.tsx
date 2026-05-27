@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
+
+import { Check } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   auJsonSel,
@@ -13,8 +13,11 @@ import {
 } from '../redux/auReducer';
 import { activeTabSel, setActiveTab } from '../redux/navigationReducer';
 import ProgressBar from './ProgressBar';
-import { Box, Stack, Typography, useTheme } from '@mui/material';
 import { CustomTheme } from '../styles/createPalette';
+import { Box, Divider, Stack, Typography, useTheme } from '@mui/material';
+import { useTabStyles } from './useTabStyles';
+import CloseIcon from '@mui/icons-material/Close';
+
 export default function TabPanel() {
   const auJson = useSelector(auJsonSel);
   const auLogoDark = useSelector(auLogoDarkSel);
@@ -26,12 +29,16 @@ export default function TabPanel() {
   const courseAUProgress = useSelector(courseAUProgressSel);
   const currentTheme: CustomTheme = useTheme();
 
+  // Track whether the Exit tab in the list is currently visible in the scroll container.
+  // Only show the pinned Exit button at the bottom when the real one has scrolled out of view.
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const exitTabRef = useRef<HTMLDivElement>(null);
+  const [isExitTabVisible, setIsExitTabVisible] = useState(true);
+
   const currentLogo = useMemo(() => {
-    if (currentTheme.palette.mode === 'light') {
-      return auLogoLight;
-    }
     return auLogoDark;
-  }, [currentTheme.palette.mode, auLogoDark, auLogoLight]);
+  }, [currentTheme.palette.mode, auLogoDark]);
+  const iconDimension = '20px';
 
   const tabClicked = (_: React.SyntheticEvent, newValue: number) => {
     dispatch(setActiveTab(newValue));
@@ -56,51 +63,8 @@ export default function TabPanel() {
       passed: slideStatus?.passed || false,
       failed: slideStatus?.failed || false,
     };
-
+ 
     return status;
-  };
-
-  // Helper function to get slide background color based on active status
-  const getSlideBackgroundColor = (slideIndex: number) => {
-    if (slideIndex === activeTab) {
-      return 'rgba(0, 123, 255, 0.25)'; // Strong blue for active slide only
-    }
-    return ''; // No background for inactive slides
-  };
-
-  // Helper function to get the color for the active tab indicator (overrides MUI default)
-  const getActiveTabIndicatorColor = () => {
-    const status = getSlideStatus(activeTab);
-
-    let color;
-    if (status.failed) {
-      color = currentTheme.palette.error.main; // Red indicator for failed active slide
-    } else if (status.passed && !status.failed) {
-      color = currentTheme.palette.success.main; // Green indicator for passed active slide (MUI success color)
-    } else {
-      color = '#007bff'; // Blue indicator for active slide with no status
-    }
-
-    return color;
-  };
-
-  // Helper function to get right border for each slide's pass/fail status
-  const getSlideRightBorder = (slideIndex: number) => {
-    const status = getSlideStatus(slideIndex);
-
-    let border;
-    // Don't add border to active slide (MUI indicator handles it)
-    if (slideIndex === activeTab) {
-      border = 'none'; // Let MUI indicator handle active slide
-    } else if (status.failed) {
-      border = `4px solid ${currentTheme.palette.error.main}`; // Red right border for failed slides
-    } else if (status.passed && !status.failed) {
-      border = `4px solid ${currentTheme.palette.success.main} `; // #4caf50 Green right border for passed slides (MUI success color)
-    } else {
-      border = 'none'; // No border for inactive, incomplete slides
-    }
-
-    return border;
   };
 
   // Helper function to get status icon for accessibility
@@ -109,37 +73,60 @@ export default function TabPanel() {
 
     if (status.failed) {
       return (
-        <CancelIcon
+        <Box
           sx={{
-            color: currentTheme.palette.error.main,
-            fontSize: '20px',
-            height: '20px', // Fixed height
-            width: '20px', // Fixed width
+            borderRadius: '12px',
+            height: iconDimension,
+            width: iconDimension,
+            backgroundColor: currentTheme.nav.deselectedTabText,
           }}
-        />
+        >
+          <CloseIcon
+            sx={{
+              color: currentTheme.nav.shouldColorTabIndicator
+                ? currentTheme.palette.error.main
+                : currentTheme.palette.primary.contrastText,
+              fontSize: iconDimension,
+              height: iconDimension,
+              width: iconDimension,
+            }}
+          />
+        </Box>
       );
     } else if (status.passed && !status.failed) {
       return (
-        <CheckCircleIcon
+        <Box
           sx={{
-            color: currentTheme.palette.success.main,
-            fontSize: '20px',
-            height: '20px', // Fixed height
-            width: '20px', // Fixed width
+            borderRadius: '12px',
+            height: iconDimension,
+            width: iconDimension,
+            backgroundColor: currentTheme.nav.deselectedTabText,
           }}
-        />
+        >
+          <Check
+            style={{
+              color: currentTheme.nav.shouldColorTabIndicator
+                ? currentTheme.palette.success.main
+                : currentTheme.palette.primary.contrastText,
+              fontSize: iconDimension,
+              height: iconDimension,
+              width: iconDimension,
+            }}
+          />
+        </Box>
       );
     }
     return null; // No icon for incomplete slides
   };
 
-  const isExitActive = activeTab === auJson?.slides?.length;
+  const {
+    baseTabStyle,
+    baseTabsStyle,
+    selectedTextIconColor,
+    deselectedTextIconColor,
+  } = useTabStyles(activeTab, getSlideStatus);
 
-  // Track whether the Exit tab in the list is currently visible in the scroll container.
-  // Only show the pinned Exit button at the bottom when the real one has scrolled out of view.
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const exitTabRef = useRef<HTMLDivElement>(null);
-  const [isExitTabVisible, setIsExitTabVisible] = useState(true);
+  const isExitActive = activeTab === auJson?.slides?.length;
 
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
@@ -154,6 +141,10 @@ export default function TabPanel() {
     return () => observer.disconnect();
   }, [auJson?.slides?.length]);
 
+  useEffect(() => {
+    //REF
+  }, [currentTheme.palette.mode]);
+
   return (
     <Box
       sx={{
@@ -161,7 +152,7 @@ export default function TabPanel() {
         width: '100%',
         height: '100vh',
         //left panel background
-        bgcolor: 'background.default',
+        bgcolor: currentTheme.nav.tabPanel,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -176,6 +167,7 @@ export default function TabPanel() {
           alignContent: 'center',
           borderRadius: 1,
           flexShrink: 0,
+          marginRight: '34px',
         }}
       >
         {currentLogo && (
@@ -190,17 +182,24 @@ export default function TabPanel() {
           />
         )}
       </Box>
-
       {/* Progress bar — fixed, never scrolls */}
       <Box sx={{ flexShrink: 0, width: '100%' }}>
-        <ProgressBar />
+        <ProgressBar
+          fillColor={currentTheme.nav.progressBarFill}
+          sxProps={{
+            borderRadius: 5,
+            height: 10,
+            backgroundColor: currentTheme.nav.progressBar,
+          }}
+          textProps={{ color: currentTheme.nav.deselectedTabText }}
+        />
       </Box>
-
       {/* Slide list — scrolls when there are many slides */}
       <Box
         ref={scrollContainerRef}
         sx={{ flex: 1, minHeight: 0, width: '100%', overflowY: 'auto' }}
       >
+        <Divider />
         <Tabs
           orientation="vertical"
           variant="scrollable"
@@ -208,53 +207,12 @@ export default function TabPanel() {
           onChange={tabClicked}
           scrollButtons={false}
           aria-label="Slide Navigation Menu"
-          sx={{
-            width: '100%',
-            //TABS background color
-            bgcolor: 'background.default',
-            color: 'white',
-            '& .MuiTabs-indicator': {
-              backgroundColor: getActiveTabIndicatorColor(),
-              width: '4px',
-            },
-            '& .MuiTab-root': {
-              minHeight: '48px',
-              padding: '12px 16px',
-              textTransform: 'none',
-              fontSize: '14px',
-              fontWeight: 'normal',
-              lineHeight: '1.2',
-              backgroundColor: 'background.default',
-              borderStyle: 'solid',
-              borderColor: currentTheme.input.outlineColor,
-              borderRadius: 0,
-              borderWidth: 1,
-            },
-            '& .MuiTab-root.Mui-selected': {
-              fontWeight: 'bold',
-              backgroundColor: '#3C59A266',
-              borderStyle: 'none',
-              borderColor: '#3C59A266',
-              borderRadius: 0,
-              borderWidth: 1,
-            },
-          }}
+          sx={baseTabsStyle}
           textColor="inherit"
         >
           {auJson?.slides?.map((slide, index) => (
             <Tab
-              sx={{
-                width: '100%',
-                backgroundColor: getSlideBackgroundColor(index),
-                borderRight: getSlideRightBorder(index),
-                position: 'relative',
-                paddingRight: '4px',
-                minHeight: '48px',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textAlign: 'center',
-                display: 'flex',
-              }}
+              sx={baseTabStyle}
               key={index}
               label={
                 <Stack
@@ -269,8 +227,17 @@ export default function TabPanel() {
                 >
                   <Typography
                     component="span"
-                    color="text.primary"
-                    sx={{ flexGrow: 1, fontSize: '16px', fontWeight: 'bold', lineHeight:1.1 }}
+                    color={
+                      index === activeTab
+                        ? selectedTextIconColor
+                        : deselectedTextIconColor
+                    }
+                    sx={{
+                      flexGrow: 1,
+                      fontSize: '16px',
+                      fontWeight: 'bold',
+                      lineHeight: 1.1,
+                    }}
                     align="center"
                   >
                     {slide.slideTitle}
@@ -284,56 +251,34 @@ export default function TabPanel() {
           <Tab
             ref={exitTabRef}
             value={auJson?.slides?.length ?? 0}
-            sx={{
-              width: '100%',
-              backgroundColor: isExitActive ? 'rgba(0, 123, 255, 0.25)' : '',
-              position: 'relative',
-              minHeight: '48px',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'center',
-              display: 'flex',
-            }}
+            sx={baseTabStyle}
             label={
-              <Typography variant="h5" color="text.primary" align="center">
+              <Typography
+                variant="h5"
+                color={
+                  isExitActive ? selectedTextIconColor : deselectedTextIconColor
+                }
+                align="center"
+              >
                 Exit
               </Typography>
             }
           />
         </Tabs>
       </Box>
-
       {/* Pinned Exit — only appears when the real Exit tab has scrolled out of view */}
       {!isExitTabVisible && (
         <Box
           onClick={() => dispatch(setActiveTab(auJson?.slides?.length ?? 0))}
-          sx={{
-            flexShrink: 0,
-            width: '100%',
-            height: '48px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            bgcolor: isExitActive ? '#3C59A266' : 'background.default',
-            borderTop: `1px solid ${currentTheme.input.outlineColor}`,
-            borderLeft: isExitActive
-              ? '4px solid #007bff'
-              : '4px solid transparent',
-            '&:hover': {
-              bgcolor: isExitActive ? '#3C59A266' : 'rgba(0, 123, 255, 0.08)',
-            },
-          }}
+          sx={{ ...baseTabStyle, cursor: 'pointer' }}
         >
           {/* Change typography to mimic tabs */}
           <Typography
             variant="h5"
-            color="text.primary"
             align="center"
-            sx={{
-              opacity: isExitActive ? 1 : 0.6,
-              transition: 'opacity 0.2s',
-            }}
+            color={
+              isExitActive ? selectedTextIconColor : deselectedTextIconColor
+            }
           >
             Exit
           </Typography>

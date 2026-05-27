@@ -82,7 +82,7 @@ function ScenarioMock({
       id="scenario-activity"
       className="paper-activity"
       sx={{
-        backgroundColor: 'background.default',
+        //REF Background backgroundColor: 'background.default',
         ...outerSx,
       }}
       {...outerStyle}

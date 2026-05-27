@@ -134,9 +134,9 @@ function SelectAll({
       {isGraded && (
         <Typography
           align="center"
-          sx={{ width: '100%' }}
+          sx={{ width: '100%', paddingRight: '24px', textAlign: 'center' }} //24 for magnifying glass icon
           variant="body2"
-          color="palette.grey.50"
+          color="text.primary"
         >
           {isCorrect ? (
             'Your Answer is Correct'

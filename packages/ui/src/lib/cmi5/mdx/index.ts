@@ -1,3 +1,5 @@
+import './animation/styles/animations.css';
+
 export * from './animation/engine/AnimationEngine';
 export * from './animation/types/Animation.types';
 

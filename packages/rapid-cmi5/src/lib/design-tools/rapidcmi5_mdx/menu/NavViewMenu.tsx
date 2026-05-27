@@ -13,7 +13,7 @@ import { useRC5Prompts } from '../modals/useRC5Prompts';
 import { RC5Context } from '../contexts/RC5Context';
 
 /**
- * Icons
+ * Icons https://lucide.dev/icons/
  */
 import {
   ArrowLeft,

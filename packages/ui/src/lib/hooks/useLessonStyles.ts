@@ -24,6 +24,7 @@ import { darken, lighten, SxProps, useTheme } from '@mui/material';
 import { useGutterRight } from '../cmi5/mdx/plugins/shared/useGutterRight';
 import { useSignalEffect } from '@preact/signals-react';
 import { maxSlideWidth$ } from '../cmi5/mdx';
+import { readOnly$, useCellValue } from '@mdxeditor/editor';
 
 type UseLessonStylesReturn = {
   blockAppearanceOpen: boolean;
@@ -45,10 +46,12 @@ export const useLessonStyles = (
   lessonTheme: LessonTheme | undefined,
   overrideContentWidthStr?: ContentWidthEnum,
   maxWidth?: number, //FUTURE
-  backgroundColor?: string,
+  bgColor?: string,
+  activityBackgroundColor?: string,
   isPlayback?: boolean,
+  isReadonly?: boolean,
 ): UseLessonStylesReturn => {
-  const muiTheme = useTheme();
+  const muiTheme: any = useTheme();
   const activityAlign =
     lessonTheme?.defaultActivityAlignment || DefaultAlignmentEnum.Center;
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
@@ -57,7 +60,7 @@ export const useLessonStyles = (
   >(undefined);
   // useMemo doesnt work with signals, mirror signal with state
   const [maxSlideWidth, setMaxSlideWidth] = useState<number | null>(null);
-
+  const isReadOnly = useCellValue(readOnly$);
   /* Lesson Theme */
   const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
   const lessonContentWidthSetting = resolvedThemeCSS?.maxWidth;
@@ -121,9 +124,9 @@ export const useLessonStyles = (
   // clipPath 0 top avoids overdrawing elements above; negative bottom absorbs the
   // trailing <p>'s margin-top so the band fills flush to the next block.
   const outerSx: SxProps = {
-    boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-    backgroundColor,
-    clipPath: backgroundColor ? `inset(0 -100vmax 0)` : undefined,
+    boxShadow: `0 0 0 100vmax ${bgColor}`,
+    bgColor,
+    clipPath: bgColor ? `inset(0 -100vmax 0)` : undefined,
     paddingTop: halfBlockPadding,
     paddingBottom: halfBlockPadding,
   };
@@ -141,17 +144,30 @@ export const useLessonStyles = (
       return lighten(muiTheme.palette.background.paper, 0.1);
     }
     return darken(muiTheme.palette.background.paper, 0.1);
-  }, [muiTheme.palette.mode]);
+  }, [muiTheme.palette.mode, muiTheme.palette.background.paper]);
 
-  const innerActivitySx = {
-    ...innerSx,
-    boxShadow: 3,
-    borderRadius: '7px',
-    borderColor: borderColor,
-    padding: 4,
-    borderStyle: 'solid',
-    borderWidth: '2px',
-  };
+  const innerActivitySx = useMemo(() => {
+    return {
+      ...innerSx,
+      boxShadow: 3,
+      borderRadius: '10px',
+      borderColor: borderColor,
+      padding: 4,
+      borderStyle: 'solid',
+      borderWidth: '2px',
+      backgroundColor:
+        isPlayback || isReadOnly
+          ? activityBackgroundColor
+          : 'background.default',
+    };
+  }, [
+    borderColor,
+    innerSx,
+    isPlayback,
+    isReadOnly,
+    activityBackgroundColor,
+    muiTheme.nav.tabPanel,
+  ]);
 
   useEffect(() => {
     //not sure if this is needed

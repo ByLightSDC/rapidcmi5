@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { createTheme } from "@mui/system";
+import { createTheme } from '@mui/material/styles';
 
 export const primaryDateStyleDark = 'MM/dd/yyyy';
 export const primaryTimeStyleDark = 'H:mm';
@@ -17,7 +17,7 @@ const mainColor = '#6F96FF'; //icons, button fills
 const hoverMainColor = '#8cadfa'; //button hover
 
 export const darkTheme = createTheme({
-   palette: {
+  palette: {
     error: {
       main: '#fc5451', // textfield error and helper text
     },
@@ -102,6 +102,18 @@ export const darkTheme = createTheme({
     iconSelected: '#FFC840',
     border: '#FFC840d0',
     borderSelected: '#FFC840',
+    currentTabIndicator: '#6F96FF', 
+    deselectedTab: '#3C59A2', //80%
+    deselectedTabText: '#ffffff', 
+    deselectedTabBorder: '#2A3F75', //60%
+    selectedTab: '#2A3F75',
+    selectedTabBorder: '#4a6bc0',
+    selectedTabText: '#ffffff',
+    shouldColorTabIndicator: true,
+    progressBar: '#4a4a4a',
+    progressBarFill: '#6F96FF',
+    tabHover: '#4a6bc0',
+    tabPanel: '#1a1a1a',
   },
   typography: {
     fontFamily: [

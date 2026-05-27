@@ -1,4 +1,3 @@
-
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
 import { Typography } from '@mui/material';
@@ -120,9 +119,9 @@ function QuestionMultipleChoice({
       {isGraded && (
         <Typography
           align="center"
-          sx={{ width: '100%' }}
+          sx={{ width: '100%', paddingRight: '24px', textAlign: 'center' }}
           variant="body2"
-          color="palette.grey.50"
+          color="text.primary"
         >
           {isCorrect
             ? 'Your Answer is Correct'

@@ -184,12 +184,12 @@ function ScenarioConsoles({
           </Typography>
         )}
         {content.introContent && <p>{content.introContent}</p>}
-        <Typography variant="caption">Scenario</Typography>
+        <Typography color="text.primary" variant="caption">Scenario</Typography>
 
         {(!rangeDataError || numRangeDataAttempts < numRetries) &&
           (!rangeConsoleDataError ||
             numRangeConsoleDataAttempts < numRetries) &&
-          !scenarioId && <p>Loading...</p>}
+          !scenarioId && <Typography color="text.primary">Loading...</Typography>}
 
         {autoGraders && (
           // This is needed so that we can get autograder completion data
