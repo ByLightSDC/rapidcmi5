@@ -16,7 +16,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useSelector, useDispatch } from 'react-redux';
 import { useContext, useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
-import { ButtonMinorUi, modal, setModal } from '@rapid-cmi5/ui';
+import { ButtonMinorUi, modal, setModal, useRangeApi } from '@rapid-cmi5/ui';
 import { ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
 import {
   courseDataCache,
@@ -33,7 +33,7 @@ import {
   DEFAULT_RETURN_URL,
   useLaunchInPlayer,
 } from './useLaunchInPlayer';
-import { ScenarioSelectionModal } from '../../../../../features/scenarios/ScenarioSelectionModal';
+import { ScenarioSelectionModal } from '../../../../../features/scenarios/components/ScenarioSelectionModal';
 
 const DEFAULT_PLAYER_URL = 'http://localhost:4201';
 // Electron IPC fallback: path relative to repo root
@@ -49,6 +49,7 @@ const DEFAULT_LMS_API_BASE =
 export function TestInPlayerDialog() {
   const dispatch = useDispatch();
   const { currentCourse, downloadCmi5Player } = useContext(GitContext);
+  const { isRangeEnabled } = useRangeApi();
   const repoAccessObject = useSelector(currentRepoAccessObjectSel);
   const modalObj = useSelector(modal);
   const courseData = useSelector(courseDataCache);
@@ -321,7 +322,7 @@ export function TestInPlayerDialog() {
                 </Box>
               )}
 
-              {useRealLaunchLink && (
+              {useRealLaunchLink && isRangeEnabled && (
                 <Box>
                   <Typography
                     variant="caption"

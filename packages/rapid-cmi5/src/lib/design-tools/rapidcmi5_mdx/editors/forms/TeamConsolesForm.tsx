@@ -26,9 +26,9 @@ import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 
 import LrsHeaderWithDetails from './LrsStatementHelper';
 
-import { ScenarioSelectionModal } from '../../../../features/scenarios/ScenarioSelectionModal';
-import ManualScenarioForm from '../../../../features/scenarios/ManualScenarioForm';
-import { ScenarioStatusCard } from '../../../../features/scenarios/ScenarioStatusCard';
+import { ScenarioSelectionModal } from '../../../../features/scenarios/components/ScenarioSelectionModal';
+import ManualScenarioForm from '../../../../features/scenarios/components/ManualScenarioForm';
+import { ScenarioStatusCard } from '../../../../features/scenarios/components/ScenarioStatusCard';
 import { useState } from 'react';
 
 export const TeamConsolesForm = ({

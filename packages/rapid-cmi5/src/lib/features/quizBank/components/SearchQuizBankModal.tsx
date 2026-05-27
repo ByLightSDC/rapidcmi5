@@ -4,7 +4,7 @@ import {
   QuestionBankApi,
   RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
-import { useRapidCmi5Opts } from '../../design-tools/course-builder/GitViewer/session/RapidCmi5OptsContext';
+import { useRapidCmi5Opts } from '../../../design-tools/course-builder/GitViewer/session/RapidCmi5OptsContext';
 
 interface QuizBankSearchFormProps {
   closeModal: () => void;

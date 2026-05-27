@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CourseAU, ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
-import { debugLogError, useRangeApi, useRangeClient } from '@rapid-cmi5/ui';
+import { debugLogError, useRangeApi } from '@rapid-cmi5/ui';
 import {
   fetchLaunchUrl,
   randomUuid,
@@ -152,7 +152,10 @@ export function useLaunchInPlayer() {
               token: lmsToken.trim(),
             });
 
-            if (!isRangeEnabled) throw Error('Range client was not enabled');
+            if (!isRangeEnabled)
+              throw Error(
+                'Range API was not enabled. Invalid attempt to create mapping.',
+              );
 
             await createAuMapping(auId, selectedScenario.uuid);
           } catch (err: unknown) {

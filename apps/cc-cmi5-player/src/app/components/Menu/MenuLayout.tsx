@@ -82,6 +82,7 @@ export default function MenuLayout() {
     <ApiProviders
       token={cmi5Instance.getAuthToken()}
       rangeUrl={config.DEVOPS_API_URL}
+      codeRunnerUrl={config.DEVOPS_API_URL}
       cmi5Enabled={true}
     >
       <Drawer

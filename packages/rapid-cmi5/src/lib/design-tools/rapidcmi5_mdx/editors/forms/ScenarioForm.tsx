@@ -33,9 +33,9 @@ import { toTitleCase } from './formUtils';
 import { useEffect, useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 
-import { ScenarioSelectionModal } from '../../../../features/scenarios/ScenarioSelectionModal';
-import ManualScenarioForm from '../../../../features/scenarios/ManualScenarioForm';
-import { ScenarioStatusCard } from '../../../../features/scenarios/ScenarioStatusCard';
+import { ScenarioSelectionModal } from '../../../../features/scenarios/components/ScenarioSelectionModal';
+import ManualScenarioForm from '../../../../features/scenarios/components/ManualScenarioForm';
+import { ScenarioStatusCard } from '../../../../features/scenarios/components/ScenarioStatusCard';
 
 export const ScenarioForm = ({
   contextMenu,

@@ -2,7 +2,7 @@
 import { useCallback } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-import { config, useRangeApi, useRangeClient } from '@rapid-cmi5/ui';
+import { config, useRangeApi } from '@rapid-cmi5/ui';
 import { debugLog } from '@rapid-cmi5/ui';
 import { DownloadCmi5Type } from '../../CourseBuilderApiTypes';
 import {
