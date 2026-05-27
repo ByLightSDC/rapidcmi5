@@ -5,7 +5,6 @@ import {
   FormStateType,
   MiniForm,
   ModalDialog,
-  AlignmentToolbarControls,
 } from '@rapid-cmi5/ui';
 import { UseFormReturn } from 'react-hook-form';
 

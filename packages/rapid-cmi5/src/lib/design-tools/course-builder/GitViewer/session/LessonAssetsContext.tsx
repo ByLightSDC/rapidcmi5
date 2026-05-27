@@ -24,6 +24,8 @@ export const ASSET_DIRS: Record<AssetType, string> = {
   file: 'Assets/Downloads',
 };
 
+export const THEME_DIR = 'Assets/Theme';
+
 interface CurrentLessonAssetsContext {
   getAsset: (type: AssetType, fileName: string) => Promise<string | undefined>;
   uploadAsset: (
@@ -32,6 +34,11 @@ interface CurrentLessonAssetsContext {
     data: Uint8Array<ArrayBuffer>,
   ) => Promise<string>;
   getAllAssets: (type: AssetType) => Promise<string[]>;
+  getLessonLogo: (fileName: string) => Promise<string | undefined>;
+  setLessonLogo: (
+    fileName: string,
+    data: Uint8Array<ArrayBuffer>,
+  ) => Promise<string>;
   getLocalFileBlob: (
     filePath: string,
     fileType?: string,
@@ -46,6 +53,8 @@ const defaultFsAssetsContext: CurrentLessonAssetsContext = {
   getAsset: async () => undefined,
   uploadAsset: async () => '',
   getAllAssets: async () => [],
+  getLessonLogo: async () => undefined,
+  setLessonLogo: async () => '',
   getLocalFileBlob: async () => null,
   getLocalFileBlobUrl: async () => null,
 };
@@ -144,6 +153,46 @@ export const CurrentLessonAssetsContextProvider = (props: tProviderProps) => {
   };
 
   /**
+   * Looks up the lesson logo by file name within the current AU's theme
+   * folder.
+   *
+   * @param fileName - The logo's file name (not a full path).
+   * @returns The AU-relative path (e.g. `./Assets/Theme/logo.png`) if the
+   * file exists, otherwise `undefined`.
+   */
+  const getLessonLogo = async (
+    fileName: string,
+  ): Promise<string | undefined> => {
+    const { auPath, repo } = getRequiredContext();
+    const exists = await gitFs.fileExists(
+      repo,
+      join(auPath, THEME_DIR, fileName),
+    );
+    if (exists) return `./${THEME_DIR}/${fileName}`;
+    return undefined;
+  };
+
+  /**
+   * Writes a logo into the current AU's theme folder and stages it for
+   * commit.
+   *
+   * @param fileName - File name to save the logo as.
+   * @param data - Raw file bytes to write.
+   * @returns The AU-relative path to the saved logo
+   * (e.g. `./Assets/Theme/logo.png`).
+   */
+  const setLessonLogo = async (
+    fileName: string,
+    data: Uint8Array<ArrayBuffer>,
+  ): Promise<string> => {
+    const { auPath, repo } = getRequiredContext();
+    const relativePath = join(auPath, THEME_DIR, fileName);
+    await gitFs.createFile(repo, relativePath, data);
+    await stageFile(relativePath);
+    return `./${THEME_DIR}/${fileName}`;
+  };
+
+  /**
    * Reads an asset out of the current AU as a Blob. Does not cache — every
    * call re-reads from the underlying filesystem.
    *
@@ -207,6 +256,8 @@ export const CurrentLessonAssetsContextProvider = (props: tProviderProps) => {
         getAsset,
         uploadAsset,
         getAllAssets,
+        getLessonLogo,
+        setLessonLogo,
         getLocalFileBlob,
         getLocalFileBlobUrl,
       }}

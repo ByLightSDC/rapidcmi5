@@ -11,6 +11,16 @@ import Typography from '@mui/material/Typography';
 import { SxProps } from '@mui/system';
 import { ButtonModalMinorUi, ButtonModalCancelUi } from '../buttons/buttonsmodal';
 
+export const IMAGE_FILE_TYPES = [
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.gif',
+  '.webp',
+  '.svg',
+  '.avif',
+];
+
 // Choose between folder or file upload with the onFileSelected or onFolderSelected functions
 type tFileUploadProps = {
   buttonTitle?: string;
@@ -18,7 +28,7 @@ type tFileUploadProps = {
   dataCache?: File[];
   noFileSelectedMessage?: string;
   enabled?: boolean;
-  fileTypes?: string;
+  fileTypes?: string | string[];
   isUploading?: boolean;
   percentLoaded?: number;
   sxProps?: SxProps;
@@ -141,7 +151,7 @@ export function FileUpload({
               name="file"
               data-testid={testId}
               id={`${testId}-input`}
-              accept={fileTypes}
+              accept={Array.isArray(fileTypes) ? fileTypes.join(',') : fileTypes}
               onChange={onFileSelection}
               style={{ display: 'none' }}
               multiple={!!onFolderSelected}

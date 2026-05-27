@@ -88,6 +88,7 @@ export const LessonThemeSchema = z.object({
   blockPaddingCustomValue: z.number().optional(),
   defaultAlignment: z.enum(DefaultAlignmentEnum).optional(),
   defaultActivityAlignment: z.enum(DefaultAlignmentEnum).optional(),
+  lessonLogo: z.string().optional(),
 });
 
 export const AuMetaDataSchema = z.object({

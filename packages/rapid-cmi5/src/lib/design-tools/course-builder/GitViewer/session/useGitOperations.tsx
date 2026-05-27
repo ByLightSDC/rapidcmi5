@@ -121,7 +121,7 @@ export const useGitOperations = (
       const remoteRepoUrls = await gitOperator.listRepoRemotes(r);
 
       removeRepoFileSelection();
-      setConfig(r, {
+      await setConfig(r, {
         authorEmail: req.authorEmail,
         authorName: req.authorName,
         remoteRepoUrl: remoteRepoUrls[0]?.url || '',

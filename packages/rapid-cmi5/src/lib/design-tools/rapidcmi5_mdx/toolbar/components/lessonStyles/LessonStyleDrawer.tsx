@@ -11,7 +11,6 @@ import {
   Typography,
   alpha,
   useTheme,
-  Box,
   Alert,
 } from '@mui/material';
 
@@ -21,7 +20,7 @@ import Grid from '@mui/material/Grid2';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useCellValue, usePublisher } from '@mdxeditor/gurx';
 
-import { drawerMode$, DRAWER_TYPE, stylesShowSeq$ } from './drawers';
+import { drawerMode$, DRAWER_TYPE, stylesShowSeq$ } from '../drawers';
 
 import { useSelector } from 'react-redux';
 
@@ -31,22 +30,26 @@ import PaletteIcon from '@mui/icons-material/Palette';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 
-import { useDrawerAutoHide } from './useDrawerAutoHide';
+import { useDrawerAutoHide } from '../useDrawerAutoHide';
 
 import {
   BlockPaddingEnum,
   ContentWidthEnum,
   DefaultAlignmentEnum,
 } from '@rapid-cmi5/cmi5-build-common';
-import { useAuContext } from '../../data-hooks/useAuContext';
+import { useAuContext } from '../../../data-hooks/useAuContext';
 import {
   blockPaddingDescriptions,
   contentWidthDescriptions,
   defaultAlignmentLabels,
-} from '../../drawers/constants';
-import { RC5Context } from '../../contexts/RC5Context';
-import { ILessonNode } from '../../drawers/components/LessonTreeNode';
-import { currentAu, currentBlock } from '@rapid-cmi5/react-editor';
+} from '../../../drawers/constants';
+import { RC5Context } from '../../../contexts/RC5Context';
+import { ILessonNode } from '../../../drawers/components/LessonTreeNode';
+import {
+  currentAu,
+  currentBlock,
+} from '../../../../../redux/courseBuilderReducer';
+import LogoUpload from './LogoUpload';
 
 /**
  * LessonStyle
@@ -60,6 +63,7 @@ export function LessonStyleDrawer() {
   const currentBlockIndex = useSelector(currentBlock);
 
   const { changeLessonTheme } = useContext(RC5Context);
+
   const theme = useTheme();
   const { au } = useAuContext();
 
@@ -76,6 +80,8 @@ export function LessonStyleDrawer() {
 
   const [defaultActivityAlignment, setDefaultActivityAlignment] =
     useState<DefaultAlignmentEnum>(DefaultAlignmentEnum.Center);
+
+  const [lessonLogo, setLessonLogo] = useState<string>('');
 
   const isOpen = useMemo(() => {
     return drawerMode === DRAWER_TYPE.STYLES;
@@ -177,6 +183,22 @@ export function LessonStyleDrawer() {
   );
 
   /**
+   * apply content logo change
+   */
+  const handleSetContentLogo = useCallback(
+    (val: string) => {
+      setLessonLogo(val);
+      if (currentLessonNode) {
+        changeLessonTheme(
+          { ...au?.lessonTheme, lessonLogo: val },
+          currentLessonNode,
+        );
+      }
+    },
+    [currentLessonNode, au],
+  );
+
+  /**
    * UE set default values from persisted lesson
    */
   useEffect(() => {
@@ -190,6 +212,7 @@ export function LessonStyleDrawer() {
       setDefaultActivityAlignment(
         au?.lessonTheme.defaultActivityAlignment || DefaultAlignmentEnum.Center,
       );
+      setLessonLogo(au?.lessonTheme.lessonLogo || '');
     }
   }, [au, au?.lessonTheme]);
 
@@ -419,6 +442,16 @@ export function LessonStyleDrawer() {
               {defaultAlignmentLabels.get(defaultActivityAlignment) ?? 'Center'}{' '}
               align activities
             </Typography>
+          </Grid>
+          <Grid size={11.5} sx={{ mt: 2.5 }}>
+            <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
+              Activity Alignment
+            </Typography>
+
+            <LogoUpload
+              currentLogoPath={lessonLogo}
+              handleSetContentLogo={handleSetContentLogo}
+            />
           </Grid>
         </Grid>
       </Stack>

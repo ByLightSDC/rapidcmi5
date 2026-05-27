@@ -46,7 +46,7 @@ import {
 import { displayData } from '../../../redux/courseBuilderReducer';
 import { SlideMenu } from '../menu/SlideMenu';
 import { SaveSlideButton } from './components/SaveSlideButton';
-import { LessonStyleButton } from './components/LessonStyleButton';
+import { LessonStyleButton } from './components/lessonStyles/LessonStyleButton';
 import { BlockTypeSelect } from './components/BlockTypeSelect';
 
 import { InsertAccordion } from './components/InsertAccordion';
@@ -81,7 +81,6 @@ import { useRC5Prompts } from '../modals/useRC5Prompts';
  *
  */
 const rightToolbarMargin = 25;
-
 
 /**
  * A toolbar component that includes all toolbar components.
@@ -189,7 +188,6 @@ export const RapidCmi5Toolbar: React.FC<{
     // Ensure the ref is attached to a DOM element and that element exists
   }, []);
 
-
   return (
     <Box
       ref={toolbarRef}
@@ -215,7 +213,11 @@ export const RapidCmi5Toolbar: React.FC<{
         <Stack direction="column" spacing={1} sx={{ padding: 1 }}>
           {viewmode === 'rich-text' && !isPlayback && (
             <Stack direction="row" spacing={1}>
-              <Stack direction="row" spacing={0} sx={{ flexGrow: 1, minWidth: 0 }}>
+              <Stack
+                direction="row"
+                spacing={0}
+                sx={{ flexGrow: 1, minWidth: 0 }}
+              >
                 <BoldItalicUnderlineToggles />
                 <ColorTextSplitButton />
                 <HighlightSplitButton />
@@ -307,8 +309,8 @@ export const RapidCmi5Toolbar: React.FC<{
           )}
           {(viewmode === 'source' ||
             (viewmode === 'rich-text' && isPlayback)) && (
-              <Box sx={{ minHeight: '32px' }}></Box>
-            )}
+            <Box sx={{ minHeight: '32px' }}></Box>
+          )}
           <Stack
             direction="row"
             spacing={1}
@@ -337,9 +339,9 @@ export const RapidCmi5Toolbar: React.FC<{
               direction="row"
               spacing={1}
               sx={{
-                background: alpha(theme.palette.primary.light, .10), //'background.default',
+                background: alpha(theme.palette.primary.light, 0.1), //'background.default',
                 borderRadius: '24px',
-                 border: `1px solid ${alpha(theme.palette.primary.main, 0.50)}`,
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.5)}`,
                 height: '34px',
                 display: 'flex',
                 justifyContent: 'center',
