@@ -144,7 +144,6 @@ export default function SelectProjectHomePage({}: {}) {
     }
   };
 
-  console.log('theme.gradients.backgroundGradient', theme.gradients.backgroundGradient);
   return (
     <Box
       sx={{
