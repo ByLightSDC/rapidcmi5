@@ -1,3 +1,13 @@
+## 0.16.0 (2026-05-28)
+
+### 🩹 Fixes
+
+- Fonts paths corrected and changed how default images operate #CCUI-2911 ([#178](https://github.com/ByLightSDC/rapidcmi5/pull/178))
+
+### ❤️ Thank You
+
+- Aaron Crawford @aaiirr123
+
 ## 0.15.0 (2026-05-19)
 
 This was a version bump only for rapid-cmi5-electron to align it with other projects, there were no code changes.

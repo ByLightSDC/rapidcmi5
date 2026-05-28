@@ -1,3 +1,18 @@
+## 0.16.0 (2026-05-28)
+
+### 🚀 Features
+
+- fix for copy pasted blocks within anim blocks ([#181](https://github.com/ByLightSDC/rapidcmi5/pull/181))
+
+### 🩹 Fixes
+
+- Fonts paths corrected and changed how default images operate #CCUI-2911 ([#178](https://github.com/ByLightSDC/rapidcmi5/pull/178))
+
+### ❤️ Thank You
+
+- Aaron Crawford @aaiirr123
+- mattkeele-bylight
+
 ## 0.15.0 (2026-05-19)
 
 ### 🩹 Fixes

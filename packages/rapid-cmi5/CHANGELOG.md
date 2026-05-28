@@ -1,3 +1,19 @@
+## 0.16.0 (2026-05-28)
+
+### 🚀 Features
+
+- Added in the ability to launch a real cmi5 link and scenario ([#182](https://github.com/ByLightSDC/rapidcmi5/pull/182))
+
+### 🩹 Fixes
+
+- prevent stale plugin re-init from clobbering animation frontmatter CCUI-3004 ([edb4f128](https://github.com/ByLightSDC/rapidcmi5/commit/edb4f128))
+- Fonts paths corrected and changed how default images operate #CCUI-2911 ([#178](https://github.com/ByLightSDC/rapidcmi5/pull/178))
+
+### ❤️ Thank You
+
+- Aaron Crawford @aaiirr123
+- Matt Keele
+
 ## 0.15.0 (2026-05-19)
 
 ### 🩹 Fixes

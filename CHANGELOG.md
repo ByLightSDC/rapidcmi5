@@ -1,3 +1,21 @@
+## 0.16.0 (2026-05-28)
+
+### 🚀 Features
+
+- Added in the ability to launch a real cmi5 link and scenario ([#182](https://github.com/ByLightSDC/rapidcmi5/pull/182))
+- fix for copy pasted blocks within anim blocks ([#181](https://github.com/ByLightSDC/rapidcmi5/pull/181))
+
+### 🩹 Fixes
+
+- Fonts paths corrected and changed how default images operate #CCUI-2911 ([#178](https://github.com/ByLightSDC/rapidcmi5/pull/178))
+- prevent stale plugin re-init from clobbering animation frontmatter CCUI-3004 ([edb4f128](https://github.com/ByLightSDC/rapidcmi5/commit/edb4f128))
+
+### ❤️ Thank You
+
+- Aaron Crawford @aaiirr123
+- Matt Keele
+- mattkeele-bylight
+
 ## 0.15.0 (2026-05-19)
 
 ### 🩹 Fixes
