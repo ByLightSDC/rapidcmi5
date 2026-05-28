@@ -61,7 +61,8 @@ export function AnimationDrawer() {
     useDrawerAutoHide('animation', isOpen, showSeq);
 
   // Hook into Lexical selection
-  const { selectedInfo, isAnimatable } = useLexicalSelection();
+  const { selectedInfo, isAnimatable, notAnimatableReason } =
+    useLexicalSelection();
   const isAlreadyAnimated = useCellValue(selectionInsideAnimDirective$);
 
   // Calculate move button states
@@ -180,9 +181,7 @@ export function AnimationDrawer() {
                 Cannot animate selected element(s)
               </Typography>
               <Typography variant="caption">
-                {selectedInfo.isEmpty
-                  ? 'Element is empty'
-                  : 'Select a different element'}
+                {notAnimatableReason ?? 'Select a different element'}
               </Typography>
             </Alert>
           ) : (
