@@ -88,7 +88,8 @@ export const LessonThemeSchema = z.object({
   blockPaddingCustomValue: z.number().optional(),
   defaultAlignment: z.enum(DefaultAlignmentEnum).optional(),
   defaultActivityAlignment: z.enum(DefaultAlignmentEnum).optional(),
-  lessonLogo: z.string().optional(),
+  lessonLogoLight: z.string().optional(),
+  lessonLogoDark: z.string().optional(),
 });
 
 export const AuMetaDataSchema = z.object({
@@ -150,6 +151,7 @@ export const CourseDataSchemaZod = z.object({
   remoteGitUrl: z.string().optional(),
   gitBranch: z.string().optional(),
   rc5Version: z.string().optional(),
+  courseTheme: LessonThemeSchema.optional(),
   blocks: z
     .array(CourseBlockSchema)
     .describe('Top-level course blocks. Most courses have a single block.'),

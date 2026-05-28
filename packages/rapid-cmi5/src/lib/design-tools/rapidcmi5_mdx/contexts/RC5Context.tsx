@@ -51,6 +51,7 @@ import {
   updateCourseData,
   updateCourseAuData,
   setDefaultLessonTheme,
+  setCourseTheme,
   updateCourseSlideData,
   resetCourseOperations,
   saveSlideContent,
@@ -76,6 +77,7 @@ interface IRC5Context {
   changeLessonName: (newName: string, element: ILessonNode) => void;
   changeSlideName: (newName: string, element: ILessonNode) => void;
   changeLessonTheme: (theme: LessonTheme, element: ILessonNode) => void;
+  changeCourseTheme: (theme: LessonTheme) => void;
   deleteLesson: (lessonIndex: number) => void;
   discardLessonChanges: () => void;
   saveCourseFile: () => Promise<string[]>;
@@ -98,6 +100,7 @@ export const RC5Context = createContext<IRC5Context>({
   changeCourseName: (newName: string) => { },
   changeLessonMoveOn: (moveOn: MoveOnCriteriaEnum, element: ILessonNode) => { },
   changeLessonTheme: (theme: LessonTheme, element: ILessonNode) => { },
+  changeCourseTheme: (theme: LessonTheme) => { },
   changeLessonName: (newName: string, element: ILessonNode) => { },
   changeSlideName: (newName: string, element: ILessonNode) => { },
   deleteLesson: (lessonIndex: number) => { },
@@ -334,6 +337,14 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
       dispatch(updateDirtyDisplay({ reason: 'change lesson theme settings' }));
     },
     [courseData, currentBlockIndex, dispatch],
+  );
+
+  const onChangeCourseTheme = useCallback(
+    (courseTheme: LessonTheme) => {
+      dispatch(setCourseTheme(courseTheme));
+      dispatch(updateDirtyDisplay({ reason: 'change course theme settings' }));
+    },
+    [dispatch],
   );
 
   const onChangeLessonName = useCallback(
@@ -612,6 +623,7 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
         changeCourseName: onChangeCourseName,
         changeLessonMoveOn: onChangeLessonMoveOn,
         changeLessonTheme: onChangeLessonTheme,
+        changeCourseTheme: onChangeCourseTheme,
         changeLessonName: onChangeLessonName,
         changeSlideName: onChangeSlideName,
         deleteLesson: onDeleteLesson,

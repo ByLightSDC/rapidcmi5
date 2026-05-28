@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './store';
 
 import { rangeDataType, rangeConsoleDataType } from '../types/AuState';
@@ -74,7 +74,14 @@ export const auSlice = createSlice({
     setAuJson: (state, action) => {
       state.auJson = action.payload;
     },
-    setAuLogo: (state, action) => {
+    setAuLogo: (
+      state,
+      action: PayloadAction<{
+        dark: string;
+        light: string;
+        width?: string | number;
+      }>,
+    ) => {
       const { dark, light, width } = action.payload;
       state.auLogoDark = dark;
       state.auLogoLight = light;

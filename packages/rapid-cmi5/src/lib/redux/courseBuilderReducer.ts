@@ -406,6 +406,9 @@ export const courseBuilderSlice = createSlice({
     setDefaultLessonTheme: (state, action: PayloadAction<LessonTheme>) => {
       state.defaultLessonTheme = action.payload;
     },
+    setCourseTheme: (state, action: PayloadAction<LessonTheme>) => {
+      state.courseData.courseTheme = action.payload;
+    },
     removeCourseAu: (
       state,
       action: PayloadAction<{
@@ -742,6 +745,7 @@ export const {
   updateCourseSlideData,
   updateCourseAuData,
   setDefaultLessonTheme,
+  setCourseTheme,
   updateDisplayText,
   updateExpandedFileTreeNodes,
   updateScenario,
@@ -811,4 +815,7 @@ export const repoViewScrollTop = (state: RootState) =>
   state.courseBuilder.repoViewScrollTop;
 export const defaultLessonThemeSel = (state: RootState) =>
   state.courseBuilder.defaultLessonTheme;
+
+export const courseThemeSel = (state: RootState) =>
+  state.courseBuilder.courseData.courseTheme;
 export default courseBuilderSlice.reducer;

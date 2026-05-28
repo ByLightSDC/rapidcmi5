@@ -568,6 +568,15 @@ export const createLesson = async ({
   const slideSlug = slugifyPath(defaultEmptySlide.slideTitle);
   const filepath = join(uniqueAuPath, `${slideSlug}.md`);
 
+  // Logo paths are AU-relative and won't resolve under a different AU,
+  // so don't inherit them from the previous lesson's default theme.
+  const inheritedTheme = defaultLessonTheme
+    ? (() => {
+        const { lessonLogoLight, lessonLogoDark, ...rest } = defaultLessonTheme;
+        return rest;
+      })()
+    : undefined;
+
   const theNewLesson: CourseAU = {
     auName,
     dirPath: uniqueAuPath,
@@ -577,7 +586,7 @@ export const createLesson = async ({
         filepath,
       },
     ],
-    ...(defaultLessonTheme ? { lessonTheme: defaultLessonTheme } : {}),
+    ...(inheritedTheme ? { lessonTheme: inheritedTheme } : {}),
   };
 
   // Get original block

@@ -46,7 +46,7 @@ import {
 import { displayData } from '../../../redux/courseBuilderReducer';
 import { SlideMenu } from '../menu/SlideMenu';
 import { SaveSlideButton } from './components/SaveSlideButton';
-import { LessonStyleButton } from './components/lessonStyles/LessonStyleButton';
+import { LessonStyleButton } from './components/courseStyles/LessonStyleButton';
 import { BlockTypeSelect } from './components/BlockTypeSelect';
 
 import { InsertAccordion } from './components/InsertAccordion';

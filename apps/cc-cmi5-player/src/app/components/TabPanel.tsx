@@ -35,9 +35,11 @@ export default function TabPanel() {
   const exitTabRef = useRef<HTMLDivElement>(null);
   const [isExitTabVisible, setIsExitTabVisible] = useState(true);
 
-  const currentLogo = useMemo(() => {
-    return auLogoDark;
-  }, [currentTheme.palette.mode, auLogoDark]);
+  const currentLogo = useMemo(
+    () =>
+      currentTheme.palette.mode === 'dark' ? auLogoDark : auLogoLight,
+    [currentTheme.palette.mode, auLogoLight, auLogoDark],
+  );
   const iconDimension = '20px';
 
   const tabClicked = (_: React.SyntheticEvent, newValue: number) => {
@@ -164,10 +166,9 @@ export default function TabPanel() {
           zIndex: 50,
           pt: 0,
           display: 'flex',
-          alignContent: 'center',
+          justifyContent: 'center',
           borderRadius: 1,
           flexShrink: 0,
-          marginRight: '34px',
         }}
       >
         {currentLogo && (

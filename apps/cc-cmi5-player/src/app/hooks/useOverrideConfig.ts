@@ -1,8 +1,11 @@
+/*
+  Lesson based overrides
+*/
 import { config } from '@rapid-cmi5/ui';
 import { logger } from '../debug';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { setAuLogo } from '../redux/auReducer';
+import { useDispatch, useSelector } from 'react-redux';
+import { auJsonSel, setAuLogo } from '../redux/auReducer';
 import { overrideDevOpsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
 import { cmi5Instance } from '../session/cmi5';
 import { CustomTheme } from '../styles/createPalette';
@@ -35,6 +38,24 @@ interface AppConfig {
   }[];
 }
 
+/**
+ * Resolves the AU logo using the priority:
+ *   1. aujson lesson theme (passed in, light + dark independently)
+ *   2. LMS launch params + cfg.json (already merged into `config.THEME`
+ *      via earlier `applyConfig` calls, with launch params winning)
+ *
+ * Width is not provided by aujson, so it always falls through to
+ * `config.THEME.LOGO_WIDTH`.
+ */
+export const resolveAuLogo = (
+  auJsonLogoLight?: string,
+  auJsonLogoDark?: string,
+) => ({
+  dark: auJsonLogoDark || config.THEME.LOGO_DARK || '',
+  light: auJsonLogoLight || config.THEME.LOGO_LIGHT || '',
+  width: config.THEME.LOGO_WIDTH,
+});
+
 const applyConfig = (cfg: LocationConfig) => {
   if (cfg.DEVOPS_API_URL != null) config.DEVOPS_API_URL = cfg.DEVOPS_API_URL;
   if (cfg.DEVOPS_GQL_URL != null) config.DEVOPS_GQL_URL = cfg.DEVOPS_GQL_URL;
@@ -60,6 +81,9 @@ const applyConfig = (cfg: LocationConfig) => {
 export const useOverrideConfigs = () => {
   const [isOverridesLoaded, setIsOverridesLoaded] = useState(false);
   const dispatch = useDispatch();
+  const auJson = useSelector(auJsonSel);
+  const auJsonLogoLight = auJson.lessonTheme?.lessonLogoLight;
+  const auJsonLogoDark = auJson.lessonTheme?.lessonLogoDark;
 
   const loadOverrides = async (path: string, inProductionMode = true) => {
     let launchData;
@@ -111,13 +135,7 @@ export const useOverrideConfigs = () => {
     } catch (error) {
       logger.warn('Override configs load failed', error, 'auManager');
     } finally {
-      dispatch(
-        setAuLogo({
-          dark: config.THEME.LOGO_DARK,
-          light: config.THEME.LOGO_LIGHT,
-          width: config.THEME.LOGO_WIDTH,
-        }),
-      );
+      dispatch(setAuLogo(resolveAuLogo(auJsonLogoLight, auJsonLogoDark)));
       overrideDevOpsApiClient(config.DEVOPS_API_URL);
 
       setIsOverridesLoaded(true);

@@ -16,7 +16,7 @@ import { areAnimationsEqual } from './utils/animationComparison';
 import { highlightAnimatedElement } from './utils/updateAnimationIndicators';
 import { debugLog, onAnimDirectiveClick$ } from '@rapid-cmi5/ui';
 import { BlockLibraryDrawer } from '../../toolbar/components/BlockLibraryDrawer';
-import { LessonStyleDrawer } from '../../toolbar/components/lessonStyles/LessonStyleDrawer';
+import { LessonStyleDrawer } from '../../toolbar/components/courseStyles/LessonStyleDrawer';
 
 export interface AnimationPluginParams {
   initialAnimations?: AnimationConfig[];
