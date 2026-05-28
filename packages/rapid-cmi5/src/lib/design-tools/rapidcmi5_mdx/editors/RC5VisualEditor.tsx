@@ -743,6 +743,7 @@ function RC5VisualEditor() {
               );
             }
 
+            //debugLog('setting markdown to', content, undefined, 'editor');
             ref.current.setMarkdown(content);
           } catch (error: any) {
             debugLog('Could not set markdown', error, undefined, 'editor');

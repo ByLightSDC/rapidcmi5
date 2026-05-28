@@ -68,26 +68,6 @@ export default function SelectProjectHomePage({}: {}) {
     }
   };
 
-  const backgroundGradient = `linear-gradient(
-  135deg,
-  ${palette.background.default} 0%,
-  ${palette.background.paper} 50%,
-  ${alpha(palette.background.default, 0.85)} 100%
-)`;
-
-  const radialGradients = `
-  radial-gradient(
-    circle at 20% 30%,
-    ${alpha(palette.primary.main, 0.35)} 0%,
-    transparent 70%
-  ),
-  radial-gradient(
-    circle at 80% 70%,
-    ${alpha(palette.primary.main, 0.3)} 0%,
-    transparent 60%
-  )
-`;
-
   const handleShowDocumentation = (doc: OptionDocumentation) => {
     setCurrentDoc(doc);
     setDocDialogOpen(true);
@@ -106,7 +86,7 @@ export default function SelectProjectHomePage({}: {}) {
   };
 
   useEffect(() => {
-    populateRecentProjects();
+   populateRecentProjects();
   }, []);
 
   const handleOpenRecentProject = async (id: string) => {
