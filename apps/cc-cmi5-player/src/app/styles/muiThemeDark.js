@@ -9,7 +9,6 @@ const tooltipColor = '#303030';
 const tooltipOutline = '1px solid #505050'; //'2px solid #505050';
 const tooltipPadding = '4px 16px';
 
-const colorPop = true;
 const mainColor = '#6F96FF'; //icons, button fills
 const hoverMainColor = '#8cadfa'; //button hover
 
@@ -51,12 +50,12 @@ export const darkTheme = createTheme({
     hoverBackground: '#FFC84020',
   },
   button: {
-    disabledBackgroundColor: '#582936', //'#07128580',
-    disabledColor: '#dbc1ca99',
-    gradient: 'linear-gradient(180deg, #e4002b 0%, #94041f 100%)',
-    minorBackgroundColor: '#572130', //'#333333',
+    disabledBackgroundColor: '#293658',
+    disabledColor: '#C1C9DB99',
+    gradient: 'linear-gradient(180deg, #405CA7 0%, #2C4B93 100%)',
+    minorBackgroundColor: '#213157',
     indicatorColor: mainColor,
-    iconColor: '#e4002b',
+    iconColor: mainColor,
   },
 
   form: {
