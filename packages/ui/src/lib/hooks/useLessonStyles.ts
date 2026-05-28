@@ -165,8 +165,7 @@ export const useLessonStyles = (
     innerSx,
     isPlayback,
     isReadOnly,
-    activityBackgroundColor,
-    muiTheme.nav.tabPanel,
+    activityBackgroundColor
   ]);
 
   useEffect(() => {

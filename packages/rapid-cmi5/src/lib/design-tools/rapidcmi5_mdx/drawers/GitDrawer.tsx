@@ -1,23 +1,17 @@
-
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  Stack,
-  Tabs,
-  Typography,
-} from '@mui/material';
+import { Stack, Tabs, Typography, useTheme } from '@mui/material';
 import { RepoState } from '../../../redux/repoManagerReducer';
 import { RootState } from '../../../redux/store';
 
 import { TabMainUi } from '@rapid-cmi5/ui';
 
-import { useMDStyleIcons } from '../styles/useMDStyleIcons';
 
 import {
   gitViewCurrentTab,
   setGitViewCurrentTab,
 } from '../../../redux/courseBuilderReducer';
-
+import { GitCompareArrows } from 'lucide-react';
 
 /**
  * Drawer for GIT view
@@ -30,9 +24,8 @@ export const GitDrawer = () => {
     (state: RootState) => state.repoManager,
   );
 
-  const { gitIcon } = useMDStyleIcons();
   const currentTab = useSelector(gitViewCurrentTab);
-
+  const currentTheme = useTheme();
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     dispatch(setGitViewCurrentTab(newValue));
   };
@@ -53,7 +46,7 @@ export const GitDrawer = () => {
         sx={{
           fontFamily: '"IBM Plex Sans", sans-serif',
           fontWeight: 'bold',
-          marginTop:.5
+          marginTop: 0.5,
         }}
       >
         VERSION CONTROL
@@ -64,10 +57,13 @@ export const GitDrawer = () => {
           spacing={1}
           sx={{
             marginTop: '4px',
-            marginBottom:1
+            marginBottom: 1,
           }}
         >
-          {gitIcon}
+          <GitCompareArrows
+            color={currentTheme.button.iconColor}
+            strokeWidth={1.15}
+          />
           <Typography>{currentBranch}</Typography>
         </Stack>
       </Stack>

@@ -10,9 +10,9 @@ mkdir -p "$PACK_OUTPUT_DIR"
 
 npx nx build cmi5-build-common
 npx nx build rapid-cmi5-ui
-npx nx build rapid-cmi5
+npx nx build rapid-cmi5-editor
 
-cd ../dist/packages
+cd ./dist/packages
 
 cd common
 COMMON_TGZ=$(npm pack)

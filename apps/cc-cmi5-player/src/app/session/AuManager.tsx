@@ -264,22 +264,20 @@ function AuManager() {
       }
     }
     if (auManagerState !== AuManagerState.ready) {
-      return (
-        <div
-          style={{
-            position: 'absolute',
-            left: 400,
-            top: 10,
-            zIndex: 9999,
-            display: 'flex',
-          }}
-        >
-          <CircularProgress size="18px" />
-          <Typography color="text.primary" sx={{ marginLeft: '8px' }}>
-            {auManagerState + loadingMessage}
-          </Typography>
-        </div>
-      );
+      if (portalTarget) {
+        return createPortal(
+          <Stack direction="row" sx={{ padding: 1, width: '70%' }}>
+            <CircularProgress size="18px" />
+            <Typography color="text.primary" sx={{ marginLeft: '8px' }}>
+              {auManagerState + loadingMessage}
+            </Typography>
+            <Box sx={{ minWidth: '48px' }} />
+          </Stack>,
+          portalTarget, // Render the children into the portalTarget DOM node
+        );
+      } else {
+        return null;
+      }
     }
     return null;
   }, [auManagerState, loadingMessage, portalTarget]);

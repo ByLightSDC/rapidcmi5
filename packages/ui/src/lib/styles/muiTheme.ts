@@ -47,6 +47,7 @@ export const lightTheme = createTheme({
     borderColor: '#D4D5DB',
     titleBackgroundColor: '#EEEEEE',
   },
+  activity: { backgroundColor: '#1e2d54' },
   button: {
     disabledBackgroundColor: '#7f8cb9',
     disabledColor: '#C1C9DB',
@@ -69,6 +70,15 @@ export const lightTheme = createTheme({
   },
   form: {
     backgroundColor: '#EEEEEE',
+  },
+  gradients: {
+    background: '#3C59A226',
+    backgroundHover: '#3C59A22B',
+    backgroundGradient:
+      'linear-gradient(135deg, #EEEEEE 0%, #F8F8F8 50%, #EEEEEED9 100%)',
+    backgroundPanel: '#F8F8F8CC',
+    backgroundRadial:
+      'radial-gradient(circle at 20% 30%, #3C59A259 0%, transparent 70%), radial-gradient(circle at 80% 70%, #3C59A24D 0%, transparent 60%)',
   },
   header: {
     border: '#ffffffc3', //active se

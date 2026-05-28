@@ -118,7 +118,7 @@ export function ButtonModalCancelUi(props: ButtonProps) {
       sx={{
         boxShadow: 1,
         borderColor: (theme: any) => `primary.dark`,
-        color: (theme: any) => `${theme.breadcrumbs.underline}`,
+        color: 'primary.main',
         minWidth: minButtonWidth,
         //minHeight: minButtonHeight,
         paddingLeft: props?.children

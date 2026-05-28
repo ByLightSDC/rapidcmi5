@@ -9,7 +9,6 @@ const tooltipColor = '#303030';
 const tooltipOutline = '1px solid #505050'; //'2px solid #505050';
 const tooltipPadding = '4px 16px';
 
-const colorPop = true;
 const mainColor = '#6F96FF'; //icons, button fills
 const hoverMainColor = '#8cadfa'; //button hover
 
@@ -43,21 +42,7 @@ export const darkTheme = createTheme({
       default: '#282b30',
     },
   },
-  // accordion: {
-  //   borderBottom: `1px solid #36393e`,
-  //   backgroundColor: '#282b30',
-  //   borderColor: '#36393e',
-  //   titleBackgroundColor: '#282b30',
-  // },
-  // card: {
-  //   default: 'linear-gradient(180deg, #3E5BA5BF 0%, #2E4C94BF 100%)',
-  //   borderColor: '#8AA6D0',
-  //   defaultHover: 'linear-gradient(180deg, #8AA6D0 0%, #8AA6D0 100%)',
-
-  //   titleColor: '#FFFFFF', // white
-  //   instructionsColor: colorPop ? '#edb445' : '#edb445',
-  //   formInstructionsColor: '#212125',
-  // },
+  activity: { backgroundColor: '#1e2d54' },
   breadcrumbs: {
     default: '#C8C8C8', //disabled breadcrumb text
     underline: mainColor,
@@ -65,26 +50,28 @@ export const darkTheme = createTheme({
     hoverBackground: '#FFC84020',
   },
   button: {
-    disabledBackgroundColor: '#293658', //'#07128580',
+    disabledBackgroundColor: '#293658',
     disabledColor: '#C1C9DB99',
     gradient: 'linear-gradient(180deg, #405CA7 0%, #2C4B93 100%)',
-    minorBackgroundColor: '#213157', //'#333333',
+    minorBackgroundColor: '#213157',
     indicatorColor: mainColor,
     iconColor: mainColor,
   },
+
   form: {
     backgroundColor: '#282b30',
   },
+  gradients: {
+    background: '#3C59A226',
+    backgroundHover: '#3C59A22B',
+    backgroundGradient:
+      'linear-gradient(135deg, #282b30 0%, #212125 50%, #282b30D9 100%)',
+    backgroundPanel: '#3a3e4480',
+    backgroundRadial:
+      'radial-gradient(circle at 20% 30%, #3C59A259 0%, transparent 70%), radial-gradient(circle at 80% 70%, #3C59A24D 0%, transparent 60%)',
+  },
   header: {
-    // border: '#ffffffb0',
-    // buttonColor: '#C5C5C5',
-    // selColor: '#A5BEFF', //'#a4c9eb', //selColor: '#A5BEFF',
-    // default: '#282b30',
-    // hoverColor: '#FFFFFF',
-    // light: '#9AA8CD', //loading bar color
-    // dark: '#333',
     title: '#ffffffc0', // white @ 80% opacity
-    //underline: '#666666'//'DarkGray', //divider OR parting line
   },
   input: {
     outlineColor: '#464646', //see overrides below MuiFilledInput, MuiFilledInput+MuiOutlinedInput

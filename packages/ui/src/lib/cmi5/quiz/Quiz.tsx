@@ -382,7 +382,7 @@ export function AuQuiz({
       }}
       {...outerStyle}
     >
-      <Box sx={{ padding: 2, ...innerSx  }}>
+      <Box sx={{ padding: 2, ...innerSx }}>
         {content.title && (
           <Typography
             color="text.primary"
@@ -478,6 +478,7 @@ export function AuQuiz({
                       sxProps={{ marginRight: '4px' }}
                       endIcon={
                         <ArrowBackIosIcon
+                          color="primary"
                           sx={{
                             padding: '0px',
                             margin: '0px',
@@ -501,6 +502,7 @@ export function AuQuiz({
                       tooltip="Next Question"
                       endIcon={
                         <ArrowForwardIosIcon
+                          color="primary"
                           sx={{
                             padding: '0px',
                             margin: '0px',

@@ -123,7 +123,7 @@ export function QuestionInput({
           onClick: handlePreviousQuestion,
         }}
       >
-        <ArrowBackIosIcon />
+        <ArrowBackIosIcon color="primary" />
       </ButtonIcon>
 
       <TextField
@@ -204,7 +204,7 @@ export function QuestionInput({
           onClick: handleNextQuestion,
         }}
       >
-        <ArrowForwardIosIcon />
+        <ArrowForwardIosIcon color="primary" />
       </ButtonIcon>
     </Stack>
   );

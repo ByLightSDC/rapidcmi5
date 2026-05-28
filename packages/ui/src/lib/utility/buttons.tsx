@@ -497,7 +497,7 @@ export function ButtonLoadingUi(props: BrandedButtonProps) {
       sx={{
         boxShadow: 1,
         border: '1px solid',
-        borderColor: (theme: any) => `${theme.breadcrumbs.underline}`,
+        borderColor: 'primary.main',
         backgroundColor: 'primary.dark',
         color: 'common.white',
         minHeight: minButtonHeight,

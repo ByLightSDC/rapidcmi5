@@ -11,6 +11,7 @@ import ElectronAppSelection from './Components/ElectronSelection';
 import CloneLoadingOverlay from './Components/LoadingOverlay';
 import { useToaster } from '@rapid-cmi5/ui';
 import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
+import { CustomTheme } from '../styles/createPalette';
 
 interface OptionDocumentation {
   title: string;
@@ -22,7 +23,7 @@ export default function SelectProjectHomePage({}: {}) {
   const [isSandboxLaunching, setIsSandboxLaunching] = useState(false);
   const [docDialogOpen, setDocDialogOpen] = useState(false);
 
-  const theme = useTheme();
+  const theme: CustomTheme = useTheme();
   const { palette } = theme;
 
   const displayToaster = useToaster();
@@ -67,26 +68,6 @@ export default function SelectProjectHomePage({}: {}) {
     }
   };
 
-  const backgroundGradient = `linear-gradient(
-  135deg,
-  ${palette.background.default} 0%,
-  ${palette.background.paper} 50%,
-  ${alpha(palette.background.default, 0.85)} 100%
-)`;
-
-  const radialGradients = `
-  radial-gradient(
-    circle at 20% 30%,
-    ${alpha(palette.primary.main, 0.35)} 0%,
-    transparent 70%
-  ),
-  radial-gradient(
-    circle at 80% 70%,
-    ${alpha(palette.primary.main, 0.3)} 0%,
-    transparent 60%
-  )
-`;
-
   const handleShowDocumentation = (doc: OptionDocumentation) => {
     setCurrentDoc(doc);
     setDocDialogOpen(true);
@@ -105,7 +86,7 @@ export default function SelectProjectHomePage({}: {}) {
   };
 
   useEffect(() => {
-    populateRecentProjects();
+   populateRecentProjects();
   }, []);
 
   const handleOpenRecentProject = async (id: string) => {
@@ -148,7 +129,7 @@ export default function SelectProjectHomePage({}: {}) {
       sx={{
         height: '100vh',
         width: '100%',
-        background: backgroundGradient,
+        background: theme.gradients.backgroundGradient,
         position: 'relative',
         overflow: 'auto',
       }}
@@ -157,7 +138,7 @@ export default function SelectProjectHomePage({}: {}) {
         sx={{
           height: '100vh',
           width: '100%',
-          background: radialGradients,
+          background: theme.gradients.backgroundRadial,
           position: 'relative',
           overflow: 'auto',
         }}

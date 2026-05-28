@@ -52,6 +52,7 @@ export const darkTheme = createTheme({
     borderColor: '#36393e',
     titleBackgroundColor: '#282b30',
   },
+  activity: { backgroundColor: '#1e2d54' },
   breadcrumbs: {
     default: '#C8C8C8', //disabled breadcrumb text
     underline: mainColor,
@@ -78,6 +79,15 @@ export const darkTheme = createTheme({
   form: {
     backgroundColor: '#282b30',
   },
+  gradients: {
+    background: '#3c59a24c',
+    backgroundHover: '#3C59A22B',
+    backgroundGradient:
+      'linear-gradient(135deg, #282b30 0%, #212125 50%, #282b30D9 100%)',
+    backgroundPanel: '#3a3e4480',
+    backgroundRadial:
+      'radial-gradient(circle at 20% 30%, #3C59A259 0%, transparent 70%), radial-gradient(circle at 80% 70%, #3C59A24D 0%, transparent 60%)',
+  },
   header: {
     border: '#ffffffb0',
     buttonColor: '#C5C5C5',
@@ -103,7 +113,7 @@ export const darkTheme = createTheme({
     iconSelected: '#FFC840', //unused
     border: '#666666', // Package Menu
     borderSelected: '#FFC840', //unused
-    currentTabIndicator: '#6F96FF', 
+    currentTabIndicator: '#6F96FF',
     currentTabIndicatorText: '#1e2d54',
     deselectedTab: '#3C59A2', //primary 80%
     deselectedTabText: '#ffffff', //'#323232D9',
