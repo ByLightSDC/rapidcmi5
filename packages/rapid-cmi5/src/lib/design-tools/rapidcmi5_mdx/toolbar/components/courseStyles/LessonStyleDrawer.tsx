@@ -32,7 +32,7 @@ import {
   DefaultAlignmentEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 import { useAuContext } from '../../../data-hooks/useAuContext';
-import { RC5Context } from '../../../contexts/RC5Context';
+import { ThemeContext } from '../../../contexts/ThemeContext';
 import { ILessonNode } from '../../../drawers/components/LessonTreeNode';
 import {
   courseDataCache,
@@ -56,7 +56,7 @@ export function LessonStyleDrawer() {
   const currentBlockIndex = useSelector(currentBlock);
   const courseData = useSelector(courseDataCache);
 
-  const { changeLessonTheme, changeCourseTheme } = useContext(RC5Context);
+  const { changeLessonTheme, changeCourseTheme } = useContext(ThemeContext);
 
   const theme = useTheme();
   const { au } = useAuContext();

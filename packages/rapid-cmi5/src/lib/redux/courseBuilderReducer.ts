@@ -1,18 +1,14 @@
 import {
   CourseData,
-  QuizContent,
-  ScenarioContent,
   SlideType,
   SlideTypeEnum,
-  CTFContent,
   Operation,
   CourseAU,
   LessonTheme,
-  CodeRunnerContent,
 } from '@rapid-cmi5/cmi5-build-common';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './store';
-import { debugLog, defaultCourseData, resetPersistance } from '@rapid-cmi5/ui';
+import { defaultCourseData, resetPersistance } from '@rapid-cmi5/ui';
 import { ViewModeEnum } from '../design-tools/course-builder/CourseBuilderTypes';
 
 export interface Scenario {
@@ -102,8 +98,6 @@ export type CourseBuilderState = {
   repoViewScrollTop: number;
   // The repo cache allows us to store current AU and slide per repo and course pair
   repoCache: RepoCache;
-  // Default formatting applied to newly created lessons
-  defaultLessonTheme?: LessonTheme;
 };
 
 // Saves the state for various repos so you may swap between them easily.
@@ -162,7 +156,6 @@ export const initialStateCourseBuilder: CourseBuilderState = {
   isVersionControlExpanded: false,
   repoFolderChange: false,
   repoViewScrollTop: 0,
-  defaultLessonTheme: undefined,
 };
 
 type tDirtyState = { reason?: string; counter?: number };
@@ -402,9 +395,6 @@ export const courseBuilderSlice = createSlice({
     ) => {
       const { blockIndex, lessonIndex, au } = action.payload;
       state.courseData.blocks[blockIndex].aus[lessonIndex] = au;
-    },
-    setDefaultLessonTheme: (state, action: PayloadAction<LessonTheme>) => {
-      state.defaultLessonTheme = action.payload;
     },
     setCourseTheme: (state, action: PayloadAction<LessonTheme>) => {
       state.courseData.courseTheme = action.payload;
@@ -744,7 +734,6 @@ export const {
   updateCourseData,
   updateCourseSlideData,
   updateCourseAuData,
-  setDefaultLessonTheme,
   setCourseTheme,
   updateDisplayText,
   updateExpandedFileTreeNodes,
@@ -813,9 +802,6 @@ export const repoFolderChange = (state: RootState) =>
   state.courseBuilder.repoFolderChange;
 export const repoViewScrollTop = (state: RootState) =>
   state.courseBuilder.repoViewScrollTop;
-export const defaultLessonThemeSel = (state: RootState) =>
-  state.courseBuilder.defaultLessonTheme;
-
 export const courseThemeSel = (state: RootState) =>
   state.courseBuilder.courseData.courseTheme;
 export default courseBuilderSlice.reducer;

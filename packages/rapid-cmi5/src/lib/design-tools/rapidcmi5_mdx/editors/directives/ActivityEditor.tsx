@@ -62,10 +62,13 @@ import {
   config,
 } from '@rapid-cmi5/ui';
 
-import { updateScenario, updateTeamScenario } from '@rapid-cmi5/react-editor';
 import ScenarioMock from './ScenarioMock';
 import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 import { TeamConsolesForm } from '../forms/scenario/TeamConsolesForm';
+import {
+  updateScenario,
+  updateTeamScenario,
+} from '../../../../redux/courseBuilderReducer';
 
 /**
  * MDX Editor for Activities
@@ -90,7 +93,6 @@ export const ActivityEditor: React.FC<
   const { userAuth, apiUrls } = useRapidCmi5Opts();
 
   const muiTheme: any = useTheme();
-
 
   const { lessonTheme } = useContext(LessonThemeContext);
   const {
@@ -483,7 +485,6 @@ const ActivityThemeWrapper = ({
   isPlayback: boolean;
 }) => {
   if (isPlayback) {
-
     const overriddenTheme: any = deepmerge(darkTheme, config.THEME.DARK);
 
     if (overriddenTheme?.palette?.info?.light) {

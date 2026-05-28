@@ -99,6 +99,11 @@ export const AuMetaDataSchema = z.object({
   rc5Version: z.string().optional(),
 });
 
+export const CourseSettings = z.object({
+  courseTheme: LessonThemeSchema.optional(),
+  metadata: AuMetaDataSchema.optional(),
+});
+
 export const CourseAuSchema = z.object({
   auName: z.string().describe('Human-readable AU/lesson name.'),
   assetsPath: z.string().optional(),
@@ -129,7 +134,9 @@ export const CourseAuSchema = z.object({
   ksats: z.array(KSATElementSchema).optional(),
   moveOnCriteria: z.enum(MoveOnCriteriaEnum).optional(),
   lessonTheme: LessonThemeSchema.optional(),
-  metadata: AuMetaDataSchema.optional(),
+  // These values are only filled in at build time do to the constraint
+  // that an au cannot look at the entire RC5.yaml file but only the config.json
+  buildTimeProps: CourseSettings.optional(),
 });
 
 export const CourseBlockSchema = z.object({

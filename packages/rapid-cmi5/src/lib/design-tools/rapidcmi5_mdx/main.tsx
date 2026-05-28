@@ -4,6 +4,7 @@ import {
   RapidCmi5OptsProvider,
 } from '../course-builder/GitViewer/session/RapidCmi5OptsContext';
 import { RC5ContextProvider } from './contexts/RC5Context';
+import { ThemeContextProvider } from './contexts/ThemeContext';
 import { ElectronEventsBridge } from '../../electron/ElectronEventBridge';
 import RC5Modals from './modals/RC5Modals';
 import Landing from './Landing';
@@ -18,9 +19,11 @@ export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {
         <RapidCmi5OptsProvider opts={rapidCmi5Opts}>
           <GitContextProvider>
             <RC5ContextProvider>
-              <ElectronEventsBridge />
-              <RC5Modals />
-              <Landing showHomeButton={rapidCmi5Opts.showHomeButton} />
+              <ThemeContextProvider>
+                <ElectronEventsBridge />
+                <RC5Modals />
+                <Landing showHomeButton={rapidCmi5Opts.showHomeButton} />
+              </ThemeContextProvider>
             </RC5ContextProvider>
           </GitContextProvider>
         </RapidCmi5OptsProvider>

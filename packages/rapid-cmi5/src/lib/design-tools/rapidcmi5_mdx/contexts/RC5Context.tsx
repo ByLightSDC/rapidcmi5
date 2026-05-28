@@ -25,7 +25,6 @@ import {
   MoveOnCriteriaEnum,
   Operation,
   CourseAU,
-  LessonTheme,
   CourseData,
   SlideType,
 } from '@rapid-cmi5/cmi5-build-common';
@@ -50,8 +49,6 @@ import {
   updateDirtyDisplay,
   updateCourseData,
   updateCourseAuData,
-  setDefaultLessonTheme,
-  setCourseTheme,
   updateCourseSlideData,
   resetCourseOperations,
   saveSlideContent,
@@ -76,8 +73,6 @@ interface IRC5Context {
   ) => void;
   changeLessonName: (newName: string, element: ILessonNode) => void;
   changeSlideName: (newName: string, element: ILessonNode) => void;
-  changeLessonTheme: (theme: LessonTheme, element: ILessonNode) => void;
-  changeCourseTheme: (theme: LessonTheme) => void;
   deleteLesson: (lessonIndex: number) => void;
   discardLessonChanges: () => void;
   saveCourseFile: () => Promise<string[]>;
@@ -95,23 +90,21 @@ interface IRC5Context {
 export const RC5Context = createContext<IRC5Context>({
   isEnabled: true,
   lessonSlides: [],
-  addEditor: (editorRef: RefObject<MDXEditorMethods>) => { },
-  removeEditor: () => { },
-  changeCourseName: (newName: string) => { },
-  changeLessonMoveOn: (moveOn: MoveOnCriteriaEnum, element: ILessonNode) => { },
-  changeLessonTheme: (theme: LessonTheme, element: ILessonNode) => { },
-  changeCourseTheme: (theme: LessonTheme) => { },
-  changeLessonName: (newName: string, element: ILessonNode) => { },
-  changeSlideName: (newName: string, element: ILessonNode) => { },
-  deleteLesson: (lessonIndex: number) => { },
-  discardLessonChanges: () => { },
+  addEditor: (editorRef: RefObject<MDXEditorMethods>) => {},
+  removeEditor: () => {},
+  changeCourseName: (newName: string) => {},
+  changeLessonMoveOn: (moveOn: MoveOnCriteriaEnum, element: ILessonNode) => {},
+  changeLessonName: (newName: string, element: ILessonNode) => {},
+  changeSlideName: (newName: string, element: ILessonNode) => {},
+  deleteLesson: (lessonIndex: number) => {},
+  discardLessonChanges: () => {},
   saveCourseFile: async () => [],
-  saveSlide: () => { },
+  saveSlide: () => {},
   saveMarkdownToCurrentSlide: (markdown: string) => false,
   getMarkdownData: () => {
     return undefined;
   },
-  sendMessage: (message: Message) => { },
+  sendMessage: (message: Message) => {},
 });
 
 // Project Context Provider
@@ -130,55 +123,58 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
 
   const lessonSlides = useMemo(() => {
     //defensive
-    if (
-      !courseData ||
-      !courseData.blocks ||
-      currentBlockIndex > courseData.blocks.length - 1
-    ) {
-      if (
-        courseData &&
-        courseData.blocks &&
-        currentBlockIndex > courseData.blocks.length - 1
-      ) {
-        dispatch(updateBlockIndex(0));
-      }
+    const blocks = courseData?.blocks;
+
+    if (!blocks) {
       return [];
     }
-    if (courseData && currentAuIndex >= 0 && currentBlockIndex >= 0) {
-      const currentBlock = courseData.blocks[currentBlockIndex];
-      if (!currentBlock || !currentBlock.aus || currentBlock.aus.length === 0) {
-        return [];
-      }
 
-      const normAuIndex = Math.min(currentBlock.aus.length - 1, currentAuIndex);
-      if (normAuIndex !== currentAuIndex) {
-        dispatch(updateAuIndex(normAuIndex));
-      }
-
-      const currentAu = currentBlock.aus[normAuIndex];
-      if (!currentAu || !currentAu.slides || currentAu.slides.length === 0) {
-        return [];
-      }
-
-      const normSlideIndex = Math.min(
-        currentAu.slides.length - 1,
-        currentSlideIndex,
-      );
-      if (normSlideIndex !== currentSlideIndex) {
-        dispatch(navigateSlide(normSlideIndex));
-      }
-
-      const currentSlide = currentAu.slides[normSlideIndex];
-      if (!currentSlide) {
-        return [];
-      }
-
-      const content = currentSlide.content as string;
-      dispatch(updateDisplayText(content));
-      return currentAu.slides;
+    if (currentBlockIndex >= blocks.length) {
+      dispatch(updateBlockIndex(0));
+      return [];
+    }
+    if (!courseData || currentAuIndex < 0 || currentBlockIndex < 0) {
+      return [];
     }
 
-    return [];
+    const currentBlock = courseData.blocks[currentBlockIndex];
+    const aus = currentBlock?.aus;
+
+    if (!aus?.length) {
+      return [];
+    }
+
+    const normAuIndex = Math.min(aus.length - 1, currentAuIndex);
+
+    if (normAuIndex !== currentAuIndex) {
+      dispatch(updateAuIndex(normAuIndex));
+    }
+
+    const currentAu = aus[normAuIndex];
+    const slides = currentAu?.slides;
+
+    if (!slides?.length) {
+      return [];
+    }
+
+    const normSlideIndex = Math.max(
+      0,
+      Math.min(slides.length - 1, currentSlideIndex),
+    );
+
+    if (normSlideIndex !== currentSlideIndex) {
+      dispatch(navigateSlide(normSlideIndex));
+    }
+
+    const currentSlide = slides[normSlideIndex];
+
+    if (!currentSlide) {
+      return [];
+    }
+
+    dispatch(updateDisplayText(currentSlide.content as string));
+
+    return slides;
   }, [
     courseData,
     currentAuIndex,
@@ -203,29 +199,22 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
     (lessonIndex: number) => {
       debugLog('onDeleteLesson', lessonIndex);
 
-      if (
-        !courseData ||
-        !courseData.blocks ||
-        !courseData.blocks[currentBlockIndex]
-      ) {
-        debugLogError('Course data not available for lesson deletion');
+      const block = courseData?.blocks?.[currentBlockIndex];
+      const lessons = block?.aus;
+
+      if (!lessons) {
+        debugLogError('Course block lessons not available for lesson deletion');
         return;
       }
 
-      const block = courseData.blocks[currentBlockIndex];
-      if (!block || !block.aus) {
-        debugLogError('Block or aus not available for lesson deletion');
-        return;
-      }
+      const lessonToDelete = lessons[lessonIndex];
 
-      const au = block.aus[lessonIndex];
-      if (!au) {
+      if (!lessonToDelete) {
         debugLogError('AU not found at lesson index');
         return;
       }
 
-      const lessonCount = block.aus.length;
-      if (lessonCount <= 1) {
+      if (lessons.length <= 1) {
         dispatch(
           setModal({
             type: warningModalId,
@@ -240,34 +229,29 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
         return;
       }
 
-      const currentAu = block.aus[currentAuIndex];
-      if (!currentAu) {
-        debugLogError('Current AU not found');
-        return;
-      }
+      const nextAuIndex =
+        lessonIndex <= currentAuIndex
+          ? Math.max(0, currentAuIndex - 1)
+          : currentAuIndex;
 
       dispatch(
         addCourseOperation({
-          filepath: au.dirPath,
+          filepath: lessonToDelete.dirPath,
           operation: Operation.Delete,
         }),
       );
 
-      const newLessonIndex = block.aus.findIndex(
-        (lesson) => lesson.dirPath === currentAu.dirPath,
-      );
-
-      dispatch(updateAuIndex(newLessonIndex));
-
       dispatch(
         removeCourseAu({
           blockIndex: currentBlockIndex,
-          lessonIndex: lessonIndex,
+          lessonIndex,
         }),
       );
+
+      dispatch(updateAuIndex(nextAuIndex));
       dispatch(updateDirtyDisplay({ reason: 'delete lesson' }));
     },
-    [courseData, currentBlockIndex, dispatch],
+    [courseData, currentBlockIndex, currentAuIndex, dispatch],
   );
 
   const onChangeCourseName = useCallback(
@@ -314,39 +298,6 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
     [courseData, currentBlockIndex, dispatch],
   );
 
-  const onChangeLessonTheme = useCallback(
-    (lessonTheme: LessonTheme, element: ILessonNode) => {
-      if (element.id === undefined) {
-        return;
-      }
-      const lessonIndex = element.id as number;
-
-      const au: CourseAU = {
-        ...courseData.blocks[currentBlockIndex].aus[lessonIndex],
-        lessonTheme,
-      };
-
-      dispatch(
-        updateCourseAuData({
-          au,
-          blockIndex: currentBlockIndex,
-          lessonIndex,
-        }),
-      );
-      dispatch(setDefaultLessonTheme(lessonTheme));
-      dispatch(updateDirtyDisplay({ reason: 'change lesson theme settings' }));
-    },
-    [courseData, currentBlockIndex, dispatch],
-  );
-
-  const onChangeCourseTheme = useCallback(
-    (courseTheme: LessonTheme) => {
-      dispatch(setCourseTheme(courseTheme));
-      dispatch(updateDirtyDisplay({ reason: 'change course theme settings' }));
-    },
-    [dispatch],
-  );
-
   const onChangeLessonName = useCallback(
     (newName: string, element: ILessonNode) => {
       if (element.id === undefined) {
@@ -354,19 +305,14 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
       }
       const lessonIndex = element.id as number;
 
-      if (
-        !courseData ||
-        !courseData.blocks ||
-        !courseData.blocks[currentBlockIndex] ||
-        !courseData.blocks[currentBlockIndex].aus ||
-        !courseData.blocks[currentBlockIndex].aus[lessonIndex]
-      ) {
+      const originalAu = courseData.blocks[currentBlockIndex].aus[lessonIndex];
+      if (!originalAu) {
         debugLogError('Course data or AU not available for lesson name change');
         return;
       }
 
       const au: CourseAU = {
-        ...courseData.blocks[currentBlockIndex].aus[lessonIndex],
+        ...originalAu,
         auName: newName,
       };
 
@@ -388,17 +334,11 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
         return;
       }
 
-      if (
-        !courseData ||
-        !courseData.blocks ||
-        !courseData.blocks[currentBlockIndex] ||
-        !courseData.blocks[currentBlockIndex].aus ||
-        !courseData.blocks[currentBlockIndex].aus[element.lesson] ||
-        !courseData.blocks[currentBlockIndex].aus[element.lesson].slides ||
-        !courseData.blocks[currentBlockIndex].aus[element.lesson].slides[
-        element.slide
-        ]
-      ) {
+      const originalSlide =
+        courseData.blocks[currentBlockIndex].aus[element.lesson].slides[
+          element.slide
+        ];
+      if (!originalSlide) {
         debugLogError(
           'Course data or slide not available for slide name change',
         );
@@ -406,9 +346,7 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
       }
 
       const slide = {
-        ...courseData.blocks[currentBlockIndex].aus[element.lesson].slides[
-        element.slide
-        ],
+        ...originalSlide,
         slideTitle: newName,
       };
 
@@ -557,7 +495,9 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
         break;
       case MessageType.changeCourse:
         if (message.meta.coursePath) {
-          handleLoadCourse(message.meta.coursePath);
+          handleLoadCourse(message.meta.coursePath).catch((e) => {
+            throw e;
+          });
         }
         break;
       case MessageType.createCourse:
@@ -622,8 +562,6 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
         addEditor: onAddEditor,
         changeCourseName: onChangeCourseName,
         changeLessonMoveOn: onChangeLessonMoveOn,
-        changeLessonTheme: onChangeLessonTheme,
-        changeCourseTheme: onChangeCourseTheme,
         changeLessonName: onChangeLessonName,
         changeSlideName: onChangeSlideName,
         deleteLesson: onDeleteLesson,

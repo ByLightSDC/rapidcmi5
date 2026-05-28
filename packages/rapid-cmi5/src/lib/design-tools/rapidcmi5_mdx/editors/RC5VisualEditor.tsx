@@ -115,6 +115,7 @@ import { linkDialogPlugin } from '../plugins/link-dialog';
 import { draggableBlockPlugin } from '../plugins/draggable-block';
 import { gutterClickPlugin } from '../plugins/gutter-click/GutterClickPlugin';
 import { CurrentLessonAssetsContextProvider } from '../../course-builder/GitViewer/session/LessonAssetsContext';
+import { LessonTheme } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -147,8 +148,15 @@ function RC5VisualEditor() {
   const pixelTop = (isAppHeaderShowing ? 40 : 0) + (isEditing ? 87 : 0);
 
   const currentLessonTheme = useMemo(() => {
-    return courseData?.blocks?.[currentBlockIndex]?.aus?.[currentAuIndex]
-      ?.lessonTheme;
+    const lessonTheme =
+      courseData?.blocks?.[currentBlockIndex]?.aus?.[currentAuIndex]
+        ?.lessonTheme;
+
+    const currentTheme: LessonTheme = {
+      ...courseData.courseTheme,
+      ...lessonTheme,
+    };
+    return currentTheme;
   }, [courseData, currentBlockIndex, currentAuIndex]);
 
   const themeClass = useRef(

@@ -6,9 +6,7 @@ import YAML from 'yaml';
 import {
   CourseAU,
   CourseData,
-  generateAuId,
   KSATElement,
-  LessonTheme,
   Operation,
   RC5_VERSION,
   RC5ScenarioContent,
@@ -537,7 +535,6 @@ export interface CreateLessonOptions extends FsContextOptions {
   blockIndex: number;
   auName: string;
   coursePath: string;
-  defaultLessonTheme?: LessonTheme;
 }
 
 export const createLesson = async ({
@@ -547,7 +544,6 @@ export const createLesson = async ({
   blockIndex,
   auName,
   coursePath,
-  defaultLessonTheme,
 }: CreateLessonOptions) => {
   if (blockIndex < 0 || blockIndex >= courseData.blocks.length) {
     throw new Error(`Invalid blockIndex ${blockIndex}`);
@@ -568,15 +564,6 @@ export const createLesson = async ({
   const slideSlug = slugifyPath(defaultEmptySlide.slideTitle);
   const filepath = join(uniqueAuPath, `${slideSlug}.md`);
 
-  // Logo paths are AU-relative and won't resolve under a different AU,
-  // so don't inherit them from the previous lesson's default theme.
-  const inheritedTheme = defaultLessonTheme
-    ? (() => {
-        const { lessonLogoLight, lessonLogoDark, ...rest } = defaultLessonTheme;
-        return rest;
-      })()
-    : undefined;
-
   const theNewLesson: CourseAU = {
     auName,
     dirPath: uniqueAuPath,
@@ -586,7 +573,6 @@ export const createLesson = async ({
         filepath,
       },
     ],
-    ...(inheritedTheme ? { lessonTheme: inheritedTheme } : {}),
   };
 
   // Get original block
@@ -645,7 +631,7 @@ export const computeCourseFromJsonFs = async ({
     throw Error('Course Data is null');
   }
 
-  let rc5Meta = await readRC5Meta(
+  const rc5Meta = await readRC5Meta(
     r,
     fsInstance,
     join(course.basePath, RC5_FILENAME),

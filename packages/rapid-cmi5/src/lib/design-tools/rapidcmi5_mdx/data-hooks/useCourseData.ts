@@ -5,7 +5,6 @@ import {
   currentAu,
   currentBlock,
   currentSlideNum,
-  defaultLessonThemeSel,
   handleCacheChange,
   isLessonMounted,
   reorderLesson,
@@ -42,7 +41,6 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
   const currentBlockIndex = useSelector(currentBlock);
   const currentSlideIndex = useSelector(currentSlideNum);
   const isLessonMountedSel = useSelector(isLessonMounted);
-  const defaultLessonTheme = useSelector(defaultLessonThemeSel);
 
   const { currentCourse, syncCurrentCourseWithGit } = useContext(GitContext);
 
@@ -86,7 +84,7 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
     if (!repoAccessObject) return;
     const fsInstance = getFsInstance();
 
-    let blockIndex = courseData.blocks.findIndex(
+    const blockIndex = courseData.blocks.findIndex(
       (block) => block.blockName === req.blockName,
     );
 
@@ -97,7 +95,6 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
       coursePath: req.coursePath,
       fsInstance: fsInstance,
       r: repoAccessObject,
-      defaultLessonTheme,
     });
 
     if (!newCourseData) {
@@ -241,8 +238,8 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
   /**
    *  reverts course data in redux to git FILES system
    */
-  const discardLessonChanges = useCallback(() => {
-    syncCurrentCourseWithGit(courseData);
+  const discardLessonChanges = useCallback(async () => {
+    await syncCurrentCourseWithGit(courseData);
   }, [courseData, syncCurrentCourseWithGit]);
 
   /**

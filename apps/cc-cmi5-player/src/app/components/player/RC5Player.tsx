@@ -73,6 +73,7 @@ import { mediaEventManager } from '../../utils/MediaEventManager';
 import { logger } from '../../debug';
 import { useSelector } from 'react-redux';
 import { auJsonSel, slideWidth } from '../../redux/auReducer';
+import { LessonTheme } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -90,7 +91,12 @@ function RC5Player() {
   const [slideAnimations, setSlideAnimations] = useState<AnimationConfig[]>([]);
   const slideWidthSel = useSelector(slideWidth);
   const auJson = useSelector(auJsonSel);
-  const currentLessonTheme = auJson?.lessonTheme;
+  const lessonTheme = auJson.lessonTheme;
+  const courseTheme = auJson.buildTimeProps.courseTheme;
+  const currentLessonTheme: LessonTheme = {
+    ...courseTheme,
+    ...lessonTheme,
+  };
   const themeClass = useRef(
     `lesson-theme-${Math.random().toString(36).slice(2, 9)}`,
   ).current;
@@ -117,7 +123,6 @@ function RC5Player() {
     // Cleanup — if the user switches slides before 150ms is up, cancel the previous timeout.
     return () => clearTimeout(id);
   }, [activeTab]);
-
 
   const thePlugins = useMemo(() => {
     const initialList = [
@@ -168,7 +173,10 @@ function RC5Player() {
       }),
       headingsPlugin(),
       htmlPlugin(),
-      videoPlugin({ disableVideoResize: true, disableVideoSettingsButton: true }),
+      videoPlugin({
+        disableVideoResize: true,
+        disableVideoSettingsButton: true,
+      }),
       imagePlayerPlugin(),
       animationPlayerPlugin(),
       ariaOverridePlugin(),

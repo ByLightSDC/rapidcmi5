@@ -35,6 +35,7 @@ import {
 } from '@rapid-cmi5/cmi5-build-common';
 
 import { RC5Context } from '../../contexts/RC5Context';
+import { ThemeContext } from '../../contexts/ThemeContext';
 import { useRC5Prompts } from '../../modals/useRC5Prompts';
 import { Renamer } from './Renamer';
 import { MoveOnCriteriaForm } from './MoveOnCriteriaForm';
@@ -79,13 +80,9 @@ function LessonTree({
     handleReorderLesson,
   } = useCourseData();
 
-  const {
-    changeLessonMoveOn,
-    changeLessonName,
-    changeSlideName,
-    saveSlide,
-    changeLessonTheme,
-  } = useContext(RC5Context);
+  const { changeLessonMoveOn, changeLessonName, changeSlideName, saveSlide } =
+    useContext(RC5Context);
+  const { changeLessonTheme } = useContext(ThemeContext);
 
   const repoAccessObject = useSelector(currentRepoAccessObjectSel);
   const isAppHeaderShowing = useSelector(appHeaderVisible);
