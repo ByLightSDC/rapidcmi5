@@ -1,51 +1,71 @@
 import { test, expect } from '@playwright/test';
+import {
+  SYNTHETIC_LAUNCH_PARAMS,
+  goToPlayer,
+  uploadFixture,
+} from '../e2e-utils';
 
 /**
- * Player infrastructure smoke test.
+ * Player smoke + first fixture-driven test.
  *
- * Proves the Playwright wiring against the player dev server works
- * end-to-end without depending on any fixture upload. Just:
- *   - dev server responding on :4201
- *   - player bundle loads
- *   - player renders *something* — whatever's currently in
- *     apps/cc-cmi5-player/src/test/config.json
+ * The first test is pure infrastructure: prove the player serves on
+ * :4201, the bundle loads, the React root mounts. No fixture upload —
+ * whatever was previously in `apps/cc-cmi5-player/src/test/config.json`
+ * is what renders. This catches "dev server is dead" before we ever
+ * try the more elaborate fixture flow.
  *
- * **Layer (L3) discipline:** this is a wiring sanity check, not a
- * content assertion. Once we start uploading per-test fixtures, the
- * directive-specific specs will assert on actual rendered content.
+ * The second test uploads the committed `e2e-tests-course.zip` fixture
+ * (a real published course produced by the editor's "Test in Player"
+ * flow) and verifies it loads. This is the first real end-to-end check
+ * that the publish → player handoff works against a known-good artifact.
  *
- * Launch params (`endpoint`, `fetch`, `actor`, `activityId`,
- * `registration`) mirror what Moodle's CMI5 plugin would supply. Stubbed
- * to "test" so the player accepts them but doesn't try to reach a real
- * LRS during the smoke.
+ * **Layer (L3) discipline:** these tests only verify the player
+ * *renders*, not that specific slide content is correct. Slide-by-slide
+ * content assertions and directive playback behaviour belong in their
+ * own specs (slide-navigation, view-media, view-blocks, activities,
+ * exit — see [Student backlog](../../../../docs/moodle-player-e2e-strategy.md)).
  */
 
-const LAUNCH_PARAMS =
-  '?endpoint=test&fetch=test&actor=test&activityId=test&registration=test';
-
-test.describe('player smoke', () => {
-  test('player serves and renders content with synthetic CMI5 launch params', async ({
-    page,
-  }) => {
-    await page.goto(`/${LAUNCH_PARAMS}`);
+test.describe('player infrastructure', () => {
+  test('serves on :4201 and mounts the React root', async ({ page }) => {
+    await page.goto(`/${SYNTHETIC_LAUNCH_PARAMS}`);
     await page.waitForLoadState('domcontentloaded');
 
-    // Verify the page actually loaded (not blank, not an error page).
     await expect(page.locator('body')).toBeVisible();
-
-    // The player's title isn't strict, but it should be non-empty.
     const title = await page.title();
     expect(title).toBeTruthy();
 
-    // Sanity: a player root element should exist. The player's main.tsx
-    // mounts into #root (standard React entry).
     const root = page.locator('#root');
     await expect(root).toBeAttached();
 
-    // Smoke for actual rendering: the root should contain *something*
-    // (any text or any child element). If the bundle crashed on load,
-    // #root would be empty.
     const childCount = await root.locator('*').count();
     expect(childCount).toBeGreaterThan(0);
+  });
+});
+
+test.describe('e2e-tests (foundation fixture)', () => {
+  test('uploads the published course zip and the player loads it', async ({
+    page,
+    request,
+  }) => {
+    // The fixture was produced by the editor's "Test in Player" rocket-icon
+    // flow against a single-block / single-lesson course with 7 slides
+    // (welcome / image / video / audio / table / blocks / goodbye). The
+    // lesson lives at compiled_course/blocks/e2e-tests/core/ inside the
+    // zip — the dev server's /upload-lesson-zip endpoint expects this path.
+    await uploadFixture(
+      request,
+      'e2e-tests.zip',
+      'compiled_course/blocks/e2e-tests/core',
+    );
+
+    const root = await goToPlayer(page);
+
+    // Course-load smoke: after upload + navigation, the player should have
+    // rendered the slide. We don't assert specific text yet — that's the
+    // job of slide-by-slide specs. Here we just want to know that the
+    // upload was actually picked up and the player didn't crash on it.
+    const renderedText = await root.innerText();
+    expect(renderedText.length).toBeGreaterThan(0);
   });
 });

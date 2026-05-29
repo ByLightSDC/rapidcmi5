@@ -191,6 +191,7 @@ export const StatementsContainerEditor: React.FC<
   return (
     <>
       <Box
+        data-testid="directive-statements"
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         sx={{
           position: 'relative',

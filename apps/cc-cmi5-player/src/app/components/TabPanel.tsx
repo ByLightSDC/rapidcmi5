@@ -202,6 +202,7 @@ export default function TabPanel() {
         sx={{ flex: 1, minHeight: 0, width: '100%', overflowY: 'auto' }}
       >
         <Tabs
+          data-testid="player-slide-nav"
           orientation="vertical"
           variant="scrollable"
           value={activeTab}
@@ -243,6 +244,7 @@ export default function TabPanel() {
         >
           {auJson?.slides?.map((slide, index) => (
             <Tab
+              data-testid={`player-slide-tab-${index}`}
               sx={{
                 width: '100%',
                 backgroundColor: getSlideBackgroundColor(index),
@@ -282,6 +284,7 @@ export default function TabPanel() {
           ))}
           {/* Exit tab in its natural position at the end of the list */}
           <Tab
+            data-testid="player-exit-tab"
             ref={exitTabRef}
             value={auJson?.slides?.length ?? 0}
             sx={{
@@ -306,6 +309,7 @@ export default function TabPanel() {
       {/* Pinned Exit — only appears when the real Exit tab has scrolled out of view */}
       {!isExitTabVisible && (
         <Box
+          data-testid="player-exit-pinned"
           onClick={() => dispatch(setActiveTab(auJson?.slides?.length ?? 0))}
           sx={{
             flexShrink: 0,

@@ -259,6 +259,7 @@ export const ImageLabelEditor: React.FC<
     return createPortal(
       <>
         <Stack
+          data-testid="directive-image-label"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           direction="row"
