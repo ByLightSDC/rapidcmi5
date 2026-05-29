@@ -44,8 +44,18 @@ const getEnabledNamespaces = (): Set<string> => {
 };
 
 // Default ignored namespaces (default OFF unless enabled via localStorage)
-// allows for backward compatibility with existing logging system
-const defaultIgnoreNamespaces = new Set<string>(['lms']);
+// Animation directive logs ('wrap', 'selection', 'plugin', 'preview', 'drawer')
+// fire on every selection / wrap / preview event and are extremely noisy.
+// Opt in per-namespace via: localStorage.setItem('DEBUG_NAMESPACES', 'wrap,selection')
+const defaultIgnoreNamespaces = new Set<string>([
+  'lms',
+  'wrap',
+  'selection',
+  'plugin',
+  'preview',
+  'drawer',
+  'editor',
+]);
 
 const isNamespaceEnabled = (namespace?: string): boolean => {
   if (!namespace) {
