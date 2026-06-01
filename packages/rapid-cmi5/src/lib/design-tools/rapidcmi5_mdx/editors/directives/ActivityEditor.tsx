@@ -62,7 +62,6 @@ import {
 } from '@rapid-cmi5/ui';
 
 import ScenarioMock from './ScenarioMock';
-import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
 import {
   updateScenario,
   updateTeamScenario,
@@ -89,8 +88,6 @@ export const ActivityEditor: React.FC<
   const isPlayback = useCellValue(editorInPlayback$);
 
   const auProps = useAuContext();
-
-  const { userAuth, apiUrls } = useRapidCmi5Opts();
 
   const muiTheme: any = useTheme();
 
@@ -396,9 +393,6 @@ export const ActivityEditor: React.FC<
                 <CodeRunner
                   auProps={auProps}
                   content={fromJson as CodeRunnerContent}
-                  authType="Bearer"
-                  token={userAuth?.token}
-                  url={apiUrls?.codeRunnerUrl}
                   innerSx={innerActivitySx}
                   outerSx={outerSx}
                   outerStyle={outerStyle}

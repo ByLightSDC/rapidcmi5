@@ -309,32 +309,7 @@ export const NavViewMenu = ({
           </Tooltip>
         </IconButton>
       )}
-      {/* {showHomeButton && (
-        <IconButton
-          aria-label="repo-selection-button"
-          data-testid="repo-selection-button"
-          color="inherit"
-          size={iconButtonSize}
-          sx={buildIconButtonSx(viewMode === ViewModeEnum.RepoSelector)}
-          disableRipple
-          onClick={() => {
-            if (viewMode === ViewModeEnum.Designer) {
-              saveSlide();
-              promptNavAway(ViewModeEnum.RepoSelector);
-            } else {
-              dispatch(changeViewMode(ViewModeEnum.RepoSelector));
-            }
-          }}
-        >
-          <Tooltip arrow placement="right" title="All Projects">
-            <ArrowLeft
-              color={iconColor}
-              strokeWidth={1.25}
-              style={navIconStyle}
-            />
-          </Tooltip>
-        </IconButton>
-      )} */}
+
       <Box sx={{ height: '32px' }} />
     </Stack>
   );

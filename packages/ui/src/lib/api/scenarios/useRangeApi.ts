@@ -6,6 +6,7 @@ import {
 import { useRangeClient } from '../../contexts/ApiContext';
 import { scenarioKey } from './queryKeys';
 import { keepPreviousData } from '@tanstack/react-query';
+import { debugLog, debugLogError } from '../../utility/logger';
 
 export function useRangeApi() {
   const { enabled, client } = useRangeClient();
@@ -67,7 +68,7 @@ export function useRangeApi() {
         body: { scenarios: [scenarioUUID] },
       });
       if (updateResponse.status !== 200) {
-        console.error(`Could not update au mapping for auId: ${auId}`);
+        debugLogError(`Could not update au mapping for auId: ${auId}`);
         throw updateResponse.body;
       }
     } else if (status === 404) {
@@ -79,7 +80,7 @@ export function useRangeApi() {
         },
       });
       if (!(status == 201 || status == 200)) {
-        console.error(`Could not create au mapping for auId: ${auId}`);
+        debugLog(`Could not create au mapping for auId: ${auId}`);
         throw new Error('Failed to create au');
       }
     } else {

@@ -30,6 +30,7 @@ export const electronFetchApi: ApiFetcher = async ({
 
   // ts-rest expects parsed body when content-type is JSON
   const contentType = res.headers['content-type'] ?? '';
+
   const parsedBody = contentType.includes('application/json')
     ? JSON.parse(res.body)
     : res.body;

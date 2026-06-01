@@ -23,12 +23,11 @@ export function ScenarioSelectionModal({
       emptyTitle="No scenarios"
       emptyDescription="Create your first scenario to get started"
       fetchItems={(search, limit, offset) => {
-        const { data, error, isPending, isPlaceholderData } = searchScenarios(
+        const { data, error, isPending } = searchScenarios(
           search,
           limit,
           offset,
         );
-        console.log('data', data, isPlaceholderData);
 
         return {
           body: data?.body,

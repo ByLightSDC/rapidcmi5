@@ -31,9 +31,6 @@ import { useCodeRunnerApi } from '../../api/codeRunner/useCodeRunnerApi';
 type CodeRunnerProps = {
   auProps: Partial<AuContextProps>;
   content: CodeRunnerContent;
-  authType: 'Basic' | 'Bearer';
-  token?: string;
-  url?: string;
   innerSx?: SxProps;
   outerSx?: SxProps;
   outerStyle?: OuterStyle;

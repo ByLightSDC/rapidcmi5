@@ -22,7 +22,7 @@ export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {
           <ApiProviders
             token={rapidCmi5Opts.userAuth?.token}
             rangeUrl={rapidCmi5Opts.apiUrls?.rangeUrl}
-            codeRunnerUrl={rapidCmi5Opts.apiUrls?.rangeUrl}
+            codeRunnerUrl={rapidCmi5Opts.apiUrls?.codeRunnerUrl}
             quizBankUrl={rapidCmi5Opts.apiUrls?.quizBankUrl}
             isElectron={isElectron}
           >
