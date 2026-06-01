@@ -1,5 +1,10 @@
-import { RC5ActivityTypeEnum } from './activity';
-import { Cmi5Scenario, CourseAU, CourseData, SlideType } from './course';
+import { RC5ActivityTypeEnum } from './activities/activity';
+import {
+  Cmi5Scenario,
+  CourseAU,
+  CourseData,
+  SlideType,
+} from './courseStructure/course';
 import { QuizState } from './quiz';
 import { ActivityScore } from './score';
 

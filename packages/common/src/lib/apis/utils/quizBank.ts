@@ -4,7 +4,7 @@ import {
   QuestionBankApiCreate,
   quizBankContract,
 } from '../quizBankContract';
-import { RC5ActivityTypeEnum } from '../../types/activity';
+import { RC5ActivityTypeEnum } from '../../types/activities/activity';
 
 type QuizBankClient = InitClientReturn<
   typeof quizBankContract,

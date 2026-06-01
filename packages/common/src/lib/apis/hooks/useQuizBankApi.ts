@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { quizBankContract } from '../quizBankContract';
 import { initClient } from '@ts-rest/core';
-import { RC5ActivityTypeEnum } from '../../types/activity';
+import { RC5ActivityTypeEnum } from '../../types/activities/activity';
 import {
   QuizBankApiError,
   handleAddQuestion,
@@ -21,7 +21,7 @@ export function useQuizBankApi(url?: string, token?: string) {
             baseUrl: url,
             baseHeaders: {
               Authorization: `Bearer ${token}`,
-            }
+            },
           })
         : undefined,
     [url, token],

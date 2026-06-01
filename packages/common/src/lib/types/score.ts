@@ -1,8 +1,11 @@
-import { RC5ActivityTypeEnum } from './activity';
+import { RC5ActivityTypeEnum } from './activities/activity';
 import { CodeRunnerContent, CodeRunnerSubmitResponse } from './codeRunner';
 import { CTFContent } from './ctf';
 import { QuizContent, QuizScore } from './quiz';
-import { ScenarioContent, ScenarioSubmitResponse } from './slide';
+import {
+  ScenarioContent,
+  ScenarioSubmitResponse,
+} from './courseStructure/slide';
 import { TeamConsolesContent } from './teamConsoles';
 
 /**

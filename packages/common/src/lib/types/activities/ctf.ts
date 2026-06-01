@@ -1,6 +1,6 @@
 // Ensure that whenever the types change ./utils/ajv-schema-generator.sh is ran
 
-import { BaseActivity } from './activity';
+import { BaseActivity } from './activities/activity';
 import { QuestionGrading, QuizCompletionEnum } from './quiz';
 
 /**

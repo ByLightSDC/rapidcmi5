@@ -6,7 +6,7 @@ import {
   ScenarioQuery,
   PaginatedScenariosResponse,
 } from '../scenarioContract';
-import { CourseAU } from '../../types/course';
+import { CourseAU } from '../../types/courseStructure/course';
 import {
   handleCreateAuMapping,
   handleFetchScenario,

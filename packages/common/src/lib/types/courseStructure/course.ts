@@ -1,32 +1,6 @@
 import { z } from 'zod/v4';
-import { MoveOnCriteriaEnum } from './activity';
-
-// --- Lesson Theme Defaults ---
-
-export enum ContentWidthEnum {
-  None = 'none',
-  Small = 'small',
-  Medium = 'medium',
-  Large = 'large',
-}
-
-export enum BlockPaddingEnum {
-  None = 'none',
-  Small = 'small',
-  Medium = 'medium',
-  Large = 'large',
-  Custom = 'custom',
-}
-
-export enum DefaultAlignmentEnum {
-  Left = 'left',
-  Center = 'center',
-  Right = 'right',
-}
-
-export const contentWidthOptions = Object.values(ContentWidthEnum);
-export const blockPaddingOptions = Object.values(BlockPaddingEnum);
-export const defaultAlignmentOptions = Object.values(DefaultAlignmentEnum);
+import { MoveOnCriteriaEnum } from '../activities/activity';
+import { ThemeSchema } from '../ui/theme';
 
 export enum Operation {
   // Covers deleting a slide or AU
@@ -39,38 +13,16 @@ export enum Operation {
   Cancel = 'Cancel',
 }
 
-export enum CourseLevel {
-  Beginner = 'beginner',
-  Intermediate = 'intermediate',
-  Advanced = 'advanced',
-}
-
-export const Cmi5ScenarioSchema = z.object({
-  uuid: z.string().optional(),
-  name: z.string().optional(),
-  message: z.string().optional(),
-  status: z.string().optional(),
-});
-
 export const SlideSchema = z.object({
   slideTitle: z.string(),
-  type: z
-    .enum([
-      'markdown',
-      'quiz',
-      'ctf',
-      'rangeosScenario',
-      'sourceDoc',
-      'codeRunner',
-    ])
-    .describe(
-      'Slide type. Default to "markdown" unless the user asks for something else.',
-    ),
   filepath: z
     .string()
     .describe(
       'Slide path relative to the course root, e.g. "introduction/slide-1.md".',
     ),
+});
+
+export const RunTimeSlideSchema = SlideSchema.extend({
   content: z.string().optional().describe('Markdown body of the slide.'),
 });
 
@@ -82,19 +34,16 @@ export const KSATElementSchema = z.object({
   doc_identifier: z.string().optional(),
 });
 
-export const LessonThemeSchema = z.object({
-  contentWidth: z.enum(ContentWidthEnum).optional(),
-  blockPadding: z.enum(BlockPaddingEnum).optional(),
-  blockPaddingCustomValue: z.number().optional(),
-  defaultAlignment: z.enum(DefaultAlignmentEnum).optional(),
-  defaultActivityAlignment: z.enum(DefaultAlignmentEnum).optional(),
-});
-
-export const AuMetaDataSchema = z.object({
+export const MetaDataSchema = z.object({
   buildTime: z.string().optional(),
   remoteGitUrl: z.string().optional(),
   gitBranch: z.string().optional(),
   rc5Version: z.string().optional(),
+});
+
+export const CourseSettings = z.object({
+  courseTheme: ThemeSchema.optional(),
+  metadata: MetaDataSchema.optional(),
 });
 
 export const CourseAuSchema = z.object({
@@ -126,14 +75,24 @@ export const CourseAuSchema = z.object({
     ),
   ksats: z.array(KSATElementSchema).optional(),
   moveOnCriteria: z.enum(MoveOnCriteriaEnum).optional(),
-  lessonTheme: LessonThemeSchema.optional(),
-  metadata: AuMetaDataSchema.optional(),
+  lessonTheme: ThemeSchema.optional(),
+});
+
+const RuntimeCourseAuSchema = CourseAuSchema.extend({
+  // These values are only filled in at build time do to the constraint
+  // that an au cannot look at the entire RC5.yaml file but only the config.json
+  buildTimeProps: CourseSettings,
+  slides: z.array(RunTimeSlideSchema),
 });
 
 export const CourseBlockSchema = z.object({
   blockName: z.string(),
   blockDescription: z.string().optional(),
   aus: z.array(CourseAuSchema),
+});
+
+export const RuntimeBlockSchema = CourseBlockSchema.extend({
+  aus: z.array(RuntimeCourseAuSchema),
 });
 
 export const CourseDataSchemaZod = z.object({
@@ -145,14 +104,18 @@ export const CourseDataSchemaZod = z.object({
     ),
   courseDescription: z.string().optional(),
   author: z.string().optional(),
-  buildTime: z.string().optional(),
-  remoteGitUrl: z.string().optional(),
-  gitBranch: z.string().optional(),
-  rc5Version: z.string().optional(),
+  buildTimeProps: CourseSettings,
   blocks: z
     .array(CourseBlockSchema)
     .describe('Top-level course blocks. Most courses have a single block.'),
 });
+
+export const RuntimeCourseDataSchemaZod = CourseDataSchemaZod.extend({
+  blocks: z
+    .array(RuntimeBlockSchema)
+    .describe('Top-level course blocks. Most courses have a single block.'),
+});
+
 export const CreateCourseInputSchema = CourseDataSchemaZod.extend({
   repoName: z
     .string()
@@ -162,11 +125,20 @@ export const CreateCourseInputSchema = CourseDataSchemaZod.extend({
     ),
 });
 
-export type Cmi5Scenario = z.infer<typeof Cmi5ScenarioSchema>;
-export type LessonTheme = z.infer<typeof LessonThemeSchema>;
-export type AuMetaData = z.infer<typeof AuMetaDataSchema>;
+export type Theme = z.infer<typeof ThemeSchema>;
+export type MetaData = z.infer<typeof MetaDataSchema>;
+// This is stored in the RC5.yaml file
 export type CourseAU = z.infer<typeof CourseAuSchema>;
+// This is used by the visual editor and has content fields as well as
+// build time props fields which hold onto course level settings
+export type RuntimeCourseAu = z.infer<typeof RuntimeCourseAuSchema>;
 export type CourseBlock = z.infer<typeof CourseBlockSchema>;
 export type SlideType = z.infer<typeof SlideSchema>;
+export type RuntimeSlideType = z.infer<typeof RunTimeSlideSchema>;
 export type CourseData = z.infer<typeof CourseDataSchemaZod>;
 export const CourseDataSchema = z.toJSONSchema(CourseDataSchemaZod);
+
+export type RunTimeCourseData = z.infer<typeof RuntimeCourseDataSchemaZod>;
+export const RunTimeCourseDataSchema = z.toJSONSchema(
+  RuntimeCourseDataSchemaZod,
+);

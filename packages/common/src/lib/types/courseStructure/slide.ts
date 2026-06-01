@@ -1,7 +1,6 @@
 // Ensure that whenever the types change ./utils/ajv-schema-generator.sh is ran
 
-import { BaseActivity, KSATElement } from './activity';
-import { SxProps } from '@mui/material';
+import { BaseActivity, KSATElement } from '../activities/activity';
 
 export const defaultSlideContent = '# Slide'; //TODO focus issues if you try to paste blank
 

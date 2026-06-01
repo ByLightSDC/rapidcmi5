@@ -1,7 +1,13 @@
-
 import Ajv, { ErrorObject } from 'ajv';
-import { ScenarioContent } from '../types/slide';
-import { DownloadFilesSchema, QuizContentSchema, ScenarioContentSchema, TeamConsolesContentSchema, CTFContentSchema, CodeRunnerContentSchema } from '../..';
+import { ScenarioContent } from '../types/courseStructure/slide';
+import {
+  DownloadFilesSchema,
+  QuizContentSchema,
+  ScenarioContentSchema,
+  TeamConsolesContentSchema,
+  CTFContentSchema,
+  CodeRunnerContentSchema,
+} from '../..';
 import { CTFContent } from '../types/ctf';
 import { DownloadFilesContent } from '../types/download';
 import { CodeRunnerContent } from '../types/codeRunner';
@@ -34,7 +40,6 @@ const validateContent = <T>(
   data: unknown,
   schema: object,
 ): ValidationResult<T> => {
-
   try {
     const validate = ajv.compile(schema);
     const valid = validate(data);

@@ -1,8 +1,8 @@
 // Ensure that whenever the types change ./utils/ajv-schema-generator.sh is ran
 
 import { z } from 'zod/v4';
-import { MoveOnCriteriaEnum } from './activity';
-import { KSATElementSchema } from './course';
+import { MoveOnCriteriaEnum } from './activities/activity';
+import { KSATElementSchema } from './courseStructure/course';
 
 export enum QuestionResponse {
   FreeResponse = 'freeResponse',

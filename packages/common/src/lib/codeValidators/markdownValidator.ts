@@ -14,7 +14,7 @@ import {
   validateScenarioContent,
   validateTeamConsolesContent,
 } from './directiveValidators';
-import { RC5ScenarioContent } from '../types/slide';
+import { RC5ScenarioContent } from '../types/courseStructure/slide';
 import { TeamConsolesContent } from '../types/teamConsoles';
 
 // We create our own version from monaco editor, no reason to be tied up with theres

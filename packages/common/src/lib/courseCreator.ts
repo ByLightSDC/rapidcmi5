@@ -1,8 +1,11 @@
 import YAML from 'yaml';
 
 import { getScenarioDirectives } from './codeValidators/markdownValidator';
-import { CourseData } from './types/course';
-import { RC5ScenarioContent, SlideTypeEnum } from './types/slide';
+import { CourseData } from './types/courseStructure/course';
+import {
+  RC5ScenarioContent,
+  SlideTypeEnum,
+} from './types/courseStructure/slide';
 import { TeamConsolesContent } from './types/teamConsoles';
 import { RC5_VERSION } from './versions';
 

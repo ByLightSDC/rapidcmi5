@@ -1,0 +1,38 @@
+// --- Lesson Theme Defaults ---
+
+import { z } from 'zod/v4';
+
+export enum ContentWidthEnum {
+  None = 'none',
+  Small = 'small',
+  Medium = 'medium',
+  Large = 'large',
+}
+
+export enum BlockPaddingEnum {
+  None = 'none',
+  Small = 'small',
+  Medium = 'medium',
+  Large = 'large',
+  Custom = 'custom',
+}
+
+export enum DefaultAlignmentEnum {
+  Left = 'left',
+  Center = 'center',
+  Right = 'right',
+}
+
+export const contentWidthOptions = Object.values(ContentWidthEnum);
+export const blockPaddingOptions = Object.values(BlockPaddingEnum);
+export const defaultAlignmentOptions = Object.values(DefaultAlignmentEnum);
+
+export const ThemeSchema = z.object({
+  contentWidth: z.enum(ContentWidthEnum).optional(),
+  blockPadding: z.enum(BlockPaddingEnum).optional(),
+  blockPaddingCustomValue: z.number().optional(),
+  defaultAlignment: z.enum(DefaultAlignmentEnum).optional(),
+  defaultActivityAlignment: z.enum(DefaultAlignmentEnum).optional(),
+  logoLight: z.string().optional(),
+  logoDark: z.string().optional(),
+});
