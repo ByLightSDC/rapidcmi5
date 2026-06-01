@@ -1,7 +1,7 @@
 import SquirrelEvents from './app/events/squirrel.events';
 import ElectronEvents from './app/events/electron.events';
 import UpdateEvents from './app/events/update.events';
-import { BrowserWindow, dialog, ipcMain, shell } from 'electron';
+import { BrowserWindow, dialog, ipcMain, net, shell } from 'electron';
 import App from './app/app';
 import path, * as nodePath from 'path'; // Renamed to avoid conflicts
 import { pipeline } from 'stream/promises';
@@ -18,22 +18,7 @@ import {
   Credentials,
   GitUserConfig,
   SSOConfig,
-  ScenarioQuery,
-  CourseAU,
-  ExecuteCodeBodyApi,
-  QuestionBankApiCreate,
-  RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
-import {
-  fetchScenario,
-  listScenarios,
-  processAu,
-  listLanguages,
-  executeCode,
-  searchQuestions,
-  addQuestion,
-  deleteQuestion,
-} from './app/api/rangeApi';
 import {
   decryptCredentials,
   encryptCredentials,
@@ -803,67 +788,25 @@ ipcMain.handle('userSettingsApi:removeCert', (_e, id: string) => {
   applyCustomCerts();
 });
 
-// ── Range / Scenario API ──────────────────────────────────────────────────────
-ipcMain.handle(
-  'rangeApi:fetchScenario',
-  (_e, baseUrl: string, token: string, uuid: string) =>
-    fetchScenario(baseUrl, token, uuid),
-);
+// Handle frontend API calls to not deal with CORS errors due to electron running on localhost
+// This should likely be solved in keycloak, but to deal with servers where we do not control keycloak
+// we must instead proxy through
+// main.ts
 
 ipcMain.handle(
-  'rangeApi:listScenarios',
-  (_e, baseUrl: string, token: string, query: ScenarioQuery) =>
-    listScenarios(baseUrl, token, query),
-);
-
-ipcMain.handle(
-  'rangeApi:processAu',
-  (_e, baseUrl: string, token: string, au: CourseAU, blockId: string) =>
-    processAu(baseUrl, token, au, blockId),
-);
-
-// ── Code Runner API ───────────────────────────────────────────────────────────
-ipcMain.handle(
-  'rangeApi:listLanguages',
-  (_e, baseUrl: string, token: string, authType: 'Basic' | 'Bearer') =>
-    listLanguages(baseUrl, token, authType),
-);
-
-ipcMain.handle(
-  'rangeApi:executeCode',
-  (
-    _e,
-    baseUrl: string,
-    token: string,
-    authType: 'Basic' | 'Bearer',
-    body: ExecuteCodeBodyApi,
-  ) => executeCode(baseUrl, token, authType, body),
-);
-
-// ── Quiz Bank API ─────────────────────────────────────────────────────────────
-ipcMain.handle(
-  'rangeApi:searchQuestions',
-  (
-    _e,
-    baseUrl: string,
-    token: string,
-    query: string,
-    page: number,
-    limit: number,
-    activityType?: RC5ActivityTypeEnum,
-  ) => searchQuestions(baseUrl, token, query, page, limit, activityType),
-);
-
-ipcMain.handle(
-  'rangeApi:addQuestion',
-  (_e, baseUrl: string, token: string, body: QuestionBankApiCreate) =>
-    addQuestion(baseUrl, token, body),
-);
-
-ipcMain.handle(
-  'rangeApi:deleteQuestion',
-  (_e, baseUrl: string, token: string, uuid: string) =>
-    deleteQuestion(baseUrl, token, uuid),
+  'api:request',
+  async (_event, { url, method, headers, body }) => {
+    const response = await net.fetch(url, { method, headers, body });
+    const responseHeaders: Record<string, string> = {};
+    response.headers.forEach((value, key) => {
+      responseHeaders[key] = value;
+    });
+    return {
+      status: response.status,
+      headers: responseHeaders,
+      body: await response.text(),
+    };
+  },
 );
 
 // Test In Player Handler — writes config.json directly from in-memory AU data,

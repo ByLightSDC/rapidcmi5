@@ -24,10 +24,9 @@ import {
 
 import { deepmerge } from '@mui/utils';
 
-import { ScenarioForm } from '../forms/scenario/ScenarioForm';
-import { CodeRunnerForm } from '../forms/CodeRunnerForm';
+import { CodeRunnerForm } from '../../../../features/codeRunner/components/CodeRunnerForm';
 
-import { QuizForm } from '../forms/QuizForm';
+import { QuizForm } from '../../../../features/quiz/components/QuizForm';
 import { useAuContext } from '../../data-hooks/useAuContext';
 import DeleteIconButton from '../components/DeleteIconButton';
 import { useDispatch } from 'react-redux';
@@ -62,10 +61,13 @@ import {
   config,
 } from '@rapid-cmi5/ui';
 
-import { updateScenario, updateTeamScenario } from '@rapid-cmi5/react-editor';
 import ScenarioMock from './ScenarioMock';
-import { useRapidCmi5Opts } from '../../../course-builder/GitViewer/session/RapidCmi5OptsContext';
-import { TeamConsolesForm } from '../forms/scenario/TeamConsolesForm';
+import {
+  updateScenario,
+  updateTeamScenario,
+} from '../../../../redux/courseBuilderReducer';
+import { ScenarioForm } from '../../../../features/scenarios/components/forms/IndividualScenarioForm';
+import { TeamConsolesForm } from '../../../../features/scenarios/components/forms/TeamScenarioForm';
 
 /**
  * MDX Editor for Activities
@@ -87,10 +89,7 @@ export const ActivityEditor: React.FC<
 
   const auProps = useAuContext();
 
-  const { userAuth, apiUrls } = useRapidCmi5Opts();
-
   const muiTheme: any = useTheme();
-
 
   const { lessonTheme } = useContext(LessonThemeContext);
   const {
@@ -351,7 +350,6 @@ export const ActivityEditor: React.FC<
           {name === 'ctf' && fromJson && (
             <>
               {isPlayback && (
-                // eslint-disable-next-line react/jsx-no-useless-fragment
                 <>
                   {fromJson.questions.length === 0 ? (
                     <Stack
@@ -395,9 +393,6 @@ export const ActivityEditor: React.FC<
                 <CodeRunner
                   auProps={auProps}
                   content={fromJson as CodeRunnerContent}
-                  authType="Bearer"
-                  token={userAuth?.token}
-                  url={apiUrls?.codeRunnerUrl}
                   innerSx={innerActivitySx}
                   outerSx={outerSx}
                   outerStyle={outerStyle}
@@ -483,7 +478,6 @@ const ActivityThemeWrapper = ({
   isPlayback: boolean;
 }) => {
   if (isPlayback) {
-
     const overriddenTheme: any = deepmerge(darkTheme, config.THEME.DARK);
 
     if (overriddenTheme?.palette?.info?.light) {

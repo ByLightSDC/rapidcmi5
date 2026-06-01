@@ -113,7 +113,16 @@ export async function loginSSORedirect(): Promise<TokenResponse> {
   if (!ssoConfig.redirectUrl)
     throw new Error('SSO redirect URL is not configured');
 
-  const redirectUri = ssoConfig.redirectUrl;
+  // Normalize through URL so the authorize request and the token-exchange
+  // request send the byte-identical redirect_uri. openid-client derives the
+  // token-exchange redirect_uri from new URL(callback).href with search/hash
+  // stripped, which silently rewrites missing paths, default ports, and case
+  // — if we don't normalize here too, Keycloak rejects with invalid_grant
+  // "Incorrect redirect_uri".
+  const normalized = new URL(ssoConfig.redirectUrl);
+  normalized.search = '';
+  normalized.hash = '';
+  const redirectUri = normalized.href;
   const config = await getOidcConfig();
 
   const codeVerifier = oidc.randomPKCECodeVerifier();
@@ -168,7 +177,6 @@ export async function loginSSORedirect(): Promise<TokenResponse> {
             pkceCodeVerifier: codeVerifier,
             expectedState: state,
           },
-          { redirect_uri: redirectUri },
         );
         resolve(tokens as unknown as TokenResponse);
       } catch (err) {

@@ -171,9 +171,6 @@ export const ActivityPlayback: React.FC<
           <CodeRunner
             auProps={auProps}
             content={fromJson as CodeRunnerContent}
-            authType="Basic"
-            url={config.DEVOPS_API_URL}
-            token={cmi5Instance.getAuthToken()}
             innerSx={innerActivitySx}
             outerSx={outerSx}
             outerStyle={outerStyle}

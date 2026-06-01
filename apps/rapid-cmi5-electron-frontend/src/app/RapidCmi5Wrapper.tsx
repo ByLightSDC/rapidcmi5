@@ -1,23 +1,9 @@
 import { Credentials, GitUserConfig } from '@rapid-cmi5/cmi5-build-common';
-import {
-  RapidCmi5,
-  GetScenarioFormProps,
-  GetQuizBankAddModalProps,
-  GetQuizBankSearchModalProps,
-} from '@rapid-cmi5/react-editor';
-import { useContext, useMemo } from 'react';
-import { ScenarioSelectionForm } from './shared/modals/ScenarioSelectionModal';
+import { RapidCmi5 } from '@rapid-cmi5/react-editor';
+import { useContext } from 'react';
 import { UserConfigContext } from './contexts/UserConfigContext';
 import { AuthContext } from './contexts/AuthContext';
-import AddToQuizBankForm from './shared/modals/quizBank/AddToQuizBankForm';
-import QuizBankSearchForm from './shared/modals/quizBank/SearchQuizBankForm';
-import {
-  useScenarioApi,
-  CourseAU,
-  ScenarioQuery,
-} from '@rapid-cmi5/cmi5-build-common';
 import { detectIsElectron } from './utils/appType';
-import { rangeApi as electronRangeApi } from './electronApi';
 import { useAppUi } from './contexts/AppUiContext';
 
 export function RapidCmi5Wrapper() {
@@ -30,37 +16,6 @@ export function RapidCmi5Wrapper() {
 
   const quizBankURL = ssoConfig?.quizBankApiUrl;
   const rangeURL = ssoConfig?.rangeRestApiUrl;
-
-  const {
-    fetchScenario: webFetchScenario,
-    processAu: webProcessAu,
-    listScenarios: webListScenarios,
-    createAuMapping: webCreateAuMapping,
-  } = useScenarioApi(rangeURL, token);
-
-  const fetchScenario = useMemo(() => {
-    if (!rangeURL || !token) return undefined;
-    if (isElectron)
-      return (uuid: string) =>
-        electronRangeApi.fetchScenario(rangeURL, token, uuid);
-    return webFetchScenario;
-  }, [rangeURL, token, isElectron, webFetchScenario]);
-
-  const processAu = useMemo(() => {
-    if (!rangeURL || !token) return undefined;
-    if (isElectron)
-      return (au: CourseAU, blockId: string) =>
-        electronRangeApi.processAu(rangeURL, token, au, blockId);
-    return webProcessAu;
-  }, [rangeURL, token, isElectron, webProcessAu]);
-
-  const listScenarios = useMemo(() => {
-    if (!rangeURL || !token) return undefined;
-    if (isElectron)
-      return (query: ScenarioQuery) =>
-        electronRangeApi.listScenarios(rangeURL, token, query);
-    return webListScenarios;
-  }, [rangeURL, token, isElectron, webListScenarios]);
 
   const handleOverrideGlobalGitConfig = (
     config?: GitUserConfig,
@@ -83,7 +38,6 @@ export function RapidCmi5Wrapper() {
   return (
     <RapidCmi5
       handleOverrideGlobalGitConfig={handleOverrideGlobalGitConfig}
-      showHomeButton={true}
       userAuth={{
         token,
         userEmail: userEmail,
@@ -95,49 +49,8 @@ export function RapidCmi5Wrapper() {
         const response = await fetch('/assets/cc-cmi5-player.zip');
         return response;
       }}
-      processAu={processAu}
-      createAuMapping={webCreateAuMapping}
-      fetchScenario={fetchScenario}
-      GetScenariosForm={
-        listScenarios
-          ? (props: GetScenarioFormProps) => (
-              <ScenarioSelectionForm
-                submitForm={props.submitForm}
-                formType={props.formType}
-                errors={props.errors}
-                formMethods={props.formMethods}
-                listScenarios={listScenarios}
-              />
-            )
-          : undefined
-      }
-      QuizBankAddModal={
-        quizBankURL && token
-          ? (props: GetQuizBankAddModalProps) => (
-              <AddToQuizBankForm
-                closeModal={props.closeModal}
-                question={props.question}
-                url={quizBankURL}
-                token={token}
-              />
-            )
-          : undefined
-      }
-      QuizBankSearchModal={
-        quizBankURL && token
-          ? (props: GetQuizBankSearchModalProps) => (
-              <QuizBankSearchForm
-                closeModal={props.closeModal}
-                activityType={props.activityType}
-                submitForm={props.submitForm}
-                currentUserEmail={userEmail}
-                url={quizBankURL}
-                token={token}
-              />
-            )
-          : undefined
-      }
       apiUrls={{
+        rangeUrl: rangeURL,
         codeRunnerUrl: rangeURL,
         quizBankUrl: quizBankURL,
       }}

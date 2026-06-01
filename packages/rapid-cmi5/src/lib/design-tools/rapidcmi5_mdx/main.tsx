@@ -10,19 +10,30 @@ import Landing from './Landing';
 import { Provider } from 'react-redux';
 import { persistor, store } from '../../redux/store';
 import { PersistGate } from 'redux-persist/integration/react';
+import { ApiProviders } from '@rapid-cmi5/ui';
+import { detectIsElectron } from '../course-builder/GitViewer/utils/gitFsInstance';
 
 export function RapidCmi5(rapidCmi5Opts: RapidCmi5Opts) {
+  const isElectron = detectIsElectron();
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <RapidCmi5OptsProvider opts={rapidCmi5Opts}>
-          <GitContextProvider>
-            <RC5ContextProvider>
-              <ElectronEventsBridge />
-              <RC5Modals />
-              <Landing showHomeButton={rapidCmi5Opts.showHomeButton} />
-            </RC5ContextProvider>
-          </GitContextProvider>
+          <ApiProviders
+            token={rapidCmi5Opts.userAuth?.token}
+            rangeUrl={rapidCmi5Opts.apiUrls?.rangeUrl}
+            codeRunnerUrl={rapidCmi5Opts.apiUrls?.codeRunnerUrl}
+            quizBankUrl={rapidCmi5Opts.apiUrls?.quizBankUrl}
+            isElectron={isElectron}
+          >
+            <GitContextProvider>
+              <RC5ContextProvider>
+                <ElectronEventsBridge />
+                <RC5Modals />
+                <Landing />
+              </RC5ContextProvider>
+            </GitContextProvider>
+          </ApiProviders>
         </RapidCmi5OptsProvider>
       </PersistGate>
     </Provider>

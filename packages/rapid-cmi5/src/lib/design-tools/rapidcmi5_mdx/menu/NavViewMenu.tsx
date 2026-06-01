@@ -33,11 +33,9 @@ const navIconStyle = { position: 'relative' as const };
  * @returns
  */
 export const NavViewMenu = ({
-  showHomeButton,
   isLeftPanelCollapsed,
   onToggleLeftPanel,
 }: {
-  showHomeButton?: boolean;
   isLeftPanelCollapsed?: boolean;
   onToggleLeftPanel?: () => void;
 }) => {
@@ -156,32 +154,31 @@ export const NavViewMenu = ({
       }}
       spacing={0}
     >
-      {showHomeButton && (
-        <IconButton
-          aria-label="repo-selection-button"
-          data-testid="repo-selection-button"
-          color="inherit"
-          size={iconButtonSize}
-          sx={buildIconButtonSx(viewMode === ViewModeEnum.RepoSelector)}
-          disableRipple
-          onClick={() => {
-            if (viewMode === ViewModeEnum.Designer) {
-              saveSlide();
-              promptNavAway(ViewModeEnum.RepoSelector);
-            } else {
-              dispatch(changeViewMode(ViewModeEnum.RepoSelector));
-            }
-          }}
-        >
-          <Tooltip arrow placement="right" title="All Projects">
-            <ArrowLeft
-              color={iconColor}
-              strokeWidth={1.25}
-              style={navIconStyle}
-            />
-          </Tooltip>
-        </IconButton>
-      )}
+      <IconButton
+        aria-label="repo-selection-button"
+        data-testid="repo-selection-button"
+        color="inherit"
+        size={iconButtonSize}
+        sx={buildIconButtonSx(viewMode === ViewModeEnum.RepoSelector)}
+        disableRipple
+        onClick={() => {
+          if (viewMode === ViewModeEnum.Designer) {
+            saveSlide();
+            promptNavAway(ViewModeEnum.RepoSelector);
+          } else {
+            dispatch(changeViewMode(ViewModeEnum.RepoSelector));
+          }
+        }}
+      >
+        <Tooltip arrow placement="right" title="All Projects">
+          <ArrowLeft
+            color={iconColor}
+            strokeWidth={1.25}
+            style={navIconStyle}
+          />
+        </Tooltip>
+      </IconButton>
+
       <Box sx={{ height: '2px' }} />
       <IconButton
         aria-label="select-design"
@@ -293,7 +290,7 @@ export const NavViewMenu = ({
             placement="right"
             title={isLeftPanelCollapsed ? 'Expand panel' : 'Collapse panel'}
             slotProps={{
-              transition: { exit: false }
+              transition: { exit: false },
             }}
           >
             {isLeftPanelCollapsed ? (
@@ -312,32 +309,7 @@ export const NavViewMenu = ({
           </Tooltip>
         </IconButton>
       )}
-      {/* {showHomeButton && (
-        <IconButton
-          aria-label="repo-selection-button"
-          data-testid="repo-selection-button"
-          color="inherit"
-          size={iconButtonSize}
-          sx={buildIconButtonSx(viewMode === ViewModeEnum.RepoSelector)}
-          disableRipple
-          onClick={() => {
-            if (viewMode === ViewModeEnum.Designer) {
-              saveSlide();
-              promptNavAway(ViewModeEnum.RepoSelector);
-            } else {
-              dispatch(changeViewMode(ViewModeEnum.RepoSelector));
-            }
-          }}
-        >
-          <Tooltip arrow placement="right" title="All Projects">
-            <ArrowLeft
-              color={iconColor}
-              strokeWidth={1.25}
-              style={navIconStyle}
-            />
-          </Tooltip>
-        </IconButton>
-      )} */}
+
       <Box sx={{ height: '32px' }} />
     </Stack>
   );

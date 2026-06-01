@@ -1,21 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/exhaustive-deps */
-import { lazy } from 'react';
 
 /* Branded */
 import {
   ascSortOrder,
   defaultSearch,
   defaultSortBy,
-  inputFilterType
+  inputFilterType,
 } from '@rapid-cmi5/ui';
 
-import {
-  ksatElementTypeFilter,
-  ksatsSortBy
-} from './filters';
-import ActionRowKsat from '../design-tools/rapidcmi5_mdx/editors/components/ActionRowKsat';
-
+import { ksatElementTypeFilter, ksatsSortBy } from './filters';
+import ActionRowKsat from '../features/ksats/components/ActionRowKsat';
 
 /* Forms */
 
