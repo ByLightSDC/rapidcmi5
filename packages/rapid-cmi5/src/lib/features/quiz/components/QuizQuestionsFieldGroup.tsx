@@ -1,0 +1,454 @@
+import { useEffect, useMemo } from 'react';
+import { toTitleCase } from '../../../shared/forms/formUtils';
+import { useWatch } from 'react-hook-form';
+
+/* MUI */
+import Grid from '@mui/material/Grid2';
+import { Box, MenuItem, Stack } from '@mui/material';
+import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
+import {
+  SlideTypeEnum,
+  QuestionResponse,
+  responseOptions,
+  gradingOptions,
+  QuizOption,
+  MatchingOption,
+} from '@rapid-cmi5/cmi5-build-common';
+import {
+  FormCrudType,
+  tFormFieldRendererProps,
+  useDisplayFocus,
+  FormControlSelectField,
+  FormControlTextField,
+  FormControlCheckboxField,
+  FormFieldArray,
+  ButtonModalMinorUi,
+  ButtonInfoField,
+} from '@rapid-cmi5/ui';
+
+/**
+ * @interface fieldGroupProps
+ * @extends tFormFieldRendererProps
+ * @property {FormCrudType} crudType Mode for displaying data
+ * @property {*} [formErrors] Top level form errors
+ */
+interface fieldGroupProps {
+  crudType: FormCrudType;
+  formErrors?: any;
+  formProps: tFormFieldRendererProps;
+  onAddToBank?: (question: any) => void;
+  rowIndex?: number;
+  slideType: SlideTypeEnum;
+}
+
+/**
+ * Slide Field Group
+ * @param props
+ * @returns
+ */
+export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
+  const { crudType, formProps, slideType, onAddToBank } = props;
+
+  const { formMethods, indexedArrayField, indexedErrors, isFocused } =
+    formProps;
+  const { control, getValues, setValue, trigger } = formMethods;
+
+  // the watch from form methods do not work very well
+  // using the react hook form method allowed for the form to be much
+  // more reactive
+  const watchQuestionType = useWatch({
+    control,
+    name: `${indexedArrayField}.type`,
+  });
+  const watchQuestion = useWatch({
+    control,
+    name: `${indexedArrayField}.question`,
+  }) as string;
+  const watchCorrectAnswer = useWatch({
+    control,
+    name: `${indexedArrayField}.typeAttributes.correctAnswer`,
+  }) as string;
+  const watchOptions = useWatch({
+    control,
+    name: `${indexedArrayField}.typeAttributes.options`,
+  }) as QuizOption[] | undefined;
+  const watchMatching = useWatch({
+    control,
+    name: `${indexedArrayField}.typeAttributes.matching`,
+  }) as MatchingOption[] | undefined;
+
+  const isQuestionValid = useMemo(() => {
+    if (!watchQuestion?.trim() || !watchQuestionType) return false;
+    if (
+      watchQuestionType === QuestionResponse.MultipleChoice ||
+      watchQuestionType === QuestionResponse.SelectAll
+    ) {
+      if (!Array.isArray(watchOptions)) return false;
+      if (watchOptions.length <= 0) return false;
+      const allOptionsSet = watchOptions.every((o) => o.text?.trim());
+      const atLeastOneCorrect = watchOptions.some((o) => o.correct);
+
+      return allOptionsSet && atLeastOneCorrect;
+    }
+    if (watchQuestionType === QuestionResponse.TrueFalse) {
+      // Ensures that it is not null or undefined
+      return !!watchCorrectAnswer;
+    }
+    if (watchQuestionType === QuestionResponse.Matching) {
+      if (!Array.isArray(watchMatching)) return false;
+      if (watchMatching.length <= 0) return false;
+
+      const allOptionsSet = watchMatching.every(
+        (o) => o.option?.trim() && o.response?.trim(),
+      );
+
+      return allOptionsSet;
+    }
+    return !!watchCorrectAnswer?.toString().trim();
+  }, [
+    watchQuestion,
+    watchQuestionType,
+    watchCorrectAnswer,
+    watchOptions,
+    watchMatching,
+  ]);
+
+  const focusHelper = useDisplayFocus();
+  // this effect is for focusing on question field when added as row to array
+  useEffect(() => {
+    if (isFocused) {
+      focusHelper.focusOnElementById(`${indexedArrayField}.question`);
+    }
+  }, [isFocused]);
+
+  useEffect(() => {
+    // Answer field is required as specific selection for true/false question
+    if (watchQuestionType === QuestionResponse.TrueFalse) {
+      setValue(`${indexedArrayField}.typeAttributes.correctAnswer`, 'True');
+      trigger(`${indexedArrayField}.typeAttributes.correctAnswer`);
+    } else if (watchQuestionType === QuestionResponse.Matching) {
+      const question = getValues(`${indexedArrayField}.question`);
+      // default the question for matching
+      if (question === '') {
+        setValue(`${indexedArrayField}.question`, 'Match the following:');
+        trigger(`${indexedArrayField}.question`);
+      }
+    }
+  }, [watchQuestionType]);
+
+  return (
+    <Grid
+      container
+      spacing={0.5}
+      sx={{ marginLeft: '12px', width: '100%' }}
+      id={indexedArrayField} // this is used for scrolling when new array entry added
+    >
+      <Grid size={12}>
+        <FormControlTextField
+          control={control}
+          placeholder="Question"
+          multiline
+          name={`${indexedArrayField}.question`}
+          label="Question"
+          error={Boolean(indexedErrors?.question)}
+          helperText={indexedErrors?.question?.message}
+          readOnly={crudType === FormCrudType.view}
+          required
+        />
+      </Grid>
+      {(watchQuestionType === QuestionResponse.MultipleChoice ||
+        watchQuestionType === QuestionResponse.SelectAll) && (
+        <>
+          <Grid size={6}>
+            <FormControlCheckboxField
+              control={control}
+              name={`${indexedArrayField}.typeAttributes.shuffleAnswers`}
+              label="Shuffle Answer Order"
+            />
+          </Grid>
+          <Grid size={11}>
+            <FormFieldArray
+              errors={indexedErrors?.typeAttributes}
+              arrayFieldName={`${indexedArrayField}.typeAttributes.options`}
+              arrayRenderItem={(props: tFormFieldRendererProps) => {
+                return (
+                  <QuestionOptionsFieldGroup
+                    crudType={crudType}
+                    formProps={props}
+                    questionField={indexedArrayField}
+                    questionType={watchQuestionType}
+                    slideType={slideType}
+                  />
+                );
+              }}
+              defaultIsExpanded={true}
+              defaultValues={{
+                text: '',
+                correct:
+                  watchQuestionType === QuestionResponse.SelectAll
+                    ? true
+                    : false,
+              }}
+              isExpandable={true}
+              title="Options *"
+              {...formProps}
+            />
+          </Grid>
+        </>
+      )}
+      {watchQuestionType === QuestionResponse.TrueFalse && (
+        <Grid size={4}>
+          <FormControlSelectField
+            control={control}
+            name={`${indexedArrayField}.typeAttributes.correctAnswer`}
+            required
+            label="Correct Answer"
+            error={Boolean(indexedErrors?.typeAttributes?.correctAnswer)}
+            helperText={indexedErrors?.typeAttributes?.correctAnswer?.message}
+            readOnly={crudType === FormCrudType.view}
+          >
+            <MenuItem key={'true'} value={'True'}>
+              True
+            </MenuItem>
+            <MenuItem key={'false'} value={'False'}>
+              False
+            </MenuItem>
+          </FormControlSelectField>
+        </Grid>
+      )}
+      {watchQuestionType !== QuestionResponse.MultipleChoice &&
+        watchQuestionType !== QuestionResponse.Matching &&
+        watchQuestionType !== QuestionResponse.SelectAll &&
+        watchQuestionType !== QuestionResponse.TrueFalse && (
+          <Grid size={11}>
+            <FormControlTextField
+              control={control}
+              placeholder="Answer"
+              multiline
+              name={`${indexedArrayField}.typeAttributes.correctAnswer`}
+              label="Answer"
+              error={Boolean(indexedErrors?.typeAttributes?.correctAnswer)}
+              helperText={indexedErrors?.typeAttributes?.correctAnswer?.message}
+              readOnly={crudType === FormCrudType.view}
+            />
+          </Grid>
+        )}
+      {watchQuestionType === QuestionResponse.Matching && (
+        <Box
+          sx={{
+            paddingRight: '8px', // to separate match delete vs quiz question delete
+            width: '100%',
+          }}
+        >
+          <FormFieldArray
+            errors={indexedErrors?.typeAttributes}
+            arrayFieldName={`${indexedArrayField}.typeAttributes.matching`}
+            arrayRenderItem={(props: tFormFieldRendererProps) => {
+              return (
+                <QuestionMatchingFieldGroup
+                  crudType={crudType}
+                  formProps={props}
+                  slideType={slideType}
+                />
+              );
+            }}
+            defaultIsExpanded={true}
+            defaultValues={{
+              option: '',
+              response: '',
+            }}
+            deleteTooltip="Delete Match"
+            isExpandable={true}
+            title="Matches *"
+            {...formProps}
+          />
+        </Box>
+      )}
+
+      <Grid size={3}>
+        <FormControlSelectField
+          control={control}
+          name={`${indexedArrayField}.type`}
+          required
+          label="Question Type"
+          error={Boolean(indexedErrors?.type)}
+          helperText={indexedErrors?.type?.message}
+          readOnly={
+            crudType === FormCrudType.view || slideType === SlideTypeEnum.CTF
+          }
+        >
+          {responseOptions.map((item) => (
+            <MenuItem key={item} value={item}>
+              {toTitleCase(item)}
+            </MenuItem>
+          ))}
+        </FormControlSelectField>
+      </Grid>
+      <Grid size={3}>
+        <FormControlSelectField
+          control={control}
+          name={`${indexedArrayField}.typeAttributes.grading`}
+          required
+          label="Response Type"
+          error={Boolean(indexedErrors?.typeAttributes?.grading)}
+          helperText={indexedErrors?.typeAttributes?.grading?.message}
+          readOnly={
+            crudType === FormCrudType.view ||
+            slideType === SlideTypeEnum.CTF ||
+            watchQuestionType === QuestionResponse.Matching
+          }
+        >
+          {gradingOptions.map((item) => (
+            <MenuItem key={item} value={item}>
+              {toTitleCase(item)}
+            </MenuItem>
+          ))}
+        </FormControlSelectField>
+      </Grid>
+      {onAddToBank && (
+        <Grid
+          size={5}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignContent: 'center',
+            height: '36px',
+          }}
+        >
+          <Stack direction="row" spacing={1} sx={{ marginTop: 1 }}>
+            <ButtonModalMinorUi
+              aria-label="search-question-bank"
+              id="search-question-bank-button"
+              onClick={() => onAddToBank(getValues(indexedArrayField))}
+              startIcon={<BookmarkAddIcon fontSize="small" />}
+              disabled={!isQuestionValid}
+            >
+              Add to Quiz Bank
+            </ButtonModalMinorUi>
+
+            <ButtonInfoField message="Adding questions to the Quiz Bank allows you to reuse them in future quizzes, lessons, and courses." />
+          </Stack>
+        </Grid>
+      )}
+    </Grid>
+  );
+}
+
+interface optionFieldGroupProps extends fieldGroupProps {
+  questionField: string;
+  questionType: QuestionResponse;
+}
+
+function QuestionOptionsFieldGroup(props: optionFieldGroupProps) {
+  const { crudType, formProps, questionField, questionType } = props;
+  const { formMethods, indexedArrayField, indexedErrors, isFocused, rowIndex } =
+    formProps;
+  const { control, getValues, setValue } = formMethods;
+
+  const focusHelper = useDisplayFocus();
+  // this effect is for focusing on text field when added as row to array
+  useEffect(() => {
+    if (isFocused) {
+      focusHelper.focusOnElementById(`${indexedArrayField}.text`);
+    }
+  }, [isFocused]);
+
+  const handleOptionSelection = (optionIndex: number, newValue: boolean) => {
+    // only ONE correct answer for simple multiple choice (vs selectAll)
+    if (questionType === QuestionResponse.MultipleChoice && newValue === true) {
+      const options = getValues(`${questionField}.typeAttributes.options`);
+      for (let i = 0; i < options.length; i++) {
+        if (i !== optionIndex) {
+          setValue(
+            `${questionField}.typeAttributes.options[${i}].correct`,
+            false,
+          );
+        }
+      }
+    }
+  };
+
+  return (
+    <Grid
+      container
+      spacing={0.5}
+      sx={{
+        marginLeft: '12px',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignContent: 'center',
+      }}
+      id={indexedArrayField} // this is used for scrolling when new array entry added
+    >
+      <Grid size={9}>
+        <FormControlTextField
+          control={control}
+          placeholder="Enter Option"
+          multiline
+          name={`${indexedArrayField}.text`}
+          error={Boolean(indexedErrors?.text)}
+          helperText={indexedErrors?.text?.message}
+          readOnly={crudType === FormCrudType.view}
+          required
+        />
+      </Grid>
+      <Grid size={3} sx={{ height: '32px' }}>
+        <FormControlCheckboxField
+          control={control}
+          name={`${indexedArrayField}.correct`}
+          label="Correct"
+          checkboxProps={{
+            disabled: crudType === FormCrudType.view,
+          }}
+          onChange={(event, value) =>
+            handleOptionSelection(rowIndex || 0, value)
+          }
+        />
+      </Grid>
+    </Grid>
+  );
+}
+
+function QuestionMatchingFieldGroup(props: fieldGroupProps) {
+  const { crudType, formProps } = props;
+  const { formMethods, indexedArrayField, indexedErrors } = formProps;
+  const { control } = formMethods;
+
+  return (
+    <Grid
+      container
+      spacing={0.5}
+      sx={{ marginLeft: '12px', width: '100%' }}
+      id={indexedArrayField}
+    >
+      <Grid size={6}>
+        <FormControlTextField
+          control={control}
+          placeholder="Enter Option"
+          multiline
+          label="Option"
+          name={`${indexedArrayField}.option`}
+          error={Boolean(indexedErrors?.text)}
+          helperText={indexedErrors?.text?.message}
+          readOnly={crudType === FormCrudType.view}
+          required
+        />
+      </Grid>
+      <Grid size={6}>
+        <FormControlTextField
+          control={control}
+          placeholder="Enter Correct Match"
+          multiline
+          name={`${indexedArrayField}.response`}
+          label="Match"
+          error={Boolean(indexedErrors?.response)}
+          helperText={indexedErrors?.response?.message}
+          readOnly={crudType === FormCrudType.view}
+          required
+        />
+      </Grid>
+    </Grid>
+  );
+}

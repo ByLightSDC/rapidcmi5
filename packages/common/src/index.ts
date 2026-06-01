@@ -32,16 +32,8 @@ export * from './lib/types/courseStructure/slide';
 export * from './lib/types/teamConsoles';
 export * from './lib/types/projects';
 export * from './lib/types/user';
-export * from './lib/apis/codeRunnerContract';
-export * from './lib/apis/hooks/useCodeRunnerApi';
-export * from './lib/apis/hooks/useQuizBankApi';
-export * from './lib/apis/hooks/useScenarioApi';
-
+export * from './lib/apis/contracts/codeRunnerContract';
 export * from './lib/utils/dateAndTime';
-export * from './lib/apis/quizBankContract';
-export * from './lib/apis/scenarioContract';
-export * from './lib/apis/utils/scenario';
-export * from './lib/apis/utils/codeRunner';
-export * from './lib/apis/utils/quizBank';
-
+export * from './lib/apis/contracts/quizBankContract';
+export * from './lib/apis/contracts/scenarioContract';
 export * from './lib/versions';

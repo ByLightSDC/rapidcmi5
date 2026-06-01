@@ -345,7 +345,6 @@ export const GitContextProvider = (props: tProviderProps) => {
       repoAccessObject,
       rapidCmi5Opts.userAuth?.token,
       rapidCmi5Opts.downloadCmi5Player,
-      rapidCmi5Opts.processAu,
     );
 
   const {

@@ -10,6 +10,16 @@ contextBridge.exposeInMainWorld('electron', {
   platform: process.platform,
 });
 
+// Allows us to use api calls to other servers getting a round CORS
+contextBridge.exposeInMainWorld('electronAPI', {
+  fetch: (opts: {
+    url: string;
+    method?: string;
+    headers?: Record<string, string>;
+    body?: string;
+  }) => ipcRenderer.invoke('api:request', opts),
+});
+
 export const ipc = {
   cmi5Build: (
     projectPath: string,
@@ -290,52 +300,6 @@ export const electronEvents = {
 };
 
 contextBridge.exposeInMainWorld('electronEvents', electronEvents);
-export const rangeApi = {
-  // Scenario
-  fetchScenario: (baseUrl: string, token: string, uuid: string) =>
-    ipcRenderer.invoke('rangeApi:fetchScenario', baseUrl, token, uuid),
-  listScenarios: (baseUrl: string, token: string, query: object) =>
-    ipcRenderer.invoke('rangeApi:listScenarios', baseUrl, token, query),
-  processAu: (baseUrl: string, token: string, au: object, blockId: string) =>
-    ipcRenderer.invoke('rangeApi:processAu', baseUrl, token, au, blockId),
-  // Code Runner
-  listLanguages: (
-    baseUrl: string,
-    token: string,
-    authType: 'Basic' | 'Bearer',
-  ) => ipcRenderer.invoke('rangeApi:listLanguages', baseUrl, token, authType),
-  executeCode: (
-    baseUrl: string,
-    token: string,
-    authType: 'Basic' | 'Bearer',
-    body: object,
-  ) =>
-    ipcRenderer.invoke('rangeApi:executeCode', baseUrl, token, authType, body),
-  // Quiz Bank
-  searchQuestions: (
-    baseUrl: string,
-    token: string,
-    query: string,
-    page: number,
-    limit: number,
-    activityType?: string,
-  ) =>
-    ipcRenderer.invoke(
-      'rangeApi:searchQuestions',
-      baseUrl,
-      token,
-      query,
-      page,
-      limit,
-      activityType,
-    ),
-  addQuestion: (baseUrl: string, token: string, body: object) =>
-    ipcRenderer.invoke('rangeApi:addQuestion', baseUrl, token, body),
-  deleteQuestion: (baseUrl: string, token: string, uuid: string) =>
-    ipcRenderer.invoke('rangeApi:deleteQuestion', baseUrl, token, uuid),
-};
-
-contextBridge.exposeInMainWorld('rangeApi', rangeApi);
 
 async function normalizeData(data: any): Promise<string | Uint8Array> {
   if (typeof data === 'string') return data;
