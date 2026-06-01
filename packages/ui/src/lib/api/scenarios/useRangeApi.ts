@@ -11,9 +11,15 @@ import { debugLog, debugLogError } from '../../utility/logger';
 export function useRangeApi() {
   const { enabled, client } = useRangeClient();
 
-  /*
-   * Resolves a scenario UUID for an AU by UUID first, then by name.
-   * Throws if the configured UUID/name does not exist; returns null if neither is set.
+  /**
+   * Resolves a RangeOS scenario UUID for an AU (Assignable Unit), preferring
+   * `rangeosScenarioUUID` and falling back to a name search via
+   * `rangeosScenarioName`. Returns `null` when neither field is set on the AU.
+   *
+   * Throws a user-facing error if the configured UUID or name does not
+   * exist in the current environment — this is the common failure mode
+   * when promoting a course between tenants where scenarios have not yet
+   * been replicated.
    */
   const handleGetAuScenarioUUID = async (au: CourseAU) => {
     if (au.rangeosScenarioUUID) {
@@ -47,6 +53,12 @@ export function useRangeApi() {
     return null;
   };
 
+  /**
+   * Full pipeline for binding an AU to its RangeOS scenario at publish/
+   * import time: resolves the scenario UUID, computes the deterministic
+   * `auId` from `{ blockId, auName }`, then upserts the AU mapping on the
+   * Range side. No-ops when no scenario is configured on the AU.
+   */
   const processAu = async (au: CourseAU, blockId: string) => {
     const scenarioUUID = await handleGetAuScenarioUUID(au);
     if (!scenarioUUID) return;
@@ -55,6 +67,12 @@ export function useRangeApi() {
     return await createAuMapping(auId, scenarioUUID);
   };
 
+  /**
+   * Upserts the Range-side AU mapping that ties an `auId` to a scenario
+   * UUID: GETs the existing mapping, PATCHes it when present (200) or
+   * POSTs a new one when absent (404). Other statuses are re-thrown so
+   * callers see the underlying error rather than a silent miss.
+   */
   const createAuMapping = async (auId: string, scenarioUUID: string) => {
     const encodedAuId = encodeURIComponent(auId);
 
@@ -88,6 +106,11 @@ export function useRangeApi() {
     }
   };
 
+  /**
+   * Paged scenario search sorted by `dateEdited desc`. Uses
+   * `keepPreviousData` so the list does not flash empty between pages,
+   * which matters for the scenario-picker UX.
+   */
   const searchScenarios = (search: string, limit: number, offset: number) => {
     return client.listScenarios.useQuery({
       queryKey: [
@@ -99,6 +122,11 @@ export function useRangeApi() {
     });
   };
 
+  /**
+   * Fetches a single scenario by UUID. Disabled when `scenarioUUID` is
+   * falsy so the picker/preview can mount and call the hook before the
+   * user has made a selection.
+   */
   const getScenario = (scenarioUUID?: string) => {
     return client.getScenario.useQuery({
       queryKey: [scenarioKey, scenarioUUID],

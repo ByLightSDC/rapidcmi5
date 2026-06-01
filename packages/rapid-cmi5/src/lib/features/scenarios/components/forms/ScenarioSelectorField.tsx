@@ -1,3 +1,6 @@
+/*
+  Reusable fields that are used for both the indvidual and team scenario forms
+*/
 import SearchIcon from '@mui/icons-material/Search';
 import { Box } from '@mui/material';
 import { ButtonMinorUi, useRangeClient } from '@rapid-cmi5/ui';

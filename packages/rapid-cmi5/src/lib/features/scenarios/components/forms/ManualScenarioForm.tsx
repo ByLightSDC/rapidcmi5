@@ -1,3 +1,7 @@
+/*
+  This form exists so that we may still allow a user to manually type
+  in a scenario to use if not connected to the range API.
+*/
 import { FormControlTextField } from '@rapid-cmi5/ui';
 import Grid from '@mui/material/Grid2';
 import { SCENARIO_GRID } from './formSettings';

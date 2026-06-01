@@ -10,6 +10,12 @@ export function useQuizBankApi() {
   const { enabled, client } = useQuizBankClient();
   const queryClient = useQueryClient();
 
+  /**
+   * Paged search over the Quiz Bank library, sorted by `dateEdited desc`.
+   * Uses `keepPreviousData` so the result list does not flash empty
+   * between pages. Pass `questionType: 'freeResponse'` to restrict to
+   * free-response questions (used by the code-runner question picker).
+   */
   const searchQuestions = (
     search: string,
     limit: number,
@@ -33,6 +39,11 @@ export function useQuizBankApi() {
     });
   };
 
+  /**
+   * Deletes a Quiz Bank question by UUID. Invalidates the `questionKey`
+   * cache on success so any open search lists refetch. Throws on a
+   * non-204 response so callers can surface the failure to the user.
+   */
   const deleteQuestion = async (uuid: string) => {
     const { status } = await client.deleteQuestion.mutate({
       params: { uuid },
@@ -41,6 +52,12 @@ export function useQuizBankApi() {
     await queryClient.invalidateQueries({ queryKey: [questionKey] });
   };
 
+  /**
+   * Creates a new Quiz Bank question. Flattens a `QuizQuestion`
+   * (`typeAttributes`, `options`, `matching`, etc.) onto the wire shape
+   * the Quiz Bank contract expects, and stamps the request with
+   * `currentQuizBankApiVersion` so the server can route by version.
+   */
   const createQuestion = async (
     isPublic: boolean,
     tags: string[],
