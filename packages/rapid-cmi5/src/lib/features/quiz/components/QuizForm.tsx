@@ -10,7 +10,6 @@ import * as yup from 'yup';
 import {
   RC5ActivityTypeEnum,
   QuizContent,
-  SlideTypeEnum,
   QuizCompletionEnum,
   MoveOnCriteriaEnum,
   QuestionResponse,
@@ -78,11 +77,6 @@ export const QuizForm = ({
   outerStyle?: OuterStyle;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const slideType =
-    activityKind === RC5ActivityTypeEnum.quiz
-      ? SlideTypeEnum.Quiz
-      : SlideTypeEnum.CTF;
-
   const [isSearchBankOpen, setIsSearchBankOpen] = useState(false);
   const [bankQuestion, setBankQuestion] = useState<QuizQuestion | null>(null);
   const { isQuizBankEnabled } = useQuizBankApi();
@@ -294,7 +288,6 @@ export const QuizForm = ({
                 <QuizQuestionsFieldGroup
                   crudType={crudType}
                   formProps={props}
-                  slideType={slideType}
                   onAddToBank={
                     isQuizBankEnabled ? (q) => setBankQuestion(q) : undefined
                   }

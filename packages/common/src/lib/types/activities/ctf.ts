@@ -1,60 +1,52 @@
 // Ensure that whenever the types change ./utils/ajv-schema-generator.sh is ran
 
-import { BaseActivity } from './activities/activity';
+import z from 'zod/v4';
+
 import { QuestionGrading, QuizCompletionEnum } from './quiz';
-
-/**
- * @typedef {string} title Activity Title
- * @property {Array<CTFQuestion>} questions Questions
- * @property {string} cmi5QuizId CMI5 Quiz Id
- * @property {QuizCompletionEnum} [completionRequired = 'passed'] Whether student must pass or attempt
- * @property {number} [passingScore = 80] Score requirement for pass/fail (0-100)
- * @property {CTFDisplay} [display] Display Settings
- */
-export type CTFContent = BaseActivity & {
-  title?: string;
-  questions: Array<CTFQuestion>;
-  cmi5QuizId: string;
-  completionRequired?: QuizCompletionEnum;
-  passingScore: number;
-  display?: CTFDisplay;
-};
-
-/**
- * @typedef {Object} CTFQuestion
- * @property {string} [title] Question Title
- * @property {string} question Question
- * @property {CTFResponse} type Question format
- * @property {BasicCFTResponse} typeAttributes Question response grading options
- * @property {string} cmi5QuestionId CMI5 Question Id
- */
-export type CTFQuestion = {
-  title?: string;
-  question: string;
-  type: CTFResponse;
-  typeAttributes: BasicCFTResponse;
-  cmi5QuestionId: string;
-};
+import { BaseActivitySchema } from './baseActivity';
 
 export enum CTFResponse {
   FreeResponse = 'freeResponse',
 }
 
-export type BasicCFTResponse = {
-  correctAnswer: string | number;
-  grading: QuestionGrading; //from quiz
-  options?: Array<CTFQuizOption> | undefined;
-};
+export const CTFQuizOptionSchema = z.object({
+  text: z.string(),
+  correct: z.boolean(),
+});
 
-export type CTFQuizOption = {
-  text: string;
-  correct: boolean;
-};
+export type CTFQuizOption = z.infer<typeof CTFQuizOptionSchema>;
 
-/**
- * @typedef {Object} CTFDisplay
- * @property {boolean} [shouldNumberQuestions] Whether questions should be numbered
- */
-export type CTFDisplay = {
-  shouldNumberQuestions?: boolean;
-};
+export const BasicCFTResponseSchema = z.object({
+  correctAnswer: z.union([z.string(), z.number()]),
+  grading: z.enum(QuestionGrading),
+  options: z.array(CTFQuizOptionSchema).optional(),
+});
+
+export type BasicCFTResponse = z.infer<typeof BasicCFTResponseSchema>;
+
+export const CTFQuestionSchema = z.object({
+  title: z.string().optional(),
+  question: z.string(),
+  type: z.enum(CTFResponse),
+  typeAttributes: BasicCFTResponseSchema,
+  cmi5QuestionId: z.string(),
+});
+
+export type CTFQuestion = z.infer<typeof CTFQuestionSchema>;
+
+export const CTFDisplaySchema = z.object({
+  shouldNumberQuestions: z.boolean().optional(),
+});
+
+export type CTFDisplay = z.infer<typeof CTFDisplaySchema>;
+
+export const CTFContentSchema = BaseActivitySchema.extend({
+  title: z.string().optional(),
+  questions: z.array(CTFQuestionSchema),
+  cmi5QuizId: z.string(),
+  completionRequired: z.enum(QuizCompletionEnum).optional(),
+  passingScore: z.number(),
+  display: CTFDisplaySchema.optional(),
+});
+
+export type CTFContent = z.infer<typeof CTFContentSchema>;

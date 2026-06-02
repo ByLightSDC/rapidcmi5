@@ -1,5 +1,5 @@
-/* eslint-disable react/jsx-no-useless-fragment */
 import {
+  CreateCourseType,
   FileUpload,
   FormControlTextField,
   FormControlUIProvider,
@@ -17,15 +17,14 @@ import { CommonAppModalState } from '@rapid-cmi5/ui';
 import { Alert, Box, IconButton, Tooltip } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
-import { useForm, UseFormReturn } from 'react-hook-form';
+import { UseFormReturn } from 'react-hook-form';
 
 import {
   DESCRIPTION_GROUP_OPT,
   NAME_GROUP,
   STARTS_WITH_HTTPS_GROUP,
 } from '@rapid-cmi5/ui';
-import { CreateCourseType } from '../../CourseBuilderApiTypes';
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useMemo } from 'react';
 import { GitContext } from '../../GitViewer/session/GitContext';
 
 export function CreateCourseForm({

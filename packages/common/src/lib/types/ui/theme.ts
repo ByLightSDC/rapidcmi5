@@ -36,3 +36,5 @@ export const ThemeSchema = z.object({
   logoLight: z.string().optional(),
   logoDark: z.string().optional(),
 });
+
+export type Theme = z.infer<typeof ThemeSchema>;

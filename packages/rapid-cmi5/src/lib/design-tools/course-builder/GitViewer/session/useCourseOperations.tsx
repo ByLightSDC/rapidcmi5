@@ -22,11 +22,10 @@ import {
 import { AppDispatch } from '../../../../redux/store';
 import { ViewModeEnum } from '../../CourseBuilderTypes';
 import { CourseData, Operation } from '@rapid-cmi5/cmi5-build-common';
-import { CreateCourseType } from '../../CourseBuilderApiTypes';
 import { courseNameInUseMessage, deleteCourseFailMessage } from './constants';
 import { GitFS } from '../utils/fileSystem';
 import { warningModalId } from '../../../rapidcmi5_mdx/modals/constants';
-import { setModal } from '@rapid-cmi5/ui';
+import { CreateCourseType, setModal } from '@rapid-cmi5/ui';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import { getRepoAccess } from './GitContext';
 import {
@@ -269,7 +268,7 @@ export const useCourseOperations = (
   const getCourseData = async (
     r: RepoAccessObject,
     coursePath: string,
-    getContents: boolean = true,
+    getContents = true,
   ): Promise<CourseData | null> => {
     return await getCourseDataInFs({
       r,
@@ -293,7 +292,7 @@ export const useCourseOperations = (
     course: Course,
   ): Promise<string[]> => {
     if (!courseOperationsSet) {
-      throw Error("Course operations was not passsed")
+      throw Error('Course operations was not passsed');
     }
     // If there are no course operations, then we are not updating any files, only things such as ordering
     try {

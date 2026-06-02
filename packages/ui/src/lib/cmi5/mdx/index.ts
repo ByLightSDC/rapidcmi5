@@ -11,6 +11,7 @@ export * from './components/SettingsIconButton';
 
 export * from './constants/colors';
 export * from './constants/defaultData';
+export * from './constants/courseBuilderFormTypes';
 
 export * from './editors/AdmonitionDirectiveDescriptor';
 export * from './editors/AdmonitionEditor';

@@ -5,6 +5,7 @@ import {
   MiniForm,
   ModalDialog,
   CommonAppModalState,
+  DownloadCmi5Type,
 } from '@rapid-cmi5/ui';
 import * as yup from 'yup';
 
@@ -12,7 +13,6 @@ import Grid from '@mui/material/Grid2';
 
 import { UseFormReturn } from 'react-hook-form';
 import { NAME_GROUP_OPT } from '@rapid-cmi5/ui';
-import { DownloadCmi5Type } from '../../CourseBuilderApiTypes';
 import { useContext, useState } from 'react';
 import { GitContext } from '../../GitViewer/session/GitContext';
 import { downloadCmi5ZipModalId } from '../../../rapidcmi5_mdx/modals/constants';

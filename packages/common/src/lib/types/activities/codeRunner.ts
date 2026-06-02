@@ -1,6 +1,7 @@
 // Ensure that whenever the types change ./utils/ajv-schema-generator.sh is ran
 
-import { BaseActivity } from './activities/activity';
+import z from 'zod/v4';
+import { BaseActivitySchema } from './baseActivity';
 
 export enum CodeRunnerLanguageEnum {
   Python = 'python',
@@ -20,17 +21,23 @@ export const CodeRunnerLanguageVersions: Record<string, string[]> = {
 
 export const CodeRunnerLanguageOptions = Object.values(CodeRunnerLanguageEnum);
 
-export type CodeRunnerContent = BaseActivity & {
-  title: string;
-  description: string;
-  evaluator: string;
-  student: string;
-  cmi5QuizId: string; // Activity ID for LRS tracking
-  programmingLanguage: string;
-  languageVersion: string;
-};
+export const CodeRunnerContentSchema = BaseActivitySchema.extend({
+  title: z.string(),
+  description: z.string(),
+  evaluator: z.string(),
+  student: z.string(),
+  cmi5QuizId: z.string(),
+  programmingLanguage: z.string(),
+  languageVersion: z.string(),
+});
 
-export type CodeRunnerSubmitResponse = {
-  isSuccess: boolean;
-  message: string;
-};
+export type CodeRunnerContent = z.infer<typeof CodeRunnerContentSchema>;
+
+export const CodeRunnerSubmitResponseSchema = z.object({
+  isSuccess: z.boolean(),
+  message: z.string(),
+});
+
+export type CodeRunnerSubmitResponse = z.infer<
+  typeof CodeRunnerSubmitResponseSchema
+>;

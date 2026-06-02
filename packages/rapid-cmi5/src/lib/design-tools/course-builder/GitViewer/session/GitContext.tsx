@@ -17,20 +17,22 @@ import {
   Credentials,
   GitUserConfig,
 } from '@rapid-cmi5/cmi5-build-common';
+
+import { ViewModeEnum } from '../../CourseBuilderTypes';
 import {
   CreateCloneType,
   CreateCommitType,
   CreateCourseType,
   CreateLocalRepoType,
+  debugLog,
+  debugLogError,
+  defaultCourseData,
   DownloadCmi5Type,
   GitConfigType,
   ImportRepoZipType,
   PullType,
   PushType,
-} from '../../CourseBuilderApiTypes';
-
-import { ViewModeEnum } from '../../CourseBuilderTypes';
-import { debugLog, debugLogError, defaultCourseData } from '@rapid-cmi5/ui';
+} from '@rapid-cmi5/ui';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import { ReadCommitResult } from 'isomorphic-git';
 import { sandboxIntro } from '../../../rapidcmi5_mdx/constants/sandboxIntro';

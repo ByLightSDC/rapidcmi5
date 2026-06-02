@@ -1,19 +1,17 @@
 // Ensure that whenever the types change ./utils/ajv-schema-generator.sh is ran
 
-//the BE type name "Element' conflicts with React Element type, so duplicating here
-export interface KSATElement {
-  element_identifier?: string;
-  element_type?: 'task' | 'knowledge' | 'skill';
-  title?: string;
-  text?: string;
-  doc_identifier?: string;
-}
+import { CodeRunnerContent } from './codeRunner';
+import { CTFContent } from './ctf';
+import { DownloadFilesContent } from './download';
+import { QuizContent } from './quiz';
+import { ScenarioContent } from './scenario';
 
-export type BaseActivity = {
-  rc5id?: string;
-  ksats?: KSATElement[]; // Array of KSAT elements
-  moveOnCriteria?: MoveOnCriteriaEnum;
-};
+export type ActivityContent =
+  | ScenarioContent
+  | QuizContent
+  | CTFContent
+  | CodeRunnerContent
+  | DownloadFilesContent;
 
 export enum RC5ActivityTypeEnum {
   consoles = 'Team Exercise',
@@ -30,14 +28,6 @@ export const activityLabels = Object.values(RC5ActivityTypeEnum).sort((a, b) =>
   a.localeCompare(b),
 );
 
-export const getDisplayNameFromSlideType = (activity: RC5ActivityTypeEnum) => {
-  const lookUpKey =
-    Object.keys(RC5ActivityTypeEnum)[
-      Object.values(RC5ActivityTypeEnum).indexOf(activity)
-    ];
-  return RC5ActivityTypeEnum[lookUpKey as keyof typeof RC5ActivityTypeEnum];
-};
-
 export const getActivityTypeFromDisplayName = (
   displayName: RC5ActivityTypeEnum,
 ) => {
@@ -53,12 +43,3 @@ export type ActivityJsonNode = {
   type: string;
   value: string;
 };
-
-export enum MoveOnCriteriaEnum {
-  Completed = 'completed',
-  Passed = 'passed',
-  CompletedAndPassed = 'completed-and-passed',
-  NotApplicable = 'not-applicable',
-}
-
-export const moveOnCriteriaOptions = Object.values(MoveOnCriteriaEnum);

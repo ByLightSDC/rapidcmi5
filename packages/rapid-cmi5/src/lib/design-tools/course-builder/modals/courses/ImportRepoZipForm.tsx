@@ -1,9 +1,9 @@
-/* eslint-disable react/jsx-no-useless-fragment */
 import {
   FileUpload,
   FormControlTextField,
   FormControlUIProvider,
   FormStateType,
+  ImportRepoZipType,
   MiniForm,
   ModalDialog,
 } from '@rapid-cmi5/ui';
@@ -12,26 +12,23 @@ import * as yup from 'yup';
 import { importRepoZipModalId } from '../../../rapidcmi5_mdx/modals/constants';
 import { CommonAppModalState } from '@rapid-cmi5/ui';
 
-import { Alert, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 
 import { UseFormReturn } from 'react-hook-form';
 
 import { NAME_GROUP } from '@rapid-cmi5/ui';
-import { ImportRepoZipType } from '../../CourseBuilderApiTypes';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { GitContext } from '../../GitViewer/session/GitContext';
 
 export function ImportRepoZipForm({
   defaultData,
   modalObj,
-  shouldOpenRepoSelectAfterClone,
   handleCloseModal,
   handleModalAction,
 }: {
   defaultData: ImportRepoZipType;
   modalObj: CommonAppModalState;
-  shouldOpenRepoSelectAfterClone?: boolean;
   handleCloseModal: () => void;
   handleModalAction: (
     modalId: string,
@@ -115,7 +112,7 @@ export function ImportRepoZipForm({
           />
         </Grid>
 
-        <Grid size={{xs: 12, sm: 6}}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.authorName)}
@@ -126,7 +123,7 @@ export function ImportRepoZipForm({
           />
         </Grid>
 
-        <Grid size={{xs: 12, sm: 6}}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <FormControlTextField
             control={control}
             error={Boolean(errors?.authorEmail)}

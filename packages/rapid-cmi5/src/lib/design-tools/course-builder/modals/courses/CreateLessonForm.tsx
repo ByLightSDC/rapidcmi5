@@ -1,6 +1,6 @@
-/* eslint-disable react/jsx-no-useless-fragment */
 import { useState } from 'react';
 import {
+  CreateLessonType,
   FormControlTextField,
   FormControlUIProvider,
   FormStateType,
@@ -14,7 +14,6 @@ import { CommonAppModalState } from '@rapid-cmi5/ui';
 import Grid from '@mui/material/Grid2';
 import { UseFormReturn } from 'react-hook-form';
 
-import { CreateLessonType } from '../../CourseBuilderApiTypes';
 import { NAME_GROUP } from '@rapid-cmi5/ui';
 import { createNewLessonModalId } from '../../../rapidcmi5_mdx/modals/constants';
 

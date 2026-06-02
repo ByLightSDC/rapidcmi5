@@ -7,7 +7,6 @@ import Grid from '@mui/material/Grid2';
 import { Box, MenuItem, Stack } from '@mui/material';
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import {
-  SlideTypeEnum,
   QuestionResponse,
   responseOptions,
   gradingOptions,
@@ -38,7 +37,6 @@ interface fieldGroupProps {
   formProps: tFormFieldRendererProps;
   onAddToBank?: (question: any) => void;
   rowIndex?: number;
-  slideType: SlideTypeEnum;
 }
 
 /**
@@ -47,7 +45,7 @@ interface fieldGroupProps {
  * @returns
  */
 export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
-  const { crudType, formProps, slideType, onAddToBank } = props;
+  const { crudType, formProps, onAddToBank } = props;
 
   const { formMethods, indexedArrayField, indexedErrors, isFocused } =
     formProps;
@@ -177,7 +175,6 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
                     formProps={props}
                     questionField={indexedArrayField}
                     questionType={watchQuestionType}
-                    slideType={slideType}
                   />
                 );
               }}
@@ -248,7 +245,6 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
                 <QuestionMatchingFieldGroup
                   crudType={crudType}
                   formProps={props}
-                  slideType={slideType}
                 />
               );
             }}
@@ -273,9 +269,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           label="Question Type"
           error={Boolean(indexedErrors?.type)}
           helperText={indexedErrors?.type?.message}
-          readOnly={
-            crudType === FormCrudType.view || slideType === SlideTypeEnum.CTF
-          }
+          readOnly={crudType === FormCrudType.view}
         >
           {responseOptions.map((item) => (
             <MenuItem key={item} value={item}>
@@ -294,7 +288,6 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           helperText={indexedErrors?.typeAttributes?.grading?.message}
           readOnly={
             crudType === FormCrudType.view ||
-            slideType === SlideTypeEnum.CTF ||
             watchQuestionType === QuestionResponse.Matching
           }
         >

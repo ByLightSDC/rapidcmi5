@@ -6,6 +6,7 @@ import {
   FormStateType,
   MiniForm,
   ModalDialog,
+  PushType,
 } from '@rapid-cmi5/ui';
 import * as yup from 'yup';
 
@@ -20,7 +21,6 @@ import { useContext } from 'react';
 
 import Grid from '@mui/material/Grid2';
 import { gitPushModalId } from '../../../rapidcmi5_mdx/modals/constants';
-import { PushType } from '../../CourseBuilderApiTypes';
 import { GitContext } from '../../GitViewer/session/GitContext';
 
 export function PushForm({

@@ -1,12 +1,8 @@
-import { RC5ActivityTypeEnum } from './activities/activity';
+import { RC5ActivityTypeEnum } from './activity';
 import { CodeRunnerContent, CodeRunnerSubmitResponse } from './codeRunner';
 import { CTFContent } from './ctf';
 import { QuizContent, QuizScore } from './quiz';
-import {
-  ScenarioContent,
-  ScenarioSubmitResponse,
-} from './courseStructure/slide';
-import { TeamConsolesContent } from './teamConsoles';
+import { ScenarioContent, ScenarioSubmitResponse } from './scenario';
 
 /**
  * @typedef {Object} SlideType
@@ -20,7 +16,6 @@ export type ActivityScore = {
     | CTFContent
     | QuizContent
     | CodeRunnerContent
-    | ScenarioContent
-    | TeamConsolesContent;
+    | ScenarioContent;
   scoreData?: QuizScore | CodeRunnerSubmitResponse | ScenarioSubmitResponse;
 };

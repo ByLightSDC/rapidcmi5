@@ -1,14 +1,7 @@
 // hooks/useGitOperations.ts
 import { useCallback, useState } from 'react';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
-import {
-  CreateCloneType,
-  CreateCommitType,
-  GitConfigType,
-  ImportRepoZipType,
-  PullType,
-  PushType,
-} from '../../CourseBuilderApiTypes';
+
 import { useDispatch, useSelector } from 'react-redux';
 import {
   addRepo,
@@ -22,7 +15,16 @@ import {
   setFileContent,
   setSelectedFile,
 } from '../../../../redux/repoManagerReducer';
-import { debugLog, debugLogError } from '@rapid-cmi5/ui';
+import {
+  CreateCloneType,
+  CreateCommitType,
+  debugLog,
+  debugLogError,
+  GitConfigType,
+  ImportRepoZipType,
+  PullType,
+  PushType,
+} from '@rapid-cmi5/ui';
 import { AppDispatch, RootState } from '../../../../redux/store';
 import {
   cloneFailMessage,
@@ -121,7 +123,7 @@ export const useGitOperations = (
       const remoteRepoUrls = await gitOperator.listRepoRemotes(r);
 
       removeRepoFileSelection();
-      setConfig(r, {
+      await setConfig(r, {
         authorEmail: req.authorEmail,
         authorName: req.authorName,
         remoteRepoUrl: remoteRepoUrls[0]?.url || '',

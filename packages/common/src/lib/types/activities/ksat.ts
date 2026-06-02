@@ -1,9 +1,19 @@
 // KSAT (Knowledge, Skills, Abilities, and Tasks) Competency Framework Types
 
+import z from 'zod/v4';
+
 export interface KSATResponse {
   error: boolean;
   data: KSATCompetency[];
 }
+
+export const KSATElementSchema = z.object({
+  element_identifier: z.string().optional(),
+  element_type: z.enum(['task', 'knowledge', 'skill']).optional(),
+  title: z.string().optional(),
+  text: z.string().optional(),
+  doc_identifier: z.string().optional(),
+});
 
 export interface KSATCompetency {
   shortname: string;
@@ -179,3 +189,5 @@ export const searchSkills = (
       skill.description.toLowerCase().includes(lowerQuery),
   );
 };
+
+export type KSATElementType = z.infer<typeof KSATElementSchema>;

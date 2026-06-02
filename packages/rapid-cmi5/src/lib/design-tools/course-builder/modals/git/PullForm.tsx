@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-useless-fragment */
 import {
   CommonAppModalState,
   FormControlCheckboxField,
@@ -9,9 +8,9 @@ import {
   MiniForm,
   ModalDialog,
   NAME_GROUP_OPT,
+  PullType,
 } from '@rapid-cmi5/ui';
 import * as yup from 'yup';
-
 
 import Grid from '@mui/material/Grid2';
 
@@ -20,9 +19,7 @@ import { Typography } from '@mui/material';
 import { UseFormReturn } from 'react-hook-form';
 import { useContext } from 'react';
 import { gitPullModalId } from '../../../rapidcmi5_mdx/modals/constants';
-import { PullType } from '../../CourseBuilderApiTypes';
 import { GitContext } from '../../GitViewer/session/GitContext';
-
 
 export function PullForm({
   defaultData,

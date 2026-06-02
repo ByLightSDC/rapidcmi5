@@ -1,61 +1,51 @@
 import {
-  SlideTypeEnum,
-  CourseAU,
   CodeRunnerContent,
   MoveOnCriteriaEnum,
   QuestionResponse,
   QuestionGrading,
-  ScenarioContent,
   CourseData,
   QuizContent,
   QuizCompletionEnum,
   CTFContent,
   DownloadFilesContent,
-  RC5ScenarioContent,
-  TeamConsolesContent,
   RC5ActivityTypeEnum,
   ContentWidthEnum,
+  ScenarioContent,
+  CourseAU,
+  SlideType,
 } from '@rapid-cmi5/cmi5-build-common';
+import {
+  CreateCommitType,
+  CreateCourseType,
+  CreateLessonType,
+  CreateLocalRepoType,
+  GitConfigType,
+  ImportRepoZipType,
+} from './courseBuilderFormTypes';
 
 export const jsonFormatSpaces = 1;
 
-export const defaultEmptySlide = {
+export const defaultEmptySlide: SlideType = {
   slideTitle: 'Slide 1',
-  type: SlideTypeEnum.Markdown,
   content: '# Slide',
   filepath: '',
 };
 
-export const defaultAutoGraderData = {
-  name: '',
-  auId: undefined,
-  testId: undefined,
-  questionId: undefined,
-  correctAnswers: [],
-  steps: [],
-  interactionName: {},
-  interactionDescription: {},
-  objective: {},
-  context: {},
-  script: undefined,
-  scenario: undefined,
-  metadata: {},
-};
-export const defaultCreateCourseData = {
+export const defaultCreateCourseData: CreateCourseType = {
   courseName: '',
   courseDescription: '',
   courseId: 'https://',
   firstAuName: 'Introduction',
-  importCmi5Zip: false,
-  useAi: false,
-  aiPrompt: '',
 };
 
-export const defaultCreateLessonData = {
+export const defaultCreateLessonData: CreateLessonType = {
   courseName: '',
   auName: '',
+  blockName: '',
+  coursePath: '',
 };
-export const defaultCloneRepoData = {
+
+export const defaultCloneRepoData: CreateLocalRepoType = {
   repoDirName: '',
   repoRemoteUrl: 'https://',
   repoBranch: 'main',
@@ -65,20 +55,20 @@ export const defaultCloneRepoData = {
   authorEmail: '',
 };
 
-export const defaultImportRepoZipData = {
+export const defaultImportRepoZipData: ImportRepoZipType = {
   repoDirName: '',
   authorName: '',
   authorEmail: '',
 };
 
-export const defaultCommitData = {
+export const defaultCommitData: CreateCommitType = {
   authorName: '',
   authorEmail: '',
   commitMessage: '',
   branch: '',
 };
 
-export const defaultGitConfigData = {
+export const defaultGitConfigData: GitConfigType = {
   authorName: '',
   authorEmail: '',
   remoteRepoUrl: '',
@@ -93,6 +83,7 @@ export const defaultAUData: CourseAU = {
   slides: [],
   teamSSOEnabled: undefined,
   dirPath: '',
+  buildTimeProps: {},
 };
 
 export const defaultCodeRunnerContent: CodeRunnerContent = {
@@ -118,13 +109,7 @@ export const defaultQuestion = {
 };
 
 export const defaultScenarioContent: ScenarioContent = {
-  introTitle: '',
-  introContent: '',
-  confirmStopButtonText: '',
   promptClassId: false,
-  stopScenarioButtonTooltip: '',
-  stopScenarioMessage: '',
-  stopScenarioTitle: '',
 };
 
 export const defaultCourseData: CourseData = {
@@ -140,10 +125,12 @@ export const defaultCourseData: CourseData = {
           auName: '',
           slides: [{ ...defaultEmptySlide }],
           dirPath: '',
+          buildTimeProps: {},
         },
       ],
     },
   ],
+  buildTimeProps: {},
 };
 
 export const defaultQuizContent: QuizContent = {
@@ -171,7 +158,7 @@ export const defaultDownloadFilesContent: DownloadFilesContent = {
 /**
  * Scenario activity insertion json
  */
-export const defaultScenarioContentData: RC5ScenarioContent = {
+export const defaultScenarioContentData: ScenarioContent = {
   uuid: '',
   name: '',
   promptClass: false,
@@ -187,7 +174,7 @@ export const defaultScenarioContentStr = JSON.stringify(
 /**
  * Scenario activity insertion json
  */
-export const defaultTeamConsolesContentData: TeamConsolesContent = {
+export const defaultTeamConsolesContentData: ScenarioContent = {
   uuid: '',
   name: '',
   moveOnCriteria: MoveOnCriteriaEnum.Completed,

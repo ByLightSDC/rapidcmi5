@@ -1,8 +1,8 @@
-import React, { createContext } from 'react';
-import { LessonTheme } from '@rapid-cmi5/cmi5-build-common';
+import { createContext } from 'react';
+import { Theme } from '@rapid-cmi5/cmi5-build-common';
 
 export interface ILessonThemeContext {
-  lessonTheme?: LessonTheme;
+  lessonTheme?: Theme;
 }
 
 /**

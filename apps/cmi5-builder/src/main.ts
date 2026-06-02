@@ -21,7 +21,6 @@ import {
   QuizContent,
   RC5_VERSION,
   SlideType,
-  SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 
 import YAML from 'yaml';
@@ -542,7 +541,6 @@ function makeScenarioSlide(args: {
   };
 
   return {
-    type: SlideTypeEnum.Markdown,
     slideTitle: 'Lab',
     content: [
       ':::scenario',
