@@ -2,20 +2,18 @@ import {
   Typography,
   ListItemText,
   ListItemButton,
-  TextField,
-  InputAdornment,
   Alert,
   AlertTitle,
-  IconButton,
 } from '@mui/material';
 import { alpha, Box, Stack, useTheme } from '@mui/system';
-import { History, Search, Clear } from '@mui/icons-material';
+import { History } from '@mui/icons-material';
 import { GlassCard } from './GlassCard';
 
 import ThemedOptionCard from './ThemedOption';
-import { DirMeta, formatRelativeTime } from '@rapid-cmi5/cmi5-build-common';
+import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
 import { useState, useMemo } from 'react';
 import SearchBar from './SearchBar';
+import { formatRelativeTime } from '@rapid-cmi5/ui';
 
 export type RecentProjectSelectionProps = {
   recentProjects: DirMeta[];

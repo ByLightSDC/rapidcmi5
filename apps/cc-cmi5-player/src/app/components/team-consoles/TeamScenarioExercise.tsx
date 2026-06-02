@@ -19,7 +19,6 @@ import {
   Divider,
   IconButton,
   ListItemIcon,
-  Paper,
   Stack,
   SxProps,
   Tabs,
@@ -48,16 +47,10 @@ import {
 } from '@rangeos-nx/frontend/clients/hooks';
 import {
   AuContextProps,
-  TeamConsolesContent,
   OuterStyle,
+  ScenarioContent,
 } from '@rapid-cmi5/cmi5-build-common';
-import {
-  LessonThemeContext,
-  OverflowTypography,
-  TabMainUi,
-  maxFormWidths,
-  useLessonThemeStyles,
-} from '@rapid-cmi5/ui';
+import { OverflowTypography, TabMainUi } from '@rapid-cmi5/ui';
 
 /**
  * Activity displays a Deployed Scenario status, VMs, Containers, and Autograders
@@ -73,7 +66,7 @@ function TeamScenarioExercise({
   outerStyle,
 }: {
   auProps: Partial<AuContextProps>;
-  content: TeamConsolesContent;
+  content: ScenarioContent;
   innerSx?: SxProps;
   outerSx?: SxProps;
   outerStyle?: OuterStyle;
@@ -219,11 +212,7 @@ function TeamScenarioExercise({
       if (loadedScenario.current === null) {
         //try loading it
         try {
-          await loadScenario(
-            content.uuid,
-            content.name,
-            content.rc5id || 'missing',
-          );
+          loadScenario(content.uuid, content.name, content.rc5id || 'missing');
           //retry to get it
           loadedScenario.current = getScenario(content.uuid, content.name);
           //display error if it missing

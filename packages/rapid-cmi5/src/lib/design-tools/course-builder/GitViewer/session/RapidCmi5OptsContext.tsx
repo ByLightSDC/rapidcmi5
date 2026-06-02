@@ -29,7 +29,6 @@ export type AiPanelMode = 'claude' | 'codex' | 'terminal';
 export interface RapidCmi5Opts {
   userAuth?: UserAuth;
   downloadCmi5Player?: () => Promise<any>;
-  fetchScenario?: (uuid: string) => Promise<ScenarioApi>;
   handleOverrideGlobalGitConfig?: (
     config?: GitUserConfig,
     creds?: Credentials,

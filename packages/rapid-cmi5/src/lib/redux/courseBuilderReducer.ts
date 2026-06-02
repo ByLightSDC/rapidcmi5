@@ -5,6 +5,7 @@ import {
   CourseAU,
   Theme,
   ScenarioApi,
+  ScenarioContent,
 } from '@rapid-cmi5/cmi5-build-common';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './store';
@@ -35,8 +36,8 @@ export type CourseBuilderState = {
   isLessonMounted: boolean;
   courseSandbox?: CourseSandbox;
   sourceCourseData?: CourseData;
-  scenario?: ScenarioApi;
-  teamScenario?: ScenarioApi;
+  scenario?: ScenarioContent;
+  teamScenario?: ScenarioContent;
   displayData: string;
   slideDeckText: string;
   slides: SlideType[];
@@ -398,7 +399,7 @@ export const courseBuilderSlice = createSlice({
     updateScenario: (
       state,
       action: PayloadAction<{
-        scenario: ScenarioApi | undefined;
+        scenario: ScenarioContent | undefined;
         shouldDirty?: boolean;
       }>,
     ) => {
@@ -430,7 +431,7 @@ export const courseBuilderSlice = createSlice({
     updateTeamScenario: (
       state,
       action: PayloadAction<{
-        scenario: ScenarioApi | undefined;
+        scenario: ScenarioContent | undefined;
       }>,
     ) => {
       state.teamScenario = action.payload.scenario;

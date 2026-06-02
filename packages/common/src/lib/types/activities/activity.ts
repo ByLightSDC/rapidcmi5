@@ -22,6 +22,8 @@ export enum RC5ActivityTypeEnum {
   scenario = 'Scenario',
 }
 
+export type QuizVarations = RC5ActivityTypeEnum.ctf | RC5ActivityTypeEnum.quiz;
+
 export const ActivityType: string[] = Object.keys(RC5ActivityTypeEnum);
 
 export const activityLabels = Object.values(RC5ActivityTypeEnum).sort((a, b) =>

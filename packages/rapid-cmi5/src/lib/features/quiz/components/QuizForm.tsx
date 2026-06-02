@@ -19,6 +19,7 @@ import {
   QuestionBankApi,
   convertFromApi,
   OuterStyle,
+  QuizVarations,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   ENUM_GROUP,
@@ -56,7 +57,7 @@ export function requireField<T>(value: T | undefined | null, field: string): T {
 }
 
 export const QuizForm = ({
-  activityKind,
+  quizVariation,
   contextMenu,
   crudType,
   defaultFormData,
@@ -66,7 +67,7 @@ export const QuizForm = ({
   outerStyle,
   onSave,
 }: {
-  activityKind: RC5ActivityTypeEnum;
+  quizVariation: QuizVarations;
   contextMenu?: JSX.Element;
   crudType: FormCrudType;
   defaultFormData: QuizContent;
@@ -75,7 +76,7 @@ export const QuizForm = ({
   innerSx?: SxProps;
   outerSx?: SxProps;
   outerStyle?: OuterStyle;
-  onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
+  onSave: (activity: QuizVarations, data: any) => void;
 }) => {
   const [isSearchBankOpen, setIsSearchBankOpen] = useState(false);
   const [bankQuestion, setBankQuestion] = useState<QuizQuestion | null>(null);
@@ -259,7 +260,7 @@ export const QuizForm = ({
           <QuizBankSearchForm
             submitForm={handleModalResponse}
             closeModal={() => setIsSearchBankOpen(false)}
-            activityType={activityKind}
+            activityType={quizVariation}
           />
         )}
         <Grid size={12}>
@@ -291,6 +292,7 @@ export const QuizForm = ({
                   onAddToBank={
                     isQuizBankEnabled ? (q) => setBankQuestion(q) : undefined
                   }
+                  quizVaration={quizVariation}
                 />
               );
             }}
@@ -335,7 +337,7 @@ export const QuizForm = ({
         dataCache={defaultFormData}
         titleEndChildren={deleteButton}
         doAction={onSaveAction}
-        formTitle={activityKind === RC5ActivityTypeEnum.quiz ? 'Quiz' : 'CTF'}
+        formTitle={quizVariation === RC5ActivityTypeEnum.quiz ? 'Quiz' : 'CTF'}
         formWidth={null}
         formSxProps={{ width: '100%', flexGrow: 1, ...innerSx, margin: 0 }}
         getFormFields={getFormFields}

@@ -335,7 +335,7 @@ export const ActivityEditor: React.FC<
               )}
               {!isPlayback && (
                 <QuizForm
-                  activityKind={RC5ActivityTypeEnum.quiz}
+                  quizVariation={RC5ActivityTypeEnum.quiz}
                   contextMenu={contextMenu}
                   crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
                   defaultFormData={fromJson}
@@ -375,7 +375,7 @@ export const ActivityEditor: React.FC<
               )}
               {!isPlayback && (
                 <QuizForm
-                  activityKind={RC5ActivityTypeEnum.ctf}
+                  quizVariation={RC5ActivityTypeEnum.ctf}
                   contextMenu={contextMenu}
                   crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
                   defaultFormData={fromJson}

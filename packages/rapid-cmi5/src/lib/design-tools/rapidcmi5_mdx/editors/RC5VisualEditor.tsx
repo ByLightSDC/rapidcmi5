@@ -115,6 +115,8 @@ import { linkDialogPlugin } from '../plugins/link-dialog';
 import { draggableBlockPlugin } from '../plugins/draggable-block';
 import { gutterClickPlugin } from '../plugins/gutter-click/GutterClickPlugin';
 import { CurrentLessonAssetsContextProvider } from '../../course-builder/GitViewer/session/LessonAssetsContext';
+import { ScenarioContent } from '@rapid-cmi5/cmi5-build-common';
+import { unknown } from 'zod/v4';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -683,11 +685,11 @@ function RC5VisualEditor() {
           );
           try {
             debugLog('updateTeamScenario (load slide)');
-            const teamScenario =
+            const teamScenario: ScenarioContent | undefined =
               content.indexOf(':consoles') > 0
-                ? { scenario: { uuid: 'unknown' } }
-                : { scenario: undefined };
-            dispatch(updateTeamScenario(teamScenario));
+                ? { uuid: 'unknown', name: 'unknown' }
+                : undefined;
+            dispatch(updateTeamScenario({ scenario: teamScenario }));
 
             // Parse animations from frontmatter before setting markdown.
             // If we already have unsaved animations in memory for this slide, keep them

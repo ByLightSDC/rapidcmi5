@@ -1,7 +1,6 @@
 // Ensure that whenever the types change ./utils/ajv-schema-generator.sh is ran
 
 import { z } from 'zod/v4';
-import { KSATElementSchema } from './ksat';
 import { BaseActivitySchema } from './baseActivity';
 
 export enum QuestionResponse {

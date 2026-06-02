@@ -1,9 +1,9 @@
 import YAML from 'yaml';
 
-import { getScenarioDirectives } from './codeValidators/markdownValidator';
-import { CourseData } from './types/courseStructure/course';
+import { getScenarioDirectives } from '../codeValidators/markdownValidator';
+import { CourseData } from '../types/courseStructure/course';
 
-import { ScenarioContent } from './types';
+import { ScenarioContent } from '../types';
 
 export interface FolderStruct {
   id: string;

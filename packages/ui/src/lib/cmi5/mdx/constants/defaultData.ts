@@ -110,6 +110,8 @@ export const defaultQuestion = {
 
 export const defaultScenarioContent: ScenarioContent = {
   promptClassId: false,
+  name: '',
+  uuid: '',
 };
 
 export const defaultCourseData: CourseData = {

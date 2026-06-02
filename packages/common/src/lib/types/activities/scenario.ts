@@ -17,8 +17,8 @@ export type ScenarioSubmitResponse = z.infer<
 
 export const ScenarioContentSchema = BaseActivitySchema.extend({
   defaultClassId: z.string().optional(),
-  uuid: z.string().optional(),
-  name: z.string().optional(),
+  uuid: z.string(),
+  name: z.string(),
   promptClassId: z.boolean().optional(),
   promptClass: z.boolean().optional(),
   cmi5QuizId: z.string().optional(),

@@ -23,7 +23,11 @@ import { useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { RC5Context } from '../contexts/RC5Context';
-import { Operation, ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
+import {
+  Operation,
+  ScenarioApi,
+  ScenarioContent,
+} from '@rapid-cmi5/cmi5-build-common';
 
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
 import { createLesson } from '../../course-builder/GitViewer/utils/useCourseOperationsUtils';
@@ -268,7 +272,7 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
           ?.rangeosScenarioName;
 
       if (scenarioID && scenarioName) {
-        const scenario: ScenarioApi = {
+        const scenario: ScenarioContent = {
           uuid: scenarioID,
           name: scenarioName,
         };

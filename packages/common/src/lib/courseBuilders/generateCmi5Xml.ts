@@ -1,4 +1,4 @@
-import { CourseData } from './types/courseStructure/course';
+import { CourseData } from '../types/courseStructure/course';
 
 function sanitizeName(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]/g, '_');
