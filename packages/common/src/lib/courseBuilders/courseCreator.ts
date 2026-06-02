@@ -1,10 +1,9 @@
 import YAML from 'yaml';
 
-import { getScenarioDirectives } from './codeValidators/markdownValidator';
-import { CourseData } from './types/course';
-import { RC5ScenarioContent, SlideTypeEnum } from './types/slide';
-import { TeamConsolesContent } from './types/teamConsoles';
-import { RC5_VERSION } from './versions';
+import { getScenarioDirectives } from '../codeValidators/markdownValidator';
+import { CourseData } from '../types/courseStructure/course';
+
+import { ScenarioContent } from '../types';
 
 export interface FolderStruct {
   id: string;
@@ -45,7 +44,6 @@ export const generateCourseJson = (folderStructure: FolderStruct[]) => {
 
   const courseData = YAML.parse(content) as CourseData;
 
-  if (courseData.rc5Version === undefined) courseData.rc5Version = RC5_VERSION;
   return generateCourseFromNav(folderStructure, courseData);
 };
 
@@ -88,38 +86,35 @@ export function generateCourseFromNav(
           }
         }
 
-        let scenarios: RC5ScenarioContent[] = [];
-        let teamExerciseConsoles: TeamConsolesContent[] = [];
+        let scenarios: ScenarioContent[] = [];
+        let teamExerciseConsoles: ScenarioContent[] = [];
 
         au.slides.map((slide) => {
-          if (slide.type === SlideTypeEnum.Markdown) {
-            //find scenarios
-            try {
-              scenarios = scenarios.concat(
-                getScenarioDirectives(slide.content as string),
-              );
-            } catch {
-              scenarios = [];
-            }
+          //find scenarios
+          try {
+            scenarios = scenarios.concat(
+              getScenarioDirectives(slide.content as string),
+            );
+          } catch {
+            scenarios = [];
+          }
 
-            //find team exercise consoles
-            try {
-              teamExerciseConsoles = teamExerciseConsoles.concat(
-                getScenarioDirectives(
-                  slide.content as string,
-                  'consoles',
-                ) as TeamConsolesContent[],
-              );
-            } catch {
-              teamExerciseConsoles = [];
-            }
+          //find team exercise consoles
+          try {
+            teamExerciseConsoles = teamExerciseConsoles.concat(
+              getScenarioDirectives(
+                slide.content as string,
+                'consoles',
+              ) as ScenarioContent[],
+            );
+          } catch {
+            teamExerciseConsoles = [];
           }
         });
 
         //we only support one scenario
         if (scenarios && scenarios.length > 0) {
-          const { uuid, name, promptClass } =
-            scenarios[0] as RC5ScenarioContent;
+          const { uuid, name, promptClass } = scenarios[0] as ScenarioContent;
           au.rangeosScenarioUUID = uuid;
           au.rangeosScenarioName = name;
           au.promptClassId = promptClass;

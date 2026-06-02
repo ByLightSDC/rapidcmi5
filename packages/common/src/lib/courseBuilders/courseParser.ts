@@ -20,7 +20,7 @@ import { mdxJsx } from 'micromark-extension-mdx-jsx';
 import { mdxMd } from 'micromark-extension-mdx-md';
 
 import { toMarkdown } from 'mdast-util-to-markdown';
-import type { Root, Code, RootContent, Text } from 'mdast';
+import type { Root, Code, RootContent } from 'mdast';
 import {
   directiveFromMarkdown,
   directiveToMarkdown,
@@ -31,7 +31,7 @@ import { parse } from 'yaml';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { directive } from 'micromark-extension-directive';
 import { SKIP, visit } from 'unist-util-visit';
-import { AdmonitionTypeEnum } from './types/admonition';
+import { AdmonitionTypeEnum } from '../types/ui/admonition';
 import {
   QuizQuestion,
   QuizOption,
@@ -40,7 +40,8 @@ import {
   BasicResponse,
   QuizCompletionEnum,
   QuizContent,
-} from './types/quiz';
+} from '../types/activities/quiz';
+
 export const RC5_FILENAME = 'RC5.yaml';
 
 function getTagName(value: string) {
@@ -105,7 +106,7 @@ function parseToMdast(input: string) {
     return;
   });
 
-  let md = toMarkdown(tree, {
+  const md = toMarkdown(tree, {
     extensions: [
       mdxJsxToMarkdown(),
       gfmStrikethroughToMarkdown(),
@@ -172,8 +173,8 @@ function mkdocsToMdxRawTextCleanup(content: string) {
 
 export function cleanMkdocs(
   content: string,
-  slidename: string = '',
-  strictMode: boolean = false,
+  slidename = '',
+  strictMode = false,
 ) {
   let md = mkdocsToMdxRawTextCleanup(content);
 

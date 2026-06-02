@@ -1,7 +1,7 @@
 import {
   ContentWidthEnum,
   DefaultAlignmentEnum,
-  LessonTheme,
+  Theme,
   OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
@@ -43,7 +43,7 @@ type UseLessonStylesReturn = {
 };
 
 export const useLessonStyles = (
-  lessonTheme: LessonTheme | undefined,
+  lessonTheme: Theme | undefined,
   overrideContentWidthStr?: ContentWidthEnum,
   maxWidth?: number, //FUTURE
   bgColor?: string,
@@ -160,13 +160,7 @@ export const useLessonStyles = (
           ? activityBackgroundColor
           : 'background.default',
     };
-  }, [
-    borderColor,
-    innerSx,
-    isPlayback,
-    isReadOnly,
-    activityBackgroundColor
-  ]);
+  }, [borderColor, innerSx, isPlayback, isReadOnly, activityBackgroundColor]);
 
   useEffect(() => {
     //not sure if this is needed

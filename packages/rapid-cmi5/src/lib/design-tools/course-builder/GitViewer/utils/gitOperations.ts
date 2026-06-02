@@ -3,8 +3,7 @@ import { GitFS } from './fileSystem';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import * as git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
-import { GitConfigType } from '../../CourseBuilderApiTypes';
-import { debugLog, debugLogError } from '@rapid-cmi5/ui';
+import { debugLog, debugLogError, GitConfigType } from '@rapid-cmi5/ui';
 import path, { join } from 'path-browserify';
 import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { slugifyPath } from './useCourseOperationsUtils';
@@ -112,7 +111,7 @@ export class GitOperations {
   };
   initGitRepo = async (
     r: RepoAccessObject,
-    defaultBranch: string = 'main',
+    defaultBranch = 'main',
   ): Promise<void> => {
     const dir = getRepoPath(r);
 
@@ -153,7 +152,7 @@ export class GitOperations {
     const dir = getRepoPath(r);
     try {
       if (this.gitFs.isElectron) {
-        window.fsApi.gitAddRemote(dir, remoteUrl);
+        await window.fsApi.gitAddRemote(dir, remoteUrl);
       } else {
         await git.addRemote({
           fs: this.gitFs.fs,
@@ -234,20 +233,17 @@ export class GitOperations {
     branch: string,
   ) => {
     const dir = getRepoPath(r);
-    try {
-      await git.commit({
-        fs: this.gitFs.fs,
-        dir,
-        author: { name: authorName, email: authorEmail },
-        message: `Merge '${branch}' into origin ${branch}`,
-        parent: [branch, '/remotes/origin/' + branch],
-        cache: this.cache,
-      });
 
-      await this.gitFs.deleteFile(r, failedMergePath);
-    } catch (error: any) {
-      throw error;
-    }
+    await git.commit({
+      fs: this.gitFs.fs,
+      dir,
+      author: { name: authorName, email: authorEmail },
+      message: `Merge '${branch}' into origin ${branch}`,
+      parent: [branch, '/remotes/origin/' + branch],
+      cache: this.cache,
+    });
+
+    await this.gitFs.deleteFile(r, failedMergePath);
   };
 
   gitPull = async (
@@ -756,7 +752,7 @@ export class GitOperations {
   gitCheckout = async (r: RepoAccessObject, branch: string) => {
     const dir = getRepoPath(r);
     if (this.gitFs.isElectron) {
-      window.fsApi.gitCheckout(dir, branch);
+      await window.fsApi.gitCheckout(dir, branch);
     } else {
       await git.checkout({
         fs: this.gitFs.fs,
@@ -948,7 +944,7 @@ export class GitOperations {
   revertFileToHEAD = async (r: RepoAccessObject, filepath: string) => {
     const dir = getRepoPath(r);
     if (this.gitFs.isElectron) {
-      window.fsApi.revertFileToHEAD(dir, filepath);
+      await window.fsApi.revertFileToHEAD(dir, filepath);
     } else {
       const headOid = await git.resolveRef({
         fs: this.gitFs.fs,

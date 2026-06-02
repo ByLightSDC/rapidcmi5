@@ -1,5 +1,5 @@
-/* eslint-disable react/jsx-no-useless-fragment */
 import {
+  CreateCloneType,
   FormControlCheckboxField,
   FormControlPassword,
   FormControlTextField,
@@ -24,7 +24,6 @@ import { useCallback, useContext, useEffect, useMemo } from 'react';
 import CheckIcon from '@mui/icons-material/Check';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import { cloneRepoModalId } from '../../../rapidcmi5_mdx/modals/constants';
-import { CreateCloneType } from '../../CourseBuilderApiTypes';
 import { GitContext } from '../../GitViewer/session/GitContext';
 
 const validationSchema = yup.object().shape({
@@ -99,7 +98,6 @@ export function CloneRepoForm({
           setValue('repoDirName', defaultName);
           trigger('repoDirName');
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [watchRepoUrl, errors['repoRemoteUrl']]);
 
       /**

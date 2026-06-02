@@ -1,10 +1,10 @@
-/* eslint-disable react/jsx-no-useless-fragment */
 import {
   FormControlPassword,
   FormControlTextField,
   FormControlUIProvider,
   FormStateType,
   GIT_URL_GROUP,
+  GitConfigType,
   MiniForm,
   ModalDialog,
 } from '@rapid-cmi5/ui';
@@ -20,7 +20,6 @@ import { NAME_GROUP_OPT } from '@rapid-cmi5/ui';
 import { useContext } from 'react';
 import { Alert, Typography } from '@mui/material';
 import { setGitConfigModalId } from '../../../rapidcmi5_mdx/modals/constants';
-import { GitConfigType } from '../../CourseBuilderApiTypes';
 import { GitContext } from '../../GitViewer/session/GitContext';
 
 export function GitConfigForm({
@@ -39,8 +38,7 @@ export function GitConfigForm({
   ) => void;
 }) {
   const { handleGitSetConfig } = useContext(GitContext);
-  const { isRepoConnectedToRemote} =
-    useContext(GitContext);
+  const { isRepoConnectedToRemote } = useContext(GitContext);
 
   const validationSchema = yup.object().shape({
     remoteRepoUrl: GIT_URL_GROUP(false),

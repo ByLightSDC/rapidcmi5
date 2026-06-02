@@ -1,5 +1,5 @@
 import { generateAuId, generateBlockId } from './generateCmi5Xml';
-import { CourseData } from './types/course';
+import { CourseData } from '../types/courseStructure/course';
 
 // Utility to localize NX build pathing in index.html
 function localizeNxBuildPathing(content: string, relativePath: string): string {
@@ -163,12 +163,8 @@ export async function generateCourseDist(
       const auPathJson = pathJoin(auPath, 'config.json');
 
       await fs.mkdir(auPath, { recursive: true });
-      au.metadata = {
-        buildTime: courseData.buildTime,
-        gitBranch: courseData.gitBranch,
-        rc5Version: courseData.rc5Version,
-        remoteGitUrl: courseData.remoteGitUrl,
-      };
+      au.buildTimeProps = courseData.buildTimeProps;
+
       await fs.writeFile(auPathJson, JSON.stringify(au, null, 2), 'utf-8');
       await copyIndexFile(distPath, auPath, fs, pathJoin, pathRelative);
     }

@@ -21,7 +21,6 @@ import {
   QuizContent,
   RC5_VERSION,
   SlideType,
-  SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 
 import YAML from 'yaml';
@@ -542,7 +541,6 @@ function makeScenarioSlide(args: {
   };
 
   return {
-    type: SlideTypeEnum.Markdown,
     slideTitle: 'Lab',
     content: [
       ':::scenario',
@@ -555,12 +553,8 @@ function makeScenarioSlide(args: {
   };
 }
 
-function isScenarioSlide(slide?: SlideType): boolean {
-  return (
-    slide?.type === SlideTypeEnum.Markdown &&
-    typeof slide.content === 'string' &&
-    slide.content.includes(':::scenario')
-  );
+function isScenarioSlide(content: string): boolean {
+  return content.includes(':::scenario');
 }
 
 function ensureScenarioFirst(
@@ -568,9 +562,10 @@ function ensureScenarioFirst(
   scenario: SlideType,
 ): SlideType[] {
   if (slides.length === 0) return [scenario];
-  if (isScenarioSlide(slides[0])) return slides; // already first → idempotent
+  const firstSlideContent = slides[0].content ?? '';
+  if (isScenarioSlide(firstSlideContent)) return slides; // already first → idempotent
   // remove any existing scenario slide elsewhere to avoid duplicates
-  const filtered = slides.filter((s) => !isScenarioSlide(s));
+  const filtered = slides.filter((s) => !isScenarioSlide(firstSlideContent));
   return [scenario, ...filtered];
 }
 
@@ -590,8 +585,7 @@ function ensureCompletionExam(course: CourseData): CourseData {
   // prevent duplicate completion slides
   const hasCompletion = slides.some(
     (s) =>
-      s.type === SlideTypeEnum.Markdown &&
-      typeof s.content === 'string' &&
+      s.content &&
       s.content.includes(':::quiz') &&
       s.content.includes('"cmi5QuizId": "course-completion"'),
   );
@@ -615,7 +609,6 @@ function ensureCompletionExam(course: CourseData): CourseData {
   };
 
   const completionSlide: SlideType = {
-    type: SlideTypeEnum.Markdown,
     slideTitle: 'Course Completion Acknowledgement',
     content: [
       ':::quiz',
@@ -760,7 +753,11 @@ async function getConvertedFolderStructure(
     ],
     courseId: courseId,
     courseTitle: courseTitle,
-    rc5Version: RC5_VERSION,
+    buildTimeProps: {
+      metadata: {
+        rc5Version: RC5_VERSION,
+      },
+    },
   };
 
   const aus = rc5File.blocks[0].aus;
@@ -811,7 +808,6 @@ async function getConvertedFolderStructure(
         const slide: SlideType = {
           filepath: fullSlidePath,
           slideTitle: title,
-          type: SlideTypeEnum.Markdown,
           content: '',
         };
 
@@ -858,7 +854,6 @@ async function getConvertedFolderStructure(
       const slide: SlideType = {
         filepath: fullPath,
         slideTitle: lesson,
-        type: SlideTypeEnum.Markdown,
         content: '',
       };
 

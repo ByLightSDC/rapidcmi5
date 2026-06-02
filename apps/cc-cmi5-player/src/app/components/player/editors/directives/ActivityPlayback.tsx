@@ -1,22 +1,17 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { DirectiveEditorProps, useCellValues } from '@mdxeditor/editor';
-
-import ScenarioConsoles from '../../../scenario/ScenarioConsoles';
-import TeamScenarioExercise from '../../../team-consoles/TeamScenarioExercise';
 import { useSelector } from 'react-redux';
-import { activeTabSel } from '../../../../redux/navigationReducer';
-import { useCMI5Session } from '../../../../hooks/useCMI5Session';
-import { SlideActivityType } from '../../../../../app/types/SlideActivityStatusState';
 import { Box, ThemeProvider, useTheme } from '@mui/material';
 import { deepmerge } from '@mui/utils';
 import {
   AuContextProps,
-  RC5ScenarioContent,
   QuizContent,
   CTFContent,
-  TeamConsolesContent,
   DownloadFileData,
+  DownloadFilesContent,
   CodeRunnerContent,
+  ScenarioContent,
+  ActivityContent,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   setProgress$,
@@ -35,20 +30,57 @@ import {
   ActivityDirectiveNode,
   darkTheme,
 } from '@rapid-cmi5/ui';
-import { cmi5Instance } from '../../../../session/cmi5';
+
+import ScenarioConsoles from '../../../scenario/ScenarioConsoles';
+import TeamScenarioExercise from '../../../team-consoles/TeamScenarioExercise';
+import { activeTabSel } from '../../../../redux/navigationReducer';
+import { useCMI5Session } from '../../../../hooks/useCMI5Session';
+import { SlideActivityType } from '../../../../../app/types/SlideActivityStatusState';
 import { auConfigInitializedSel } from '../../../../redux/auReducer';
 
-/**
- * Non editable Activity View
- * @param param0
- * @returns
- */
+type DirectiveName = ActivityDirectiveNode['name'];
 
+const extractJsonString = (node: ActivityDirectiveNode): string | null => {
+  const firstChild = node.children?.[0];
+  if (!firstChild) return null;
+
+  if (firstChild.type === 'code' && typeof firstChild.value === 'string') {
+    return firstChild.value;
+  }
+
+  if (firstChild.type === 'paragraph') {
+    const textNode = firstChild.children?.[0];
+    if (textNode?.type === 'text' && typeof textNode.value === 'string') {
+      return textNode.value;
+    }
+  }
+
+  return null;
+};
+
+const parseActivityContent = (
+  node: ActivityDirectiveNode,
+): ActivityContent | null => {
+  const jsonString = extractJsonString(node);
+  if (!jsonString) return null;
+
+  try {
+    return JSON.parse(jsonString) as ActivityContent;
+  } catch (error) {
+    debugLogError(`Failed to parse activity content JSON ${error}`);
+    return null;
+  }
+};
+
+const DOWNLOAD_DIRECTIVE: DirectiveName = 'download';
+
+/** Non-editable activity view rendered inside the MDX player. */
 export const ActivityPlayback: React.FC<
   DirectiveEditorProps<ActivityDirectiveNode>
 > = ({ mdastNode }) => {
-  const { name } = mdastNode; //scenario, quiz, etc.
-  const [fromJson, setFromJson] = useState<any>(undefined);
+  const { name } = mdastNode;
+  const [content, setContent] = useState<ActivityContent | null>(null);
+
   const [setProgress, submitScore, getActivityCache, setActivityCache] =
     useCellValues(
       setProgress$,
@@ -58,23 +90,24 @@ export const ActivityPlayback: React.FC<
     );
 
   const activeTab = useSelector(activeTabSel);
+  const isConfigInitialized = useSelector(auConfigInitializedSel);
   const { isAuthenticated, isTestMode } = useCMI5Session();
-
-  const auProps: Partial<AuContextProps> = {
-    setProgress: setProgress,
-    submitScore: submitScore,
-    setActivityCache,
-    getActivityCache,
-    activeTab: activeTab,
-    isAuthenticated: isAuthenticated,
-    isTestMode: isTestMode,
-  };
-
   const muiTheme = useTheme();
   const { lessonTheme } = useContext(LessonThemeContext);
+
+  const auProps: Partial<AuContextProps> = {
+    setProgress,
+    submitScore,
+    setActivityCache,
+    getActivityCache,
+    activeTab,
+    isAuthenticated,
+    isTestMode,
+  };
+
   const { innerActivitySx, outerSx, outerStyle } = useLessonStyles(
     lessonTheme,
-    mdastNode?.attributes?.contentWidth,
+    mdastNode.attributes?.contentWidth,
     maxFormWidths.downloadsEditor,
     muiTheme.palette.background.paper,
     muiTheme.activity.backgroundColor,
@@ -82,130 +115,109 @@ export const ActivityPlayback: React.FC<
     true,
   );
 
-  /**
-   * update theme with overrides from cfg file
-   */
-  const isConfigInitialized = useSelector(auConfigInitializedSel);
-  const activityTheme = useMemo(() => {
-    const base = darkTheme;
-    if (!isConfigInitialized) {
-      return base;
+  const activityTheme = useMemo(
+    () =>
+      isConfigInitialized ? deepmerge(darkTheme, config.THEME.DARK) : darkTheme,
+    [isConfigInitialized],
+  );
+
+  useEffect(() => {
+    if (content) return;
+
+    if (!mdastNode.children?.length) {
+      debugLogError('Missing activity children');
+      return;
     }
-    const overriddenTheme = deepmerge(base, config.THEME.DARK);
-    return overriddenTheme;
-  }, [isConfigInitialized]);
 
-  /** Get Default Form Data from MDAST Node */
-  React.useEffect(() => {
-    if (!fromJson) {
-      if (mdastNode?.children?.length > 0) {
-        try {
-          let jsonContent;
-          const cnode = mdastNode.children[0];
+    const parsed = parseActivityContent(mdastNode);
+    if (parsed) setContent(parsed);
+  }, [mdastNode, content]);
 
-          if (cnode.type === 'code') {
-            jsonContent = cnode.value;
-          } else if (cnode.type === 'paragraph') {
-            const tnode = cnode.children[0];
-            if (tnode.type === 'text') {
-              jsonContent = tnode.value;
-            }
-          }
-          //console.log('mounted activity json str=', jsonNode.value);
-          if (!jsonContent) return;
-          const json = JSON.parse(jsonContent);
-          setFromJson(json);
-        } catch (e) {
-          //TODO validation here
-          console.log(e);
-        }
-      } else {
-        debugLogError('Missing activity children');
-      }
-    }
-  }, [mdastNode?.children, fromJson]);
+  const layoutProps = {
+    innerSx: innerActivitySx,
+    outerSx,
+    outerStyle,
+  } as const;
 
-  return (
-    <div
-      style={{
-        padding: 0,
-        margin: 0,
-        width: '100%',
-      }}
-    >
-      <ThemeProvider theme={activityTheme}>
-        {name === SlideActivityType.SCENARIO && fromJson && (
+  const renderActivity = (): React.ReactNode => {
+    if (!content) return null;
+
+    switch (name) {
+      case SlideActivityType.SCENARIO: {
+        const scenario = content as ScenarioContent;
+        return (
           <ScenarioConsoles
             auProps={auProps}
             content={{
-              scenarioName: (fromJson as RC5ScenarioContent).name,
-              scenarioUUID: (fromJson as RC5ScenarioContent).uuid,
-              promptClassId: (fromJson as RC5ScenarioContent).promptClass,
+              name: scenario.name,
+              uuid: scenario.uuid,
+              promptClassId: scenario.promptClass,
             }}
-            innerSx={innerActivitySx}
-            outerSx={outerSx}
-            outerStyle={outerStyle}
+            {...layoutProps}
           />
-        )}
+        );
+      }
 
-        {name === SlideActivityType.QUIZ && fromJson && (
+      case SlideActivityType.QUIZ:
+        return (
           <AuQuiz
             auProps={auProps}
-            content={fromJson as QuizContent}
-            innerSx={innerActivitySx}
-            outerSx={outerSx}
-            outerStyle={outerStyle}
+            content={content as QuizContent}
+            {...layoutProps}
           />
-        )}
+        );
 
-        {name === SlideActivityType.CTF && fromJson && (
+      case SlideActivityType.CTF:
+        return (
           <AuCTF
             auProps={auProps}
-            content={fromJson as CTFContent}
-            innerSx={innerActivitySx}
-            outerSx={outerSx}
-            outerStyle={outerStyle}
+            content={content as CTFContent}
+            {...layoutProps}
           />
-        )}
-        {name === SlideActivityType.CODE_RUNNER && fromJson && (
+        );
+
+      case SlideActivityType.CODE_RUNNER:
+        return (
           <CodeRunner
             auProps={auProps}
-            content={fromJson as CodeRunnerContent}
-            innerSx={innerActivitySx}
-            outerSx={outerSx}
-            outerStyle={outerStyle}
+            content={content as CodeRunnerContent}
+            {...layoutProps}
           />
-        )}
-        {name === SlideActivityType.CONSOLES && fromJson && (
-          <>
-            <TeamScenarioExercise
-              auProps={auProps}
-              content={fromJson as TeamConsolesContent}
-              innerSx={innerActivitySx}
-              outerSx={outerSx}
-              outerStyle={outerStyle}
-            />
-            {/* REF keep for testing individual scenario UI with a deployed scenario requires ScenarioWrapper, debugRangeId, debugScenarioId
-           <ScenarioConsoles
+        );
+
+      case SlideActivityType.CONSOLES:
+        return (
+          <TeamScenarioExercise
             auProps={auProps}
-            content={fromJson as TeamConsolesContent}
-          /> */}
-          </>
-        )}
-        {name === 'download' && fromJson && (
+            content={content as ScenarioContent}
+            {...layoutProps}
+          />
+        );
+
+      case DOWNLOAD_DIRECTIVE: {
+        const { files } = content as DownloadFilesContent;
+        return (
           <Box>
-            {fromJson.files.map((fileData: DownloadFileData) => {
-              return (
-                <FileDownloadLink
-                  fileData={fileData}
-                  auDir=""
-                  filePath={`./Assets/Downloads/${fileData.path}`}
-                />
-              );
-            })}
+            {files.map((file: DownloadFileData) => (
+              <FileDownloadLink
+                key={file.path}
+                fileData={file}
+                auDir=""
+                filePath={`./Assets/Downloads/${file.path}`}
+              />
+            ))}
           </Box>
-        )}
-      </ThemeProvider>
+        );
+      }
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div style={{ padding: 0, margin: 0, width: '100%' }}>
+      <ThemeProvider theme={activityTheme}>{renderActivity()}</ThemeProvider>
     </div>
   );
 };

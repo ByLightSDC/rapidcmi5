@@ -9,6 +9,7 @@ import {
   CommonAppModalState,
   NAME_GROUP_OPT,
   useToaster,
+  SuperSaveFormType,
 } from '@rapid-cmi5/ui';
 import Grid from '@mui/material/Grid2';
 
@@ -16,7 +17,6 @@ import { Alert } from '@mui/material';
 import * as yup from 'yup';
 
 import { UseFormReturn } from 'react-hook-form';
-import { SuperSaveFormType } from '../../CourseBuilderApiTypes';
 
 import {
   cacheWarning,
@@ -171,7 +171,7 @@ export function SaveCourseForm({
         });
       }
 
-      delay(2000);
+      await delay(2000);
 
       dispatch(updateDirtyDisplay({ counter: 0 }));
 

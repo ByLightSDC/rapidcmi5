@@ -1,11 +1,4 @@
-import {
-  alpha,
-  IconButton,
-  Stack,
-  Tooltip,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { Stack, Typography, useTheme } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -21,10 +14,7 @@ import {
   deleteSlide,
   navigateSlide,
 } from '../../../redux/courseBuilderReducer';
-import {
-  defaultSlideContent,
-  SlideTypeEnum,
-} from '@rapid-cmi5/cmi5-build-common';
+import { defaultSlideContent } from '@rapid-cmi5/cmi5-build-common';
 
 import { RC5Context } from '../contexts/RC5Context';
 import { useContext } from 'react';
@@ -83,7 +73,6 @@ export const SlideMenu = () => {
         slide: {
           content: defaultSlideContent,
           slideTitle: slideTitle,
-          type: SlideTypeEnum.Markdown,
           filepath,
         },
         insertionPoint,

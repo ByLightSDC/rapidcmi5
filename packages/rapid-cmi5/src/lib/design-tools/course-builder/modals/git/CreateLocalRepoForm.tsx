@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 import {
+  CreateCloneType,
   FormControlPassword,
   FormControlTextField,
   FormControlUIProvider,
@@ -23,7 +24,6 @@ import { Alert, Typography } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import { createLocalRepoModalId } from '../../../rapidcmi5_mdx/modals/constants';
-import { CreateCloneType } from '../../CourseBuilderApiTypes';
 import { GitContext } from '../../GitViewer/session/GitContext';
 
 export function CreateLocalRepoForm({

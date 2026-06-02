@@ -2,7 +2,7 @@ import {
   BlockPaddingEnum,
   ContentWidthEnum,
   DefaultAlignmentEnum,
-  LessonTheme,
+  Theme,
 } from '@rapid-cmi5/cmi5-build-common';
 
 export const CONTENT_WIDTH_MAP: Record<ContentWidthEnum, string | null> = {
@@ -61,7 +61,7 @@ export function resolveBlockMaxWidth(
  * Resolves a LessonTheme to concrete CSS values.
  * Returns null if no theme is set (avoids unnecessary style injection).
  */
-export function resolveLessonThemeCSS(theme?: LessonTheme): {
+export function resolveLessonThemeCSS(theme?: Theme): {
   maxWidth: string | null;
   blockPadding: string | null;
   textAlign: string;
@@ -99,7 +99,7 @@ export function resolveLessonThemeCSS(theme?: LessonTheme): {
  */
 export function generateLessonThemeStyleTag(
   scopedClass: string,
-  theme?: LessonTheme,
+  theme?: Theme,
   slideWidth?: number,
   isPlayback?: boolean,
 ): string {
@@ -125,11 +125,15 @@ export function generateLessonThemeStyleTag(
       max-width: 100%;
       height: auto;
     }
-    ${isPlayback ? `.${scopedClass} .mdxeditor-root-contenteditable video {
+    ${
+      isPlayback
+        ? `.${scopedClass} .mdxeditor-root-contenteditable video {
       display: block;
       width: 100%;
       height: auto;
-    }` : ''}
+    }`
+        : ''
+    }
     .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-block-expand] img {
       display: block;
     }
@@ -247,5 +251,12 @@ export function generateLessonThemeStyleTag(
     }`
     : '';
 
-  return imageBaseRule + paragraphWidthRule + alignmentRule + widthRule + blockPaddingRule + blockBaseRule;
+  return (
+    imageBaseRule +
+    paragraphWidthRule +
+    alignmentRule +
+    widthRule +
+    blockPaddingRule +
+    blockBaseRule
+  );
 }

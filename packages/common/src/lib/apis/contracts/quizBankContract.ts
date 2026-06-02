@@ -7,10 +7,10 @@
 import { initContract } from '@ts-rest/core';
 import { z } from 'zod';
 import {
-  QuestionGrading,
   QuestionResponse,
+  QuestionGrading,
   QuizQuestion,
-} from '../../types/quiz';
+} from '../../types/activities/quiz';
 
 const c = initContract();
 

@@ -76,43 +76,39 @@ export class GitFS {
 
     this.isMountStarted = true;
 
+    const handle = await navigator.storage.getDirectory();
+
     try {
-      const handle = await navigator.storage.getDirectory();
-
-      try {
-        //@ts-ignore
-        for await (const [name, entry] of handle.entries()) {
-          try {
-            // The second argument makes it recursive for directories
-            await handle.removeEntry(name, { recursive: true });
-          } catch (err) {
-            console.error(`Failed to remove ${name}:`, err);
-          }
+      //@ts-ignore
+      for await (const [name, entry] of handle.entries()) {
+        try {
+          // The second argument makes it recursive for directories
+          await handle.removeEntry(name, { recursive: true });
+        } catch (err) {
+          console.error(`Failed to remove ${name}:`, err);
         }
-      } catch {}
-
-      const webacess = await WebAccess.create({ handle });
-
-      await configure({
-        mounts: {
-          '/inBrowser': await IndexedDB.create({ storeName: 'rc5DB' }),
-          // this exists for the git cache, it is needed to speed up operations for the
-          // file system access api
-          '/gitfs': webacess,
-        },
-      });
-
-      try {
-        await this.fs.promises.mkdir('/inBrowser', { recursive: true });
-      } catch (error: any) {
-        debugLogError(error);
       }
+    } catch {}
 
-      this.isBrowserFsLoaded = true;
-      this.isMountStarted = false;
+    const webacess = await WebAccess.create({ handle });
+
+    await configure({
+      mounts: {
+        '/inBrowser': await IndexedDB.create({ storeName: 'rc5DB' }),
+        // this exists for the git cache, it is needed to speed up operations for the
+        // file system access api
+        '/gitfs': webacess,
+      },
+    });
+
+    try {
+      await this.fs.promises.mkdir('/inBrowser', { recursive: true });
     } catch (error: any) {
-      throw error;
+      debugLogError(error);
     }
+
+    this.isBrowserFsLoaded = true;
+    this.isMountStarted = false;
   };
 
   buildCmi5Course = async (
@@ -233,8 +229,6 @@ export class GitFS {
       const builtZip = await this.generateZip(cmi5BuildCache, '');
 
       return await builtZip.generateAsync({ type: 'blob' });
-    } catch (error: any) {
-      throw error;
     } finally {
       try {
         await this.clearDirectory(join(cmi5BuildCache, 'compiled_course'));
@@ -371,18 +365,14 @@ export class GitFS {
   ) => {
     const webacess = await WebAccess.create({ handle: dirHandle });
 
-    try {
-      if (forClone) {
-        zenFs.umount('/localFileSystem');
-        zenFs.mount('/localFileSystem', webacess);
-      } else {
-        zenFs.umount('/localFileSystem/' + dirHandle.name);
-        zenFs.mount('/localFileSystem/' + dirHandle.name, webacess);
-      }
-      this.isBrowserFsLoaded = true;
-    } catch (error: any) {
-      throw error;
+    if (forClone) {
+      zenFs.umount('/localFileSystem');
+      zenFs.mount('/localFileSystem', webacess);
+    } else {
+      zenFs.umount('/localFileSystem/' + dirHandle.name);
+      zenFs.mount('/localFileSystem/' + dirHandle.name, webacess);
     }
+    this.isBrowserFsLoaded = true;
   };
 
   async openLocalRepo(id?: string) {
@@ -829,7 +819,7 @@ export class GitFS {
   ) => {
     const courseData = await getRc5Content(zip);
 
-    if (!courseData.rc5Version) {
+    if (!courseData.buildTimeProps?.metadata?.rc5Version) {
       throw new Error(
         'Cannot upload an RC5 zip file without a version number.\n' +
           'Add rc5Version: 0.0.1 to the bottom of your RC5.yaml file to override.',

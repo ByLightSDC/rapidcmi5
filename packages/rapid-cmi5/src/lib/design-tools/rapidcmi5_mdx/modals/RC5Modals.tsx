@@ -1,6 +1,11 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 
-import { ButtonCopyText, modal, setModal } from '@rapid-cmi5/ui';
+import {
+  ButtonCopyText,
+  modal,
+  setModal,
+  SuperSaveFormType,
+} from '@rapid-cmi5/ui';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   deleteCourseModalId,
@@ -20,7 +25,6 @@ import { useRapidCmi5Opts } from '../../course-builder/GitViewer/session/RapidCm
 import { RootState } from '../../../redux/store';
 import { RepoState } from '../../../redux/repoManagerReducer';
 import SaveCourseForm from '../../course-builder/modals/courses/SaveCourseForm';
-import { SuperSaveFormType } from '../../course-builder/CourseBuilderApiTypes';
 import SelectGitDialogs from '../../course-builder/modals/git/SelectGitDialogs';
 
 export default function RC5Modals() {
@@ -184,7 +188,7 @@ export default function RC5Modals() {
   };
 
   const defaultSaveData = useMemo(() => {
-    const theDefaultData : SuperSaveFormType = {
+    const theDefaultData: SuperSaveFormType = {
       commit: {
         ...defaultCommitData,
         authorEmail: currentGitConfig?.authorEmail?.toLowerCase(),
@@ -215,7 +219,6 @@ export default function RC5Modals() {
   ]);
 
   return (
-    // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
       {modalObj.type !== '' && (
         <>

@@ -15,8 +15,8 @@ import Grid from '@mui/material/Grid2';
 import * as yup from 'yup';
 import {
   moveOnCriteriaOptions,
-  TeamConsolesContent,
   RC5ActivityTypeEnum,
+  ScenarioContent,
 } from '@rapid-cmi5/cmi5-build-common';
 
 import LrsHeaderWithDetails from '../../../../shared/forms/LrsStatementHelper';
@@ -36,7 +36,7 @@ export const TeamConsolesForm = ({
 }: {
   contextMenu?: JSX.Element;
   crudType: FormCrudType;
-  defaultFormData: TeamConsolesContent;
+  defaultFormData: ScenarioContent;
   deleteButton?: JSX.Element;
   handleCloseModal?: () => void;
   innerSx?: any;
@@ -56,7 +56,7 @@ export const TeamConsolesForm = ({
 
   const onSaveAction = (data: any) => {
     if (onSave) {
-      onSave(RC5ActivityTypeEnum.consoles, data as TeamConsolesContent);
+      onSave(RC5ActivityTypeEnum.consoles, data);
     }
   };
 

@@ -30,8 +30,6 @@ import {
   CourseData,
   defaultSlideContent,
   MoveOnCriteriaEnum,
-  LessonTheme,
-  SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 
 import { RC5Context } from '../../contexts/RC5Context';
@@ -47,6 +45,7 @@ import { currentRepoAccessObjectSel } from '../../../../redux/repoManagerReducer
 import { slugifyPath } from '../../../course-builder/GitViewer/utils/useCourseOperationsUtils';
 import { appHeaderVisible, useToaster } from '@rapid-cmi5/ui';
 import { Box } from '@mui/system';
+import { Theme } from '@emotion/react';
 
 const textColor = 'text.hint';
 
@@ -116,7 +115,7 @@ function LessonTree({
     });
   };
 
-  const handleLessonSettings = (theme: LessonTheme) => {
+  const handleLessonSettings = (theme: Theme) => {
     if (lessonSettingsForm) {
       changeLessonTheme(theme, lessonSettingsForm);
     }
@@ -151,7 +150,7 @@ function LessonTree({
           setMenuAnchorPos([event.clientX - 60, event.clientY + 20]);
           setMenuNode(element);
           break;
-        case LessonNodeActionEnum.AddSlide:
+        case LessonNodeActionEnum.AddSlide: {
           saveSlide(); //save before navigating away from this slide
           const slideTitle = `Slide ${element.children.length + 1}`;
 
@@ -180,14 +179,14 @@ function LessonTree({
               blockIndex: element.block,
               slide: {
                 content: defaultSlideContent,
-                slideTitle: slideTitle,
-                type: SlideTypeEnum.Markdown,
+                slideTitle,
                 filepath,
               },
             }),
           );
 
           break;
+        }
         case LessonNodeActionEnum.Rename:
           setMenuAnchor(event.target);
           break;

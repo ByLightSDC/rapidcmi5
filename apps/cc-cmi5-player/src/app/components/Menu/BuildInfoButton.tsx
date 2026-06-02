@@ -24,16 +24,17 @@ export default function BuildInfoButton({ color }: { color?: string }) {
   const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);
   const theme = useTheme();
 
-  if (!auJson?.metadata) return null;
+  const metadata = auJson.buildTimeProps?.metadata;
+  if (!metadata) return null;
 
   const rows = [
-    { label: 'RC5 Version', value: auJson.metadata.rc5Version },
-    { label: 'Branch', value: auJson.metadata.gitBranch },
-    { label: 'Remote', value: auJson.metadata.remoteGitUrl },
+    { label: 'RC5 Version', value: metadata.rc5Version },
+    { label: 'Branch', value: metadata.gitBranch },
+    { label: 'Remote', value: metadata.remoteGitUrl },
     {
       label: 'Build Time',
-      value: auJson.metadata.buildTime
-        ? new Date(auJson.metadata.buildTime).toLocaleString()
+      value: metadata.buildTime
+        ? new Date(metadata.buildTime).toLocaleString()
         : undefined,
     },
   ].filter((row) => Boolean(row.value));

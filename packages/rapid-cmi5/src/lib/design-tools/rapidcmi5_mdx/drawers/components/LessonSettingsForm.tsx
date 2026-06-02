@@ -26,7 +26,7 @@ import {
   BlockPaddingEnum,
   ContentWidthEnum,
   DefaultAlignmentEnum,
-  LessonTheme,
+  Theme,
 } from '@rapid-cmi5/cmi5-build-common';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import {
@@ -41,8 +41,8 @@ export function LessonSettingsForm({
   currentTheme,
 }: {
   handleCloseModal: () => void;
-  handleModalAction: (theme: LessonTheme) => void;
-  currentTheme?: LessonTheme;
+  handleModalAction: (theme: Theme) => void;
+  currentTheme?: Theme;
 }) {
   const modalObj = useSelector(modal);
 
@@ -71,7 +71,7 @@ export function LessonSettingsForm({
 
   const onResponse = (isSuccess: boolean, data: any, message: string) => {
     if (isSuccess) {
-      const theme: LessonTheme = {
+      const theme: Theme = {
         contentWidth,
         blockPadding,
         defaultAlignment,
