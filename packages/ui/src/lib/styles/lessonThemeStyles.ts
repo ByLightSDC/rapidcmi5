@@ -129,6 +129,10 @@ export function generateLessonThemeStyleTag(
       display: block;
       width: 100%;
       height: auto;
+    }
+    .${scopedClass} .mdxeditor-root-contenteditable audio {
+      display: block;
+      width: 100%;
     }` : ''}
     .${scopedClass} .mdxeditor-root-contenteditable [data-editor-block-type="image"][data-block-expand] img {
       display: block;
@@ -155,7 +159,9 @@ export function generateLessonThemeStyleTag(
     overflow: visible;
   }
   .${scopedClass} .mdxeditor-root-contenteditable > div > div > [data-lexical-decorator],
-  .${scopedClass} .mdxeditor-root-contenteditable > div > div > video {
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > video,
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > audio,
+  .${scopedClass} .mdxeditor-root-contenteditable > div > div > p > audio {
     max-width: ${css.maxWidth};
     margin-left: auto;
     margin-right: auto;
