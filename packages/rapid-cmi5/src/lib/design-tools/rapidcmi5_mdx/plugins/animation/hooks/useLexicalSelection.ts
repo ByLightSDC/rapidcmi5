@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { SELECTION_CHANGE_COMMAND, COMMAND_PRIORITY_NORMAL } from 'lexical';
 import { usePublisher, useCellValue } from '@mdxeditor/gurx';
+import { selectionInsideAnimDirective$ } from '@rapid-cmi5/ui';
 import {
   selectedElement$,
   slideAnimations$,
@@ -11,6 +12,7 @@ import {
 } from '../state/animationCells';
 import {
   getSelectedElementInfo,
+  getNotAnimatableReason,
   isNodeAnimatable,
   SelectedElementInfo,
 } from '../utils/lexicalSelection';
@@ -32,6 +34,11 @@ export function useLexicalSelection() {
     null,
   );
   const [isAnimatable, setIsAnimatable] = useState(false);
+  // Why the current selection isn't animatable — surfaced in the drawer's warning.
+  const [notAnimatableReason, setNotAnimatableReason] = useState<string | null>(
+    null,
+  );
+  const publishInsideAnim = usePublisher(selectionInsideAnimDirective$);
   const currentAnimationsRef = useRef(currentAnimations);
   const isDrawerOpenRef = useRef(isDrawerOpen);
 
@@ -51,6 +58,7 @@ export function useLexicalSelection() {
 
     // Only run validation if drawer is open (performance + avoid false negatives)
     let animatable = isNodeAnimatable(info);
+    let reason: string | null = null;
     if (animatable && isDrawerOpenRef.current) {
       const validation = SelectionValidator.validateForWrapping(
         editor,
@@ -72,6 +80,7 @@ export function useLexicalSelection() {
       }
 
       if (!validation.isValid) {
+        reason = validation.reason ?? null;
         debugLog(
           '[useLexicalSelection] Validation blocked animatable (drawer toggle)',
           {
@@ -83,11 +92,19 @@ export function useLexicalSelection() {
           'selection',
         );
       }
+    } else if (!animatable) {
+      // The cheap pre-check (empty / root / tablecell / tablerow) rejected it
+      // before the validator could provide a richer reason.
+      reason = getNotAnimatableReason(info);
     }
 
     setSelectedInfo(info);
     setIsAnimatable(animatable);
-  }, [editor, isDrawerOpen]);
+    setNotAnimatableReason(reason);
+    // Outer editor authoritative: clear "inside anim" — the nested bridge will
+    // re-assert true on its own selection-change if focus is in an anim.
+    publishInsideAnim(false);
+  }, [editor, isDrawerOpen, publishInsideAnim]);
 
   useEffect(() => {
     debugLog(
@@ -121,6 +138,7 @@ export function useLexicalSelection() {
 
         // Only run validation if drawer is open (performance + avoid false negatives)
         let animatable = isNodeAnimatable(info);
+        let reason: string | null = null;
         if (animatable && isDrawerOpenRef.current) {
           const validation = SelectionValidator.validateForWrapping(
             editor,
@@ -142,6 +160,7 @@ export function useLexicalSelection() {
           }
 
           if (!validation.isValid) {
+            reason = validation.reason ?? null;
             debugLog(
               '[useLexicalSelection] Validation blocked animatable',
               {
@@ -153,10 +172,17 @@ export function useLexicalSelection() {
               'selection',
             );
           }
+        } else if (!animatable) {
+          // Cheap pre-check rejected before the validator could provide a
+          // richer reason (empty / root / tablecell / tablerow).
+          reason = getNotAnimatableReason(info);
         }
 
         setSelectedInfo(info);
         setIsAnimatable(animatable);
+        setNotAnimatableReason(reason);
+        // Outer-editor selection change — reset; nested bridge re-asserts if needed.
+        publishInsideAnim(false);
         debugLog('animatable', animatable, undefined, 'selection');
 
         // Publish to Gurx state
@@ -216,10 +242,11 @@ export function useLexicalSelection() {
       // clearInterval(cleanupInterval);
       unregister();
     };
-  }, [editor, publishSelectedElement, setAnimations, setSelectedAnimation]);
+  }, [editor, publishSelectedElement, setAnimations, setSelectedAnimation, publishInsideAnim]);
 
   return {
     selectedInfo,
     isAnimatable,
+    notAnimatableReason,
   };
 }

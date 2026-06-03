@@ -15,6 +15,7 @@ import {
 } from '@mdxeditor/editor';
 import { RC5NestedLexicalEditor } from '../plugins/shared/RC5NestedLexicalEditor';
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import {
   $createParagraphNode,
   $createTextNode,
@@ -31,12 +32,11 @@ import {
   animDirectiveClickHandler$,
   slideAnimationsForDirectives$,
   animationToUnwrap$,
+  animDeletePortalTargets$,
 } from '../plugins/animation-directive';
 
 // MUI components for Accordion-style icons
 import { Box, IconButton, Stack, Tooltip } from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { debugLog } from '@rapid-cmi5/ui';
 
@@ -108,6 +108,13 @@ export const AnimDirectiveDescriptor: DirectiveDescriptor<ContainerDirective> =
 
       // Get click handler from plugin parameters
       const clickHandler = useCellValue(animDirectiveClickHandler$);
+
+      // Drawer-side portal target for this animation's Delete button.
+      // When present (drawer open + this row expanded), the button is rendered
+      // into the drawer and we suppress the inline floating overlay. When null,
+      // we fall back to the inline overlay shown on hover/select.
+      const deletePortalTargets = useCellValue(animDeletePortalTargets$);
+      const deletePortalTarget = deletePortalTargets[animId] ?? null;
 
       // Watch for selection changes (data-animation-selected attribute)
       useEffect(() => {
@@ -343,31 +350,57 @@ export const AnimDirectiveDescriptor: DirectiveDescriptor<ContainerDirective> =
               />
             </Box>
 
-            {/* Settings and Delete icons - matching Layout/Image style, 10px from badge */}
-            {!isReadOnly && (isHovered || isSelected) && (
+            {/* Delete icon. Rendered into the Animation Drawer row when that
+                animation's portal slot is mounted; otherwise falls back to the
+                inline overlay shown on hover/select. The portaled button blurs
+                the slide editor on click, so we refocus + yield a frame before
+                running handleRemoveAnimation (whose unwrap pipeline depends on
+                insertMarkdown$ being gated on inFocus$). */}
+            {!isReadOnly &&
+              deletePortalTarget &&
+              createPortal(
+                <Tooltip
+                  title={
+                    isLastAnimation
+                      ? 'Clear Animation (unwrap content)'
+                      : 'Remove Animation'
+                  }
+                >
+                  <span>
+                    <IconButton
+                      size="small"
+                      disabled={!isLastAnimation}
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (!isLastAnimation) return;
+                        parentEditor.focus();
+                        await new Promise<void>((resolve) =>
+                          requestAnimationFrame(() => resolve()),
+                        );
+                        handleRemoveAnimation();
+                      }}
+                      sx={{ opacity: isLastAnimation ? 1 : 0.3 }}
+                    >
+                      <DeleteForeverIcon fontSize="small" color="primary" />
+                    </IconButton>
+                  </span>
+                </Tooltip>,
+                deletePortalTarget,
+              )}
+            {!isReadOnly &&
+              !deletePortalTarget &&
+              (isHovered || isSelected) && (
               <Box
                 sx={{
                   backgroundColor: '#EEEEEEe6',
                   position: 'absolute',
-                  left: '24px', // Badge at left:-10px + 24px width + 10px gap = 24px
+                  left: '16px', // Badge at left:-10px + 24px width + 2px gap = 16px
                   top: '-10px', // Align with badge top
                   display: 'flex',
                   borderRadius: '4px',
                 }}
               >
-                <Tooltip title="Edit Animation Settings">
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      // Open animation drawer/settings
-                      if (clickHandler && myAnimation) {
-                        clickHandler(animId);
-                      }
-                    }}
-                  >
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
                 <Tooltip
                   title={
                     isLastAnimation
@@ -432,6 +465,11 @@ export const InlineAnimDirectiveDescriptor: DirectiveDescriptor<TextDirective> =
       const [isSelected, setIsSelected] = useState(false);
       const isReadOnly = useCellValue(readOnly$);
       const clickHandler = useCellValue(animDirectiveClickHandler$);
+
+      // Drawer-side portal target for this animation's Delete button. See the
+      // block descriptor above for rationale.
+      const deletePortalTargets = useCellValue(animDeletePortalTargets$);
+      const deletePortalTarget = deletePortalTargets[animId] ?? null;
 
       // LayoutBox pattern hooks
       const removeNode = useLexicalNodeRemove();
@@ -740,12 +778,47 @@ export const InlineAnimDirectiveDescriptor: DirectiveDescriptor<TextDirective> =
             </div>
           )}
 
-          {/* Settings and Delete icons - compact for inline, 10px from badge */}
-          {!isReadOnly && (isHovered || isSelected) && (
+          {/* Delete icon. Drawer portal when available; inline overlay otherwise.
+              See block descriptor for the refocus-on-portal-click rationale. */}
+          {!isReadOnly &&
+            deletePortalTarget &&
+            createPortal(
+              <Tooltip
+                title={
+                  isLastAnimation
+                    ? 'Remove Animation (unwrap content)'
+                    : 'Remove Animation'
+                }
+              >
+                <span>
+                  <IconButton
+                    size="small"
+                    disabled={!isLastAnimation}
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (!isLastAnimation) return;
+                      parentEditor.focus();
+                      await new Promise<void>((resolve) =>
+                        requestAnimationFrame(() => resolve()),
+                      );
+                      handleRemoveAnimation();
+                    }}
+                    sx={{ opacity: isLastAnimation ? 1 : 0.3 }}
+                  >
+                    <DeleteForeverIcon fontSize="small" color="primary" />
+                  </IconButton>
+                </span>
+              </Tooltip>,
+              deletePortalTarget,
+            )}
+          {!isReadOnly &&
+            !deletePortalTarget &&
+            (isHovered || isSelected) && (
             <Box
               sx={{
                 position: 'absolute',
-                left: '20px', // Badge at left:-6px + 18px width + 8px gap ≈ 20px
+                left: '14px', // Badge at left:-6px + 18px width + 2px gap = 14px
                 top: '-12px', // Align with badge top
                 display: 'flex',
                 backgroundColor: '#EEEEEEe6',
@@ -753,19 +826,6 @@ export const InlineAnimDirectiveDescriptor: DirectiveDescriptor<TextDirective> =
                 zIndex: 100,
               }}
             >
-              <Tooltip title="Edit Animation Settings">
-                <IconButton
-                  size="small"
-                  onClick={() => {
-                    if (clickHandler) {
-                      clickHandler(animId);
-                    }
-                  }}
-                  sx={{ padding: '2px' }}
-                >
-                  <EditIcon sx={{ fontSize: '14px' }} />
-                </IconButton>
-              </Tooltip>
               <Tooltip
                 title={
                   isLastAnimation

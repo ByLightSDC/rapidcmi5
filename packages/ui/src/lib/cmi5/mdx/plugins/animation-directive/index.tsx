@@ -7,9 +7,19 @@ import {
   realmPlugin,
   addActivePlugin$,
   addComposerChild$,
+  addNestedEditorChild$,
   Cell,
   Signal,
+  useNestedEditorContext,
 } from '@mdxeditor/editor';
+import { useEffect } from 'react';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import {
+  SELECTION_CHANGE_COMMAND,
+  BLUR_COMMAND,
+  COMMAND_PRIORITY_LOW,
+} from 'lexical';
+import { usePublisher } from '@mdxeditor/gurx';
 
 import AnimationDirectiveRegistry from '../../editors/AnimationDirectiveRegistry';
 import { AnimationConfig } from '../../animation/types/Animation.types';
@@ -45,6 +55,71 @@ export const onAnimDirectiveDelete$ = Signal<string>();
  * Descriptors watch this cell and trigger unwrap when it matches their animation
  */
 export const animationToUnwrap$ = Cell<string | null>(null);
+
+/**
+ * Portal targets for the per-animation Delete button.
+ * Keyed by `directiveId`. The Animation Drawer's timeline row registers a slot
+ * element under its directiveId on mount and clears it on unmount. The anim
+ * directive descriptor reads the map and, when a target exists, portals its
+ * Delete button into the drawer row instead of rendering an inline overlay.
+ */
+export const animDeletePortalTargets$ = Cell<
+  Record<string, HTMLElement | null>
+>({});
+
+/**
+ * Whether the active editor selection sits inside an :::anim directive.
+ * Published by NestedAnimSelectionBridge (rendered inside every NestedLexicalEditor
+ * but only active when its parent mdast node is name='anim'). The outer editor's
+ * selection-change handler resets this to false; the bridge re-asserts true on
+ * selection-change inside the nested anim editor, and clears on blur.
+ *
+ * Drives the "Selected elements already animated" message in the animation drawer.
+ */
+export const selectionInsideAnimDirective$ = Cell<boolean>(false);
+
+/**
+ * Plugin component injected into every NestedLexicalEditor. Bails out unless its
+ * parent directive is `:::anim` (or inline `:anim`). Bridges nested-editor
+ * selection events up to the outer-editor world via `selectionInsideAnimDirective$`.
+ */
+function NestedAnimSelectionBridge() {
+  const ctx = useNestedEditorContext();
+  const [editor] = useLexicalComposerContext();
+  const publish = usePublisher(selectionInsideAnimDirective$);
+
+  const isAnim =
+    (ctx?.mdastNode as { name?: string } | undefined)?.name === 'anim';
+
+  useEffect(() => {
+    if (!isAnim) return;
+
+    const unregisterSelection = editor.registerCommand(
+      SELECTION_CHANGE_COMMAND,
+      () => {
+        publish(true);
+        return false;
+      },
+      COMMAND_PRIORITY_LOW,
+    );
+
+    const unregisterBlur = editor.registerCommand(
+      BLUR_COMMAND,
+      () => {
+        publish(false);
+        return false;
+      },
+      COMMAND_PRIORITY_LOW,
+    );
+
+    return () => {
+      unregisterSelection();
+      unregisterBlur();
+    };
+  }, [editor, isAnim, publish]);
+
+  return null;
+}
 
 /**
  * Signal published by descriptors after successfully unwrapping
@@ -94,6 +169,7 @@ export const animationDirectivePlugin = realmPlugin<{
     realm.pubIn({
       [addActivePlugin$]: 'animationDirective',
       [addComposerChild$]: AnimationDirectiveRegistry,
+      [addNestedEditorChild$]: NestedAnimSelectionBridge,
     });
 
     // Set up click handler that publishes to the action

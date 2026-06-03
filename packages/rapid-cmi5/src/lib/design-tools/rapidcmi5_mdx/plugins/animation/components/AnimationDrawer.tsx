@@ -27,7 +27,7 @@ import { AnimationPreview } from './AnimationPreview';
 import { WrapWithAnimDirective } from './WrapWithAnimDirective';
 import { useLexicalSelection } from '../hooks/useLexicalSelection';
 import { highlightAnimatedElement } from '../utils/updateAnimationIndicators';
-import { ButtonMinorUi } from '@rapid-cmi5/ui';
+import { ButtonMinorUi, selectionInsideAnimDirective$ } from '@rapid-cmi5/ui';
 
 /** Icons */
 import CloseIcon from '@mui/icons-material/Close';
@@ -61,7 +61,9 @@ export function AnimationDrawer() {
     useDrawerAutoHide('animation', isOpen, showSeq);
 
   // Hook into Lexical selection
-  const { selectedInfo, isAnimatable } = useLexicalSelection();
+  const { selectedInfo, isAnimatable, notAnimatableReason } =
+    useLexicalSelection();
+  const isAlreadyAnimated = useCellValue(selectionInsideAnimDirective$);
 
   // Calculate move button states
   const selectedAnimIndex = animations.findIndex(
@@ -161,15 +163,16 @@ export function AnimationDrawer() {
 
         {/* Selected Element Info */}
         <Box sx={{ padding: 2, borderBottom: 1, borderColor: 'divider' }}>
-          {selectedInfo && isAnimatable ? (
-            <Alert severity="success" icon={<CheckCircleIcon />} sx={{ mb: 1 }}>
-              <Typography variant="body2" fontWeight="bold">
-                Selected: {selectedInfo.label}
+          {isAlreadyAnimated ? (
+            <Alert severity="info" sx={{ mb: 1 }}>
+              <Typography variant="body2">
+                Selected elements already animated
               </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {selectedInfo.selectionType === 'inline'
-                  ? 'inline'
-                  : selectedInfo.nodeType}
+            </Alert>
+          ) : selectedInfo && isAnimatable ? (
+            <Alert severity="success" icon={<CheckCircleIcon />} sx={{ mb: 1 }}>
+              <Typography variant="body2">
+                Click [+ Add Animation] to animate these elements
               </Typography>
             </Alert>
           ) : selectedInfo && !isAnimatable ? (
@@ -178,15 +181,13 @@ export function AnimationDrawer() {
                 Cannot animate selected element(s)
               </Typography>
               <Typography variant="caption">
-                {selectedInfo.isEmpty
-                  ? 'Element is empty'
-                  : 'Select a different element'}
+                {notAnimatableReason ?? 'Select a different element'}
               </Typography>
             </Alert>
           ) : (
             <Alert severity="info" sx={{ mb: 1 }}>
               <Typography variant="body2">
-                Select element(s) to animate
+                Select text or elements you want to animate
               </Typography>
               <Typography variant="caption">
                 Paragraphs, headings, images, videos, etc.
