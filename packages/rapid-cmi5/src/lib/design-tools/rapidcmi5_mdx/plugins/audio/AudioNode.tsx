@@ -32,8 +32,9 @@ export type SerializedAudioNode = Spread<
     title?: string;
     src: string;
     rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
-    id?: string; // Unique persistent ID for animation targeting
+    id?: string;
     autoplay?: boolean;
+    captionSrc?: string;
     type: 'audio';
     version: 1;
   },
@@ -50,9 +51,11 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
   /** @internal */
   __title: string | undefined;
   /** @internal */
-  __id: string; // Unique persistent ID for animation targeting
+  __id: string;
   /** @internal */
   __autoplay: boolean;
+  /** @internal */
+  __captionSrc: string | undefined;
 
   /** @internal */
   __rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
@@ -71,20 +74,22 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
       node.__key,
       undefined,
       node.__autoplay,
+      node.__captionSrc,
     );
-    cloned.__id = node.__id; // Preserve id on clone
+    cloned.__id = node.__id;
     return cloned;
   }
 
   /** @internal */
   static override importJSON(serializedNode: SerializedAudioNode): AudioNode {
-    const { title, src, rest, id, autoplay } = serializedNode;
+    const { title, src, rest, id, autoplay, captionSrc } = serializedNode;
     const node = $createAudioNode({
       title,
       src,
       rest,
-      id, // Restore id from saved state
+      id,
       autoplay,
+      captionSrc,
     });
     return node;
   }
@@ -124,14 +129,15 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
     key?: NodeKey,
     id?: string,
     autoplay?: boolean,
+    captionSrc?: string,
   ) {
     super(key);
     this.__src = src;
     this.__title = title;
     this.__rest = rest ?? [];
-    // Generate or restore unique id for animation targeting
     this.__id = id || this.generateId();
     this.__autoplay = autoplay ?? false;
+    this.__captionSrc = captionSrc;
   }
 
   /** @internal */
@@ -150,8 +156,9 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
       title: this.getTitle(),
       src: this.getSrc(),
       rest: this.__rest,
-      id: this.__id, // Save id for persistence
+      id: this.__id,
       autoplay: this.__autoplay,
+      captionSrc: this.__captionSrc,
       type: 'audio',
       version: 1,
     };
@@ -211,6 +218,14 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
     this.getWritable().__autoplay = autoplay;
   }
 
+  getCaptionSrc(): string | undefined {
+    return this.__captionSrc;
+  }
+
+  setCaptionSrc(captionSrc: string | undefined): void {
+    this.getWritable().__captionSrc = captionSrc;
+  }
+
   /** @internal */
   shouldBeSerializedAsElement(): boolean {
     // ALWAYS serialize as HTML element to preserve id for animations!
@@ -227,6 +242,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
         rest={this.__rest}
         id={this.__id}
         autoplay={this.__autoplay}
+        captionSrc={this.__captionSrc}
       />
     );
   }
@@ -243,6 +259,7 @@ export interface CreateAudioNodeParameters {
   src: string;
   id?: string;
   autoplay?: boolean;
+  captionSrc?: string;
 }
 
 /**
@@ -251,8 +268,8 @@ export interface CreateAudioNodeParameters {
  * @group Audio
  */
 export function $createAudioNode(params: CreateAudioNodeParameters): AudioNode {
-  const { title, src, key, rest, id, autoplay } = params;
-  return new AudioNode(src, title, rest, key, id, autoplay);
+  const { title, src, key, rest, id, autoplay, captionSrc } = params;
+  return new AudioNode(src, title, rest, key, id, autoplay, captionSrc);
 }
 
 /**

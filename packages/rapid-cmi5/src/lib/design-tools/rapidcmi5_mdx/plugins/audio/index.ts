@@ -72,6 +72,7 @@ export interface SrcAudioParameters extends BaseAudioParameters {
   src: string;
   rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   autoplay?: boolean;
+  captionSrc?: string;
 }
 
 /**
@@ -87,6 +88,8 @@ export interface SaveAudioParameters extends BaseAudioParameters {
   file?: FileList;
   rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   autoplay?: boolean;
+  captionSrc?: string;
+  captionFile?: FileList;
 }
 
 /**
@@ -112,7 +115,7 @@ export interface NewAudioDialogState {
 export interface EditingAudioDialogState {
   type: 'editing';
   nodeKey: string;
-  initialValues: Omit<SaveAudioParameters, 'file'>;
+  initialValues: Omit<SaveAudioParameters, 'file' | 'captionFile'>;
 }
 
 const internalInsertAudio$ = Signal<SrcAudioParameters>((r) => {
@@ -125,6 +128,7 @@ const internalInsertAudio$ = Signal<SrcAudioParameters>((r) => {
           title: values.title ?? '',
           rest: values.rest ?? [],
           autoplay: values.autoplay,
+          captionSrc: values.captionSrc,
         });
         $insertNodes([audioNode]);
         if ($isRootOrShadowRoot(audioNode.getParentOrThrow())) {
@@ -196,33 +200,44 @@ export const audioDialogState$ = Cell<
       withLatestFrom(activeEditor$, audioUploadHandler$, audioDialogState$),
     ),
     ([values, theEditor, audioUploadHandler, dialogState]) => {
-      const handler =
-        dialogState.type === 'editing'
-          ? (src: string) => {
-              theEditor?.update(() => {
-                const { nodeKey } = dialogState;
-                const audioNode = $getNodeByKey(nodeKey)! as AudioNode;
+      const applyAudioNode = (src: string, captionSrc: string | undefined) => {
+        if (dialogState.type === 'editing') {
+          theEditor?.update(() => {
+            const { nodeKey } = dialogState;
+            const audioNode = $getNodeByKey(nodeKey)! as AudioNode;
 
-                audioNode.setTitle(values.title);
-                audioNode.setSrc(src);
-                audioNode.setRest(values.rest);
-                audioNode.setAutoplay(values.autoplay ?? false);
-              });
-              r.pub(audioDialogState$, { type: 'inactive' });
-            }
-          : (src: string) => {
-              r.pub(internalInsertAudio$, { ...values, src });
-              r.pub(audioDialogState$, { type: 'inactive' });
-            };
+            audioNode.setTitle(values.title);
+            audioNode.setSrc(src);
+            audioNode.setRest(values.rest);
+            audioNode.setAutoplay(values.autoplay ?? false);
+            audioNode.setCaptionSrc(captionSrc);
+          });
+          r.pub(audioDialogState$, { type: 'inactive' });
+        } else {
+          r.pub(internalInsertAudio$, { ...values, src, captionSrc });
+          r.pub(audioDialogState$, { type: 'inactive' });
+        }
+      };
+
+      const resolveCaption = async (src: string) => {
+        if (values.captionFile && values.captionFile.length > 0 && audioUploadHandler) {
+          const captionSrc = await audioUploadHandler(values.captionFile.item(0)!);
+          applyAudioNode(src, captionSrc);
+        } else {
+          applyAudioNode(src, values.captionSrc);
+        }
+      };
 
       if (values.file && values.file.length > 0) {
         audioUploadHandler?.(values.file.item(0)!)
-          .then(handler)
+          .then(resolveCaption)
           .catch((e: unknown) => {
             throw e;
           });
       } else if (values.src) {
-        handler(values.src);
+        resolveCaption(values.src).catch((e: unknown) => {
+          throw e;
+        });
       }
     },
   );
