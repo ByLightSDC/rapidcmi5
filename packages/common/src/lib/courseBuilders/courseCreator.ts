@@ -1,9 +1,9 @@
 import YAML from 'yaml';
 
-import { getScenarioDirectives } from './codeValidators/markdownValidator';
-import { CourseData, SlideTypeEnum } from './types/course';
+import { getScenarioDirectives } from '../codeValidators/markdownValidator';
+import { CourseData, SlideTypeEnum } from '../types/course';
+import { ScenarioContent } from '../types/activities';
 import { RC5_VERSION } from './versions';
-import { ScenarioContent } from './types/activities';
 
 export interface FolderStruct {
   id: string;
