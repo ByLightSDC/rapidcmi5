@@ -1,6 +1,5 @@
 import { z } from 'zod/v4';
 import { CourseBlockSchema } from './block';
-import { CourseSettings } from './metadata';
 
 export enum Operation {
   // Covers deleting a slide or AU

@@ -86,7 +86,6 @@ export const defaultGitConfigData = {
 export const defaultAUData: CourseAU = {
   auName: '',
   assetsPath: '',
-  backgroundImage: '',
   rangeosScenarioName: '',
   rangeosScenarioUUID: '',
   slides: [],
