@@ -1,5 +1,5 @@
-import { generateAuId, generateBlockId } from './generateCmi5Xml';
-import { CourseData } from './types/course';
+import { CourseData } from '../types/course';
+import { generateBlockId, generateAuId } from './generateCmi5Xml';
 
 // Utility to localize NX build pathing in index.html
 function localizeNxBuildPathing(content: string, relativePath: string): string {
