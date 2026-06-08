@@ -1,27 +1,36 @@
 {
-  "auName": "intro",
-  "dirPath": "net_exam_a/intro",
+  "auName": "Introduction",
+  "dirPath": "aarons-course/introduction",
   "slides": [
     {
-      "slideTitle": "Exam",
-      "type": "markdown",
-      "filepath": "net_exam_a/intro/exam.md",
-      "content": ":::scenario\n```json\n{\n \"uuid\": \"558a535d-6087-4bb3-b341-9683a3594328\",\n \"name\": \"test\",\n \"promptClass\": false,\n \"moveOnCriteria\": \"completed\",\n \"defaultClassId\": \"net_a\",\n \"rc5id\": \"20260107133844-9510a34a-046b-428b-ad15-ef0093208f3b\"\n}\n```\n:::\n\n\n\n:::quiz\n```json\n{\n \"cmi5QuizId\": \"quiz\",\n \"completionRequired\": \"completed-and-passed\",\n \"moveOnCriteria\": \"completed-and-passed\",\n \"passingScore\": 80,\n \"questions\": [\n  {\n   \"question\": \"aaaa\",\n   \"type\": \"freeResponse\",\n   \"typeAttributes\": {\n    \"correctAnswer\": \"aaaaa\",\n    \"grading\": \"exact\"\n   },\n   \"cmi5QuestionId\": \"quiz_q1\"\n  },\n  {\n   \"question\": \"tttt\",\n   \"type\": \"freeResponse\",\n   \"typeAttributes\": {\n    \"correctAnswer\": \"tttt\",\n    \"grading\": \"exact\"\n   },\n   \"cmi5QuestionId\": \"quiz_q2\"\n  }\n ],\n \"title\": \"Quiz\",\n \"rc5id\": \"20260203144730-168b4ad2-5102-4ff5-9f64-78a591632273\"\n}\n```\n:::\n\n\n\n:::note{title=\"Note\" collapse=\"closed\"}\ntest\n:::\n\n\n\n\n\n\n\n\n\n:::danger{title=\"Danger\" collapse=\"closed\"}\naaaa\n:::\n\n::::accordion{style=\"margin: 4px;\"}\n:::accordionContent{title=\"Accordion 1 Title\"}\nAccordion 1 Content Goes Here\n:::\n\n:::accordionContent{title=\"Accordion 2 Title\"}\nAccordion 2 Content Goes Here\n:::\n\n:::accordionContent{title=\"Accordion 3 Title\"}\nAccordion 3 Content Goes Here\n:::\n::::"
+      "slideTitle": "Slide 1",
+      "filepath": "aarons-course/introduction/slide-1.md",
+      "content": "# Slide\n\n\n\n:::scenario{contentWidth=\"medium\"}\n```json\n{\n \"uuid\": \"ccd2e70c-f95a-47f1-83ec-e3aa0e5cd520\",\n \"name\": \"Demo Scenario\",\n \"promptClass\": false,\n \"moveOnCriteria\": \"completed\",\n \"rc5id\": \"20260608134023-7a6315a4-1c54-4fd0-bef2-8d298c8a563c\"\n}\n```\n:::"
     },
     {
-      "slideTitle": "Exam Completion",
-      "type": "markdown",
-      "filepath": "net_exam_a/intro/exam-completion.md",
-      "content": "---\nanimations:\n  - id: anim_1770148133980_6oy0eke0g\n    order: 1\n    targetNodeKey: \"113\"\n    directiveId: anim_1770148133961_gc0hya\n    targetLabel: \"Paragraph: aaaaa\"\n    entranceEffect: fadeIn\n    trigger: onSlideOpen\n    duration: 5\n    delay: 0\n    enabled: true\n---\n\n:::quiz\n```json\n{\n \"cmi5QuizId\": \"course-complete\",\n \"completionRequired\": \"completed-and-passed\",\n \"moveOnCriteria\": \"completed-and-passed\",\n \"passingScore\": 80,\n \"questions\": [\n  {\n   \"question\": \"CompleteType in : \\\"Complete\\\" in order to finish the exam.\",\n   \"type\": \"freeResponse\",\n   \"typeAttributes\": {\n    \"correctAnswer\": \"Complete\",\n    \"grading\": \"exact\"\n   },\n   \"cmi5QuestionId\": \"course-complete_q1\"\n  }\n ],\n \"title\": \"Course Completion Acknowledgement\",\n \"rc5id\": \"20260107133936-29a4bfa0-a3e9-4d0b-9b3b-a0ca37bfe329\"\n}\n```\n:::\n\n::::accordion{style=\"margin: 4px;\"}\n:::accordionContent{title=\"Accordion 1 Title\"}\nAccordion 1 Content Goes Here\n:::\n\n:::accordionContent{title=\"Accordion 2 Title\"}\nAccordion 2 Content Goes Here\n:::\n\n:::accordionContent{title=\"Accordion 3 Title\"}\nAccordion 3 Content Goes Here\n:::\n::::\n\n::::tabs{style=\"margin: 4px;\"}\n:::tabContent{title=\"Tab 1 Title\"}\nTab 1 Content Goes Herase\n:::\n\n:::tabContent{title=\"Tab 2 Title\"}\nTab 2 Content Goes Here\n:::\n\n:::tabContent{title=\"Tab 3 Title\"}\nTab 3 Content Goes Here\n:::\n::::\n\n:::anim{#anim_1770148133961_gc0hya}\naaaaa\n\n\n\n\n\n\n\n\n\n:fx[sssssssssss]{type=\"box\" color=\"#aa0000\"}\n:::"
+      "slideTitle": "Slide 2",
+      "filepath": "aarons-course/introduction/slide-2-1.md",
+      "content": "# Slide\n\n\n\n:::codeRunner{contentWidth=\"medium\"}\n```json\n{\n \"title\": \"Code Runner\",\n \"description\": \"test\",\n \"evaluator\": \"print(f\\\"test {add(3,3)}\\\")\",\n \"student\": \"def add(x,y):\\n  return x+y\",\n \"cmi5QuizId\": \"code-runner-activity-1\",\n \"moveOnCriteria\": \"completed\",\n \"languageVersion\": \"3.12.3\",\n \"programmingLanguage\": \"python3\",\n \"rc5id\": \"20260602100355-2b42247f-06f3-4983-9900-259d45ac0d11\"\n}\n```\n:::"
+    },
+    {
+      "slideTitle": "Slide 2",
+      "filepath": "aarons-course/introduction/slide-2.md",
+      "content": ":::quiz{contentWidth=\"medium\"}\n```json\n{\n \"cmi5QuizId\": \"quiz\",\n \"completionRequired\": \"completed-and-passed\",\n \"moveOnCriteria\": \"completed-and-passed\",\n \"passingScore\": 80,\n \"questions\": [\n  {\n   \"question\": \"test\",\n   \"type\": \"freeResponse\",\n   \"typeAttributes\": {\n    \"correctAnswer\": \"test\",\n    \"grading\": \"exact\"\n   },\n   \"cmi5QuestionId\": \"quiz_q1\"\n  },\n  {\n   \"type\": \"multipleChoice\",\n   \"cmi5QuestionId\": \"quiz_q2\",\n   \"question\": \"Which of the following ports is used by DNS, and what makes it unusual compared to most application protocols?\",\n   \"typeAttributes\": {\n    \"correctAnswer\": \"\",\n    \"grading\": \"exact\",\n    \"options\": [\n     {\n      \"text\": \"Port 53, only uses TCP\",\n      \"correct\": false\n     },\n     {\n      \"text\": \"Port 53, only uses UDP\",\n      \"correct\": false\n     },\n     {\n      \"text\": \"Port 53, uses both TCP and UDP\",\n      \"correct\": true\n     },\n     {\n      \"text\": \"Port 23, uses UDP\",\n      \"correct\": false\n     }\n    ]\n   }\n  }\n ],\n \"title\": \"Quiz\",\n \"rc5id\": \"20260602100149-77319aba-0748-49ba-8eb3-245ef8a6875b\"\n}\n```\n:::\n\n# Slide\n\n:::ctf{contentWidth=\"large\"}\n```json\n{\n \"title\": \"Capture The Flag\",\n \"questions\": [\n  {\n   \"question\": \"aa\",\n   \"type\": \"freeResponse\",\n   \"typeAttributes\": {\n    \"correctAnswer\": \"aa\",\n    \"grading\": \"exact\"\n   },\n   \"cmi5QuestionId\": \"quiz_q1\"\n  },\n  {\n   \"type\": \"freeResponse\",\n   \"cmi5QuestionId\": \"quiz_q2\",\n   \"question\": \"Which port does HTTPS use by default?\",\n   \"typeAttributes\": {\n    \"correctAnswer\": \"443\",\n    \"grading\": \"exact\"\n   }\n  }\n ],\n \"cmi5QuizId\": \"quiz\",\n \"completionRequired\": \"completed-and-passed\",\n \"moveOnCriteria\": \"completed-and-passed\",\n \"passingScore\": 100,\n \"rc5id\": \"20260602120257-6496fa1e-5ee6-4f8d-ac71-f7eb2934dff3\"\n}\n```\n:::"
+    },
+    {
+      "slideTitle": "Slide 3",
+      "filepath": "aarons-course/introduction/slide-3.md",
+      "content": "# Slide\n\n:::download{contentWidth=\"small\"}\n```json\n{\n \"files\": [\n  {\n   \"name\": \"Screenshot 2026-05-27 at 5.08.11 PM.png\",\n   \"path\": \"Screenshot 2026-05-27 at 5.08.11 PM.png\",\n   \"type\": \"image/png\"\n  }\n ],\n \"rc5id\": \"20260602100310-83a2c21d-02d8-4d40-ba9a-fd20bf5a7087\"\n}\n```\n:::"
     }
   ],
   "teamSSOEnabled": false,
-  "rangeosScenarioName": "test",
-  "rangeosScenarioUUID": "558a535d-6087-4bb3-b341-9683a3594328",
+  "rangeosScenarioName": "Demo Scenario",
+  "rangeosScenarioUUID": "ccd2e70c-f95a-47f1-83ec-e3aa0e5cd520",
   "promptClassId": false,
-  "defaultClassId": "net_a",
   "ksats": [],
   "metadata": {
-    "rc5Version": "1.0.0"
+    "buildTime": "2026-06-08T17:45:58.135Z",
+    "gitBranch": "main",
+    "rc5Version": "0.16.0"
   }
 }

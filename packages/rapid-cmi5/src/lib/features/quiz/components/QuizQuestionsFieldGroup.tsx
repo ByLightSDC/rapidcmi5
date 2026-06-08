@@ -7,7 +7,6 @@ import Grid from '@mui/material/Grid2';
 import { Box, MenuItem, Stack } from '@mui/material';
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import {
-  SlideTypeEnum,
   QuestionResponse,
   responseOptions,
   gradingOptions,
@@ -24,6 +23,7 @@ import {
   FormFieldArray,
   ButtonModalMinorUi,
   ButtonInfoField,
+  debugLogError,
 } from '@rapid-cmi5/ui';
 
 /**
@@ -38,7 +38,7 @@ interface fieldGroupProps {
   formProps: tFormFieldRendererProps;
   onAddToBank?: (question: any) => void;
   rowIndex?: number;
-  slideType: SlideTypeEnum;
+  slideType: 'ctf' | 'quiz';
 }
 
 /**
@@ -125,13 +125,17 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
     // Answer field is required as specific selection for true/false question
     if (watchQuestionType === QuestionResponse.TrueFalse) {
       setValue(`${indexedArrayField}.typeAttributes.correctAnswer`, 'True');
-      trigger(`${indexedArrayField}.typeAttributes.correctAnswer`);
+      trigger(`${indexedArrayField}.typeAttributes.correctAnswer`).catch(
+        (err) => debugLogError(err),
+      );
     } else if (watchQuestionType === QuestionResponse.Matching) {
       const question = getValues(`${indexedArrayField}.question`);
       // default the question for matching
       if (question === '') {
         setValue(`${indexedArrayField}.question`, 'Match the following:');
-        trigger(`${indexedArrayField}.question`);
+        trigger(`${indexedArrayField}.question`).catch((err) =>
+          debugLogError(err),
+        );
       }
     }
   }, [watchQuestionType]);
@@ -273,9 +277,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           label="Question Type"
           error={Boolean(indexedErrors?.type)}
           helperText={indexedErrors?.type?.message}
-          readOnly={
-            crudType === FormCrudType.view || slideType === SlideTypeEnum.CTF
-          }
+          readOnly={crudType === FormCrudType.view || slideType === 'ctf'}
         >
           {responseOptions.map((item) => (
             <MenuItem key={item} value={item}>
@@ -294,7 +296,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           helperText={indexedErrors?.typeAttributes?.grading?.message}
           readOnly={
             crudType === FormCrudType.view ||
-            slideType === SlideTypeEnum.CTF ||
+            slideType === 'ctf' ||
             watchQuestionType === QuestionResponse.Matching
           }
         >

@@ -1,5 +1,16 @@
 import { z } from 'zod/v4';
-import { MoveOnCriteriaEnum } from './activity';
+import { KSATElementSchema, MoveOnCriteriaEnum } from './activities';
+
+export enum SlideTypeEnum {
+  CTF = 'ctf',
+  Quiz = 'quiz',
+  Markdown = 'markdown',
+  Scenario = 'rangeosScenario',
+  SourceDoc = 'sourceDoc',
+  CodeRunner = 'codeRunner',
+}
+
+export const defaultSlideContent = '# Slide'; //TODO focus issues if you try to paste blank
 
 // --- Lesson Theme Defaults ---
 
@@ -72,14 +83,6 @@ export const SlideSchema = z.object({
       'Slide path relative to the course root, e.g. "introduction/slide-1.md".',
     ),
   content: z.string().optional().describe('Markdown body of the slide.'),
-});
-
-export const KSATElementSchema = z.object({
-  element_identifier: z.string().optional(),
-  element_type: z.enum(['task', 'knowledge', 'skill']).optional(),
-  title: z.string().optional(),
-  text: z.string().optional(),
-  doc_identifier: z.string().optional(),
 });
 
 export const LessonThemeSchema = z.object({

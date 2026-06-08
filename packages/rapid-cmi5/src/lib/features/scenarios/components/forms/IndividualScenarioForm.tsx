@@ -1,6 +1,7 @@
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import { UseFormReturn } from 'react-hook-form';
 import {
+  debugLogError,
   FormControlCheckboxField,
   FormControlSelectField,
   FormControlTextField,
@@ -18,7 +19,7 @@ import Grid from '@mui/material/Grid2';
 import * as yup from 'yup';
 import {
   moveOnCriteriaOptions,
-  RC5ScenarioContent,
+  ScenarioContent,
   OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 
@@ -44,7 +45,7 @@ export const ScenarioForm = ({
 }: {
   contextMenu?: JSX.Element;
   crudType: FormCrudType;
-  defaultFormData: RC5ScenarioContent;
+  defaultFormData: ScenarioContent;
   deleteButton?: JSX.Element;
   handleCloseModal?: () => void;
   innerSx?: SxProps;
@@ -64,7 +65,7 @@ export const ScenarioForm = ({
 
   const onSaveAction = (data: any) => {
     if (onSave) {
-      onSave(RC5ActivityTypeEnum.scenario, data as RC5ScenarioContent);
+      onSave(RC5ActivityTypeEnum.scenario, data as ScenarioContent);
     }
   };
 
@@ -86,7 +87,7 @@ export const ScenarioForm = ({
 
     useEffect(() => {
       if (watchPromptClass) {
-        trigger('defaultClassId');
+        trigger('defaultClassId').catch((err) => debugLogError(err));
       }
     }, [watchPromptClass]);
 

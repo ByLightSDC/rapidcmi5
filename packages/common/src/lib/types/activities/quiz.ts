@@ -1,8 +1,7 @@
 // Ensure that whenever the types change ./utils/ajv-schema-generator.sh is ran
 
 import { z } from 'zod/v4';
-import { MoveOnCriteriaEnum } from './activity';
-import { KSATElementSchema } from './course';
+import { BaseActivitySchema } from './baseActivity';
 
 export enum QuestionResponse {
   FreeResponse = 'freeResponse',
@@ -65,11 +64,7 @@ export const QuizQuestionSchema = z.object({
   cmi5QuestionId: z.string(),
 });
 
-export const QuizContentSchemaZod = z.object({
-  // BaseActivity fields
-  rc5id: z.string().optional(),
-  ksats: z.array(KSATElementSchema).optional(),
-  moveOnCriteria: z.enum(MoveOnCriteriaEnum).optional(),
+export const QuizContentSchemaZod = BaseActivitySchema.extend({
   // QuizContent fields
   title: z.string().optional(),
   questions: z.array(QuizQuestionSchema),
