@@ -3,57 +3,15 @@ import {
   SlideType,
   Operation,
   CourseAU,
-  LessonTheme,
+  Theme,
+  ScenarioContent,
+  SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './store';
 import { defaultCourseData, resetPersistance } from '@rapid-cmi5/ui';
 import { ViewModeEnum } from '../design-tools/course-builder/CourseBuilderTypes';
 
-export interface Scenario {
-  /**
-   *
-   * @type {string}
-   * @memberof Scenario
-   */
-  uuid?: string;
-  /**
-   * Date when the object was created.
-   * @type {string}
-   * @memberof Scenario
-   */
-  dateCreated?: string;
-  /**
-   * Date when the object was last edited.
-   * @type {string}
-   * @memberof Scenario
-   */
-  dateEdited?: string;
-  /**
-   * A user provided human readable description.
-   * @type {string}
-   * @memberof Scenario
-   */
-  description?: string;
-  /**
-   * A user provided human readable name.
-   * @type {string}
-   * @memberof Scenario
-   */
-  name?: string;
-  /**
-   * The author of the package.
-   * @type {string}
-   * @memberof Scenario
-   */
-  author?: string;
-  /**
-   * User provided metadata
-   * @type {object}
-   * @memberof Scenario
-   */
-  metadata?: object;
-}
 /**
  * Before user is connected to repo, they can play in slides sandbox
  * FUTURE we will allow them to apply stash to a new lesson
@@ -78,8 +36,8 @@ export type CourseBuilderState = {
   isLessonMounted: boolean;
   courseSandbox?: CourseSandbox;
   sourceCourseData?: CourseData;
-  scenario?: Partial<Scenario>;
-  teamScenario?: Partial<Scenario>;
+  scenario?: ScenarioContent;
+  teamScenario?: ScenarioContent;
   displayData: string;
   slideDeckText: string;
   slides: SlideType[];
@@ -98,7 +56,7 @@ export type CourseBuilderState = {
   // The repo cache allows us to store current AU and slide per repo and course pair
   repoCache: RepoCache;
   // Default formatting applied to newly created lessons
-  defaultLessonTheme?: LessonTheme;
+  defaultLessonTheme?: Theme;
 };
 
 // Saves the state for various repos so you may swap between them easily.
@@ -142,7 +100,9 @@ export const initialStateCourseBuilder: CourseBuilderState = {
   teamScenario: undefined,
   slideDeckText: '',
   sourceCourseData: undefined,
-  slides: [{ slideTitle: '', content: '', type: 'markdown', filepath: '' }],
+  slides: [
+    { slideTitle: '', content: '', type: SlideTypeEnum.Markdown, filepath: '' },
+  ],
   viewMode: ViewModeEnum.RepoSelector,
   currentAuIndex: 0,
   currentBlockIndex: 0,
@@ -396,7 +356,7 @@ export const courseBuilderSlice = createSlice({
       const { blockIndex, lessonIndex, au } = action.payload;
       state.courseData.blocks[blockIndex].aus[lessonIndex] = au;
     },
-    setDefaultLessonTheme: (state, action: PayloadAction<LessonTheme>) => {
+    setDefaultLessonTheme: (state, action: PayloadAction<Theme>) => {
       state.defaultLessonTheme = action.payload;
     },
     removeCourseAu: (
@@ -441,7 +401,7 @@ export const courseBuilderSlice = createSlice({
     updateScenario: (
       state,
       action: PayloadAction<{
-        scenario: Partial<Scenario> | undefined;
+        scenario: ScenarioContent | undefined;
         shouldDirty?: boolean;
       }>,
     ) => {
@@ -473,7 +433,7 @@ export const courseBuilderSlice = createSlice({
     updateTeamScenario: (
       state,
       action: PayloadAction<{
-        scenario: Partial<Scenario> | undefined;
+        scenario: ScenarioContent | undefined;
       }>,
     ) => {
       state.teamScenario = action.payload.scenario;

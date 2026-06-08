@@ -1,4 +1,4 @@
-import { DirMeta } from '../types/projects';
+import { DirMeta } from '../types';
 
 export const sortProjectMetas = (projectMetas: DirMeta[]) => {
   return projectMetas.sort((a, b) => {

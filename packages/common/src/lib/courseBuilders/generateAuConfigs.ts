@@ -1,4 +1,4 @@
-import { CourseData } from '../types/course';
+import { CourseData } from '../types';
 import { generateBlockId, generateAuId } from './generateCmi5Xml';
 
 // Utility to localize NX build pathing in index.html

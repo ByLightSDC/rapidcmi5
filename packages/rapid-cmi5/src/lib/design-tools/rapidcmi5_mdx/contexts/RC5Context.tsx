@@ -25,7 +25,7 @@ import {
   MoveOnCriteriaEnum,
   Operation,
   CourseAU,
-  LessonTheme,
+  Theme,
   CourseData,
   SlideType,
 } from '@rapid-cmi5/cmi5-build-common';
@@ -75,7 +75,7 @@ interface IRC5Context {
   ) => void;
   changeLessonName: (newName: string, element: ILessonNode) => void;
   changeSlideName: (newName: string, element: ILessonNode) => void;
-  changeLessonTheme: (theme: LessonTheme, element: ILessonNode) => void;
+  changeLessonTheme: (theme: Theme, element: ILessonNode) => void;
   deleteLesson: (lessonIndex: number) => void;
   discardLessonChanges: () => void;
   saveCourseFile: () => Promise<string[]>;
@@ -93,22 +93,22 @@ interface IRC5Context {
 export const RC5Context = createContext<IRC5Context>({
   isEnabled: true,
   lessonSlides: [],
-  addEditor: (editorRef: RefObject<MDXEditorMethods>) => { },
-  removeEditor: () => { },
-  changeCourseName: (newName: string) => { },
-  changeLessonMoveOn: (moveOn: MoveOnCriteriaEnum, element: ILessonNode) => { },
-  changeLessonTheme: (theme: LessonTheme, element: ILessonNode) => { },
-  changeLessonName: (newName: string, element: ILessonNode) => { },
-  changeSlideName: (newName: string, element: ILessonNode) => { },
-  deleteLesson: (lessonIndex: number) => { },
-  discardLessonChanges: () => { },
+  addEditor: (editorRef: RefObject<MDXEditorMethods>) => {},
+  removeEditor: () => {},
+  changeCourseName: (newName: string) => {},
+  changeLessonMoveOn: (moveOn: MoveOnCriteriaEnum, element: ILessonNode) => {},
+  changeLessonTheme: (theme: Theme, element: ILessonNode) => {},
+  changeLessonName: (newName: string, element: ILessonNode) => {},
+  changeSlideName: (newName: string, element: ILessonNode) => {},
+  deleteLesson: (lessonIndex: number) => {},
+  discardLessonChanges: () => {},
   saveCourseFile: async () => [],
-  saveSlide: () => { },
+  saveSlide: () => {},
   saveMarkdownToCurrentSlide: (markdown: string) => false,
   getMarkdownData: () => {
     return undefined;
   },
-  sendMessage: (message: Message) => { },
+  sendMessage: (message: Message) => {},
 });
 
 // Project Context Provider
@@ -312,7 +312,7 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
   );
 
   const onChangeLessonTheme = useCallback(
-    (lessonTheme: LessonTheme, element: ILessonNode) => {
+    (lessonTheme: Theme, element: ILessonNode) => {
       if (element.id === undefined) {
         return;
       }
@@ -385,7 +385,7 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
         !courseData.blocks[currentBlockIndex].aus[element.lesson] ||
         !courseData.blocks[currentBlockIndex].aus[element.lesson].slides ||
         !courseData.blocks[currentBlockIndex].aus[element.lesson].slides[
-        element.slide
+          element.slide
         ]
       ) {
         debugLogError(
@@ -396,7 +396,7 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
 
       const slide = {
         ...courseData.blocks[currentBlockIndex].aus[element.lesson].slides[
-        element.slide
+          element.slide
         ],
         slideTitle: newName,
       };

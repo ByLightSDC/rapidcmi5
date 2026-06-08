@@ -1,12 +1,12 @@
 import React, { createContext } from 'react';
-import { LessonTheme } from '@rapid-cmi5/cmi5-build-common';
+import { Theme } from '@rapid-cmi5/cmi5-build-common';
 
 export interface ILessonThemeContext {
-  lessonTheme?: LessonTheme;
+  lessonTheme?: Theme;
 }
 
 /**
- * Provides the current lesson's LessonTheme to directive editor components
+ * Provides the current lesson's Theme to directive editor components
  * that are rendered inside the MDXEditor plugin tree.
  *
  * Wrap MDXEditor with LessonThemeContext.Provider in RC5VisualEditor.

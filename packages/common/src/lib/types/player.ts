@@ -1,6 +1,9 @@
-import { ActivityScore, QuizState } from './activities';
 import { RC5ActivityTypeEnum } from './activities/activity';
-import { Cmi5Scenario, CourseAU, CourseData, SlideType } from './course';
+import { QuizState } from './activities/quiz';
+import { CourseData } from './courseStructure/course';
+import { ActivityScore } from './activities/score';
+import { CourseAU, SlideType } from './courseStructure';
+import { ScenarioContent } from './activities';
 
 export type SetCmi5ProgressHandler = (progress: boolean) => void;
 export type SubmitCmiScoreHandler = (data: ActivityScore) => void;
@@ -29,7 +32,7 @@ export interface AuContextProps {
   au?: CourseAU;
   getSlide?: (props: AuContextProps) => JSX.Element | null;
   progressPercent: number;
-  scenario?: Cmi5Scenario | undefined;
+  scenario?: ScenarioContent;
   slides: SlideType[];
   viewedSlides: number[];
   setActiveTab: (selTab: number) => void;

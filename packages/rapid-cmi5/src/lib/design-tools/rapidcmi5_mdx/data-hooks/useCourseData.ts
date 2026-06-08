@@ -10,7 +10,6 @@ import {
   isLessonMounted,
   reorderLesson,
   reorderSlide,
-  Scenario,
   setIsLessonMounted,
   updateAuAndSlideIndex,
   updateAuIndex,
@@ -24,7 +23,7 @@ import { useCallback, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import { RC5Context } from '../contexts/RC5Context';
-import { Operation } from '@rapid-cmi5/cmi5-build-common';
+import { Operation, ScenarioContent } from '@rapid-cmi5/cmi5-build-common';
 import { CreateLessonType } from '../../course-builder/CourseBuilderApiTypes';
 
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
@@ -86,7 +85,7 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
     if (!repoAccessObject) return;
     const fsInstance = getFsInstance();
 
-    let blockIndex = courseData.blocks.findIndex(
+    const blockIndex = courseData.blocks.findIndex(
       (block) => block.blockName === req.blockName,
     );
 
@@ -241,8 +240,8 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
   /**
    *  reverts course data in redux to git FILES system
    */
-  const discardLessonChanges = useCallback(() => {
-    syncCurrentCourseWithGit(courseData);
+  const discardLessonChanges = useCallback(async () => {
+    await syncCurrentCourseWithGit(courseData);
   }, [courseData, syncCurrentCourseWithGit]);
 
   /**
@@ -269,8 +268,8 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
         courseData.blocks[currentBlockIndex]?.aus?.[currentAuIndex]
           ?.rangeosScenarioName;
 
-      if (scenarioID || scenarioName) {
-        const scenario: Scenario = {
+      if (scenarioID && scenarioName) {
+        const scenario: ScenarioContent = {
           uuid: scenarioID,
           name: scenarioName,
         };
