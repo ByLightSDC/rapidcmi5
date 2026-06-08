@@ -30,7 +30,7 @@ import {
   CourseData,
   defaultSlideContent,
   MoveOnCriteriaEnum,
-  LessonTheme,
+  Theme,
   SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 
@@ -116,7 +116,7 @@ function LessonTree({
     });
   };
 
-  const handleLessonSettings = (theme: LessonTheme) => {
+  const handleLessonSettings = (theme: Theme) => {
     if (lessonSettingsForm) {
       changeLessonTheme(theme, lessonSettingsForm);
     }

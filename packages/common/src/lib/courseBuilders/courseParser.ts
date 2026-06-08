@@ -31,7 +31,6 @@ import { parse } from 'yaml';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { directive } from 'micromark-extension-directive';
 import { SKIP, visit } from 'unist-util-visit';
-import { AdmonitionTypeEnum } from '../types/admonition';
 import {
   QuizQuestion,
   QuizOption,
@@ -41,6 +40,7 @@ import {
   QuizCompletionEnum,
   QuizContent,
 } from '../types/activities';
+import { AdmonitionTypeEnum } from '../types';
 
 export const RC5_FILENAME = 'RC5.yaml';
 

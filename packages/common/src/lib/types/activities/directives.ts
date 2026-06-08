@@ -1,5 +1,5 @@
 import { ContainerDirective } from 'mdast-util-directive';
-import { ContentWidthEnum } from '../course';
+import { ContentWidthEnum } from '../ui';
 
 /**
  * Represents a container directive node for a tab group.

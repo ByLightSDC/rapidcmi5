@@ -7,7 +7,7 @@ import {
   CourseAU,
   CourseData,
   KSATElementType,
-  LessonTheme,
+  Theme,
   Operation,
   RC5_VERSION,
   ScenarioContent,
@@ -535,7 +535,7 @@ export interface CreateLessonOptions extends FsContextOptions {
   blockIndex: number;
   auName: string;
   coursePath: string;
-  defaultLessonTheme?: LessonTheme;
+  defaultLessonTheme?: Theme;
 }
 
 export const createLesson = async ({
