@@ -14,16 +14,16 @@ import {
   SlideStatus,
 } from '../types/CourseAUProgress';
 
-import {
-  SlideActivityStatus,
-  SlideActivityType,
-} from '../types/SlideActivityStatusState';
 import { SlideChangedStatus } from '../types/SlideState';
 import { cmi5Instance } from '../session/cmi5';
 
 // import { SlideActivityStatusState } from '../types/SlideActivityStatusState'; // Commented out - not used
 import { logger } from '../debug';
-import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
+import {
+  CourseAU,
+  SlideActivityStatus,
+  SlideActivityType,
+} from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Create slide identifiers from CourseAU data
@@ -170,13 +170,18 @@ function parseActivityMetadata(slideContent: string): {
   }
 
   // Parse Code Runner blocks
-  const codeRunnerBlockRegex = /:::codeRunner\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
+  const codeRunnerBlockRegex =
+    /:::codeRunner\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
   let codeRunnerMatch;
 
   while ((codeRunnerMatch = codeRunnerBlockRegex.exec(slideContent)) !== null) {
     try {
       const codeRunnerData = JSON.parse(codeRunnerMatch[1]);
-      logger.debug('Parsed Code Runner data from markdown', codeRunnerData, 'auManager');
+      logger.debug(
+        'Parsed Code Runner data from markdown',
+        codeRunnerData,
+        'auManager',
+      );
 
       // Generate cmi5QuizId if not provided (use title or fallback)
       // TODO: don't like either of these... alsothis should be done in the CodeRunner component automatically during export/packaging (guid etc) remove this when that's working
@@ -193,10 +198,12 @@ function parseActivityMetadata(slideContent: string): {
         } else {
           // Create a simple hash from the evaluator content for consistency
           const contentHash = Math.abs(
-            codeRunnerData.evaluator?.split('').reduce((a: number, b: string) => {
-              a = (a << 5) - a + b.charCodeAt(0);
-              return a & a;
-            }, 0) || 0,
+            codeRunnerData.evaluator
+              ?.split('')
+              .reduce((a: number, b: string) => {
+                a = (a << 5) - a + b.charCodeAt(0);
+                return a & a;
+              }, 0) || 0,
           )
             .toString(36)
             .substr(0, 8);
@@ -1355,7 +1362,8 @@ export async function updateSlideStatus(
   // Use provided previous status or fall back to current status
   const wasPreviouslyCompleted =
     previousStatus?.wasCompleted ?? progress.slideStatus[slideGuid]?.completed;
-  const wasPreviouslyPassed = previousStatus?.wasPassed ?? progress.slideStatus[slideGuid]?.passed;
+  const wasPreviouslyPassed =
+    previousStatus?.wasPassed ?? progress.slideStatus[slideGuid]?.passed;
 
   if (allActivitiesCompleted && !wasPreviouslyCompleted) {
     // All activities completed - send slideCompleted event

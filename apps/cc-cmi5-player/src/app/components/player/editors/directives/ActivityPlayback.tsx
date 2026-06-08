@@ -5,13 +5,17 @@ import { Box, ThemeProvider, useTheme } from '@mui/material';
 import { deepmerge } from '@mui/utils';
 import {
   AuContextProps,
-  QuizContent,
-  CTFContent,
+  QuizContentSchemaZod,
+  CTFContentSchema,
   DownloadFileData,
-  DownloadFilesContent,
-  CodeRunnerContent,
-  ScenarioContent,
-  ActivityContent,
+  DownloadFilesContentSchema,
+  CodeRunnerContentSchema,
+  ScenarioContentSchema,
+  validateScenarioContent,
+  DirectiveToActivityMapping,
+  ActivityDirectiveNode,
+  DirectiveName,
+  SlideActivityType,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   setProgress$,
@@ -27,7 +31,6 @@ import {
   LessonThemeContext,
   useLessonStyles,
   maxFormWidths,
-  ActivityDirectiveNode,
   darkTheme,
 } from '@rapid-cmi5/ui';
 
@@ -35,10 +38,7 @@ import ScenarioConsoles from '../../../scenario/ScenarioConsoles';
 import TeamScenarioExercise from '../../../team-consoles/TeamScenarioExercise';
 import { activeTabSel } from '../../../../redux/navigationReducer';
 import { useCMI5Session } from '../../../../hooks/useCMI5Session';
-import { SlideActivityType } from '../../../../../app/types/SlideActivityStatusState';
 import { auConfigInitializedSel } from '../../../../redux/auReducer';
-
-type DirectiveName = ActivityDirectiveNode['name'];
 
 const extractJsonString = (node: ActivityDirectiveNode): string | null => {
   const firstChild = node.children?.[0];
@@ -60,26 +60,69 @@ const extractJsonString = (node: ActivityDirectiveNode): string | null => {
 
 const parseActivityContent = (
   node: ActivityDirectiveNode,
-): ActivityContent | null => {
+  name: DirectiveName,
+): DirectiveToActivityMapping | null => {
   const jsonString = extractJsonString(node);
   if (!jsonString) return null;
 
+  let raw: unknown;
   try {
-    return JSON.parse(jsonString) as ActivityContent;
+    raw = JSON.parse(jsonString);
   } catch (error) {
     debugLogError(`Failed to parse activity content JSON ${error}`);
     return null;
   }
-};
 
-const DOWNLOAD_DIRECTIVE: DirectiveName = 'download';
+  const logInvalid = (error: unknown): null => {
+    debugLogError(`Invalid ${name} content: ${error}`);
+    return null;
+  };
+
+  switch (name) {
+    case SlideActivityType.SCENARIO: {
+      const r = validateScenarioContent(raw);
+      return r.valid ? { name, content: r.data } : logInvalid(r.errors);
+    }
+    case SlideActivityType.QUIZ: {
+      const r = QuizContentSchemaZod.safeParse(raw);
+      return r.success
+        ? { name, content: r.data }
+        : logInvalid(r.error.message);
+    }
+    case SlideActivityType.CTF: {
+      const r = CTFContentSchema.safeParse(raw);
+      return r.success
+        ? { name, content: r.data }
+        : logInvalid(r.error.message);
+    }
+    case SlideActivityType.CODE_RUNNER: {
+      const r = CodeRunnerContentSchema.safeParse(raw);
+      return r.success
+        ? { name, content: r.data }
+        : logInvalid(r.error.message);
+    }
+    case SlideActivityType.CONSOLES: {
+      const r = ScenarioContentSchema.safeParse(raw);
+      return r.success
+        ? { name, content: r.data }
+        : logInvalid(r.error.message);
+    }
+    case SlideActivityType.DOWNLOAD: {
+      const r = DownloadFilesContentSchema.safeParse(raw);
+      return r.success
+        ? { name, content: r.data }
+        : logInvalid(r.error.message);
+    }
+    default:
+      return null;
+  }
+};
 
 /** Non-editable activity view rendered inside the MDX player. */
 export const ActivityPlayback: React.FC<
   DirectiveEditorProps<ActivityDirectiveNode>
 > = ({ mdastNode }) => {
-  const { name } = mdastNode;
-  const [content, setContent] = useState<ActivityContent | null>(null);
+  const [parsed, setParsed] = useState<DirectiveToActivityMapping | null>(null);
 
   const [setProgress, submitScore, getActivityCache, setActivityCache] =
     useCellValues(
@@ -122,16 +165,16 @@ export const ActivityPlayback: React.FC<
   );
 
   useEffect(() => {
-    if (content) return;
+    if (parsed) return;
 
     if (!mdastNode.children?.length) {
       debugLogError('Missing activity children');
       return;
     }
 
-    const parsed = parseActivityContent(mdastNode);
-    if (parsed) setContent(parsed);
-  }, [mdastNode, content]);
+    const result = parseActivityContent(mdastNode, mdastNode.name);
+    if (result) setParsed(result);
+  }, [mdastNode, parsed]);
 
   const layoutProps = {
     innerSx: innerActivitySx,
@@ -140,19 +183,15 @@ export const ActivityPlayback: React.FC<
   } as const;
 
   const renderActivity = (): React.ReactNode => {
-    if (!content) return null;
+    if (!parsed) return null;
 
-    switch (name) {
+    switch (parsed.name) {
       case SlideActivityType.SCENARIO: {
-        const scenario = content as ScenarioContent;
+        const { content } = parsed;
         return (
           <ScenarioConsoles
             auProps={auProps}
-            content={{
-              name: scenario.name,
-              uuid: scenario.uuid,
-              promptClassId: scenario.promptClass,
-            }}
+            content={content}
             {...layoutProps}
           />
         );
@@ -160,27 +199,19 @@ export const ActivityPlayback: React.FC<
 
       case SlideActivityType.QUIZ:
         return (
-          <AuQuiz
-            auProps={auProps}
-            content={content as QuizContent}
-            {...layoutProps}
-          />
+          <AuQuiz auProps={auProps} content={parsed.content} {...layoutProps} />
         );
 
       case SlideActivityType.CTF:
         return (
-          <AuCTF
-            auProps={auProps}
-            content={content as CTFContent}
-            {...layoutProps}
-          />
+          <AuCTF auProps={auProps} content={parsed.content} {...layoutProps} />
         );
 
       case SlideActivityType.CODE_RUNNER:
         return (
           <CodeRunner
             auProps={auProps}
-            content={content as CodeRunnerContent}
+            content={parsed.content}
             {...layoutProps}
           />
         );
@@ -189,13 +220,13 @@ export const ActivityPlayback: React.FC<
         return (
           <TeamScenarioExercise
             auProps={auProps}
-            content={content as ScenarioContent}
+            content={parsed.content}
             {...layoutProps}
           />
         );
 
-      case DOWNLOAD_DIRECTIVE: {
-        const { files } = content as DownloadFilesContent;
+      case SlideActivityType.DOWNLOAD: {
+        const { files } = parsed.content;
         return (
           <Box>
             {files.map((file: DownloadFileData) => (

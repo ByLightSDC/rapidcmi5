@@ -227,15 +227,9 @@ export function useAutoGraderProgress({
           autoGraderResults: [], // Could include detailed results if needed
         };
 
-        // Ensure the scenario content has the UUID that matches the parsed markdown
-        // The scenarioContent should already have the correct uuid from the markdown
-        const enrichedScenarioContent = {
-          ...scenarioContent,
-        };
-
         const activityScore: ActivityScore = {
           activityType: RC5ActivityTypeEnum.scenario,
-          activityContent: enrichedScenarioContent,
+          activityContent: scenarioContent,
           scoreData,
         };
 

@@ -25,14 +25,13 @@ import {
   sendDetailedInteractionStatements,
 } from './Cmi5Helpers';
 import { gradeActivity, createSlideActivityScore } from './gradeActivity';
-import {
-  ActivityType,
-  SlideActivityScore,
-  SlideActivityType,
-} from '../types/SlideActivityStatusState';
+
 import {
   ActivityScore,
+  ActivityType,
   getActivityTypeFromDisplayName,
+  SlideActivityScore,
+  SlideActivityType,
 } from '@rapid-cmi5/cmi5-build-common';
 import { config } from '@rapid-cmi5/ui';
 
@@ -1808,7 +1807,11 @@ async function handleCodeRunnerInteractionStatements(
     // Additional CodeRunner-specific LRS operations can be added here if needed
     // For example: logging code submission, execution results, etc.
   } catch (error) {
-    logger.error('Error in CodeRunner activity scored LMS operations', error, 'lms');
+    logger.error(
+      'Error in CodeRunner activity scored LMS operations',
+      error,
+      'lms',
+    );
   }
 }
 

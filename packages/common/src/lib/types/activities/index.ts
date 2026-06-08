@@ -8,3 +8,4 @@ export * from './quiz';
 export * from './scenario';
 export * from './score';
 export * from './download';
+export * from './directives';

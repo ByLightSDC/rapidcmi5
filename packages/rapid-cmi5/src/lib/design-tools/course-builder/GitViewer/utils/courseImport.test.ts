@@ -1,10 +1,6 @@
 import JSZip from 'jszip';
 import YAML from 'yaml';
-import {
-  CourseData,
-  RC5_FILENAME,
-  SlideTypeEnum,
-} from '@rapid-cmi5/cmi5-build-common';
+import { CourseData, RC5_FILENAME } from '@rapid-cmi5/cmi5-build-common';
 import {
   resolveCourseZipPaths,
   isExcludedAuFile,
@@ -22,7 +18,11 @@ function makeCourseData(overrides: Partial<CourseData> = {}): CourseData {
     courseTitle: 'Original Course',
     courseId: 'https://example.com/original',
     courseDescription: 'Original description',
-    rc5Version: '0.0.1',
+    buildTimeProps: {
+      metadata: {
+        rc5Version: '0.0.1',
+      },
+    },
     blocks: [
       {
         blockName: 'Original Course',
@@ -32,7 +32,6 @@ function makeCourseData(overrides: Partial<CourseData> = {}): CourseData {
             dirPath: 'OriginalCourse/au1',
             slides: [
               {
-                type: SlideTypeEnum.Markdown,
                 filepath: 'OriginalCourse/au1/lesson1.md',
                 slideTitle: 'lesson1',
                 content: '',
@@ -44,7 +43,6 @@ function makeCourseData(overrides: Partial<CourseData> = {}): CourseData {
             dirPath: 'OriginalCourse/au2',
             slides: [
               {
-                type: SlideTypeEnum.Markdown,
                 filepath: 'OriginalCourse/au2/lesson2.md',
                 slideTitle: 'lesson2',
                 content: '',
@@ -194,7 +192,7 @@ describe('getRc5Content', () => {
 
     expect(result.courseTitle).toBe('Original Course');
     expect(result.courseId).toBe('https://example.com/original');
-    expect(result.rc5Version).toBe('0.0.1');
+    expect(result.buildTimeProps?.metadata?.rc5Version).toBe('0.0.1');
     expect(result.blocks).toHaveLength(1);
     expect(result.blocks[0].aus).toHaveLength(2);
   });
@@ -313,7 +311,6 @@ describe('updateCourseData', () => {
               dirPath: 'OldCourse/block-a/au1',
               slides: [
                 {
-                  type: 'markdown' as any,
                   filepath: 'OldCourse/block-a/au1/slide.md',
                   content: '',
                   slideTitle: 'slide',
@@ -330,7 +327,6 @@ describe('updateCourseData', () => {
               dirPath: 'OldCourse/block-b/au2',
               slides: [
                 {
-                  type: 'markdown' as any,
                   filepath: 'OldCourse/block-b/au2/slide.md',
                   content: '',
                   slideTitle: 'slide',

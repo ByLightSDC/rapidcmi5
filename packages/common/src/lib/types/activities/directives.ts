@@ -1,5 +1,5 @@
-import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ContainerDirective } from 'mdast-util-directive';
+import { ContentWidthEnum } from '../ui';
 
 /**
  * Represents a container directive node for a tab group.
@@ -16,6 +16,7 @@ export interface ActivityDirectiveNode extends ContainerDirective {
     | 'codeRunner'
     | 'quiz'
     | 'scenario';
+
   /**
    * Optional attributes for customizing the tab container.
    * - `color`: Used for visual styling (e.g. tab highlight color).
@@ -28,3 +29,5 @@ export interface ActivityDirectiveNode extends ContainerDirective {
 
   children: any;
 }
+
+export type DirectiveName = ActivityDirectiveNode['name'];

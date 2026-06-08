@@ -194,6 +194,7 @@ export const QuizForm = ({
 
       setIsSearchBankOpen(false);
     };
+
     return (
       <>
         <Grid size={3}>

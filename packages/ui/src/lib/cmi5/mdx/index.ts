@@ -26,7 +26,6 @@ export * from './icons/Icons';
 export * from './plugins/accordion/AccordionContentDirectiveDescriptor';
 export * from './plugins/accordion/AccordionContentEditor';
 export * from './plugins/accordion/AccordionDirectiveDescriptor';
-export * from './plugins/activity/types';
 export * from './plugins/animation-directive';
 export * from './plugins/code';
 export * from './plugins/code/CodeMirrorEditor';

@@ -1,11 +1,4 @@
 import {
-  ActivityCompletionPayload,
-  SlideActivityScore,
-  ActivityType,
-  SlideActivityType,
-} from '../types/SlideActivityStatusState';
-
-import {
   sendActivityCompletedVerb,
   sendActivityPassedVerb,
   sendActivityFailedVerb,
@@ -13,6 +6,12 @@ import {
 
 import { logger } from '../debug';
 import { updateActivityStatus } from './ActivityStatusHelpers';
+import {
+  ActivityCompletionPayload,
+  ActivityType,
+  SlideActivityScore,
+  SlideActivityType,
+} from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Shared grading function that handles activity completion and pass/fail determination

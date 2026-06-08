@@ -1,9 +1,9 @@
-import { logger } from '../debug';
-import { store } from '../redux/store';
 import {
   ActivityCompletionPayload,
   SlideActivityStatus,
-} from '../types/SlideActivityStatusState';
+} from '@rapid-cmi5/cmi5-build-common';
+import { logger } from '../debug';
+import { store } from '../redux/store';
 
 export async function updateActivityStatus(
   payload: ActivityCompletionPayload,

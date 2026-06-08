@@ -14,12 +14,7 @@ import { checkForDevMode } from './DevMode';
 import { logger } from '../debug';
 
 import { sendActivityCompletedVerb } from './LmsStatementManager';
-import { gradeActivity, createSlideActivityScore } from './gradeActivity';
-import {
-  ActivityType,
-  SlideActivityScore,
-  SlideActivityType,
-} from '../types/SlideActivityStatusState';
+
 import {
   ActivityScore,
   RC5ActivityTypeEnum,
@@ -30,6 +25,8 @@ import {
   CTFResponse,
   QuizQuestion,
   QuizState,
+  SlideActivityScore,
+  SlideActivityType,
 } from '@rapid-cmi5/cmi5-build-common';
 
 /**
@@ -771,7 +768,7 @@ export async function setAutoGradersProgress(uuid: string): Promise<void> {
   };
 
   try {
-    await xapi.sendStatement({statement: statement as any});
+    await xapi.sendStatement({ statement: statement as any });
     console.log(`Sent statement for UUID ${uuid}`);
   } catch (error) {
     console.error('Failed to send statement for AutoGrader UUID:', error);

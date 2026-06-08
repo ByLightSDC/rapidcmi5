@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import {
   DirectiveEditorProps,
   useCellValue,
@@ -40,6 +34,7 @@ import {
   CTFContent,
   CodeRunnerContent,
   ContentWidthEnum,
+  ActivityDirectiveNode,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   useTimeStampUUID,
@@ -55,7 +50,6 @@ import {
   LessonThemeContext,
   maxFormWidths,
   BlockAppearanceForm,
-  ActivityDirectiveNode,
   InsertLineReturnButton,
   darkTheme,
   config,

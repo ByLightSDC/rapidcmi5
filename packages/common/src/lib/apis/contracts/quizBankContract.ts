@@ -165,9 +165,9 @@ export function convertFromApi(apiObj: QuestionBankApi): QuizQuestion {
     typeAttributes: {
       correctAnswer: apiObj.correctAnswer,
       grading: gradingApiMap[apiObj.grading],
-      options: apiObj.options,
-      matching: apiObj.matching,
-      shuffleAnswers: apiObj.shuffleAnswers,
+      options: apiObj.options ?? undefined,
+      matching: apiObj.matching ?? undefined,
+      shuffleAnswers: apiObj.shuffleAnswers ?? undefined,
     },
   };
 }

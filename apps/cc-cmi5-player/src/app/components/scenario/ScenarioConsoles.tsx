@@ -18,7 +18,6 @@ import {
   Divider,
   IconButton,
   ListItemIcon,
-  Paper,
   Stack,
   SxProps,
   Tabs,
@@ -310,11 +309,6 @@ function ScenarioStatus({
     ScenarioUpdatesContext,
   );
 
-  const confirmStopButtonText = confirmDeleteButtonText;
-
-  const stopScenarioTitle = deleteTitle;
-  const stopScenarioMessage = deletePrompt;
-
   const toggleClock = () => {
     setIsClockShowing(!isClockShowing);
   };
@@ -434,9 +428,9 @@ function ScenarioStatus({
 
           <ScenarioModals
             rangeIdSel={rangeId}
-            confirmStopButtonText={confirmStopButtonText}
-            stopScenarioMessage={stopScenarioMessage}
-            stopScenarioTitle={stopScenarioTitle}
+            confirmStopButtonText={confirmDeleteButtonText}
+            stopScenarioMessage={deleteTitle}
+            stopScenarioTitle={deletePrompt}
           />
         </Stack>
       );
