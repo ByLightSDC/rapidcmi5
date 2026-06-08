@@ -12,10 +12,8 @@ import {
   validateCodeRunnerContent,
   validateQuizContent,
   validateScenarioContent,
-  validateTeamConsolesContent,
 } from './directiveValidators';
-import { RC5ScenarioContent } from '../types/slide';
-import { TeamConsolesContent } from '../types/teamConsoles';
+import { ScenarioContent } from '../types/activities';
 
 // We create our own version from monaco editor, no reason to be tied up with theres
 export enum MarkerSeverity {
@@ -49,7 +47,7 @@ type ValidatorFn = (
 ) => { valid: true; data: any } | { valid: false; errors: string[] };
 
 const directiveValidators: Record<string, ValidatorFn> = {
-  consoles: validateTeamConsolesContent,
+  consoles: validateScenarioContent,
   quiz: validateQuizContent,
   scenario: validateScenarioContent,
   ctf: validateCTFContent,
@@ -88,7 +86,7 @@ export function validateMarkdownDirectives(content: string): IMarkerData[] {
 export function getScenarioDirectives(
   content: string,
   directiveFilter?: string,
-): RC5ScenarioContent[] | TeamConsolesContent[] {
+): ScenarioContent[] {
   const tree = fromMarkdown(content, {
     extensions: [directive()],
     mdastExtensions: [directiveFromMarkdown()],
@@ -132,7 +130,7 @@ export function getScenarioDirectives(
       return;
     }
 
-    let result = validator(directiveContent);
+    const result = validator(directiveContent);
     if (!result.valid) return;
     directives.push(result.data);
   });
@@ -162,7 +160,7 @@ export function validateDirective(node: ContainerDirective): IMarkerData[] {
     const validator = directiveValidators[node.name];
     if (!validator) return [invalidJsonResponse(node.position)];
 
-    let result = validator(directiveContent);
+    const result = validator(directiveContent);
 
     if (result.valid) return [];
 

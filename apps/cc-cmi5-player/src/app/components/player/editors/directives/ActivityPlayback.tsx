@@ -11,10 +11,9 @@ import { Box, ThemeProvider, useTheme } from '@mui/material';
 import { deepmerge } from '@mui/utils';
 import {
   AuContextProps,
-  RC5ScenarioContent,
+  ScenarioContent,
   QuizContent,
   CTFContent,
-  TeamConsolesContent,
   DownloadFileData,
   CodeRunnerContent,
 } from '@rapid-cmi5/cmi5-build-common';
@@ -138,9 +137,9 @@ export const ActivityPlayback: React.FC<
           <ScenarioConsoles
             auProps={auProps}
             content={{
-              scenarioName: (fromJson as RC5ScenarioContent).name,
-              scenarioUUID: (fromJson as RC5ScenarioContent).uuid,
-              promptClassId: (fromJson as RC5ScenarioContent).promptClass,
+              name: (fromJson as ScenarioContent).name ?? '',
+              uuid: (fromJson as ScenarioContent).uuid,
+              promptClassId: (fromJson as ScenarioContent).promptClass,
             }}
             innerSx={innerActivitySx}
             outerSx={outerSx}
@@ -180,7 +179,7 @@ export const ActivityPlayback: React.FC<
           <>
             <TeamScenarioExercise
               auProps={auProps}
-              content={fromJson as TeamConsolesContent}
+              content={fromJson as ScenarioContent}
               innerSx={innerActivitySx}
               outerSx={outerSx}
               outerStyle={outerStyle}

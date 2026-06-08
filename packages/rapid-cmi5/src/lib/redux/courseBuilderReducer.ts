@@ -1,18 +1,13 @@
 import {
   CourseData,
-  QuizContent,
-  ScenarioContent,
   SlideType,
-  SlideTypeEnum,
-  CTFContent,
   Operation,
   CourseAU,
   LessonTheme,
-  CodeRunnerContent,
 } from '@rapid-cmi5/cmi5-build-common';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './store';
-import { debugLog, defaultCourseData, resetPersistance } from '@rapid-cmi5/ui';
+import { defaultCourseData, resetPersistance } from '@rapid-cmi5/ui';
 import { ViewModeEnum } from '../design-tools/course-builder/CourseBuilderTypes';
 
 export interface Scenario {
@@ -147,9 +142,7 @@ export const initialStateCourseBuilder: CourseBuilderState = {
   teamScenario: undefined,
   slideDeckText: '',
   sourceCourseData: undefined,
-  slides: [
-    { slideTitle: '', content: '', type: SlideTypeEnum.Markdown, filepath: '' },
-  ],
+  slides: [{ slideTitle: '', content: '', type: 'markdown', filepath: '' }],
   viewMode: ViewModeEnum.RepoSelector,
   currentAuIndex: 0,
   currentBlockIndex: 0,

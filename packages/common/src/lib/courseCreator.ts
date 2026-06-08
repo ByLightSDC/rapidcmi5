@@ -1,10 +1,9 @@
 import YAML from 'yaml';
 
 import { getScenarioDirectives } from './codeValidators/markdownValidator';
-import { CourseData } from './types/course';
-import { RC5ScenarioContent, SlideTypeEnum } from './types/slide';
-import { TeamConsolesContent } from './types/teamConsoles';
+import { CourseData, SlideTypeEnum } from './types/course';
 import { RC5_VERSION } from './versions';
+import { ScenarioContent } from './types/activities';
 
 export interface FolderStruct {
   id: string;
@@ -88,8 +87,8 @@ export function generateCourseFromNav(
           }
         }
 
-        let scenarios: RC5ScenarioContent[] = [];
-        let teamExerciseConsoles: TeamConsolesContent[] = [];
+        let scenarios: ScenarioContent[] = [];
+        let teamExerciseConsoles: ScenarioContent[] = [];
 
         au.slides.map((slide) => {
           if (slide.type === SlideTypeEnum.Markdown) {
@@ -108,7 +107,7 @@ export function generateCourseFromNav(
                 getScenarioDirectives(
                   slide.content as string,
                   'consoles',
-                ) as TeamConsolesContent[],
+                ) as ScenarioContent[],
               );
             } catch {
               teamExerciseConsoles = [];
@@ -118,8 +117,7 @@ export function generateCourseFromNav(
 
         //we only support one scenario
         if (scenarios && scenarios.length > 0) {
-          const { uuid, name, promptClass } =
-            scenarios[0] as RC5ScenarioContent;
+          const { uuid, name, promptClass } = scenarios[0] as ScenarioContent;
           au.rangeosScenarioUUID = uuid;
           au.rangeosScenarioName = name;
           au.promptClassId = promptClass;

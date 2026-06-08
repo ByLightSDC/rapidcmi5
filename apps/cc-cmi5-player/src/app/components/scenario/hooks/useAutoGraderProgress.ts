@@ -15,7 +15,10 @@ import { cmi5Instance } from '../../../session/cmi5';
 import { ScenarioUpdatesContext } from '../ScenarioUpdatesContext';
 import { debugLogError } from '@rapid-cmi5/ui';
 import { logger } from '../../../debug';
-import { AutoGrader, DevopsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
+import {
+  AutoGrader,
+  DevopsApiClient,
+} from '@rangeos-nx/frontend/clients/devops-api';
 
 type UseAutoGraderProgressArgs = {
   isTestMode?: boolean;
@@ -202,17 +205,9 @@ export function useAutoGraderProgress({
           autoGraderResults: [], // Could include detailed results if needed
         };
 
-        // Ensure the scenario content has the UUID that matches the parsed markdown
-        // The scenarioContent should already have the correct uuid from the markdown
-        const enrichedScenarioContent = {
-          ...scenarioContent,
-          // Make sure we have the uuid field that the getActivityId function looks for
-          uuid: scenarioContent?.uuid || scenarioContent?.scenarioUUID,
-        };
-
         const activityScore: ActivityScore = {
           activityType: RC5ActivityTypeEnum.scenario,
-          activityContent: enrichedScenarioContent,
+          activityContent: scenarioContent,
           scoreData,
         };
 
@@ -232,17 +227,9 @@ export function useAutoGraderProgress({
           autoGraderResults: [], // Could include detailed results if needed
         };
 
-        // Ensure the scenario content has the UUID that matches the parsed markdown
-        // The scenarioContent should already have the correct uuid from the markdown
-        const enrichedScenarioContent = {
-          ...scenarioContent,
-          // Make sure we have the uuid field that the getActivityId function looks for
-          uuid: scenarioContent?.uuid || scenarioContent?.scenarioUUID,
-        };
-
         const activityScore: ActivityScore = {
           activityType: RC5ActivityTypeEnum.scenario,
-          activityContent: enrichedScenarioContent,
+          activityContent: scenarioContent,
           scoreData,
         };
 

@@ -1,5 +1,4 @@
 import {
-  SlideTypeEnum,
   CourseAU,
   CodeRunnerContent,
   MoveOnCriteriaEnum,
@@ -11,19 +10,18 @@ import {
   QuizCompletionEnum,
   CTFContent,
   DownloadFilesContent,
-  RC5ScenarioContent,
-  TeamConsolesContent,
   RC5ActivityTypeEnum,
   ContentWidthEnum,
+  SlideType,
 } from '@rapid-cmi5/cmi5-build-common';
 
 export const jsonFormatSpaces = 1;
 
-export const defaultEmptySlide = {
+export const defaultEmptySlide: SlideType = {
   slideTitle: 'Slide 1',
-  type: SlideTypeEnum.Markdown,
   content: '# Slide',
   filepath: '',
+  type: 'markdown',
 };
 
 export const defaultAutoGraderData = {
@@ -118,13 +116,9 @@ export const defaultQuestion = {
 };
 
 export const defaultScenarioContent: ScenarioContent = {
-  introTitle: '',
-  introContent: '',
-  confirmStopButtonText: '',
   promptClassId: false,
-  stopScenarioButtonTooltip: '',
-  stopScenarioMessage: '',
-  stopScenarioTitle: '',
+  uuid: '',
+  name: '',
 };
 
 export const defaultCourseData: CourseData = {
@@ -171,7 +165,7 @@ export const defaultDownloadFilesContent: DownloadFilesContent = {
 /**
  * Scenario activity insertion json
  */
-export const defaultScenarioContentData: RC5ScenarioContent = {
+export const defaultScenarioContentData: ScenarioContent = {
   uuid: '',
   name: '',
   promptClass: false,
@@ -187,7 +181,7 @@ export const defaultScenarioContentStr = JSON.stringify(
 /**
  * Scenario activity insertion json
  */
-export const defaultTeamConsolesContentData: TeamConsolesContent = {
+export const defaultTeamConsolesContentData: ScenarioContent = {
   uuid: '',
   name: '',
   moveOnCriteria: MoveOnCriteriaEnum.Completed,

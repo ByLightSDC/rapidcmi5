@@ -26,13 +26,12 @@ import { routeDelim } from '../scenario/ScenarioConsoleTab';
 import { sendScenarioEventVerb } from '../../utils/LmsStatementManager';
 import { debugLog, debugLogError, logger } from '../../debug';
 
-import { useCellValue } from '@mdxeditor/editor';
 import { AuManagerContext } from '../../session/AuManager';
 import {
-  TeamConsolesContent,
   ScenarioSubmitResponse,
   ActivityScore,
   RC5ActivityTypeEnum,
+  ScenarioContent,
 } from '@rapid-cmi5/cmi5-build-common';
 import { ConsoleProvider } from '../scenario/console/ConsoleContext';
 import ConsolesDisplay from '../scenario/console/ConsolesDisplay';
@@ -575,7 +574,7 @@ export const TeamScenarioContextProvider: any = (props: tProviderProps) => {
    * @param {ScenarioResources} scenario Loaded Scenario and its resources
    */
   const submitAutoGraderScores = (
-    content: TeamConsolesContent,
+    content: ScenarioContent,
     scenario: ScenarioResources,
   ) => {
     let completedTasks = 0;
@@ -605,10 +604,12 @@ export const TeamScenarioContextProvider: any = (props: tProviderProps) => {
 
     // Ensure the scenario content has the UUID that matches the parsed markdown
     // The scenarioContent should already have the correct uuid from the markdown
+    const scenarioUuid = scenario.scenarioId;
+    if (!scenarioUuid) throw Error('No scenario UUID was provided');
     const enrichedScenarioContent = {
       ...content,
       // Make sure we have the uuid field that the getActivityId function looks for
-      uuid: scenario?.scenarioId || content?.rc5id,
+      uuid: scenarioUuid,
     };
 
     const activityScore: ActivityScore = {
@@ -729,7 +730,7 @@ export const TeamScenarioContextProvider: any = (props: tProviderProps) => {
       <ConsoleProvider
         isRouteRelative={true}
         routeDelim={routeDelim}
-        key='team-exercise-consoles'
+        key="team-exercise-consoles"
         rangeId={undefined}
         scenarioId={undefined} // because one slide can have more than one scenario
         onScenarioEvent={async (eventType, scenarioIdParam, metadata) => {

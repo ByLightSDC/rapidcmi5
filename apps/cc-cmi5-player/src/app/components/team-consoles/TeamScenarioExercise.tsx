@@ -48,7 +48,7 @@ import {
 } from '@rangeos-nx/frontend/clients/hooks';
 import {
   AuContextProps,
-  TeamConsolesContent,
+  ScenarioContent,
   OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
@@ -73,7 +73,7 @@ function TeamScenarioExercise({
   outerStyle,
 }: {
   auProps: Partial<AuContextProps>;
-  content: TeamConsolesContent;
+  content: ScenarioContent;
   innerSx?: SxProps;
   outerSx?: SxProps;
   outerStyle?: OuterStyle;

@@ -18,7 +18,6 @@ import {
   Divider,
   IconButton,
   ListItemIcon,
-  Paper,
   Stack,
   SxProps,
   Tabs,
@@ -170,26 +169,16 @@ function ScenarioConsoles({
       {...outerStyle}
     >
       <Box sx={{ ...innerSx }}>
-        {content.introTitle && (
-          <Typography
-            color="text.primary"
-            align="center"
-            variant="h2"
-            style={{
-              fontWeight: 800,
-              paddingBottom: '8px',
-            }}
-          >
-            content.introTitle
-          </Typography>
-        )}
-        {content.introContent && <p>{content.introContent}</p>}
-        <Typography color="text.primary" variant="caption">Scenario</Typography>
+        <Typography color="text.primary" variant="caption">
+          Scenario
+        </Typography>
 
         {(!rangeDataError || numRangeDataAttempts < numRetries) &&
           (!rangeConsoleDataError ||
             numRangeConsoleDataAttempts < numRetries) &&
-          !scenarioId && <Typography color="text.primary">Loading...</Typography>}
+          !scenarioId && (
+            <Typography color="text.primary">Loading...</Typography>
+          )}
 
         {autoGraders && (
           // This is needed so that we can get autograder completion data
@@ -206,7 +195,10 @@ function ScenarioConsoles({
         )}
 
         {rangeDataError && numRangeDataAttempts === numRetries && (
-          <Alert  sx={{ backgroundColor: 'transparent', borderStyle: 'none' }} severity="error">
+          <Alert
+            sx={{ backgroundColor: 'transparent', borderStyle: 'none' }}
+            severity="error"
+          >
             <AlertTitle>{rangeDataError}</AlertTitle>
             <ButtonMainUi
               startIcon={<ReplayIcon />}
@@ -237,7 +229,10 @@ function ScenarioConsoles({
         {!rangeDataError &&
           rangeConsoleDataError &&
           numRangeConsoleDataAttempts === numRetries && (
-            <Alert  sx={{ backgroundColor: 'transparent', borderStyle: 'none' }} severity="error">
+            <Alert
+              sx={{ backgroundColor: 'transparent', borderStyle: 'none' }}
+              severity="error"
+            >
               <AlertTitle>{rangeConsoleDataError}</AlertTitle>
               <ButtonMinorUi
                 onClick={() => {
@@ -310,14 +305,9 @@ function ScenarioStatus({
 }) {
   const [isClockShowing, setIsClockShowing] = useState(false);
 
-  const { getUpdates, rangeId, scenarioId, scenarioStatusChangeCounter } =
-    useContext(ScenarioUpdatesContext);
-
-  const confirmStopButtonText =
-    slideContent.confirmStopButtonText || confirmDeleteButtonText;
-
-  const stopScenarioTitle = slideContent.stopScenarioTitle || deleteTitle;
-  const stopScenarioMessage = slideContent.stopScenarioMessage || deletePrompt;
+  const { getUpdates, rangeId, scenarioStatusChangeCounter } = useContext(
+    ScenarioUpdatesContext,
+  );
 
   const toggleClock = () => {
     setIsClockShowing(!isClockShowing);
@@ -438,9 +428,9 @@ function ScenarioStatus({
 
           <ScenarioModals
             rangeIdSel={rangeId}
-            confirmStopButtonText={confirmStopButtonText}
-            stopScenarioMessage={stopScenarioMessage}
-            stopScenarioTitle={stopScenarioTitle}
+            confirmStopButtonText={confirmDeleteButtonText}
+            stopScenarioMessage={deleteTitle}
+            stopScenarioTitle={deletePrompt}
           />
         </Stack>
       );

@@ -40,7 +40,8 @@ import {
   BasicResponse,
   QuizCompletionEnum,
   QuizContent,
-} from './types/quiz';
+} from './types/activities';
+
 export const RC5_FILENAME = 'RC5.yaml';
 
 function getTagName(value: string) {
@@ -105,7 +106,7 @@ function parseToMdast(input: string) {
     return;
   });
 
-  let md = toMarkdown(tree, {
+  const md = toMarkdown(tree, {
     extensions: [
       mdxJsxToMarkdown(),
       gfmStrikethroughToMarkdown(),
@@ -172,8 +173,8 @@ function mkdocsToMdxRawTextCleanup(content: string) {
 
 export function cleanMkdocs(
   content: string,
-  slidename: string = '',
-  strictMode: boolean = false,
+  slidename = '',
+  strictMode = false,
 ) {
   let md = mkdocsToMdxRawTextCleanup(content);
 

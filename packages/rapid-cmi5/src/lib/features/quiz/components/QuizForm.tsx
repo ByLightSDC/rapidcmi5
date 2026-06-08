@@ -10,7 +10,6 @@ import * as yup from 'yup';
 import {
   RC5ActivityTypeEnum,
   QuizContent,
-  SlideTypeEnum,
   QuizCompletionEnum,
   MoveOnCriteriaEnum,
   QuestionResponse,
@@ -20,6 +19,7 @@ import {
   QuestionBankApi,
   convertFromApi,
   OuterStyle,
+  SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   ENUM_GROUP,
