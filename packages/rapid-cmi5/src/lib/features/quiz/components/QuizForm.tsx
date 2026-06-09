@@ -19,7 +19,7 @@ import {
   QuestionBankApi,
   convertFromApi,
   OuterStyle,
-  SlideTypeEnum,
+  QuizVarations,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   ENUM_GROUP,
@@ -57,7 +57,7 @@ export function requireField<T>(value: T | undefined | null, field: string): T {
 }
 
 export const QuizForm = ({
-  activityKind,
+  activityType,
   contextMenu,
   crudType,
   defaultFormData,
@@ -67,7 +67,7 @@ export const QuizForm = ({
   outerStyle,
   onSave,
 }: {
-  activityKind: RC5ActivityTypeEnum;
+  activityType: QuizVarations;
   contextMenu?: JSX.Element;
   crudType: FormCrudType;
   defaultFormData: QuizContent;
@@ -78,11 +78,6 @@ export const QuizForm = ({
   outerStyle?: OuterStyle;
   onSave: (activity: RC5ActivityTypeEnum, data: any) => void;
 }) => {
-  const slideType =
-    activityKind === RC5ActivityTypeEnum.quiz
-      ? SlideTypeEnum.Quiz
-      : SlideTypeEnum.CTF;
-
   const [isSearchBankOpen, setIsSearchBankOpen] = useState(false);
   const [bankQuestion, setBankQuestion] = useState<QuizQuestion | null>(null);
   const { isQuizBankEnabled } = useQuizBankApi();
@@ -265,7 +260,7 @@ export const QuizForm = ({
           <QuizBankSearchForm
             submitForm={handleModalResponse}
             closeModal={() => setIsSearchBankOpen(false)}
-            activityType={activityKind}
+            activityType={activityType}
           />
         )}
         <Grid size={12}>
@@ -294,7 +289,7 @@ export const QuizForm = ({
                 <QuizQuestionsFieldGroup
                   crudType={crudType}
                   formProps={props}
-                  slideType={slideType}
+                  activityType={activityType}
                   onAddToBank={
                     isQuizBankEnabled ? (q) => setBankQuestion(q) : undefined
                   }
@@ -342,7 +337,7 @@ export const QuizForm = ({
         dataCache={defaultFormData}
         titleEndChildren={deleteButton}
         doAction={onSaveAction}
-        formTitle={activityKind === RC5ActivityTypeEnum.quiz ? 'Quiz' : 'CTF'}
+        formTitle={activityType === RC5ActivityTypeEnum.quiz ? 'Quiz' : 'CTF'}
         formWidth={null}
         formSxProps={{ width: '100%', flexGrow: 1, ...innerSx, margin: 0 }}
         getFormFields={getFormFields}

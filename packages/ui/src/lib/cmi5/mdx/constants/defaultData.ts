@@ -13,7 +13,6 @@ import {
   RC5ActivityTypeEnum,
   ContentWidthEnum,
   SlideType,
-  SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 
 export const jsonFormatSpaces = 1;
@@ -22,7 +21,6 @@ export const defaultEmptySlide: SlideType = {
   slideTitle: 'Slide 1',
   content: '# Slide',
   filepath: '',
-  type: SlideTypeEnum.Markdown,
 };
 
 export const defaultAutoGraderData = {

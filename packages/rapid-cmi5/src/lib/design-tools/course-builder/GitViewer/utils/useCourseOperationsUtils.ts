@@ -12,7 +12,6 @@ import {
   RC5_VERSION,
   ScenarioContent,
   SlideType,
-  SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 import { courseNameInUseMessage } from '../session/constants';
 import { GitFS, MAX_FS_SLUG_LENGTH } from './fileSystem';
@@ -137,7 +136,6 @@ export const createNewCourseInFs = async ({
               slides: [
                 {
                   slideTitle: baseSlideTitle,
-                  type: SlideTypeEnum.Markdown,
                   filepath: firstSlidePath,
                 },
               ],
