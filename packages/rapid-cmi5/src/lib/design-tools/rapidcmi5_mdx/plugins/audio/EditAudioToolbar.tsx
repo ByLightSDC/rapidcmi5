@@ -13,6 +13,7 @@ export interface EditAudioToolbarProps {
   title: string;
   rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   autoplay?: boolean;
+  captionSrc?: string;
 }
 
 export function EditAudioToolbar({
@@ -22,6 +23,7 @@ export function EditAudioToolbar({
   title,
   rest,
   autoplay,
+  captionSrc,
 }: EditAudioToolbarProps): JSX.Element {
   const openEditAudioDialog = usePublisher(openEditAudioDialog$);
 
@@ -50,6 +52,7 @@ export function EditAudioToolbar({
                 title,
                 rest,
                 autoplay,
+                captionSrc,
               },
             });
           }}

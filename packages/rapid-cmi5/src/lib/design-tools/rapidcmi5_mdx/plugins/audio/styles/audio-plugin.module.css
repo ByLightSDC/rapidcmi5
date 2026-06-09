@@ -18,3 +18,71 @@
   text-align: center;
   color: #666;
 }
+
+.transcriptContainer {
+  margin-top: 4px;
+}
+
+.transcriptToggle {
+  background: none;
+  border: none;
+  padding: 4px 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgb(60, 132, 244);
+  cursor: pointer;
+}
+
+.transcriptToggle:hover {
+  text-decoration: underline;
+}
+
+.transcriptList {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+}
+
+.transcriptCue {
+  margin: 0;
+}
+
+.transcriptCueButton {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.transcriptCueButton:hover {
+  background-color: rgba(60, 132, 244, 0.08);
+}
+
+.transcriptCueActive .transcriptCueButton {
+  background-color: rgba(60, 132, 244, 0.16);
+  font-weight: 600;
+}
+
+.transcriptTime {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 0.8rem;
+}
+
+.transcriptText {
+  flex: 1 1 auto;
+  white-space: pre-wrap;
+}
