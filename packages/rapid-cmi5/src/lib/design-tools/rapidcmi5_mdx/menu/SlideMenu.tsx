@@ -21,10 +21,7 @@ import {
   deleteSlide,
   navigateSlide,
 } from '../../../redux/courseBuilderReducer';
-import {
-  defaultSlideContent,
-  SlideTypeEnum,
-} from '@rapid-cmi5/cmi5-build-common';
+import { defaultSlideContent } from '@rapid-cmi5/cmi5-build-common';
 
 import { RC5Context } from '../contexts/RC5Context';
 import { useContext } from 'react';
@@ -83,7 +80,6 @@ export const SlideMenu = () => {
         slide: {
           content: defaultSlideContent,
           slideTitle: slideTitle,
-          type: SlideTypeEnum.Markdown,
           filepath,
         },
         insertionPoint,

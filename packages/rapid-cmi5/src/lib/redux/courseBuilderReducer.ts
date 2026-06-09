@@ -5,7 +5,6 @@ import {
   CourseAU,
   Theme,
   ScenarioContent,
-  SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './store';
@@ -100,9 +99,7 @@ export const initialStateCourseBuilder: CourseBuilderState = {
   teamScenario: undefined,
   slideDeckText: '',
   sourceCourseData: undefined,
-  slides: [
-    { slideTitle: '', content: '', type: SlideTypeEnum.Markdown, filepath: '' },
-  ],
+  slides: [{ slideTitle: '', content: '', filepath: '' }],
   viewMode: ViewModeEnum.RepoSelector,
   currentAuIndex: 0,
   currentBlockIndex: 0,

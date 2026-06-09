@@ -3,7 +3,7 @@ import YAML from 'yaml';
 import { getScenarioDirectives } from '../codeValidators/markdownValidator';
 import { ScenarioContent } from '../types/activities';
 import { RC5_VERSION } from './versions';
-import { CourseData, SlideTypeEnum } from '../types';
+import { CourseData } from '../types';
 
 export interface FolderStruct {
   id: string;
@@ -91,27 +91,25 @@ export function generateCourseFromNav(
         let teamExerciseConsoles: ScenarioContent[] = [];
 
         au.slides.map((slide) => {
-          if (slide.type === SlideTypeEnum.Markdown) {
-            //find scenarios
-            try {
-              scenarios = scenarios.concat(
-                getScenarioDirectives(slide.content as string),
-              );
-            } catch {
-              scenarios = [];
-            }
+          //find scenarios
+          try {
+            scenarios = scenarios.concat(
+              getScenarioDirectives(slide.content as string),
+            );
+          } catch {
+            scenarios = [];
+          }
 
-            //find team exercise consoles
-            try {
-              teamExerciseConsoles = teamExerciseConsoles.concat(
-                getScenarioDirectives(
-                  slide.content as string,
-                  'consoles',
-                ) as ScenarioContent[],
-              );
-            } catch {
-              teamExerciseConsoles = [];
-            }
+          //find team exercise consoles
+          try {
+            teamExerciseConsoles = teamExerciseConsoles.concat(
+              getScenarioDirectives(
+                slide.content as string,
+                'consoles',
+              ) as ScenarioContent[],
+            );
+          } catch {
+            teamExerciseConsoles = [];
           }
         });
 
