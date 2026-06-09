@@ -83,9 +83,16 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
   config.plugins = config.plugins || [];
   config.plugins.push(new PlayerManifestPlugin());
 
+  const PUBLIC_PATH = '/course/blocks/name/au/';
+
   const theConfig = merge(config, {
     ignoreWarnings: [/Failed to parse source map/],
+    output: {
+      publicPath: PUBLIC_PATH,
+    },
     devServer: {
+      devMiddleware: { publicPath: PUBLIC_PATH },
+      historyApiFallback: { index: `${PUBLIC_PATH}index.html` },
       client: {
         overlay: {
           runtimeErrors: (error) => {
@@ -99,6 +106,20 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
       // Allow cross-origin requests from the editor dev server (localhost:4200)
       headers: { 'Access-Control-Allow-Origin': '*' },
       setupMiddlewares: (middlewares, devServer) => {
+        // Redirect root → app's public path so bare localhost:4200 works.
+        devServer.app.get('/', (_req, res) => res.redirect(PUBLIC_PATH));
+
+        // Serve test fixtures from the parent of the player URL so:
+        //   /course/blocks/name/RC5.yaml       -> src/test/RC5.yaml
+        //   /course/blocks/name/au/config.json -> src/test/au/config.json
+        //   /course/blocks/name/au/Assets/...  -> src/test/au/Assets/...
+        // Mounted in setupMiddlewares so it runs before historyApiFallback
+        // (which would otherwise rewrite unknown paths to index.html).
+        devServer.app.use(
+          '/course/blocks/name',
+          require('express').static(TEST_DIR),
+        );
+
         // CORS preflight for all dev endpoints
         devServer.app.use((req, res, next) => {
           if (req.method === 'OPTIONS') {

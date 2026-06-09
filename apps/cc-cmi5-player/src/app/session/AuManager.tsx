@@ -303,7 +303,7 @@ function AuManager() {
       setAuManagerState(AuManagerState.error);
     }
     if (auManagerState === AuManagerState.waiting) {
-      loadContent('./config.json');
+      loadContent();
       setAuManagerState(AuManagerState.loadingContent);
       return;
     } else if (auManagerState === AuManagerState.loadingContent) {

@@ -30,7 +30,7 @@ import {
   TextFieldMainUi,
   ViewExpander,
 } from '@rapid-cmi5/ui';
-import { useLessonAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
+import { useLessonAssets } from '../../../../contexts/LessonAssetsContext';
 
 // used for uploading files
 const VisuallyHiddenInput = styled('input')({

@@ -23,7 +23,7 @@ import { currentAuPath } from '../../../../redux/courseBuilderReducer';
 import {
   ASSET_DIRS,
   useLessonAssets,
-} from '../../../course-builder/GitViewer/session/LessonAssetsContext';
+} from '../../../../contexts/LessonAssetsContext';
 
 /**
  * Form course creators can use to attack files to a Lesson AU

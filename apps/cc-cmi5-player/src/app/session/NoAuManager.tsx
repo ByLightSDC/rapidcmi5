@@ -100,7 +100,7 @@ function NoAuManager() {
     }
 
     if (noAuManagerState === NoAuManagerState.waiting) {
-      loadContent('./config.json');
+      loadContent();
       setNoAuManagerState(NoAuManagerState.loadingContent);
       return;
     } else if (noAuManagerState === NoAuManagerState.loadingContent) {
