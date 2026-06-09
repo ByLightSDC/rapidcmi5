@@ -21,7 +21,7 @@ import {
 } from '@rapid-cmi5/cmi5-build-common';
 
 import { ButtonMainUi } from '../../utility/buttons';
-import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
+import { CoursePresentationContext } from '../mdx/contexts/ThemeContext';
 import {
   maxFormWidths,
   useLessonThemeStyles,
@@ -78,7 +78,7 @@ export function CodeRunner({
   outerStyle,
 }: CodeRunnerProps) {
   const { setProgress, submitScore, isAuthenticated, isTestMode } = auProps;
-  const { lessonTheme } = useContext(LessonThemeContext);
+  const { theme } = useContext(CoursePresentationContext);
 
   const { isCodeRunnerEnabled, executeCode } = useCodeRunnerApi();
 
@@ -87,7 +87,7 @@ export function CodeRunner({
   );
 
   const { blockPadding, outerActivitySxWithConstrainedWidthForm } =
-    useLessonThemeStyles(lessonTheme, maxFormWidths.codeRunnerPlayback);
+    useLessonThemeStyles(theme, maxFormWidths.codeRunnerPlayback);
 
   const [submissionStr, setSubmissionStr] = useState('');
   const [successStr, setSuccessStr] = useState('');

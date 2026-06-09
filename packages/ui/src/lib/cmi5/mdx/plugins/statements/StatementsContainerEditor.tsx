@@ -28,7 +28,7 @@ import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 import { StatementPreset, StatementsContainerDirectiveNode } from './types';
 import { STATEMENT_PRESETS } from './constants';
 
-import { LessonThemeContext } from '../../contexts/LessonThemeContext';
+import { CoursePresentationContext } from '../../contexts/ThemeContext';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
@@ -53,8 +53,8 @@ export const StatementsContainerEditor: React.FC<
 
   //#region lesson style
   const muiTheme = useTheme();
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  const { theme } = useContext(CoursePresentationContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(theme);
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';

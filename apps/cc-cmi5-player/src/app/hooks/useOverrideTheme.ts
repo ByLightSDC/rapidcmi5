@@ -12,7 +12,6 @@ import { auConfigInitializedSel } from '../redux/auReducer';
  * @returns
  */
 export const useOverrideTheme = () => {
-
   const themeSel = useSelector(themeColor);
   const isConfigInitialized = useSelector(auConfigInitializedSel);
 
@@ -28,6 +27,7 @@ export const useOverrideTheme = () => {
     const overrides: CustomTheme =
       themeSel === 'dark' ? config.THEME.DARK : config.THEME.LIGHT;
     const overriddenTheme = deepmerge(base, overrides);
+
     return overriddenTheme;
   }, [themeSel, isConfigInitialized]);
 

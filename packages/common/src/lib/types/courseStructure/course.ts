@@ -1,5 +1,6 @@
 import { z } from 'zod/v4';
 import { CourseBlockSchema } from './block';
+import { ThemeSchema } from '../ui';
 
 export enum Operation {
   // Covers deleting a slide or AU
@@ -20,13 +21,17 @@ export const CourseDataSchemaZod = z.object({
     ),
   courseDescription: z.string().optional(),
   author: z.string().optional(),
-  buildTime: z.string().optional(),
+  buildTime: z.iso
+    .datetime()
+    .optional()
+    .describe('ISO 8601 timestamp of when the course was built.'),
   remoteGitUrl: z.string().optional(),
   gitBranch: z.string().optional(),
   rc5Version: z.string().optional(),
   blocks: z
     .array(CourseBlockSchema)
     .describe('Top-level course blocks. Most courses have a single block.'),
+  theme: ThemeSchema,
 });
 
 export const CreateCourseInputSchema = CourseDataSchemaZod.extend({

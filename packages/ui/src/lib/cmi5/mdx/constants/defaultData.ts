@@ -13,6 +13,9 @@ import {
   RC5ActivityTypeEnum,
   ContentWidthEnum,
   SlideType,
+  BlockPaddingEnum,
+  DefaultAlignmentEnum,
+  Theme,
 } from '@rapid-cmi5/cmi5-build-common';
 
 export const jsonFormatSpaces = 1;
@@ -21,6 +24,13 @@ export const defaultEmptySlide: SlideType = {
   slideTitle: 'Slide 1',
   content: '# Slide',
   filepath: '',
+};
+
+export const defaultTheme: Theme = {
+  blockPadding: BlockPaddingEnum.None,
+  contentWidth: ContentWidthEnum.None,
+  defaultAlignment: DefaultAlignmentEnum.Left,
+  defaultActivityAlignment: DefaultAlignmentEnum.Center,
 };
 
 export const defaultAutoGraderData = {
@@ -123,6 +133,7 @@ export const defaultCourseData: CourseData = {
   courseTitle: '',
   courseDescription: '',
   courseId: '',
+  theme: defaultTheme,
   blocks: [
     {
       blockName: '',

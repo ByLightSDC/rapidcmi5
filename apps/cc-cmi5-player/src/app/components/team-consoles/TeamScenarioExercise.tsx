@@ -52,7 +52,7 @@ import {
   OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
-  LessonThemeContext,
+  CoursePresentationContext,
   OverflowTypography,
   TabMainUi,
   maxFormWidths,

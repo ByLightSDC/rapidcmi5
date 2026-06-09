@@ -28,13 +28,12 @@ import {
   FileDownloadLink,
   CodeRunner,
   config,
-  LessonThemeContext,
+  CoursePresentationContext,
   useLessonStyles,
   maxFormWidths,
   ActivityDirectiveNode,
   darkTheme,
 } from '@rapid-cmi5/ui';
-import { cmi5Instance } from '../../../../session/cmi5';
 import { auConfigInitializedSel } from '../../../../redux/auReducer';
 
 /**
@@ -70,9 +69,9 @@ export const ActivityPlayback: React.FC<
   };
 
   const muiTheme = useTheme();
-  const { lessonTheme } = useContext(LessonThemeContext);
+  const { theme } = useContext(CoursePresentationContext);
   const { innerActivitySx, outerSx, outerStyle } = useLessonStyles(
-    lessonTheme,
+    theme,
     mdastNode?.attributes?.contentWidth,
     maxFormWidths.downloadsEditor,
     muiTheme.palette.background.paper,

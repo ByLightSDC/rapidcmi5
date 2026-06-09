@@ -21,7 +21,12 @@ import {
   getScenarioDirectives,
   RC5_FILENAME,
 } from '@rapid-cmi5/cmi5-build-common';
-import { debugLog, debugLogError, defaultEmptySlide } from '@rapid-cmi5/ui';
+import {
+  debugLog,
+  debugLogError,
+  defaultEmptySlide,
+  defaultTheme,
+} from '@rapid-cmi5/ui';
 import { basename, dirname, join, normalize } from 'path-browserify';
 import JSZip from 'jszip';
 import { getRepoPath, GitOperations } from './gitOperations';
@@ -145,6 +150,7 @@ export const createNewCourseInFs = async ({
           blockDescription: '',
         },
       ],
+      theme: defaultTheme,
       gitBranch,
       remoteGitUrl,
       buildTime,

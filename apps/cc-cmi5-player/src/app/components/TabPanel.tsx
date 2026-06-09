@@ -1,28 +1,21 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
 import { Check } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  auJsonSel,
-  auLogoDarkSel,
-  auLogoLightSel,
-  auLogoWidthSel,
-  courseAUProgressSel,
-} from '../redux/auReducer';
+import { auJsonSel, courseAUProgressSel } from '../redux/auReducer';
 import { activeTabSel, setActiveTab } from '../redux/navigationReducer';
 import ProgressBar from './ProgressBar';
 import { CustomTheme } from '../styles/createPalette';
 import { Box, Divider, Stack, Typography, useTheme } from '@mui/material';
 import { useTabStyles } from './useTabStyles';
 import CloseIcon from '@mui/icons-material/Close';
+import { CoursePresentationContext } from '@rapid-cmi5/ui';
 
 export default function TabPanel() {
   const auJson = useSelector(auJsonSel);
-  const auLogoDark = useSelector(auLogoDarkSel);
-  const auLogoLight = useSelector(auLogoLightSel);
-  const auLogoWidth = useSelector(auLogoWidthSel);
+  const { theme } = useContext(CoursePresentationContext);
 
   const dispatch = useDispatch();
   const activeTab = useSelector(activeTabSel);
@@ -36,8 +29,10 @@ export default function TabPanel() {
   const [isExitTabVisible, setIsExitTabVisible] = useState(true);
 
   const currentLogo = useMemo(() => {
-    return auLogoDark;
-  }, [currentTheme.palette.mode, auLogoDark]);
+    console.log('Theme ', theme);
+    return theme.logo?.dark?.relativePath;
+  }, [currentTheme.palette.mode, theme]);
+
   const iconDimension = '20px';
 
   const tabClicked = (_: React.SyntheticEvent, newValue: number) => {
@@ -63,7 +58,7 @@ export default function TabPanel() {
       passed: slideStatus?.passed || false,
       failed: slideStatus?.failed || false,
     };
- 
+
     return status;
   };
 
@@ -173,7 +168,7 @@ export default function TabPanel() {
         {currentLogo && (
           <img
             alt="Course or Logo"
-            width={auLogoWidth}
+            width={'200px'}
             style={{
               padding: '16px',
               paddingBottom: '0px',

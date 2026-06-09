@@ -52,7 +52,7 @@ import {
   AuCTF,
   CodeRunner,
   useLessonStyles,
-  LessonThemeContext,
+  CoursePresentationContext,
   maxFormWidths,
   BlockAppearanceForm,
   ActivityDirectiveNode,
@@ -91,7 +91,7 @@ export const ActivityEditor: React.FC<
 
   const muiTheme: any = useTheme();
 
-  const { lessonTheme } = useContext(LessonThemeContext);
+  const { theme } = useContext(CoursePresentationContext);
   const {
     blockAppearanceOpen,
     contentWidthDisplay,
@@ -102,7 +102,7 @@ export const ActivityEditor: React.FC<
     setBlockAppearanceOpen,
     setContentWidth,
   } = useLessonStyles(
-    lessonTheme,
+    theme,
     mdastNode?.attributes?.contentWidth,
     maxFormWidths.downloadsEditor,
     muiTheme.palette.background.paper,

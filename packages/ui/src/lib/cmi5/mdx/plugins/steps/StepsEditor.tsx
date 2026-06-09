@@ -61,7 +61,7 @@ import {
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
-import { LessonThemeContext } from '../../contexts/LessonThemeContext';
+import { CoursePresentationContext } from '../../contexts/ThemeContext';
 import {
   resolveLessonThemeCSS,
   resolveBlockMaxWidth,
@@ -99,8 +99,8 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
 
   const [isPlayback, readOnly] = useCellValues(editorInPlayback$, readOnly$);
 
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  const { theme } = useContext(CoursePresentationContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(theme);
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';

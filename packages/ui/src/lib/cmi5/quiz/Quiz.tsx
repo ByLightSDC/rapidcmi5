@@ -47,7 +47,7 @@ import {
   OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 import { ButtonMinorUi, ButtonMainUi } from '../../utility/buttons';
-import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
+import { CoursePresentationContext } from '../mdx/contexts/ThemeContext';
 import {
   maxFormWidths,
   useLessonThemeStyles,
@@ -85,9 +85,9 @@ export function AuQuiz({
     Array(content.questions.length).fill(null),
   );
   /* Lesson Theme */
-  const { lessonTheme } = useContext(LessonThemeContext);
+  const { theme } = useContext(CoursePresentationContext);
   const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
-    lessonTheme,
+    theme,
     maxFormWidths.quizPlayback,
   );
 

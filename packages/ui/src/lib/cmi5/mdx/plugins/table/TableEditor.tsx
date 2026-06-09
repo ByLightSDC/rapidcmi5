@@ -43,7 +43,7 @@ import {
   resolveBlockMaxWidth,
 } from '../../../../styles/lessonThemeStyles';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
-import { LessonThemeContext } from '../../contexts/LessonThemeContext';
+import { CoursePresentationContext } from '../../contexts/ThemeContext';
 import { TableNode } from './TableNode';
 
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -188,10 +188,10 @@ export const TableEditor: React.FC<TableEditorProps> = ({
     readOnly$,
     editorInPlayback$,
   );
-  const { lessonTheme } = useContext(LessonThemeContext);
+  const { theme } = useContext(CoursePresentationContext);
 
   const muiTheme = useTheme();
-  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  const resolvedThemeCSS = resolveLessonThemeCSS(theme);
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';

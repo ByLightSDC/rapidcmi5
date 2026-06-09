@@ -54,7 +54,6 @@ import {
   generateLessonThemeStyleTag,
   StepsDirectiveDescriptor,
   StepContentDirectiveDescriptor,
-  LessonThemeContext,
   QuotesContainerDirectiveDescriptor,
   QuotesContentDirectiveDescriptor,
   StatementsContainerDirectiveDescriptor,
@@ -90,7 +89,9 @@ function RC5Player() {
   const [slideAnimations, setSlideAnimations] = useState<AnimationConfig[]>([]);
   const slideWidthSel = useSelector(slideWidth);
   const auJson = useSelector(auJsonSel);
-  const currentLessonTheme = auJson?.lessonTheme;
+
+  const lessonTheme = auJson?.lessonTheme;
+
   const themeClass = useRef(
     `lesson-theme-${Math.random().toString(36).slice(2, 9)}`,
   ).current;
@@ -117,7 +118,6 @@ function RC5Player() {
     // Cleanup — if the user switches slides before 150ms is up, cancel the previous timeout.
     return () => clearTimeout(id);
   }, [activeTab]);
-
 
   const thePlugins = useMemo(() => {
     const initialList = [
@@ -168,7 +168,10 @@ function RC5Player() {
       }),
       headingsPlugin(),
       htmlPlugin(),
-      videoPlugin({ disableVideoResize: true, disableVideoSettingsButton: true }),
+      videoPlugin({
+        disableVideoResize: true,
+        disableVideoSettingsButton: true,
+      }),
       imagePlayerPlugin(),
       animationPlayerPlugin(),
       ariaOverridePlugin(),
@@ -262,12 +265,12 @@ function RC5Player() {
   const lessonStyleCss = useMemo(() => {
     const css = generateLessonThemeStyleTag(
       themeClass,
-      currentLessonTheme,
+      lessonTheme,
       slideWidthSel,
       true,
     );
     return css;
-  }, [themeClass, currentLessonTheme, slideWidthSel]);
+  }, [themeClass, lessonTheme, slideWidthSel]);
 
   /**
    * Set up an event listener for the ESC key.
@@ -381,27 +384,23 @@ function RC5Player() {
         onClick={onClickSlide}
         ref={editorContainerRef}
       >
-        {currentLessonTheme && <style>{lessonStyleCss}</style>}
+        {lessonTheme && <style>{lessonStyleCss}</style>}
         {thePlugins && thePlugins.length > 0 && (
-          <LessonThemeContext.Provider
-            value={{ lessonTheme: currentLessonTheme }}
+          <div
+            role="tabpanel"
+            aria-label="Slide content"
+            ref={slideContentRef}
           >
-            <div
-              role="tabpanel"
-              aria-label="Slide content"
-              ref={slideContentRef}
-            >
-              <div id="toc-portal-target" />
-              <MDXEditor
-                className={mdxTheme}
-                ref={ref}
-                markdown={''}
-                plugins={thePlugins}
-                readOnly={true}
-                key={activeTab}
-              />
-            </div>
-          </LessonThemeContext.Provider>
+            <div id="toc-portal-target" />
+            <MDXEditor
+              className={mdxTheme}
+              ref={ref}
+              markdown={''}
+              plugins={thePlugins}
+              readOnly={true}
+              key={activeTab}
+            />
+          </div>
         )}
       </Box>
       {fullScreenImage && (

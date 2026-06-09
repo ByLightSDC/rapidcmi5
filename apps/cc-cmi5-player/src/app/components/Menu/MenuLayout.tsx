@@ -4,7 +4,7 @@ import Drawer from '@mui/material/Drawer';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Box, useTheme } from '@mui/material';
-import { auJsonSel } from '../../redux/auReducer';
+import { auJsonSel, courseDataSel } from '../../redux/auReducer';
 import { activeTabSel } from '../../redux/navigationReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import RC5Player from '../player/RC5Player';
@@ -19,6 +19,7 @@ import {
   setIconColor,
   maxSlideWidth$,
   ApiProviders,
+  CoursePresentationProvider,
 } from '@rapid-cmi5/ui';
 import { CustomTheme } from '../../styles/createPalette';
 import LessonToolbar from './LessonToolbar';
@@ -30,6 +31,9 @@ export default function MenuLayout() {
   const currentTheme: CustomTheme = useTheme();
   const dispatch = useDispatch();
   const auJson = useSelector(auJsonSel);
+  const courseData = useSelector(courseDataSel);
+  const lessonTheme = auJson?.lessonTheme;
+  const courseTheme = courseData?.theme;
   const activeTab = useSelector(activeTabSel);
   const isExitSlide = activeTab === auJson?.slides?.length;
   const themedDividerColor = useSelector(dividerColor);
@@ -85,6 +89,10 @@ export default function MenuLayout() {
       codeRunnerUrl={config.DEVOPS_API_URL}
       cmi5Enabled={true}
     >
+      <CoursePresentationProvider
+        lessonTheme={lessonTheme}
+        courseTheme={courseTheme}
+      >
       <Drawer
         sx={{
           width: isMenuDrawerOpen ? DRAWER_WIDTH : 0,
@@ -147,6 +155,7 @@ export default function MenuLayout() {
           </>
         )}
       </PanelGroup>
+      </CoursePresentationProvider>
     </ApiProviders>
   );
 }

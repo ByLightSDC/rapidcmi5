@@ -1,5 +1,9 @@
 import { useState } from 'react';
-import { setAuJson, setCourseAUProgress } from '../redux/auReducer';
+import {
+  setAuJson,
+  setCourseAUProgress,
+  setCourseData,
+} from '../redux/auReducer';
 import { useDispatch } from 'react-redux';
 
 import { initializeCourseAUProgress } from '../utils/CourseAUProgressHelpers';
@@ -55,10 +59,12 @@ export const useAuContent = () => {
       const response = await fetch(courseConfigPath);
       if (response.ok) {
         const yamlText = await response.text();
-        const parsedYaml = yaml.load(yamlText);
+        // JSON_SCHEMA skips js-yaml's `!!timestamp` resolver so ISO-looking
+        // strings (e.g. buildTime) stay as strings instead of Date objects.
+        const parsedYaml = yaml.load(yamlText, { schema: yaml.JSON_SCHEMA });
         const courseContent: CourseData = CourseDataSchemaZod.parse(parsedYaml);
 
-        // TODO wire courseContent (CourseData) into a course-level redux slice.
+        dispatch(setCourseData(courseContent));
         logger.debug(
           'Loaded course data',
           { courseTitle: courseContent.courseTitle },
@@ -74,6 +80,10 @@ export const useAuContent = () => {
           },
           'auManager',
         );
+        setIsLoaded(false);
+        setContentErrorMessage(
+          `Error loading ${RC5_FILENAME}: ${response.statusText}`,
+        );
       }
     } catch (err) {
       if (err instanceof ZodError) {
@@ -83,12 +93,18 @@ export const useAuContent = () => {
           { issues, courseConfigPath },
           'auManager',
         );
+        setIsLoaded(false);
+        setContentErrorMessage(
+          `${RC5_FILENAME} schema errors:\n${summary}`,
+        );
       } else {
         logger.error(
           'Exception loading course content',
           { error: err, courseConfigPath },
           'auManager',
         );
+        setIsLoaded(false);
+        setContentErrorMessage(`Error loading ${RC5_FILENAME}`);
       }
     }
 

@@ -6,7 +6,7 @@ import { Box, Stack } from '@mui/material';
 import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 import { StatementsContext } from './StatementsContext';
 
-import { LessonThemeContext } from '../../contexts/LessonThemeContext';
+import { CoursePresentationContext } from '../../contexts/ThemeContext';
 import { statementFontPresets } from './constants';
 import { useLessonThemeStyles } from '../../../../hooks/useLessonThemeStyles';
 
@@ -21,8 +21,8 @@ export const StatementEditor: React.FC<
   const { preset } = useContext(StatementsContext);
 
   //#region Styles
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const { blockPadding } = useLessonThemeStyles(lessonTheme);
+  const { theme } = useContext(CoursePresentationContext);
+  const { blockPadding } = useLessonThemeStyles(theme);
 
   const scopedClass = useRef(
     `statement-block-${Math.random().toString(36).slice(2, 9)}`,

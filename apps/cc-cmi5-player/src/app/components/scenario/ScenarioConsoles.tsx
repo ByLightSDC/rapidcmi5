@@ -68,7 +68,7 @@ import {
   ButtonMinorUi,
   OverflowTypography,
   TabMainUi,
-  LessonThemeContext,
+  CoursePresentationContext,
   maxFormWidths,
   useLessonThemeStyles,
 } from '@rapid-cmi5/ui';
@@ -105,9 +105,9 @@ function ScenarioConsoles({
   // const scenarioId = debugScenarioId;
 
   /* Lesson Theme */
-  const { lessonTheme } = useContext(LessonThemeContext);
+  const { theme } = useContext(CoursePresentationContext);
   const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
-    lessonTheme,
+    theme,
     maxFormWidths.scenarioPlayback,
   );
 

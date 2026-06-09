@@ -8,7 +8,6 @@ import {
   usePublisher,
 } from '@mdxeditor/editor';
 import * as Mdast from 'mdast';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
 import {
@@ -60,7 +59,7 @@ import { ButtonMinorUi, ButtonOptions } from '../../../../utility/buttons';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
-import { LessonThemeContext } from '../../contexts/LessonThemeContext';
+import { CoursePresentationContext } from '../../contexts/ThemeContext';
 import {
   resolveLessonThemeCSS,
   resolveBlockMaxWidth,
@@ -85,8 +84,8 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   parentEditor,
 }) => {
   const muiTheme = useTheme();
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  const { theme } = useContext(CoursePresentationContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(theme);
   // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
   // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
   const blockPadding = resolvedThemeCSS

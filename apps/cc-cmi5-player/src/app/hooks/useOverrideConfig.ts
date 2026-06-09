@@ -2,7 +2,6 @@ import { config, debugLog } from '@rapid-cmi5/ui';
 import { logger } from '../debug';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setAuLogo } from '../redux/auReducer';
 import { overrideDevOpsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
 import { cmi5Instance } from '../session/cmi5';
 import { CustomTheme } from '../styles/createPalette';
@@ -104,9 +103,9 @@ export const useOverrideConfigs = () => {
       if (!cfg.locations)
         throw Error('No locations where found in the cfg.json');
 
-        const deployment =
-          cfg.locations.find((b) => window.location.origin.indexOf(b.url) >= 0) ??
-          cfg.locations.find((d) => d.name === 'default');
+      const deployment =
+        cfg.locations.find((b) => window.location.origin.indexOf(b.url) >= 0) ??
+        cfg.locations.find((d) => d.name === 'default');
 
       if (!deployment) throw Error('No default is defined in the cfg.json');
 
@@ -135,15 +134,7 @@ export const useOverrideConfigs = () => {
     } catch (error) {
       logger.warn('Override configs load failed', error, 'auManager');
     } finally {
-      dispatch(
-        setAuLogo({
-          dark: config.THEME.LOGO_DARK,
-          light: config.THEME.LOGO_LIGHT,
-          width: config.THEME.LOGO_WIDTH,
-        }),
-      );
       overrideDevOpsApiClient(config.DEVOPS_API_URL);
-
       setIsOverridesLoaded(true);
     }
   };
