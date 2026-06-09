@@ -31,7 +31,6 @@ import {
   defaultSlideContent,
   MoveOnCriteriaEnum,
   Theme,
-  SlideTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 
 import { RC5Context } from '../../contexts/RC5Context';
@@ -181,7 +180,6 @@ function LessonTree({
               slide: {
                 content: defaultSlideContent,
                 slideTitle: slideTitle,
-                type: SlideTypeEnum.Markdown,
                 filepath,
               },
             }),

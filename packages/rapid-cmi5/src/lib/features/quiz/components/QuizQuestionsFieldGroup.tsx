@@ -12,6 +12,8 @@ import {
   gradingOptions,
   QuizOption,
   MatchingOption,
+  RC5ActivityTypeEnum,
+  QuizVarations,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   FormCrudType,
@@ -38,7 +40,7 @@ interface fieldGroupProps {
   formProps: tFormFieldRendererProps;
   onAddToBank?: (question: any) => void;
   rowIndex?: number;
-  slideType: 'ctf' | 'quiz';
+  activityType: QuizVarations;
 }
 
 /**
@@ -47,7 +49,7 @@ interface fieldGroupProps {
  * @returns
  */
 export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
-  const { crudType, formProps, slideType, onAddToBank } = props;
+  const { crudType, formProps, activityType, onAddToBank } = props;
 
   const { formMethods, indexedArrayField, indexedErrors, isFocused } =
     formProps;
@@ -181,7 +183,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
                     formProps={props}
                     questionField={indexedArrayField}
                     questionType={watchQuestionType}
-                    slideType={slideType}
+                    activityType={activityType}
                   />
                 );
               }}
@@ -252,7 +254,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
                 <QuestionMatchingFieldGroup
                   crudType={crudType}
                   formProps={props}
-                  slideType={slideType}
+                  activityType={activityType}
                 />
               );
             }}
@@ -269,23 +271,25 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
         </Box>
       )}
 
-      <Grid size={3}>
-        <FormControlSelectField
-          control={control}
-          name={`${indexedArrayField}.type`}
-          required
-          label="Question Type"
-          error={Boolean(indexedErrors?.type)}
-          helperText={indexedErrors?.type?.message}
-          readOnly={crudType === FormCrudType.view || slideType === 'ctf'}
-        >
-          {responseOptions.map((item) => (
-            <MenuItem key={item} value={item}>
-              {toTitleCase(item)}
-            </MenuItem>
-          ))}
-        </FormControlSelectField>
-      </Grid>
+      {activityType === RC5ActivityTypeEnum.quiz && (
+        <Grid size={3}>
+          <FormControlSelectField
+            control={control}
+            name={`${indexedArrayField}.type`}
+            required
+            label="Question Type"
+            error={Boolean(indexedErrors?.type)}
+            helperText={indexedErrors?.type?.message}
+            readOnly={crudType === FormCrudType.view}
+          >
+            {responseOptions.map((item) => (
+              <MenuItem key={item} value={item}>
+                {toTitleCase(item)}
+              </MenuItem>
+            ))}
+          </FormControlSelectField>
+        </Grid>
+      )}
       <Grid size={3}>
         <FormControlSelectField
           control={control}
@@ -296,7 +300,7 @@ export function QuizQuestionsFieldGroup(props: fieldGroupProps) {
           helperText={indexedErrors?.typeAttributes?.grading?.message}
           readOnly={
             crudType === FormCrudType.view ||
-            slideType === 'ctf' ||
+            activityType === RC5ActivityTypeEnum.ctf ||
             watchQuestionType === QuestionResponse.Matching
           }
         >

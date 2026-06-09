@@ -4,18 +4,8 @@ import z from 'zod/v4';
 
 export const defaultSlideContent = '# Slide'; //TODO focus issues if you try to paste blank
 
-export enum SlideTypeEnum {
-  CTF = 'ctf',
-  Quiz = 'quiz',
-  Markdown = 'markdown',
-  Scenario = 'rangeosScenario',
-  SourceDoc = 'sourceDoc',
-  CodeRunner = 'codeRunner',
-}
-
 export const SlideSchema = z.object({
   slideTitle: z.string(),
-  type: z.enum(SlideTypeEnum),
   filepath: z
     .string()
     .describe(
