@@ -43,7 +43,7 @@ import {
   resolveBlockMaxWidth,
 } from '../../../../styles/lessonThemeStyles';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
-import { CoursePresentationContext } from '../../contexts/ThemeContext';
+import { CoursePresentationContext } from '../../contexts/PresentationContext';
 import { TableNode } from './TableNode';
 
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';

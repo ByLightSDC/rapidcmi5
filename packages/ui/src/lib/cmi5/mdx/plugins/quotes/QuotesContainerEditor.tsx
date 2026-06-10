@@ -35,7 +35,7 @@ import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 import { QuotePreset, QuotesContainerDirectiveNode } from './types';
 import { QUOTE_PRESETS } from './constants';
 
-import { CoursePresentationContext } from '../../contexts/ThemeContext';
+import { CoursePresentationContext } from '../../contexts/PresentationContext';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';

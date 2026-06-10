@@ -11,7 +11,7 @@ import { CustomTheme } from '../styles/createPalette';
 import { Box, Divider, Stack, Typography, useTheme } from '@mui/material';
 import { useTabStyles } from './useTabStyles';
 import CloseIcon from '@mui/icons-material/Close';
-import { CoursePresentationContext } from '@rapid-cmi5/ui';
+import { CoursePresentationContext, themeColor } from '@rapid-cmi5/ui';
 
 export default function TabPanel() {
   const auJson = useSelector(auJsonSel);
@@ -21,6 +21,8 @@ export default function TabPanel() {
   const activeTab = useSelector(activeTabSel);
   const courseAUProgress = useSelector(courseAUProgressSel);
   const currentTheme: CustomTheme = useTheme();
+  // Dark or light mode
+  const themeMode = useSelector(themeColor);
 
   // Track whether the Exit tab in the list is currently visible in the scroll container.
   // Only show the pinned Exit button at the bottom when the real one has scrolled out of view.
@@ -29,9 +31,12 @@ export default function TabPanel() {
   const [isExitTabVisible, setIsExitTabVisible] = useState(true);
 
   const currentLogo = useMemo(() => {
-    console.log('Theme ', theme);
-    return theme.logo?.dark?.relativePath;
-  }, [currentTheme.palette.mode, theme]);
+    if (themeMode === 'dark') {
+      return theme.logo?.dark?.relativePath;
+    } else {
+      return theme.logo?.light?.relativePath;
+    }
+  }, [themeMode, theme]);
 
   const iconDimension = '20px';
 

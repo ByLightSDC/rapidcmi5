@@ -59,7 +59,7 @@ import { ButtonMinorUi, ButtonOptions } from '../../../../utility/buttons';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
-import { CoursePresentationContext } from '../../contexts/ThemeContext';
+import { CoursePresentationContext } from '../../contexts/PresentationContext';
 import {
   resolveLessonThemeCSS,
   resolveBlockMaxWidth,

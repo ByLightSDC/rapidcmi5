@@ -85,7 +85,8 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
   config.plugins = config.plugins || [];
   config.plugins.push(new PlayerManifestPlugin());
 
-  const PUBLIC_PATH = '/course/blocks/name/au/';
+  const PUBLIC_PATH =
+    process.env.NX_PUBLIC_PLAYER_PUBLIC_PATH || '/course/blocks/name/au/';
 
   const theConfig = merge(config, {
     ignoreWarnings: [/Failed to parse source map/],

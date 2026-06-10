@@ -47,7 +47,7 @@ import {
 } from './types';
 import { createGridCell, findMatchingPreset, GRID_PRESETS } from './constants';
 import { GridContextProvider } from './GridContext';
-import { CoursePresentationContext } from '../../contexts/ThemeContext';
+import { CoursePresentationContext } from '../../contexts/PresentationContext';
 import {
   resolveLessonThemeCSS,
   resolveBlockMaxWidth,

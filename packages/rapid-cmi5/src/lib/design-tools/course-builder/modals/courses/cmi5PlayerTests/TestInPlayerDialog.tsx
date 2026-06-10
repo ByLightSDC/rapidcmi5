@@ -16,7 +16,13 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useSelector, useDispatch } from 'react-redux';
 import { useContext, useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
-import { ButtonMinorUi, modal, setModal, useRangeApi } from '@rapid-cmi5/ui';
+import {
+  ButtonMinorUi,
+  config,
+  modal,
+  setModal,
+  useRangeApi,
+} from '@rapid-cmi5/ui';
 import { ScenarioApi } from '@rapid-cmi5/cmi5-build-common';
 import {
   courseDataCache,
@@ -35,8 +41,7 @@ import {
 } from './useLaunchInPlayer';
 import { ScenarioSelectionModal } from '../../../../../features/scenarios/components/modals/ScenarioSelectionModal';
 
-const DEFAULT_PLAYER_URL =
-  'http://localhost:4201/course/blocks/name/au/index.html';
+const DEFAULT_PLAYER_URL = `http://localhost:4201${config.PLAYER_PUBLIC_PATH}index.html`;
 // Electron IPC fallback: path relative to repo root
 const DEFAULT_CONFIG_PATH = 'apps/cc-cmi5-player/src/test/config.json';
 

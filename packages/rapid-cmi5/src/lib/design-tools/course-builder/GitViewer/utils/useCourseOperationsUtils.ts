@@ -150,7 +150,7 @@ export const createNewCourseInFs = async ({
           blockDescription: '',
         },
       ],
-      theme: defaultTheme,
+      courseTheme: defaultTheme,
       gitBranch,
       remoteGitUrl,
       buildTime,

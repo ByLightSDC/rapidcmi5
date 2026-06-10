@@ -6,7 +6,7 @@ import { Box, Stack } from '@mui/material';
 import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 import { StatementsContext } from './StatementsContext';
 
-import { CoursePresentationContext } from '../../contexts/ThemeContext';
+import { CoursePresentationContext } from '../../contexts/PresentationContext';
 import { statementFontPresets } from './constants';
 import { useLessonThemeStyles } from '../../../../hooks/useLessonThemeStyles';
 

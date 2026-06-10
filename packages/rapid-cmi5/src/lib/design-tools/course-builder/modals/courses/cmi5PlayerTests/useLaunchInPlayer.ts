@@ -94,8 +94,6 @@ export function useLaunchInPlayer() {
         const auJson = JSON.stringify(currentLesson, null, 2);
         await writeConfigViaIpc(auJson, playerUrl, configPath);
       } else if (repoAccessObject && currentCourse?.basePath) {
-        console.log('Rebduiliding');
-
         if (rebuildPlayerZip && downloadCmi5Player) {
           setStatusMsg('Downloading player zip…');
           await fsInstance.downloadCmi5PlayerIfNeeded(downloadCmi5Player);
@@ -113,7 +111,6 @@ export function useLaunchInPlayer() {
         );
 
         setStatusMsg('Uploading to player…');
-        console.log('iploading');
         await loadLessonViaZip(
           playerUrl,
           zipBlob,
@@ -121,7 +118,6 @@ export function useLaunchInPlayer() {
           courseDirPath,
         );
       } else {
-        console.log('Writing via http');
         const auJson = JSON.stringify(currentLesson, null, 2);
         await writeConfigViaHttp(playerUrl, auJson);
       }

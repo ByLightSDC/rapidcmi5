@@ -1,23 +1,18 @@
 import { createContext, ReactNode, useMemo, useState } from 'react';
 import { Theme } from '@rapid-cmi5/cmi5-build-common';
 
-export interface IThemeContext {
-  /**
-   * Effective theme: course values overlaid by lesson values, then by any
-   * logo overrides set via `setLogoOverrides`.
-   */
+export interface IPresentationContext {
   theme: Theme;
 }
 
 /**
- * Provides the effective Theme (course values overlaid by lesson values)
+ * Provides the effective Theme (org values -> course values -> lesson values (highest precedence))
  * to directive editor components rendered inside the MDXEditor plugin tree.
  *
  * Consumers only see the merged `theme`. To change the base values, update
- * the `lessonTheme` / `courseTheme` props on the surrounding Provider; to
- * override logos at runtime, call `setLogoOverrides`.
+ * the `lessonTheme` / `courseTheme / `orgTheme`` props on the surrounding Provider;
  */
-export const CoursePresentationContext = createContext<IThemeContext>({
+export const CoursePresentationContext = createContext<IPresentationContext>({
   theme: {},
 });
 
@@ -48,8 +43,7 @@ export function CoursePresentationProvider({
   orgTheme?: Theme;
   children: ReactNode;
 }) {
-  console.log('Recieved themes', lessonTheme, courseTheme, orgTheme);
-  const value = useMemo<IThemeContext>(
+  const value = useMemo<IPresentationContext>(
     () => ({
       theme: { ...mergeThemes(orgTheme, courseTheme, lessonTheme) },
     }),

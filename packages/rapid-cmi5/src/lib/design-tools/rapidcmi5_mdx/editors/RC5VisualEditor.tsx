@@ -152,7 +152,7 @@ function RC5VisualEditor() {
   }, [courseData, currentBlockIndex, currentAuIndex]);
 
   const currentCourseTheme = useMemo(() => {
-    return courseData?.theme;
+    return courseData?.courseTheme;
   }, [courseData]);
 
   const themeClass = useRef(

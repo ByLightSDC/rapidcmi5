@@ -19,11 +19,6 @@
           "apps/cc-cmi5-player/src/favicon.ico",
           "apps/cc-cmi5-player/src/assets",
           "apps/cc-cmi5-player/src/cfg.json",
-          {
-            "input": "apps/cc-cmi5-player/src/test/",
-            "glob": "**/*",
-            "output": "./course/blocks/name"
-          },
           "apps/cc-cmi5-player/src/mockServiceWorker.js"
         ],
         "styles": ["apps/cc-cmi5-player/src/styles.css"],

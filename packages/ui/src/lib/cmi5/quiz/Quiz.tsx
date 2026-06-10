@@ -47,7 +47,7 @@ import {
   OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 import { ButtonMinorUi, ButtonMainUi } from '../../utility/buttons';
-import { CoursePresentationContext } from '../mdx/contexts/ThemeContext';
+import { CoursePresentationContext } from '../mdx/contexts/PresentationContext';
 import {
   maxFormWidths,
   useLessonThemeStyles,

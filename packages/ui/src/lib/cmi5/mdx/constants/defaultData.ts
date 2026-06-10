@@ -133,7 +133,7 @@ export const defaultCourseData: CourseData = {
   courseTitle: '',
   courseDescription: '',
   courseId: '',
-  theme: defaultTheme,
+  courseTheme: defaultTheme,
   blocks: [
     {
       blockName: '',

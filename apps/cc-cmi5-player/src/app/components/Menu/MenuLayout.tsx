@@ -34,7 +34,7 @@ export default function MenuLayout() {
   const courseData = useSelector(courseDataSel);
   const orgTheme = useSelector(orgThemeSel);
   const lessonTheme = auJson?.lessonTheme;
-  const courseTheme = courseData?.theme;
+  const courseTheme = courseData?.courseTheme;
   const activeTab = useSelector(activeTabSel);
   const isExitSlide = activeTab === auJson?.slides?.length;
   const themedDividerColor = useSelector(dividerColor);

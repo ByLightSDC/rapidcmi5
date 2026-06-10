@@ -56,7 +56,7 @@ import { SelectorMainUi } from '../../../inputs/selectors/selectors';
 import { debugLogError } from '../../../utility/logger';
 import { editorInPlayback$ } from '../state/vars';
 import { convertMarkdownToMdast } from '../util/conversion';
-import { CoursePresentationContext } from '../contexts/ThemeContext';
+import { CoursePresentationContext } from '../contexts/PresentationContext';
 import {
   resolveLessonThemeCSS,
   resolveBlockMaxWidth,

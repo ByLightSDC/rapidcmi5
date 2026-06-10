@@ -13,7 +13,7 @@ import { QuotesContext } from './QuotesContext';
 import { convertMarkdownToMdast } from '../../util/conversion';
 import { toMarkdown } from 'mdast-util-to-markdown';
 import { imgCache } from '../image/constants';
-import { CoursePresentationContext } from '../../contexts/ThemeContext';
+import { CoursePresentationContext } from '../../contexts/PresentationContext';
 import { fontPresets } from './constants';
 import { useLessonThemeStyles } from '@rapid-cmi5/ui';
 

@@ -49,7 +49,7 @@ import {
 } from './ctfReducer';
 import { Box, Stack } from '@mui/material';
 import { ButtonInfoField, ButtonMainUi } from '../../utility/buttons';
-import { CoursePresentationContext } from '../mdx/contexts/ThemeContext';
+import { CoursePresentationContext } from '../mdx/contexts/PresentationContext';
 import {
   maxFormWidths,
   useLessonThemeStyles,
