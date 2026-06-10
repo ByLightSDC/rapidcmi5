@@ -38,7 +38,11 @@ export const LexicalAudioVisitor: LexicalExportVisitor<AudioNode, Mdast.Html> =
         }
       }
 
-      // Now outerHTML will include all attributes properly (including data-audio-id and original src)
+      const captionSrc = lexicalNode.getCaptionSrc();
+      if (captionSrc) {
+        audio.setAttribute('data-caption-src', captionSrc);
+      }
+
       actions.appendToParent(mdastParent, {
         type: 'html',
         value: audio.outerHTML,

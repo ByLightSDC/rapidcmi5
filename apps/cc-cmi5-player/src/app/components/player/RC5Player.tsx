@@ -61,7 +61,7 @@ import {
   CoursePresentationContext,
 } from '@rapid-cmi5/ui';
 
-import { videoPlugin } from '@rapid-cmi5/react-editor';
+import { audioPlugin, videoPlugin } from '@rapid-cmi5/react-editor';
 import { RC5PlayerToolbar } from './RC5PlayerToolbar';
 import { ActivityDirectiveDescriptor } from './editors/directives/ActivityDirectiveDescriptor';
 import { AuManagerContext } from '../../session/AuManager';
@@ -172,6 +172,7 @@ function RC5Player() {
         disableVideoResize: true,
         disableVideoSettingsButton: true,
       }),
+      audioPlugin({ disableAudioSettingsButton: true }),
       imagePlayerPlugin(),
       animationPlayerPlugin(),
       ariaOverridePlugin(),
