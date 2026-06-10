@@ -2,6 +2,7 @@ import { config, debugLog } from '@rapid-cmi5/ui';
 import { logger } from '../debug';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { setOrgTheme } from '../redux/auReducer';
 import { overrideDevOpsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
 import { cmi5Instance } from '../session/cmi5';
 import { CustomTheme } from '../styles/createPalette';
@@ -134,7 +135,23 @@ export const useOverrideConfigs = () => {
     } catch (error) {
       logger.warn('Override configs load failed', error, 'auManager');
     } finally {
+      dispatch(
+        setOrgTheme({
+          logo: {
+            dark: {
+              fileName: config.THEME.LOGO_DARK,
+              relativePath: config.THEME.LOGO_DARK,
+            },
+            light: {
+              fileName: config.THEME.LOGO_LIGHT,
+              relativePath: config.THEME.LOGO_LIGHT,
+            },
+          },
+        }),
+      );
+
       overrideDevOpsApiClient(config.DEVOPS_API_URL);
+
       setIsOverridesLoaded(true);
     }
   };

@@ -33,11 +33,14 @@ const logoSchema = z.object({
 });
 
 export const ThemeSchema = z.object({
-  contentWidth: z.enum(ContentWidthEnum).optional(),
-  blockPadding: z.enum(BlockPaddingEnum).optional(),
-  blockPaddingCustomValue: z.number().optional(),
-  defaultAlignment: z.enum(DefaultAlignmentEnum).optional(),
-  defaultActivityAlignment: z.enum(DefaultAlignmentEnum).optional(),
+  contentWidth: z.enum(ContentWidthEnum).optional().catch(undefined),
+  blockPadding: z.enum(BlockPaddingEnum).optional().catch(undefined),
+  blockPaddingCustomValue: z.number().optional().catch(undefined),
+  defaultAlignment: z.enum(DefaultAlignmentEnum).optional().catch(undefined),
+  defaultActivityAlignment: z
+    .enum(DefaultAlignmentEnum)
+    .optional()
+    .catch(undefined),
   logo: z
     .object({
       light: logoSchema,

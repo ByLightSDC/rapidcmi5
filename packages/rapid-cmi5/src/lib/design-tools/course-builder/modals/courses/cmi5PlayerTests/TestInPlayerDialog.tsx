@@ -35,7 +35,8 @@ import {
 } from './useLaunchInPlayer';
 import { ScenarioSelectionModal } from '../../../../../features/scenarios/components/modals/ScenarioSelectionModal';
 
-const DEFAULT_PLAYER_URL = 'http://localhost:4201';
+const DEFAULT_PLAYER_URL =
+  'http://localhost:4201/course/blocks/name/au/index.html';
 // Electron IPC fallback: path relative to repo root
 const DEFAULT_CONFIG_PATH = 'apps/cc-cmi5-player/src/test/config.json';
 

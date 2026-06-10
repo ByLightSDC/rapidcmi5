@@ -42,8 +42,10 @@ class PlayerManifestPlugin {
 const AdmZip = require('adm-zip');
 
 const TEST_DIR = path.resolve(__dirname, 'src/test');
-const TEST_CONFIG_PATH = path.join(TEST_DIR, 'config.json');
-const TEST_ASSETS_PATH = path.join(TEST_DIR, 'Assets');
+const TEST_CONFIG_PATH = path.join(TEST_DIR, 'au', 'config.json');
+const TEST_ASSETS_PATH = path.join(TEST_DIR, 'au', 'Assets');
+const TEST_RC5_YAML_PATH = path.join(TEST_DIR, 'RC5.yaml');
+const TEST_COURSE_ASSETS_PATH = path.join(TEST_DIR, 'Assets');
 
 function setCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -152,19 +154,23 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
         });
 
         // POST /upload-lesson-zip — full path with assets, zip bytes sent directly from browser
-        // Query param: lessonDirPath — path inside zip to the lesson folder
-        //              (e.g. "compiled_course/blocks/sandbox/intro")
+        // Query params:
+        //   lessonDirPath — path inside zip to the lesson folder
+        //                   (e.g. "compiled_course/blocks/sandbox/intro")
+        //   courseDirPath — optional path inside zip to the course root
+        //                   (e.g. "compiled_course/blocks/sandbox"). When provided,
+        //                   RC5.yaml and the course-level Assets/ are also extracted
+        //                   into TEST_DIR.
         // Body: raw zip bytes (application/octet-stream)
         devServer.app.post('/upload-lesson-zip', (req, res) => {
           setCors(res);
           const lessonDirPath = req.query['lessonDirPath'];
+          const courseDirPath = req.query['courseDirPath'];
           if (!lessonDirPath) {
-            return res
-              .status(400)
-              .json({
-                success: false,
-                error: 'lessonDirPath query param is required',
-              });
+            return res.status(400).json({
+              success: false,
+              error: 'lessonDirPath query param is required',
+            });
           }
 
           const chunks = [];
@@ -179,12 +185,10 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
               // Extract config.json
               const configEntry = zip.getEntry(`${lessonDirPath}/config.json`);
               if (!configEntry) {
-                return res
-                  .status(400)
-                  .json({
-                    success: false,
-                    error: `config.json not found at ${lessonDirPath}/config.json in zip`,
-                  });
+                return res.status(400).json({
+                  success: false,
+                  error: `config.json not found at ${lessonDirPath}/config.json in zip`,
+                });
               }
               fs.mkdirSync(TEST_DIR, { recursive: true });
               fs.writeFileSync(
@@ -212,7 +216,50 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
                 fs.rmSync(TEST_ASSETS_PATH, { recursive: true, force: true });
               }
 
-              res.json({ success: true, assetsCount: assetEntries.length });
+              let courseAssetsCount = 0;
+              let rc5YamlExtracted = false;
+              if (courseDirPath) {
+                const rc5Entry = zip.getEntry(`${courseDirPath}/RC5.yaml`);
+                if (rc5Entry) {
+                  fs.writeFileSync(
+                    TEST_RC5_YAML_PATH,
+                    rc5Entry.getData().toString('utf-8'),
+                    'utf-8',
+                  );
+                  rc5YamlExtracted = true;
+                } else {
+                  fs.rmSync(TEST_RC5_YAML_PATH, { force: true });
+                }
+
+                const courseAssetsPrefix = `${courseDirPath}/Assets/`;
+                const courseAssetEntries = zip
+                  .getEntries()
+                  .filter(
+                    (e) =>
+                      e.entryName.startsWith(courseAssetsPrefix) &&
+                      !e.isDirectory,
+                  );
+                fs.rmSync(TEST_COURSE_ASSETS_PATH, {
+                  recursive: true,
+                  force: true,
+                });
+                for (const entry of courseAssetEntries) {
+                  const relPath = entry.entryName.slice(
+                    courseAssetsPrefix.length,
+                  );
+                  const destPath = path.join(TEST_COURSE_ASSETS_PATH, relPath);
+                  fs.mkdirSync(path.dirname(destPath), { recursive: true });
+                  fs.writeFileSync(destPath, entry.getData());
+                }
+                courseAssetsCount = courseAssetEntries.length;
+              }
+
+              res.json({
+                success: true,
+                assetsCount: assetEntries.length,
+                courseAssetsCount,
+                rc5YamlExtracted,
+              });
             } catch (err) {
               res.status(500).json({ success: false, error: err.message });
             }
@@ -235,12 +282,10 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
               const { zipPath, lessonDirPath } = JSON.parse(body);
 
               if (!zipPath || !lessonDirPath) {
-                return res
-                  .status(400)
-                  .json({
-                    success: false,
-                    error: 'zipPath and lessonDirPath are required',
-                  });
+                return res.status(400).json({
+                  success: false,
+                  error: 'zipPath and lessonDirPath are required',
+                });
               }
               if (!fs.existsSync(zipPath)) {
                 return res
@@ -253,12 +298,10 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
               // Extract config.json
               const configEntry = zip.getEntry(`${lessonDirPath}/config.json`);
               if (!configEntry) {
-                return res
-                  .status(400)
-                  .json({
-                    success: false,
-                    error: `config.json not found at ${lessonDirPath}/config.json in zip`,
-                  });
+                return res.status(400).json({
+                  success: false,
+                  error: `config.json not found at ${lessonDirPath}/config.json in zip`,
+                });
               }
               fs.mkdirSync(TEST_DIR, { recursive: true });
               fs.writeFileSync(

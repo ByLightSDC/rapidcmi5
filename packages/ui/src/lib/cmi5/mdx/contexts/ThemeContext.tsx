@@ -22,16 +22,16 @@ export const CoursePresentationContext = createContext<IThemeContext>({
 });
 
 /**
- * Shallow-merge an LMS-level theme with course- and lesson-level themes.
- * Lesson values win, then course; LMS values only fill in any remaining gaps.
+ * Shallow-merge an org-level theme with course- and lesson-level themes.
+ * Lesson values win, then course; org values only fill in any remaining gaps.
  */
 export function mergeThemes(
-  lmsTheme?: Theme,
+  orgTheme?: Theme,
   courseTheme?: Theme,
   lessonTheme?: Theme,
 ): Theme {
   return {
-    ...(lmsTheme ?? {}),
+    ...(orgTheme ?? {}),
     ...(courseTheme ?? {}),
     ...(lessonTheme ?? {}),
   };
@@ -40,20 +40,20 @@ export function mergeThemes(
 export function CoursePresentationProvider({
   lessonTheme,
   courseTheme,
-  lmsTheme,
+  orgTheme,
   children,
 }: {
   lessonTheme?: Theme;
   courseTheme?: Theme;
-  lmsTheme?: Theme;
+  orgTheme?: Theme;
   children: ReactNode;
 }) {
-  console.log('Recieved themes', lessonTheme, courseTheme, lmsTheme);
+  console.log('Recieved themes', lessonTheme, courseTheme, orgTheme);
   const value = useMemo<IThemeContext>(
     () => ({
-      theme: { ...mergeThemes(lmsTheme, courseTheme, lessonTheme) },
+      theme: { ...mergeThemes(orgTheme, courseTheme, lessonTheme) },
     }),
-    [lessonTheme, courseTheme, lmsTheme],
+    [lessonTheme, courseTheme, orgTheme],
   );
 
   return (

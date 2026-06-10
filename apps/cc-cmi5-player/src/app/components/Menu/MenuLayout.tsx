@@ -4,7 +4,7 @@ import Drawer from '@mui/material/Drawer';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Box, useTheme } from '@mui/material';
-import { auJsonSel, courseDataSel } from '../../redux/auReducer';
+import { auJsonSel, courseDataSel, orgThemeSel } from '../../redux/auReducer';
 import { activeTabSel } from '../../redux/navigationReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import RC5Player from '../player/RC5Player';
@@ -32,6 +32,7 @@ export default function MenuLayout() {
   const dispatch = useDispatch();
   const auJson = useSelector(auJsonSel);
   const courseData = useSelector(courseDataSel);
+  const orgTheme = useSelector(orgThemeSel);
   const lessonTheme = auJson?.lessonTheme;
   const courseTheme = courseData?.theme;
   const activeTab = useSelector(activeTabSel);
@@ -92,69 +93,70 @@ export default function MenuLayout() {
       <CoursePresentationProvider
         lessonTheme={lessonTheme}
         courseTheme={courseTheme}
+        orgTheme={orgTheme}
       >
-      <Drawer
-        sx={{
-          width: isMenuDrawerOpen ? DRAWER_WIDTH : 0,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            backgroundColor: 'background.default',
-            width: DRAWER_WIDTH,
-            boxSizing: 'border-box',
-            overflow: 'hidden',
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={isMenuDrawerOpen}
-      >
-        <div role="navigation" aria-label="Slides">
-          <TabPanel />
-        </div>
-      </Drawer>
+        <Drawer
+          sx={{
+            width: isMenuDrawerOpen ? DRAWER_WIDTH : 0,
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              backgroundColor: 'background.default',
+              width: DRAWER_WIDTH,
+              boxSizing: 'border-box',
+              overflow: 'hidden',
+            },
+          }}
+          variant="persistent"
+          anchor="left"
+          open={isMenuDrawerOpen}
+        >
+          <div role="navigation" aria-label="Slides">
+            <TabPanel />
+          </div>
+        </Drawer>
 
-      <PanelGroup direction="horizontal">
-        <Panel defaultSize={45} minSize={5}>
-          <Box
-            ref={slideRef}
-            sx={{
-              backgroundColor: palette.background.paper,
-              height: '100%',
-              width: '100%',
-              overflow: 'auto',
-            }}
-          >
-            <LessonToolbar
-              isMenuDrawerOpen={isMenuDrawerOpen}
-              isSplitPanelShown={isSplitPanelShown}
-              onDrawerOpen={handleDrawerOpen}
-              onDrawerClose={handleDrawerClose}
-              onSplitOn={handleSplitOn}
-              onSplitOff={handleSplitOff}
-            />
+        <PanelGroup direction="horizontal">
+          <Panel defaultSize={45} minSize={5}>
+            <Box
+              ref={slideRef}
+              sx={{
+                backgroundColor: palette.background.paper,
+                height: '100%',
+                width: '100%',
+                overflow: 'auto',
+              }}
+            >
+              <LessonToolbar
+                isMenuDrawerOpen={isMenuDrawerOpen}
+                isSplitPanelShown={isSplitPanelShown}
+                onDrawerOpen={handleDrawerOpen}
+                onDrawerClose={handleDrawerClose}
+                onSplitOn={handleSplitOn}
+                onSplitOff={handleSplitOff}
+              />
 
-            {isExitSlide ? (
-              <ExitSlide />
-            ) : !config.CMI5_SSO_ENABLED ? (
-              <ScenarioWrapper>
-                <RC5Player />
-              </ScenarioWrapper>
-            ) : (
-              <TeamScenarioContextProvider isEnabled={true}>
-                <RC5Player />
-              </TeamScenarioContextProvider>
-            )}
-          </Box>
-        </Panel>
-        {isSplitPanelShown && (
-          <>
-            <PanelResizeHandle
-              style={{ width: 4, backgroundColor: themedDividerColor }}
-            />
-            <Panel />
-          </>
-        )}
-      </PanelGroup>
+              {isExitSlide ? (
+                <ExitSlide />
+              ) : !config.CMI5_SSO_ENABLED ? (
+                <ScenarioWrapper>
+                  <RC5Player />
+                </ScenarioWrapper>
+              ) : (
+                <TeamScenarioContextProvider isEnabled={true}>
+                  <RC5Player />
+                </TeamScenarioContextProvider>
+              )}
+            </Box>
+          </Panel>
+          {isSplitPanelShown && (
+            <>
+              <PanelResizeHandle
+                style={{ width: 4, backgroundColor: themedDividerColor }}
+              />
+              <Panel />
+            </>
+          )}
+        </PanelGroup>
       </CoursePresentationProvider>
     </ApiProviders>
   );

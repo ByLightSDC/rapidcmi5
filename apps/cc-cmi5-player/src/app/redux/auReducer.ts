@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './store';
 
 import { rangeDataType, rangeConsoleDataType } from '../types/AuState';
-import { CourseAU, CourseData } from '@rapid-cmi5/cmi5-build-common';
+import { CourseAU, CourseData, Theme } from '@rapid-cmi5/cmi5-build-common';
 import { defaultCourseAuData } from '../session/constants';
 import { CourseAUProgress } from '../types/CourseAUProgress';
 import { initializeCourseAUProgress as createCourseAUProgress } from '../utils/CourseAUProgressHelpers';
@@ -31,6 +31,7 @@ type tAuState = {
   // Triggers lesson style re-render needed to allow activities to go fullwidth
   slideWidth?: number;
   studentId: string;
+  orgTheme?: Theme;
 
   // New consolidated progress tracking
   courseAUProgress?: CourseAUProgress;
@@ -63,6 +64,7 @@ export const initialState: tAuState = {
   rangeConsoleDataAttempts: 0,
   slideWidth: 800,
   studentId: '',
+  orgTheme: undefined,
   courseAUProgress: undefined,
 };
 
@@ -123,6 +125,9 @@ export const auSlice = createSlice({
     },
     setStudentId: (state, action) => {
       state.studentId = action.payload;
+    },
+    setOrgTheme: (state, action: PayloadAction<Theme | undefined>) => {
+      state.orgTheme = action.payload;
     },
     // CourseAUProgress actions
     initializeCourseAUProgress: (state, action) => {
@@ -223,6 +228,7 @@ export const {
   setRangeDataAttempts,
   setRangeConsoleDataAttempts,
   setStudentId,
+  setOrgTheme,
   // CourseAUProgress actions
   initializeCourseAUProgress,
   setCourseAUProgress,
@@ -258,6 +264,7 @@ export const rangeDataAttemptsSel = (state: RootState) =>
 export const rangeConsoleDataAttemptsSel = (state: RootState) =>
   state.au.rangeConsoleDataAttempts;
 export const slideWidth = (state: RootState) => state.au.slideWidth;
+export const orgThemeSel = (state: RootState) => state.au.orgTheme;
 export const courseAUProgressSel = (state: RootState) => {
   const value = state.au.courseAUProgress;
   return value;

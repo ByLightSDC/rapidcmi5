@@ -31,7 +31,7 @@ export const CourseDataSchemaZod = z.object({
   blocks: z
     .array(CourseBlockSchema)
     .describe('Top-level course blocks. Most courses have a single block.'),
-  theme: ThemeSchema,
+  theme: ThemeSchema.optional(),
 });
 
 export const CreateCourseInputSchema = CourseDataSchemaZod.extend({

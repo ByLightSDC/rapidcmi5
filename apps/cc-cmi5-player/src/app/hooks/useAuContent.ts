@@ -29,9 +29,7 @@ function formatZodError(err: ZodError): {
     message: issue.message,
     code: issue.code,
   }));
-  const summary = issues
-    .map((i) => `  • ${i.path}: ${i.message}`)
-    .join('\n');
+  const summary = issues.map((i) => `  • ${i.path}: ${i.message}`).join('\n');
   return { summary, issues };
 }
 
@@ -94,9 +92,7 @@ export const useAuContent = () => {
           'auManager',
         );
         setIsLoaded(false);
-        setContentErrorMessage(
-          `${RC5_FILENAME} schema errors:\n${summary}`,
-        );
+        setContentErrorMessage(`${RC5_FILENAME} schema errors:\n${summary}`);
       } else {
         logger.error(
           'Exception loading course content',

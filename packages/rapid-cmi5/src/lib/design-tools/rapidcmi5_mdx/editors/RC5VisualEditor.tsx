@@ -114,7 +114,6 @@ import { ErrorBoundary } from './ErrorBoundary';
 import { linkDialogPlugin } from '../plugins/link-dialog';
 import { draggableBlockPlugin } from '../plugins/draggable-block';
 import { gutterClickPlugin } from '../plugins/gutter-click/GutterClickPlugin';
-import { CurrentLessonAssetsContextProvider } from '../../../contexts/LessonAssetsContext';
 import { ScenarioContent } from '@rapid-cmi5/cmi5-build-common';
 
 /**
