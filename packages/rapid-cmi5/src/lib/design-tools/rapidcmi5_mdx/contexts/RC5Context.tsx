@@ -50,7 +50,6 @@ import {
   updateDirtyDisplay,
   updateCourseData,
   updateCourseAuData,
-  setDefaultLessonTheme,
   updateCourseSlideData,
   resetCourseOperations,
   saveSlideContent,
@@ -75,7 +74,7 @@ interface IRC5Context {
   ) => void;
   changeLessonName: (newName: string, element: ILessonNode) => void;
   changeSlideName: (newName: string, element: ILessonNode) => void;
-  changeLessonTheme: (theme: Theme, element: ILessonNode) => void;
+  changeCourseTheme: (theme: Theme) => void;
   deleteLesson: (lessonIndex: number) => void;
   discardLessonChanges: () => void;
   saveCourseFile: () => Promise<string[]>;
@@ -97,7 +96,7 @@ export const RC5Context = createContext<IRC5Context>({
   removeEditor: () => {},
   changeCourseName: (newName: string) => {},
   changeLessonMoveOn: (moveOn: MoveOnCriteriaEnum, element: ILessonNode) => {},
-  changeLessonTheme: (theme: Theme, element: ILessonNode) => {},
+  changeCourseTheme: (theme: Theme) => {},
   changeLessonName: (newName: string, element: ILessonNode) => {},
   changeSlideName: (newName: string, element: ILessonNode) => {},
   deleteLesson: (lessonIndex: number) => {},
@@ -311,29 +310,12 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
     [courseData, currentBlockIndex, dispatch],
   );
 
-  const onChangeLessonTheme = useCallback(
-    (lessonTheme: Theme, element: ILessonNode) => {
-      if (element.id === undefined) {
-        return;
-      }
-      const lessonIndex = element.id as number;
-
-      const au: CourseAU = {
-        ...courseData.blocks[currentBlockIndex].aus[lessonIndex],
-        lessonTheme,
-      };
-
-      dispatch(
-        updateCourseAuData({
-          au,
-          blockIndex: currentBlockIndex,
-          lessonIndex,
-        }),
-      );
-      dispatch(setDefaultLessonTheme(lessonTheme));
-      dispatch(updateDirtyDisplay({ reason: 'change lesson theme settings' }));
+  const onChangeCourseTheme = useCallback(
+    (theme: Theme) => {
+      dispatch(updateCourseData({ ...courseData, courseTheme: theme }));
+      dispatch(updateDirtyDisplay({ reason: 'change course theme settings' }));
     },
-    [courseData, currentBlockIndex, dispatch],
+    [courseData],
   );
 
   const onChangeLessonName = useCallback(
@@ -539,14 +521,14 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
    * @param {Message} message Sends message
    * @returns
    */
-  const sendMessage = (message: Message) => {
+  const sendMessage = async (message: Message) => {
     switch (message.type) {
       case MessageType.remountLesson:
         dispatch(setIsLessonMounted(false));
         break;
       case MessageType.changeCourse:
         if (message.meta.coursePath) {
-          handleLoadCourse(message.meta.coursePath);
+          await handleLoadCourse(message.meta.coursePath);
         }
         break;
       case MessageType.createCourse:
@@ -611,7 +593,7 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
         addEditor: onAddEditor,
         changeCourseName: onChangeCourseName,
         changeLessonMoveOn: onChangeLessonMoveOn,
-        changeLessonTheme: onChangeLessonTheme,
+        changeCourseTheme: onChangeCourseTheme,
         changeLessonName: onChangeLessonName,
         changeSlideName: onChangeSlideName,
         deleteLesson: onDeleteLesson,

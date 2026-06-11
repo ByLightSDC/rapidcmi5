@@ -90,8 +90,8 @@ const rightToolbarMargin = 25;
  * @group Toolbar Components
  */
 export const RapidCmi5Toolbar: React.FC<{
-  lessonTheme?: Theme;
-}> = ({ lessonTheme }) => {
+  courseTheme?: Theme;
+}> = ({ courseTheme }) => {
   const changeViewMode = usePublisher(viewMode$);
   const { getMarkdownData } = useContext(RC5Context);
   const realm = useRealm();
@@ -134,8 +134,8 @@ export const RapidCmi5Toolbar: React.FC<{
   }, []);
 
   useEffect(() => {
-    realm.pub(lessonTheme$, lessonTheme);
-  }, [lessonTheme]);
+    realm.pub(lessonTheme$, courseTheme);
+  }, [courseTheme]);
 
   useEffect(() => {
     if (getMarkdownData() !== content) {

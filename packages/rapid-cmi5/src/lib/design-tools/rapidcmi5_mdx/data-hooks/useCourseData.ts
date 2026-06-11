@@ -1,11 +1,10 @@
-import { debugLog, debugLogError } from '@rapid-cmi5/ui';
+import { debugLog, debugLogError, defaultTheme } from '@rapid-cmi5/ui';
 import {
   addCourseOperation,
   courseDataCache,
   currentAu,
   currentBlock,
   currentSlideNum,
-  defaultLessonThemeSel,
   handleCacheChange,
   isLessonMounted,
   reorderLesson,
@@ -41,7 +40,6 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
   const currentBlockIndex = useSelector(currentBlock);
   const currentSlideIndex = useSelector(currentSlideNum);
   const isLessonMountedSel = useSelector(isLessonMounted);
-  const defaultLessonTheme = useSelector(defaultLessonThemeSel);
 
   const { currentCourse, syncCurrentCourseWithGit } = useContext(GitContext);
 
@@ -96,7 +94,7 @@ export const useCourseData = (shouldUseEffects?: boolean) => {
       coursePath: req.coursePath,
       fsInstance: fsInstance,
       r: repoAccessObject,
-      defaultLessonTheme,
+      defaultLessonTheme: defaultTheme,
     });
 
     if (!newCourseData) {

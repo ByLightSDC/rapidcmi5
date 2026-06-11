@@ -25,39 +25,32 @@ export const CoursePresentationContext = createContext<IPresentationContext>({
  * Shallow-merge an org-level theme with course- and lesson-level themes.
  * Lesson values win, then course; org values only fill in any remaining gaps.
  */
-export function mergeThemes(
-  orgTheme?: Theme,
-  courseTheme?: Theme,
-  lessonTheme?: Theme,
-): Theme {
+export function mergeThemes(orgTheme?: Theme, courseTheme?: Theme): Theme {
   return {
     ...(orgTheme ?? {}),
     ...(courseTheme ?? {}),
-    ...(lessonTheme ?? {}),
   };
 }
 
 export function CoursePresentationProvider({
-  lessonTheme,
   courseTheme,
   orgTheme,
   themeMode,
   children,
 }: {
-  lessonTheme?: Theme;
   courseTheme?: Theme;
   orgTheme?: Theme;
   themeMode: ThemeMode;
   children: ReactNode;
 }) {
   const value = useMemo<IPresentationContext>(() => {
-    const theme = mergeThemes(orgTheme, courseTheme, lessonTheme);
+    const theme = mergeThemes(orgTheme, courseTheme);
     const logoPath =
       themeMode === 'dark'
         ? theme.logo?.dark?.relativePath
         : theme.logo?.light?.relativePath;
     return { theme, themeMode, logoPath };
-  }, [lessonTheme, courseTheme, orgTheme, themeMode]);
+  }, [courseTheme, orgTheme, themeMode]);
 
   return (
     <CoursePresentationContext.Provider value={value}>

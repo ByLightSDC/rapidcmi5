@@ -140,16 +140,10 @@ function RC5VisualEditor() {
   const { handleBlobImageFile, isFsLoaded, currentCourse } =
     useContext(GitContext);
   const courseData = useSelector(courseDataCache);
-  const currentAuIndex = useSelector(currentAu);
-  const currentBlockIndex = useSelector(currentBlock);
+
   const editorContainerRef = React.useRef<HTMLDivElement>(null);
   const isEditing = true;
   const pixelTop = (isAppHeaderShowing ? 40 : 0) + (isEditing ? 87 : 0);
-
-  const currentLessonTheme = useMemo(() => {
-    return courseData?.blocks?.[currentBlockIndex]?.aus?.[currentAuIndex]
-      ?.lessonTheme;
-  }, [courseData, currentBlockIndex, currentAuIndex]);
 
   const currentCourseTheme = useMemo(() => {
     return courseData?.courseTheme;
@@ -462,7 +456,7 @@ function RC5VisualEditor() {
         toolbarPlugin({
           toolbarClassName: 'mdxeditor-editor-toolbar',
           toolbarContents: () => (
-            <RapidCmi5Toolbar lessonTheme={currentLessonTheme} />
+            <RapidCmi5Toolbar courseTheme={currentCourseTheme} />
           ),
         }),
       );
@@ -550,9 +544,9 @@ function RC5VisualEditor() {
    * create lesson css
    */
   const lessonStyleCss = useMemo(() => {
-    const css = generateLessonThemeStyleTag(themeClass, currentLessonTheme);
+    const css = generateLessonThemeStyleTag(themeClass, currentCourseTheme);
     return css;
-  }, [themeClass, currentLessonTheme]);
+  }, [themeClass, currentCourseTheme]);
 
   /**
    * Create a wrapped ref that intercepts getMarkdown to inject animations
@@ -774,11 +768,10 @@ function RC5VisualEditor() {
         sx={{ height: `calc(100vh - ${pixelTop}px)` }}
         ref={editorContainerRef}
       >
-        {currentLessonTheme && <style>{lessonStyleCss}</style>}
+        {currentCourseTheme && <style>{lessonStyleCss}</style>}
 
         <ErrorBoundary>
           <CoursePresentationProvider
-            lessonTheme={currentLessonTheme}
             courseTheme={currentCourseTheme}
             themeMode={themeMode}
           >

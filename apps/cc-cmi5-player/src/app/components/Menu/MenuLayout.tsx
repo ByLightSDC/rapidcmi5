@@ -34,7 +34,6 @@ export default function MenuLayout() {
   const auJson = useSelector(auJsonSel);
   const courseData = useSelector(courseDataSel);
   const orgTheme = useSelector(orgThemeSel);
-  const lessonTheme = auJson?.lessonTheme;
   const courseTheme = courseData?.courseTheme;
   const activeTab = useSelector(activeTabSel);
   const isExitSlide = activeTab === auJson?.slides?.length;
@@ -93,7 +92,6 @@ export default function MenuLayout() {
       cmi5Enabled={true}
     >
       <CoursePresentationProvider
-        lessonTheme={lessonTheme}
         courseTheme={courseTheme}
         orgTheme={orgTheme}
         themeMode={themeMode}

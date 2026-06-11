@@ -11,7 +11,6 @@ import {
   Typography,
   alpha,
   useTheme,
-  Box,
   Alert,
 } from '@mui/material';
 
@@ -38,32 +37,27 @@ import {
   ContentWidthEnum,
   DefaultAlignmentEnum,
 } from '@rapid-cmi5/cmi5-build-common';
-import { useAuContext } from '../../data-hooks/useAuContext';
 import {
   blockPaddingDescriptions,
   contentWidthDescriptions,
   defaultAlignmentLabels,
 } from '../../drawers/constants';
 import { RC5Context } from '../../contexts/RC5Context';
-import { ILessonNode } from '../../drawers/components/LessonTreeNode';
-import { currentAu, currentBlock } from '@rapid-cmi5/react-editor';
+import { courseDataCache } from '../../../../redux/courseBuilderReducer';
 
 /**
- * LessonStyle
  * Apply styles globally
  */
 export function LessonStyleDrawer() {
   useLexicalComposerContext(); // Ensures we are inside a Lexical editor context
   const drawerMode = useCellValue(drawerMode$);
   const changeViewMode = usePublisher(drawerMode$);
-  const currentAuIndex = useSelector(currentAu);
-  const currentBlockIndex = useSelector(currentBlock);
+  const courseData = useSelector(courseDataCache);
 
-  const { changeLessonTheme } = useContext(RC5Context);
+  const { changeCourseTheme } = useContext(RC5Context);
   const theme = useTheme();
-  const { au } = useAuContext();
+  const courseTheme = courseData?.courseTheme;
 
-  const [currentLessonNode, setLessonNode] = useState<ILessonNode>();
   const [contentWidth, setContentWidth] = useState<ContentWidthEnum>(
     ContentWidthEnum.None,
   );
@@ -96,116 +90,59 @@ export function LessonStyleDrawer() {
     getDrawerSx,
   } = useDrawerAutoHide('styles', isOpen, showSeq);
 
-  /**
-   * apply content width changes
-   */
   const handleSetContentWidth = useCallback(
     (val: ContentWidthEnum) => {
       setContentWidth(val);
-      if (currentLessonNode) {
-        changeLessonTheme(
-          { ...au?.lessonTheme, contentWidth: val },
-          currentLessonNode,
-        );
-      }
+      changeCourseTheme({ ...courseTheme, contentWidth: val });
     },
-    [currentLessonNode, au],
+    [courseTheme, changeCourseTheme],
   );
 
-  /**
-   * apply block padding changes
-   */
   const handleSetBlockPadding = useCallback(
     (val: BlockPaddingEnum) => {
       setBlockPadding(val);
-      if (currentLessonNode) {
-        changeLessonTheme(
-          { ...au?.lessonTheme, blockPadding: val },
-          currentLessonNode,
-        );
-      }
+      changeCourseTheme({ ...courseTheme, blockPadding: val });
     },
-    [currentLessonNode, au],
+    [courseTheme, changeCourseTheme],
   );
 
-  /**
-   * apply default alignment changes
-   */
   const handleSetCustomPadding = useCallback(
     (val: number) => {
       setCustomPadding(val);
-      if (currentLessonNode) {
-        changeLessonTheme(
-          { ...au?.lessonTheme, blockPaddingCustomValue: val },
-          currentLessonNode,
-        );
-      }
+      changeCourseTheme({ ...courseTheme, blockPaddingCustomValue: val });
     },
-    [currentLessonNode, au],
+    [courseTheme, changeCourseTheme],
   );
 
-  /**
-   * apply default alignment changes
-   */
   const handleSetDefaultAlignment = useCallback(
     (val: DefaultAlignmentEnum) => {
       setDefaultAlignment(val);
-      if (currentLessonNode) {
-        changeLessonTheme(
-          { ...au?.lessonTheme, defaultAlignment: val },
-          currentLessonNode,
-        );
-      }
+      changeCourseTheme({ ...courseTheme, defaultAlignment: val });
     },
-    [currentLessonNode, au],
+    [courseTheme, changeCourseTheme],
   );
 
-  /**
-   * apply default alignment changes
-   */
   const handleSetDefaultActivityAlignment = useCallback(
     (val: DefaultAlignmentEnum) => {
       setDefaultActivityAlignment(val);
-      if (currentLessonNode) {
-        changeLessonTheme(
-          { ...au?.lessonTheme, defaultActivityAlignment: val },
-          currentLessonNode,
-        );
-      }
+      changeCourseTheme({ ...courseTheme, defaultActivityAlignment: val });
     },
-    [currentLessonNode, au],
+    [courseTheme, changeCourseTheme],
   );
 
-  /**
-   * UE set default values from persisted lesson
-   */
   useEffect(() => {
-    if (au?.lessonTheme) {
-      setContentWidth(au?.lessonTheme.contentWidth || ContentWidthEnum.None);
-      setBlockPadding(au?.lessonTheme.blockPadding || BlockPaddingEnum.None);
-      setCustomPadding(au?.lessonTheme.blockPaddingCustomValue ?? 16);
+    if (courseTheme) {
+      setContentWidth(courseTheme.contentWidth || ContentWidthEnum.None);
+      setBlockPadding(courseTheme.blockPadding || BlockPaddingEnum.None);
+      setCustomPadding(courseTheme.blockPaddingCustomValue ?? 16);
       setDefaultAlignment(
-        au?.lessonTheme.defaultAlignment || DefaultAlignmentEnum.Left,
+        courseTheme.defaultAlignment || DefaultAlignmentEnum.Left,
       );
       setDefaultActivityAlignment(
-        au?.lessonTheme.defaultActivityAlignment || DefaultAlignmentEnum.Center,
+        courseTheme.defaultActivityAlignment || DefaultAlignmentEnum.Center,
       );
     }
-  }, [au, au?.lessonTheme]);
-
-  /**
-   * UE creates fake lesson node to pass to change lesson method when a setting is applied
-   */
-  useEffect(() => {
-    setLessonNode({
-      id: currentAuIndex,
-      lesson: currentAuIndex,
-      name: '',
-      parent: null,
-      children: [],
-      block: currentBlockIndex,
-    });
-  }, [currentAuIndex]);
+  }, [courseTheme]);
 
   return (
     <Drawer
@@ -251,7 +188,7 @@ export function LessonStyleDrawer() {
             variant="h6"
             sx={{ color: 'primary.main', flex: 1, marginLeft: 1 }}
           >
-            Lesson Appearance
+            Course Appearance
           </Typography>
           <Tooltip
             title={
@@ -275,13 +212,13 @@ export function LessonStyleDrawer() {
           </Tooltip>
           <IconButton
             onClick={handleClose}
-            aria-label="Close Lesson Appearance"
+            aria-label="Close Course Appearance"
           >
             <CloseIcon />
           </IconButton>
         </Stack>
         <Alert severity="info" sx={{ margin: 2 }}>
-          Settings are applied to the current lesson
+          Settings are applied to the entire course
         </Alert>
         <Grid container sx={{ margin: 2 }}>
           {/* Content Width */}
