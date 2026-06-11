@@ -1,8 +1,11 @@
 import { createContext, ReactNode, useMemo, useState } from 'react';
 import { Theme } from '@rapid-cmi5/cmi5-build-common';
+import { ThemeMode } from '../../../redux/commonAppReducer';
 
 export interface IPresentationContext {
   theme: Theme;
+  themeMode: ThemeMode;
+  logoPath: string | undefined;
 }
 
 /**
@@ -14,6 +17,8 @@ export interface IPresentationContext {
  */
 export const CoursePresentationContext = createContext<IPresentationContext>({
   theme: {},
+  themeMode: 'light',
+  logoPath: undefined,
 });
 
 /**
@@ -36,19 +41,23 @@ export function CoursePresentationProvider({
   lessonTheme,
   courseTheme,
   orgTheme,
+  themeMode,
   children,
 }: {
   lessonTheme?: Theme;
   courseTheme?: Theme;
   orgTheme?: Theme;
+  themeMode: ThemeMode;
   children: ReactNode;
 }) {
-  const value = useMemo<IPresentationContext>(
-    () => ({
-      theme: { ...mergeThemes(orgTheme, courseTheme, lessonTheme) },
-    }),
-    [lessonTheme, courseTheme, orgTheme],
-  );
+  const value = useMemo<IPresentationContext>(() => {
+    const theme = mergeThemes(orgTheme, courseTheme, lessonTheme);
+    const logoPath =
+      themeMode === 'dark'
+        ? theme.logo?.dark?.relativePath
+        : theme.logo?.light?.relativePath;
+    return { theme, themeMode, logoPath };
+  }, [lessonTheme, courseTheme, orgTheme, themeMode]);
 
   return (
     <CoursePresentationContext.Provider value={value}>

@@ -15,14 +15,12 @@ import { CoursePresentationContext, themeColor } from '@rapid-cmi5/ui';
 
 export default function TabPanel() {
   const auJson = useSelector(auJsonSel);
-  const { theme } = useContext(CoursePresentationContext);
+  const { logoPath } = useContext(CoursePresentationContext);
 
   const dispatch = useDispatch();
   const activeTab = useSelector(activeTabSel);
   const courseAUProgress = useSelector(courseAUProgressSel);
   const currentTheme: CustomTheme = useTheme();
-  // Dark or light mode
-  const themeMode = useSelector(themeColor);
 
   // Track whether the Exit tab in the list is currently visible in the scroll container.
   // Only show the pinned Exit button at the bottom when the real one has scrolled out of view.
@@ -30,15 +28,8 @@ export default function TabPanel() {
   const exitTabRef = useRef<HTMLDivElement>(null);
   const [isExitTabVisible, setIsExitTabVisible] = useState(true);
 
-  const currentLogo = useMemo(() => {
-    if (themeMode === 'dark') {
-      return theme.logo?.dark?.relativePath;
-    } else {
-      return theme.logo?.light?.relativePath;
-    }
-  }, [themeMode, theme]);
-
   const iconDimension = '20px';
+  const auLogoWidth = '200px';
 
   const tabClicked = (_: React.SyntheticEvent, newValue: number) => {
     dispatch(setActiveTab(newValue));
@@ -170,15 +161,15 @@ export default function TabPanel() {
           marginRight: '34px',
         }}
       >
-        {currentLogo && (
+        {logoPath && (
           <img
             alt="Course or Logo"
-            width={'200px'}
+            width={auLogoWidth}
             style={{
               padding: '16px',
               paddingBottom: '0px',
             }}
-            src={currentLogo}
+            src={logoPath}
           />
         )}
       </Box>

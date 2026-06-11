@@ -71,6 +71,7 @@ import {
   QuotesContentDirectiveDescriptor,
   StatementsContainerDirectiveDescriptor,
   StatementDirectiveDescriptor,
+  themeColor,
 } from '@rapid-cmi5/ui';
 
 import {
@@ -126,9 +127,7 @@ function RC5VisualEditor() {
   const { addEditor, removeEditor } = useContext(RC5Context);
 
   const currentSlideIndex = useSelector(currentSlideNum);
-
-  const theme = useTheme();
-  const themeMode = theme.palette.mode;
+  const themeMode = useSelector(themeColor);
 
   const [mdxTheme, setMdxTheme] = useState(
     `${themeMode}-theme ${themeMode}-editor nested-editable-${themeMode}`,
@@ -782,6 +781,7 @@ function RC5VisualEditor() {
           <CoursePresentationProvider
             lessonTheme={currentLessonTheme}
             courseTheme={currentCourseTheme}
+            themeMode={themeMode}
           >
             <MDXEditor
               className={mdxTheme}

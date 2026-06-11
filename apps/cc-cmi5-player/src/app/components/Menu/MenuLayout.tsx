@@ -20,6 +20,7 @@ import {
   maxSlideWidth$,
   ApiProviders,
   CoursePresentationProvider,
+  themeColor,
 } from '@rapid-cmi5/ui';
 import { CustomTheme } from '../../styles/createPalette';
 import LessonToolbar from './LessonToolbar';
@@ -41,6 +42,7 @@ export default function MenuLayout() {
   const muiTheme = useTheme();
   const { palette } = muiTheme;
   const slideRef = useRef<HTMLDivElement>(null);
+  const themeMode = useSelector(themeColor);
 
   useCMI5Session();
 
@@ -94,6 +96,7 @@ export default function MenuLayout() {
         lessonTheme={lessonTheme}
         courseTheme={courseTheme}
         orgTheme={orgTheme}
+        themeMode={themeMode}
       >
         <Drawer
           sx={{

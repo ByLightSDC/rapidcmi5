@@ -21,6 +21,7 @@ export function formatZodError(err: ZodError): {
   return { summary, issues };
 }
 
+// Parse the course level RC5.yaml file.
 export function parseCourseDataYaml(yamlText: string) {
   try {
     const parsedYaml = yaml.load(yamlText, { schema: yaml.JSON_SCHEMA });
@@ -37,6 +38,7 @@ export function parseCourseDataYaml(yamlText: string) {
   }
 }
 
+// Parse the lesson level config.json file.
 export function parseAuConfigJson(rawContent: unknown) {
   try {
     const auContent: CourseAU = CourseAuSchema.parse(rawContent);
