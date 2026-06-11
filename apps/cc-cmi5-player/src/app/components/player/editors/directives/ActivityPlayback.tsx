@@ -69,9 +69,9 @@ export const ActivityPlayback: React.FC<
   };
 
   const muiTheme = useTheme();
-  const { theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useContext(CoursePresentationContext);
   const { innerActivitySx, outerSx, outerStyle } = useLessonStyles(
-    theme,
+    rc5Theme,
     mdastNode?.attributes?.contentWidth,
     maxFormWidths.downloadsEditor,
     muiTheme.palette.background.paper,

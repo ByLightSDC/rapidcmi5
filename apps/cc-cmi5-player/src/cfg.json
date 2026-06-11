@@ -14,7 +14,7 @@
         "THEME": {
           "SLIDE_BACKGROUND": "",
           "LOGO_DARK": "./assets/bylight/RapidCMI5_Logo_Dark.png",
-          "LOGO_LIGHT": "./assets/bylight/RapidCMI5_Logo_Light.png"
+          "LOGO_LIGHT": "./assets/bylight/RapidCMI5_Logo_Dark.png"
         }
       }
     },
@@ -32,7 +32,7 @@
         "THEME": {
           "SLIDE_BACKGROUND": "",
           "LOGO_DARK": "./assets/bylight/RapidCMI5_Logo_Dark.png",
-          "LOGO_LIGHT": "./assets/bylight/RapidCMI5_Logo_Light.png"
+          "LOGO_LIGHT": "./assets/bylight/RapidCMI5_Logo_Dark.png"
         }
       }
     },
@@ -44,7 +44,7 @@
         "DEVOPS_GQL_URL": "https://rangeos-graphql.develop-cp.rangeos.engineering/",
         "DEVOPS_GQL_SUBSCRIPTIONS_URL": "wss:////rangeos-graphql.develop-cp.rangeos.engineering",
         "LOGO_DARK": "./assets/bylight/RapidCMI5_Logo_Dark.png",
-        "LOGO_LIGHT": "./assets/bylight/RapidCMI5_Logo_Light.png"
+        "LOGO_LIGHT": "./assets/bylight/RapidCMI5_Logo_Dark.png"
       }
     },
     {
@@ -57,7 +57,7 @@
         "THEME": {
           "SLIDE_BACKGROUND": "",
           "LOGO_DARK": "./assets/bylight/RapidCMI5_Logo_Dark.png",
-          "LOGO_LIGHT": "./assets/bylight/RapidCMI5_Logo_Light.png"
+          "LOGO_LIGHT": "./assets/bylight/RapidCMI5_Logo_Dark.png"
         }
       }
     },
@@ -71,7 +71,7 @@
         "THEME": {
           "SLIDE_BACKGROUND": "",
           "LOGO_DARK": "./assets/bylight/RapidCMI5_Logo_Dark.png",
-          "LOGO_LIGHT": "./assets/bylight/RapidCMI5_Logo_Light.png"
+          "LOGO_LIGHT": "./assets/bylight/RapidCMI5_Logo_Dark.png"
         }
       }
     },

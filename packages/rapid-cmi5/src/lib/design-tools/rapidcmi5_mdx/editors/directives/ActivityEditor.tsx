@@ -91,7 +91,7 @@ export const ActivityEditor: React.FC<
 
   const muiTheme: any = useTheme();
 
-  const { theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useContext(CoursePresentationContext);
   const {
     blockAppearanceOpen,
     contentWidthDisplay,
@@ -102,7 +102,7 @@ export const ActivityEditor: React.FC<
     setBlockAppearanceOpen,
     setContentWidth,
   } = useLessonStyles(
-    theme,
+    rc5Theme,
     mdastNode?.attributes?.contentWidth,
     maxFormWidths.downloadsEditor,
     muiTheme.palette.background.paper,

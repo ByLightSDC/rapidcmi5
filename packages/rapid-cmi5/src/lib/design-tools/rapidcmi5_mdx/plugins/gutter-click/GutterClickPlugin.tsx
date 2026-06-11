@@ -81,14 +81,14 @@ function getNearestBlock(
 
 function GutterClickHandler() {
   const [editor] = useLexicalComposerContext();
-  const { theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useContext(CoursePresentationContext);
   const editorRoot = editor.getRootElement();
 
   if (!editorRoot) return;
 
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
-      const css = resolveLessonThemeCSS(theme);
+      const css = resolveLessonThemeCSS(rc5Theme);
       const maxWidthCss = css?.maxWidth ?? null;
       const { left: contentLeft, right: contentRight } = getContentColumnBounds(
         editorRoot,
@@ -171,7 +171,7 @@ function GutterClickHandler() {
     editorRoot.addEventListener('mousedown', handleMouseDown, true);
     return () =>
       editorRoot.removeEventListener('mousedown', handleMouseDown, true);
-  }, [editor, theme]);
+  }, [editor, rc5Theme]);
 
   return null;
 }

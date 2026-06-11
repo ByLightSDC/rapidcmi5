@@ -85,9 +85,9 @@ export function AuQuiz({
     Array(content.questions.length).fill(null),
   );
   /* Lesson Theme */
-  const { theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useContext(CoursePresentationContext);
   const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
-    theme,
+    rc5Theme,
     maxFormWidths.quizPlayback,
   );
 

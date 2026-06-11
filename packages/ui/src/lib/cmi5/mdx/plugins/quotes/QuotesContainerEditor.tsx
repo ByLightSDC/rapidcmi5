@@ -62,8 +62,8 @@ export const QuotesContainerEditor: React.FC<
 
   //#region lesson style
   const muiTheme = useTheme();
-  const { theme } = useContext(CoursePresentationContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(theme);
+  const { rc5Theme } = useContext(CoursePresentationContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(rc5Theme);
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';

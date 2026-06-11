@@ -105,9 +105,9 @@ function ScenarioConsoles({
   // const scenarioId = debugScenarioId;
 
   /* Lesson Theme */
-  const { theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useContext(CoursePresentationContext);
   const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
-    theme,
+    rc5Theme,
     maxFormWidths.scenarioPlayback,
   );
 

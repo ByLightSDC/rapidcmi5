@@ -188,10 +188,10 @@ export const TableEditor: React.FC<TableEditorProps> = ({
     readOnly$,
     editorInPlayback$,
   );
-  const { theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useContext(CoursePresentationContext);
 
   const muiTheme = useTheme();
-  const resolvedThemeCSS = resolveLessonThemeCSS(theme);
+  const resolvedThemeCSS = resolveLessonThemeCSS(rc5Theme);
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';

@@ -90,7 +90,7 @@ function RC5Player() {
   const [slideAnimations, setSlideAnimations] = useState<AnimationConfig[]>([]);
   const slideWidthSel = useSelector(slideWidth);
 
-  const { theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useContext(CoursePresentationContext);
 
   const themeClass = useRef(
     `lesson-theme-${Math.random().toString(36).slice(2, 9)}`,
@@ -266,12 +266,12 @@ function RC5Player() {
   const lessonStyleCss = useMemo(() => {
     const css = generateLessonThemeStyleTag(
       themeClass,
-      theme,
+      rc5Theme,
       slideWidthSel,
       true,
     );
     return css;
-  }, [themeClass, theme, slideWidthSel]);
+  }, [themeClass, rc5Theme, slideWidthSel]);
 
   /**
    * Set up an event listener for the ESC key.
@@ -385,7 +385,7 @@ function RC5Player() {
         onClick={onClickSlide}
         ref={editorContainerRef}
       >
-        {theme && <style>{lessonStyleCss}</style>}
+        {rc5Theme && <style>{lessonStyleCss}</style>}
         {thePlugins && thePlugins.length > 0 && (
           <div role="tabpanel" aria-label="Slide content" ref={slideContentRef}>
             <div id="toc-portal-target" />

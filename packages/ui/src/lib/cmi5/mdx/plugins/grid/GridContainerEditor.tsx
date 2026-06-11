@@ -70,8 +70,8 @@ export const GridContainerEditor: React.FC<
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
   const muiTheme = useTheme();
-  const { theme } = useContext(CoursePresentationContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(theme);
+  const { rc5Theme } = useContext(CoursePresentationContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(rc5Theme);
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';

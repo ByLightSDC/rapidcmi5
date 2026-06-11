@@ -3,8 +3,7 @@ import { Rc5Theme } from '@rapid-cmi5/cmi5-build-common';
 import { ThemeMode } from '../../../redux/commonAppReducer';
 
 export interface IPresentationContext {
-  theme: Rc5Theme;
-  themeMode: ThemeMode;
+  rc5Theme: Rc5Theme;
   logoPath: string | undefined;
 }
 
@@ -16,8 +15,7 @@ export interface IPresentationContext {
  * the `lessonTheme` / `courseTheme / `orgTheme`` props on the surrounding Provider;
  */
 export const CoursePresentationContext = createContext<IPresentationContext>({
-  theme: {},
-  themeMode: 'light',
+  rc5Theme: {},
   logoPath: undefined,
 });
 
@@ -47,12 +45,12 @@ export function CoursePresentationProvider({
   children: ReactNode;
 }) {
   const value = useMemo<IPresentationContext>(() => {
-    const theme = mergeThemes(orgTheme, courseTheme);
+    const rc5Theme = mergeThemes(orgTheme, courseTheme);
     const logoPath =
       themeMode === 'dark'
-        ? theme.logo?.dark?.relativePath
-        : theme.logo?.light?.relativePath;
-    return { theme, themeMode, logoPath };
+        ? rc5Theme.logo?.dark?.relativePath
+        : rc5Theme.logo?.light?.relativePath;
+    return { rc5Theme, logoPath };
   }, [courseTheme, orgTheme, themeMode]);
 
   return (

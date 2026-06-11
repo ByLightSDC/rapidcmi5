@@ -21,8 +21,8 @@ export const StatementEditor: React.FC<
   const { preset } = useContext(StatementsContext);
 
   //#region Styles
-  const { theme } = useContext(CoursePresentationContext);
-  const { blockPadding } = useLessonThemeStyles(theme);
+  const { rc5Theme } = useContext(CoursePresentationContext);
+  const { blockPadding } = useLessonThemeStyles(rc5Theme);
 
   const scopedClass = useRef(
     `statement-block-${Math.random().toString(36).slice(2, 9)}`,
