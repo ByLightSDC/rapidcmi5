@@ -52,21 +52,40 @@ function setCors(res) {
 }
 // Nx plugins for webpack.
 module.exports = composePlugins(withNx(), withReact(), (config) => {
-  // Exclude monaco-editor from default CSS rules (postcss-loader can't resolve .ttf)
+  // The font stylesheet declares url('./Roboto/Roboto-Bold.ttf') etc. Running it
+  // through Nx's default postcss/css-loader chain makes the loader try to resolve
+  // those .ttf references, which fails on Windows (it mangles the absolute path,
+  // dropping the drive letter -> \code\bylight\...). The .ttf files are already
+  // copied verbatim into the build by the `assets` array in project.json, and the
+  // compiled stylesheet lives alongside them under assets/fonts/, so the relative
+  // url()s resolve at runtime. We therefore exclude this stylesheet (and
+  // monaco-editor's CSS, same .ttf-resolution problem) from the default CSS rules
+  // and handle them with a plain css-loader that leaves url()s untouched.
+  const FONT_CSS = /assets[\\/]fonts[\\/]stylesheet\.css$/;
   config.module.rules.forEach((rule) => {
     if (rule.oneOf) {
       rule.oneOf.forEach((oneOfRule) => {
         if (oneOfRule.test && oneOfRule.test.toString().includes('css')) {
           if (Array.isArray(oneOfRule.exclude)) {
-            oneOfRule.exclude.push(/monaco-editor/);
+            oneOfRule.exclude.push(/monaco-editor/, FONT_CSS);
           } else if (oneOfRule.exclude) {
-            oneOfRule.exclude = [oneOfRule.exclude, /monaco-editor/];
+            oneOfRule.exclude = [oneOfRule.exclude, /monaco-editor/, FONT_CSS];
           } else {
-            oneOfRule.exclude = /monaco-editor/;
+            oneOfRule.exclude = [/monaco-editor/, FONT_CSS];
           }
         }
       });
     }
+  });
+
+  // Handle the font stylesheet without postcss; url:false leaves the relative
+  // .ttf references as-is (the files are copied as static assets, see above).
+  config.module.rules.unshift({
+    test: FONT_CSS,
+    use: [
+      'style-loader',
+      { loader: 'css-loader', options: { url: false } },
+    ],
   });
 
   // Handle monaco-editor CSS without postcss-loader
