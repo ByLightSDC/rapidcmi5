@@ -21,7 +21,7 @@ import { test, expect } from '../fixtures/e2e-tests-course-fixture';
  * decoding / video frame inspection — L2 territory or beyond).
  */
 
-test.describe('view media', () => {
+test.describe('view media @content', () => {
   test('Image slide renders an <img>', async ({ page }) => {
     await page.getByTestId('player-slide-tab-1').click();
 

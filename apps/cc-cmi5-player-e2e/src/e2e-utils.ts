@@ -33,6 +33,21 @@ import { expect } from '@playwright/test';
  *   player-exit-slide          — the synthetic exit-slide content
  *                                (rendered when Exit tab is active)
  *
+ * Activity directives (Quiz / CTF / CodeRunner / Scenario / Consoles /
+ * Download) all share the `directive-activity` root, with the specific
+ * type exposed via the `data-activity-type` attribute on the same node:
+ *
+ *   page.getByTestId('directive-activity')
+ *     .and(page.locator('[data-activity-type="quiz"]'))
+ *
+ * Activity sub-components also have type-level test-ids on their own
+ * rendered root, so tests can confirm not just "an activity rendered"
+ * but "the right activity body rendered":
+ *
+ *   activity-quiz          — the AuQuiz body
+ *   activity-code-runner   — TBD when the slide is added
+ *   activity-scenario      — TBD when the slide is added
+ *
  * Math / Footnote / Animation / FX directives do not have test-ids yet;
  * they'll be added when a test needs them.
  */

@@ -250,6 +250,13 @@ export const useGitOperations = (
   const pushRepo = useCallback(
     async (req: PushType) => {
       const r: RepoAccessObject = getRepoAccess(repoAccessObject);
+      // TEMP DIAGNOSTIC — remove after debugging push auth. Never log the raw token.
+      console.log('[pushRepo diagnostic]', {
+        repoUsername: req.repoUsername,
+        passwordLength: req.repoPassword?.length ?? 0,
+        passwordPrefix: req.repoPassword?.slice(0, 8) ?? '',
+        passwordLast4: req.repoPassword?.slice(-4) ?? '',
+      });
       await gitOperator.gitPush(
         r,
         req.repoUsername,

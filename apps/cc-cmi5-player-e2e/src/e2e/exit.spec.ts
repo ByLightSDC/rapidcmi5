@@ -13,7 +13,7 @@ import { test, expect } from '../fixtures/e2e-tests-course-fixture';
  * needs an LRS mock — deferred).
  */
 
-test.describe('exit', () => {
+test.describe('exit @navigation', () => {
   test('clicking the Exit tab activates the exit slide', async ({ page }) => {
     // While we're on a real slide, the exit-slide content should not exist.
     await expect(page.getByTestId('player-exit-slide')).toHaveCount(0);
@@ -32,12 +32,12 @@ test.describe('exit', () => {
   });
 
   test('Exit tab is reachable from any slide', async ({ page }) => {
-    // Walk from the last real slide (Goodbye = index 6) → Exit. Earlier
-    // tests covered exit-from-slide-0; this one verifies it works from
-    // a non-initial position (catches state-leakage bugs where the
-    // Exit tab is somehow disabled after navigation).
-    await page.getByTestId('player-slide-tab-6').click();
-    await expect(page.getByTestId('player-slide-tab-6')).toHaveAttribute(
+    // Walk from the last real slide (Goodbye = index 7 in the 8-slide
+    // fixture) → Exit. Earlier tests covered exit-from-slide-0; this one
+    // verifies it works from a non-initial position (catches state-leakage
+    // bugs where the Exit tab is somehow disabled after navigation).
+    await page.getByTestId('player-slide-tab-7').click();
+    await expect(page.getByTestId('player-slide-tab-7')).toHaveAttribute(
       'aria-selected',
       'true',
     );

@@ -29,7 +29,7 @@ import { test, expect } from '../fixtures/e2e-tests-course-fixture';
  * `directive-*` test-id; we assert on the rendered text instead.
  */
 
-test.describe('view blocks', () => {
+test.describe('view blocks @content', () => {
   test('Blocks slide renders a tabs directive', async ({ page }) => {
     await page.getByTestId('player-slide-tab-5').click();
 

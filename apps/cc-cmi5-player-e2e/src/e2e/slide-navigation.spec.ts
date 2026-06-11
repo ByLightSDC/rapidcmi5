@@ -3,23 +3,27 @@ import { test, expect } from '../fixtures/e2e-tests-course-fixture';
 /**
  * Slide navigation tests against the player.
  *
- * The fixture uploads the `e2e-tests.zip` course (7 slides + Exit) and
+ * The fixture uploads the `e2e-tests.zip` course (8 slides + Exit) and
  * lands each test on the freshly-loaded player. These tests exercise
  * the **sidebar tab navigation** — the only nav surface the player
  * exposes (no separate prev/next buttons in the toolbar).
  *
  * Slide order:
- *   0 Welcome / 1 Image / 2 Video / 3 Audio / 4 Table / 5 Blocks / 6 Goodbye
+ *   0 Welcome / 1 Image / 2 Video / 3 Audio / 4 Table / 5 Blocks /
+ *   6 Quiz / 7 Goodbye
+ *
+ * (CodeRunner and Scenario will be added once the fixture grows; this
+ * suite's expectations need to grow with the fixture.)
  *
  * **L3 scope:** these assert the click → active-tab transition. They do
  * not verify what content lands inside the slide (that's view-media,
- * view-blocks, etc.).
+ * view-blocks, activities, etc.).
  */
 
-test.describe('slide navigation', () => {
-  test('sidebar renders all 7 slide tabs plus Exit', async ({ page }) => {
+test.describe('slide navigation @navigation', () => {
+  test('sidebar renders all 8 slide tabs plus Exit', async ({ page }) => {
     const slideTabs = page.getByTestId(/^player-slide-tab-\d+$/);
-    await expect(slideTabs).toHaveCount(7);
+    await expect(slideTabs).toHaveCount(8);
     await expect(page.getByTestId('player-exit-tab')).toBeVisible();
   });
 
@@ -30,7 +34,7 @@ test.describe('slide navigation', () => {
     await expect(firstTab).toHaveAttribute('aria-selected', 'true');
 
     // No other tab should be selected.
-    const otherTabs = page.getByTestId(/^player-slide-tab-[1-6]$/);
+    const otherTabs = page.getByTestId(/^player-slide-tab-[1-7]$/);
     for (let i = 0; i < (await otherTabs.count()); i++) {
       await expect(otherTabs.nth(i)).toHaveAttribute(
         'aria-selected',
@@ -57,7 +61,7 @@ test.describe('slide navigation', () => {
   test('every slide tab can be activated by clicking', async ({ page }) => {
     // Walk forward through every slide. This catches a tab being
     // disabled/missing or activation failing for a specific index.
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 8; i++) {
       const tab = page.getByTestId(`player-slide-tab-${i}`);
       await tab.click();
       await expect(tab).toHaveAttribute('aria-selected', 'true');
@@ -78,6 +82,7 @@ test.describe('slide navigation', () => {
       'Audio',
       'Table',
       'Blocks',
+      'Quiz',
       'Goodbye',
     ];
     for (let i = 0; i < expectedTitles.length; i++) {

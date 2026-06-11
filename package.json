@@ -29,6 +29,10 @@
     "nxe:e2e:codegen": "playwright codegen --target=playwright-test http://127.0.0.1:4200",
     "nxe:e2e:record": "cross-env PW_PROJECT=chromium nx e2e rapid-cmi5-electron-frontend -- --project=chromium --headed --workers=1 -g \"recording stub\"",
     "player:e2e": "nx e2e cc-cmi5-player-e2e",
+    "player:e2e:smoke": "nx e2e cc-cmi5-player-e2e --configuration=smoke",
+    "player:e2e:navigation": "nx e2e cc-cmi5-player-e2e --configuration=navigation",
+    "player:e2e:content": "nx e2e cc-cmi5-player-e2e --configuration=content",
+    "player:e2e:activities": "nx e2e cc-cmi5-player-e2e --configuration=activities",
     "player:e2e:debug": "nx e2e cc-cmi5-player-e2e -- --project=chromium --headed --workers=1 --reporter=list",
     "player:e2e:ui": "nx e2e cc-cmi5-player-e2e -- --project=chromium --ui",
     "player:e2e:report": "playwright show-report dist/.playwright/apps/cc-cmi5-player-e2e/playwright-report"

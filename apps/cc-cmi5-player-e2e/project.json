@@ -27,6 +27,22 @@
         "chromium-ui": {
           "project": ["chromium"],
           "ui": true
+        },
+        "smoke": {
+          "project": ["chromium"],
+          "grep": "@smoke"
+        },
+        "navigation": {
+          "project": ["chromium"],
+          "grep": "@navigation"
+        },
+        "content": {
+          "project": ["chromium"],
+          "grep": "@content"
+        },
+        "activities": {
+          "project": ["chromium"],
+          "grep": "@activities"
         }
       },
       "metadata": {

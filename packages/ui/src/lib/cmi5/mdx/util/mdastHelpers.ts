@@ -18,8 +18,6 @@ export function getAttributeValue(
 export function normalizeTableCellChildren(
   nodes: (Mdast.BlockContent | Mdast.DefinitionContent)[] = [],
 ): Mdast.PhrasingContent[] {
-  console.log('normalizeTableCellChildren', nodes);
-
   const result: Mdast.PhrasingContent[] = [];
 
   for (const n of nodes) {
@@ -56,7 +54,6 @@ export function normalizeTableCellChildren(
     //   });
     // }
   }
-  console.log('result', result);
   return result;
 }
 
@@ -83,5 +80,3 @@ export function isTag(node: any, tagName: string): node is MdxJsxFlowElement {
     node.name === tagName
   );
 }
-
-

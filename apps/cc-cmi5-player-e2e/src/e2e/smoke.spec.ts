@@ -26,7 +26,7 @@ import {
  * exit — see [Student backlog](../../../../docs/moodle-player-e2e-strategy.md)).
  */
 
-test.describe('player infrastructure', () => {
+test.describe('player infrastructure @smoke', () => {
   test('serves on :4201 and mounts the React root', async ({ page }) => {
     await page.goto(`/${SYNTHETIC_LAUNCH_PARAMS}`);
     await page.waitForLoadState('domcontentloaded');
@@ -43,7 +43,7 @@ test.describe('player infrastructure', () => {
   });
 });
 
-test.describe('e2e-tests (foundation fixture)', () => {
+test.describe('e2e-tests (foundation fixture) @smoke', () => {
   test('uploads the published course zip and the player loads it', async ({
     page,
     request,
