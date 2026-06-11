@@ -127,7 +127,8 @@ function RC5VisualEditor() {
   const { addEditor, removeEditor } = useContext(RC5Context);
 
   const currentSlideIndex = useSelector(currentSlideNum);
-  const themeMode = useSelector(themeColor);
+  const muiTheme = useTheme();
+  const themeMode = muiTheme.palette.mode;
 
   const [mdxTheme, setMdxTheme] = useState(
     `${themeMode}-theme ${themeMode}-editor nested-editable-${themeMode}`,
@@ -338,8 +339,6 @@ function RC5VisualEditor() {
     },
     [currentAuPathSel, currentRepoAccessObject, isFsLoaded],
   );
-
-  const muiTheme = useTheme();
 
   const thePlugins = useMemo(() => {
     const initialList: RealmPlugin[] = [
