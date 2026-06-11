@@ -7,6 +7,7 @@ import {
   CourseDataSchemaZod,
 } from '../types';
 import * as yaml from 'js-yaml';
+import { migrateCourseData } from './migrations';
 
 export function formatZodError(err: ZodError): {
   summary: string;
@@ -25,7 +26,10 @@ export function formatZodError(err: ZodError): {
 export function parseCourseDataYaml(yamlText: string) {
   try {
     const parsedYaml = yaml.load(yamlText, { schema: yaml.JSON_SCHEMA });
-    const courseContent: CourseData = CourseDataSchemaZod.parse(parsedYaml);
+
+    const migratedYaml = migrateCourseData(parsedYaml);
+
+    const courseContent: CourseData = CourseDataSchemaZod.parse(migratedYaml);
     return courseContent;
   } catch (err) {
     if (err instanceof ZodError) {

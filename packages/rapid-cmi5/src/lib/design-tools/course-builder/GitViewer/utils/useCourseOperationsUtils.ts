@@ -7,11 +7,12 @@ import {
   CourseAU,
   CourseData,
   KSATElementType,
-  Theme,
+  Rc5Theme,
   Operation,
   RC5_VERSION,
   ScenarioContent,
   SlideType,
+  parseCourseDataYaml,
 } from '@rapid-cmi5/cmi5-build-common';
 import { courseNameInUseMessage } from '../session/constants';
 import { GitFS, MAX_FS_SLUG_LENGTH } from './fileSystem';
@@ -291,14 +292,14 @@ export const findAllCourses = async ({
 export const readRC5Meta = async (
   r: RepoAccessObject,
   fsInstance: GitFS,
-
   metaPath: string,
 ): Promise<CourseData | null> => {
   try {
     const navContent = await fsInstance.getFileContent(r, join(metaPath));
     if (!navContent?.content) throw new Error('No content in metadata');
 
-    return YAML.parse(navContent.content.toString()) as CourseData;
+    const courseData = parseCourseDataYaml(navContent.content);
+    return courseData;
   } catch (err) {
     debugLogError(`Failed to parse YAML: ${err}`);
     return null;
@@ -539,7 +540,7 @@ export interface CreateLessonOptions extends FsContextOptions {
   blockIndex: number;
   auName: string;
   coursePath: string;
-  defaultLessonTheme?: Theme;
+  defaultLessonTheme?: Rc5Theme;
 }
 
 export const createLesson = async ({

@@ -75,7 +75,7 @@ import { UndoRedo } from './components/UndoRedo';
 import { InsertQuotes } from './components/InsertQuotes';
 import { InsertStatements } from './components/InsertStatements';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
-import { Theme } from '@rapid-cmi5/cmi5-build-common';
+import { Rc5Theme } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Layout Constants
@@ -90,8 +90,8 @@ const rightToolbarMargin = 25;
  * @group Toolbar Components
  */
 export const RapidCmi5Toolbar: React.FC<{
-  lessonTheme?: Theme;
-}> = ({ lessonTheme }) => {
+  courseTheme?: Rc5Theme;
+}> = ({ courseTheme }) => {
   const changeViewMode = usePublisher(viewMode$);
   const { getMarkdownData } = useContext(RC5Context);
   const realm = useRealm();
@@ -134,8 +134,8 @@ export const RapidCmi5Toolbar: React.FC<{
   }, []);
 
   useEffect(() => {
-    realm.pub(lessonTheme$, lessonTheme);
-  }, [lessonTheme]);
+    realm.pub(lessonTheme$, courseTheme);
+  }, [courseTheme]);
 
   useEffect(() => {
     if (getMarkdownData() !== content) {

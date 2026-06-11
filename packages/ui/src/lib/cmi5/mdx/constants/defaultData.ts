@@ -15,7 +15,7 @@ import {
   SlideType,
   BlockPaddingEnum,
   DefaultAlignmentEnum,
-  Theme,
+  Rc5Theme,
 } from '@rapid-cmi5/cmi5-build-common';
 
 export const jsonFormatSpaces = 1;
@@ -26,7 +26,7 @@ export const defaultEmptySlide: SlideType = {
   filepath: '',
 };
 
-export const defaultTheme: Theme = {
+export const defaultTheme: Rc5Theme = {
   blockPadding: BlockPaddingEnum.None,
   contentWidth: ContentWidthEnum.None,
   defaultAlignment: DefaultAlignmentEnum.Left,

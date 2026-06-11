@@ -1,9 +1,9 @@
-import { createContext, ReactNode, useMemo, useState } from 'react';
-import { Theme } from '@rapid-cmi5/cmi5-build-common';
+import { createContext, ReactNode, useMemo } from 'react';
+import { Rc5Theme } from '@rapid-cmi5/cmi5-build-common';
 import { ThemeMode } from '../../../redux/commonAppReducer';
 
 export interface IPresentationContext {
-  theme: Theme;
+  theme: Rc5Theme;
   themeMode: ThemeMode;
   logoPath: string | undefined;
 }
@@ -26,38 +26,34 @@ export const CoursePresentationContext = createContext<IPresentationContext>({
  * Lesson values win, then course; org values only fill in any remaining gaps.
  */
 export function mergeThemes(
-  orgTheme?: Theme,
-  courseTheme?: Theme,
-  lessonTheme?: Theme,
-): Theme {
+  orgTheme?: Rc5Theme,
+  courseTheme?: Rc5Theme,
+): Rc5Theme {
   return {
     ...(orgTheme ?? {}),
     ...(courseTheme ?? {}),
-    ...(lessonTheme ?? {}),
   };
 }
 
 export function CoursePresentationProvider({
-  lessonTheme,
   courseTheme,
   orgTheme,
   themeMode,
   children,
 }: {
-  lessonTheme?: Theme;
-  courseTheme?: Theme;
-  orgTheme?: Theme;
+  courseTheme?: Rc5Theme;
+  orgTheme?: Rc5Theme;
   themeMode: ThemeMode;
   children: ReactNode;
 }) {
   const value = useMemo<IPresentationContext>(() => {
-    const theme = mergeThemes(orgTheme, courseTheme, lessonTheme);
+    const theme = mergeThemes(orgTheme, courseTheme);
     const logoPath =
       themeMode === 'dark'
         ? theme.logo?.dark?.relativePath
         : theme.logo?.light?.relativePath;
     return { theme, themeMode, logoPath };
-  }, [lessonTheme, courseTheme, orgTheme, themeMode]);
+  }, [courseTheme, orgTheme, themeMode]);
 
   return (
     <CoursePresentationContext.Provider value={value}>

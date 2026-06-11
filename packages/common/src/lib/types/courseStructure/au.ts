@@ -1,6 +1,5 @@
 import z from 'zod/v4';
 import { KSATElementSchema } from '../activities/ksat';
-import { ThemeSchema } from '../ui/theme';
 import { SlideSchema } from './slide';
 import { MoveOnCriteriaEnum } from '../activities/baseActivity';
 
@@ -32,7 +31,6 @@ export const CourseAuSchema = z.object({
     ),
   ksats: z.array(KSATElementSchema).optional(),
   moveOnCriteria: z.enum(MoveOnCriteriaEnum).optional(),
-  lessonTheme: ThemeSchema.optional(),
 });
 
 export type CourseAU = z.infer<typeof CourseAuSchema>;
