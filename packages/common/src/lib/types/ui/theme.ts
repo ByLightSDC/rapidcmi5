@@ -49,4 +49,4 @@ export const ThemeSchema = z.object({
     .optional(),
 });
 
-export type Theme = z.infer<typeof ThemeSchema>;
+export type Rc5Theme = z.infer<typeof ThemeSchema>;

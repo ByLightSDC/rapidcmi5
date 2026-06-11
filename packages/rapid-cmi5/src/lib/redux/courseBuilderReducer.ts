@@ -3,7 +3,7 @@ import {
   SlideType,
   Operation,
   CourseAU,
-  Theme,
+  Rc5Theme,
   ScenarioContent,
 } from '@rapid-cmi5/cmi5-build-common';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';

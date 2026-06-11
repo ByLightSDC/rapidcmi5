@@ -71,7 +71,6 @@ import {
   QuotesContentDirectiveDescriptor,
   StatementsContainerDirectiveDescriptor,
   StatementDirectiveDescriptor,
-  themeColor,
 } from '@rapid-cmi5/ui';
 
 import {
@@ -94,8 +93,6 @@ import {
   updateDirtyDisplay,
   updateTeamScenario,
   courseDataCache,
-  currentAu,
-  currentBlock,
 } from '../../../redux/courseBuilderReducer';
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
 

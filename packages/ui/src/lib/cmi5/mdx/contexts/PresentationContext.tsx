@@ -1,9 +1,9 @@
-import { createContext, ReactNode, useMemo, useState } from 'react';
-import { Theme } from '@rapid-cmi5/cmi5-build-common';
+import { createContext, ReactNode, useMemo } from 'react';
+import { Rc5Theme } from '@rapid-cmi5/cmi5-build-common';
 import { ThemeMode } from '../../../redux/commonAppReducer';
 
 export interface IPresentationContext {
-  theme: Theme;
+  theme: Rc5Theme;
   themeMode: ThemeMode;
   logoPath: string | undefined;
 }
@@ -25,7 +25,10 @@ export const CoursePresentationContext = createContext<IPresentationContext>({
  * Shallow-merge an org-level theme with course- and lesson-level themes.
  * Lesson values win, then course; org values only fill in any remaining gaps.
  */
-export function mergeThemes(orgTheme?: Theme, courseTheme?: Theme): Theme {
+export function mergeThemes(
+  orgTheme?: Rc5Theme,
+  courseTheme?: Rc5Theme,
+): Rc5Theme {
   return {
     ...(orgTheme ?? {}),
     ...(courseTheme ?? {}),
@@ -38,8 +41,8 @@ export function CoursePresentationProvider({
   themeMode,
   children,
 }: {
-  courseTheme?: Theme;
-  orgTheme?: Theme;
+  courseTheme?: Rc5Theme;
+  orgTheme?: Rc5Theme;
   themeMode: ThemeMode;
   children: ReactNode;
 }) {

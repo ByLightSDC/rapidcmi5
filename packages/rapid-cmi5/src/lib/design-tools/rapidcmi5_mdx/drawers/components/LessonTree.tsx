@@ -30,7 +30,7 @@ import {
   CourseData,
   defaultSlideContent,
   MoveOnCriteriaEnum,
-  Theme,
+  Rc5Theme,
 } from '@rapid-cmi5/cmi5-build-common';
 
 import { RC5Context } from '../../contexts/RC5Context';

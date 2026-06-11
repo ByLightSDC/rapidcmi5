@@ -2,7 +2,7 @@ import {
   BlockPaddingEnum,
   ContentWidthEnum,
   DefaultAlignmentEnum,
-  Theme,
+  Rc5Theme,
 } from '@rapid-cmi5/cmi5-build-common';
 
 export const CONTENT_WIDTH_MAP: Record<ContentWidthEnum, string | null> = {
@@ -61,7 +61,7 @@ export function resolveBlockMaxWidth(
  * Resolves a Theme to concrete CSS values.
  * Returns null if no theme is set (avoids unnecessary style injection).
  */
-export function resolveLessonThemeCSS(theme?: Theme): {
+export function resolveLessonThemeCSS(theme?: Rc5Theme): {
   maxWidth: string | null;
   blockPadding: string | null;
   textAlign: string;
@@ -99,7 +99,7 @@ export function resolveLessonThemeCSS(theme?: Theme): {
  */
 export function generateLessonThemeStyleTag(
   scopedClass: string,
-  theme?: Theme,
+  theme?: Rc5Theme,
   slideWidth?: number,
   isPlayback?: boolean,
 ): string {

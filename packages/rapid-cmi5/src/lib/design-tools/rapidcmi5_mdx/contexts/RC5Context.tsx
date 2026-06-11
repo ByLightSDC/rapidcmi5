@@ -25,7 +25,7 @@ import {
   MoveOnCriteriaEnum,
   Operation,
   CourseAU,
-  Theme,
+  Rc5Theme,
   CourseData,
   SlideType,
 } from '@rapid-cmi5/cmi5-build-common';
@@ -74,7 +74,7 @@ interface IRC5Context {
   ) => void;
   changeLessonName: (newName: string, element: ILessonNode) => void;
   changeSlideName: (newName: string, element: ILessonNode) => void;
-  changeCourseTheme: (theme: Theme) => void;
+  changeCourseTheme: (theme: Rc5Theme) => void;
   deleteLesson: (lessonIndex: number) => void;
   discardLessonChanges: () => void;
   saveCourseFile: () => Promise<string[]>;
@@ -96,7 +96,7 @@ export const RC5Context = createContext<IRC5Context>({
   removeEditor: () => {},
   changeCourseName: (newName: string) => {},
   changeLessonMoveOn: (moveOn: MoveOnCriteriaEnum, element: ILessonNode) => {},
-  changeCourseTheme: (theme: Theme) => {},
+  changeCourseTheme: (theme: Rc5Theme) => {},
   changeLessonName: (newName: string, element: ILessonNode) => {},
   changeSlideName: (newName: string, element: ILessonNode) => {},
   deleteLesson: (lessonIndex: number) => {},
@@ -311,7 +311,7 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
   );
 
   const onChangeCourseTheme = useCallback(
-    (theme: Theme) => {
+    (theme: Rc5Theme) => {
       dispatch(updateCourseData({ ...courseData, courseTheme: theme }));
       dispatch(updateDirtyDisplay({ reason: 'change course theme settings' }));
     },

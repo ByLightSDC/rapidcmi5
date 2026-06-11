@@ -1,7 +1,7 @@
 import {
   ContentWidthEnum,
   DefaultAlignmentEnum,
-  Theme,
+  Rc5Theme,
   OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
@@ -43,7 +43,7 @@ type UseLessonStylesReturn = {
 };
 
 export const useLessonStyles = (
-  lessonTheme: Theme | undefined,
+  lessonTheme: Rc5Theme | undefined,
   overrideContentWidthStr?: ContentWidthEnum,
   maxWidth?: number, //FUTURE
   bgColor?: string,
