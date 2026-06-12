@@ -1,7 +1,6 @@
 // --- Lesson Theme Defaults ---
 
 import { z } from 'zod/v4';
-
 export enum ContentWidthEnum {
   None = 'none',
   Small = 'small',
@@ -28,7 +27,6 @@ export const blockPaddingOptions = Object.values(BlockPaddingEnum);
 export const defaultAlignmentOptions = Object.values(DefaultAlignmentEnum);
 
 const logoSchema = z.object({
-  fileName: z.string().optional(),
   relativePath: z.string().optional(),
 });
 
@@ -47,6 +45,12 @@ export const ThemeSchema = z.object({
       dark: logoSchema,
     })
     .optional(),
+  faviconUrl: z.string().optional(),
+  playerTitle: z.string().optional(),
+  // mui themes, we need to fix some of our packages to get this to work with
+  // the correct types
+  light: z.any().optional(),
+  dark: z.any().optional(),
 });
 
 export type Rc5Theme = z.infer<typeof ThemeSchema>;

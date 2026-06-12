@@ -89,7 +89,7 @@ export const ActivityPlayback: React.FC<
     if (!isConfigInitialized) {
       return base;
     }
-    const overriddenTheme = deepmerge(base, config.THEME.DARK);
+    const overriddenTheme = deepmerge(base, rc5Theme.dark);
     return overriddenTheme;
   }, [isConfigInitialized]);
 

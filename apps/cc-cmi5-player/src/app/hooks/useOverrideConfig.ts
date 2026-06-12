@@ -1,22 +1,12 @@
-import { config, debugLog } from '@rapid-cmi5/ui';
+import { config } from '@rapid-cmi5/ui';
+import { deepmerge } from '@mui/utils';
 import { logger } from '../debug';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { setOrgTheme } from '../redux/auReducer';
 import { overrideDevOpsApiClient } from '@rangeos-nx/frontend/clients/devops-api';
 import { cmi5Instance } from '../session/cmi5';
-import { CustomTheme } from '../styles/createPalette';
-
-interface ThemeConfig {
-  SLIDE_BACKGROUND?: string;
-  LOGO_DARK?: string;
-  LOGO_LIGHT?: string;
-  LOGO_WIDTH?: string;
-  LIGHT?: CustomTheme;
-  DARK?: CustomTheme;
-  TITLE?: string;
-  FAV_ICON?: string;
-}
+import { Rc5Theme } from '@rapid-cmi5/cmi5-build-common';
+import { setOrgTheme } from '../redux/auReducer';
+import { useDispatch } from 'react-redux';
 
 interface LocationConfig {
   DEVOPS_API_URL?: string;
@@ -26,7 +16,7 @@ interface LocationConfig {
   KEYCLOAK_REALM?: string;
   KEYCLOAK_CLIENT_ID?: string;
   KEYCLOAK_SCOPE?: string;
-  THEME?: ThemeConfig;
+  THEME?: Rc5Theme;
 }
 
 interface AppConfig {
@@ -37,25 +27,22 @@ interface AppConfig {
   }[];
 }
 
-/**
- * applies title and fav ico
- */
-const applyThemeEffects = () => {
-  if (config.THEME.TITLE) {
-    document.title = config.THEME.TITLE;
+const applyThemeEffects = (theme: Rc5Theme) => {
+  if (theme.playerTitle) {
+    document.title = theme.playerTitle;
   }
-  if (config.THEME.FAV_ICON) {
+  if (theme.faviconUrl) {
     let link = document.querySelector<HTMLLinkElement>("link[rel='icon']");
     if (!link) {
       link = document.createElement('link');
       link.rel = 'icon';
       document.head.appendChild(link);
     }
-    link.href = config.THEME.FAV_ICON;
+    link.href = theme.faviconUrl;
   }
 };
 
-const applyConfig = (cfg: LocationConfig) => {
+const applyLocationOverrides = (cfg: LocationConfig) => {
   if (cfg.DEVOPS_API_URL != null) config.DEVOPS_API_URL = cfg.DEVOPS_API_URL;
   if (cfg.DEVOPS_GQL_URL != null) config.DEVOPS_GQL_URL = cfg.DEVOPS_GQL_URL;
   if (cfg.DEVOPS_GQL_SUBSCRIPTIONS_URL != null)
@@ -65,26 +52,12 @@ const applyConfig = (cfg: LocationConfig) => {
   if (cfg.KEYCLOAK_CLIENT_ID != null)
     config.KEYCLOAK_CLIENT_ID = cfg.KEYCLOAK_CLIENT_ID;
   if (cfg.KEYCLOAK_SCOPE != null) config.KEYCLOAK_SCOPE = cfg.KEYCLOAK_SCOPE;
-  if (cfg.THEME != null) {
-    if (cfg.THEME.LIGHT) config.THEME.LIGHT = cfg.THEME.LIGHT;
-    if (cfg.THEME.DARK) config.THEME.DARK = cfg.THEME.DARK;
-    if (cfg.THEME.LOGO_DARK) config.THEME.LOGO_DARK = cfg.THEME.LOGO_DARK;
-    if (cfg.THEME.LOGO_LIGHT) config.THEME.LOGO_LIGHT = cfg.THEME.LOGO_LIGHT;
-    if (cfg.THEME.LOGO_WIDTH) config.THEME.LOGO_WIDTH = cfg.THEME.LOGO_WIDTH;
-    if (cfg.THEME.TITLE) config.THEME.TITLE = cfg.THEME.TITLE;
-    if (cfg.THEME.FAV_ICON) config.THEME.FAV_ICON = cfg.THEME.FAV_ICON;
-
-    if (cfg.THEME.SLIDE_BACKGROUND)
-      config.THEME.SLIDE_BACKGROUND = cfg.THEME.SLIDE_BACKGROUND;
-
-    applyThemeEffects();
-  }
 };
 
 export const useOverrideConfigs = () => {
   const [isOverridesLoaded, setIsOverridesLoaded] = useState(false);
-  const dispatch = useDispatch();
 
+  const dispatch = useDispatch();
   const loadOverrides = async (path: string, inProductionMode = true) => {
     let launchData;
     if (inProductionMode) {
@@ -95,6 +68,8 @@ export const useOverrideConfigs = () => {
         );
       }
     }
+
+    let mergedTheme: Rc5Theme | undefined;
 
     try {
       const response = await fetch(path);
@@ -110,21 +85,23 @@ export const useOverrideConfigs = () => {
 
       if (!deployment) throw Error('No default is defined in the cfg.json');
 
-      applyConfig(deployment.config);
+      applyLocationOverrides(deployment.config);
+      console.log('deployment', deployment);
+      mergedTheme = deployment.config.THEME;
 
       if (inProductionMode && launchData?.launchParameters) {
         try {
-          logger.debug('launch params', launchData.launchParameters);
           const parsedLaunchParams: LocationConfig = JSON.parse(
             launchData.launchParameters,
           );
-          applyConfig(parsedLaunchParams);
-          logger.debug(
-            'Overrode config from launch params',
-            parsedLaunchParams,
-            'auManager',
-          );
-        } catch (e) {
+          applyLocationOverrides(parsedLaunchParams);
+          if (parsedLaunchParams.THEME) {
+            mergedTheme = deepmerge(
+              mergedTheme ?? {},
+              parsedLaunchParams.THEME,
+            ) as Rc5Theme;
+          }
+        } catch (err) {
           logger.warn(
             'Failed to parse launchParameters as JSON',
             { launchParameters: launchData.launchParameters },
@@ -132,23 +109,14 @@ export const useOverrideConfigs = () => {
           );
         }
       }
-    } catch (error) {
-      logger.warn('Override configs load failed', error, 'auManager');
+    } catch (err) {
+      logger.warn('Override configs load failed', err, 'auManager');
     } finally {
-      dispatch(
-        setOrgTheme({
-          logo: {
-            dark: {
-              fileName: config.THEME.LOGO_DARK,
-              relativePath: config.THEME.LOGO_DARK,
-            },
-            light: {
-              fileName: config.THEME.LOGO_LIGHT,
-              relativePath: config.THEME.LOGO_LIGHT,
-            },
-          },
-        }),
-      );
+      if (mergedTheme) {
+        applyThemeEffects(mergedTheme);
+        console.log('merged themes ', mergedTheme);
+        dispatch(setOrgTheme(mergedTheme));
+      }
 
       overrideDevOpsApiClient(config.DEVOPS_API_URL);
 

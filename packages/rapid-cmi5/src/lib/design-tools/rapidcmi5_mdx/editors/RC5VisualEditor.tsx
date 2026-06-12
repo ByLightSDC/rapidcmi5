@@ -71,6 +71,8 @@ import {
   QuotesContentDirectiveDescriptor,
   StatementsContainerDirectiveDescriptor,
   StatementDirectiveDescriptor,
+  lightTheme,
+  darkTheme,
 } from '@rapid-cmi5/ui';
 
 import {
@@ -452,9 +454,7 @@ function RC5VisualEditor() {
         }),
         toolbarPlugin({
           toolbarClassName: 'mdxeditor-editor-toolbar',
-          toolbarContents: () => (
-            <RapidCmi5Toolbar courseTheme={currentCourseTheme} />
-          ),
+          toolbarContents: () => <RapidCmi5Toolbar />,
         }),
       );
     }
@@ -769,8 +769,10 @@ function RC5VisualEditor() {
 
         <ErrorBoundary>
           <CoursePresentationProvider
-            courseTheme={currentCourseTheme}
             themeMode={themeMode}
+            courseTheme={currentCourseTheme}
+            baseLightTheme={lightTheme}
+            baseDarkTheme={darkTheme}
           >
             <MDXEditor
               className={mdxTheme}

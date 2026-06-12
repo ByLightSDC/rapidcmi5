@@ -11,7 +11,7 @@ import { CustomTheme } from '../styles/createPalette';
 import { Box, Divider, Stack, Typography, useTheme } from '@mui/material';
 import { useTabStyles } from './useTabStyles';
 import CloseIcon from '@mui/icons-material/Close';
-import { CoursePresentationContext, themeColor } from '@rapid-cmi5/ui';
+import { CoursePresentationContext } from '@rapid-cmi5/ui';
 
 export default function TabPanel() {
   const auJson = useSelector(auJsonSel);

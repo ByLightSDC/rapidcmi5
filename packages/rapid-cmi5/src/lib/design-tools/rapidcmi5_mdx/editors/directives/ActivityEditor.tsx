@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import {
   DirectiveEditorProps,
   useCellValue,
@@ -478,7 +472,9 @@ const ActivityThemeWrapper = ({
   isPlayback: boolean;
 }) => {
   if (isPlayback) {
-    const overriddenTheme: any = deepmerge(darkTheme, config.THEME.DARK);
+    const { rc5Theme } = useContext(CoursePresentationContext);
+
+    const overriddenTheme: any = deepmerge(darkTheme, rc5Theme);
 
     if (overriddenTheme?.palette?.info?.light) {
       return <ThemeProvider theme={overriddenTheme}>{children}</ThemeProvider>;

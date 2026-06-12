@@ -19,7 +19,6 @@ import {
   setIconColor,
   maxSlideWidth$,
   ApiProviders,
-  CoursePresentationProvider,
   themeColor,
 } from '@rapid-cmi5/ui';
 import { CustomTheme } from '../../styles/createPalette';
@@ -32,16 +31,12 @@ export default function MenuLayout() {
   const currentTheme: CustomTheme = useTheme();
   const dispatch = useDispatch();
   const auJson = useSelector(auJsonSel);
-  const courseData = useSelector(courseDataSel);
-  const orgTheme = useSelector(orgThemeSel);
-  const courseTheme = courseData?.courseTheme;
   const activeTab = useSelector(activeTabSel);
   const isExitSlide = activeTab === auJson?.slides?.length;
   const themedDividerColor = useSelector(dividerColor);
   const muiTheme = useTheme();
   const { palette } = muiTheme;
   const slideRef = useRef<HTMLDivElement>(null);
-  const themeMode = useSelector(themeColor);
 
   useCMI5Session();
 
@@ -91,74 +86,68 @@ export default function MenuLayout() {
       codeRunnerUrl={config.DEVOPS_API_URL}
       cmi5Enabled={true}
     >
-      <CoursePresentationProvider
-        courseTheme={courseTheme}
-        orgTheme={orgTheme}
-        themeMode={themeMode}
+      <Drawer
+        sx={{
+          width: isMenuDrawerOpen ? DRAWER_WIDTH : 0,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            backgroundColor: 'background.default',
+            width: DRAWER_WIDTH,
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+          },
+        }}
+        variant="persistent"
+        anchor="left"
+        open={isMenuDrawerOpen}
       >
-        <Drawer
-          sx={{
-            width: isMenuDrawerOpen ? DRAWER_WIDTH : 0,
-            flexShrink: 0,
-            '& .MuiDrawer-paper': {
-              backgroundColor: 'background.default',
-              width: DRAWER_WIDTH,
-              boxSizing: 'border-box',
-              overflow: 'hidden',
-            },
-          }}
-          variant="persistent"
-          anchor="left"
-          open={isMenuDrawerOpen}
-        >
-          <div role="navigation" aria-label="Slides">
-            <TabPanel />
-          </div>
-        </Drawer>
+        <div role="navigation" aria-label="Slides">
+          <TabPanel />
+        </div>
+      </Drawer>
 
-        <PanelGroup direction="horizontal">
-          <Panel defaultSize={45} minSize={5}>
-            <Box
-              ref={slideRef}
-              sx={{
-                backgroundColor: palette.background.paper,
-                height: '100%',
-                width: '100%',
-                overflow: 'auto',
-              }}
-            >
-              <LessonToolbar
-                isMenuDrawerOpen={isMenuDrawerOpen}
-                isSplitPanelShown={isSplitPanelShown}
-                onDrawerOpen={handleDrawerOpen}
-                onDrawerClose={handleDrawerClose}
-                onSplitOn={handleSplitOn}
-                onSplitOff={handleSplitOff}
-              />
+      <PanelGroup direction="horizontal">
+        <Panel defaultSize={45} minSize={5}>
+          <Box
+            ref={slideRef}
+            sx={{
+              backgroundColor: palette.background.paper,
+              height: '100%',
+              width: '100%',
+              overflow: 'auto',
+            }}
+          >
+            <LessonToolbar
+              isMenuDrawerOpen={isMenuDrawerOpen}
+              isSplitPanelShown={isSplitPanelShown}
+              onDrawerOpen={handleDrawerOpen}
+              onDrawerClose={handleDrawerClose}
+              onSplitOn={handleSplitOn}
+              onSplitOff={handleSplitOff}
+            />
 
-              {isExitSlide ? (
-                <ExitSlide />
-              ) : !config.CMI5_SSO_ENABLED ? (
-                <ScenarioWrapper>
-                  <RC5Player />
-                </ScenarioWrapper>
-              ) : (
-                <TeamScenarioContextProvider isEnabled={true}>
-                  <RC5Player />
-                </TeamScenarioContextProvider>
-              )}
-            </Box>
-          </Panel>
-          {isSplitPanelShown && (
-            <>
-              <PanelResizeHandle
-                style={{ width: 4, backgroundColor: themedDividerColor }}
-              />
-              <Panel />
-            </>
-          )}
-        </PanelGroup>
-      </CoursePresentationProvider>
+            {isExitSlide ? (
+              <ExitSlide />
+            ) : !config.CMI5_SSO_ENABLED ? (
+              <ScenarioWrapper>
+                <RC5Player />
+              </ScenarioWrapper>
+            ) : (
+              <TeamScenarioContextProvider isEnabled={true}>
+                <RC5Player />
+              </TeamScenarioContextProvider>
+            )}
+          </Box>
+        </Panel>
+        {isSplitPanelShown && (
+          <>
+            <PanelResizeHandle
+              style={{ width: 4, backgroundColor: themedDividerColor }}
+            />
+            <Panel />
+          </>
+        )}
+      </PanelGroup>
     </ApiProviders>
   );
 }

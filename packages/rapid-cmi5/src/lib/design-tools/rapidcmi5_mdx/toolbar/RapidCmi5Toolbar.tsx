@@ -41,6 +41,7 @@ import {
   toolbarRect$,
   maxSlideWidth$,
   debugLog,
+  CoursePresentationContext,
 } from '@rapid-cmi5/ui';
 
 import { displayData } from '../../../redux/courseBuilderReducer';
@@ -89,14 +90,12 @@ const rightToolbarMargin = 25;
  * You'll probably want to create your own toolbar component that includes only the buttons that you need.
  * @group Toolbar Components
  */
-export const RapidCmi5Toolbar: React.FC<{
-  courseTheme?: Rc5Theme;
-}> = ({ courseTheme }) => {
+export const RapidCmi5Toolbar: React.FC = () => {
   const changeViewMode = usePublisher(viewMode$);
   const { getMarkdownData } = useContext(RC5Context);
+  const { rc5Theme } = useContext(CoursePresentationContext);
   const realm = useRealm();
   const viewmode = useCellValue(viewMode$);
-  const themedDividerColor = useSelector(dividerColor);
   const content = useSelector(displayData);
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef<HTMLDivElement>(null);
@@ -134,8 +133,8 @@ export const RapidCmi5Toolbar: React.FC<{
   }, []);
 
   useEffect(() => {
-    realm.pub(lessonTheme$, courseTheme);
-  }, [courseTheme]);
+    realm.pub(lessonTheme$, rc5Theme);
+  }, [rc5Theme]);
 
   useEffect(() => {
     if (getMarkdownData() !== content) {
