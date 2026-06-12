@@ -95,9 +95,6 @@ function LessonTree({
   const [menuAnchorPos, setMenuAnchorPos] = useState<number[]>([0, 0]);
   const [moveOnCriteriaForm, setMoveOnCriteriaForm] =
     useState<ILessonNode | null>(null);
-  const [lessonSettingsForm, setLessonSettingsForm] =
-    useState<ILessonNode | null>(null);
-
   const handleMoveOn = (moveOn: MoveOnCriteriaEnum) => {
     if (moveOnCriteriaForm) {
       changeLessonMoveOn(moveOn, moveOnCriteriaForm);

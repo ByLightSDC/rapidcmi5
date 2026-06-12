@@ -16,8 +16,6 @@ import {
   useTheme,
 } from '@mui/material';
 
-import { deepmerge } from '@mui/utils';
-
 import { CodeRunnerForm } from '../../../../features/codeRunner/components/CodeRunnerForm';
 
 import { QuizForm } from '../../../../features/quiz/components/QuizForm';
@@ -472,12 +470,10 @@ const ActivityThemeWrapper = ({
   isPlayback: boolean;
 }) => {
   if (isPlayback) {
-    const { rc5Theme } = useContext(CoursePresentationContext);
+    const { currentTheme } = useContext(CoursePresentationContext);
 
-    const overriddenTheme: any = deepmerge(darkTheme, rc5Theme);
-
-    if (overriddenTheme?.palette?.info?.light) {
-      return <ThemeProvider theme={overriddenTheme}>{children}</ThemeProvider>;
+    if (currentTheme?.palette?.info?.light) {
+      return <ThemeProvider theme={currentTheme}>{children}</ThemeProvider>;
     }
     return <>{children}</>;
   }

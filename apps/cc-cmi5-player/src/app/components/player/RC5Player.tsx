@@ -20,7 +20,7 @@ import {
   useAnimationPlayback,
 } from './plugins/animation-player';
 import '@mdxeditor/editor/style.css';
-import React, { useContext, useEffect, useMemo, useState, useRef } from 'react';
+import { useContext, useEffect, useMemo, useState, useRef } from 'react';
 
 import { Box, Typography } from '@mui/material';
 import {
@@ -79,7 +79,7 @@ import { auJsonSel, slideWidth } from '../../redux/auReducer';
  * @returns
  */
 function RC5Player() {
-  const ref = React.useRef<MDXEditorMethods>(null);
+  const ref = useRef<MDXEditorMethods>(null);
   const { slideData, activeTab } = useContext(AuManagerContext);
   const [fullScreenImage, setFullScreenImage] = useState<string>('');
   const [fullScreenImageStyle, setFullScreenImageStyle] = useState({});
@@ -294,7 +294,7 @@ function RC5Player() {
     };
   }, []);
 
-  const editorContainerRef = React.useRef<HTMLDivElement>(null);
+  const editorContainerRef = useRef<HTMLDivElement>(null);
 
   /**
    * Parse animations from markdown BEFORE loading into editor

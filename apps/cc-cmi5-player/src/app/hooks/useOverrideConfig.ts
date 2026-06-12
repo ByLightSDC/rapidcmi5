@@ -27,6 +27,13 @@ interface AppConfig {
   }[];
 }
 
+// We only want to have this for the CMI5 Player
+// We may want to change this in the future to support
+// Setting this at the course level rather than only
+// through the LMS or cfg.json
+/**
+ * Applies Title and Favicon
+ **/
 const applyThemeEffects = (theme: Rc5Theme) => {
   if (theme.playerTitle) {
     document.title = theme.playerTitle;
@@ -86,7 +93,6 @@ export const useOverrideConfigs = () => {
       if (!deployment) throw Error('No default is defined in the cfg.json');
 
       applyLocationOverrides(deployment.config);
-      console.log('deployment', deployment);
       mergedTheme = deployment.config.THEME;
 
       if (inProductionMode && launchData?.launchParameters) {
@@ -114,7 +120,8 @@ export const useOverrideConfigs = () => {
     } finally {
       if (mergedTheme) {
         applyThemeEffects(mergedTheme);
-        console.log('merged themes ', mergedTheme);
+        // Set the org level theme settings
+        // This is then used by the CoursePresentationContext
         dispatch(setOrgTheme(mergedTheme));
       }
 

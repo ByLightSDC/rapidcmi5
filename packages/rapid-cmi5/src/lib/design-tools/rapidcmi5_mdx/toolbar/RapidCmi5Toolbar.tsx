@@ -35,9 +35,8 @@ import { RC5Context } from '../contexts/RC5Context';
 
 import {
   editorInPlayback$,
-  lessonTheme$,
+  courseTheme$,
   CONTENT_UPDATED_COMMAND,
-  dividerColor,
   toolbarRect$,
   maxSlideWidth$,
   debugLog,
@@ -133,7 +132,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    realm.pub(lessonTheme$, rc5Theme);
+    realm.pub(courseTheme$, rc5Theme);
   }, [rc5Theme]);
 
   useEffect(() => {

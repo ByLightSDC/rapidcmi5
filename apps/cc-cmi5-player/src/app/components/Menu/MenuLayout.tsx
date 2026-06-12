@@ -4,7 +4,7 @@ import Drawer from '@mui/material/Drawer';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Box, useTheme } from '@mui/material';
-import { auJsonSel, courseDataSel, orgThemeSel } from '../../redux/auReducer';
+import { auJsonSel } from '../../redux/auReducer';
 import { activeTabSel } from '../../redux/navigationReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import RC5Player from '../player/RC5Player';
@@ -19,7 +19,6 @@ import {
   setIconColor,
   maxSlideWidth$,
   ApiProviders,
-  themeColor,
 } from '@rapid-cmi5/ui';
 import { CustomTheme } from '../../styles/createPalette';
 import LessonToolbar from './LessonToolbar';

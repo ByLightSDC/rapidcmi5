@@ -26,4 +26,4 @@ export const activeTab$ = Cell<number | null>(null);
  * settings even though they render via Lexical portals outside the React
  * context provider tree.
  */
-export const lessonTheme$ = Cell<Rc5Theme | undefined>(undefined);
+export const courseTheme$ = Cell<Rc5Theme | undefined>(undefined);
