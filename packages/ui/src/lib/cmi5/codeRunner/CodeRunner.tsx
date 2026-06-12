@@ -21,7 +21,10 @@ import {
 } from '@rapid-cmi5/cmi5-build-common';
 
 import { ButtonMainUi } from '../../utility/buttons';
-import { CoursePresentationContext } from '../mdx/contexts/PresentationContext';
+import {
+  CoursePresentationContext,
+  useCoursePresentation,
+} from '../mdx/contexts/PresentationContext';
 import {
   maxFormWidths,
   useLessonThemeStyles,
@@ -78,7 +81,7 @@ export function CodeRunner({
   outerStyle,
 }: CodeRunnerProps) {
   const { setProgress, submitScore, isAuthenticated, isTestMode } = auProps;
-  const { rc5Theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useCoursePresentation();
 
   const { isCodeRunnerEnabled, executeCode } = useCodeRunnerApi();
 

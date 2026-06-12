@@ -33,6 +33,7 @@ import {
   maxFormWidths,
   ActivityDirectiveNode,
   darkTheme,
+  useCoursePresentation,
 } from '@rapid-cmi5/ui';
 import { auConfigInitializedSel } from '../../../../redux/auReducer';
 
@@ -69,7 +70,7 @@ export const ActivityPlayback: React.FC<
   };
 
   const muiTheme = useTheme();
-  const { rc5Theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useCoursePresentation();
   const { innerActivitySx, outerSx, outerStyle } = useLessonStyles(
     rc5Theme,
     mdastNode?.attributes?.contentWidth,

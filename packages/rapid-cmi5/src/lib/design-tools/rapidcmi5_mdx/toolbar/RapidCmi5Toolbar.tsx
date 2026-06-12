@@ -40,7 +40,7 @@ import {
   toolbarRect$,
   maxSlideWidth$,
   debugLog,
-  CoursePresentationContext,
+  useCoursePresentation,
 } from '@rapid-cmi5/ui';
 
 import { displayData } from '../../../redux/courseBuilderReducer';
@@ -75,7 +75,6 @@ import { UndoRedo } from './components/UndoRedo';
 import { InsertQuotes } from './components/InsertQuotes';
 import { InsertStatements } from './components/InsertStatements';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
-import { Rc5Theme } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Layout Constants
@@ -92,7 +91,7 @@ const rightToolbarMargin = 25;
 export const RapidCmi5Toolbar: React.FC = () => {
   const changeViewMode = usePublisher(viewMode$);
   const { getMarkdownData } = useContext(RC5Context);
-  const { rc5Theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useCoursePresentation();
   const realm = useRealm();
   const viewmode = useCellValue(viewMode$);
   const content = useSelector(displayData);

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
@@ -11,11 +11,11 @@ import { CustomTheme } from '../styles/createPalette';
 import { Box, Divider, Stack, Typography, useTheme } from '@mui/material';
 import { useTabStyles } from './useTabStyles';
 import CloseIcon from '@mui/icons-material/Close';
-import { CoursePresentationContext } from '@rapid-cmi5/ui';
+import { useCoursePresentation } from '@rapid-cmi5/ui';
 
 export default function TabPanel() {
   const auJson = useSelector(auJsonSel);
-  const { logoPath } = useContext(CoursePresentationContext);
+  const { logoPath } = useCoursePresentation();
 
   const dispatch = useDispatch();
   const activeTab = useSelector(activeTabSel);

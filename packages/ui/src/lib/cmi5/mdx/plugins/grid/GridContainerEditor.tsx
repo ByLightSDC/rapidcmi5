@@ -47,7 +47,10 @@ import {
 } from './types';
 import { createGridCell, findMatchingPreset, GRID_PRESETS } from './constants';
 import { GridContextProvider } from './GridContext';
-import { CoursePresentationContext } from '../../contexts/PresentationContext';
+import {
+  CoursePresentationContext,
+  useCoursePresentation,
+} from '../../contexts/PresentationContext';
 import {
   resolveLessonThemeCSS,
   resolveBlockMaxWidth,
@@ -70,7 +73,7 @@ export const GridContainerEditor: React.FC<
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
   const muiTheme = useTheme();
-  const { rc5Theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useCoursePresentation();
   const resolvedThemeCSS = resolveLessonThemeCSS(rc5Theme);
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')

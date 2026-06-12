@@ -49,14 +49,13 @@ import {
 
 import { AdmonitionDirectiveNode } from './AdmonitionDirectiveDescriptor';
 import DeleteIconButton from '../components/DeleteIconButton';
-import SettingsIconButton from '../components/SettingsIconButton';
 import InsertLineReturnButton from '../components/InsertLineReturnButton';
 import { AdmonitionTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { SelectorMainUi } from '../../../inputs/selectors/selectors';
 import { debugLogError } from '../../../utility/logger';
 import { editorInPlayback$ } from '../state/vars';
 import { convertMarkdownToMdast } from '../util/conversion';
-import { CoursePresentationContext } from '../contexts/PresentationContext';
+import { useCoursePresentation } from '../contexts/PresentationContext';
 import {
   resolveLessonThemeCSS,
   resolveBlockMaxWidth,
@@ -103,7 +102,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   descriptor,
 }) => {
   const muiTheme = useTheme();
-  const { rc5Theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useCoursePresentation();
   const resolvedThemeCSS = resolveLessonThemeCSS(rc5Theme);
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')

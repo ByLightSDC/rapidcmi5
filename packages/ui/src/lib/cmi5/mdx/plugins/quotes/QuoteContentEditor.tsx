@@ -13,7 +13,7 @@ import { QuotesContext } from './QuotesContext';
 import { convertMarkdownToMdast } from '../../util/conversion';
 import { toMarkdown } from 'mdast-util-to-markdown';
 import { imgCache } from '../image/constants';
-import { CoursePresentationContext } from '../../contexts/PresentationContext';
+import { useCoursePresentation } from '../../contexts/PresentationContext';
 import { fontPresets } from './constants';
 import { useLessonThemeStyles } from '@rapid-cmi5/ui';
 
@@ -30,7 +30,7 @@ export const QuoteContentEditor: React.FC<
     useContext(QuotesContext);
 
   //#region Styles
-  const { rc5Theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useCoursePresentation();
   const { blockPadding } = useLessonThemeStyles(rc5Theme);
 
   const scopedClass = useRef(

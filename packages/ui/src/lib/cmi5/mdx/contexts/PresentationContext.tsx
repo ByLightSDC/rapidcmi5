@@ -1,7 +1,8 @@
-import { createContext, ReactNode, useMemo } from 'react';
+import { createContext, ReactNode, useContext, useMemo } from 'react';
 import { deepmerge } from '@mui/utils';
 import { Rc5Theme } from '@rapid-cmi5/cmi5-build-common';
 import { ThemeMode } from '../../../redux/commonAppReducer';
+import { Theme, ThemeProvider } from '@mui/material';
 
 export interface IPresentationContext {
   rc5Theme: Rc5Theme;
@@ -10,8 +11,17 @@ export interface IPresentationContext {
   activityTheme: any;
 }
 
+export function useCoursePresentation() {
+  const ctx = useContext(CoursePresentationContext);
+  if (!ctx)
+    throw new Error(
+      'useCoursePresentation must be used within CoursePresentationProvider',
+    );
+  return ctx;
+}
+
 /**
- * Provides the effective Theme (org values -> course values -> lesson values (highest precedence))
+ * Provides the effective Theme (org values -> course values (highest precedence))
  * to directive editor components rendered inside the MDXEditor plugin tree.
  *
  * Consumers see the merged `rc5Theme` plus `currentTheme` / `activityTheme`
@@ -25,18 +35,11 @@ export const CoursePresentationContext = createContext<IPresentationContext>({
   activityTheme: undefined,
 });
 
-/**
- * Shallow-merge an org-level theme with course- and lesson-level themes.
- * Lesson values win, then course; org values only fill in any remaining gaps.
- */
 export function mergeThemes(
   orgTheme?: Rc5Theme,
   courseTheme?: Rc5Theme,
 ): Rc5Theme {
-  return {
-    ...(orgTheme ?? {}),
-    ...(courseTheme ?? {}),
-  };
+  return deepmerge(orgTheme ?? {}, courseTheme ?? {});
 }
 
 export function CoursePresentationProvider({
@@ -48,8 +51,8 @@ export function CoursePresentationProvider({
   children,
 }: {
   themeMode: ThemeMode;
-  baseLightTheme: any;
-  baseDarkTheme: any;
+  baseLightTheme: Theme;
+  baseDarkTheme: Theme;
   orgTheme?: Rc5Theme;
   courseTheme?: Rc5Theme;
   children: ReactNode;
@@ -65,6 +68,9 @@ export function CoursePresentationProvider({
     const base = themeMode === 'dark' ? baseDarkTheme : baseLightTheme;
     const overrides = themeMode === 'dark' ? rc5Theme.dark : rc5Theme.light;
     const currentTheme = deepmerge(base, overrides);
+    // TODO
+    // I dont believe this is correct but am keeping it here for now
+    // as this is how I found it
     const activityTheme = deepmerge(baseDarkTheme, rc5Theme.dark);
 
     return {
@@ -75,9 +81,14 @@ export function CoursePresentationProvider({
     };
   }, [courseTheme, orgTheme, themeMode, baseLightTheme, baseDarkTheme]);
 
+  /**
+   * There is a special MUI Theme Provider to deal with the elements within
+   * the domain of the object. This allows us to have special MUI themes for the
+   * MDX editor portion and different themese for the main rapid cmi5 application
+   */
   return (
     <CoursePresentationContext.Provider value={value}>
-      {children}
+      <ThemeProvider theme={value.currentTheme}>{children}</ThemeProvider>
     </CoursePresentationContext.Provider>
   );
 }

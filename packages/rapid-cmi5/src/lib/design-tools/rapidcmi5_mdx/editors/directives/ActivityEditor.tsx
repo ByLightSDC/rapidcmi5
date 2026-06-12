@@ -44,13 +44,11 @@ import {
   AuCTF,
   CodeRunner,
   useLessonStyles,
-  CoursePresentationContext,
   maxFormWidths,
   BlockAppearanceForm,
   ActivityDirectiveNode,
   InsertLineReturnButton,
-  darkTheme,
-  config,
+  useCoursePresentation,
 } from '@rapid-cmi5/ui';
 
 import ScenarioMock from './ScenarioMock';
@@ -83,7 +81,7 @@ export const ActivityEditor: React.FC<
 
   const muiTheme: any = useTheme();
 
-  const { rc5Theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useCoursePresentation();
   const {
     blockAppearanceOpen,
     contentWidthDisplay,
@@ -470,7 +468,7 @@ const ActivityThemeWrapper = ({
   isPlayback: boolean;
 }) => {
   if (isPlayback) {
-    const { currentTheme } = useContext(CoursePresentationContext);
+    const { currentTheme } = useCoursePresentation();
 
     if (currentTheme?.palette?.info?.light) {
       return <ThemeProvider theme={currentTheme}>{children}</ThemeProvider>;

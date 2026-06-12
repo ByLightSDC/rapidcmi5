@@ -49,7 +49,10 @@ import {
 } from './ctfReducer';
 import { Box, Stack } from '@mui/material';
 import { ButtonInfoField, ButtonMainUi } from '../../utility/buttons';
-import { CoursePresentationContext } from '../mdx/contexts/PresentationContext';
+import {
+  CoursePresentationContext,
+  useCoursePresentation,
+} from '../mdx/contexts/PresentationContext';
 import {
   maxFormWidths,
   useLessonThemeStyles,
@@ -123,7 +126,7 @@ export function AuCTF({
   const passingScore = ctfContent.passingScore || 80;
 
   /* Lesson Theme */
-  const { rc5Theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useCoursePresentation();
   const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
     rc5Theme,
     maxFormWidths.ctfPlayback,

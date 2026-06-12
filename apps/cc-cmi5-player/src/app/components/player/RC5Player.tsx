@@ -58,7 +58,7 @@ import {
   QuotesContentDirectiveDescriptor,
   StatementsContainerDirectiveDescriptor,
   StatementDirectiveDescriptor,
-  CoursePresentationContext,
+  useCoursePresentation,
 } from '@rapid-cmi5/ui';
 
 import { audioPlugin, videoPlugin } from '@rapid-cmi5/react-editor';
@@ -72,7 +72,7 @@ import { GridCellDirectiveDescriptor } from './editors/directives/GridCellDirect
 import { mediaEventManager } from '../../utils/MediaEventManager';
 import { logger } from '../../debug';
 import { useSelector } from 'react-redux';
-import { auJsonSel, slideWidth } from '../../redux/auReducer';
+import { slideWidth } from '../../redux/auReducer';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -90,7 +90,7 @@ function RC5Player() {
   const [slideAnimations, setSlideAnimations] = useState<AnimationConfig[]>([]);
   const slideWidthSel = useSelector(slideWidth);
 
-  const { rc5Theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useCoursePresentation();
 
   const themeClass = useRef(
     `lesson-theme-${Math.random().toString(36).slice(2, 9)}`,

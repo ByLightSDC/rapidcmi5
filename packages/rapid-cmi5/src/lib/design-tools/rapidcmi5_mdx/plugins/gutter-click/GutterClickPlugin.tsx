@@ -7,7 +7,10 @@ import {
   DecoratorNode,
 } from 'lexical';
 import { realmPlugin, addComposerChild$ } from '@mdxeditor/editor';
-import { CoursePresentationContext } from '@rapid-cmi5/ui';
+import {
+  CoursePresentationContext,
+  useCoursePresentation,
+} from '@rapid-cmi5/ui';
 import { resolveLessonThemeCSS } from '@rapid-cmi5/ui';
 
 function getContentColumnBounds(
@@ -81,7 +84,7 @@ function getNearestBlock(
 
 function GutterClickHandler() {
   const [editor] = useLexicalComposerContext();
-  const { rc5Theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useCoursePresentation();
   const editorRoot = editor.getRootElement();
 
   if (!editorRoot) return;

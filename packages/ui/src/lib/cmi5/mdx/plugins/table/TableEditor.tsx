@@ -31,7 +31,6 @@ import {
 import * as Mdast from 'mdast';
 import React, {
   ElementType,
-  useContext,
   useEffect,
   useState,
   useRef,
@@ -43,7 +42,7 @@ import {
   resolveBlockMaxWidth,
 } from '../../../../styles/lessonThemeStyles';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
-import { CoursePresentationContext } from '../../contexts/PresentationContext';
+import { useCoursePresentation } from '../../contexts/PresentationContext';
 import { TableNode } from './TableNode';
 
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
@@ -188,7 +187,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
     readOnly$,
     editorInPlayback$,
   );
-  const { rc5Theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useCoursePresentation();
 
   const muiTheme = useTheme();
   const resolvedThemeCSS = resolveLessonThemeCSS(rc5Theme);
