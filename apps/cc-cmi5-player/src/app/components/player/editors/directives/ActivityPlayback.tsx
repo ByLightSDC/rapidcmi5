@@ -8,7 +8,6 @@ import { activeTabSel } from '../../../../redux/navigationReducer';
 import { useCMI5Session } from '../../../../hooks/useCMI5Session';
 import { SlideActivityType } from '../../../../../app/types/SlideActivityStatusState';
 import { Box, ThemeProvider, useTheme } from '@mui/material';
-import { deepmerge } from '@mui/utils';
 import {
   AuContextProps,
   ScenarioContent,
@@ -27,8 +26,6 @@ import {
   AuCTF,
   FileDownloadLink,
   CodeRunner,
-  config,
-  CoursePresentationContext,
   useLessonStyles,
   maxFormWidths,
   ActivityDirectiveNode,
@@ -70,7 +67,7 @@ export const ActivityPlayback: React.FC<
   };
 
   const muiTheme = useTheme();
-  const { rc5Theme } = useCoursePresentation();
+  const { rc5Theme, activityTheme } = useCoursePresentation();
   const { innerActivitySx, outerSx, outerStyle } = useLessonStyles(
     rc5Theme,
     mdastNode?.attributes?.contentWidth,
@@ -80,19 +77,6 @@ export const ActivityPlayback: React.FC<
     true,
     true,
   );
-
-  /**
-   * update theme with overrides from cfg file
-   */
-  const isConfigInitialized = useSelector(auConfigInitializedSel);
-  const activityTheme = useMemo(() => {
-    const base = darkTheme;
-    if (!isConfigInitialized) {
-      return base;
-    }
-    const overriddenTheme = deepmerge(base, rc5Theme.dark);
-    return overriddenTheme;
-  }, [isConfigInitialized]);
 
   /** Get Default Form Data from MDAST Node */
   React.useEffect(() => {
