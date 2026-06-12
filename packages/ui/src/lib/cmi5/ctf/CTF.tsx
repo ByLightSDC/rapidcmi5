@@ -123,9 +123,9 @@ export function AuCTF({
   const passingScore = ctfContent.passingScore || 80;
 
   /* Lesson Theme */
-  const { theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useContext(CoursePresentationContext);
   const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
-    theme,
+    rc5Theme,
     maxFormWidths.ctfPlayback,
   );
 

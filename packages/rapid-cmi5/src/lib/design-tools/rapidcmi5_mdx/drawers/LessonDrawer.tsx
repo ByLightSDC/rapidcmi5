@@ -1,6 +1,5 @@
 import {
   alpha,
-  Box,
   Divider,
   IconButton,
   List,
@@ -72,7 +71,6 @@ export const LessonDrawer = () => {
     promptCreateLesson,
     promptDeleteCourse,
     promptDownloadCourseCMI5Zip,
-    promptTestInPlayer,
   } = useRC5Prompts();
 
   const [menuAnchor, setMenuAnchor] = useState<any>(null);

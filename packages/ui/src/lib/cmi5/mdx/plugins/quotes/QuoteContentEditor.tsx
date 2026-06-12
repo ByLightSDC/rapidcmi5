@@ -30,8 +30,8 @@ export const QuoteContentEditor: React.FC<
     useContext(QuotesContext);
 
   //#region Styles
-  const { theme } = useContext(CoursePresentationContext);
-  const { blockPadding } = useLessonThemeStyles(theme);
+  const { rc5Theme } = useContext(CoursePresentationContext);
+  const { blockPadding } = useLessonThemeStyles(rc5Theme);
 
   const scopedClass = useRef(
     `quote-block-${Math.random().toString(36).slice(2, 9)}`,

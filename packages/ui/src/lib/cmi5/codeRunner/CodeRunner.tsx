@@ -78,7 +78,7 @@ export function CodeRunner({
   outerStyle,
 }: CodeRunnerProps) {
   const { setProgress, submitScore, isAuthenticated, isTestMode } = auProps;
-  const { theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useContext(CoursePresentationContext);
 
   const { isCodeRunnerEnabled, executeCode } = useCodeRunnerApi();
 
@@ -87,7 +87,7 @@ export function CodeRunner({
   );
 
   const { blockPadding, outerActivitySxWithConstrainedWidthForm } =
-    useLessonThemeStyles(theme, maxFormWidths.codeRunnerPlayback);
+    useLessonThemeStyles(rc5Theme, maxFormWidths.codeRunnerPlayback);
 
   const [submissionStr, setSubmissionStr] = useState('');
   const [successStr, setSuccessStr] = useState('');

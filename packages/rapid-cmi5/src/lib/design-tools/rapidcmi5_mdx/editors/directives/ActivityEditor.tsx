@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import {
   DirectiveEditorProps,
   useCellValue,
@@ -21,8 +15,6 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-
-import { deepmerge } from '@mui/utils';
 
 import { CodeRunnerForm } from '../../../../features/codeRunner/components/CodeRunnerForm';
 
@@ -91,7 +83,7 @@ export const ActivityEditor: React.FC<
 
   const muiTheme: any = useTheme();
 
-  const { theme } = useContext(CoursePresentationContext);
+  const { rc5Theme } = useContext(CoursePresentationContext);
   const {
     blockAppearanceOpen,
     contentWidthDisplay,
@@ -102,7 +94,7 @@ export const ActivityEditor: React.FC<
     setBlockAppearanceOpen,
     setContentWidth,
   } = useLessonStyles(
-    theme,
+    rc5Theme,
     mdastNode?.attributes?.contentWidth,
     maxFormWidths.downloadsEditor,
     muiTheme.palette.background.paper,
@@ -478,10 +470,10 @@ const ActivityThemeWrapper = ({
   isPlayback: boolean;
 }) => {
   if (isPlayback) {
-    const overriddenTheme: any = deepmerge(darkTheme, config.THEME.DARK);
+    const { currentTheme } = useContext(CoursePresentationContext);
 
-    if (overriddenTheme?.palette?.info?.light) {
-      return <ThemeProvider theme={overriddenTheme}>{children}</ThemeProvider>;
+    if (currentTheme?.palette?.info?.light) {
+      return <ThemeProvider theme={currentTheme}>{children}</ThemeProvider>;
     }
     return <>{children}</>;
   }

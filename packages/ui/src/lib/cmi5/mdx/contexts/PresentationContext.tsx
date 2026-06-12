@@ -1,24 +1,28 @@
-import { createContext, ReactNode, useMemo, useState } from 'react';
-import { Theme } from '@rapid-cmi5/cmi5-build-common';
+import { createContext, ReactNode, useMemo } from 'react';
+import { deepmerge } from '@mui/utils';
+import { Rc5Theme } from '@rapid-cmi5/cmi5-build-common';
 import { ThemeMode } from '../../../redux/commonAppReducer';
 
 export interface IPresentationContext {
-  theme: Theme;
-  themeMode: ThemeMode;
+  rc5Theme: Rc5Theme;
   logoPath: string | undefined;
+  currentTheme: any;
+  activityTheme: any;
 }
 
 /**
  * Provides the effective Theme (org values -> course values -> lesson values (highest precedence))
  * to directive editor components rendered inside the MDXEditor plugin tree.
  *
- * Consumers only see the merged `theme`. To change the base values, update
- * the `lessonTheme` / `courseTheme / `orgTheme`` props on the surrounding Provider;
+ * Consumers see the merged `rc5Theme` plus `currentTheme` / `activityTheme`
+ * (the base MUI themes blended with overrides). `orgTheme` and `courseTheme`
+ * are controlled props driven by the caller's source of truth.
  */
 export const CoursePresentationContext = createContext<IPresentationContext>({
-  theme: {},
-  themeMode: 'light',
+  rc5Theme: {},
   logoPath: undefined,
+  currentTheme: undefined,
+  activityTheme: undefined,
 });
 
 /**
@@ -26,38 +30,50 @@ export const CoursePresentationContext = createContext<IPresentationContext>({
  * Lesson values win, then course; org values only fill in any remaining gaps.
  */
 export function mergeThemes(
-  orgTheme?: Theme,
-  courseTheme?: Theme,
-  lessonTheme?: Theme,
-): Theme {
+  orgTheme?: Rc5Theme,
+  courseTheme?: Rc5Theme,
+): Rc5Theme {
   return {
     ...(orgTheme ?? {}),
     ...(courseTheme ?? {}),
-    ...(lessonTheme ?? {}),
   };
 }
 
 export function CoursePresentationProvider({
-  lessonTheme,
-  courseTheme,
-  orgTheme,
   themeMode,
+  baseLightTheme,
+  baseDarkTheme,
+  orgTheme,
+  courseTheme,
   children,
 }: {
-  lessonTheme?: Theme;
-  courseTheme?: Theme;
-  orgTheme?: Theme;
   themeMode: ThemeMode;
+  baseLightTheme: any;
+  baseDarkTheme: any;
+  orgTheme?: Rc5Theme;
+  courseTheme?: Rc5Theme;
   children: ReactNode;
 }) {
   const value = useMemo<IPresentationContext>(() => {
-    const theme = mergeThemes(orgTheme, courseTheme, lessonTheme);
+    // This is the computed version with course overriding org level settings
+    const rc5Theme = mergeThemes(orgTheme, courseTheme);
     const logoPath =
       themeMode === 'dark'
-        ? theme.logo?.dark?.relativePath
-        : theme.logo?.light?.relativePath;
-    return { theme, themeMode, logoPath };
-  }, [lessonTheme, courseTheme, orgTheme, themeMode]);
+        ? rc5Theme.logo?.dark?.relativePath
+        : rc5Theme.logo?.light?.relativePath;
+
+    const base = themeMode === 'dark' ? baseDarkTheme : baseLightTheme;
+    const overrides = themeMode === 'dark' ? rc5Theme.dark : rc5Theme.light;
+    const currentTheme = deepmerge(base, overrides);
+    const activityTheme = deepmerge(baseDarkTheme, rc5Theme.dark);
+
+    return {
+      rc5Theme,
+      logoPath,
+      currentTheme,
+      activityTheme,
+    };
+  }, [courseTheme, orgTheme, themeMode, baseLightTheme, baseDarkTheme]);
 
   return (
     <CoursePresentationContext.Provider value={value}>

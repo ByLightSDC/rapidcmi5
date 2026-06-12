@@ -84,8 +84,8 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   parentEditor,
 }) => {
   const muiTheme = useTheme();
-  const { theme } = useContext(CoursePresentationContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(theme);
+  const { rc5Theme } = useContext(CoursePresentationContext);
+  const resolvedThemeCSS = resolveLessonThemeCSS(rc5Theme);
   // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
   // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
   const blockPadding = resolvedThemeCSS
