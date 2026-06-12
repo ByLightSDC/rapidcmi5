@@ -30,7 +30,7 @@ import {
   CourseData,
   defaultSlideContent,
   MoveOnCriteriaEnum,
-  Theme,
+  Rc5Theme,
 } from '@rapid-cmi5/cmi5-build-common';
 
 import { RC5Context } from '../../contexts/RC5Context';
@@ -38,7 +38,6 @@ import { useRC5Prompts } from '../../modals/useRC5Prompts';
 import { Renamer } from './Renamer';
 import { MoveOnCriteriaForm } from './MoveOnCriteriaForm';
 import { DndProvider } from 'react-dnd';
-import { LessonSettingsForm } from './LessonSettingsForm';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { GitContext } from '../../../course-builder/GitViewer/session/GitContext';
@@ -78,13 +77,8 @@ function LessonTree({
     handleReorderLesson,
   } = useCourseData();
 
-  const {
-    changeLessonMoveOn,
-    changeLessonName,
-    changeSlideName,
-    saveSlide,
-    changeLessonTheme,
-  } = useContext(RC5Context);
+  const { changeLessonMoveOn, changeLessonName, changeSlideName, saveSlide } =
+    useContext(RC5Context);
 
   const repoAccessObject = useSelector(currentRepoAccessObjectSel);
   const isAppHeaderShowing = useSelector(appHeaderVisible);
@@ -101,9 +95,6 @@ function LessonTree({
   const [menuAnchorPos, setMenuAnchorPos] = useState<number[]>([0, 0]);
   const [moveOnCriteriaForm, setMoveOnCriteriaForm] =
     useState<ILessonNode | null>(null);
-  const [lessonSettingsForm, setLessonSettingsForm] =
-    useState<ILessonNode | null>(null);
-
   const handleMoveOn = (moveOn: MoveOnCriteriaEnum) => {
     if (moveOnCriteriaForm) {
       changeLessonMoveOn(moveOn, moveOnCriteriaForm);
@@ -111,17 +102,6 @@ function LessonTree({
     setMoveOnCriteriaForm(null);
     displayToaster({
       message: `Move on criteria for AU changed to ${moveOn.replace('-', ' ')}`,
-      severity: 'success',
-    });
-  };
-
-  const handleLessonSettings = (theme: Theme) => {
-    if (lessonSettingsForm) {
-      changeLessonTheme(theme, lessonSettingsForm);
-    }
-    setLessonSettingsForm(null);
-    displayToaster({
-      message: 'Lesson settings updated',
       severity: 'success',
     });
   };
@@ -188,10 +168,6 @@ function LessonTree({
           break;
         case LessonNodeActionEnum.Rename:
           setMenuAnchor(event.target);
-          break;
-
-        case LessonNodeActionEnum.LessonSettings:
-          setLessonSettingsForm(element);
           break;
 
         case LessonNodeActionEnum.SetMoveOnCriteria:
@@ -516,22 +492,6 @@ function LessonTree({
                       ? courseData?.blocks?.[moveOnCriteriaForm.block]?.aus?.[
                           moveOnCriteriaForm.id as number
                         ]?.moveOnCriteria
-                      : undefined
-                  }
-                />
-              )}
-              {lessonSettingsForm && (
-                <LessonSettingsForm
-                  handleCloseModal={() => {
-                    setLessonSettingsForm(null);
-                  }}
-                  handleModalAction={handleLessonSettings}
-                  currentTheme={
-                    lessonSettingsForm.id !== undefined &&
-                    lessonSettingsForm.block !== undefined
-                      ? courseData?.blocks?.[lessonSettingsForm.block]?.aus?.[
-                          lessonSettingsForm.id as number
-                        ]?.lessonTheme
                       : undefined
                   }
                 />

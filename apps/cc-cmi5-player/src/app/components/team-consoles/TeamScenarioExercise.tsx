@@ -51,13 +51,7 @@ import {
   ScenarioContent,
   OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
-import {
-  LessonThemeContext,
-  OverflowTypography,
-  TabMainUi,
-  maxFormWidths,
-  useLessonThemeStyles,
-} from '@rapid-cmi5/ui';
+import { OverflowTypography, TabMainUi } from '@rapid-cmi5/ui';
 
 /**
  * Activity displays a Deployed Scenario status, VMs, Containers, and Autograders

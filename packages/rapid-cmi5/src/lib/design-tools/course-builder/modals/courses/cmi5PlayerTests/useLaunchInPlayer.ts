@@ -104,13 +104,19 @@ export function useLaunchInPlayer() {
 
         setStatusMsg('Building course zip…');
         const lessonDirPath = `compiled_course/blocks/${currentLesson.dirPath}`;
+        const courseDirPath = `compiled_course/blocks/${currentCourse.basePath}`;
         const zipBlob = await fsInstance.buildCmi5CourseBlob(
           repoAccessObject,
           currentCourse.basePath,
         );
 
         setStatusMsg('Uploading to player…');
-        await loadLessonViaZip(playerUrl, zipBlob, lessonDirPath);
+        await loadLessonViaZip(
+          playerUrl,
+          zipBlob,
+          lessonDirPath,
+          courseDirPath,
+        );
       } else {
         const auJson = JSON.stringify(currentLesson, null, 2);
         await writeConfigViaHttp(playerUrl, auJson);

@@ -71,6 +71,8 @@ import {
   QuotesContentDirectiveDescriptor,
   StatementsContainerDirectiveDescriptor,
   StatementDirectiveDescriptor,
+  lightTheme,
+  darkTheme,
 } from '@rapid-cmi5/ui';
 
 import {
@@ -93,8 +95,6 @@ import {
   updateDirtyDisplay,
   updateTeamScenario,
   courseDataCache,
-  currentAu,
-  currentBlock,
 } from '../../../redux/courseBuilderReducer';
 import { currentRepoAccessObjectSel } from '../../../redux/repoManagerReducer';
 
@@ -106,7 +106,7 @@ import { directiveLinter } from './code/codeMirrorUtils';
 import { ActivityDirectiveDescriptor } from './directives/ActivityDirectiveDescriptor';
 import { LayoutBoxDirectiveDescriptor } from './directives/layout-box/LayoutBoxDirectiveDescriptor';
 
-import { LessonThemeContext } from '@rapid-cmi5/ui';
+import { CoursePresentationProvider } from '@rapid-cmi5/ui';
 
 import { RC5Context } from '../contexts/RC5Context';
 import { RapidCmi5Toolbar } from '../toolbar/RapidCmi5Toolbar';
@@ -114,7 +114,6 @@ import { ErrorBoundary } from './ErrorBoundary';
 import { linkDialogPlugin } from '../plugins/link-dialog';
 import { draggableBlockPlugin } from '../plugins/draggable-block';
 import { gutterClickPlugin } from '../plugins/gutter-click/GutterClickPlugin';
-import { CurrentLessonAssetsContextProvider } from '../../course-builder/GitViewer/session/LessonAssetsContext';
 import { ScenarioContent } from '@rapid-cmi5/cmi5-build-common';
 
 /**
@@ -127,9 +126,8 @@ function RC5VisualEditor() {
   const { addEditor, removeEditor } = useContext(RC5Context);
 
   const currentSlideIndex = useSelector(currentSlideNum);
-
-  const theme = useTheme();
-  const themeMode = theme.palette.mode;
+  const muiTheme = useTheme();
+  const themeMode = muiTheme.palette.mode;
 
   const [mdxTheme, setMdxTheme] = useState(
     `${themeMode}-theme ${themeMode}-editor nested-editable-${themeMode}`,
@@ -141,16 +139,14 @@ function RC5VisualEditor() {
   const { handleBlobImageFile, isFsLoaded, currentCourse } =
     useContext(GitContext);
   const courseData = useSelector(courseDataCache);
-  const currentAuIndex = useSelector(currentAu);
-  const currentBlockIndex = useSelector(currentBlock);
+
   const editorContainerRef = React.useRef<HTMLDivElement>(null);
   const isEditing = true;
   const pixelTop = (isAppHeaderShowing ? 40 : 0) + (isEditing ? 87 : 0);
 
-  const currentLessonTheme = useMemo(() => {
-    return courseData?.blocks?.[currentBlockIndex]?.aus?.[currentAuIndex]
-      ?.lessonTheme;
-  }, [courseData, currentBlockIndex, currentAuIndex]);
+  const currentCourseTheme = useMemo(() => {
+    return courseData?.courseTheme;
+  }, [courseData]);
 
   const themeClass = useRef(
     `lesson-theme-${Math.random().toString(36).slice(2, 9)}`,
@@ -337,8 +333,6 @@ function RC5VisualEditor() {
     [currentAuPathSel, currentRepoAccessObject, isFsLoaded],
   );
 
-  const muiTheme = useTheme();
-
   const thePlugins = useMemo(() => {
     const initialList: RealmPlugin[] = [
       //DEBUG
@@ -460,9 +454,7 @@ function RC5VisualEditor() {
         }),
         toolbarPlugin({
           toolbarClassName: 'mdxeditor-editor-toolbar',
-          toolbarContents: () => (
-            <RapidCmi5Toolbar lessonTheme={currentLessonTheme} />
-          ),
+          toolbarContents: () => <RapidCmi5Toolbar />,
         }),
       );
     }
@@ -549,9 +541,9 @@ function RC5VisualEditor() {
    * create lesson css
    */
   const lessonStyleCss = useMemo(() => {
-    const css = generateLessonThemeStyleTag(themeClass, currentLessonTheme);
+    const css = generateLessonThemeStyleTag(themeClass, currentCourseTheme);
     return css;
-  }, [themeClass, currentLessonTheme]);
+  }, [themeClass, currentCourseTheme]);
 
   /**
    * Create a wrapped ref that intercepts getMarkdown to inject animations
@@ -773,11 +765,14 @@ function RC5VisualEditor() {
         sx={{ height: `calc(100vh - ${pixelTop}px)` }}
         ref={editorContainerRef}
       >
-        {currentLessonTheme && <style>{lessonStyleCss}</style>}
+        {currentCourseTheme && <style>{lessonStyleCss}</style>}
 
         <ErrorBoundary>
-          <LessonThemeContext.Provider
-            value={{ lessonTheme: currentLessonTheme }}
+          <CoursePresentationProvider
+            themeMode={themeMode}
+            courseTheme={currentCourseTheme}
+            baseLightTheme={lightTheme}
+            baseDarkTheme={darkTheme}
           >
             <MDXEditor
               className={mdxTheme}
@@ -788,7 +783,7 @@ function RC5VisualEditor() {
               readOnly={!isEditing}
               onError={onErrorHelper}
             />
-          </LessonThemeContext.Provider>
+          </CoursePresentationProvider>
         </ErrorBoundary>
       </Box>
     ) : (

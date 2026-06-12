@@ -4,6 +4,7 @@ import { getScenarioDirectives } from '../codeValidators/markdownValidator';
 import { ScenarioContent } from '../types/activities';
 import { RC5_VERSION } from './versions';
 import { CourseData } from '../types';
+import { RC5_FILENAME } from './courseParser';
 
 export interface FolderStruct {
   id: string;
@@ -16,7 +17,7 @@ export interface FolderStruct {
 export const generateCourseJson = (folderStructure: FolderStruct[]) => {
   // We are just doing one block for now
 
-  const metaFile = folderStructure.find((node) => node.name === 'RC5.yaml');
+  const metaFile = folderStructure.find((node) => node.name === RC5_FILENAME);
 
   if (!metaFile) {
     console.error('No meta file was found');

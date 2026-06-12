@@ -40,8 +40,7 @@ import {
 } from '@mdxeditor/editor';
 import { $isImageNode, ImageNode } from './ImageNode';
 import ImageResizer from './ImageResizer';
-import { useLessonAssets } from '../../../course-builder/GitViewer/session/LessonAssetsContext';
-import { useSelector } from 'react-redux';
+import { useLessonAssets } from '../../../../contexts/LessonAssetsContext';
 
 import RC5LinkEditor from '../link/RC5LinkEditor';
 import {
@@ -125,10 +124,10 @@ function LazyImage({
     const loadImage = async () => {
       const blobUrl = await getLocalFileBlobUrl(src);
       if (!blobUrl && loadAttemptCtr < MAX_LOAD_ATTEMPTS) {
-        setTimeout(() => {
+        setTimeout(async () => {
           // console.log('load image attempt', loadAttemptCtr);
           loadAttemptCtr++;
-          loadImage();
+          await loadImage();
         }, 100);
       } else {
         setUrl(blobUrl ? blobUrl : '');

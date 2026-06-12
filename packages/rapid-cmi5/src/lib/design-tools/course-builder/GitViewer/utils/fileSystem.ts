@@ -128,8 +128,6 @@ export class GitFS {
    * is stale.
    */
   seedPlayerCacheFromDevServer = async (playerUrl: string): Promise<void> => {
-    const base = playerUrl.replace(/\/$/, '');
-
     try {
       await this.clearDirectory(cmi5BuildCache);
     } catch {}
@@ -139,7 +137,7 @@ export class GitFS {
     await this.createDirRecursive(cmi5BuildCache);
 
     for (const filename of ['index.html', 'cfg.json', 'favicon.ico']) {
-      const res = await fetch(`${base}/${filename}`);
+      const res = await fetch(new URL(filename, playerUrl).href);
       if (!res.ok)
         throw new Error(
           `Failed to fetch ${filename} from player dev server (${res.status})`,

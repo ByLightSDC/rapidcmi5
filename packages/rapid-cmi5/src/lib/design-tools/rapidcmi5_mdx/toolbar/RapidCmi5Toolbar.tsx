@@ -35,12 +35,12 @@ import { RC5Context } from '../contexts/RC5Context';
 
 import {
   editorInPlayback$,
-  lessonTheme$,
+  courseTheme$,
   CONTENT_UPDATED_COMMAND,
-  dividerColor,
   toolbarRect$,
   maxSlideWidth$,
   debugLog,
+  useCoursePresentation,
 } from '@rapid-cmi5/ui';
 
 import { displayData } from '../../../redux/courseBuilderReducer';
@@ -75,7 +75,6 @@ import { UndoRedo } from './components/UndoRedo';
 import { InsertQuotes } from './components/InsertQuotes';
 import { InsertStatements } from './components/InsertStatements';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
-import { Theme } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Layout Constants
@@ -89,14 +88,12 @@ const rightToolbarMargin = 25;
  * You'll probably want to create your own toolbar component that includes only the buttons that you need.
  * @group Toolbar Components
  */
-export const RapidCmi5Toolbar: React.FC<{
-  lessonTheme?: Theme;
-}> = ({ lessonTheme }) => {
+export const RapidCmi5Toolbar: React.FC = () => {
   const changeViewMode = usePublisher(viewMode$);
   const { getMarkdownData } = useContext(RC5Context);
+  const { rc5Theme } = useCoursePresentation();
   const realm = useRealm();
   const viewmode = useCellValue(viewMode$);
-  const themedDividerColor = useSelector(dividerColor);
   const content = useSelector(displayData);
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef<HTMLDivElement>(null);
@@ -134,8 +131,8 @@ export const RapidCmi5Toolbar: React.FC<{
   }, []);
 
   useEffect(() => {
-    realm.pub(lessonTheme$, lessonTheme);
-  }, [lessonTheme]);
+    realm.pub(courseTheme$, rc5Theme);
+  }, [rc5Theme]);
 
   useEffect(() => {
     if (getMarkdownData() !== content) {

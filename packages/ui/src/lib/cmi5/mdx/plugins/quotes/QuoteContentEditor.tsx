@@ -13,7 +13,7 @@ import { QuotesContext } from './QuotesContext';
 import { convertMarkdownToMdast } from '../../util/conversion';
 import { toMarkdown } from 'mdast-util-to-markdown';
 import { imgCache } from '../image/constants';
-import { LessonThemeContext } from '../../contexts/LessonThemeContext';
+import { useCoursePresentation } from '../../contexts/PresentationContext';
 import { fontPresets } from './constants';
 import { useLessonThemeStyles } from '@rapid-cmi5/ui';
 
@@ -30,8 +30,8 @@ export const QuoteContentEditor: React.FC<
     useContext(QuotesContext);
 
   //#region Styles
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const { blockPadding } = useLessonThemeStyles(lessonTheme);
+  const { rc5Theme } = useCoursePresentation();
+  const { blockPadding } = useLessonThemeStyles(rc5Theme);
 
   const scopedClass = useRef(
     `quote-block-${Math.random().toString(36).slice(2, 9)}`,
