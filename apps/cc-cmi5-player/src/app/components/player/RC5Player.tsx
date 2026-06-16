@@ -20,7 +20,14 @@ import {
   useAnimationPlayback,
 } from './plugins/animation-player';
 import '@mdxeditor/editor/style.css';
-import React, { useContext, useEffect, useMemo, useState, useRef } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from 'react';
 
 import { Box, Typography } from '@mui/material';
 import {
@@ -118,7 +125,6 @@ function RC5Player() {
     return () => clearTimeout(id);
   }, [activeTab]);
 
-
   const thePlugins = useMemo(() => {
     const initialList = [
       frontmatterPlugin(), // CRITICAL: Hide frontmatter (animations, etc) from rendering
@@ -168,7 +174,10 @@ function RC5Player() {
       }),
       headingsPlugin(),
       htmlPlugin(),
-      videoPlugin({ disableVideoResize: true, disableVideoSettingsButton: true }),
+      videoPlugin({
+        disableVideoResize: true,
+        disableVideoSettingsButton: true,
+      }),
       imagePlayerPlugin(),
       animationPlayerPlugin(),
       ariaOverridePlugin(),
@@ -197,7 +206,7 @@ function RC5Player() {
    * Resize Image full screen
    * @param event
    */
-  const onClickSlide = (event: React.MouseEvent<HTMLDivElement>) => {
+  const onClickSlide = useCallback((event: MouseEvent) => {
     const target = event.target as HTMLElement | null;
     const id = target?.id ?? null;
 
@@ -254,7 +263,46 @@ function RC5Player() {
         }
       }
     }
-  };
+  }, []);
+
+  /**
+   * Attach the image-fullscreen click handler directly to each image-label
+   * overlay div, instead of delegating it from an ancestor of the whole slide.
+   * A click listener on an ancestor that wraps all the read-only slide content
+   * (headings, quote text, author names, etc.) causes Chrome's accessibility
+   * tree to expose every descendant to screen readers as "clickable" — even
+   * though only these specific overlay divs actually do anything on click.
+   *
+   * image-label divs can be nested arbitrarily deep inside directive content
+   * (grid cells, layout boxes, quotes), and MDXEditor fully remounts on every
+   * slide change (key={activeTab}), so a MutationObserver is used to catch
+   * newly-rendered ones rather than querying once on mount.
+   */
+  useEffect(() => {
+    const container = slideContentRef.current;
+    if (!container) return;
+
+    const attached = new WeakSet<Element>();
+
+    const attachIfNeeded = (el: Element) => {
+      if (attached.has(el)) return;
+      attached.add(el);
+      el.addEventListener('click', onClickSlide as EventListener);
+    };
+
+    const scanForImageLabels = () => {
+      container
+        .querySelectorAll('div[id^="image-labels-"]')
+        .forEach(attachIfNeeded);
+    };
+
+    scanForImageLabels();
+
+    const observer = new MutationObserver(scanForImageLabels);
+    observer.observe(container, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, [onClickSlide]);
 
   /**
    * create lesson css
@@ -378,7 +426,6 @@ function RC5Player() {
       <Box
         className={themeClass}
         sx={{ height: '100%' }}
-        onClick={onClickSlide}
         ref={editorContainerRef}
       >
         {currentLessonTheme && <style>{lessonStyleCss}</style>}
