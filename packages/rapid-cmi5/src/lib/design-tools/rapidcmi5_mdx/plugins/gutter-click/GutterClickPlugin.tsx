@@ -7,7 +7,10 @@ import {
   DecoratorNode,
 } from 'lexical';
 import { realmPlugin, addComposerChild$ } from '@mdxeditor/editor';
-import { LessonThemeContext } from '@rapid-cmi5/ui';
+import {
+  CoursePresentationContext,
+  useCoursePresentation,
+} from '@rapid-cmi5/ui';
 import { resolveLessonThemeCSS } from '@rapid-cmi5/ui';
 
 function getContentColumnBounds(
@@ -81,14 +84,14 @@ function getNearestBlock(
 
 function GutterClickHandler() {
   const [editor] = useLexicalComposerContext();
-  const { lessonTheme } = useContext(LessonThemeContext);
+  const { rc5Theme } = useCoursePresentation();
   const editorRoot = editor.getRootElement();
 
   if (!editorRoot) return;
 
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
-      const css = resolveLessonThemeCSS(lessonTheme);
+      const css = resolveLessonThemeCSS(rc5Theme);
       const maxWidthCss = css?.maxWidth ?? null;
       const { left: contentLeft, right: contentRight } = getContentColumnBounds(
         editorRoot,
@@ -171,7 +174,7 @@ function GutterClickHandler() {
     editorRoot.addEventListener('mousedown', handleMouseDown, true);
     return () =>
       editorRoot.removeEventListener('mousedown', handleMouseDown, true);
-  }, [editor, lessonTheme]);
+  }, [editor, rc5Theme]);
 
   return null;
 }

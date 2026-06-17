@@ -56,7 +56,7 @@ import { ButtonMinorUi, ButtonOptions } from '../../../../utility/buttons';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
-import { LessonThemeContext } from '../../contexts/LessonThemeContext';
+import { useCoursePresentation } from '../../contexts/PresentationContext';
 import {
   resolveLessonThemeCSS,
   resolveBlockMaxWidth,
@@ -79,8 +79,8 @@ export const AccordionEditor: React.FC<
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
   const muiTheme = useTheme();
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  const { rc5Theme } = useCoursePresentation();
+  const resolvedThemeCSS = resolveLessonThemeCSS(rc5Theme);
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';

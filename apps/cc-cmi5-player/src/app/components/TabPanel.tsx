@@ -1,28 +1,21 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
 import { Check } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  auJsonSel,
-  auLogoDarkSel,
-  auLogoLightSel,
-  auLogoWidthSel,
-  courseAUProgressSel,
-} from '../redux/auReducer';
+import { auJsonSel, courseAUProgressSel } from '../redux/auReducer';
 import { activeTabSel, setActiveTab } from '../redux/navigationReducer';
 import ProgressBar from './ProgressBar';
 import { CustomTheme } from '../styles/createPalette';
 import { Box, Divider, Stack, Typography, useTheme } from '@mui/material';
 import { useTabStyles } from './useTabStyles';
 import CloseIcon from '@mui/icons-material/Close';
+import { useCoursePresentation } from '@rapid-cmi5/ui';
 
 export default function TabPanel() {
   const auJson = useSelector(auJsonSel);
-  const auLogoDark = useSelector(auLogoDarkSel);
-  const auLogoLight = useSelector(auLogoLightSel);
-  const auLogoWidth = useSelector(auLogoWidthSel);
+  const { logoPath } = useCoursePresentation();
 
   const dispatch = useDispatch();
   const activeTab = useSelector(activeTabSel);
@@ -35,10 +28,8 @@ export default function TabPanel() {
   const exitTabRef = useRef<HTMLDivElement>(null);
   const [isExitTabVisible, setIsExitTabVisible] = useState(true);
 
-  const currentLogo = useMemo(() => {
-    return auLogoDark;
-  }, [currentTheme.palette.mode, auLogoDark]);
   const iconDimension = '20px';
+  const auLogoWidth = '200px';
 
   const tabClicked = (_: React.SyntheticEvent, newValue: number) => {
     dispatch(setActiveTab(newValue));
@@ -63,7 +54,7 @@ export default function TabPanel() {
       passed: slideStatus?.passed || false,
       failed: slideStatus?.failed || false,
     };
- 
+
     return status;
   };
 
@@ -170,7 +161,7 @@ export default function TabPanel() {
           marginRight: '34px',
         }}
       >
-        {currentLogo && (
+        {logoPath && (
           <img
             alt="Course or Logo"
             width={auLogoWidth}
@@ -178,7 +169,7 @@ export default function TabPanel() {
               padding: '16px',
               paddingBottom: '0px',
             }}
-            src={currentLogo}
+            src={logoPath}
           />
         )}
       </Box>

@@ -8,7 +8,6 @@ import { activeTabSel } from '../../../../redux/navigationReducer';
 import { useCMI5Session } from '../../../../hooks/useCMI5Session';
 import { SlideActivityType } from '../../../../../app/types/SlideActivityStatusState';
 import { Box, ThemeProvider, useTheme } from '@mui/material';
-import { deepmerge } from '@mui/utils';
 import {
   AuContextProps,
   ScenarioContent,
@@ -27,14 +26,12 @@ import {
   AuCTF,
   FileDownloadLink,
   CodeRunner,
-  config,
-  LessonThemeContext,
   useLessonStyles,
   maxFormWidths,
   ActivityDirectiveNode,
   darkTheme,
+  useCoursePresentation,
 } from '@rapid-cmi5/ui';
-import { cmi5Instance } from '../../../../session/cmi5';
 import { auConfigInitializedSel } from '../../../../redux/auReducer';
 
 /**
@@ -70,9 +67,9 @@ export const ActivityPlayback: React.FC<
   };
 
   const muiTheme = useTheme();
-  const { lessonTheme } = useContext(LessonThemeContext);
+  const { rc5Theme, activityTheme } = useCoursePresentation();
   const { innerActivitySx, outerSx, outerStyle } = useLessonStyles(
-    lessonTheme,
+    rc5Theme,
     mdastNode?.attributes?.contentWidth,
     maxFormWidths.downloadsEditor,
     muiTheme.palette.background.paper,
@@ -80,19 +77,6 @@ export const ActivityPlayback: React.FC<
     true,
     true,
   );
-
-  /**
-   * update theme with overrides from cfg file
-   */
-  const isConfigInitialized = useSelector(auConfigInitializedSel);
-  const activityTheme = useMemo(() => {
-    const base = darkTheme;
-    if (!isConfigInitialized) {
-      return base;
-    }
-    const overriddenTheme = deepmerge(base, config.THEME.DARK);
-    return overriddenTheme;
-  }, [isConfigInitialized]);
 
   /** Get Default Form Data from MDAST Node */
   React.useEffect(() => {

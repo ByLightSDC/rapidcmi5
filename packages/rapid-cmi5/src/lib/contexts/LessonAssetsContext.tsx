@@ -6,14 +6,11 @@
 import { createContext, useContext, useEffect, useRef } from 'react';
 
 import { useSelector } from 'react-redux';
-import { getFsInstance } from '../utils/gitFsInstance';
+import { getFsInstance } from '../design-tools/course-builder/GitViewer/utils/gitFsInstance';
 import { join } from 'path-browserify';
-import { currentRepoAccessObjectSel } from '../../../../redux/repoManagerReducer';
-import {
-  currentAuPath,
-  currentSlideNum,
-} from '../../../../redux/courseBuilderReducer';
-import { useGitOperations } from './useGitOperations';
+import { currentRepoAccessObjectSel } from '../redux/repoManagerReducer';
+import { currentAuPath, currentSlideNum } from '../redux/courseBuilderReducer';
+import { useGitOperations } from '../design-tools/course-builder/GitViewer/session/useGitOperations';
 
 export type AssetType = 'image' | 'video' | 'audio' | 'file';
 
@@ -23,7 +20,6 @@ export const ASSET_DIRS: Record<AssetType, string> = {
   audio: 'Assets/Audio',
   file: 'Assets/Downloads',
 };
-
 interface CurrentLessonAssetsContext {
   getAsset: (type: AssetType, fileName: string) => Promise<string | undefined>;
   uploadAsset: (

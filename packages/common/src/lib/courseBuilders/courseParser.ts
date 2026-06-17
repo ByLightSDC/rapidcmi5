@@ -43,6 +43,7 @@ import {
 import { AdmonitionTypeEnum } from '../types';
 
 export const RC5_FILENAME = 'RC5.yaml';
+export const LESSON_CONFIG_FILENAME = 'config.json';
 
 function getTagName(value: string) {
   return value

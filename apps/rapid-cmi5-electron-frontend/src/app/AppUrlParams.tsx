@@ -12,8 +12,8 @@ export default function AppUrlParams() {
 
   const checkParams = () => {
     //to force a theme
-    const themeParam = searchParams.get('theme') || '';
-    if (themeParam) {
+    const themeParam = searchParams.get('theme');
+    if (themeParam === 'light' || themeParam === 'dark') {
       dispatch(setTheme(themeParam));
     }
     const navDisabled = searchParams.get('nav_disabled') || '';
