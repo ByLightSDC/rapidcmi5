@@ -335,6 +335,12 @@ function ScenarioStatus({
       return (
         <Stack
           direction="row"
+          // Scenario header is present once the scenario is deployed (status
+          // known). `data-scenario-status` exposes the lifecycle status; the
+          // status icon below (scenario-status-icon) is only shown while NOT
+          // Ready, so its ABSENCE is the "ready" signal for tests.
+          data-testid="scenario-header"
+          data-scenario-status={scenarioWithStatus.status}
           sx={{
             padding: 0,
             position: 'relative',
@@ -352,6 +358,9 @@ function ScenarioStatus({
           {scenarioWithStatus.status !==
             DeployedScenarioDetailStatusEnum.Ready && (
             <ListItemIcon
+              // Present only while the scenario is provisioning / errored
+              // (status !== Ready). Tests wait for this to disappear.
+              data-testid="scenario-status-icon"
               sx={{
                 padding: 0,
                 margin: 0,
@@ -436,15 +445,17 @@ function ScenarioStatus({
       );
     }
     return (
-      <OverflowTypography
-        title="Loading..."
-        variant="h5"
-        sxProps={
-          {
-            //fontWeight: 'bold',
+      <Box data-testid="scenario-loading">
+        <OverflowTypography
+          title="Loading..."
+          variant="h5"
+          sxProps={
+            {
+              //fontWeight: 'bold',
+            }
           }
-        }
-      />
+        />
+      </Box>
     );
   }, [
     scenarioStatusChangeCounter,
