@@ -15,8 +15,8 @@ function applyAriaFixes(rootElement: HTMLElement) {
   // browse/reading mode instead of forms mode or treating content as clickable.
   // Guarded so a no-op setAttribute doesn't queue a mutation record (this fn
   // is also called by the MutationObserver below, on every correction).
-  if (rootElement.getAttribute('role') !== 'document') {
-    rootElement.setAttribute('role', 'document');
+  if (rootElement.getAttribute('role') !== 'presentation') {
+    rootElement.setAttribute('role', 'presentation');
   }
 
   // NOTE: contenteditable="false" is intentionally left alone here (unlike an
@@ -63,7 +63,7 @@ function applyAriaFixes(rootElement: HTMLElement) {
 // applyAriaFixes above) and settles on "false" via Lexical's own logic, but
 // aria-readonly/aria-autocomplete still need to be watched and stripped each
 // time they're rewritten.
-const WATCHED_ATTRIBUTES = ['aria-readonly', 'aria-autocomplete'];
+const WATCHED_ATTRIBUTES = ['role', 'aria-readonly', 'aria-autocomplete'];
 
 /**
  * AriaCleanupPlugin (internal component)
@@ -87,26 +87,50 @@ const WATCHED_ATTRIBUTES = ['aria-readonly', 'aria-autocomplete'];
  * it stays idle except to catch that single delayed correction — it isn't
  * polling or watching the wider subtree.
  */
+function applyDecoratorFixes(rootElement: HTMLElement) {
+  rootElement
+    .querySelectorAll<HTMLElement>('div[data-lexical-decorator="true"]')
+    .forEach((el) => {
+      if (el.getAttribute('role') !== 'presentation') {
+        el.setAttribute('role', 'presentation');
+      }
+    });
+}
+
 function AriaCleanupPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
-    let observer: MutationObserver | null = null;
+    let attrObserver: MutationObserver | null = null;
+    let decoratorObserver: MutationObserver | null = null;
 
     return editor.registerRootListener((rootElement) => {
-      observer?.disconnect();
-      observer = null;
+      attrObserver?.disconnect();
+      decoratorObserver?.disconnect();
+      attrObserver = null;
+      decoratorObserver = null;
 
       if (!rootElement) return;
 
       applyAriaFixes(rootElement);
+      applyDecoratorFixes(rootElement);
 
-      observer = new MutationObserver(() => {
+      attrObserver = new MutationObserver(() => {
         applyAriaFixes(rootElement);
       });
-      observer.observe(rootElement, {
+      attrObserver.observe(rootElement, {
         attributes: true,
         attributeFilter: WATCHED_ATTRIBUTES,
+      });
+
+      // Watch for decorator divs added dynamically (e.g. quotes, grid cells
+      // rendered as Lexical decorator nodes inside the root subtree).
+      decoratorObserver = new MutationObserver(() => {
+        applyDecoratorFixes(rootElement);
+      });
+      decoratorObserver.observe(rootElement, {
+        childList: true,
+        subtree: true,
       });
     });
   }, [editor]);
