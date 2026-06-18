@@ -22,9 +22,6 @@ export function HiddenHeader({
     <Typography
       component={variant}
       sx={{
-        // backgroundColor: 'pink',
-        // width: '20px',
-        // height: '20px',
         position: 'absolute',
         width: '1px',
         height: '1px',
