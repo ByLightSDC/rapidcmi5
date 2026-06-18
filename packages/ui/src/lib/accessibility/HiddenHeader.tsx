@@ -6,7 +6,7 @@ export function HiddenHeader({
   pageTitle,
   variant = 'h1',
 }: {
-  header: string;
+  header?: string;
   pageTitle?: string;
   variant?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 }) {
@@ -14,10 +14,12 @@ export function HiddenHeader({
    * 2.4.2 Page Titled (Level A) requires that each page has a title that describes its topic or purpose
    */
   useEffect(() => {
-
     document.title = `${pageTitle || header} | RangeOS`;
   }, [header]);
 
+  if (!header) {
+    return null;
+  }
   return (
     <Typography
       component={variant}

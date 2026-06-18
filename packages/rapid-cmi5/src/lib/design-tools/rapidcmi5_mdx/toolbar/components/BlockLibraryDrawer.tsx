@@ -60,6 +60,12 @@ import {
   selectionRangeError,
 } from '../constants';
 import { InsertStatements } from './InsertStatements';
+import {
+  drawerHeaderStyles,
+  drawerHeaderVariant,
+  drawerTitleStyles,
+  drawerTitleVariant,
+} from '@rapid-cmi5/ui';
 
 const headerSxProps = {
   cursor: 'pointer',
@@ -181,10 +187,8 @@ export function BlockLibraryDrawer() {
           }}
         >
           <WidgetsIcon color="primary" />
-          <Typography
-            variant="h6"
-            sx={{ color: 'primary.main', flex: 1, marginLeft: 1 }}
-          >
+
+          <Typography variant={drawerHeaderVariant} sx={drawerHeaderStyles}>
             Block Library
           </Typography>
           <Tooltip
@@ -234,6 +238,8 @@ export function BlockLibraryDrawer() {
           <Stack direction="column" spacing={2}>
             <ViewExpander
               title="Activities"
+              titleSxProps={drawerTitleStyles}
+              titleVariant={drawerTitleVariant}
               defaultIsExpanded={false}
               headerSxProps={headerSxProps}
               rightMenuChildren={
@@ -262,6 +268,8 @@ export function BlockLibraryDrawer() {
             </ViewExpander>
             <ViewExpander
               title="Admonitions"
+              titleSxProps={drawerTitleStyles}
+              titleVariant={drawerTitleVariant}
               defaultIsExpanded={false}
               headerSxProps={headerSxProps}
               shouldEndWithDivider={true}
@@ -272,6 +280,8 @@ export function BlockLibraryDrawer() {
             </ViewExpander>
             <ViewExpander
               title="Layout"
+              titleSxProps={drawerTitleStyles}
+              titleVariant={drawerTitleVariant}
               defaultIsExpanded={true}
               headerSxProps={headerSxProps}
               shouldEndWithDivider={true}
@@ -299,6 +309,8 @@ export function BlockLibraryDrawer() {
             </ViewExpander>
             <ViewExpander
               title="Media"
+              titleSxProps={drawerTitleStyles}
+              titleVariant={drawerTitleVariant}
               defaultIsExpanded={false}
               headerSxProps={headerSxProps}
               shouldEndWithDivider={true}

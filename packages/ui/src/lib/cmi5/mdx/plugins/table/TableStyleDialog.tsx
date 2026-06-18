@@ -24,6 +24,7 @@ import {
   BlockWidthValue,
 } from '../shared/BlockAppearanceForm';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
+import { drawerTitleStyles, drawerTitleVariant } from 'packages/ui/src/lib/styles/typography';
 
 const contentWidthDescriptions: Record<BlockWidthValue, string> = {
   [BLOCK_WIDTH_INHERIT]: 'Use lesson-level content width setting',
@@ -685,7 +686,7 @@ export const TableStyleDialog: React.FC<TableStyleProps> = ({
           {/* --- CONTENT WIDTH --- */}
           <Grid size={12}>
             <Paper variant="outlined" sx={{ p: 2 }}>
-              <Typography variant="h6" sx={{ mb: 1 }}>Content Width</Typography>
+              <Typography variant={drawerTitleVariant} sx={{ ...drawerTitleStyles, mb: 1 }}>Content Width</Typography>
               <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                 <ToggleButtonGroup
                   value={blockWidthValue}

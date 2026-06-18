@@ -40,6 +40,7 @@ import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 
 import { useDrawerAutoHide } from '../../../toolbar/components/useDrawerAutoHide';
 import { animationShowSeq$ } from '../../../toolbar/components/drawers';
+import { drawerHeaderStyles, drawerHeaderVariant } from '@rapid-cmi5/ui';
 
 /**
  * Main animation drawer component
@@ -57,8 +58,14 @@ export function AnimationDrawer() {
 
   const showSeq = useCellValue(animationShowSeq$);
 
-  const { autoHide, toggleAutoHide, handleMouseEnter, handleMouseLeave, effectiveOpen, getDrawerSx } =
-    useDrawerAutoHide('animation', isOpen, showSeq);
+  const {
+    autoHide,
+    toggleAutoHide,
+    handleMouseEnter,
+    handleMouseLeave,
+    effectiveOpen,
+    getDrawerSx,
+  } = useDrawerAutoHide('animation', isOpen, showSeq);
 
   // Hook into Lexical selection
   const { selectedInfo, isAnimatable, notAnimatableReason } =
@@ -134,23 +141,33 @@ export function AnimationDrawer() {
           sx={{
             alignItems: 'center',
             padding: 2,
-             background: alpha(theme.palette.primary.main, 0.15),
+            background: alpha(theme.palette.primary.main, 0.15),
             borderBottom: 1,
             borderColor: 'divider',
           }}
         >
-          <MotionPhotosAutoIcon color="primary"/>
-          <Typography variant="h6" sx={{ color:'primary.main', flex: 1, marginLeft: 1 }}>
+          <MotionPhotosAutoIcon color="primary" />
+          <Typography variant={drawerHeaderVariant} sx={drawerHeaderStyles}>
             Animation Library
           </Typography>
-          <Tooltip title={autoHide ? 'Auto-hide on (click to pin)' : 'Auto-hide off (click to enable)'}>
+          <Tooltip
+            title={
+              autoHide
+                ? 'Auto-hide on (click to pin)'
+                : 'Auto-hide off (click to enable)'
+            }
+          >
             <IconButton
               onClick={toggleAutoHide}
               aria-label={autoHide ? 'Disable auto-hide' : 'Enable auto-hide'}
               size="small"
               sx={{ color: autoHide ? 'primary.main' : 'text.disabled' }}
             >
-              {autoHide ? <PushPinOutlinedIcon fontSize="small" /> : <PushPinIcon fontSize="small" />}
+              {autoHide ? (
+                <PushPinOutlinedIcon fontSize="small" />
+              ) : (
+                <PushPinIcon fontSize="small" />
+              )}
             </IconButton>
           </Tooltip>
           <IconButton

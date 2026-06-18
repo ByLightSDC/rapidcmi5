@@ -101,6 +101,7 @@ export * from './lib/validation/validationTypes';
 export * from './lib/utility/buttons';
 export * from './lib/utility/useToaster';
 export * from './lib/utility/logger';
+export * from './lib/styles/typography';
 export * from './lib/styles/muiTheme';
 export * from './lib/styles/muiThemeDark';
 export * from './lib/styles/lessonThemeStyles';
