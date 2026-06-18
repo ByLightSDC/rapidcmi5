@@ -108,6 +108,7 @@ export default function MenuLayout() {
       <PanelGroup direction="horizontal">
         <Panel defaultSize={45} minSize={5}>
           <Box
+            data-testid="player-slide-content"
             ref={slideRef}
             sx={{
               backgroundColor: palette.background.paper,

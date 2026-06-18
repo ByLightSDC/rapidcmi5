@@ -362,6 +362,7 @@ export const AccordionEditor: React.FC<
     <>
       <Box
         id="container"
+        data-testid="directive-accordion"
         ref={containerRef}
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         {...(contentWidth !== undefined
