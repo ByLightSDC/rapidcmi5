@@ -69,7 +69,7 @@ export default function AppHeader() {
    */
   const logoIcon = useMemo(() => {
     return (
-      <Stack direction="row" sx={{ paddingLeft: '4px' }}>
+      <Stack direction="row" sx={{ paddingLeft: '4px' }} aria-label="RapidCMI5">
         <RapidCmi5Icon isDarkThemeOnly={true} />
         <RapidCmi5Title />
       </Stack>
