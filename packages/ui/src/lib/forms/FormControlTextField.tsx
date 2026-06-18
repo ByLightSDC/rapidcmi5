@@ -15,6 +15,7 @@ import ReadOnlyTextField from './ReadOnlyTextField';
 import { ButtonIcon, ButtonInfoField } from '../utility/buttons';
 
 export type tFormControlTextFieldProps = {
+  autoComplete?: string;
   control?: Control;
   disabled?: boolean;
   error?: boolean;
@@ -37,6 +38,7 @@ export type tFormControlTextFieldProps = {
 };
 
 export function FormControlTextField({
+  autoComplete = 'off',
   control,
   disabled = true,
   error = false,
@@ -93,7 +95,7 @@ export function FormControlTextField({
               <div className="content-row">
                 {!readOnly ? (
                   <TextField
-                    autoComplete="off"
+                    autoComplete={autoComplete}
                     sx={{
                       borderRadius: '4px',
                       ...sxProps,

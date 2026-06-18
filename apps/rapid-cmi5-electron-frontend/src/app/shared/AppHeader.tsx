@@ -109,7 +109,7 @@ export default function AppHeader() {
       {/* Right section - Settings and User */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
         <IconButton
-          aria-label="user-settings"
+          aria-label="User Settings"
           id="settings-menu-anchor"
           onClick={() => onAppIconClick(settingsKey)}
           size="small"
@@ -143,7 +143,7 @@ export default function AppHeader() {
       {isElectron && (
         <>
           <IconButton
-            aria-label="terminal"
+            aria-label={terminalOpen ? 'Close Terminal' : 'Open Terminal'}
             aria-pressed={terminalOpen}
             disableTouchRipple
             onClick={handleOpenTerminal}
@@ -171,7 +171,7 @@ export default function AppHeader() {
             </Tooltip>
           </IconButton>
           <IconButton
-            aria-label="ai-tools"
+            aria-label={aiOpen ? 'Close AI Tools' : 'Open AI Tools'}
             aria-pressed={aiOpen}
             disableTouchRipple
             onClick={handleOpenAi}
