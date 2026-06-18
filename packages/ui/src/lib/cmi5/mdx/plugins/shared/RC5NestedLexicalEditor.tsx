@@ -44,6 +44,7 @@ import { importMdastTreeToLexical } from '../../util/importMarkdownToLexical';
 import { RC5SharedHistoryPlugin } from '../history/RC5SharedHistoryPlugin';
 import { useEffect, useState } from 'react';
 import { editorInPlayback$ } from '../../state/vars';
+import { renderMdastBlock, renderMdastInline } from '../../util/renderMdastStatic';
 
 /**
  * A nested editor React component that allows editing of the contents of complex markdown nodes that have nested markdown content (for example, custom directives or JSX elements).
@@ -285,6 +286,14 @@ export const RC5NestedLexicalEditor = function <
     updateMdastNode,
     rootEditor,
   ]);
+
+  if (isPlayback) {
+    return block ? (
+      <div>{content.map((node, i) => renderMdastBlock(node, i))}</div>
+    ) : (
+      <span>{renderMdastInline(content as Mdast.PhrasingContent[])}</span>
+    );
+  }
 
   return (
     <LexicalNestedComposer initialEditor={editor} initialTheme={lexicalTheme}>
