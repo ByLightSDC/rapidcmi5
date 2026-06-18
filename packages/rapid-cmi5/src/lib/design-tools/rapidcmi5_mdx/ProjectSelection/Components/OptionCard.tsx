@@ -1,4 +1,4 @@
-import { Info, InfoOutlined } from '@mui/icons-material';
+import { Info } from '@mui/icons-material';
 import {
   ListItem,
   ListItemButton,
@@ -34,87 +34,91 @@ const OptionCard = ({
 
   return (
     <ThemedOptionCard>
-      {/* Apply to outer or inner element */}
-      <ListItemButton
-        data-testid={dataTestId}
-        onClick={handleSelect}
-        disabled={disabled}
-        sx={{
-          borderRadius: 2,
-          p: 1.2,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          gap: 0.5,
-          transition: 'none',
-          '&:hover': {
-            background: 'transparent',
-          },
-        }}
-      >
-        {/* Header Row */}
-        <Box
+      <Box sx={{ position: 'relative' }}>
+        <ListItemButton
+          data-testid={dataTestId}
+          onClick={handleSelect}
+          disabled={disabled}
           sx={{
+            borderRadius: 2,
+            p: 1.2,
+            pr: 5,
             display: 'flex',
-            alignItems: 'center',
-            width: '100%',
-            gap: 1,
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            gap: 0.5,
+            transition: 'none',
+            '&:hover': {
+              background: 'transparent',
+            },
           }}
         >
-          <ListItemIcon
+          {/* Header Row */}
+          <Box
             sx={{
-              minWidth: 'auto',
-              color: alpha(palette.primary.main, 0.9),
+              display: 'flex',
+              alignItems: 'center',
+              width: '100%',
+              gap: 1,
             }}
           >
-            {icon}
-          </ListItemIcon>
-          <ListItemText
-            primary={title}
-            sx={{
-              margin: 0,
-              flex: 1,
-              fontFamily: '"IBM Plex Sans", sans-serif',
-              fontWeight: 500,
-              fontSize: '14px',
-              letterSpacing: '0.01em',
-            }}
-          />
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleShowDocs();
-            }}
-            disabled={disabled}
-            sx={{
-              color: alpha(palette.primary.main, 0.8),
-              transition: 'all 0.2s ease',
-              '&:hover': {
+            <ListItemIcon
+              sx={{
+                minWidth: 'auto',
                 color: alpha(palette.primary.main, 0.9),
-                background: alpha(palette.primary.main, 0.15),
-                transform: 'scale(1.1)',
-              },
+              }}
+            >
+              {icon}
+            </ListItemIcon>
+            <ListItemText
+              primary={title}
+              sx={{
+                margin: 0,
+                flex: 1,
+                fontFamily: '"IBM Plex Sans", sans-serif',
+                fontWeight: 500,
+                fontSize: '14px',
+                letterSpacing: '0.01em',
+              }}
+            />
+          </Box>
+
+          {/* Description Text */}
+          <Typography
+            variant="body2"
+            sx={{
+              fontSize: '0.8rem',
+              fontFamily: '"IBM Plex Sans", sans-serif',
+              lineHeight: 1.4,
+              pl: 1,
+              width: '100%',
             }}
           >
-            <Info fontSize="small" />
-          </IconButton>
-        </Box>
+            {subText}
+          </Typography>
+        </ListItemButton>
 
-        {/* Description Text */}
-        <Typography
-          variant="body2"
+        <IconButton
+          aria-label={`Information about ${title}`}
+          size="small"
+          onClick={handleShowDocs}
+          disabled={disabled}
           sx={{
-            fontSize: '0.8rem',
-            fontFamily: '"IBM Plex Sans", sans-serif',
-            lineHeight: 1.4,
-            pl: 1,
-            width: '100%',
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            color: alpha(palette.primary.main, 0.8),
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              color: alpha(palette.primary.main, 0.9),
+              background: alpha(palette.primary.main, 0.15),
+              transform: 'scale(1.1)',
+            },
           }}
         >
-          {subText}
-        </Typography>
-      </ListItemButton>
+          <Info fontSize="small" />
+        </IconButton>
+      </Box>
     </ThemedOptionCard>
   );
 };

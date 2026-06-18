@@ -61,10 +61,11 @@ export function GlassCard({
           {icon}
         </Box>
         <Typography
-          variant="h5"
+          variant="h2"
           sx={{
             fontFamily: '"Space Mono", monospace',
             fontWeight: 600,
+            fontSize: '18px',
           }}
         >
           {title}
