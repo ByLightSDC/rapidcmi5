@@ -110,6 +110,29 @@ div#horizontalgap {
   width: 0px;
 }
 
+/* Skip to main content link - visually hidden until focused */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 10000;
+  padding: 12px 24px;
+  background: #000000;
+  color: #ffffff !important;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 2px solid #ffffff;
+  border-radius: 0 0 4px 0;
+  white-space: nowrap;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 3px solid #6f96ff;
+  outline-offset: 2px;
+}
+
 /* REF  Scrollbar Styles
 Moved to theme
 */
@@ -427,13 +450,13 @@ align-items: center; */
 }
 
 /* Alternating row colors — activated by data-striped="true" on the table */
-.rc5-table[data-striped="true"] tbody tr:nth-child(odd) td {
+.rc5-table[data-striped='true'] tbody tr:nth-child(odd) td {
   background-color: var(--stripe-odd, #d6e4f7);
 }
-.rc5-table[data-striped="true"] tbody tr:nth-child(even) td {
+.rc5-table[data-striped='true'] tbody tr:nth-child(even) td {
   background-color: var(--stripe-even, #ffffff);
 }
 /* Explicit cell background-color (set via inline style) takes precedence */
-.rc5-table[data-striped="true"] tbody td[style*="background-color"] {
+.rc5-table[data-striped='true'] tbody td[style*='background-color'] {
   background-color: revert;
 }
