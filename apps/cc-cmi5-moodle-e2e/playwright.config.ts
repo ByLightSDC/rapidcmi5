@@ -34,6 +34,13 @@ export default defineConfig({
   // Tests share one remote Moodle course; serialize to avoid cross-test
   // interference on launch/completion state until we prove parallelism safe.
   workers: 1,
+  // The live player occasionally crashes on launch (a pre-existing,
+  // intermittent "A is not a function" in useCMI5Session's console-creds
+  // path — present on main, unrelated to these tests). That blanks the
+  // player iframe and fails whatever test ran during that launch. Retry so a
+  // transient crash re-launches instead of red-flagging the suite. See the
+  // known-issue note in docs/moodle-player-e2e-strategy.md.
+  retries: 2,
   use: {
     baseURL,
     trace: 'on-first-retry',

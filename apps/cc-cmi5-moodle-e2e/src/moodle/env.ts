@@ -49,4 +49,23 @@ export const moodleEnv = {
   get activityId(): string {
     return optional('MOODLE_ACTIVITY_ID', '744');
   },
+
+  // --- RangeOS devops API (class-scenario deployment, @scenario lane) ---
+
+  /** rangeos-api base, e.g. https://rangeos-api.develop-cp.rangeos.engineering */
+  devopsApiUrl: optional(
+    'NX_PUBLIC_DEVOPS_API_URL',
+    'https://rangeos-api.develop-cp.rangeos.engineering',
+  ),
+
+  /**
+   * Keycloak-minted JWT for rangeos-api (the long Authorization header the
+   * RangeOS dashboard sends when deploying a class scenario). Pasted manually
+   * for now — it expires, so refresh it for @scenario class runs. (Future:
+   * mint via Keycloak password grant against realm=cloudcents,
+   * client=rangeos-dashboard so it's self-sustaining.)
+   */
+  get rangeosApiJwt(): string {
+    return required('RANGEOS_API_JWT');
+  },
 };

@@ -1,4 +1,9 @@
-import { expect, type FrameLocator, type Page } from '@playwright/test';
+import {
+  expect,
+  type FrameLocator,
+  type Locator,
+  type Page,
+} from '@playwright/test';
 import { moodleEnv } from './env';
 
 /**
@@ -79,24 +84,42 @@ export interface LaunchedPlayer {
 }
 
 /**
- * Clicks Launch for the AU at `auIndex` (0-based row in the Assignable
- * Units table) and resolves to a handle on the player.
+ * Clicks Launch for the AU whose name matches `auName` in the Assignable
+ * Units table and resolves to a handle on the player.
  *
- * Detects iframe vs popup by racing a popup event against the appearance
- * of a player iframe. The spike's job is to confirm which path real Moodle
- * takes; both are wired so the test passes either way and logs the shape.
+ * The e2e course has multiple AUs (Media:Basic / Scenario:Individual /
+ * Scenario:Class / Components:Basic / Quiz:Basic), each a row in the table
+ * with its own Launch link. We target by NAME (the AU's row) rather than by
+ * index so test intent is explicit and order-independent.
  */
 export async function launchAu(
   page: Page,
-  auIndex = 0,
+  auName: string,
 ): Promise<LaunchedPlayer> {
-  // `exact: true` — see gotoActivity: a substring match would also hit the
-  // nav's "Toggle workplace launcher" link and open the apps grid instead.
-  const launchButton = page
-    .getByRole('link', { name: 'Launch', exact: true })
-    .nth(auIndex);
-  await expect(launchButton).toBeVisible();
+  // Scope to the table row containing the AU name, then its Launch link.
+  // `exact: true` on "Launch" — a substring match would also hit the nav's
+  // "Toggle workplace launcher" link and open the apps grid instead.
+  const row = page.getByRole('row', { name: new RegExp(escapeRegExp(auName)) });
+  const launchButton = row.getByRole('link', { name: 'Launch', exact: true });
+  await expect(launchButton).toBeVisible({ timeout: 15_000 });
 
+  return clickAndResolvePlayer(page, launchButton);
+}
+
+/** Escapes a string for safe use inside a RegExp (AU names contain ':'). */
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Clicks a Launch link and resolves the launched player, handling the three
+ * shapes Moodle may use (new tab / same-tab nav to launch.php with an iframe /
+ * injected iframe). Confirmed shape for RangeOS Moodle: sameTab + iframe.
+ */
+async function clickAndResolvePlayer(
+  page: Page,
+  launchButton: Locator,
+): Promise<LaunchedPlayer> {
   const urlBefore = page.url();
 
   // The cmi5 launch link opens with target=_blank, which the browser

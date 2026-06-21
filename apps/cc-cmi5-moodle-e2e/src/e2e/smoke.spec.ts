@@ -11,11 +11,15 @@ import { test, expect } from '../fixtures/moodle-course-fixture';
  * and the course actually rendered.
  *
  * **L3 scope:** verifies the player *rendered*, not specific slide content.
- * Slide-by-slide assertions live in slide-navigation / view-media /
- * view-blocks / activities / exit.
+ * Per-lesson content assertions live in view-media (Media:Basic) /
+ * view-blocks (Components:Basic) / activities (Quiz:Basic) / scenario
+ * (Scenario:Individual + Scenario:Class).
  */
 
 test.describe('moodle launch smoke @smoke', () => {
+  // Smoke against the simplest media lesson; any AU would do.
+  test.use({ auName: 'Media:Basic' });
+
   test('the launched player renders its slide content', async ({ player }) => {
     const slideContent = player.getByTestId('player-slide-content');
     await expect(slideContent).toBeVisible({ timeout: 30_000 });

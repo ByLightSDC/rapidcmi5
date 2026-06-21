@@ -1,78 +1,39 @@
-import type { FrameLocator, Page } from '@playwright/test';
 import { test, expect } from '../fixtures/moodle-course-fixture';
-
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+import {
+  waitForScenarioReady,
+  SCENARIO_READY_TIMEOUT as READY_TIMEOUT,
+} from '../lms/scenarioReady';
 
 /**
- * Individual Scenario activity tests — the async, infra-dependent tier.
+ * Scenario activity tests — the async, infra-dependent tier.
  *
- * The fixture course's "Individual Scenario" slide (index 7) authors a
- * `:::scenario` directive (test-console, an Ubuntu 22.04 workstation). On
- * launch the player provisions a real VM via the range backend, so unlike
- * the render tests this exercises live infrastructure:
+ * The course has two scenario AUs (they can't share a cmi5 lesson):
+ *   - Scenario:Individual — a `:::scenario` that AUTO-DEPLOYS a VM on launch
+ *     (promptClass: false). This file covers it end to end.
+ *   - Scenario:Class — a `:::scenario` with promptClass: true (prompts for a
+ *     Class ID / expects a pre-deployed scenario). Covered separately in
+ *     scenario-class.spec.ts (different flow).
  *
- *   launch → "Loading..." → scenario deployed (status transitions to Ready)
- *          → HYPERVISOR console button available → Guacamole console opens.
+ * Each scenario AU has a single slide (Slide 1 = player-slide-tab-0).
  *
- * **@scenario lane — kept OUT of the default run.** These depend on the
- * range backend actually deploying a VM, which can take minutes and can be
- * down. Run them on-demand against a known-healthy backend:
- *   npx nx e2e cc-cmi5-moodle-e2e --configuration=scenario   (grep @scenario)
+ * **@scenario lane — kept OUT of the default run.** Depends on the range
+ * backend deploying a VM (minutes, can be down). Run on-demand:
+ *   npx nx e2e cc-cmi5-moodle-e2e --configuration=scenario
  *
- * Readiness contract (test-ids added in cc-cmi5-player):
+ * Readiness contract (player test-ids):
  *   scenario-loading        — "Loading..." box; present until deployed
- *   scenario-header         — deployed scenario header; carries
- *                             data-scenario-status="<lifecycle status>"
- *   scenario-status-icon    — shown only while status !== Ready; its
- *                             ABSENCE is the "ready" signal
- *   scenario-console-button — the HYPERVISOR console button
- *   scenario-console-popup  — the Guacamole console window (#total-container)
+ *   scenario-header         — deployed header; data-scenario-status="<status>"
+ *   scenario-status-icon    — shown only while status !== Ready (absence=ready)
+ *   scenario-console-button — HYPERVISOR console button
+ *   scenario-console-popup  — Guacamole window (+data-connected on CONNECTED)
  */
 
-const SCENARIO_SLIDE = 'player-slide-tab-7';
-
-// VM provisioning is slow and varies with backend load. Default 10 min,
-// override with SCENARIO_READY_TIMEOUT_MS for a slower/faster backend.
-const READY_TIMEOUT = Number(
-  process.env['SCENARIO_READY_TIMEOUT_MS'] ?? 10 * 60_000,
-);
-
-// Scenario lifecycle statuses (from DeployedScenarioDetailStatusEnum):
-// Unknown / Ready / NotReady / Creating / Error / Deleting / Stopped.
-const TERMINAL_FAILURE_STATUSES = ['Error', 'Stopped', 'Deleting'];
-
-/**
- * Waits for the scenario to reach `Ready`, polling `data-scenario-status` so
- * a timeout reports the status it was STUCK in (e.g. "Creating") rather than
- * a bare locator timeout. Fails fast on a terminal-failure status.
- */
-async function waitForScenarioReady(
-  player: FrameLocator | Page,
-): Promise<void> {
-  const header = player.getByTestId('scenario-header');
-  // Header appears once the scenario is deployed (status known at all).
-  await expect(header).toBeVisible({ timeout: READY_TIMEOUT });
-
-  const deadline = Date.now() + READY_TIMEOUT;
-  let lastStatus = '(unknown)';
-  while (Date.now() < deadline) {
-    lastStatus =
-      (await header.getAttribute('data-scenario-status')) ?? '(none)';
-    if (lastStatus === 'Ready') return;
-    if (TERMINAL_FAILURE_STATUSES.includes(lastStatus)) {
-      throw new Error(
-        `Scenario reached terminal status "${lastStatus}" — backend deploy failed/torn down.`,
-      );
-    }
-    await sleep(5_000);
-  }
-  throw new Error(
-    `Scenario did not become Ready within ${READY_TIMEOUT}ms (last status: "${lastStatus}"). ` +
-      `If the backend was healthy but slow, raise SCENARIO_READY_TIMEOUT_MS.`,
-  );
-}
+// Each scenario AU has one slide.
+const SCENARIO_SLIDE = 'player-slide-tab-0';
 
 test.describe('individual scenario @scenario @slow', () => {
+  test.use({ auName: 'Scenario:Individual' });
+
   test('scenario directive renders with type=scenario', async ({ player }) => {
     await player.getByTestId(SCENARIO_SLIDE).click();
 
@@ -91,8 +52,6 @@ test.describe('individual scenario @scenario @slow', () => {
 
     await waitForScenarioReady(player);
 
-    // Once Ready: "Loading..." is gone and the provisioning/error status icon
-    // (shown only while status !== Ready) is no longer present.
     await expect(player.getByTestId('scenario-loading')).toHaveCount(0);
     await expect(player.getByTestId('scenario-status-icon')).toHaveCount(0);
     await expect(player.getByTestId('scenario-header')).toHaveAttribute(
@@ -111,10 +70,9 @@ test.describe('individual scenario @scenario @slow', () => {
     await expect(hypervisor).toBeVisible({ timeout: READY_TIMEOUT });
     await hypervisor.click();
 
-    // The Guacamole console window mounts.
-    await expect(
-      player.getByTestId('scenario-console-popup'),
-    ).toBeVisible({ timeout: 60_000 });
+    await expect(player.getByTestId('scenario-console-popup')).toBeVisible({
+      timeout: 60_000,
+    });
   });
 
   test('HYPERVISOR console connects to the VM (login screen reached)', async ({
@@ -132,16 +90,13 @@ test.describe('individual scenario @scenario @slow', () => {
     const popup = player.getByTestId('scenario-console-popup');
     await expect(popup).toBeVisible({ timeout: 60_000 });
 
-    // The Guacamole tunnel reaching CONNECTED means the VM display (the Ubuntu
-    // login screen) is live — not just that the window opened. We can't assert
-    // the login text itself because Guacamole paints into a <canvas> (pixels,
-    // no queryable DOM), so the connection-state attribute is the signal.
+    // Guacamole reaching CONNECTED means the VM display (Ubuntu login screen)
+    // is live — not just the window opened. Can't assert the login text:
+    // Guacamole paints into a <canvas> (pixels, no queryable DOM).
     await expect(popup).toHaveAttribute('data-connected', 'true', {
       timeout: 90_000,
     });
 
-    // Sanity: the Guacamole display canvas attached and has real dimensions
-    // (a painted login screen), not a 0x0 / absent canvas.
     const canvas = popup.locator('canvas').first();
     await expect(canvas).toBeVisible({ timeout: 10_000 });
   });

@@ -37,7 +37,8 @@ test.describe('Moodle launch @launch', () => {
     await login(page);
     await gotoActivity(page, moodleEnv.activityId);
 
-    const player = await launchAu(page, 0);
+    // Launch the simplest media lesson; the spike only proves launch mechanics.
+    const player = await launchAu(page, 'Media:Basic');
 
     // Observation for the spike write-up: how did Moodle surface the player?
     // Confirmed `sameTab` against RangeOS Moodle (the Launch link navigates
