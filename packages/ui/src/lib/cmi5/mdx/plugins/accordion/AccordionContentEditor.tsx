@@ -113,8 +113,6 @@ export const AccordionContentEditor: React.FC<
       </AccordionSummary>
       <AccordionDetails
         id={`panel${accordionIndex}-content`}
-        role="region"
-        aria-labelledby={`panel${accordionIndex}-header`}
         sx={{ backgroundColor: basePageBg, position: 'relative' }}
         ref={contentRef}
       >
