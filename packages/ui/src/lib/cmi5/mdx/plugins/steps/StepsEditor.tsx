@@ -53,6 +53,7 @@ import {
 } from '../../../../utility/buttons';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
+import { renderMdastBlock } from '../../util/renderMdastStatic';
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { useCoursePresentation } from '../../contexts/PresentationContext';
 import {
@@ -560,21 +561,29 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                   </Typography>
                 </Box>
 
-                <NestedLexicalEditor<ContainerDirective>
-                  block={true}
-                  getContent={(node) => {
-                    return node.children;
-                  }}
-                  getUpdatedMdastNode={(node, children: any) => ({
-                    ...node,
-                    children,
-                  })}
-                  contentEditableProps={{
-                    'aria-label': title
-                      ? `${title} step content`
-                      : 'Step content',
-                  }}
-                />
+                {isPlayback ? (
+                  <div>
+                    {(
+                      mdastNode.children[step]?.children as unknown as Mdast.RootContent[]
+                    )?.map((node, i) => renderMdastBlock(node, i))}
+                  </div>
+                ) : (
+                  <NestedLexicalEditor<ContainerDirective>
+                    block={true}
+                    getContent={(node) => {
+                      return node.children;
+                    }}
+                    getUpdatedMdastNode={(node, children: any) => ({
+                      ...node,
+                      children,
+                    })}
+                    contentEditableProps={{
+                      'aria-label': title
+                        ? `${title} step content`
+                        : 'Step content',
+                    }}
+                  />
+                )}
                 <Stack
                   direction="row"
                   spacing={1}
