@@ -15,6 +15,7 @@ declare global {
       NX_PUBLIC_KEYCLOAK_CLIENT_ID?: string;
       NX_PUBLIC_KEYCLOAK_SCOPE?: string;
       NX_PUBLIC_MSW_MOCK?: boolean;
+      NX_PUBLIC_PLAYER_PUBLIC_PATH?: string;
     };
   }
 }
@@ -103,6 +104,11 @@ let MSW_MOCK =
   yn(process.env['NX_PUBLIC_MSW_MOCK'], { default: false });
 MSW_MOCK = checkEnv(MSW_MOCK, 'NX_PUBLIC_MSW_MOCK');
 
+const PLAYER_PUBLIC_PATH =
+  window._env_?.NX_PUBLIC_PLAYER_PUBLIC_PATH ||
+  process.env['NX_PUBLIC_PLAYER_PUBLIC_PATH'] ||
+  '/course/blocks/name/au/';
+
 //Static
 const DEVOPS_API_CMI_VERSION = '/v1/cmi5';
 const DEVOPS_API_CONTENT_VERSION = '/v1/content';
@@ -124,14 +130,5 @@ export const config = {
   DEVOPS_GQL_URL,
   CMI5_SSO_ENABLED,
   MSW_MOCK,
-  THEME: {
-    DARK: {},
-    LIGHT: {},
-    SLIDE_BACKGROUND: '',
-    LOGO_DARK: './assets/bylight/RapidCMI5_Logo_Dark.png',
-    LOGO_LIGHT: './assets/bylight/RapidCMI5_Logo_Light.png',
-    LOGO_WIDTH: '140px',
-    TITLE: '',
-    FAV_ICON: '',
-  },
+  PLAYER_PUBLIC_PATH,
 };

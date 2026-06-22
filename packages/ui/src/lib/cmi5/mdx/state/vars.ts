@@ -2,7 +2,7 @@ import { Cell } from '@mdxeditor/editor';
 import {
   ActivityScore,
   GetActivityCacheHandler,
-  LessonTheme,
+  Rc5Theme,
   SetActivityCacheHandler,
   SetCmi5ProgressHandler,
   SubmitCmiScoreHandler,
@@ -26,4 +26,4 @@ export const activeTab$ = Cell<number | null>(null);
  * settings even though they render via Lexical portals outside the React
  * context provider tree.
  */
-export const lessonTheme$ = Cell<LessonTheme | undefined>(undefined);
+export const courseTheme$ = Cell<Rc5Theme | undefined>(undefined);

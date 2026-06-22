@@ -61,14 +61,14 @@ import {
   generateLessonThemeStyleTag,
   StepsDirectiveDescriptor,
   StepContentDirectiveDescriptor,
-  LessonThemeContext,
   QuotesContainerDirectiveDescriptor,
   QuotesContentDirectiveDescriptor,
   StatementsContainerDirectiveDescriptor,
   StatementDirectiveDescriptor,
+  useCoursePresentation,
 } from '@rapid-cmi5/ui';
 
-import { videoPlugin } from '@rapid-cmi5/react-editor';
+import { audioPlugin, videoPlugin } from '@rapid-cmi5/react-editor';
 import { RC5PlayerToolbar } from './RC5PlayerToolbar';
 import { ActivityDirectiveDescriptor } from './editors/directives/ActivityDirectiveDescriptor';
 import { AuManagerContext } from '../../session/AuManager';
@@ -79,14 +79,14 @@ import { GridCellDirectiveDescriptor } from './editors/directives/GridCellDirect
 import { mediaEventManager } from '../../utils/MediaEventManager';
 import { logger } from '../../debug';
 import { useSelector } from 'react-redux';
-import { auJsonSel, slideWidth } from '../../redux/auReducer';
+import { slideWidth } from '../../redux/auReducer';
 
 /**
  * Rapid CMI5 Visual Editor
  * @returns
  */
 function RC5Player() {
-  const ref = React.useRef<MDXEditorMethods>(null);
+  const ref = useRef<MDXEditorMethods>(null);
   const { slideData, activeTab } = useContext(AuManagerContext);
   const [fullScreenImage, setFullScreenImage] = useState<string>('');
   const [fullScreenImageStyle, setFullScreenImageStyle] = useState({});
@@ -96,8 +96,9 @@ function RC5Player() {
   );
   const [slideAnimations, setSlideAnimations] = useState<AnimationConfig[]>([]);
   const slideWidthSel = useSelector(slideWidth);
-  const auJson = useSelector(auJsonSel);
-  const currentLessonTheme = auJson?.lessonTheme;
+
+  const { rc5Theme } = useCoursePresentation();
+
   const themeClass = useRef(
     `lesson-theme-${Math.random().toString(36).slice(2, 9)}`,
   ).current;
@@ -178,6 +179,7 @@ function RC5Player() {
         disableVideoResize: true,
         disableVideoSettingsButton: true,
       }),
+      audioPlugin({ disableAudioSettingsButton: true }),
       imagePlayerPlugin(),
       animationPlayerPlugin(),
       ariaOverridePlugin(),
@@ -310,12 +312,12 @@ function RC5Player() {
   const lessonStyleCss = useMemo(() => {
     const css = generateLessonThemeStyleTag(
       themeClass,
-      currentLessonTheme,
+      rc5Theme,
       slideWidthSel,
       true,
     );
     return css;
-  }, [themeClass, currentLessonTheme, slideWidthSel]);
+  }, [themeClass, rc5Theme, slideWidthSel]);
 
   /**
    * Set up an event listener for the ESC key.
@@ -338,7 +340,7 @@ function RC5Player() {
     };
   }, []);
 
-  const editorContainerRef = React.useRef<HTMLDivElement>(null);
+  const editorContainerRef = useRef<HTMLDivElement>(null);
 
   /**
    * Parse animations from markdown BEFORE loading into editor
@@ -428,27 +430,19 @@ function RC5Player() {
         sx={{ height: '100%' }}
         ref={editorContainerRef}
       >
-        {currentLessonTheme && <style>{lessonStyleCss}</style>}
+        {rc5Theme && <style>{lessonStyleCss}</style>}
         {thePlugins && thePlugins.length > 0 && (
-          <LessonThemeContext.Provider
-            value={{ lessonTheme: currentLessonTheme }}
-          >
-            <div
-              role="tabpanel"
-              aria-label="Slide content"
-              ref={slideContentRef}
-            >
-              <div id="toc-portal-target" />
-              <MDXEditor
-                className={mdxTheme}
-                ref={ref}
-                markdown={''}
-                plugins={thePlugins}
-                readOnly={true}
-                key={activeTab}
-              />
-            </div>
-          </LessonThemeContext.Provider>
+          <div role="tabpanel" aria-label="Slide content" ref={slideContentRef}>
+            <div id="toc-portal-target" />
+            <MDXEditor
+              className={mdxTheme}
+              ref={ref}
+              markdown={''}
+              plugins={thePlugins}
+              readOnly={true}
+              key={activeTab}
+            />
+          </div>
         )}
       </Box>
       {fullScreenImage && (

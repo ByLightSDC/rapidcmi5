@@ -42,29 +42,50 @@ class PlayerManifestPlugin {
 const AdmZip = require('adm-zip');
 
 const TEST_DIR = path.resolve(__dirname, 'src/test');
-const TEST_CONFIG_PATH = path.join(TEST_DIR, 'config.json');
-const TEST_ASSETS_PATH = path.join(TEST_DIR, 'Assets');
+const TEST_CONFIG_PATH = path.join(TEST_DIR, 'au', 'config.json');
+const TEST_ASSETS_PATH = path.join(TEST_DIR, 'au', 'Assets');
+const TEST_RC5_YAML_PATH = path.join(TEST_DIR, 'RC5.yaml');
+const TEST_COURSE_ASSETS_PATH = path.join(TEST_DIR, 'Assets');
 
 function setCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 }
 // Nx plugins for webpack.
 module.exports = composePlugins(withNx(), withReact(), (config) => {
-  // Exclude monaco-editor from default CSS rules (postcss-loader can't resolve .ttf)
+  // The font stylesheet declares url('./Roboto/Roboto-Bold.ttf') etc. Running it
+  // through Nx's default postcss/css-loader chain makes the loader try to resolve
+  // those .ttf references, which fails on Windows (it mangles the absolute path,
+  // dropping the drive letter -> \code\bylight\...). The .ttf files are already
+  // copied verbatim into the build by the `assets` array in project.json, and the
+  // compiled stylesheet lives alongside them under assets/fonts/, so the relative
+  // url()s resolve at runtime. We therefore exclude this stylesheet (and
+  // monaco-editor's CSS, same .ttf-resolution problem) from the default CSS rules
+  // and handle them with a plain css-loader that leaves url()s untouched.
+  const FONT_CSS = /assets[\\/]fonts[\\/]stylesheet\.css$/;
   config.module.rules.forEach((rule) => {
     if (rule.oneOf) {
       rule.oneOf.forEach((oneOfRule) => {
         if (oneOfRule.test && oneOfRule.test.toString().includes('css')) {
           if (Array.isArray(oneOfRule.exclude)) {
-            oneOfRule.exclude.push(/monaco-editor/);
+            oneOfRule.exclude.push(/monaco-editor/, FONT_CSS);
           } else if (oneOfRule.exclude) {
-            oneOfRule.exclude = [oneOfRule.exclude, /monaco-editor/];
+            oneOfRule.exclude = [oneOfRule.exclude, /monaco-editor/, FONT_CSS];
           } else {
-            oneOfRule.exclude = /monaco-editor/;
+            oneOfRule.exclude = [/monaco-editor/, FONT_CSS];
           }
         }
       });
     }
+  });
+
+  // Handle the font stylesheet without postcss; url:false leaves the relative
+  // .ttf references as-is (the files are copied as static assets, see above).
+  config.module.rules.unshift({
+    test: FONT_CSS,
+    use: [
+      'style-loader',
+      { loader: 'css-loader', options: { url: false } },
+    ],
   });
 
   // Handle monaco-editor CSS without postcss-loader
@@ -83,9 +104,17 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
   config.plugins = config.plugins || [];
   config.plugins.push(new PlayerManifestPlugin());
 
+  const PUBLIC_PATH =
+    process.env.NX_PUBLIC_PLAYER_PUBLIC_PATH || '/course/blocks/name/au/';
+
   const theConfig = merge(config, {
     ignoreWarnings: [/Failed to parse source map/],
+    output: {
+      publicPath: PUBLIC_PATH,
+    },
     devServer: {
+      devMiddleware: { publicPath: PUBLIC_PATH },
+      historyApiFallback: { index: `${PUBLIC_PATH}index.html` },
       client: {
         overlay: {
           runtimeErrors: (error) => {
@@ -99,6 +128,20 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
       // Allow cross-origin requests from the editor dev server (localhost:4200)
       headers: { 'Access-Control-Allow-Origin': '*' },
       setupMiddlewares: (middlewares, devServer) => {
+        // Redirect root → app's public path so bare localhost:4200 works.
+        devServer.app.get('/', (_req, res) => res.redirect(PUBLIC_PATH));
+
+        // Serve test fixtures from the parent of the player URL so:
+        //   /course/blocks/name/RC5.yaml       -> src/test/RC5.yaml
+        //   /course/blocks/name/au/config.json -> src/test/au/config.json
+        //   /course/blocks/name/au/Assets/...  -> src/test/au/Assets/...
+        // Mounted in setupMiddlewares so it runs before historyApiFallback
+        // (which would otherwise rewrite unknown paths to index.html).
+        devServer.app.use(
+          '/course/blocks/name',
+          require('express').static(TEST_DIR),
+        );
+
         // CORS preflight for all dev endpoints
         devServer.app.use((req, res, next) => {
           if (req.method === 'OPTIONS') {
@@ -131,19 +174,23 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
         });
 
         // POST /upload-lesson-zip — full path with assets, zip bytes sent directly from browser
-        // Query param: lessonDirPath — path inside zip to the lesson folder
-        //              (e.g. "compiled_course/blocks/sandbox/intro")
+        // Query params:
+        //   lessonDirPath — path inside zip to the lesson folder
+        //                   (e.g. "compiled_course/blocks/sandbox/intro")
+        //   courseDirPath — optional path inside zip to the course root
+        //                   (e.g. "compiled_course/blocks/sandbox"). When provided,
+        //                   RC5.yaml and the course-level Assets/ are also extracted
+        //                   into TEST_DIR.
         // Body: raw zip bytes (application/octet-stream)
         devServer.app.post('/upload-lesson-zip', (req, res) => {
           setCors(res);
           const lessonDirPath = req.query['lessonDirPath'];
+          const courseDirPath = req.query['courseDirPath'];
           if (!lessonDirPath) {
-            return res
-              .status(400)
-              .json({
-                success: false,
-                error: 'lessonDirPath query param is required',
-              });
+            return res.status(400).json({
+              success: false,
+              error: 'lessonDirPath query param is required',
+            });
           }
 
           const chunks = [];
@@ -158,12 +205,10 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
               // Extract config.json
               const configEntry = zip.getEntry(`${lessonDirPath}/config.json`);
               if (!configEntry) {
-                return res
-                  .status(400)
-                  .json({
-                    success: false,
-                    error: `config.json not found at ${lessonDirPath}/config.json in zip`,
-                  });
+                return res.status(400).json({
+                  success: false,
+                  error: `config.json not found at ${lessonDirPath}/config.json in zip`,
+                });
               }
               fs.mkdirSync(TEST_DIR, { recursive: true });
               fs.writeFileSync(
@@ -191,7 +236,50 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
                 fs.rmSync(TEST_ASSETS_PATH, { recursive: true, force: true });
               }
 
-              res.json({ success: true, assetsCount: assetEntries.length });
+              let courseAssetsCount = 0;
+              let rc5YamlExtracted = false;
+              if (courseDirPath) {
+                const rc5Entry = zip.getEntry(`${courseDirPath}/RC5.yaml`);
+                if (rc5Entry) {
+                  fs.writeFileSync(
+                    TEST_RC5_YAML_PATH,
+                    rc5Entry.getData().toString('utf-8'),
+                    'utf-8',
+                  );
+                  rc5YamlExtracted = true;
+                } else {
+                  fs.rmSync(TEST_RC5_YAML_PATH, { force: true });
+                }
+
+                const courseAssetsPrefix = `${courseDirPath}/Assets/`;
+                const courseAssetEntries = zip
+                  .getEntries()
+                  .filter(
+                    (e) =>
+                      e.entryName.startsWith(courseAssetsPrefix) &&
+                      !e.isDirectory,
+                  );
+                fs.rmSync(TEST_COURSE_ASSETS_PATH, {
+                  recursive: true,
+                  force: true,
+                });
+                for (const entry of courseAssetEntries) {
+                  const relPath = entry.entryName.slice(
+                    courseAssetsPrefix.length,
+                  );
+                  const destPath = path.join(TEST_COURSE_ASSETS_PATH, relPath);
+                  fs.mkdirSync(path.dirname(destPath), { recursive: true });
+                  fs.writeFileSync(destPath, entry.getData());
+                }
+                courseAssetsCount = courseAssetEntries.length;
+              }
+
+              res.json({
+                success: true,
+                assetsCount: assetEntries.length,
+                courseAssetsCount,
+                rc5YamlExtracted,
+              });
             } catch (err) {
               res.status(500).json({ success: false, error: err.message });
             }
@@ -214,12 +302,10 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
               const { zipPath, lessonDirPath } = JSON.parse(body);
 
               if (!zipPath || !lessonDirPath) {
-                return res
-                  .status(400)
-                  .json({
-                    success: false,
-                    error: 'zipPath and lessonDirPath are required',
-                  });
+                return res.status(400).json({
+                  success: false,
+                  error: 'zipPath and lessonDirPath are required',
+                });
               }
               if (!fs.existsSync(zipPath)) {
                 return res
@@ -232,12 +318,10 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
               // Extract config.json
               const configEntry = zip.getEntry(`${lessonDirPath}/config.json`);
               if (!configEntry) {
-                return res
-                  .status(400)
-                  .json({
-                    success: false,
-                    error: `config.json not found at ${lessonDirPath}/config.json in zip`,
-                  });
+                return res.status(400).json({
+                  success: false,
+                  error: `config.json not found at ${lessonDirPath}/config.json in zip`,
+                });
               }
               fs.mkdirSync(TEST_DIR, { recursive: true });
               fs.writeFileSync(

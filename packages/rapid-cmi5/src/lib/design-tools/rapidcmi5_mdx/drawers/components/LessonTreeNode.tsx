@@ -1,6 +1,3 @@
-/* eslint-disable react/jsx-no-useless-fragment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { INode } from 'react-accessible-treeview/dist/TreeView/types';
 
 /* MUI */
@@ -31,7 +28,6 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import NewspaperOutlinedIcon from '@mui/icons-material/NewspaperOutlined';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import PaletteIcon from '@mui/icons-material/Palette';
 
 import React, { useRef } from 'react';
 import { ButtonOptions, RowAction } from '@rapid-cmi5/ui';
@@ -67,7 +63,6 @@ export enum LessonNodeActionEnum {
   AddSlide,
   Rename,
   SetMoveOnCriteria,
-  LessonSettings,
   Delete,
 }
 
@@ -97,10 +92,6 @@ const lessonNodeActions = [
   {
     tooltip: 'Move On Criteria',
     icon: <EmojiEventsIcon color="inherit" />,
-  },
-  {
-    tooltip: 'Lesson Appearance',
-    icon: <PaletteIcon color="inherit" />,
   },
   {
     tooltip: 'Delete Lesson',
@@ -424,7 +415,6 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                 {element.name}
               </Typography>
               {slideNodeActions.map((option: RowAction, index: number) => (
-                // eslint-disable-next-line react/jsx-no-useless-fragment
                 <>
                   {!option.hidden && (
                     <React.Fragment key={option.tooltip}>

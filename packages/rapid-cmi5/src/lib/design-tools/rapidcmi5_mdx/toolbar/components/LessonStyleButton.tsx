@@ -15,7 +15,6 @@ export const LessonStyleButton = () => {
   const changeViewMode = usePublisher(drawerMode$);
   const publishShowSeq = usePublisher(stylesShowSeq$);
   const showSeq = useCellValue(stylesShowSeq$);
-const theme = useTheme();
   const handleClick = useCallback(() => {
     changeViewMode(DRAWER_TYPE.STYLES);
     publishShowSeq(showSeq + 1);
@@ -23,11 +22,11 @@ const theme = useTheme();
 
   return (
     <MUIButtonWithTooltip
-      title="Lesson Appearance"
+      title="Course Appearance"
       onClick={handleClick}
-      aria-label="Lesson Appearance"
+      aria-label="Course Appearance"
     >
-      <PaletteIcon fontSize="medium"  />
+      <PaletteIcon fontSize="medium" />
     </MUIButtonWithTooltip>
   );
 };

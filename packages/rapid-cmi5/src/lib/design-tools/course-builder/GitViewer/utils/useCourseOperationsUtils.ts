@@ -6,15 +6,13 @@ import YAML from 'yaml';
 import {
   CourseAU,
   CourseData,
-  generateAuId,
-  KSATElement,
-  LessonTheme,
+  KSATElementType,
+  Rc5Theme,
   Operation,
   RC5_VERSION,
-  RC5ScenarioContent,
+  ScenarioContent,
   SlideType,
-  SlideTypeEnum,
-  TeamConsolesContent,
+  parseCourseDataYaml,
 } from '@rapid-cmi5/cmi5-build-common';
 import { courseNameInUseMessage } from '../session/constants';
 import { GitFS, MAX_FS_SLUG_LENGTH } from './fileSystem';
@@ -24,7 +22,12 @@ import {
   getScenarioDirectives,
   RC5_FILENAME,
 } from '@rapid-cmi5/cmi5-build-common';
-import { debugLog, debugLogError, defaultEmptySlide } from '@rapid-cmi5/ui';
+import {
+  debugLog,
+  debugLogError,
+  defaultEmptySlide,
+  defaultTheme,
+} from '@rapid-cmi5/ui';
 import { basename, dirname, join, normalize } from 'path-browserify';
 import JSZip from 'jszip';
 import { getRepoPath, GitOperations } from './gitOperations';
@@ -110,7 +113,7 @@ export const createNewCourseInFs = async ({
   courseDescription,
   courseId,
   baseSlideTitle = 'Slide 1',
-  baseSlideContent = defaultEmptySlide.content,
+  baseSlideContent = defaultEmptySlide.content ?? '',
 }: CreateNewCourseInFsOptions) => {
   try {
     await fsInstance.createDir(r, coursePath);
@@ -139,7 +142,6 @@ export const createNewCourseInFs = async ({
               slides: [
                 {
                   slideTitle: baseSlideTitle,
-                  type: SlideTypeEnum.Markdown,
                   filepath: firstSlidePath,
                 },
               ],
@@ -149,6 +151,7 @@ export const createNewCourseInFs = async ({
           blockDescription: '',
         },
       ],
+      courseTheme: defaultTheme,
       gitBranch,
       remoteGitUrl,
       buildTime,
@@ -289,14 +292,14 @@ export const findAllCourses = async ({
 export const readRC5Meta = async (
   r: RepoAccessObject,
   fsInstance: GitFS,
-
   metaPath: string,
 ): Promise<CourseData | null> => {
   try {
     const navContent = await fsInstance.getFileContent(r, join(metaPath));
     if (!navContent?.content) throw new Error('No content in metadata');
 
-    return YAML.parse(navContent.content.toString()) as CourseData;
+    const courseData = parseCourseDataYaml(navContent.content);
+    return courseData;
   } catch (err) {
     debugLogError(`Failed to parse YAML: ${err}`);
     return null;
@@ -461,11 +464,11 @@ export async function updateSlidePaths(
   fsInstance: GitFS,
   changedFiles: string[],
 ): Promise<{
-  firstScenario?: RC5ScenarioContent;
-  firstTeamScenario?: TeamConsolesContent;
+  firstScenario?: ScenarioContent;
+  firstTeamScenario?: ScenarioContent;
 }> {
-  let firstScenario: RC5ScenarioContent | undefined = undefined;
-  let firstTeamScenario: TeamConsolesContent | undefined = undefined;
+  let firstScenario: ScenarioContent | undefined = undefined;
+  let firstTeamScenario: ScenarioContent | undefined = undefined;
 
   for (const slide of au.slides) {
     const fileName = slugifyPath(slide.slideTitle);
@@ -500,20 +503,20 @@ export async function updateSlidePaths(
     }
 
     if (typeof slide.content === 'string') {
-      let individualTrainingScenarios: RC5ScenarioContent[];
+      let individualTrainingScenarios: ScenarioContent[];
       try {
         individualTrainingScenarios = getScenarioDirectives(slide.content);
       } catch {
         individualTrainingScenarios = [];
       }
 
-      let teamExerciseScenarios: TeamConsolesContent[];
+      let teamExerciseScenarios: ScenarioContent[];
 
       try {
         teamExerciseScenarios = getScenarioDirectives(
           slide.content,
           'consoles',
-        ) as TeamConsolesContent[];
+        ) as ScenarioContent[];
       } catch {
         teamExerciseScenarios = [];
       }
@@ -525,7 +528,7 @@ export async function updateSlidePaths(
         firstScenario = individualTrainingScenarios[0];
       }
       if (teamExerciseScenarios && teamExerciseScenarios.length > 0) {
-        firstTeamScenario = teamExerciseScenarios[0] as TeamConsolesContent;
+        firstTeamScenario = teamExerciseScenarios[0] as ScenarioContent;
       }
     }
   }
@@ -537,7 +540,7 @@ export interface CreateLessonOptions extends FsContextOptions {
   blockIndex: number;
   auName: string;
   coursePath: string;
-  defaultLessonTheme?: LessonTheme;
+  defaultLessonTheme?: Rc5Theme;
 }
 
 export const createLesson = async ({
@@ -636,7 +639,7 @@ export const computeCourseFromJsonFs = async ({
     throw Error('Course Data is null');
   }
 
-  let rc5Meta = await readRC5Meta(
+  const rc5Meta = await readRC5Meta(
     r,
     fsInstance,
     join(course.basePath, RC5_FILENAME),
@@ -750,7 +753,7 @@ const stripSlideContent = (course: CourseData): CourseData => ({
     ...block,
     aus: block.aus.map((au) => {
       // Extract KSATs from all slides in this AU
-      const allKsats: KSATElement[] = [];
+      const allKsats: KSATElementType[] = [];
       au.slides.forEach((slide) => {
         if (slide.content && typeof slide.content === 'string') {
           const slideKsats = extractKsatsFromSlide(slide.content);
@@ -774,7 +777,7 @@ const stripSlideContent = (course: CourseData): CourseData => ({
 });
 
 // Extract KSAT data from slide content
-const extractKsatsFromSlide = (slideContent: string): KSATElement[] => {
+const extractKsatsFromSlide = (slideContent: string): KSATElementType[] => {
   try {
     // Look for JSON blocks in the slide content
     const jsonMatch = slideContent.match(/```json\s*([\s\S]*?)\s*```/);

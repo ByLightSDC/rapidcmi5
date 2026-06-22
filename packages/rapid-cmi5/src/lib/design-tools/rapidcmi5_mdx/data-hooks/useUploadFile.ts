@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import {
   AssetType,
   useLessonAssets,
-} from '../../course-builder/GitViewer/session/LessonAssetsContext';
+} from '../../../contexts/LessonAssetsContext';
 import { debugLogError } from '@rapid-cmi5/ui';
 
 export type AssetUploadHandler = (file: File) => Promise<string>;

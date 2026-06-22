@@ -25,6 +25,7 @@ import {
 } from './index';
 import { $isAudioNode } from './AudioNode';
 import styles from './styles/audio-plugin.module.css';
+import { AudioTranscript } from './AudioTranscript';
 import { useCellValues } from '@mdxeditor/gurx';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 
@@ -33,6 +34,10 @@ interface AudioComponentProps {
   title?: string;
   nodeKey: NodeKey;
   id: string;
+  /** Original caption path, serialized onto the element for the player/LRS. */
+  captionSrc?: string;
+  /** Fetchable caption URL (blob in the builder, relative path in the player). */
+  resolvedCaptionSrc?: string;
 }
 
 function AudioComponent({
@@ -40,6 +45,8 @@ function AudioComponent({
   title,
   nodeKey,
   id,
+  captionSrc,
+  resolvedCaptionSrc,
 }: AudioComponentProps): JSX.Element {
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const [isSelected, setSelected, clearSelection] =
@@ -210,6 +217,7 @@ function AudioComponent({
           controls
           muted={false}
           data-audio-id={id}
+          data-caption-src={captionSrc}
           style={{
             display: 'block',
             maxWidth: '100%',
@@ -218,6 +226,12 @@ function AudioComponent({
             pointerEvents: 'auto',
           }}
         />
+        {resolvedCaptionSrc && (
+          <AudioTranscript
+            captionSrc={resolvedCaptionSrc}
+            audioRef={audioRef}
+          />
+        )}
       </div>
     </React.Suspense>
   );
@@ -230,6 +244,7 @@ export interface AudioEditorProps {
   rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   id: string;
   autoplay: boolean;
+  captionSrc?: string;
 }
 
 export function AudioEditor({
@@ -239,6 +254,7 @@ export function AudioEditor({
   rest,
   id,
   autoplay,
+  captionSrc,
 }: AudioEditorProps): JSX.Element {
   const [audioFilePath] = useCellValues(audioFilePath$);
   const [Placeholder] = useCellValues(audioPlaceholder$);
@@ -246,6 +262,9 @@ export function AudioEditor({
   const [disableSettingsButton] = useCellValues(disableAudioSettingsButton$);
   const [audioPreviewHandler] = useCellValues(audioPreviewHandler$);
   const [previewSrc, setPreviewSrc] = React.useState(src);
+  const [previewCaptionSrc, setPreviewCaptionSrc] = React.useState<
+    string | undefined
+  >(captionSrc);
   const [isSelected] = useLexicalNodeSelection(nodeKey);
 
   React.useEffect(() => {
@@ -263,6 +282,28 @@ export function AudioEditor({
     }
   }, [src, audioPreviewHandler, audioFilePath]);
 
+  // Resolve the caption source the same way as the audio source — in the
+  // builder it must be turned into a blob URL, while in the player the
+  // relative path is directly fetchable.
+  React.useEffect(() => {
+    if (!captionSrc) {
+      setPreviewCaptionSrc(undefined);
+      return;
+    }
+    if (audioPreviewHandler && captionSrc.startsWith('./')) {
+      audioPreviewHandler(captionSrc)
+        .then((blobUrl) => {
+          setPreviewCaptionSrc(blobUrl);
+        })
+        .catch((err) => {
+          console.error('[AudioEditor] Caption preview handler error:', err);
+          setPreviewCaptionSrc(captionSrc);
+        });
+    } else {
+      setPreviewCaptionSrc(captionSrc);
+    }
+  }, [captionSrc, audioPreviewHandler, audioFilePath]);
+
   const isLocal = src.startsWith('./');
   const initialAudioPath = isLocal ? src : null;
   // Extract just the filename from the relative path
@@ -279,6 +320,8 @@ export function AudioEditor({
           title={title}
           nodeKey={nodeKey}
           id={id}
+          captionSrc={captionSrc}
+          resolvedCaptionSrc={previewCaptionSrc}
         />
         {shouldShowToolbar && (
           <EditAudioToolbar
@@ -288,6 +331,7 @@ export function AudioEditor({
             title={title || ''}
             rest={rest}
             autoplay={autoplay}
+            captionSrc={captionSrc}
           />
         )}
       </div>

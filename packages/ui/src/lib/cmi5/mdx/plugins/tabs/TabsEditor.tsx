@@ -8,17 +8,9 @@ import {
   usePublisher,
 } from '@mdxeditor/editor';
 import * as Mdast from 'mdast';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import {
-  CSSProperties,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { CSSProperties, useCallback, useEffect, useRef, useState } from 'react';
 
 import { $getRoot } from 'lexical';
 
@@ -54,13 +46,12 @@ import { TabContentDirectiveNode, TabDirectiveNode } from './types';
 
 import { $isElementNode } from 'lexical';
 import { DEFAULT_TAB } from './constants';
-import { darkTab } from './styles';
 import ModalDialog from '../../../../modals/ModalDialog';
 import { ButtonMinorUi, ButtonOptions } from '../../../../utility/buttons';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
 import { convertMdastToMarkdown } from '../../util/conversion';
-import { LessonThemeContext } from '../../contexts/LessonThemeContext';
+import { useCoursePresentation } from '../../contexts/PresentationContext';
 import {
   resolveLessonThemeCSS,
   resolveBlockMaxWidth,
@@ -85,8 +76,8 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
   parentEditor,
 }) => {
   const muiTheme = useTheme();
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  const { rc5Theme } = useCoursePresentation();
+  const resolvedThemeCSS = resolveLessonThemeCSS(rc5Theme);
   // When a theme is set but padding is None, resolvedThemeCSS.blockPadding is null — use 0.
   // When no theme is set at all (resolvedThemeCSS is null), default to M (32px).
   const blockPadding = resolvedThemeCSS

@@ -10,7 +10,7 @@ import {
   useTheme,
 } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { auJsonSel } from '../../redux/auReducer';
+import { courseDataSel } from '../../redux/auReducer';
 import { TOOLTIP_ENTER_DELAY, TOOLTIP_ENTER_NEXT_DELAY } from './shared';
 import { RapidCmi5Icon, RapidCmi5Title } from '@rapid-cmi5/ui';
 
@@ -20,20 +20,20 @@ import { RapidCmi5Icon, RapidCmi5Title } from '@rapid-cmi5/ui';
   rapid cmi5 it is running we can quickly see if there is a version mismatch.
 */
 export default function BuildInfoButton({ color }: { color?: string }) {
-  const auJson = useSelector(auJsonSel);
+  const courseData = useSelector(courseDataSel);
   const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);
   const theme = useTheme();
 
-  if (!auJson?.metadata) return null;
+  if (!courseData) return null;
 
   const rows = [
-    { label: 'RC5 Version', value: auJson.metadata.rc5Version },
-    { label: 'Branch', value: auJson.metadata.gitBranch },
-    { label: 'Remote', value: auJson.metadata.remoteGitUrl },
+    { label: 'RC5 Version', value: courseData.rc5Version },
+    { label: 'Branch', value: courseData.gitBranch },
+    { label: 'Remote', value: courseData.remoteGitUrl },
     {
       label: 'Build Time',
-      value: auJson.metadata.buildTime
-        ? new Date(auJson.metadata.buildTime).toLocaleString()
+      value: courseData.buildTime
+        ? new Date(courseData.buildTime).toLocaleString()
         : undefined,
     },
   ].filter((row) => Boolean(row.value));

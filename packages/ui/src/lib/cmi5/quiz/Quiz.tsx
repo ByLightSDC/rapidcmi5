@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import useQuizGrader from './hooks/useQuizGrader';
 
@@ -24,7 +17,6 @@ import {
   Box,
   CircularProgress,
   IconButton,
-  Paper,
   Stack,
   SxProps,
   Tooltip,
@@ -47,7 +39,7 @@ import {
   OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
 import { ButtonMinorUi, ButtonMainUi } from '../../utility/buttons';
-import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
+import { useCoursePresentation } from '../mdx/contexts/PresentationContext';
 import {
   maxFormWidths,
   useLessonThemeStyles,
@@ -85,9 +77,9 @@ export function AuQuiz({
     Array(content.questions.length).fill(null),
   );
   /* Lesson Theme */
-  const { lessonTheme } = useContext(LessonThemeContext);
+  const { rc5Theme } = useCoursePresentation();
   const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
-    lessonTheme,
+    rc5Theme,
     maxFormWidths.quizPlayback,
   );
 

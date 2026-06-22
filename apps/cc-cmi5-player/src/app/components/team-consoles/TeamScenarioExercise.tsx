@@ -48,16 +48,10 @@ import {
 } from '@rangeos-nx/frontend/clients/hooks';
 import {
   AuContextProps,
-  TeamConsolesContent,
+  ScenarioContent,
   OuterStyle,
 } from '@rapid-cmi5/cmi5-build-common';
-import {
-  LessonThemeContext,
-  OverflowTypography,
-  TabMainUi,
-  maxFormWidths,
-  useLessonThemeStyles,
-} from '@rapid-cmi5/ui';
+import { OverflowTypography, TabMainUi } from '@rapid-cmi5/ui';
 
 /**
  * Activity displays a Deployed Scenario status, VMs, Containers, and Autograders
@@ -73,7 +67,7 @@ function TeamScenarioExercise({
   outerStyle,
 }: {
   auProps: Partial<AuContextProps>;
-  content: TeamConsolesContent;
+  content: ScenarioContent;
   innerSx?: SxProps;
   outerSx?: SxProps;
   outerStyle?: OuterStyle;

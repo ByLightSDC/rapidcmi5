@@ -8,13 +8,11 @@ import { activeTabSel } from '../../../../redux/navigationReducer';
 import { useCMI5Session } from '../../../../hooks/useCMI5Session';
 import { SlideActivityType } from '../../../../../app/types/SlideActivityStatusState';
 import { Box, ThemeProvider, useTheme } from '@mui/material';
-import { deepmerge } from '@mui/utils';
 import {
   AuContextProps,
-  RC5ScenarioContent,
+  ScenarioContent,
   QuizContent,
   CTFContent,
-  TeamConsolesContent,
   DownloadFileData,
   CodeRunnerContent,
 } from '@rapid-cmi5/cmi5-build-common';
@@ -28,14 +26,12 @@ import {
   AuCTF,
   FileDownloadLink,
   CodeRunner,
-  config,
-  LessonThemeContext,
   useLessonStyles,
   maxFormWidths,
   ActivityDirectiveNode,
   darkTheme,
+  useCoursePresentation,
 } from '@rapid-cmi5/ui';
-import { cmi5Instance } from '../../../../session/cmi5';
 import { auConfigInitializedSel } from '../../../../redux/auReducer';
 
 /**
@@ -71,9 +67,9 @@ export const ActivityPlayback: React.FC<
   };
 
   const muiTheme = useTheme();
-  const { lessonTheme } = useContext(LessonThemeContext);
+  const { rc5Theme, activityTheme } = useCoursePresentation();
   const { innerActivitySx, outerSx, outerStyle } = useLessonStyles(
-    lessonTheme,
+    rc5Theme,
     mdastNode?.attributes?.contentWidth,
     maxFormWidths.downloadsEditor,
     muiTheme.palette.background.paper,
@@ -81,19 +77,6 @@ export const ActivityPlayback: React.FC<
     true,
     true,
   );
-
-  /**
-   * update theme with overrides from cfg file
-   */
-  const isConfigInitialized = useSelector(auConfigInitializedSel);
-  const activityTheme = useMemo(() => {
-    const base = darkTheme;
-    if (!isConfigInitialized) {
-      return base;
-    }
-    const overriddenTheme = deepmerge(base, config.THEME.DARK);
-    return overriddenTheme;
-  }, [isConfigInitialized]);
 
   /** Get Default Form Data from MDAST Node */
   React.useEffect(() => {
@@ -138,9 +121,9 @@ export const ActivityPlayback: React.FC<
           <ScenarioConsoles
             auProps={auProps}
             content={{
-              scenarioName: (fromJson as RC5ScenarioContent).name,
-              scenarioUUID: (fromJson as RC5ScenarioContent).uuid,
-              promptClassId: (fromJson as RC5ScenarioContent).promptClass,
+              name: (fromJson as ScenarioContent).name ?? '',
+              uuid: (fromJson as ScenarioContent).uuid,
+              promptClassId: (fromJson as ScenarioContent).promptClass,
             }}
             innerSx={innerActivitySx}
             outerSx={outerSx}
@@ -180,7 +163,7 @@ export const ActivityPlayback: React.FC<
           <>
             <TeamScenarioExercise
               auProps={auProps}
-              content={fromJson as TeamConsolesContent}
+              content={fromJson as ScenarioContent}
               innerSx={innerActivitySx}
               outerSx={outerSx}
               outerStyle={outerStyle}

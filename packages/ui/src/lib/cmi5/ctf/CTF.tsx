@@ -49,7 +49,10 @@ import {
 } from './ctfReducer';
 import { Box, Stack } from '@mui/material';
 import { ButtonInfoField, ButtonMainUi } from '../../utility/buttons';
-import { LessonThemeContext } from '../mdx/contexts/LessonThemeContext';
+import {
+  CoursePresentationContext,
+  useCoursePresentation,
+} from '../mdx/contexts/PresentationContext';
 import {
   maxFormWidths,
   useLessonThemeStyles,
@@ -62,7 +65,6 @@ import { isAnswerInputEnabled$, shouldCheckAnswer$ } from './vars';
 import { FlagEffect } from './FlagEffect';
 import { useToaster } from '../../utility/useToaster';
 import { submitScoreMessage } from './constants';
-import { ThemeProvider } from '@emotion/react';
 
 const answerBoxGridSize = 3.8;
 const attemptedLabel = '#Attempted';
@@ -124,16 +126,16 @@ export function AuCTF({
   const passingScore = ctfContent.passingScore || 80;
 
   /* Lesson Theme */
-  const { lessonTheme } = useContext(LessonThemeContext);
+  const { rc5Theme } = useCoursePresentation();
   const { outerActivitySxWithConstrainedWidth } = useLessonThemeStyles(
-    lessonTheme,
+    rc5Theme,
     maxFormWidths.ctfPlayback,
   );
 
-  const theme = useTheme();
-  const { palette } = theme;
+  const muiTheme = useTheme();
+  const { palette } = muiTheme;
   const defaultHighContrastColor =
-    theme.palette.mode === 'light' ? 'common.white' : 'common.black';
+    palette.mode === 'light' ? 'common.white' : 'common.black';
 
   /**
    * Selects question if it is available (no grade or bad grade)
@@ -663,7 +665,7 @@ export function AuCTF({
               </Alert>
             </Box>
           )}
-          <Box sx={{minHeight:'12px'}}/>
+          <Box sx={{ minHeight: '12px' }} />
         </Box>
       </Box>
     )

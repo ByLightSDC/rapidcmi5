@@ -8,7 +8,7 @@ import {
   slideDeck,
 } from '../../../redux/courseBuilderReducer';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLessonAssets } from '../../course-builder/GitViewer/session/LessonAssetsContext';
+import { useLessonAssets } from '../../../contexts/LessonAssetsContext';
 import { AuContextProps } from '@rapid-cmi5/cmi5-build-common';
 
 /**

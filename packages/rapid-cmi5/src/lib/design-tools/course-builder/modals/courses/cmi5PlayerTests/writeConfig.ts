@@ -2,7 +2,7 @@ export async function writeConfigViaHttp(
   playerUrl: string,
   auJson: string,
 ): Promise<void> {
-  const endpoint = `${playerUrl.replace(/\/$/, '')}/test-config`;
+  const endpoint = `${new URL(playerUrl).origin}/test-config`;
   const res = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -37,8 +37,12 @@ export async function loadLessonViaZip(
   playerUrl: string,
   zipBlob: Blob,
   lessonDirPath: string,
+  courseDirPath?: string,
 ): Promise<void> {
-  const endpoint = `${playerUrl.replace(/\/$/, '')}/upload-lesson-zip?lessonDirPath=${encodeURIComponent(lessonDirPath)}`;
+  const params = new URLSearchParams({ lessonDirPath });
+  if (courseDirPath) params.set('courseDirPath', courseDirPath);
+  const endpoint = `${new URL(playerUrl).origin}/upload-lesson-zip?${params.toString()}`;
+
   const res = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/octet-stream' },

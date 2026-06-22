@@ -1,5 +1,4 @@
 import {
-  SlideTypeEnum,
   CourseAU,
   CodeRunnerContent,
   MoveOnCriteriaEnum,
@@ -11,19 +10,27 @@ import {
   QuizCompletionEnum,
   CTFContent,
   DownloadFilesContent,
-  RC5ScenarioContent,
-  TeamConsolesContent,
   RC5ActivityTypeEnum,
   ContentWidthEnum,
+  SlideType,
+  BlockPaddingEnum,
+  DefaultAlignmentEnum,
+  Rc5Theme,
 } from '@rapid-cmi5/cmi5-build-common';
 
 export const jsonFormatSpaces = 1;
 
-export const defaultEmptySlide = {
+export const defaultEmptySlide: SlideType = {
   slideTitle: 'Slide 1',
-  type: SlideTypeEnum.Markdown,
   content: '# Slide',
   filepath: '',
+};
+
+export const defaultTheme: Rc5Theme = {
+  blockPadding: BlockPaddingEnum.None,
+  contentWidth: ContentWidthEnum.None,
+  defaultAlignment: DefaultAlignmentEnum.Left,
+  defaultActivityAlignment: DefaultAlignmentEnum.Center,
 };
 
 export const defaultAutoGraderData = {
@@ -87,7 +94,6 @@ export const defaultGitConfigData = {
 export const defaultAUData: CourseAU = {
   auName: '',
   assetsPath: '',
-  backgroundImage: '',
   rangeosScenarioName: '',
   rangeosScenarioUUID: '',
   slides: [],
@@ -118,19 +124,16 @@ export const defaultQuestion = {
 };
 
 export const defaultScenarioContent: ScenarioContent = {
-  introTitle: '',
-  introContent: '',
-  confirmStopButtonText: '',
   promptClassId: false,
-  stopScenarioButtonTooltip: '',
-  stopScenarioMessage: '',
-  stopScenarioTitle: '',
+  uuid: '',
+  name: '',
 };
 
 export const defaultCourseData: CourseData = {
   courseTitle: '',
   courseDescription: '',
   courseId: '',
+  courseTheme: defaultTheme,
   blocks: [
     {
       blockName: '',
@@ -171,7 +174,7 @@ export const defaultDownloadFilesContent: DownloadFilesContent = {
 /**
  * Scenario activity insertion json
  */
-export const defaultScenarioContentData: RC5ScenarioContent = {
+export const defaultScenarioContentData: ScenarioContent = {
   uuid: '',
   name: '',
   promptClass: false,
@@ -187,7 +190,7 @@ export const defaultScenarioContentStr = JSON.stringify(
 /**
  * Scenario activity insertion json
  */
-export const defaultTeamConsolesContentData: TeamConsolesContent = {
+export const defaultTeamConsolesContentData: ScenarioContent = {
   uuid: '',
   name: '',
   moveOnCriteria: MoveOnCriteriaEnum.Completed,

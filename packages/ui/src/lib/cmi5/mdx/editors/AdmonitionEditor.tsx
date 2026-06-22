@@ -50,7 +50,6 @@ import {
 
 import { AdmonitionDirectiveNode } from './AdmonitionDirectiveDescriptor';
 import DeleteIconButton from '../components/DeleteIconButton';
-import SettingsIconButton from '../components/SettingsIconButton';
 import InsertLineReturnButton from '../components/InsertLineReturnButton';
 import { AdmonitionTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { SelectorMainUi } from '../../../inputs/selectors/selectors';
@@ -59,7 +58,7 @@ import { editorInPlayback$ } from '../state/vars';
 import { renderMdastBlock } from '../util/renderMdastStatic';
 import * as Mdast from 'mdast';
 import { convertMarkdownToMdast } from '../util/conversion';
-import { LessonThemeContext } from '../contexts/LessonThemeContext';
+import { useCoursePresentation } from '../contexts/PresentationContext';
 import {
   resolveLessonThemeCSS,
   resolveBlockMaxWidth,
@@ -106,8 +105,8 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   descriptor,
 }) => {
   const muiTheme = useTheme();
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  const { rc5Theme } = useCoursePresentation();
+  const resolvedThemeCSS = resolveLessonThemeCSS(rc5Theme);
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';
@@ -153,7 +152,10 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   >(mdastNode?.attributes?.['contentWidth'] as ContentWidthEnum | undefined);
   const [blockAppearanceOpen, setBlockAppearanceOpen] = useState(false);
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
-  const { containerRef, menuRight } = useGutterRight(resolvedThemeCSS, blockMaxWidth);
+  const { containerRef, menuRight } = useGutterRight(
+    resolvedThemeCSS,
+    blockMaxWidth,
+  );
 
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const [adColor, setAdColor] = useState<
@@ -326,12 +328,12 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
 
   const outerSx: SxProps = backgroundColor
     ? {
-      boxShadow: `0 0 0 100vmax ${backgroundColor}`,
-      clipPath: `inset(0 -100vmax 0)`,
-      backgroundColor,
-      paddingTop: blockPadding,
-      paddingBottom: blockPadding,
-    }
+        boxShadow: `0 0 0 100vmax ${backgroundColor}`,
+        clipPath: `inset(0 -100vmax 0)`,
+        backgroundColor,
+        paddingTop: blockPadding,
+        paddingBottom: blockPadding,
+      }
     : {};
 
   const expandIcon = useMemo(() => {
@@ -358,10 +360,10 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
       {...(contentWidth !== undefined ? { 'data-block-override': 'true' } : {})}
       {...(contentWidth !== undefined
         ? {
-          style: {
-            '--block-max-width': blockMaxWidth ?? 'none',
-          } as React.CSSProperties,
-        }
+            style: {
+              '--block-max-width': blockMaxWidth ?? 'none',
+            } as React.CSSProperties,
+          }
         : {})}
       sx={{
         margin: 0,
@@ -375,10 +377,10 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
           width: '100%',
           ...(blockMaxWidth
             ? {
-              maxWidth: blockMaxWidth,
-              marginLeft: 'auto',
-              marginRight: 'auto',
-            }
+                maxWidth: blockMaxWidth,
+                marginLeft: 'auto',
+                marginRight: 'auto',
+              }
             : {}),
         }}
       >

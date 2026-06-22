@@ -1,8 +1,8 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from './store';
 
 import { rangeDataType, rangeConsoleDataType } from '../types/AuState';
-import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
+import { CourseAU, CourseData, Rc5Theme } from '@rapid-cmi5/cmi5-build-common';
 import { defaultCourseAuData } from '../session/constants';
 import { CourseAUProgress } from '../types/CourseAUProgress';
 import { initializeCourseAUProgress as createCourseAUProgress } from '../utils/CourseAUProgressHelpers';
@@ -17,6 +17,7 @@ type tAuState = {
   auViewedSlides: number[];
   auInitStatement: string;
   auJson: CourseAU;
+  courseData?: CourseData;
   classId?: string;
   isConfigInitialized: boolean;
   isDisplayInitialized: boolean;
@@ -30,6 +31,7 @@ type tAuState = {
   // Triggers lesson style re-render needed to allow activities to go fullwidth
   slideWidth?: number;
   studentId: string;
+  orgTheme?: Rc5Theme;
 
   // New consolidated progress tracking
   courseAUProgress?: CourseAUProgress;
@@ -45,6 +47,7 @@ export const initialState: tAuState = {
   auViewedSlides: [],
   auInitStatement: '',
   auJson: defaultCourseAuData,
+  courseData: undefined,
   classId: '',
   isConfigInitialized: false,
   isDisplayInitialized: false,
@@ -61,6 +64,7 @@ export const initialState: tAuState = {
   rangeConsoleDataAttempts: 0,
   slideWidth: 800,
   studentId: '',
+  orgTheme: undefined,
   courseAUProgress: undefined,
 };
 
@@ -68,17 +72,11 @@ export const auSlice = createSlice({
   name: 'au',
   initialState,
   reducers: {
-    setAuPath: (state, action) => {
-      state.auPath = action.payload;
-    },
-    setAuJson: (state, action) => {
+    setAuJson: (state, action: PayloadAction<CourseAU>) => {
       state.auJson = action.payload;
     },
-    setAuLogo: (state, action) => {
-      const { dark, light, width } = action.payload;
-      state.auLogoDark = dark;
-      state.auLogoLight = light;
-      state.auLogoWidth = width;
+    setCourseData: (state, action: PayloadAction<CourseData>) => {
+      state.courseData = action.payload;
     },
     setAuProgress: (state, action) => {
       state.auProgress = action.payload;
@@ -127,6 +125,9 @@ export const auSlice = createSlice({
     },
     setStudentId: (state, action) => {
       state.studentId = action.payload;
+    },
+    setOrgTheme: (state, action: PayloadAction<Rc5Theme | undefined>) => {
+      state.orgTheme = action.payload;
     },
     // CourseAUProgress actions
     initializeCourseAUProgress: (state, action) => {
@@ -211,9 +212,8 @@ export const auSlice = createSlice({
 
 // export actions to dispatch from components
 export const {
-  setAuPath,
   setAuJson,
-  setAuLogo,
+  setCourseData,
   setAuProgress,
   setAuViewedSlides,
   setAuInitStatment,
@@ -228,6 +228,7 @@ export const {
   setRangeDataAttempts,
   setRangeConsoleDataAttempts,
   setStudentId,
+  setOrgTheme,
   // CourseAUProgress actions
   initializeCourseAUProgress,
   setCourseAUProgress,
@@ -237,9 +238,6 @@ export const {
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of
 // in the slice file. For example: `useSelector((state: RootState) => state.counter.value)`
-export const auLogoDarkSel = (state: RootState) => state.au.auLogoDark;
-export const auLogoLightSel = (state: RootState) => state.au.auLogoLight;
-export const auLogoWidthSel = (state: RootState) => state.au.auLogoWidth;
 export const classIdSel = (state: RootState) => state.au.classId;
 export const studentIdSel = (state: RootState) => state.au.studentId;
 export const auPathSel = (state: RootState) => state.au.auPath;
@@ -248,6 +246,7 @@ export const auViewedSlidesSel = (state: RootState) => state.au.auViewedSlides;
 export const auInitStatementSel = (state: RootState) =>
   state.au.auInitStatement;
 export const auJsonSel = (state: RootState) => state.au.auJson;
+export const courseDataSel = (state: RootState) => state.au.courseData;
 export const auSessionInitializedSel = (state: RootState) =>
   state.au.isSessionInitialized;
 export const auConfigInitializedSel = (state: RootState) =>
@@ -265,6 +264,7 @@ export const rangeDataAttemptsSel = (state: RootState) =>
 export const rangeConsoleDataAttemptsSel = (state: RootState) =>
   state.au.rangeConsoleDataAttempts;
 export const slideWidth = (state: RootState) => state.au.slideWidth;
+export const orgThemeSel = (state: RootState) => state.au.orgTheme;
 export const courseAUProgressSel = (state: RootState) => {
   const value = state.au.courseAUProgress;
   return value;

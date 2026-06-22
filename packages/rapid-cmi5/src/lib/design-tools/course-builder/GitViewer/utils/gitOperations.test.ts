@@ -51,9 +51,7 @@ const MOCK_CREDENTIALS = {
 // Setup and Teardown
 // ============================================================================
 
-async function setupTestContext(
-  repoName: string = 'test-repo',
-): Promise<TestContext> {
+async function setupTestContext(repoName = 'test-repo'): Promise<TestContext> {
   vol.reset();
 
   const instance = createNewFsInstance(false);
@@ -69,7 +67,7 @@ async function setupTestContext(
   return { instance, r, gitOps, fileState: initFileState };
 }
 
-async function initializeRepo(ctx: TestContext, branch: string = 'main') {
+async function initializeRepo(ctx: TestContext, branch = 'main') {
   await ctx.gitOps.initGitRepo(ctx.r, branch);
 }
 
@@ -93,7 +91,7 @@ async function commitTestFile(
   ctx: TestContext,
   filepath: string,
   content: string,
-  message: string = 'Test commit',
+  message = 'Test commit',
 ) {
   await createTestFile(ctx, filepath, content);
   await ctx.gitOps.gitStageFile(ctx.r, filepath);

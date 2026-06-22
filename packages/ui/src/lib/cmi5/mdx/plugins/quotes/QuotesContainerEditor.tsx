@@ -6,14 +6,7 @@ import {
 } from '@mdxeditor/editor';
 
 import { ContainerDirective } from 'mdast-util-directive';
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { editorInPlayback$ } from '../../state/vars';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
@@ -29,13 +22,12 @@ import {
 
 import DeleteIconButton from '../../components/DeleteIconButton';
 import EditIcon from '@mui/icons-material/Edit';
-import PaletteIcon from '@mui/icons-material/Palette';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
 import { QuotePreset, QuotesContainerDirectiveNode } from './types';
 import { QUOTE_PRESETS } from './constants';
 
-import { LessonThemeContext } from '../../contexts/LessonThemeContext';
+import { useCoursePresentation } from '../../contexts/PresentationContext';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
@@ -62,8 +54,8 @@ export const QuotesContainerEditor: React.FC<
 
   //#region lesson style
   const muiTheme = useTheme();
-  const { lessonTheme } = useContext(LessonThemeContext);
-  const resolvedThemeCSS = resolveLessonThemeCSS(lessonTheme);
+  const { rc5Theme } = useCoursePresentation();
+  const resolvedThemeCSS = resolveLessonThemeCSS(rc5Theme);
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';

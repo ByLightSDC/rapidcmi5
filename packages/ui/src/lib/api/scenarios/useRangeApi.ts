@@ -77,7 +77,7 @@ export function useRangeApi() {
     const encodedAuId = encodeURIComponent(auId);
 
     const { body, status } = await client.getAuMapping.query({
-      params: { auId },
+      params: { auId: encodedAuId },
     });
 
     if (status === 200) {

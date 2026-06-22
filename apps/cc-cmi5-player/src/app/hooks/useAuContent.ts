@@ -1,9 +1,30 @@
 import { useState } from 'react';
-import { setAuJson, setCourseAUProgress } from '../redux/auReducer';
+import {
+  setAuJson,
+  setCourseAUProgress,
+  setCourseData,
+} from '../redux/auReducer';
 import { useDispatch } from 'react-redux';
 
 import { initializeCourseAUProgress } from '../utils/CourseAUProgressHelpers';
 import { logger } from '../debug';
+import { join } from 'path-browserify';
+import {
+  LESSON_CONFIG_FILENAME,
+  parseAuConfigJson,
+  parseCourseDataYaml,
+  RC5_FILENAME,
+} from '@rapid-cmi5/cmi5-build-common';
+
+// The config json is in the current directory
+const lessonConfigPath = LESSON_CONFIG_FILENAME;
+
+// TODO We need to clean up this course structure, it was not well done and we may no longer need all
+// of these levels
+
+// The couse config path can be shown as such /base folder/compiled_course/blocks/block name/au name/current directory
+// The RC5.yaml file is inside of the block name folder, one level up from the config.json
+const courseConfigPath = join('..', RC5_FILENAME);
 
 /**
  * Load AU lesson config
@@ -14,102 +35,58 @@ export const useAuContent = () => {
   const [contentErrorMessage, setContentErrorMessage] = useState('');
   const dispatch = useDispatch();
 
-  const loadContent = async (path: string) => {
-    logger.debug('Loading AU content', { path }, 'auManager');
+  const loadContent = async () => {
+    // load course level config
 
     try {
-      logger.debug('Fetching config file', { path }, 'auManager');
-      const response = await fetch(path);
-
-      if (response.ok) {
-        logger.debug(
-          'Config file fetched successfully',
-          {
-            status: response.status,
-            statusText: response.statusText,
-          },
-          'auManager',
-        );
-
-        const content = (await response.json()) as any;
-        logger.debug(
-          'Config content parsed',
-          {
-            auName: content.auName,
-            auTitle: content.title,
-            totalSlides: content.slides?.length || 0,
-          },
-          'auManager',
-        );
-
-        logger.debug('Dispatching setAuJson', { content }, 'auManager');
-        dispatch(setAuJson(content));
-
-        // Initialize the course metadata structure
-        // logger.debug(
-        //   'Initializing CourseAUProgress with course metadata',
-        //   { auName: content.auName, totalSlides: content.slides?.length || 0 },
-        //   'auManager',
-        // );
-        const initialCourseAUProgress = initializeCourseAUProgress({
-          auJson: content,
-          auProgress: 0,
-          auViewedSlides: [],
-        });
-
-        logger.debug(
-          'CourseAUProgress initialized, dispatching to Redux',
-          {
-            auId: initialCourseAUProgress.courseStructure.auId,
-            totalSlides: initialCourseAUProgress.courseStructure.totalSlides,
-            totalActivities: Object.keys(
-              initialCourseAUProgress.slideActivitiesMeta,
-            ).reduce(
-              (sum, slideGuid) =>
-                sum +
-                Object.keys(
-                  initialCourseAUProgress.slideActivitiesMeta[slideGuid],
-                ).length,
-              0,
-            ),
-          },
-          'auManager',
-        );
-        dispatch(setCourseAUProgress(initialCourseAUProgress));
-
-        logger.debug('Setting content loaded to true', undefined, 'auManager');
-        setIsLoaded(true);
-        setContentErrorMessage('');
-
-        logger.debug(
-          'AU content loading completed successfully',
-          undefined,
-          'auManager',
-        );
-      } else {
-        logger.error(
-          'Failed to fetch config file',
-          {
-            status: response.status,
-            statusText: response.statusText,
-            path,
-          },
-          'auManager',
-        );
-        setIsLoaded(false);
-        setContentErrorMessage(
-          `Error loading config.json :${response.statusText}`,
+      const response = await fetch(courseConfigPath);
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch ${RC5_FILENAME}: ${response.status} ${response.statusText}`,
         );
       }
-    } catch (e) {
+      const yamlText = await response.text();
+      const courseContent = parseCourseDataYaml(yamlText);
+      dispatch(setCourseData(courseContent));
+    } catch (err) {
       logger.error(
-        'Exception loading AU content',
-        { error: e, path },
+        'Exception loading course content',
+        { error: err, courseConfigPath },
         'auManager',
       );
-      console.log(e);
       setIsLoaded(false);
-      setContentErrorMessage('Error loading content');
+      setContentErrorMessage(`Error loading ${RC5_FILENAME}`);
+    }
+
+    try {
+      const response = await fetch(lessonConfigPath);
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch ${LESSON_CONFIG_FILENAME}: ${response.status} ${response.statusText}`,
+        );
+      }
+      const rawContent = await response.json();
+      const content = parseAuConfigJson(rawContent);
+      dispatch(setAuJson(content));
+
+      const initialCourseAUProgress = initializeCourseAUProgress({
+        auJson: content,
+        auProgress: 0,
+        auViewedSlides: [],
+      });
+
+      dispatch(setCourseAUProgress(initialCourseAUProgress));
+
+      setIsLoaded(true);
+      setContentErrorMessage('');
+    } catch (err) {
+      logger.error(
+        'Exception loading AU content',
+        { error: err, lessonConfigPath },
+        'auManager',
+      );
+      setIsLoaded(false);
+      setContentErrorMessage(`Error loading ${LESSON_CONFIG_FILENAME}`);
     }
   };
 

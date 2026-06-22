@@ -7,10 +7,10 @@
 import { initContract } from '@ts-rest/core';
 import { z } from 'zod';
 import {
-  QuestionGrading,
   QuestionResponse,
+  QuestionGrading,
   QuizQuestion,
-} from '../../types/quiz';
+} from '../../types/activities';
 
 const c = initContract();
 
@@ -165,9 +165,9 @@ export function convertFromApi(apiObj: QuestionBankApi): QuizQuestion {
     typeAttributes: {
       correctAnswer: apiObj.correctAnswer,
       grading: gradingApiMap[apiObj.grading],
-      options: apiObj.options,
-      matching: apiObj.matching,
-      shuffleAnswers: apiObj.shuffleAnswers,
+      options: apiObj.options ?? undefined,
+      matching: apiObj.matching ?? undefined,
+      shuffleAnswers: apiObj.shuffleAnswers ?? undefined,
     },
   };
 }

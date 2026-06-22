@@ -4,6 +4,8 @@ import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 import { resetPersistance } from './utils/store';
 import { FormCrudType } from './utils/types';
 
+export type ThemeMode = 'light' | 'dark';
+
 /**
  * Expanded values
  */
@@ -61,7 +63,7 @@ export type tCommonAppState = {
   expanded: { [key: string]: boolean };
   iconColor: string;
   dividerColor: string;
-  themeColor: string;
+  themeColor: ThemeMode;
   isLoading: boolean;
   isNavOpen: boolean;
   navBarIndex: number;
@@ -120,7 +122,7 @@ export const commonAppSlice : Slice = createSlice({
     setIconColor: (state, action: PayloadAction<string>) => {
       state.iconColor = action.payload;
     },
-    setTheme: (state, action: PayloadAction<string>) => {
+    setTheme: (state, action: PayloadAction<ThemeMode>) => {
       state.themeColor = action.payload;
     },
     setLoader: (state, action: PayloadAction<boolean>) => {

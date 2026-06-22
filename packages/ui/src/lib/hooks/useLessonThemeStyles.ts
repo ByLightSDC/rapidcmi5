@@ -1,16 +1,12 @@
 import { SxProps } from '@mui/system';
-import {
-  DefaultAlignmentEnum,
-  LessonTheme,
-} from '@rapid-cmi5/cmi5-build-common';
+import { DefaultAlignmentEnum, Rc5Theme } from '@rapid-cmi5/cmi5-build-common';
 import { resolveLessonThemeCSS } from '../styles/lessonThemeStyles';
-import { useSelector } from 'react-redux';
 import { useSignalEffect } from '@preact/signals-react';
 import { maxSlideWidth$ } from '../cmi5/mdx';
 import { useMemo, useState } from 'react';
 
 export const useLessonThemeStyles = (
-  lessonTheme: LessonTheme | undefined,
+  lessonTheme: Rc5Theme | undefined,
   maxWidth?: number,
 ) => {
   // useMemo doesnt work with signals, mirror signal with state
