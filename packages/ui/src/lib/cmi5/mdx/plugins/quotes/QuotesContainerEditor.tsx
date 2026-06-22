@@ -1,12 +1,19 @@
 import {
   DirectiveEditorProps,
-  NestedLexicalEditor,
   useCellValues,
   useMdastNodeUpdater,
 } from '@mdxeditor/editor';
+import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 
 import { ContainerDirective } from 'mdast-util-directive';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { editorInPlayback$ } from '../../state/vars';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
@@ -15,6 +22,7 @@ import {
   alpha,
   Box,
   IconButton,
+  Stack,
   SxProps,
   Tooltip,
   useTheme,
@@ -24,7 +32,11 @@ import DeleteIconButton from '../../components/DeleteIconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
-import { QuotePreset, QuotesContainerDirectiveNode } from './types';
+import {
+  QuoteContentDirectiveNode,
+  QuotePreset,
+  QuotesContainerDirectiveNode,
+} from './types';
 import { QUOTE_PRESETS } from './constants';
 
 import { useCoursePresentation } from '../../contexts/PresentationContext';
@@ -34,10 +46,70 @@ import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover'
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { findMatchingQuotePreset } from './methods';
 
-import { QuotesContextProvider } from './QuotesContext';
+import { QuotesContext, QuotesContextProvider } from './QuotesContext';
+import { renderMdastBlock } from '../../util/renderMdastStatic';
+import * as Mdast from 'mdast';
 import { useFocusWithin } from '../shared/useFocusWithin';
 import QuotesSettings from './QuotesSettings';
 import { BackgroundColorTrigger, useBackgroundColors } from '@rapid-cmi5/ui';
+
+function StaticQuoteItem({
+  mdastNode,
+  preset,
+  blockPadding,
+}: {
+  mdastNode: QuoteContentDirectiveNode;
+  preset: string;
+  blockPadding: string;
+}) {
+  const { imageSource } = useContext(QuotesContext);
+  const isRow = preset === '3' || preset === '4';
+  const imgSize = preset === '3' ? '160px' : '72px';
+  const imgRadius = preset === '3' ? '' : '50%';
+
+  return (
+    <Box
+      sx={{
+        position: 'relative',
+        minHeight: '60px',
+        marginLeft: blockPadding,
+        marginRight: blockPadding,
+      }}
+    >
+      <Stack
+        direction={isRow ? 'row' : 'column'}
+        spacing={2}
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 2,
+          paddingBottom: 0,
+          paddingTop: 0,
+        }}
+      >
+        {imageSource && (
+          <img
+            src={imageSource}
+            alt="Author Headshot"
+            style={{
+              width: imgSize,
+              height: imgSize,
+              borderRadius: imgRadius,
+              objectFit: 'cover',
+            }}
+          />
+        )}
+        <div>
+          {(mdastNode.children as unknown as Mdast.RootContent[]).map(
+            (node, i) => renderMdastBlock(node, i),
+          )}
+        </div>
+        {mdastNode.attributes?.author && <p>{mdastNode.attributes.author}</p>}
+      </Stack>
+    </Box>
+  );
+}
 
 /**
  * Quotes Container Editor for grid layout directive.
@@ -194,6 +266,56 @@ export const QuotesContainerEditor: React.FC<
     setOverrideColor(bgColor);
   }, [mdastNode]);
 
+  if (isPlayback) {
+    return (
+      <Box
+        {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
+        sx={{
+          position: 'relative',
+          padding: 0,
+          ...outerSx,
+          ...sxProps,
+          margin: 0,
+        }}
+        role="quotes"
+        aria-label="Quotes Container"
+      >
+        <Box
+          sx={{
+            width: '100%',
+            borderRadius: 1,
+            boxShadow: 2,
+            backgroundColor: (theme) => theme.palette.background.paper,
+            paddingTop: blockPadding,
+            paddingBottom: blockPadding,
+          }}
+        >
+          <Box
+            sx={{
+              backgroundColor: (theme) =>
+                `${alpha(theme.palette.background.default, muiTheme.palette.mode === 'light' ? 0 : 0.5)}`,
+            }}
+          >
+            {mdastNode.children.map((child, i) => (
+              <QuotesContextProvider
+                key={i}
+                preset={currentPreset.id}
+                avatar={child.attributes?.avatar}
+                carouselIndex={i}
+              >
+                <StaticQuoteItem
+                  mdastNode={child}
+                  preset={currentPreset.id}
+                  blockPadding={blockPadding}
+                />
+              </QuotesContextProvider>
+            ))}
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
+
   return (
     <>
       <Box
@@ -233,7 +355,7 @@ export const QuotesContainerEditor: React.FC<
               preset={currentPreset.id}
               avatar={selectedAvatar}
             >
-              <NestedLexicalEditor<ContainerDirective>
+              <RC5NestedLexicalEditor<ContainerDirective>
                 block={true}
                 getContent={(node) => node.children}
                 getUpdatedMdastNode={(node, children: any) => ({
