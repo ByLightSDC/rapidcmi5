@@ -23,7 +23,6 @@ import {
   Popover,
   SxProps,
   Tooltip,
-  Typography,
   useTheme,
 } from '@mui/material';
 import PaletteIcon from '@mui/icons-material/Palette';
@@ -55,8 +54,7 @@ import { AdmonitionTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { SelectorMainUi } from '../../../inputs/selectors/selectors';
 import { debugLogError } from '../../../utility/logger';
 import { editorInPlayback$ } from '../state/vars';
-import { renderMdastBlock } from '../util/renderMdastStatic';
-import * as Mdast from 'mdast';
+import { RC5NestedLexicalEditor } from '../plugins/shared/RC5NestedLexicalEditor';
 import { convertMarkdownToMdast } from '../util/conversion';
 import { useCoursePresentation } from '../contexts/PresentationContext';
 import {
@@ -414,45 +412,39 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
                 '--basePageBg': 'transparent',
               }}
             >
-              {isPlayback ? (
-                <Typography component="span" sx={{ fontWeight: 'bold' }}>
-                  {getTitle(mdastNode.attributes)}
-                </Typography>
-              ) : (
-                <NestedLexicalEditor<Paragraph>
-                  getContent={(node) => {
-                    const theNode = convertMarkdownToMdast(
-                      getTitle(mdastNode.attributes),
-                      syntaxExtensions,
-                    );
-                    return theNode.children;
-                  }}
-                  getUpdatedMdastNode={(
-                    mdastParagraphNode,
-                    paragraphChildren: any,
-                  ) => {
-                    if (paragraphChildren.length > 0) {
-                      const titleStr = toMarkdown(paragraphChildren[0]);
-                      if (titleStr === title) {
-                        return mdastParagraphNode;
-                      }
-
-                      setTitle(titleStr);
-
-                      return {
-                        ...mdastParagraphNode,
-                        attributes: {
-                          collapse: attCollapse,
-                          title: titleStr,
-                        },
-                      };
+              <RC5NestedLexicalEditor<Paragraph>
+                getContent={(node) => {
+                  const theNode = convertMarkdownToMdast(
+                    getTitle(mdastNode.attributes),
+                    syntaxExtensions,
+                  );
+                  return theNode.children;
+                }}
+                getUpdatedMdastNode={(
+                  mdastParagraphNode,
+                  paragraphChildren: any,
+                ) => {
+                  if (paragraphChildren.length > 0) {
+                    const titleStr = toMarkdown(paragraphChildren[0]);
+                    if (titleStr === title) {
+                      return mdastParagraphNode;
                     }
 
-                    return mdastParagraphNode;
-                  }}
-                  contentEditableProps={{ 'aria-label': 'Admonition Title' }}
-                />
-              )}
+                    setTitle(titleStr);
+
+                    return {
+                      ...mdastParagraphNode,
+                      attributes: {
+                        collapse: attCollapse,
+                        title: titleStr,
+                      },
+                    };
+                  }
+
+                  return mdastParagraphNode;
+                }}
+                contentEditableProps={{ 'aria-label': 'Admonition Title' }}
+              />
             </div>
           </AccordionSummary>
 
@@ -465,24 +457,16 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
               borderWidth: '1px',
             }}
           >
-            {isPlayback ? (
-              <div>
-                {(mdastNode.children as unknown as Mdast.RootContent[]).map((node, i) =>
-                  renderMdastBlock(node, i)
-                )}
-              </div>
-            ) : (
-              <NestedLexicalEditor<ContainerDirective>
-                block={true}
-                getContent={(node) => {
-                  return node.children;
-                }}
-                getUpdatedMdastNode={(mdastNode, containerChildren: any) => {
-                  return { ...mdastNode, children: containerChildren };
-                }}
-                contentEditableProps={{ 'aria-label': 'Admonition Content' }}
-              />
-            )}
+            <RC5NestedLexicalEditor<ContainerDirective>
+              block={true}
+              getContent={(node) => {
+                return node.children;
+              }}
+              getUpdatedMdastNode={(mdastNode, containerChildren: any) => {
+                return { ...mdastNode, children: containerChildren };
+              }}
+              contentEditableProps={{ 'aria-label': 'Admonition Content' }}
+            />
           </AccordionDetails>
         </Accordion>
       </Box>

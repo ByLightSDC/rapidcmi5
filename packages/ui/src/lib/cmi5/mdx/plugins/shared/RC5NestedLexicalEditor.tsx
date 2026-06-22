@@ -288,11 +288,15 @@ export const RC5NestedLexicalEditor = function <
   ]);
 
   if (isPlayback) {
-    return block ? (
-      <div>{content.map((node, i) => renderMdastBlock(node, i))}</div>
-    ) : (
-      <span>{renderMdastInline(content as Mdast.PhrasingContent[])}</span>
+    if (block) {
+      return <div>{content.map((node, i) => renderMdastBlock(node, i))}</div>;
+    }
+    const inlineNodes: Mdast.PhrasingContent[] = content.flatMap((node) =>
+      node.type === 'paragraph'
+        ? (node as Mdast.Paragraph).children
+        : [node as Mdast.PhrasingContent],
     );
+    return <span>{renderMdastInline(inlineNodes)}</span>;
   }
 
   return (
