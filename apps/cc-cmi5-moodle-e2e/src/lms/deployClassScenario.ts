@@ -1,4 +1,5 @@
 import { moodleEnv } from '../moodle/env';
+import { getRangeosApiToken } from './keycloakToken';
 
 /**
  * Deploys a class scenario via the RangeOS devops API — the programmatic
@@ -19,12 +20,33 @@ import { moodleEnv } from '../moodle/env';
  */
 
 /**
- * The scenario UUID to deploy. Both Scenario:Individual and Scenario:Class in
- * the e2e course reference this same `test-console` scenario (they differ only
- * by promptClass); the value comes from the course config
- * (compiled_course/blocks/e2e-tests/scenarioclass/config.json → uuid).
+ * Per-AU scenario UUIDs. Each scenario AU references its OWN RangeOS scenario
+ * template so the tests don't collide — sharing one scenario across
+ * Individual + Class + Team caused "The AU already has a scenario assigned but
+ * it is not available for the class" (an Individual auto-deploy clashing with a
+ * Class/Team classId-deployment of the same scenario uuid).
+ *
+ * These MUST match the uuids the course AUs' directives reference (from the
+ * exported e2e-tests.zip):
+ *   scenarioindividual → e2e-basic-individual
+ *   scenarioclass      → e2e-basic-class
+ *   scenarioteam       → e2e-basic-team
+ * Env overrides let a re-author swap them without a code change.
  */
-export const E2E_SCENARIO_UUID = '63644278-6431-4ba9-b891-acb52c49fcf0';
+export const E2E_INDIVIDUAL_SCENARIO_UUID =
+  process.env['E2E_INDIVIDUAL_SCENARIO_UUID']?.trim() ||
+  '7511ace6-b0b3-474d-bec6-2238a188edfe'; // e2e-basic-individual
+
+export const E2E_CLASS_SCENARIO_UUID =
+  process.env['E2E_CLASS_SCENARIO_UUID']?.trim() ||
+  '139dd6bd-d57f-4d8c-ae37-ca4773eda7cc'; // e2e-basic-class
+
+export const E2E_TEAM_SCENARIO_UUID =
+  process.env['E2E_TEAM_SCENARIO_UUID']?.trim() ||
+  '61da8978-d9f2-4ef5-b8b1-cb9949d2ecd6'; // e2e-basic-team
+
+/** @deprecated kept for any callers; prefer the per-type uuids above. */
+export const E2E_SCENARIO_UUID = E2E_INDIVIDUAL_SCENARIO_UUID;
 
 export interface DeployedClass {
   /** The unique class id used for this deployment (enter it at the prompt). */
@@ -39,60 +61,36 @@ export interface DeployedClass {
   response: unknown;
 }
 
+/** Minutes until a deployment auto-deletes (expirationAction:'delete'). */
+const DEFAULT_EXPIRES_MIN = 30;
+
 /**
- * Deploys the e2e class scenario for a fresh, unique classId and returns it.
- * The caller enters this classId at the player's "Enter Class" prompt.
+ * Shared POST to scenariosDeploy. Returns the queued background-job uuid.
+ * (POST /v1/cmi5/scenarios/{uuid}; the deploy is ASYNC — it queues a job and
+ * returns { state:'Queued', uuid:<jobUuid>, jobQueue, ... }.)
  */
-export async function deployClassScenario(args?: {
-  scenarioUuid?: string;
-  /**
-   * Minutes until the deployment auto-deletes (default 30). With
-   * expirationAction: 'delete' the backend tears the deployment down at
-   * endDate, so a short window keeps test deployments from piling up — they
-   * self-clean ~30 min after a run. Long enough for the test to deploy +
-   * connect; raise it if a slow backend run risks expiring mid-test.
-   */
-  expiresInMinutes?: number;
-}): Promise<DeployedClass> {
-  const scenarioUuid = args?.scenarioUuid ?? E2E_SCENARIO_UUID;
-  const expiresInMinutes = args?.expiresInMinutes ?? 30;
-
-  // Unique per run so concurrent/repeated runs never collide on seats.
-  const classId = `e2e-${Date.now()}`;
-  const endDate = new Date(
-    Date.now() + expiresInMinutes * 60 * 1000,
-  ).toISOString();
-
+async function postScenarioDeploy(
+  scenarioUuid: string,
+  body: Record<string, unknown>,
+  label: string,
+): Promise<{ jobUuid: string | undefined; response: unknown }> {
   const url = `${moodleEnv.devopsApiUrl.replace(/\/$/, '')}/v1/cmi5/scenarios/${encodeURIComponent(
     scenarioUuid,
   )}`;
+  const jwt = await getRangeosApiToken();
 
-  // Accept the JWT pasted either raw or with a "Bearer " prefix — send it as
-  // the header expects (the dashboard's working request used the raw JWT).
-  const jwt = moodleEnv.rangeosApiJwt.replace(/^Bearer\s+/i, '');
-
-  console.log(
-    `[deployClassScenario] POST ${url}  classId=${classId} endDate=${endDate}`,
-  );
+  console.log(`[${label}] POST ${url}  ${JSON.stringify(body)}`);
 
   const res = await fetch(url, {
     method: 'POST',
-    headers: {
-      Authorization: jwt,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      classId,
-      count: 1,
-      endDate,
-      expirationAction: 'delete',
-    }),
+    headers: { Authorization: jwt, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
   });
 
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
     throw new Error(
-      `Class scenario deploy failed: ${res.status} ${res.statusText} — ${text}. ` +
+      `${label} failed: ${res.status} ${res.statusText} — ${text}. ` +
         `(If 401/403, the RANGEOS_API_JWT is missing/expired — refresh it.)`,
     );
   }
@@ -101,14 +99,112 @@ export async function deployClassScenario(args?: {
     uuid?: string;
     jobId?: string;
   };
-  // The deploy queues a background job; its uuid is what we poll for
-  // completion. (Response shape: { ..., jobQueue, state:'Queued', uuid }.)
   const jobUuid = response?.uuid ?? response?.jobId;
   console.log(
-    `[deployClassScenario] queued OK classId=${classId} jobUuid=${jobUuid}`,
+    `[${label}] queued OK jobUuid=${jobUuid}`,
     JSON.stringify(response).slice(0, 300),
   );
+  return { jobUuid, response };
+}
+
+/**
+ * Deploys the e2e CLASS scenario for a fresh, unique classId and returns it.
+ * The caller enters this classId at the player's "Enter Class" prompt.
+ */
+export async function deployClassScenario(args?: {
+  scenarioUuid?: string;
+  /** Minutes until the deployment auto-deletes (default 30). */
+  expiresInMinutes?: number;
+}): Promise<DeployedClass> {
+  const scenarioUuid = args?.scenarioUuid ?? E2E_CLASS_SCENARIO_UUID;
+  const expiresInMinutes = args?.expiresInMinutes ?? DEFAULT_EXPIRES_MIN;
+
+  // Unique per run so concurrent/repeated runs never collide on seats.
+  const classId = `e2e-${Date.now()}`;
+  const endDate = new Date(
+    Date.now() + expiresInMinutes * 60 * 1000,
+  ).toISOString();
+
+  const { jobUuid, response } = await postScenarioDeploy(
+    scenarioUuid,
+    { classId, count: 1, endDate, expirationAction: 'delete' },
+    'deployClassScenario',
+  );
   return { classId, jobUuid, response };
+}
+
+/**
+ * Deploys the e2e TEAM scenario (one shared instance multiple users connect to)
+ * and returns the queued job uuid + the classId used.
+ *
+ * The scenariosDeploy endpoint REQUIRES classId even for team (400
+ * REQUIRED_VALIDATION_ERROR otherwise). Unlike class there's no "Enter Class"
+ * prompt — the player (TeamScenarioExercise) finds the deployment by scanning
+ * the launched SSO user's ranges for a scenario matching the directive's
+ * uuid/name, not by classId. So we still pass a unique classId to satisfy the
+ * API; it's just not entered anywhere.
+ */
+export async function deployTeamScenario(args?: {
+  scenarioUuid?: string;
+  expiresInMinutes?: number;
+}): Promise<{ classId: string; jobUuid: string | undefined; response: unknown }> {
+  const scenarioUuid = args?.scenarioUuid ?? E2E_TEAM_SCENARIO_UUID;
+  const expiresInMinutes = args?.expiresInMinutes ?? DEFAULT_EXPIRES_MIN;
+  const classId = `e2e-team-${Date.now()}`;
+  const endDate = new Date(
+    Date.now() + expiresInMinutes * 60 * 1000,
+  ).toISOString();
+
+  const { jobUuid, response } = await postScenarioDeploy(
+    scenarioUuid,
+    { classId, count: 1, endDate, expirationAction: 'delete' },
+    'deployTeamScenario',
+  );
+  return { classId, jobUuid, response };
+}
+
+/**
+ * Polls until a deployed scenario with `scenarioName` reports status "Ready"
+ * (queryable via GET /v1/cmi5/scenarios?name=). The deploy background JOB
+ * completing only means the deploy was SCHEDULED — the scenario/VM keeps
+ * provisioning after (the dashboard shows an hourglass). The team player scans
+ * for the deployment ONCE on launch with no retry, so we must wait for it to
+ * actually be Ready BEFORE launching. Returns when at least one matching
+ * deployment is Ready.
+ */
+export async function waitForDeployedScenarioReady(
+  scenarioName: string,
+  opts?: { timeoutMs?: number; pollMs?: number },
+): Promise<void> {
+  const timeoutMs = opts?.timeoutMs ?? 12 * 60_000;
+  const pollMs = opts?.pollMs ?? 5_000;
+  const url = `${moodleEnv.devopsApiUrl.replace(/\/$/, '')}/v1/cmi5/scenarios?name=${encodeURIComponent(
+    scenarioName,
+  )}`;
+
+  const deadline = Date.now() + timeoutMs;
+  let lastStatuses = '(none)';
+  while (Date.now() < deadline) {
+    const jwt = await getRangeosApiToken();
+    const res = await fetch(url, { headers: { Authorization: jwt } });
+    if (res.ok) {
+      const data = (await res.json().catch(() => null)) as {
+        data?: Array<{ status?: string }>;
+      } | null;
+      const recs = data?.data ?? [];
+      lastStatuses = recs.map((r) => r.status).join(',') || '(empty)';
+      if (recs.some((r) => r.status === 'Ready')) {
+        console.log(
+          `[waitForDeployedScenarioReady] ${scenarioName} is Ready`,
+        );
+        return;
+      }
+    }
+    await new Promise((r) => setTimeout(r, pollMs));
+  }
+  throw new Error(
+    `Deployed scenario "${scenarioName}" not Ready within ${timeoutMs}ms (last statuses: ${lastStatuses}).`,
+  );
 }
 
 /**
@@ -126,7 +222,7 @@ export async function waitForClassDeploymentReady(
 ): Promise<void> {
   const timeoutMs = opts?.timeoutMs ?? 10 * 60_000;
   const pollMs = opts?.pollMs ?? 5_000;
-  const jwt = moodleEnv.rangeosApiJwt.replace(/^Bearer\s+/i, '');
+  const jwt = await getRangeosApiToken();
   const url = `${moodleEnv.devopsApiUrl.replace(/\/$/, '')}/v1/background-jobs/${encodeURIComponent(
     jobUuid,
   )}`;

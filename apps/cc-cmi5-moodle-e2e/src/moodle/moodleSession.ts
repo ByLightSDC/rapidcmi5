@@ -129,7 +129,7 @@ async function clickAndResolvePlayer(
   // missed the tab even though it visibly opened.)
   const newPagePromise = page
     .context()
-    .waitForEvent('page', { timeout: 15_000 })
+    .waitForEvent('page', { timeout: 8_000 })
     .catch(() => null);
 
   await launchButton.click();
@@ -137,9 +137,17 @@ async function clickAndResolvePlayer(
   // (1) New tab / popup on the context.
   const popup = await newPagePromise;
   if (popup) {
-    await popup.waitForLoadState('domcontentloaded');
+    await popup.waitForLoadState('domcontentloaded').catch(() => undefined);
     console.log(`[launchAu] new tab opened at: ${popup.url()}`);
-    return { shape: 'newTab', page: popup, content: () => popup };
+    // A team-SSO launch may briefly open a Keycloak auth popup that then closes
+    // / redirects; that's NOT the player. Only treat a popup as the player if
+    // it's the cmi5 launch (launch.php). Otherwise fall through to same-tab.
+    if (/mod\/cmi5\/launch\.php/i.test(popup.url())) {
+      return { shape: 'newTab', page: popup, content: () => popup };
+    }
+    console.log(
+      `[launchAu] popup is not the player (${popup.url()}); using same-tab/iframe`,
+    );
   }
 
   // (2) Same-tab navigation — RangeOS Moodle's actual behavior: the tab

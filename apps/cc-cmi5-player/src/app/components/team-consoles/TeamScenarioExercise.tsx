@@ -286,13 +286,14 @@ function TeamScenarioExercise({
       }}
       {...outerStyle}
     >
-      <Box sx={{ ...innerSx }}>
+      <Box sx={{ ...innerSx }} data-testid="team-scenario">
         <Typography color="text.primary" variant="caption">
           Team Exercise
         </Typography>
 
         {errorDetails && (
           <Alert
+            data-testid="team-scenario-error"
             sx={{ backgroundColor: 'transparent', borderStyle: 'none' }}
             severity="error"
           >
@@ -301,8 +302,11 @@ function TeamScenarioExercise({
         )}
         {scenarioId && (
           <>
+            {/* Present only once a deployed team scenario was found in the
+                user's ranges — the team "ready" signal for tests. */}
             <Stack
               direction="row"
+              data-testid="team-scenario-ready"
               sx={{
                 padding: 0,
                 position: 'relative',

@@ -59,13 +59,33 @@ export const moodleEnv = {
   ),
 
   /**
-   * Keycloak-minted JWT for rangeos-api (the long Authorization header the
-   * RangeOS dashboard sends when deploying a class scenario). Pasted manually
-   * for now — it expires, so refresh it for @scenario class runs. (Future:
-   * mint via Keycloak password grant against realm=cloudcents,
-   * client=rangeos-dashboard so it's self-sustaining.)
+   * Optional pre-pasted rangeos-api JWT (a Keycloak access token). If set, it's
+   * used as-is. If NOT set, the suite mints one via Keycloak password grant
+   * from the bot creds below (preferred — self-renewing, and the deploy user
+   * matches the launch user so team-scenario range lookups resolve).
    */
-  get rangeosApiJwt(): string {
-    return required('RANGEOS_API_JWT');
+  get rangeosApiJwtOverride(): string | undefined {
+    const v = process.env['RANGEOS_API_JWT'];
+    return v && v.trim() ? v.trim() : undefined;
+  },
+
+  // --- Keycloak (mint the rangeos-api token via password grant) ---
+  keycloakUrl: optional(
+    'NX_PUBLIC_KEYCLOAK_URL',
+    'https://keycloak.global.cloudcents.bylight.com',
+  ),
+  keycloakRealm: optional('NX_PUBLIC_KEYCLOAK_REALM', 'cloudcents'),
+  // rangeos-dashboard is a PUBLIC client with Direct Access Grants enabled, so
+  // password grant needs only username+password (no client secret).
+  keycloakClientId: optional(
+    'NX_PUBLIC_KEYCLOAK_CLIENT_ID',
+    'rangeos-dashboard',
+  ),
+  /** Keycloak bot user (e2e-rc5-bot). Needs rangeos_administrator to deploy. */
+  get keycloakBotUser(): string {
+    return required('KEYCLOAK_BOT_USER');
+  },
+  get keycloakBotPass(): string {
+    return required('KEYCLOAK_BOT_PASS');
   },
 };

@@ -20,6 +20,16 @@ import {
  * backend deploying a VM (minutes, can be down). Run on-demand:
  *   npx nx e2e cc-cmi5-moodle-e2e --configuration=scenario
  *
+ * **ONE comprehensive test per launch — deliberate.** Individual AUTO-DEPLOYS a
+ * VM keyed by the cmi5 REGISTRATION on launch, then polls for it. We proved
+ * that a single launch deploys → reaches Ready → connects Guacamole reliably.
+ * But splitting this into several tests that each re-launch the SAME AU FAILS:
+ * the first launch completes the AU (sends activityCompleted/Passed) and caches
+ * a cmi5 session in sessionStorage, and the next launch resumes that satisfied
+ * registration in a way that never re-deploys → stuck "never Ready". Each VM
+ * spin-up is also minutes of infra. So we do the whole chain in ONE launch and
+ * never re-launch the Individual AU within this file.
+ *
  * Readiness contract (player test-ids):
  *   scenario-loading        — "Loading..." box; present until deployed
  *   scenario-header         — deployed header; data-scenario-status="<status>"
@@ -34,55 +44,30 @@ const SCENARIO_SLIDE = 'player-slide-tab-0';
 test.describe('individual scenario @scenario @slow', () => {
   test.use({ auName: 'Scenario:Individual' });
 
-  test('scenario directive renders with type=scenario', async ({ player }) => {
+  test('renders, auto-deploys, reaches Ready, and connects the console', async ({
+    player,
+  }) => {
+    test.setTimeout(READY_TIMEOUT + 120_000);
     await player.getByTestId(SCENARIO_SLIDE).click();
 
+    // 1. The scenario directive rendered with the right activity type.
     const activity = player
       .getByTestId('player-slide-content')
       .getByTestId('directive-activity');
     await expect(activity).toBeVisible({ timeout: 15_000 });
     await expect(activity).toHaveAttribute('data-activity-type', 'scenario');
-  });
 
-  test('scenario deploys and becomes ready (no error/loading state)', async ({
-    player,
-  }) => {
-    test.setTimeout(READY_TIMEOUT + 60_000);
-    await player.getByTestId(SCENARIO_SLIDE).click();
-
+    // 2. The auto-deployed VM provisions and the header reaches Ready (no
+    //    lingering loading/spinner state).
     await waitForScenarioReady(player);
-
     await expect(player.getByTestId('scenario-loading')).toHaveCount(0);
     await expect(player.getByTestId('scenario-status-icon')).toHaveCount(0);
     await expect(player.getByTestId('scenario-header')).toHaveAttribute(
       'data-scenario-status',
       'Ready',
     );
-  });
 
-  test('HYPERVISOR console opens a Guacamole window', async ({ player }) => {
-    test.setTimeout(READY_TIMEOUT + 60_000);
-    await player.getByTestId(SCENARIO_SLIDE).click();
-
-    await waitForScenarioReady(player);
-
-    const hypervisor = player.getByTestId('scenario-console-button').first();
-    await expect(hypervisor).toBeVisible({ timeout: READY_TIMEOUT });
-    await hypervisor.click();
-
-    await expect(player.getByTestId('scenario-console-popup')).toBeVisible({
-      timeout: 60_000,
-    });
-  });
-
-  test('HYPERVISOR console connects to the VM (login screen reached)', async ({
-    player,
-  }) => {
-    test.setTimeout(READY_TIMEOUT + 120_000);
-    await player.getByTestId(SCENARIO_SLIDE).click();
-
-    await waitForScenarioReady(player);
-
+    // 3. The HYPERVISOR console opens a Guacamole window...
     const hypervisor = player.getByTestId('scenario-console-button').first();
     await expect(hypervisor).toBeVisible({ timeout: READY_TIMEOUT });
     await hypervisor.click();
@@ -90,13 +75,13 @@ test.describe('individual scenario @scenario @slow', () => {
     const popup = player.getByTestId('scenario-console-popup');
     await expect(popup).toBeVisible({ timeout: 60_000 });
 
-    // Guacamole reaching CONNECTED means the VM display (Ubuntu login screen)
-    // is live — not just the window opened. Can't assert the login text:
-    // Guacamole paints into a <canvas> (pixels, no queryable DOM).
+    // 4. ...and the tunnel reaches CONNECTED — the VM display (Ubuntu login
+    //    screen) is live. Can't assert the login text: Guacamole paints into a
+    //    <canvas> (pixels, no queryable DOM), so we assert the canvas + the
+    //    data-connected flag instead.
     await expect(popup).toHaveAttribute('data-connected', 'true', {
       timeout: 90_000,
     });
-
     const canvas = popup.locator('canvas').first();
     await expect(canvas).toBeVisible({ timeout: 10_000 });
   });

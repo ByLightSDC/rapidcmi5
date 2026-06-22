@@ -35,6 +35,13 @@
         "scenario": {
           "project": ["chromium"],
           "grep": "@scenario"
+        },
+        "scenario-debug": {
+          "project": ["chromium"],
+          "grep": "@scenario",
+          "headed": true,
+          "workers": 1,
+          "reporter": "list"
         }
       },
       "metadata": {

@@ -1,5 +1,6 @@
 import { test as base, type FrameLocator, type Page } from '@playwright/test';
 import { login, gotoActivity, launchAu } from '../moodle/moodleSession';
+import { loginToKeycloak } from '../lms/keycloakLogin';
 import { moodleEnv } from '../moodle/env';
 
 /**
@@ -35,6 +36,23 @@ import { moodleEnv } from '../moodle/env';
 interface MoodleOptions {
   /** AU/lesson to launch, by its name in the Assignable Units table. */
   auName: string;
+  /**
+   * If true, establish a Keycloak browser SSO session (as the bot) BEFORE the
+   * Moodle launch. Required for TEAM scenarios (teamSSOEnabled): the player
+   * does Keycloak `login-required`, which can't render its login form inside
+   * the launch iframe — a pre-existing session makes that auth silent.
+   * (Individual/Class use Basic auth and don't need this.)
+   */
+  requireKeycloakSso: boolean;
+  /**
+   * Optional async hook run BEFORE the Moodle launch. Required for TEAM
+   * scenarios: the player scans the user's ranges for the deployed scenario
+   * ONCE on launch (no retry), so the deploy must be Ready before launch — not
+   * after (the test body runs after the player has already launched + scanned).
+   * (Class doesn't need this: it waits at the "Enter Class" prompt, so the test
+   * body can deploy after launch.)
+   */
+  preLaunch: (() => Promise<void>) | undefined;
 }
 
 interface MoodleFixtures {
@@ -45,11 +63,25 @@ interface MoodleFixtures {
 export const test = base.extend<MoodleOptions & MoodleFixtures>({
   // Default AU; specs override with `test.use({ auName: '…' })`.
   auName: ['Media:Basic', { option: true }],
+  requireKeycloakSso: [false, { option: true }],
+  preLaunch: [undefined, { option: true }],
 
-  player: async ({ page, auName }, use) => {
+  player: async ({ page, auName, requireKeycloakSso, preLaunch }, use) => {
     // The full real flow (login → activity → launch → iframe player boot
     // against a live LRS) comfortably exceeds Playwright's 30s default.
     test.setTimeout(90_000);
+
+    // Team scenarios need a Keycloak session BEFORE launch (see option doc).
+    if (requireKeycloakSso) {
+      await loginToKeycloak(page);
+    }
+
+    // Deploy/setup that must complete BEFORE the player launches (team scans
+    // on launch, one-shot). Generous timeout — provisioning can take minutes.
+    if (preLaunch) {
+      test.setTimeout(15 * 60_000);
+      await preLaunch();
+    }
 
     await login(page);
     await gotoActivity(page, moodleEnv.activityId);
