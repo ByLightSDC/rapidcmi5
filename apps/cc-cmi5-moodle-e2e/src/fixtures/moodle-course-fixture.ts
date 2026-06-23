@@ -51,8 +51,14 @@ interface MoodleOptions {
    * after (the test body runs after the player has already launched + scanned).
    * (Class doesn't need this: it waits at the "Enter Class" prompt, so the test
    * body can deploy after launch.)
+   *
+   * NOTE: the hook is wrapped in an object (`{ run }`) rather than passed as a
+   * bare function. Playwright treats a function-valued OPTION fixture as a
+   * fixture SETUP function and expects it to call `use()` — passing a bare
+   * `async () => {}` triggers `Error: use() was not called in fixture
+   * "preLaunch"`. Wrapping it in an object keeps the value non-callable.
    */
-  preLaunch: (() => Promise<void>) | undefined;
+  preLaunch: { run: () => Promise<void> } | undefined;
 }
 
 interface MoodleFixtures {
@@ -80,7 +86,7 @@ export const test = base.extend<MoodleOptions & MoodleFixtures>({
     // on launch, one-shot). Generous timeout — provisioning can take minutes.
     if (preLaunch) {
       test.setTimeout(15 * 60_000);
-      await preLaunch();
+      await preLaunch.run();
     }
 
     await login(page);

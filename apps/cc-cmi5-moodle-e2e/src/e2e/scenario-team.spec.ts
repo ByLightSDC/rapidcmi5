@@ -44,13 +44,15 @@ test.describe('team scenario @scenario @slow', () => {
     // provisioning (the deploy JOB completing ≠ the scenario being Ready) —
     // yields "No deployed scenario found". We deploy here, then wait for the
     // scenario itself to report Ready, then the fixture launches.
-    preLaunch: async () => {
-      const { jobUuid } = await deployTeamScenario();
-      if (!jobUuid) throw new Error('team deploy returned no job uuid');
-      await waitForClassDeploymentReady(jobUuid, { timeoutMs: READY_TIMEOUT });
-      await waitForDeployedScenarioReady(TEAM_SCENARIO_NAME, {
-        timeoutMs: READY_TIMEOUT,
-      });
+    preLaunch: {
+      run: async () => {
+        const { jobUuid } = await deployTeamScenario();
+        if (!jobUuid) throw new Error('team deploy returned no job uuid');
+        await waitForClassDeploymentReady(jobUuid, { timeoutMs: READY_TIMEOUT });
+        await waitForDeployedScenarioReady(TEAM_SCENARIO_NAME, {
+          timeoutMs: READY_TIMEOUT,
+        });
+      },
     },
   });
 
