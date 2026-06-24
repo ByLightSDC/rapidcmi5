@@ -142,175 +142,177 @@ export const NavViewMenu = ({
   }, []);
 
   return (
-    <Stack
-      direction="column"
-      alignItems="center"
-      sx={{
-        width: '48px',
-        height: '100%',
-        minHeight: 0,
-        marginTop: '8px',
-        paddingX: 2,
-      }}
-      spacing={0}
-    >
-      <IconButton
-        aria-label="repo-selection-button"
-        data-testid="repo-selection-button"
-        color="inherit"
-        size={iconButtonSize}
-        sx={buildIconButtonSx(viewMode === ViewModeEnum.RepoSelector)}
-        disableRipple
-        onClick={() => {
-          if (viewMode === ViewModeEnum.Designer) {
-            saveSlide();
-            promptNavAway(ViewModeEnum.RepoSelector);
-          } else {
-            dispatch(changeViewMode(ViewModeEnum.RepoSelector));
-          }
+    <nav aria-label="Editor Drawer Navigation">
+      <Stack
+        direction="column"
+        alignItems="center"
+        sx={{
+          width: '48px',
+          height: '100%',
+          minHeight: 0,
+          marginTop: '8px',
+          paddingX: 2,
         }}
+        spacing={0}
       >
-        <Tooltip arrow placement="right" title="All Projects">
-          <ArrowLeft
-            color={iconColor}
-            strokeWidth={1.25}
-            style={navIconStyle}
-          />
-        </Tooltip>
-      </IconButton>
-
-      <Box sx={{ height: '2px' }} />
-      <IconButton
-        aria-label="select-design"
-        color="inherit"
-        size={iconButtonSize}
-        sx={buildIconButtonSx(viewMode === ViewModeEnum.Designer)}
-        disableRipple
-        onClick={() => {
-          handleNavToDesigner();
-        }}
-      >
-        <Tooltip arrow placement="right" title="Visual Designer">
-          <PencilRuler
-            color={iconColor}
-            strokeWidth={1.15}
-            style={navIconStyle}
-          />
-        </Tooltip>
-      </IconButton>
-
-      <IconButton
-        aria-label="select-files"
-        data-testid="code-editor-button"
-        color="inherit"
-        size={iconButtonSize}
-        sx={buildIconButtonSx(viewMode === ViewModeEnum.CodeEditor)}
-        disableRipple
-        onClick={() => {
-          if (viewMode === ViewModeEnum.Designer) {
-            saveSlide();
-            promptNavAway(ViewModeEnum.CodeEditor);
-          } else {
-            dispatch(changeViewMode(ViewModeEnum.CodeEditor));
-          }
-        }}
-      >
-        <Tooltip arrow placement="right" title="Course Files">
-          <Files color={iconColor} strokeWidth={1.15} style={navIconStyle} />
-        </Tooltip>
-      </IconButton>
-      <IconButton
-        aria-label="select-git"
-        data-testid="git-editor-button"
-        color="inherit"
-        size={iconButtonSize}
-        sx={buildIconButtonSx(viewMode === ViewModeEnum.GitEditor)}
-        disableRipple
-        onClick={() => {
-          //REF was promptGitModal();
-          if (viewMode === ViewModeEnum.Designer) {
-            saveSlide();
-            promptNavAway(ViewModeEnum.GitEditor);
-          } else {
-            dispatch(changeViewMode(ViewModeEnum.GitEditor));
-          }
-        }}
-      >
-        <Tooltip
-          arrow
-          placement="right"
-          title={
-            isRepoConnectedToRemote
-              ? 'Version Control'
-              : 'No remote repository configured. Click the settings ⚙️ icon to add a remote.'
-          }
-        >
-          <Stack direction="row">
-            <Box sx={navIconStyle}>
-              <GitCompareArrows
-                color={iconColor}
-                strokeWidth={1.15}
-                style={navIconStyle}
-              />
-              {viewMode !== ViewModeEnum.GitEditor && gitBadgeIndicator}
-            </Box>
-            {!isRepoConnectedToRemote && (
-              <TriangleAlert
-                color={palette.warning.main}
-                size={9}
-                style={{
-                  position: 'absolute',
-                  right: 1,
-                  marginTop: 1,
-                  padding: 0,
-                }}
-              />
-            )}
-          </Stack>
-        </Tooltip>
-      </IconButton>
-      <Box sx={{ flexGrow: 1 }} />
-      {onToggleLeftPanel && (
         <IconButton
-          aria-label="toggle-left-panel"
-          data-testid="toggle-left-panel-button"
+          aria-label="repo-selection-button"
+          data-testid="repo-selection-button"
           color="inherit"
           size={iconButtonSize}
-          sx={buildIconButtonSx(false)}
+          sx={buildIconButtonSx(viewMode === ViewModeEnum.RepoSelector)}
           disableRipple
-          onClick={onToggleClicked}
+          onClick={() => {
+            if (viewMode === ViewModeEnum.Designer) {
+              saveSlide();
+              promptNavAway(ViewModeEnum.RepoSelector);
+            } else {
+              dispatch(changeViewMode(ViewModeEnum.RepoSelector));
+            }
+          }}
+        >
+          <Tooltip arrow placement="right" title="All Projects">
+            <ArrowLeft
+              color={iconColor}
+              strokeWidth={1.25}
+              style={navIconStyle}
+            />
+          </Tooltip>
+        </IconButton>
+
+        <Box sx={{ height: '2px' }} />
+        <IconButton
+          aria-label="select-design"
+          color="inherit"
+          size={iconButtonSize}
+          sx={buildIconButtonSx(viewMode === ViewModeEnum.Designer)}
+          disableRipple
+          onClick={() => {
+            handleNavToDesigner();
+          }}
+        >
+          <Tooltip arrow placement="right" title="Visual Designer">
+            <PencilRuler
+              color={iconColor}
+              strokeWidth={1.15}
+              style={navIconStyle}
+            />
+          </Tooltip>
+        </IconButton>
+
+        <IconButton
+          aria-label="select-files"
+          data-testid="code-editor-button"
+          color="inherit"
+          size={iconButtonSize}
+          sx={buildIconButtonSx(viewMode === ViewModeEnum.CodeEditor)}
+          disableRipple
+          onClick={() => {
+            if (viewMode === ViewModeEnum.Designer) {
+              saveSlide();
+              promptNavAway(ViewModeEnum.CodeEditor);
+            } else {
+              dispatch(changeViewMode(ViewModeEnum.CodeEditor));
+            }
+          }}
+        >
+          <Tooltip arrow placement="right" title="Course Files">
+            <Files color={iconColor} strokeWidth={1.15} style={navIconStyle} />
+          </Tooltip>
+        </IconButton>
+        <IconButton
+          aria-label="select-git"
+          data-testid="git-editor-button"
+          color="inherit"
+          size={iconButtonSize}
+          sx={buildIconButtonSx(viewMode === ViewModeEnum.GitEditor)}
+          disableRipple
+          onClick={() => {
+            //REF was promptGitModal();
+            if (viewMode === ViewModeEnum.Designer) {
+              saveSlide();
+              promptNavAway(ViewModeEnum.GitEditor);
+            } else {
+              dispatch(changeViewMode(ViewModeEnum.GitEditor));
+            }
+          }}
         >
           <Tooltip
             arrow
-            enterDelay={1000}
-            enterNextDelay={1000}
-            open={isToggleTooltipShowing}
-            onOpen={() => setIsToggleTooltipShowing(true)}
-            onClose={() => setIsToggleTooltipShowing(false)}
             placement="right"
-            title={isLeftPanelCollapsed ? 'Expand panel' : 'Collapse panel'}
-            slotProps={{
-              transition: { exit: false },
-            }}
+            title={
+              isRepoConnectedToRemote
+                ? 'Version Control'
+                : 'No remote repository configured. Click the settings ⚙️ icon to add a remote.'
+            }
           >
-            {isLeftPanelCollapsed ? (
-              <PanelLeftOpen
-                color={palette.text.hint}
-                strokeWidth={1.25}
-                style={navIconStyle}
-              />
-            ) : (
-              <PanelLeftClose
-                color={palette.text.hint}
-                strokeWidth={1.25}
-                style={navIconStyle}
-              />
-            )}
+            <Stack direction="row">
+              <Box sx={navIconStyle}>
+                <GitCompareArrows
+                  color={iconColor}
+                  strokeWidth={1.15}
+                  style={navIconStyle}
+                />
+                {viewMode !== ViewModeEnum.GitEditor && gitBadgeIndicator}
+              </Box>
+              {!isRepoConnectedToRemote && (
+                <TriangleAlert
+                  color={palette.warning.main}
+                  size={9}
+                  style={{
+                    position: 'absolute',
+                    right: 1,
+                    marginTop: 1,
+                    padding: 0,
+                  }}
+                />
+              )}
+            </Stack>
           </Tooltip>
         </IconButton>
-      )}
+        <Box sx={{ flexGrow: 1 }} />
+        {onToggleLeftPanel && (
+          <IconButton
+            aria-label="toggle-left-panel"
+            data-testid="toggle-left-panel-button"
+            color="inherit"
+            size={iconButtonSize}
+            sx={buildIconButtonSx(false)}
+            disableRipple
+            onClick={onToggleClicked}
+          >
+            <Tooltip
+              arrow
+              enterDelay={1000}
+              enterNextDelay={1000}
+              open={isToggleTooltipShowing}
+              onOpen={() => setIsToggleTooltipShowing(true)}
+              onClose={() => setIsToggleTooltipShowing(false)}
+              placement="right"
+              title={isLeftPanelCollapsed ? 'Expand panel' : 'Collapse panel'}
+              slotProps={{
+                transition: { exit: false },
+              }}
+            >
+              {isLeftPanelCollapsed ? (
+                <PanelLeftOpen
+                  color={palette.text.hint}
+                  strokeWidth={1.25}
+                  style={navIconStyle}
+                />
+              ) : (
+                <PanelLeftClose
+                  color={palette.text.hint}
+                  strokeWidth={1.25}
+                  style={navIconStyle}
+                />
+              )}
+            </Tooltip>
+          </IconButton>
+        )}
 
-      <Box sx={{ height: '32px' }} />
-    </Stack>
+        <Box sx={{ height: '32px' }} />
+      </Stack>
+    </nav>
   );
 };

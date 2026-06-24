@@ -407,7 +407,7 @@ function LessonTree({
   }, []);
 
   return (
-    <>
+    <nav aria-label="Lesson Navigation">
       <DndProvider backend={HTML5Backend}>
         <Box
           sx={{
@@ -500,7 +500,7 @@ function LessonTree({
           )}
         </Box>
       </DndProvider>
-    </>
+    </nav>
   );
 }
 
