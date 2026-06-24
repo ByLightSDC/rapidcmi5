@@ -14,6 +14,7 @@ import {
 } from '@mdxeditor/editor';
 import { imagePlayerPlugin } from './plugins/image-player/';
 import { ariaOverridePlugin } from './plugins/aria-override/ariaOverridePlugin';
+import { playerThematicBreakPlugin } from './plugins/thematic-break/playerThematicBreakPlugin';
 import {
   animationPlayerPlugin,
   parseFrontmatterAnimations,
@@ -196,6 +197,7 @@ function RC5Player() {
       quotePlugin(),
       tablePlugin(),
       thematicBreakPlugin(),
+      playerThematicBreakPlugin(),
       toolbarPlugin({
         toolbarClassName: 'mdxeditor-preview-toolbar',
         toolbarContents: () => <RC5PlayerToolbar />,
