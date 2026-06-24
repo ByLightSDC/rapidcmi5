@@ -24,7 +24,7 @@ import {
   BlockWidthValue,
 } from '../shared/BlockAppearanceForm';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
-import { drawerTitleStyles, drawerTitleVariant } from 'packages/ui/src/lib/styles/typography';
+import { drawerTitleStyles, drawerTitleVariant } from '@rapid-cmi5/ui';
 
 const contentWidthDescriptions: Record<BlockWidthValue, string> = {
   [BLOCK_WIDTH_INHERIT]: 'Use lesson-level content width setting',

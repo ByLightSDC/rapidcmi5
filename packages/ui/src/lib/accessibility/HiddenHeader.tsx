@@ -15,7 +15,7 @@ export function HiddenHeader({
    */
   useEffect(() => {
     document.title = `${pageTitle || header} | RangeOS`;
-  }, [header]);
+  }, [header, pageTitle]);
 
   if (!header) {
     return null;

@@ -106,6 +106,7 @@ export * from './lib/styles/muiTheme';
 export * from './lib/styles/muiThemeDark';
 export * from './lib/styles/lessonThemeStyles';
 export * from './lib/styles/directiveStyles';
+export * from './lib/styles/typography';
 export * from './lib/cmi5/mdx/contexts/PresentationContext';
 export * from './lib/utility/useQueryCache';
 export * from './lib/utility/useQueryDetails';
