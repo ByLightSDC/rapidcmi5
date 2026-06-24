@@ -89,63 +89,66 @@ export default function ProductionModeSelection({
   };
   const theme = useTheme();
   const { palette } = theme;
-
+  const ariaLabelId = 'production-mode';
   return (
     <GlassCard
+      ariaLabelId={ariaLabelId}
       title="Production Mode"
       icon={<CreateNewFolder sx={{ color: 'white' }} />}
     >
-      <List sx={{ p: 0 }}>
-        {/* Clone Git Repository */}
-        <OptionCard
-          data-testid="clone-repo-button"
-          title={'Clone Git Repository'}
-          handleSelect={cloneRepo}
-          handleShowDocs={() => handleShowDocs('clone')}
-          disabled={isDisabled}
-          icon={
-            getSvgStyleIcon(StyleIconTypeEnum.GIT, {
-              fontSize: 'inherit',
-              color: alpha(palette.primary.main, 0.9),
-            }) || <></>
-          }
-          subText={<>Clone remote git repository to your desktop</>}
-        />
-        {/* Open Existing Repository */}
-        {!isElectron && (
+      <nav aria-labelledby={ariaLabelId}>
+        <List sx={{ p: 0 }}>
+          {/* Clone Git Repository */}
           <OptionCard
-            data-testid="open-repo-button"
-            title={'Open Existing Project'}
-            handleSelect={() => openLocalFolder()}
-            handleShowDocs={() => handleShowDocs('open')}
+            data-testid="clone-repo-button"
+            title={'Clone Git Repository'}
+            handleSelect={cloneRepo}
+            handleShowDocs={() => handleShowDocs('clone')}
             disabled={isDisabled}
-            icon={<FolderOpen />}
-            subText={<>Select existing git project on your desktop</>}
+            icon={
+              getSvgStyleIcon(StyleIconTypeEnum.GIT, {
+                fontSize: 'inherit',
+                color: alpha(palette.primary.main, 0.9),
+              }) || <></>
+            }
+            subText={<>Clone remote git repository to your desktop</>}
           />
-        )}
-        {/* Open Existing Repository */}
-        {isElectron && (
+          {/* Open Existing Repository */}
+          {!isElectron && (
+            <OptionCard
+              data-testid="open-repo-button"
+              title={'Open Existing Project'}
+              handleSelect={() => openLocalFolder()}
+              handleShowDocs={() => handleShowDocs('open')}
+              disabled={isDisabled}
+              icon={<FolderOpen />}
+              subText={<>Select existing git project on your desktop</>}
+            />
+          )}
+          {/* Open Existing Repository */}
+          {isElectron && (
+            <OptionCard
+              data-testid="open-repo-button"
+              title={'Open Existing Project'}
+              handleSelect={() => openLocalFolder()}
+              handleShowDocs={() => handleShowDocs('open')}
+              disabled={isDisabled}
+              icon={<FolderOpen />}
+              subText={<>Select existing git project on your desktop</>}
+            />
+          )}
+          {/* Create New Repository */}
           <OptionCard
-            data-testid="open-repo-button"
-            title={'Open Existing Project'}
-            handleSelect={() => openLocalFolder()}
-            handleShowDocs={() => handleShowDocs('open')}
+            data-testid="create-repo-button"
+            title={'Create New Project'}
+            handleSelect={() => createRepo()}
+            handleShowDocs={() => handleShowDocs('create')}
             disabled={isDisabled}
-            icon={<FolderOpen />}
-            subText={<>Select existing git project on your desktop</>}
+            icon={<CreateNewFolder />}
+            subText={<>Create new git project on your desktop</>}
           />
-        )}
-        {/* Create New Repository */}
-        <OptionCard
-          data-testid="create-repo-button"
-          title={'Create New Project'}
-          handleSelect={() => createRepo()}
-          handleShowDocs={() => handleShowDocs('create')}
-          disabled={isDisabled}
-          icon={<CreateNewFolder />}
-          subText={<>Create new git project on your desktop</>}
-        />
-      </List>
+        </List>
+      </nav>
     </GlassCard>
   );
 }

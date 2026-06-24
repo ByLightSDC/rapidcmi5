@@ -47,9 +47,10 @@ export default function RecentProjectSelection({
   const handleClearSearch = () => {
     setSearchQuery('');
   };
-
+  const ariaLabelId = 'recent-projects';
   return (
     <GlassCard
+      ariaLabelId={ariaLabelId}
       sx={{ height: 'clamp(650px, 80vh, 700px)' }}
       title="Recent Projects"
       icon={<History sx={{ color: 'white' }} />}
@@ -93,49 +94,38 @@ export default function RecentProjectSelection({
             },
           }}
         >
-          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 2 }}>
-            {filteredProjects.map((project) => (
-              <ThemedOptionCard key={project.id}>
-                <ListItemButton
-                  onClick={() => onOpenRecentProject(project.id)}
-                  disabled={isDisabled}
-                  sx={{
-                    borderRadius: 2,
-                    p: 1.2,
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 1,
-                    transition: 'none',
-                    '&:hover': { background: 'transparent' },
-                  }}
-                >
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Box sx={{ mb: 0.5 }}>
-                      <ListItemText
-                        primary={project.name}
-                        sx={{
-                          margin: 0,
-                          fontFamily: '"IBM Plex Sans", sans-serif',
-                          fontWeight: 500,
-                          fontSize: '14px',
-                          letterSpacing: '0.01em',
-                        }}
-                      />
-                    </Box>
-                    <Stack spacing={0.5}>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          fontFamily: '"IBM Plex Sans", sans-serif',
-                          fontSize: '0.75rem',
-                          color: alpha(palette.text.primary, 0.7),
-                        }}
-                      >
-                        Last Accessed:{' '}
-                        {formatRelativeTime(project.lastAccessed)}
-                      </Typography>
-                      {project.createdAt && (
+          <nav aria-labelledby={ariaLabelId}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 2 }}>
+              {filteredProjects.map((project) => (
+                <ThemedOptionCard key={project.id}>
+                  <ListItemButton
+                    onClick={() => onOpenRecentProject(project.id)}
+                    disabled={isDisabled}
+                    sx={{
+                      borderRadius: 2,
+                      p: 1.2,
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 1,
+                      transition: 'none',
+                      '&:hover': { background: 'transparent' },
+                    }}
+                  >
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Box sx={{ mb: 0.5 }}>
+                        <ListItemText
+                          primary={project.name}
+                          sx={{
+                            margin: 0,
+                            fontFamily: '"IBM Plex Sans", sans-serif',
+                            fontWeight: 500,
+                            fontSize: '14px',
+                            letterSpacing: '0.01em',
+                          }}
+                        />
+                      </Box>
+                      <Stack spacing={0.5}>
                         <Typography
                           variant="caption"
                           sx={{
@@ -144,27 +134,40 @@ export default function RecentProjectSelection({
                             color: alpha(palette.text.primary, 0.7),
                           }}
                         >
-                          Created: {formatRelativeTime(project.createdAt)}
+                          Last Accessed:{' '}
+                          {formatRelativeTime(project.lastAccessed)}
                         </Typography>
-                      )}
-                      {project.remoteUrl && (
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            fontFamily: '"Space Mono", monospace',
-                            fontSize: '0.7rem',
-                            color: alpha(palette.text.primary, 0.5),
-                          }}
-                        >
-                          {project.remoteUrl}
-                        </Typography>
-                      )}
-                    </Stack>
-                  </Box>
-                </ListItemButton>
-              </ThemedOptionCard>
-            ))}
-          </Box>
+                        {project.createdAt && (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontFamily: '"IBM Plex Sans", sans-serif',
+                              fontSize: '0.75rem',
+                              color: alpha(palette.text.primary, 0.7),
+                            }}
+                          >
+                            Created: {formatRelativeTime(project.createdAt)}
+                          </Typography>
+                        )}
+                        {project.remoteUrl && (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontFamily: '"Space Mono", monospace',
+                              fontSize: '0.7rem',
+                              color: alpha(palette.text.primary, 0.5),
+                            }}
+                          >
+                            {project.remoteUrl}
+                          </Typography>
+                        )}
+                      </Stack>
+                    </Box>
+                  </ListItemButton>
+                </ThemedOptionCard>
+              ))}
+            </Box>
+          </nav>
         </Box>
 
         {filteredProjects.length === 0 && recentProjects.length > 0 && (

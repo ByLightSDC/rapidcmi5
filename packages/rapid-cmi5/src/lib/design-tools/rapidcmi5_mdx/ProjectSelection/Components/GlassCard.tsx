@@ -1,14 +1,16 @@
-import { PropsWithChildren, ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { Box, Paper, PaperProps, Typography, useTheme } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { CreateNewFolder } from '@mui/icons-material';
+
 export interface GlassCardProps extends PaperProps {
+  ariaLabelId?: string;
   title: string;
   icon: ReactNode;
   headerAction?: ReactNode;
 }
 export function GlassCard({
   children,
+  ariaLabelId,
   title,
   icon,
   headerAction,
@@ -61,6 +63,7 @@ export function GlassCard({
           {icon}
         </Box>
         <Typography
+          id={ariaLabelId}
           variant="h2"
           sx={{
             fontFamily: '"Space Mono", monospace',
