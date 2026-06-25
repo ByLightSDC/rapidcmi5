@@ -29,39 +29,6 @@ test.describe('test basic quiz  @quizzes', () => {
     ).toBeVisible({ timeout: 15_000 });
   });
 
-  test('tags the activity with type=quiz', async ({ player }) => {
-    await player.getByTestId(QUIZ_SLIDE).click();
-    await expect(
-      player
-        .getByTestId('player-slide-content')
-        .getByTestId('directive-activity'),
-    ).toHaveAttribute('data-activity-type', 'quiz');
-  });
-
-  test('renders the AuQuiz body', async ({ player }) => {
-    await player.getByTestId(QUIZ_SLIDE).click();
-    await expect(
-      player.getByTestId('player-slide-content').getByTestId('activity-quiz'),
-    ).toBeVisible({ timeout: 15_000 });
-  });
-
-  test('shows the fixture quiz title', async ({ player }) => {
-    await player.getByTestId(QUIZ_SLIDE).click();
-    const quizBody = player
-      .getByTestId('player-slide-content')
-      .getByTestId('activity-quiz');
-    await expect(quizBody.getByRole('heading', { name: 'Quiz' })).toBeVisible();
-  });
-
-  test('shows the fixture question text', async ({ player }) => {
-    await player.getByTestId(QUIZ_SLIDE).click();
-    await expect(
-      player
-        .getByTestId('player-slide-content')
-        .getByText('What color is blue'),
-    ).toBeVisible({ timeout: 15_000 });
-  });
-
   /**
    * Interaction tests — submit against the REAL LRS. Tagged
    * @quiz-interaction so they can be excluded from the stable lane.

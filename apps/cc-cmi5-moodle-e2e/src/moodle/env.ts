@@ -50,6 +50,44 @@ export const moodleEnv = {
     return optional('MOODLE_ACTIVITY_ID', '744');
   },
 
+  // --- Moodle web service (course upsert + registration reset) ---
+
+  /**
+   * Moodle WS token on the "RapidCMI5 Integration" service. Needs the
+   * mod_cmi5 reset/deploy functions on that service (incl.
+   * mod_cmi5_reset_registration_state, capability mod/cmi5:managecontent).
+   * Same token used by `npm run upload:moodle`.
+   */
+  get wsToken(): string {
+    return required('MOODLE_WS_TOKEN');
+  },
+
+  /**
+   * WS token for the registration-reset call. The reset function
+   * (mod_cmi5_reset_registration_state) can't be added to the built-in
+   * "RapidCMI5 Integration" service via the UI, so it lives on a separate
+   * CUSTOM service with its own token. Falls back to MOODLE_WS_TOKEN if you
+   * ever bundle both onto one service.
+   */
+  get resetWsToken(): string {
+    const v = process.env['MOODLE_RESET_WS_TOKEN'];
+    return v && v.trim() ? v.trim() : this.wsToken;
+  },
+
+  /**
+   * Numeric Moodle user id of the bot (NOT the username). Used to reset the
+   * bot's cmi5 registration state between runs so every run starts from a
+   * clean "Not started" AU state (the upsert preserves the cmid AND the
+   * learner's progress, so without this each scenario AU resumes as already
+   * "Satisfied" and the player skips to the End Slide). Read it once from
+   * Moodle (the user's profile URL has `?id=<n>`). If unset, the reset is
+   * skipped with a warning.
+   */
+  get botUserId(): string | undefined {
+    const v = process.env['MOODLE_BOT_USER_ID'];
+    return v && v.trim() ? v.trim() : undefined;
+  },
+
   // --- RangeOS devops API (class-scenario deployment, @scenario lane) ---
 
   /** rangeos-api base, e.g. https://rangeos-api.develop-cp.rangeos.engineering */

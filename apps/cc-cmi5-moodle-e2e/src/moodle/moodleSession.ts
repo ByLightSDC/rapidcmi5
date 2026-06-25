@@ -64,21 +64,19 @@ export async function gotoActivity(
 }
 
 /**
- * Result of a launch: a unified handle to the player, regardless of how
- * Moodle surfaced it.
+ * Result of a launch: a unified handle to the player.
  *
- * Observed shape (RangeOS Moodle, spike): the Launch link navigates the
- * SAME tab to `mod/cmi5/launch.php`, which renders the player in that tab
- * (`shape: 'sameTab'`). The iframe and new-tab branches remain wired in
- * case other launch configs differ.
+ * Only the Embedded (iframe) launch method is supported: the Launch link
+ * navigates the same tab to `mod/cmi5/launch.php`, which embeds the player in an
+ * <iframe> (`shape: 'sameTab'`), or an iframe is injected without navigation
+ * (`shape: 'iframe'`). Either way `content()` returns the iframe FrameLocator.
  *
- * `content()` returns the locator scope to query the player with — player
- * locators resolve inside it unchanged whether it's a Page or a FrameLocator.
+ * `content()` is the locator scope to query the player with — player locators
+ * resolve inside it unchanged.
  */
 export interface LaunchedPlayer {
-  shape: 'iframe' | 'newTab' | 'sameTab';
+  shape: 'iframe' | 'sameTab';
   frame?: FrameLocator;
-  /** The player Page (same-tab nav or new tab). */
   page?: Page;
   content(): FrameLocator | Page;
 }
@@ -112,9 +110,11 @@ function escapeRegExp(s: string): string {
 }
 
 /**
- * Clicks a Launch link and resolves the launched player, handling the three
- * shapes Moodle may use (new tab / same-tab nav to launch.php with an iframe /
- * injected iframe). Confirmed shape for RangeOS Moodle: sameTab + iframe.
+ * Clicks a Launch link and resolves the launched player. We support ONLY the
+ * Embedded (iframe) launch method: the tab navigates to launch.php which embeds
+ * the player in an <iframe> (same-tab), or an iframe is injected without
+ * navigation. The "New window" launch method (player in a separate tab) is NOT
+ * supported — set the activity's Launch method to "Embedded (iframe)".
  */
 async function clickAndResolvePlayer(
   page: Page,
@@ -134,27 +134,26 @@ async function clickAndResolvePlayer(
 
   await launchButton.click();
 
-  // (1) New tab / popup on the context.
+  // We ONLY support the iframe (Embedded) launch method. The cmi5 activity's
+  // "Launch method" MUST be set to "Embedded (iframe)" — with "New window" the
+  // player opens in a separate tab and this resolver intentionally won't latch
+  // onto it (we don't support that shape). A popup may still briefly appear
+  // (e.g. a team-SSO Keycloak auth window); log it but do NOT treat it as the
+  // player — fall through to the iframe path.
   const popup = await newPagePromise;
   if (popup) {
     await popup.waitForLoadState('domcontentloaded').catch(() => undefined);
-    console.log(`[launchAu] new tab opened at: ${popup.url()}`);
-    // A team-SSO launch may briefly open a Keycloak auth popup that then closes
-    // / redirects; that's NOT the player. Only treat a popup as the player if
-    // it's the cmi5 launch (launch.php). Otherwise fall through to same-tab.
-    if (/mod\/cmi5\/launch\.php/i.test(popup.url())) {
-      return { shape: 'newTab', page: popup, content: () => popup };
-    }
     console.log(
-      `[launchAu] popup is not the player (${popup.url()}); using same-tab/iframe`,
+      `[launchAu] a popup/new tab opened (${popup.url()}); ignoring it — ` +
+        `only the Embedded (iframe) launch method is supported`,
     );
   }
 
-  // (2) Same-tab navigation — RangeOS Moodle's actual behavior: the tab
-  //     navigates to launch.php, which then EMBEDS the player in an
-  //     <iframe>. So the player content is one frame down — content() must
-  //     return the FrameLocator, not the top page (querying the page finds
-  //     only Moodle chrome, never the player's tabs).
+  // (1) Same-tab navigation — the supported shape: the tab navigates to
+  //     launch.php, which then EMBEDS the player in an <iframe>. So the player
+  //     content is one frame down — content() must return the FrameLocator, not
+  //     the top page (querying the page finds only Moodle chrome, never the
+  //     player's tabs).
   await page
     .waitForURL((url) => url.href !== urlBefore, { timeout: 5_000 })
     .catch(() => undefined);
@@ -169,7 +168,7 @@ async function clickAndResolvePlayer(
     return { shape: 'sameTab', page, frame, content: () => frame };
   }
 
-  // (3) Iframe injected into the current page without navigation.
+  // (2) Iframe injected into the current page without navigation.
   const iframeCount = await page.locator('iframe').count();
   console.log(
     `[launchAu] no popup, no navigation; iframes on page: ${iframeCount}`,

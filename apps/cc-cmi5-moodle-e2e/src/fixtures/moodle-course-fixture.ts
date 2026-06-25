@@ -77,6 +77,10 @@ export const test = base.extend<MoodleOptions & MoodleFixtures>({
     // against a live LRS) comfortably exceeds Playwright's 30s default.
     test.setTimeout(90_000);
 
+    // (Progress is reset ONCE for the whole run in global-setup.ts, so the run
+    // starts from a clean "Not started" state — see that file for why per-run
+    // rather than per-launch.)
+
     // Team scenarios need a Keycloak session BEFORE launch (see option doc).
     if (requireKeycloakSso) {
       await loginToKeycloak(page);

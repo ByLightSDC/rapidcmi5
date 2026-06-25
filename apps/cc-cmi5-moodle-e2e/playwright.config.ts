@@ -27,6 +27,10 @@ const HTML_REPORT_DIR =
 
 export default defineConfig({
   ...nxE2EPreset(__filename, { testDir: './src/e2e' }),
+  // Reset the bot's cmi5 registration ONCE before the suite so the run starts
+  // from a clean "Not started" state (the upsert preserves cmid AND prior
+  // progress — otherwise scenario AUs resume as Satisfied and skip the console).
+  globalSetup: require.resolve('./src/global-setup.ts'),
   reporter: [
     [process.env.CI ? 'github' : 'list'],
     ['html', { open: 'never', outputFolder: HTML_REPORT_DIR }],
