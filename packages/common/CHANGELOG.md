@@ -1,3 +1,17 @@
+## 0.17.0 (2026-06-26)
+
+### 🚀 Features
+
+- Added in React Query and unified electron and web app clients
+
+### 🩹 Fixes
+
+- Fonts paths corrected and changed how default images operate #CCUI-2911
+
+### ❤️ Thank You
+
+- Aaron Crawford
+
 ## 0.16.0 (2026-05-28)
 
 ### 🚀 Features

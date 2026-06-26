@@ -1,3 +1,23 @@
+## 0.17.0 (2026-06-26)
+
+### 🚀 Features
+
+- Caption support to audio component (CCUI-2817)
+- Added in React Query and unified electron and web app clients
+- Added in the ability to launch a real cmi5 link and scenario
+
+### 🩹 Fixes
+
+- anim text clarification (CCUI-2684)
+- prevent stale plugin re-init from clobbering animation frontmatter CCUI-3004
+- Fonts paths corrected and changed how default images operate #CCUI-2911
+
+### ❤️ Thank You
+
+- Aaron Crawford
+- Matt Keele
+- mattkeele-bylight
+
 ## 0.16.0 (2026-05-28)
 
 ### 🚀 Features
