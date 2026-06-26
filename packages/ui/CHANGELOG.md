@@ -1,3 +1,21 @@
+## 0.18.0 (2026-06-26)
+
+### 🚀 Features
+
+- Added in React Query and unified electron and web app clients
+- fix for copy pasted blocks within anim blocks
+
+### 🩹 Fixes
+
+- anim text clarification (CCUI-2684)
+- honor lesson contentWidth for audio in player (CCUI-3005)
+- Fonts paths corrected and changed how default images operate #CCUI-2911
+
+### ❤️ Thank You
+
+- Aaron Crawford
+- mattkeele-bylight
+
 ## 0.17.0 (2026-06-26)
 
 ### 🚀 Features
