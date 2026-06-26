@@ -7,21 +7,27 @@ import { useSelector } from 'react-redux';
 import { courseAUProgressSel } from '../redux/auReducer';
 import { SxProps } from '@mui/system';
 
-function LinearProgressWithLabel(
-  props: LinearProgressProps & {
-    fillColor?: string;
-    completeFillColor?: string;
-    sxProps?: SxProps;
-    textProps?: SxProps;
-    value: number;
-  },
-) {
+function LinearProgressWithLabel({
+  fillColor,
+  completeFillColor,
+  sxProps,
+  textProps,
+  value,
+  ...linearProgressProps
+}: LinearProgressProps & {
+  fillColor?: string;
+  completeFillColor?: string;
+  sxProps?: SxProps;
+  textProps?: SxProps;
+  value: number;
+}) {
   return (
     <Box
       sx={{
         display: 'flex',
         alignItems: 'center',
         ml: 1,
+        pointerEvents: 'none',
       }}
     >
       <Box
@@ -29,20 +35,21 @@ function LinearProgressWithLabel(
           width: '90%',
           mr: 1,
           color:
-            props.value === 100
-              ? (props.completeFillColor ?? 'success')
-              : (props.fillColor ?? 'primary'),
+            value === 100
+              ? (completeFillColor ?? 'success')
+              : (fillColor ?? 'primary'),
         }}
       >
         <LinearProgress
           variant="determinate"
           aria-label="Course Progress"
-          {...props}
+          value={value}
+          {...linearProgressProps}
           sx={{
             borderRadius: 5,
             color: 'inherit',
             height: 10,
-            ...props.sxProps,
+            ...sxProps,
           }}
         />
       </Box>
@@ -50,9 +57,9 @@ function LinearProgressWithLabel(
         <Typography
           aria-hidden="true"
           variant="body2"
-          sx={{ fontWeight: 700, color: 'text.primary', ...props.textProps }}
+          sx={{ fontWeight: 700, color: 'text.primary', ...textProps }}
         >
-          {`${Math.round(props.value)}%`}
+          {`${Math.round(value)}%`}
         </Typography>
       </Box>
     </Box>
