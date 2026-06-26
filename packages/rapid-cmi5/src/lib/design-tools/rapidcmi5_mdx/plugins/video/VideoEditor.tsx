@@ -31,6 +31,7 @@ import styles from './styles/video-plugin.module.css';
 import { useCellValues, usePublisher } from '@mdxeditor/gurx';
 import VideoResizer from './VideoResizer';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
+import { editorInPlayback$ } from '@rapid-cmi5/ui';
 
 const imageCache = new Set();
 
@@ -346,6 +347,7 @@ export function VideoEditor({
   const [EditVideoToolbar] = useCellValues(editVideoToolbarComponent$);
   const [disableSettingsButton] = useCellValues(disableVideoSettingsButton$);
   const [videoPreviewHandler] = useCellValues(videoPreviewHandler$);
+  const [isPlayback] = useCellValues(editorInPlayback$);
   const [previewSrc, setPreviewSrc] = React.useState(src);
   const [previewCaptionSrc, setPreviewCaptionSrc] = React.useState<
     string | undefined
@@ -376,6 +378,38 @@ export function VideoEditor({
   const isLocal = src.startsWith('./');
   const initialVideoPath = isLocal ? src : null;
   const videoSource = isLocal ? `${videoFilePath}${src.slice(1)}` : src;
+
+  const playbackVideoRef = React.useRef<HTMLVideoElement | null>(null);
+
+  React.useEffect(() => {
+    if (isPlayback && playbackVideoRef.current) {
+      const decoratorSpan = playbackVideoRef.current.parentElement;
+      if (decoratorSpan) {
+        decoratorSpan.setAttribute('role', 'presentation');
+      }
+    }
+  }, [isPlayback]);
+
+  if (isPlayback) {
+    return (
+      <video
+        ref={playbackVideoRef}
+        src={previewSrc || videoSource}
+        title={title}
+        controls
+        style={{
+          height: height === 'inherit' ? 'inherit' : `${height}px`,
+          maxWidth: '100%',
+          width: width === 'inherit' ? 'inherit' : `${width}px`,
+        }}
+        data-video-id={videoId}
+      >
+        {previewCaptionSrc && (
+          <track kind="captions" src={previewCaptionSrc} srcLang="en" label="English" default />
+        )}
+      </video>
+    );
+  }
 
   return (
     <React.Suspense fallback={Placeholder ? <Placeholder /> : null}>
