@@ -232,6 +232,7 @@ export const LessonDrawer = () => {
                   color: 'common.white',
                   borderRadius: 6,
                   border: `1px solid ${theme.palette.primary.light}`,
+                  marginTop: '6px',
                   transition:
                     'transform 120ms ease, background-color 120ms ease',
                   '&:hover': {
@@ -255,7 +256,7 @@ export const LessonDrawer = () => {
               gap: 0.5,
               justifyContent: 'flex-end',
               minWidth: '112px',
-              marginTop: '4px',
+              marginTop: '6px',
             }}
           >
             <Tooltip title="Create Lesson">

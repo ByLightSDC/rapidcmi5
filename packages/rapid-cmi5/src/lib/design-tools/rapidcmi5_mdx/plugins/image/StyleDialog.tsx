@@ -599,6 +599,7 @@ export const StyleDialog: React.FC<StyleProps> = ({
                       defaultValue={borderStyle}
                       options={BorderStyles}
                       onSelect={handleBorderStyleSelect}
+                      label="Border Style"
                     />
                   </Grid>
                 </Grid>

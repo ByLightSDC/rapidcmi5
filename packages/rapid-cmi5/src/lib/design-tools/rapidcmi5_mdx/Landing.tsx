@@ -11,10 +11,16 @@ import {
   ListItemIcon,
   ListItemText,
   Stack,
+  Typography,
   useTheme,
 } from '@mui/material';
 
-import { ButtonOptions, RowAction, setModal } from '@rapid-cmi5/ui';
+import {
+  ButtonOptions,
+  HiddenHeader,
+  RowAction,
+  setModal,
+} from '@rapid-cmi5/ui';
 
 /** Data */
 import { LessonDrawer } from './drawers/LessonDrawer';
@@ -192,18 +198,23 @@ export function Landing() {
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
                 >
-                  <ListItemText
-                    primary={currentRepo}
+                  <HiddenHeader pageTitle={currentRepo || undefined} />
+                  <Typography
+                    color="primary.main"
+                    variant="h1"
                     sx={{
                       padding: 2,
                       margin: 0,
                       flex: 1,
                       fontFamily: '"IBM Plex Sans", sans-serif',
-                      fontWeight: 500,
-                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      fontSize: '16px',
                       letterSpacing: '0.01em',
+                      textTransform: 'uppercase', //'capitalize',
                     }}
-                  />
+                  >
+                    {currentRepo}
+                  </Typography>
                   <Stack direction="row" sx={{ marginRight: 2 }}>
                     <ButtonOptions
                       optionButton={(handleClick: any, tooltip: string) => {

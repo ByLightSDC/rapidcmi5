@@ -44,6 +44,7 @@ import {
 } from '../../drawers/constants';
 import { RC5Context } from '../../contexts/RC5Context';
 import { courseDataCache } from '../../../../redux/courseBuilderReducer';
+import { drawerHeaderStyles, drawerHeaderVariant, drawerTitleStyles, drawerTitleVariant } from '@rapid-cmi5/ui';
 
 /**
  * Apply styles globally
@@ -184,10 +185,8 @@ export function LessonStyleDrawer() {
           }}
         >
           <PaletteIcon color="primary" />
-          <Typography
-            variant="h6"
-            sx={{ color: 'primary.main', flex: 1, marginLeft: 1 }}
-          >
+
+          <Typography variant={drawerHeaderVariant} sx={drawerHeaderStyles}>
             Course Appearance
           </Typography>
           <Tooltip
@@ -223,7 +222,7 @@ export function LessonStyleDrawer() {
         <Grid container sx={{ margin: 2 }}>
           {/* Content Width */}
           <Grid size={11.5}>
-            <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
+            <Typography variant={drawerTitleVariant}  sx={{ ...drawerTitleStyles, mb: 1 }}>
               Content Width
             </Typography>
             <ToggleButtonGroup
@@ -249,7 +248,7 @@ export function LessonStyleDrawer() {
 
           {/* Block Padding */}
           <Grid size={11.5} sx={{ mt: 2.5 }}>
-            <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
+            <Typography variant={drawerTitleVariant}  sx={{ ...drawerTitleStyles, mb: 1 }}>
               Block Padding
             </Typography>
             <ToggleButtonGroup
@@ -265,7 +264,10 @@ export function LessonStyleDrawer() {
               <ToggleButton value={BlockPaddingEnum.Small}>S</ToggleButton>
               <ToggleButton value={BlockPaddingEnum.Medium}>M</ToggleButton>
               <ToggleButton value={BlockPaddingEnum.Large}>L</ToggleButton>
-              <ToggleButton value={BlockPaddingEnum.Custom}>
+              <ToggleButton
+                value={BlockPaddingEnum.Custom}
+                aria-label="Custom padding"
+              >
                 <MoreHorizIcon fontSize="small" />
               </ToggleButton>
             </ToggleButtonGroup>
@@ -301,7 +303,7 @@ export function LessonStyleDrawer() {
 
           {/* Default Alignment */}
           <Grid size={11.5} sx={{ mt: 2.5 }}>
-            <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
+            <Typography variant={drawerTitleVariant}  sx={{ ...drawerTitleStyles, mb: 1 }}>
               Text Alignment
             </Typography>
             <ToggleButtonGroup
@@ -330,7 +332,7 @@ export function LessonStyleDrawer() {
           </Grid>
           {/* Default Activity Alignment */}
           <Grid size={11.5} sx={{ mt: 2.5 }}>
-            <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 1 }}>
+            <Typography variant={drawerTitleVariant}  sx={{ ...drawerTitleStyles, mb: 1 }}>
               Activity Alignment
             </Typography>
             <ToggleButtonGroup

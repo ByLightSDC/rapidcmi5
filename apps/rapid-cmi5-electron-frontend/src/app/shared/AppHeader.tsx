@@ -79,125 +79,127 @@ export default function AppHeader() {
   if (!showAppHeader) return null;
 
   return (
-    <Box
-      sx={{
-        height: '40px',
-        backgroundColor: (theme: any) => `${theme.header.default}`,
-        borderBottom: '1px solid',
-        borderBottomColor: 'divider',
-        display: 'flex',
-        alignItems: 'center',
-        px: 1,
-      }}
-    >
-      {/* Left section - Logo and Dashboard Menu */}
+    <header>
       <Box
         sx={{
+          height: '40px',
+          backgroundColor: (theme: any) => `${theme.header.default}`,
+          borderBottom: '1px solid',
+          borderBottomColor: 'divider',
           display: 'flex',
           alignItems: 'center',
-          gap: 1,
-          marginLeft: '8px',
-          marginTop: '6px', //this offsets loading bar that appears under the app header box
+          px: 1,
         }}
       >
-        {logoIcon}
-      </Box>
-
-      {/* Center section - could add breadcrumbs or title here */}
-      <Box sx={{ flex: 1 }} />
-
-      {/* Right section - Settings and User */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <IconButton
-          aria-label="User Settings"
-          id="settings-menu-anchor"
-          onClick={() => onAppIconClick(settingsKey)}
-          size="small"
-          disableTouchRipple
+        {/* Left section - Logo and Dashboard Menu */}
+        <Box
           sx={{
-            color: (theme: any) => `${theme.header.buttonColor}`,
-            borderRadius: '4px',
-            '&:hover': {
-              backgroundColor: 'action.hover',
-              color: (theme: any) => `${theme.header.hoverColor}`,
-            },
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            marginLeft: '8px',
+            marginTop: '6px', //this offsets loading bar that appears under the app header box
           }}
         >
-          <Tooltip
-            arrow
-            enterDelay={500}
-            enterNextDelay={500}
-            title="User Settings"
-            placement="bottom"
-          >
-            <Settings {...thinIconProps} />
-          </Tooltip>
-        </IconButton>
+          {logoIcon}
+        </Box>
 
-        <UserInfoBox
-          anchorEl={settingsMenuAnchor}
-          onClose={() => setSettingsMenuAnchor(null)}
-        />
+        {/* Center section - could add breadcrumbs or title here */}
+        <Box sx={{ flex: 1 }} />
+
+        {/* Right section - Settings and User */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <IconButton
+            aria-label="User Settings"
+            id="settings-menu-anchor"
+            onClick={() => onAppIconClick(settingsKey)}
+            size="small"
+            disableTouchRipple
+            sx={{
+              color: (theme: any) => `${theme.header.buttonColor}`,
+              borderRadius: '4px',
+              '&:hover': {
+                backgroundColor: 'action.hover',
+                color: (theme: any) => `${theme.header.hoverColor}`,
+              },
+            }}
+          >
+            <Tooltip
+              arrow
+              enterDelay={500}
+              enterNextDelay={500}
+              title="User Settings"
+              placement="bottom"
+            >
+              <Settings {...thinIconProps} />
+            </Tooltip>
+          </IconButton>
+
+          <UserInfoBox
+            anchorEl={settingsMenuAnchor}
+            onClose={() => setSettingsMenuAnchor(null)}
+          />
+        </Box>
+
+        {isElectron && (
+          <>
+            <IconButton
+              aria-label={terminalOpen ? 'Close Terminal' : 'Open Terminal'}
+              aria-pressed={terminalOpen}
+              disableTouchRipple
+              onClick={handleOpenTerminal}
+              size="small"
+              sx={{
+                color: (theme: any) => `${theme.header.buttonColor}`,
+                borderRadius: '4px',
+                backgroundColor: terminalOpen
+                  ? 'action.selected'
+                  : 'transparent',
+                '&:hover': {
+                  backgroundColor: 'action.hover',
+                  color: (theme: any) => `${theme.header.hoverColor}`,
+                },
+              }}
+            >
+              <Tooltip
+                arrow
+                enterDelay={500}
+                enterNextDelay={500}
+                title={terminalOpen ? 'Close Terminal' : 'Open Terminal'}
+                placement="bottom"
+              >
+                <SquareTerminal {...thinIconProps} />
+              </Tooltip>
+            </IconButton>
+            <IconButton
+              aria-label={aiOpen ? 'Close AI Tools' : 'Open AI Tools'}
+              aria-pressed={aiOpen}
+              disableTouchRipple
+              onClick={handleOpenAi}
+              size="small"
+              sx={{
+                color: (theme: any) => `${theme.header.buttonColor}`,
+                borderRadius: '4px',
+                backgroundColor: aiOpen ? 'action.selected' : 'transparent',
+                '&:hover': {
+                  backgroundColor: 'action.hover',
+                  color: (theme: any) => `${theme.header.hoverColor}`,
+                },
+              }}
+            >
+              <Tooltip
+                arrow
+                enterDelay={500}
+                enterNextDelay={500}
+                title={aiOpen ? 'Close AI Tools' : 'Open AI Tools'}
+                placement="bottom"
+              >
+                <Astroid {...thinIconProps} />
+              </Tooltip>
+            </IconButton>
+          </>
+        )}
       </Box>
-
-      {isElectron && (
-        <>
-          <IconButton
-            aria-label={terminalOpen ? 'Close Terminal' : 'Open Terminal'}
-            aria-pressed={terminalOpen}
-            disableTouchRipple
-            onClick={handleOpenTerminal}
-            size="small"
-            sx={{
-              color: (theme: any) => `${theme.header.buttonColor}`,
-              borderRadius: '4px',
-              backgroundColor: terminalOpen
-                ? 'action.selected'
-                : 'transparent',
-              '&:hover': {
-                backgroundColor: 'action.hover',
-                color: (theme: any) => `${theme.header.hoverColor}`,
-              },
-            }}
-          >
-            <Tooltip
-              arrow
-              enterDelay={500}
-              enterNextDelay={500}
-              title={terminalOpen ? 'Close Terminal' : 'Open Terminal'}
-              placement="bottom"
-            >
-              <SquareTerminal {...thinIconProps} />
-            </Tooltip>
-          </IconButton>
-          <IconButton
-            aria-label={aiOpen ? 'Close AI Tools' : 'Open AI Tools'}
-            aria-pressed={aiOpen}
-            disableTouchRipple
-            onClick={handleOpenAi}
-            size="small"
-            sx={{
-              color: (theme: any) => `${theme.header.buttonColor}`,
-              borderRadius: '4px',
-              backgroundColor: aiOpen ? 'action.selected' : 'transparent',
-              '&:hover': {
-                backgroundColor: 'action.hover',
-                color: (theme: any) => `${theme.header.hoverColor}`,
-              },
-            }}
-          >
-            <Tooltip
-              arrow
-              enterDelay={500}
-              enterNextDelay={500}
-              title={aiOpen ? 'Close AI Tools' : 'Open AI Tools'}
-              placement="bottom"
-            >
-              <Astroid {...thinIconProps} />
-            </Tooltip>
-          </IconButton>
-        </>
-      )}
-    </Box>
+    </header>
   );
 }

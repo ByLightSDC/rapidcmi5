@@ -22,6 +22,7 @@ export default function SearchBar({
       <TextField
         size="small"
         placeholder="Search projects..."
+        inputProps={{ 'aria-label': 'Search projects' }}
         value={searchQuery}
         onChange={handleSearchChange}
         disabled={isDisabled}
@@ -56,6 +57,7 @@ export default function SearchBar({
                 onClick={handleClearSearch}
                 edge="end"
                 disabled={isDisabled}
+                aria-label="Clear search"
                 sx={{
                   width: 24,
                   height: 24,
