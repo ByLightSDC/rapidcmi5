@@ -14,11 +14,14 @@ import { mergeRegister } from '@lexical/utils';
 import { COMMAND_PRIORITY_LOW } from 'lexical';
 import { RoughNotation, types } from 'react-rough-notation';
 import { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { PhrasingContent } from 'mdast';
 
 import { CHANGE_TEXT_FX, selFxNode$, showTextFx$ } from '../plugins/fx/vars';
 import { FxDirectiveAttributes, FxDirectiveNode } from '../plugins/fx/types';
 import { convertMdastToMarkdown } from '../util/conversion';
+import { editorInPlayback$ } from '../state/vars';
+import { renderMdastInline } from '../util/renderMdastStatic';
 
 /**
  * MDX Fx plugin using the Rough Notation library which allows you to animate circling, underlining, etc text
@@ -49,9 +52,10 @@ export const FxDirectiveDescriptor: DirectiveDescriptor<FxDirectiveNode> = {
     const theType: types = mdastNode.attributes?.type || 'underline';
     const theColor: string = mdastNode.attributes?.color || '#0adf0dff';
 
-    const [editorInFocus, showTextFx] = useCellValues(
+    const [editorInFocus, showTextFx, isPlayback] = useCellValues(
       editorInFocus$,
       showTextFx$,
+      editorInPlayback$,
     );
 
     /**
@@ -195,6 +199,59 @@ export const FxDirectiveDescriptor: DirectiveDescriptor<FxDirectiveNode> = {
         unregister();
       };
     }, [editor, onApplyShape]);
+
+    // Ref to attach to span after react renders.
+    const playbackRef = useRef<HTMLSpanElement | null>(null);
+
+    // Check if its in the player, ie playback mode/nonediting.
+    useEffect(() => {
+      if (!isPlayback || !playbackRef.current) return;
+
+      // Lexical wraps decorator which announces clickable, walk up DOM and find it.
+      let decoratorSpan: HTMLElement | null = playbackRef.current;
+      while (
+        decoratorSpan &&
+        !decoratorSpan.hasAttribute('data-lexical-decorator')
+      ) {
+        decoratorSpan = decoratorSpan.parentElement;
+      }
+      if (!decoratorSpan) return;
+      //IF found, add role=presentation to hide it from NVDA.
+      decoratorSpan.setAttribute('role', 'presentation');
+
+      // Rough-notation library injects <svg> elements inside span, NVDA saw as 'graphic.'
+      // Hide with 'aria-hidden'.
+      const hideSvgs = () => {
+        decoratorSpan!.querySelectorAll('svg').forEach((svg) => {
+          svg.setAttribute('aria-hidden', 'true');
+        });
+      };
+
+      // SVG is injected asynchronously, so mutation observer looks for new children to hide.
+      hideSvgs();
+      const observer = new MutationObserver(hideSvgs);
+      observer.observe(decoratorSpan, { childList: true, subtree: true });
+      return () => observer.disconnect();
+    }, [isPlayback]);
+
+    // Render statically
+    if (isPlayback) {
+      return (
+        <RoughNotation
+          animate={false}
+          brackets={['left', 'right']}
+          color={theColor}
+          type={theType}
+          show={true}
+        >
+          <span ref={playbackRef}>
+            {renderMdastInline(
+              mdastNode.children as unknown as PhrasingContent[],
+            )}
+          </span>
+        </RoughNotation>
+      );
+    }
 
     return (
       <RoughNotation
