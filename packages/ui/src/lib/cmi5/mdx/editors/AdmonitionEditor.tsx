@@ -194,8 +194,8 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
    * delete mdast node
    */
   const onDelete = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation();
+    (e?: React.MouseEvent<HTMLButtonElement>) => {
+      e?.stopPropagation();
       removeNode();
     },
     [removeNode],

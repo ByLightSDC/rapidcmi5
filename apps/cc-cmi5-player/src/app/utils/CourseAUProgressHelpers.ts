@@ -92,7 +92,12 @@ function parseActivityMetadata(slideContent: string): {
   );
 
   // Basic regex to find quiz blocks in markdown
-  const quizBlockRegex = /:::quiz\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
+  // The directive name may be followed by an optional attributes block, e.g.
+  // `:::quiz{contentWidth="medium"}`, which the editor emits. Allow (and ignore)
+  // it — without `(?:\{[^}]*\})?` the attributes break the match, the activity
+  // never registers, the slide is treated as "no activities", and so it
+  // auto-completes on view (and moveOn auto-advances past it).
+  const quizBlockRegex = /:::quiz(?:\{[^}]*\})?\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
   let match;
 
   while ((match = quizBlockRegex.exec(slideContent)) !== null) {
@@ -131,7 +136,7 @@ function parseActivityMetadata(slideContent: string): {
   }
 
   // Parse CTF blocks
-  const ctfBlockRegex = /:::ctf\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
+  const ctfBlockRegex = /:::ctf(?:\{[^}]*\})?\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
   let ctfMatch;
 
   while ((ctfMatch = ctfBlockRegex.exec(slideContent)) !== null) {
@@ -170,7 +175,7 @@ function parseActivityMetadata(slideContent: string): {
   }
 
   // Parse Code Runner blocks
-  const codeRunnerBlockRegex = /:::codeRunner\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
+  const codeRunnerBlockRegex = /:::codeRunner(?:\{[^}]*\})?\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
   let codeRunnerMatch;
 
   while ((codeRunnerMatch = codeRunnerBlockRegex.exec(slideContent)) !== null) {
@@ -237,7 +242,7 @@ function parseActivityMetadata(slideContent: string): {
 
   // Parse Scenario blocks
   const scenarioBlockRegex =
-    /:::scenario\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
+    /:::scenario(?:\{[^}]*\})?\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
   let scenarioMatch;
 
   while ((scenarioMatch = scenarioBlockRegex.exec(slideContent)) !== null) {
@@ -285,7 +290,7 @@ function parseActivityMetadata(slideContent: string): {
 
   // TODO: Add parsing for other activity types (autograder)
   const consoleScenarioBlockRegex =
-    /:::consoles\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
+    /:::consoles(?:\{[^}]*\})?\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
   let consolesScenarioMatch;
 
   while (
