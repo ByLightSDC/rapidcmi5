@@ -53,6 +53,7 @@ import { useFocusWithin } from '../shared/useFocusWithin';
 import QuotesSettings from './QuotesSettings';
 import { BackgroundColorTrigger, useBackgroundColors } from '@rapid-cmi5/ui';
 
+// Static quote item for playback — RC5NestedLexicalEditor's contenteditable announces as 'clickable' to NVDA.
 function StaticQuoteItem({
   mdastNode,
   preset,
@@ -266,6 +267,7 @@ export const QuotesContainerEditor: React.FC<
     setOverrideColor(bgColor);
   }, [mdastNode]);
 
+  // Render statically without editor controls or gutter buttons.
   if (isPlayback) {
     return (
       <Box

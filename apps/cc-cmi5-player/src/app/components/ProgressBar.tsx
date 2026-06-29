@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { courseAUProgressSel } from '../redux/auReducer';
 import { SxProps } from '@mui/system';
 
+// Custom props destructured out to prevent spreading them as DOM attributes (fillcolor, sxprops, etc.) on LinearProgress.
 function LinearProgressWithLabel({
   fillColor,
   completeFillColor,
@@ -22,6 +23,7 @@ function LinearProgressWithLabel({
   value: number;
 }) {
   return (
+    // pointerEvents: none prevents NVDA from announcing the progress bar as 'clickable'.
     <Box
       sx={{
         display: 'flex',

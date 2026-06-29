@@ -447,6 +447,7 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
             })}
           </Tabs>
 
+          {/* In playback, render static HTML — NestedLexicalEditor's contenteditable announces as 'clickable' to NVDA. */}
           {isPlayback ? (
             <>
               {mdastNode.children.map((child, i) => (

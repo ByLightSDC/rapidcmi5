@@ -130,6 +130,7 @@ export const RC5NestedLexicalEditor = function <
     const editor = createEditor({
       nodes: usedLexicalNodes,
       theme: realm.getValue(lexicalTheme$),
+      // Non-editable in playback so Lexical does not register click handlers on the contenteditable.
       editable: !isPlayback,
     });
     return editor;
@@ -287,6 +288,8 @@ export const RC5NestedLexicalEditor = function <
     rootEditor,
   ]);
 
+  // In playback, render static HTML instead of a live editor.
+  // Lexical's contenteditable registers click handlers that NVDA announces as 'clickable'.
   if (isPlayback) {
     if (block) {
       return <div>{content.map((node, i) => renderMdastBlock(node, i))}</div>;

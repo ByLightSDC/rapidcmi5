@@ -325,6 +325,7 @@ export const ImageLabelEditor: React.FC<
               >
                 {/* title editor */}
                 <Box sx={{ padding: 2 }}>
+                  {/* In playback, render static HTML — NestedLexicalEditor's contenteditable announces as 'clickable' to NVDA. */}
                   {isPlayback ? (
                     <span>
                       {renderMdastInline(
@@ -382,6 +383,7 @@ export const ImageLabelEditor: React.FC<
                     padding: 2,
                   }}
                 >
+                  {/* In playback, render static HTML — same reason as title above. */}
                   {isPlayback ? (
                     <div>
                       {(mdastNode.children as RootContent[]).map((node, i) =>

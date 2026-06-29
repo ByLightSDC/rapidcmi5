@@ -33,6 +33,7 @@ import { StatementsContextProvider } from './StatementsContext';
 import StatementsSettings from './StatementsSettings';
 import { BackgroundColorTrigger, useBackgroundColors } from '@rapid-cmi5/ui';
 
+// Static statement item for playback — NestedLexicalEditor's contenteditable announces as 'clickable' to NVDA.
 function StaticStatementItem({
   mdastNode,
   preset,
@@ -338,6 +339,7 @@ export const StatementsContainerEditor: React.FC<
             paddingBottom: blockPadding,
           }}
         >
+          {/* In playback, render static HTML — NestedLexicalEditor's contenteditable announces as 'clickable' to NVDA. */}
           {isPlayback ? (
             mdastNode.children.map((child, i) => (
               <StaticStatementItem

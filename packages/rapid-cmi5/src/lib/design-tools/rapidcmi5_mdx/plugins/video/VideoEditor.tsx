@@ -379,8 +379,12 @@ export function VideoEditor({
   const initialVideoPath = isLocal ? src : null;
   const videoSource = isLocal ? `${videoFilePath}${src.slice(1)}` : src;
 
+  // Ref to attach to video element after React renders.
   const playbackVideoRef = React.useRef<HTMLVideoElement | null>(null);
 
+  // Check if in the player, ie playback mode/nonediting.
+  // The video's parent is the Lexical decorator span which NVDA announces as 'clickable'.
+  // Set role=presentation to hide it from NVDA.
   React.useEffect(() => {
     if (isPlayback && playbackVideoRef.current) {
       const decoratorSpan = playbackVideoRef.current.parentElement;
@@ -390,6 +394,7 @@ export function VideoEditor({
     }
   }, [isPlayback]);
 
+  // Render statically without editor toolbar, selection handlers, or resize controls.
   if (isPlayback) {
     return (
       <video

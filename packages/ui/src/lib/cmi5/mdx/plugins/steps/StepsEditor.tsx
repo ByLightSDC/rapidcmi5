@@ -561,6 +561,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                   </Typography>
                 </Box>
 
+                {/* In playback, render static HTML — NestedLexicalEditor's contenteditable announces as 'clickable' to NVDA. */}
                 {isPlayback ? (
                   <div>
                     {(
