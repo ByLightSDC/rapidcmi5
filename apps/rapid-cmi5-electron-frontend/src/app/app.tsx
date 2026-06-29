@@ -110,6 +110,9 @@ function AppWorkspace() {
         minHeight: 0,
       }}
     >
+      <a href="#app-routes" className="skip-link">
+        Skip to main content
+      </a>
       <AppHeader />
 
       <main

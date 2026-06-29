@@ -26,7 +26,7 @@ export const darkTheme = createTheme({
       main: mainColor,
       dark: '#3C59A2',
       light: hoverMainColor,
-      contrastText: '#212121',
+      contrastText: '#fff',
     },
     secondary: {
       main: '#ed6c02', //#A5BEFF

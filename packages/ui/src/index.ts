@@ -3,6 +3,7 @@
 export { config } from './lib/environments/FrontendEnvironment.env';
 
 export * from './lib/navigation/paging/paginationFiltersConstants';
+export * from './lib/accessibility/HiddenHeader';
 export * from './lib/apps/AppLogo';
 export * from './lib/apps/RapidCmi5Icon';
 export * from './lib/apps/RapidCmi5Title';

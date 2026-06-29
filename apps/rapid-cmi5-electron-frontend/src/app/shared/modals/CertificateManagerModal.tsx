@@ -103,7 +103,7 @@ export default function CertificateManagerModal({
                 secondaryAction={
                   <IconButton
                     edge="end"
-                    aria-label="delete"
+                    aria-label={`Delete ${cert.filename}`}
                     onClick={() => handleRemove(cert)}
                   >
                     <DeleteIcon />

@@ -9,7 +9,7 @@ import { RootState } from '../../../redux/store';
 import WebAppSelection from './Components/WebAppSelection';
 import ElectronAppSelection from './Components/ElectronSelection';
 import CloneLoadingOverlay from './Components/LoadingOverlay';
-import { useToaster } from '@rapid-cmi5/ui';
+import { HiddenHeader, useToaster } from '@rapid-cmi5/ui';
 import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
 import { CustomTheme } from '../styles/createPalette';
 
@@ -86,7 +86,7 @@ export default function SelectProjectHomePage({}: {}) {
   };
 
   useEffect(() => {
-   populateRecentProjects();
+    populateRecentProjects();
   }, []);
 
   const handleOpenRecentProject = async (id: string) => {
@@ -134,6 +134,7 @@ export default function SelectProjectHomePage({}: {}) {
         overflow: 'auto',
       }}
     >
+      <HiddenHeader header="Projects Dashboard" />
       <Box
         sx={{
           height: '100vh',

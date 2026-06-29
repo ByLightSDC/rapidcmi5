@@ -107,6 +107,7 @@ export function ConfigureGlobalGitConfigForm({
                   label="Git Username"
                   placeholder="user.name"
                   readOnly={false}
+                  autoComplete="username"
                 />
               </Grid>
 
@@ -135,6 +136,7 @@ export function ConfigureGlobalGitConfigForm({
               label="Author Name"
               placeholder="FirstName LastName"
               readOnly={false}
+              autoComplete="name"
             />
           </Grid>
 
@@ -148,6 +150,7 @@ export function ConfigureGlobalGitConfigForm({
               label="Author Email"
               placeholder="user@gmail.com"
               readOnly={false}
+              autoComplete="email"
             />
           </Grid>
           <Alert severity="info">
