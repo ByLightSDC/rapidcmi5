@@ -38,8 +38,17 @@ export const LexicalAudioVisitor: LexicalExportVisitor<AudioNode, Mdast.Html> =
         }
       }
 
+      // Transcript: either a timed VTT file (data-caption-src) or a block of
+      // plain text (data-caption-text). Emit exactly one. `setAttribute`
+      // handles escaping of quotes/newlines in the text value.
+      const captionKind = lexicalNode.getCaptionKind();
+      const captionText = lexicalNode.getCaptionText();
       const captionSrc = lexicalNode.getCaptionSrc();
-      if (captionSrc) {
+      if (captionKind === 'text' && captionText) {
+        audio.setAttribute('data-caption-kind', 'text');
+        audio.setAttribute('data-caption-text', captionText);
+      } else if (captionSrc) {
+        // Default / 'vtt': preserve the existing data-caption-src contract.
         audio.setAttribute('data-caption-src', captionSrc);
       }
 

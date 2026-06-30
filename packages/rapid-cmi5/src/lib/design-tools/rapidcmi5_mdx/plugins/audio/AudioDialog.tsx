@@ -6,6 +6,7 @@ import {
   audioDialogState$,
   audioFilePath$,
 } from './index';
+import { CaptionKind } from './AudioNode';
 
 import { useCellValues, usePublisher } from '@mdxeditor/gurx';
 
@@ -16,6 +17,8 @@ import {
   Paper,
   Stack,
   Switch,
+  Tab,
+  Tabs,
   Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -63,6 +66,9 @@ export const AudioDialog: React.FC = () => {
   const [captionSrc, setCaptionSrc] = useState<string>('');
   const [selectedCaptionFiles, setSelectedCaptionFiles] = useState<FileList | null>(null);
   const [captionFileOptions, setCaptionFileOptions] = useState<string[]>([]);
+  // Transcript source mode. The active tab IS the caption kind.
+  const [captionKind, setCaptionKind] = useState<CaptionKind>('vtt');
+  const [captionText, setCaptionText] = useState<string>('');
 
 
 
@@ -82,6 +88,9 @@ export const AudioDialog: React.FC = () => {
       setAudioStyle('');
       setAutoplay(state.initialValues.autoplay ?? false);
       setCaptionSrc(state.initialValues.captionSrc ?? '');
+      setCaptionText(state.initialValues.captionText ?? '');
+      // Default to 'vtt' for back-compat (existing nodes have no captionKind).
+      setCaptionKind(state.initialValues.captionKind ?? 'vtt');
       if (state.initialValues.rest) {
         const styleAttribute = state.initialValues.rest.find(
           //@ts-ignore
@@ -98,6 +107,8 @@ export const AudioDialog: React.FC = () => {
       setAudioStyle('');
       setAutoplay(false);
       setCaptionSrc('');
+      setCaptionText('');
+      setCaptionKind('vtt');
     }
 
     // clear files regardless of editing state
@@ -133,8 +144,12 @@ export const AudioDialog: React.FC = () => {
       title: title,
       rest: restParams,
       autoplay: autoplay,
-      captionSrc: captionSrc || undefined,
-      captionFile: selectedCaptionFiles,
+      captionKind: captionKind,
+      // Only send the field for the active mode; the save handler enforces
+      // mutual exclusion, but this keeps the payload clean.
+      captionSrc: captionKind === 'vtt' ? captionSrc || undefined : undefined,
+      captionFile: captionKind === 'vtt' ? selectedCaptionFiles : undefined,
+      captionText: captionKind === 'text' ? captionText || undefined : undefined,
     };
 
     saveAudio(audioParams);
@@ -334,50 +349,77 @@ export const AudioDialog: React.FC = () => {
               infoText="Inline styles Ex. border-radius:8px;"
             />
 
-            {/* Caption / Transcript (VTT) section */}
+            {/* Transcript section — VTT (timed) or plain text. The selected
+                tab is the source of truth (captionKind). */}
             <Paper variant="outlined" sx={{ p: 2 }}>
               <Stack spacing={2}>
-                <Typography variant="subtitle2">Transcript / Captions (VTT)</Typography>
-                <Stack direction="row" spacing={2}>
-                  <ButtonModalMainUi
-                    component="label"
-                    role={undefined}
-                    tabIndex={-1}
-                    startIcon={<UploadFileIcon />}
-                  >
-                    Upload VTT
-                    <VisuallyHiddenInput
-                      type="file"
-                      accept=".vtt"
-                      onChange={handleCaptionFileSelected}
+                <Typography variant="subtitle2">Transcript / Captions</Typography>
+                <Tabs
+                  value={captionKind}
+                  onChange={(_e, value: CaptionKind) => setCaptionKind(value)}
+                  variant="fullWidth"
+                >
+                  <Tab label="VTT (timed)" value="vtt" />
+                  <Tab label="Text" value="text" />
+                </Tabs>
+
+                {captionKind === 'vtt' ? (
+                  <Stack spacing={2}>
+                    <Stack direction="row" spacing={2}>
+                      <ButtonModalMainUi
+                        component="label"
+                        role={undefined}
+                        tabIndex={-1}
+                        startIcon={<UploadFileIcon />}
+                      >
+                        Upload VTT
+                        <VisuallyHiddenInput
+                          type="file"
+                          accept=".vtt"
+                          onChange={handleCaptionFileSelected}
+                        />
+                      </ButtonModalMainUi>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="caption">
+                          {selectedCaptionFiles && selectedCaptionFiles.length > 0
+                            ? selectedCaptionFiles[0].name
+                            : 'No VTT file chosen'}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                    <ComboBoxSelectorUi
+                      label="Caption File"
+                      id="audio-caption"
+                      options={captionFileOptions}
+                      defaultValue={captionSrc.replace(AUDIO_DIR, '')}
+                      showAllOptions={true}
+                      autocompleteProps={{ freeSolo: true }}
+                      onSelect={(selectionValue: any) => {
+                        if (!selectionValue) {
+                          setCaptionSrc('');
+                        } else if (selectionValue.startsWith('http')) {
+                          setCaptionSrc(selectionValue);
+                        } else {
+                          setCaptionSrc(`${AUDIO_DIR}${selectionValue}`);
+                        }
+                      }}
+                      infoText="Associate a WebVTT (.vtt) transcript file with this audio. The transcript will be displayed below the audio player."
                     />
-                  </ButtonModalMainUi>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Typography variant="caption">
-                      {selectedCaptionFiles && selectedCaptionFiles.length > 0
-                        ? selectedCaptionFiles[0].name
-                        : 'No VTT file chosen'}
-                    </Typography>
-                  </Box>
-                </Stack>
-                <ComboBoxSelectorUi
-                  label="Caption File"
-                  id="audio-caption"
-                  options={captionFileOptions}
-                  defaultValue={captionSrc.replace(AUDIO_DIR, '')}
-                  showAllOptions={true}
-                  autocompleteProps={{ freeSolo: true }}
-                  onSelect={(selectionValue: any) => {
-                    if (!selectionValue) {
-                      setCaptionSrc('');
-                    } else if (selectionValue.startsWith('http')) {
-                      setCaptionSrc(selectionValue);
-                    } else {
-                      setCaptionSrc(`${AUDIO_DIR}${selectionValue}`);
-                    }
-                  }}
-                  infoText="Associate a WebVTT (.vtt) transcript file with this audio. The transcript will be displayed below the audio player."
-                />
+                  </Stack>
+                ) : (
+                  <TextFieldMainUi
+                    margin="dense"
+                    label="Transcript text"
+                    name="audio-caption-text"
+                    type="text"
+                    fullWidth
+                    multiline
+                    minRows={4}
+                    value={captionText}
+                    onChange={(textValue: string) => setCaptionText(textValue)}
+                    infoText="Plain-text transcript shown below the audio player. Unlike VTT, it has no timing, highlighting, or click-to-seek."
+                  />
+                )}
               </Stack>
             </Paper>
 

@@ -3,8 +3,16 @@ import { parseVtt, VttCue } from './parseVtt';
 import styles from './styles/audio-plugin.module.css';
 
 interface AudioTranscriptProps {
-  /** URL of the WebVTT caption/transcript file. */
-  captionSrc: string;
+  /**
+   * URL of the WebVTT caption/transcript file. Used for the timed VTT mode
+   * (highlighting + click-to-seek). Ignored when `text` is provided.
+   */
+  captionSrc?: string;
+  /**
+   * Plain-text transcript. When set, the panel renders this static text with
+   * no timing, highlighting, or seeking. Takes precedence over `captionSrc`.
+   */
+  text?: string;
   /** Ref to the associated audio element, used for highlighting and seeking. */
   audioRef: React.RefObject<HTMLAudioElement>;
 }
@@ -26,6 +34,7 @@ function formatTime(seconds: number): string {
  */
 export function AudioTranscript({
   captionSrc,
+  text,
   audioRef,
 }: AudioTranscriptProps): JSX.Element | null {
   const [cues, setCues] = React.useState<VttCue[]>([]);
@@ -33,13 +42,15 @@ export function AudioTranscript({
   const [expanded, setExpanded] = React.useState<boolean>(false);
   const [error, setError] = React.useState<boolean>(false);
 
-  // Fetch and parse the VTT whenever the source changes.
+  const isText = typeof text === 'string' && text.trim() !== '';
+
+  // Fetch and parse the VTT whenever the source changes. Skipped in text mode.
   React.useEffect(() => {
     let cancelled = false;
     setError(false);
     setCues([]);
 
-    if (!captionSrc) {
+    if (isText || !captionSrc) {
       return;
     }
 
@@ -64,7 +75,7 @@ export function AudioTranscript({
     return () => {
       cancelled = true;
     };
-  }, [captionSrc]);
+  }, [captionSrc, isText]);
 
   // Track the active cue against the audio's current time.
   React.useEffect(() => {
@@ -91,6 +102,27 @@ export function AudioTranscript({
       audio.currentTime = cue.start;
     }
   };
+
+  // Plain-text transcript: same collapsible affordance, no timing/seeking.
+  if (isText) {
+    return (
+      <div className={styles.transcriptContainer}>
+        <button
+          type="button"
+          className={styles.transcriptToggle}
+          aria-expanded={expanded}
+          onClick={() => setExpanded((prev) => !prev)}
+        >
+          {expanded ? 'Hide transcript' : 'Show transcript'}
+        </button>
+        {expanded && (
+          <div className={styles.transcriptText} style={{ whiteSpace: 'pre-wrap' }}>
+            {text}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   // Nothing to show if the transcript could not be loaded or has no cues.
   if (error || cues.length === 0) {
