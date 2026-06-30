@@ -42,7 +42,13 @@ export default function ScenarioSubscription({
     query: scenarioUpdatedQuery,
     variables: {
       rangeId: rangeId,
-      scenarioId: scenarioId,
+      // The query declares $uuid (scenarioUpdated(uuid: $uuid)); this MUST be
+      // keyed `uuid`, not `scenarioId`. Passing `scenarioId` left $uuid unbound
+      // → the server filter never matched → ZERO scenarioUpdated events → the
+      // scenario header stayed stuck NotReady (while console/VM subscriptions,
+      // which correctly declare+pass $scenarioId, worked fine). scenarioId IS
+      // the scenario's uuid.
+      uuid: scenarioId,
     },
   };
 
@@ -60,7 +66,15 @@ export default function ScenarioSubscription({
       if (updateScenarioSubscription?.data?.data?.scenarioUpdated) {
         const scenario = updateScenarioSubscription.data.data
           .scenarioUpdated as Partial<DeployedScenarioData>;
-        if (Object.prototype.hasOwnProperty.call(scenario, 'packages')) {
+        // Accept the update if it carries packages OR a status. The original
+        // guard only let through events with a `packages` field, which would
+        // DROP a status-only update (e.g. NotReady → Ready) — so even once
+        // events arrive, the header could miss the Ready transition. Gating on
+        // status too lets the scenario header advance on status-only pushes.
+        if (
+          Object.prototype.hasOwnProperty.call(scenario, 'packages') ||
+          scenario.status !== undefined
+        ) {
           setUpdate(scenario, Topic.ResourceScenario);
         }
       }
