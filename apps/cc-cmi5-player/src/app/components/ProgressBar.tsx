@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import { useSelector } from 'react-redux';
 import { courseAUProgressSel } from '../redux/auReducer';
 import { SxProps } from '@mui/system';
+import { RC5LinearProgress } from './RC5ProgressBar';
 
 // Custom props destructured out to prevent spreading them as DOM attributes (fillcolor, sxprops, etc.) on LinearProgress.
 function LinearProgressWithLabel({
@@ -22,14 +23,13 @@ function LinearProgressWithLabel({
   textProps?: SxProps;
   value: number;
 }) {
+  // pointerEvents: none in RC5LinearProgress wrap prevents NVDA from announcing the progress bar as 'clickable'
   return (
-    // pointerEvents: none prevents NVDA from announcing the progress bar as 'clickable'.
     <Box
       sx={{
         display: 'flex',
         alignItems: 'center',
         ml: 1,
-        pointerEvents: 'none',
       }}
     >
       <Box
@@ -42,7 +42,7 @@ function LinearProgressWithLabel({
               : (fillColor ?? 'primary'),
         }}
       >
-        <LinearProgress
+        <RC5LinearProgress
           variant="determinate"
           aria-label="Course Progress"
           value={value}
@@ -92,7 +92,7 @@ export default function ProgressBar({
         marginBottom: '1rem',
       }}
     >
-     <Box sx={{minHeight:'8px'}}/>
+      <Box sx={{ minHeight: '8px' }} />
       <LinearProgressWithLabel
         fillColor={fillColor}
         completeFillColor={completeFillColor}
