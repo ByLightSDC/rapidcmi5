@@ -379,46 +379,22 @@ export function VideoEditor({
   const initialVideoPath = isLocal ? src : null;
   const videoSource = isLocal ? `${videoFilePath}${src.slice(1)}` : src;
 
-  // Ref to attach to video element after React renders.
-  const playbackVideoRef = React.useRef<HTMLVideoElement | null>(null);
-
-  // Check if in the player, ie playback mode/nonediting.
   // The video's parent is the Lexical decorator span which NVDA announces as 'clickable'.
   // Set role=presentation to hide it from NVDA.
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+
   React.useEffect(() => {
-    if (isPlayback && playbackVideoRef.current) {
-      const decoratorSpan = playbackVideoRef.current.parentElement;
+    if (isPlayback && containerRef.current) {
+      const decoratorSpan = containerRef.current.parentElement;
       if (decoratorSpan) {
         decoratorSpan.setAttribute('role', 'presentation');
       }
     }
   }, [isPlayback]);
 
-  // Render statically without editor toolbar, selection handlers, or resize controls.
-  if (isPlayback) {
-    return (
-      <video
-        ref={playbackVideoRef}
-        src={previewSrc || videoSource}
-        title={title}
-        controls
-        style={{
-          height: height === 'inherit' ? 'inherit' : `${height}px`,
-          maxWidth: '100%',
-          width: width === 'inherit' ? 'inherit' : `${width}px`,
-        }}
-        data-video-id={videoId}
-      >
-        {previewCaptionSrc && (
-          <track kind="captions" src={previewCaptionSrc} srcLang="en" label="English" default />
-        )}
-      </video>
-    );
-  }
-
   return (
     <React.Suspense fallback={Placeholder ? <Placeholder /> : null}>
-      <div style={{ position: 'relative', display: 'inline-block' }}>
+      <div ref={containerRef} style={{ position: 'relative', display: 'inline-block' }}>
         <LazyVideo
           src={previewSrc || videoSource}
           title={title}
