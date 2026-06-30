@@ -24,8 +24,7 @@ import {
   $createFootnoteDefinitionNode,
 } from './methods';
 import { CONTENT_UPDATED_COMMAND, fnRefOrder$, fnRefs$ } from './vars';
-import { debugLog } from '../../../../utility/logger';
-import { debuglog } from 'util';
+
 import { useSelector } from 'react-redux';
 import { modal } from '@rapid-cmi5/ui';
 
@@ -115,7 +114,6 @@ export default function FootnoteRegistry() {
         (n: FootnoteDefinitionNode) => n.getLabel() === ref.getLabel(),
       );
       if (!defNode) {
-        debugLog('new matching def');
         // create new
         defNode = $createFootnoteDefinitionNode({
           label: ref.getLabel(),
@@ -129,7 +127,6 @@ export default function FootnoteRegistry() {
       } else {
         // reparent
         // this happens if definitions are out of order in the source mark down
-        debugLog('reparent def');
         defNode.remove();
       }
 
@@ -179,7 +176,6 @@ export default function FootnoteRegistry() {
    * Remove matching definition by reference key
    */
   const updateRemoveDefinition = useCallback((refKey: string) => {
-    debugLog('remove matching definition from ref=', refKey);
 
     if (!(refKey in fnDefsByRefs.current)) {
       // no ref def pair found
@@ -212,7 +208,6 @@ export default function FootnoteRegistry() {
     if (fnRefOrder.current.length === 0 && groupKey.current !== null) {
       const group = $getNodeByKey(groupKey.current);
       if (group) {
-        debugLog('remove group');
         group.remove();
       }
     }
@@ -284,7 +279,6 @@ export default function FootnoteRegistry() {
               ) {
                 const refnode = d.props.lexicalNode as FootnoteReferenceNode;
                 if (!refnode.getIsDefInit()) {
-                  debuglog('create matching def');
                   // determine reference ordering
                   updateAddToReferenceOrders(refnode);
                   // add definition node
@@ -386,5 +380,7 @@ export default function FootnoteRegistry() {
       }
     };
   }, [rootEditor]);
+
+
   return <div />;
 }
