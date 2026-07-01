@@ -54,6 +54,7 @@ import { AdmonitionTypeEnum } from '@rapid-cmi5/cmi5-build-common';
 import { SelectorMainUi } from '../../../inputs/selectors/selectors';
 import { debugLogError } from '../../../utility/logger';
 import { editorInPlayback$ } from '../state/vars';
+import { RC5NestedLexicalEditor } from '../plugins/shared/RC5NestedLexicalEditor';
 import { convertMarkdownToMdast } from '../util/conversion';
 import { useCoursePresentation } from '../contexts/PresentationContext';
 import {
@@ -411,7 +412,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
                 '--basePageBg': 'transparent',
               }}
             >
-              <NestedLexicalEditor<Paragraph>
+              <RC5NestedLexicalEditor<Paragraph>
                 getContent={(node) => {
                   const theNode = convertMarkdownToMdast(
                     getTitle(mdastNode.attributes),
@@ -456,7 +457,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
               borderWidth: '1px',
             }}
           >
-            <NestedLexicalEditor<ContainerDirective>
+            <RC5NestedLexicalEditor<ContainerDirective>
               block={true}
               getContent={(node) => {
                 return node.children;

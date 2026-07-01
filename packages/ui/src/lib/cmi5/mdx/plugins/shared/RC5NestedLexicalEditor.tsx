@@ -43,6 +43,8 @@ import { exportLexicalTreeToMdast } from '../../util/exportMarkdownFromLexical';
 import { importMdastTreeToLexical } from '../../util/importMarkdownToLexical';
 import { RC5SharedHistoryPlugin } from '../history/RC5SharedHistoryPlugin';
 import { useEffect, useState } from 'react';
+import { editorInPlayback$ } from '../../state/vars';
+import { renderMdastBlock, renderMdastInline } from '../../util/renderMdastStatic';
 
 /**
  * A nested editor React component that allows editing of the contents of complex markdown nodes that have nested markdown content (for example, custom directives or JSX elements).
@@ -107,6 +109,7 @@ export const RC5NestedLexicalEditor = function <
     jsxIsAvailable,
     nestedEditorChildren,
     lexicalTheme,
+    isPlayback,
   ] = useCellValues(
     rootEditor$,
     importVisitors$,
@@ -118,6 +121,7 @@ export const RC5NestedLexicalEditor = function <
     jsxIsAvailable$,
     nestedEditorChildren$,
     lexicalTheme$,
+    editorInPlayback$,
   );
 
   const setEditorInFocus = usePublisher(editorInFocus$);
@@ -126,6 +130,8 @@ export const RC5NestedLexicalEditor = function <
     const editor = createEditor({
       nodes: usedLexicalNodes,
       theme: realm.getValue(lexicalTheme$),
+      // Non-editable in playback so Lexical does not register click handlers on the contenteditable.
+      editable: !isPlayback,
     });
     return editor;
   });
@@ -281,6 +287,20 @@ export const RC5NestedLexicalEditor = function <
     updateMdastNode,
     rootEditor,
   ]);
+
+  // In playback, render static HTML instead of a live editor.
+  // Lexical's contenteditable registers click handlers that NVDA announces as 'clickable'.
+  if (isPlayback) {
+    if (block) {
+      return <div>{content.map((node, i) => renderMdastBlock(node, i))}</div>;
+    }
+    const inlineNodes: Mdast.PhrasingContent[] = content.flatMap((node) =>
+      node.type === 'paragraph'
+        ? (node as Mdast.Paragraph).children
+        : [node as Mdast.PhrasingContent],
+    );
+    return <span>{renderMdastInline(inlineNodes)}</span>;
+  }
 
   return (
     <LexicalNestedComposer initialEditor={editor} initialTheme={lexicalTheme}>

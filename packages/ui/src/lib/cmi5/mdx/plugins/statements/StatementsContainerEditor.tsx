@@ -11,14 +11,16 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { editorInPlayback$ } from '../../state/vars';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 
-import { Box, IconButton, SxProps, Tooltip, useTheme } from '@mui/material';
+import { Box, IconButton, Stack, SxProps, Tooltip, useTheme } from '@mui/material';
 
 import DeleteIconButton from '../../components/DeleteIconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
-import { StatementPreset, StatementsContainerDirectiveNode } from './types';
+import { StatementDirectiveNode, StatementPreset, StatementsContainerDirectiveNode } from './types';
 import { STATEMENT_PRESETS } from './constants';
+import { renderMdastBlock } from '../../util/renderMdastStatic';
+import * as Mdast from 'mdast';
 
 import { useCoursePresentation } from '../../contexts/PresentationContext';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
@@ -30,6 +32,138 @@ import { findMatchingStatementPreset } from './methods';
 import { StatementsContextProvider } from './StatementsContext';
 import StatementsSettings from './StatementsSettings';
 import { BackgroundColorTrigger, useBackgroundColors } from '@rapid-cmi5/ui';
+
+// Static statement item for playback — NestedLexicalEditor's contenteditable announces as 'clickable' to NVDA.
+function StaticStatementItem({
+  mdastNode,
+  preset,
+  blockPadding,
+}: {
+  mdastNode: StatementDirectiveNode;
+  preset: string;
+  blockPadding: string;
+}) {
+  const staticContent = (
+    <div>
+      {(mdastNode.children as unknown as Mdast.RootContent[]).map((node, i) =>
+        renderMdastBlock(node, i),
+      )}
+    </div>
+  );
+
+  return (
+    <Box
+      sx={{
+        position: 'relative',
+        minHeight: '60px',
+        marginLeft: blockPadding,
+        marginRight: blockPadding,
+      }}
+      role="statement"
+    >
+      {preset === '1' && (
+        <Stack
+          direction="column"
+          spacing={2}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 2,
+            paddingBottom: 0,
+            marginLeft: '25%',
+            marginRight: '25%',
+          }}
+        >
+          <Box
+            sx={{
+              height: '2px',
+              backgroundColor: 'background.default',
+              width: '100%',
+            }}
+          />
+          <Box />
+          <strong>{staticContent}</strong>
+          <Box />
+          <Box
+            sx={{
+              height: '2px',
+              backgroundColor: 'background.default',
+              width: '100%',
+            }}
+          />
+        </Stack>
+      )}
+      {preset === '2' && (
+        <Stack
+          direction="column"
+          spacing={2}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 2,
+            paddingBottom: 0,
+            paddingTop: 0,
+          }}
+        >
+          <Box
+            sx={{
+              height: '4px',
+              backgroundColor: 'primary.main',
+              width: '10%',
+            }}
+          />
+          <Box />
+          {staticContent}
+        </Stack>
+      )}
+      {preset === '3' && (
+        <Stack
+          direction="row"
+          spacing={2}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 2,
+            paddingBottom: 0,
+            paddingTop: 0,
+          }}
+        >
+          <Stack direction="column">{staticContent}</Stack>
+        </Stack>
+      )}
+      {preset === '4' && (
+        <Stack
+          direction="row"
+          spacing={2}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 2,
+            paddingBottom: 0,
+            paddingTop: 0,
+          }}
+        >
+          <Stack direction="column">
+            <Box
+              sx={{
+                margin: '8px',
+                marginBottom: '16px',
+                height: '6px',
+                backgroundColor: 'primary.main',
+                width: '10%',
+              }}
+            />
+            <strong>{staticContent}</strong>
+          </Stack>
+        </Stack>
+      )}
+    </Box>
+  );
+}
 
 /**
  * Statements Container Editor for the statements layout directive.
@@ -205,22 +339,34 @@ export const StatementsContainerEditor: React.FC<
             paddingBottom: blockPadding,
           }}
         >
-          <StatementsContextProvider
-            carouselIndex={carouselIndex}
-            preset={selectedPreset.id}
-          >
-            <NestedLexicalEditor<ContainerDirective>
-              block={true}
-              getContent={(node) => node.children}
-              getUpdatedMdastNode={(node, children: any) => ({
-                ...node,
-                children,
-              })}
-              contentEditableProps={{
-                'aria-label': 'Statement layout sections',
-              }}
-            />
-          </StatementsContextProvider>
+          {/* In playback, render static HTML — NestedLexicalEditor's contenteditable announces as 'clickable' to NVDA. */}
+          {isPlayback ? (
+            mdastNode.children.map((child, i) => (
+              <StaticStatementItem
+                key={i}
+                mdastNode={child}
+                preset={selectedPreset.id}
+                blockPadding={blockPadding}
+              />
+            ))
+          ) : (
+            <StatementsContextProvider
+              carouselIndex={carouselIndex}
+              preset={selectedPreset.id}
+            >
+              <NestedLexicalEditor<ContainerDirective>
+                block={true}
+                getContent={(node) => node.children}
+                getUpdatedMdastNode={(node, children: any) => ({
+                  ...node,
+                  children,
+                })}
+                contentEditableProps={{
+                  'aria-label': 'Statement layout sections',
+                }}
+              />
+            </StatementsContextProvider>
+          )}
         </Box>
 
         {/* Gutter buttons */}

@@ -50,6 +50,7 @@ import ModalDialog from '../../../../modals/ModalDialog';
 import { ButtonMinorUi, ButtonOptions } from '../../../../utility/buttons';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
+import { renderMdastBlock } from '../../util/renderMdastStatic';
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { useCoursePresentation } from '../../contexts/PresentationContext';
 import {
@@ -446,21 +447,40 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
             })}
           </Tabs>
 
-          <TabsContext.Provider value={{ tab }}>
-            <NestedLexicalEditor<ContainerDirective>
-              block={true}
-              getContent={(node) => {
-                return node.children;
-              }}
-              getUpdatedMdastNode={(node, children: any) => ({
-                ...node,
-                children,
-              })}
-              contentEditableProps={{
-                'aria-label': 'Tabs content',
-              }}
-            />
-          </TabsContext.Provider>
+          {/* In playback, render static HTML — NestedLexicalEditor's contenteditable announces as 'clickable' to NVDA. */}
+          {isPlayback ? (
+            <>
+              {mdastNode.children.map((child, i) => (
+                <div
+                  key={i}
+                  role="tabpanel"
+                  id={`tabpanel-${i}`}
+                  aria-labelledby={`tab-${i}`}
+                  style={{ display: i === tab ? undefined : 'none' }}
+                >
+                  {(child.children as unknown as Mdast.RootContent[]).map(
+                    (node, j) => renderMdastBlock(node, j),
+                  )}
+                </div>
+              ))}
+            </>
+          ) : (
+            <TabsContext.Provider value={{ tab }}>
+              <NestedLexicalEditor<ContainerDirective>
+                block={true}
+                getContent={(node) => {
+                  return node.children;
+                }}
+                getUpdatedMdastNode={(node, children: any) => ({
+                  ...node,
+                  children,
+                })}
+                contentEditableProps={{
+                  'aria-label': 'Tabs content',
+                }}
+              />
+            </TabsContext.Provider>
+          )}
         </Box>
 
         {/* Gutter buttons — absolutely positioned to the right of the decorator */}

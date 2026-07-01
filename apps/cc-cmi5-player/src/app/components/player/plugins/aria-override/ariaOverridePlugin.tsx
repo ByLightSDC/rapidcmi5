@@ -7,56 +7,131 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { useEffect } from 'react';
 
 /**
+ * Applies the same corrections to a Lexical root element, whether it's the
+ * initial mount or a re-application triggered by the MutationObserver below.
+ */
+function applyAriaFixes(rootElement: HTMLElement) {
+  // Replace Lexical's incorrect role with document — tells NVDA to use
+  // browse/reading mode instead of forms mode or treating content as clickable.
+  // Guarded so a no-op setAttribute doesn't queue a mutation record (this fn
+  // is also called by the MutationObserver below, on every correction).
+  if (rootElement.getAttribute('role') !== 'presentation') {
+    rootElement.setAttribute('role', 'presentation');
+  }
+
+  // NOTE: contenteditable="false" is intentionally left alone here (unlike an
+  // earlier version of this fix, which stripped it). Lexical keeps real click
+  // listeners registered on the root even in read-only mode (for links,
+  // checkbox lists, etc.); contenteditable="false" appears to be the signal
+  // Chrome's accessibility tree uses to treat this subtree as a sealed
+  // non-interactive boundary and stop exposing those listeners to descendants
+  // as "clickable". Removing the attribute removed that boundary — Chrome
+  // doesn't recompute the exposure immediately, so it read clean until a
+  // focus-out/focus-in on the document forced a recompute, at which point
+  // every descendant started reading as clickable again. role="document"
+  // below is what actually fixes NVDA forms-mode; contenteditable doesn't
+  // need to be touched for that.
+
+  // Remove aria-readonly — implies textbox semantics even without the role
+  if (rootElement.hasAttribute('aria-readonly')) {
+    rootElement.removeAttribute('aria-readonly');
+  }
+
+  // Remove aria-autocomplete — only valid on combobox/textbox/list inputs
+  if (rootElement.hasAttribute('aria-autocomplete')) {
+    rootElement.removeAttribute('aria-autocomplete');
+  }
+
+  // Remove spellcheck — browser keeps this "true" by default on contenteditable elements
+  if (rootElement.getAttribute('spellcheck') !== 'false') {
+    rootElement.setAttribute('spellcheck', 'false');
+  }
+
+  // Remove aria-label if Lexical has set it to "editable markdown" —
+  // wrong context for a content consumer in the player
+  const currentLabel = rootElement.getAttribute('aria-label');
+  if (currentLabel === 'editable markdown') {
+    rootElement.removeAttribute('aria-label');
+  }
+}
+
+// Lexical's ContentEditable renders contenteditable, aria-readonly, and
+// aria-autocomplete all from the same isEditable state (role and spellCheck
+// are not tied to it). When a nested editor's editable state is corrected
+// from true to false one tick after mount, React re-renders all three
+// together. contenteditable itself is left alone (see the note in
+// applyAriaFixes above) and settles on "false" via Lexical's own logic, but
+// aria-readonly/aria-autocomplete still need to be watched and stripped each
+// time they're rewritten.
+const WATCHED_ATTRIBUTES = ['role', 'aria-readonly', 'aria-autocomplete'];
+
+/**
  * AriaCleanupPlugin (internal component)
  *
  * Injected into both the root and every nested Lexical composer.
  *
  * Lexical hardcodes several ARIA attributes on its editor element that cause
  * NVDA to treat slide content as an interactive form field rather than readable
- * content. This plugin corrects that by:
+ * content. applyAriaFixes corrects that on every root element Lexical attaches.
  *
- * - Removing role="textbox"         (incorrect role for content regions)
- * - Removing contenteditable="false" (presence alone triggers forms mode in NVDA)
- * - Removing aria-readonly           (implies textbox semantics)
- * - Removing aria-autocomplete       (only valid on form inputs)
- * - Setting role="region"            (correct landmark for notable content areas)
- * - Setting aria-label="Slide content" (neutral, accurate label)
- *
- * registerRootListener fires when Lexical attaches its editor element to the DOM.
- * The listener is automatically cleaned up when the component unmounts.
+ * registerRootListener fires once when an editor's root element first mounts,
+ * and again only if that root element is swapped for a different DOM node.
+ * It does NOT fire again when a nested editor's own contentEditable prop is
+ * later flipped by React (no new node, so no new ref, so no new listener
+ * call) — and freshly-created nested editors (quotes, grid cells, etc.) do
+ * exactly that one tick after mount: they're born editable=true, then their
+ * parent composer corrects them to editable=false via a React state update,
+ * which re-renders contenteditable="false" (and aria-readonly/aria-autocomplete
+ * alongside it) onto the existing node after our listener already ran. The
+ * MutationObserver below is scoped to WATCHED_ATTRIBUTES on this one node, so
+ * it stays idle except to catch that single delayed correction — it isn't
+ * polling or watching the wider subtree.
  */
+function applyDecoratorFixes(rootElement: HTMLElement) {
+  rootElement
+    .querySelectorAll<HTMLElement>('div[data-lexical-decorator="true"]')
+    .forEach((el) => {
+      if (el.getAttribute('role') !== 'presentation') {
+        el.setAttribute('role', 'presentation');
+      }
+    });
+}
+
 function AriaCleanupPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
+    let attrObserver: MutationObserver | null = null;
+    let decoratorObserver: MutationObserver | null = null;
+
     return editor.registerRootListener((rootElement) => {
+      attrObserver?.disconnect();
+      decoratorObserver?.disconnect();
+      attrObserver = null;
+      decoratorObserver = null;
+
       if (!rootElement) return;
 
-      // Remove incorrect role if present
-      if (rootElement.getAttribute('role') === 'textbox') {
-        rootElement.removeAttribute('role');
-      }
+      applyAriaFixes(rootElement);
+      applyDecoratorFixes(rootElement);
 
-      // Remove contenteditable="false" — triggers NVDA forms mode regardless of value
-      if (rootElement.getAttribute('contenteditable') === 'false') {
-        rootElement.removeAttribute('contenteditable');
-      }
+      attrObserver = new MutationObserver(() => {
+        applyAriaFixes(rootElement);
+      });
+      attrObserver.observe(rootElement, {
+        attributes: true,
+        attributeFilter: WATCHED_ATTRIBUTES,
+      });
 
-      // Remove aria-readonly — implies textbox semantics even without the role
-      if (rootElement.hasAttribute('aria-readonly')) {
-        rootElement.removeAttribute('aria-readonly');
-      }
-
-      // Remove aria-autocomplete — only valid on combobox/textbox/list inputs
-      if (rootElement.hasAttribute('aria-autocomplete')) {
-        rootElement.removeAttribute('aria-autocomplete');
-      }
-      // Remove aria-label if Lexical has set it to "editable markdown" —
-      // wrong context for a content consumer in the player
-      const currentLabel = rootElement.getAttribute('aria-label');
-      if (currentLabel === 'editable markdown') {
-        rootElement.removeAttribute('aria-label');
-      }
+      // Watch for decorator divs added dynamically (e.g. quotes, grid cells
+      // rendered as Lexical decorator nodes inside the root subtree).
+      decoratorObserver = new MutationObserver(() => {
+        applyDecoratorFixes(rootElement);
+      });
+      decoratorObserver.observe(rootElement, {
+        childList: true,
+        subtree: true,
+      });
     });
   }, [editor]);
 

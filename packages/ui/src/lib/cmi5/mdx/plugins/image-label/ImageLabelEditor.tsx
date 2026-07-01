@@ -7,7 +7,7 @@ import {
 } from '@mdxeditor/editor';
 import type { ContainerDirective } from 'mdast-util-directive';
 
-import { Paragraph } from 'mdast';
+import { Paragraph, PhrasingContent, RootContent } from 'mdast';
 import { toMarkdown } from 'mdast-util-to-markdown';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -44,6 +44,7 @@ import {
   toolbarRect$,
 } from '@rapid-cmi5/ui';
 import { convertMarkdownToMdast } from '../../util/conversion';
+import { renderMdastBlock, renderMdastInline } from '../../util/renderMdastStatic';
 
 /**
  * Accordion Editor for accordion directives
@@ -324,39 +325,53 @@ export const ImageLabelEditor: React.FC<
               >
                 {/* title editor */}
                 <Box sx={{ padding: 2 }}>
-                  <NestedLexicalEditor<Paragraph>
-                    getContent={(node) => {
-                      const theNode = convertMarkdownToMdast(
-                        theTitle,
-                        syntaxExtensions,
-                      );
-                      return theNode.children;
-                    }}
-                    getUpdatedMdastNode={(
-                      mdastParagraphNode,
-                      paragraphChildren: any,
-                    ) => {
-                      if (paragraphChildren.length > 0) {
-                        const titleStr = toMarkdown(paragraphChildren[0]);
-                        if (titleStr === title) {
-                          return mdastParagraphNode;
+                  {/* In playback, render static HTML — NestedLexicalEditor's contenteditable announces as 'clickable' to NVDA. */}
+                  {isPlayback ? (
+                    <span>
+                      {renderMdastInline(
+                        convertMarkdownToMdast(theTitle, syntaxExtensions).children.flatMap(
+                          (node) =>
+                            node.type === 'paragraph'
+                              ? (node as any).children as PhrasingContent[]
+                              : [node as PhrasingContent],
+                        ),
+                      )}
+                    </span>
+                  ) : (
+                    <NestedLexicalEditor<Paragraph>
+                      getContent={(node) => {
+                        const theNode = convertMarkdownToMdast(
+                          theTitle,
+                          syntaxExtensions,
+                        );
+                        return theNode.children;
+                      }}
+                      getUpdatedMdastNode={(
+                        mdastParagraphNode,
+                        paragraphChildren: any,
+                      ) => {
+                        if (paragraphChildren.length > 0) {
+                          const titleStr = toMarkdown(paragraphChildren[0]);
+                          if (titleStr === title) {
+                            return mdastParagraphNode;
+                          }
+
+                          setTitle(titleStr);
+
+                          return {
+                            ...mdastParagraphNode,
+                            attributes: {
+                              ...mdastNode.attributes,
+                              title: titleStr,
+                            },
+                          };
                         }
 
-                        setTitle(titleStr);
-
-                        return {
-                          ...mdastParagraphNode,
-                          attributes: {
-                            ...mdastNode.attributes,
-                            title: titleStr,
-                          },
-                        };
-                      }
-
-                      return mdastParagraphNode;
-                    }}
-                    contentEditableProps={{ 'aria-label': 'Image label title' }}
-                  />
+                        return mdastParagraphNode;
+                      }}
+                      contentEditableProps={{ 'aria-label': 'Image label title' }}
+                    />
+                  )}
                 </Box>
                 <Divider sx={{ paddingTop: 0, marginBottom: 0 }} />
                 {/* content editor */}
@@ -368,21 +383,30 @@ export const ImageLabelEditor: React.FC<
                     padding: 2,
                   }}
                 >
-                  <NestedLexicalEditor<ContainerDirective>
-                    block={true}
-                    getContent={(node) => {
-                      return node.children;
-                    }}
-                    getUpdatedMdastNode={(node, children: any) => ({
-                      ...node,
-                      children,
-                    })}
-                    contentEditableProps={{
-                      'aria-label': theTitle
-                        ? `${theTitle} label content`
-                        : 'Image label content',
-                    }}
-                  />
+                  {/* In playback, render static HTML — same reason as title above. */}
+                  {isPlayback ? (
+                    <div>
+                      {(mdastNode.children as RootContent[]).map((node, i) =>
+                        renderMdastBlock(node, i),
+                      )}
+                    </div>
+                  ) : (
+                    <NestedLexicalEditor<ContainerDirective>
+                      block={true}
+                      getContent={(node) => {
+                        return node.children;
+                      }}
+                      getUpdatedMdastNode={(node, children: any) => ({
+                        ...node,
+                        children,
+                      })}
+                      contentEditableProps={{
+                        'aria-label': theTitle
+                          ? `${theTitle} label content`
+                          : 'Image label content',
+                      }}
+                    />
+                  )}
                 </Box>
               </Stack>
             </Fade>

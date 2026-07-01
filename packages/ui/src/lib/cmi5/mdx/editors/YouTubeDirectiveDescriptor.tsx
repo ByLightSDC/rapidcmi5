@@ -1,12 +1,13 @@
-import { DirectiveDescriptor, insertMarkdown$ } from '@mdxeditor/editor';
+import { DirectiveDescriptor, insertMarkdown$, useCellValues } from '@mdxeditor/editor';
 import { LeafDirective } from 'mdast-util-directive';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Box, IconButton, Stack, TextField, Tooltip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { usePublisher } from '@mdxeditor/gurx';
+import { editorInPlayback$ } from '../state/vars';
 
 /**
  * Example
@@ -49,6 +50,19 @@ const YoutubeEditor = ({
     id ? `https://www.youtube.com/watch?v=${id}` : '',
   );
   const insertMarkdown = usePublisher(insertMarkdown$);
+  const [isPlayback] = useCellValues(editorInPlayback$);
+  // The iframe's parent is the Lexical decorator span which NVDA announces as 'clickable'.
+  // Set role=presentation to hide it from NVDA.
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (isPlayback && containerRef.current) {
+      const decoratorSpan = containerRef.current.parentElement;
+      if (decoratorSpan) {
+        decoratorSpan.setAttribute('role', 'presentation');
+      }
+    }
+  }, [isPlayback]);
 
   const handleDelete = () => {
     parentEditor.update(() => {
@@ -73,8 +87,10 @@ const YoutubeEditor = ({
     setEditing(false);
   };
 
+  const embedSrc = `https://www.youtube.com/embed/${mdastNode.attributes.id}`;
+
   return (
-    <Box sx={{ position: 'relative', display: 'inline-block' }}>
+    <Box ref={containerRef} sx={{ position: 'relative', display: 'inline-block' }}>
       {/* Gutter buttons */}
       <Box
         sx={{
@@ -142,7 +158,7 @@ const YoutubeEditor = ({
       <iframe
         width="640"
         height="480"
-        src={`https://www.youtube.com/embed/${mdastNode.attributes.id}`}
+        src={embedSrc}
         title="YouTube video player"
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

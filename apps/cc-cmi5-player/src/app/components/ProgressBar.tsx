@@ -6,16 +6,24 @@ import Box from '@mui/material/Box';
 import { useSelector } from 'react-redux';
 import { courseAUProgressSel } from '../redux/auReducer';
 import { SxProps } from '@mui/system';
+import { RC5LinearProgress } from './RC5ProgressBar';
 
-function LinearProgressWithLabel(
-  props: LinearProgressProps & {
-    fillColor?: string;
-    completeFillColor?: string;
-    sxProps?: SxProps;
-    textProps?: SxProps;
-    value: number;
-  },
-) {
+// Custom props destructured out to prevent spreading them as DOM attributes (fillcolor, sxprops, etc.) on LinearProgress.
+function LinearProgressWithLabel({
+  fillColor,
+  completeFillColor,
+  sxProps,
+  textProps,
+  value,
+  ...linearProgressProps
+}: LinearProgressProps & {
+  fillColor?: string;
+  completeFillColor?: string;
+  sxProps?: SxProps;
+  textProps?: SxProps;
+  value: number;
+}) {
+  // pointerEvents: none in RC5LinearProgress wrap prevents NVDA from announcing the progress bar as 'clickable'
   return (
     <Box
       sx={{
@@ -29,20 +37,21 @@ function LinearProgressWithLabel(
           width: '90%',
           mr: 1,
           color:
-            props.value === 100
-              ? (props.completeFillColor ?? 'success')
-              : (props.fillColor ?? 'primary'),
+            value === 100
+              ? (completeFillColor ?? 'success')
+              : (fillColor ?? 'primary'),
         }}
       >
-        <LinearProgress
+        <RC5LinearProgress
           variant="determinate"
           aria-label="Course Progress"
-          {...props}
+          value={value}
+          {...linearProgressProps}
           sx={{
             borderRadius: 5,
             color: 'inherit',
             height: 10,
-            ...props.sxProps,
+            ...sxProps,
           }}
         />
       </Box>
@@ -50,9 +59,9 @@ function LinearProgressWithLabel(
         <Typography
           aria-hidden="true"
           variant="body2"
-          sx={{ fontWeight: 700, color: 'text.primary', ...props.textProps }}
+          sx={{ fontWeight: 700, color: 'text.primary', ...textProps }}
         >
-          {`${Math.round(props.value)}%`}
+          {`${Math.round(value)}%`}
         </Typography>
       </Box>
     </Box>
@@ -83,7 +92,7 @@ export default function ProgressBar({
         marginBottom: '1rem',
       }}
     >
-     <Box sx={{minHeight:'8px'}}/>
+      <Box sx={{ minHeight: '8px' }} />
       <LinearProgressWithLabel
         fillColor={fillColor}
         completeFillColor={completeFillColor}
