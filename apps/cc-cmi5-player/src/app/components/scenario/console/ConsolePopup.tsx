@@ -1323,6 +1323,12 @@ export function ConsolePopup(props: tProps) {
   return open ? (
     <div
       id="total-container"
+      data-testid="scenario-console-popup"
+      // Reflects the Guacamole client connection state. Flips to "true" when
+      // the tunnel reaches CONNECTED (Guacamole state 3) — i.e. the VM display
+      // (login screen) is live, not just the window opened. Tests assert this
+      // to confirm the console actually connected to the VM.
+      data-connected={isConnected ? 'true' : 'false'}
       style={{
         pointerEvents: 'none',
         position: 'absolute',
