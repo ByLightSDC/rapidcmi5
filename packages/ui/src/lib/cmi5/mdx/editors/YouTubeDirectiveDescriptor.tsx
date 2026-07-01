@@ -51,15 +51,13 @@ const YoutubeEditor = ({
   );
   const insertMarkdown = usePublisher(insertMarkdown$);
   const [isPlayback] = useCellValues(editorInPlayback$);
-  // Ref to attach to iframe after React renders.
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
-
-  // Check if in the player, ie playback mode/nonediting.
   // The iframe's parent is the Lexical decorator span which NVDA announces as 'clickable'.
   // Set role=presentation to hide it from NVDA.
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
-    if (isPlayback && iframeRef.current) {
-      const decoratorSpan = iframeRef.current.parentElement;
+    if (isPlayback && containerRef.current) {
+      const decoratorSpan = containerRef.current.parentElement;
       if (decoratorSpan) {
         decoratorSpan.setAttribute('role', 'presentation');
       }
@@ -91,24 +89,8 @@ const YoutubeEditor = ({
 
   const embedSrc = `https://www.youtube.com/embed/${mdastNode.attributes.id}`;
 
-  // Render statically without Edit/Delete toolbar buttons.
-  if (isPlayback) {
-    return (
-      <iframe
-        ref={iframeRef}
-        width="640"
-        height="480"
-        src={embedSrc}
-        title="YouTube video player"
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowFullScreen
-      />
-    );
-  }
-
   return (
-    <Box sx={{ position: 'relative', display: 'inline-block' }}>
+    <Box ref={containerRef} sx={{ position: 'relative', display: 'inline-block' }}>
       {/* Gutter buttons */}
       <Box
         sx={{
