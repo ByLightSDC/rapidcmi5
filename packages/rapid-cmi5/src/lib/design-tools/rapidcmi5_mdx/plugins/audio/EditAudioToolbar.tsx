@@ -1,6 +1,7 @@
 import React from 'react';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 import { openEditAudioDialog$ } from './index';
+import { CaptionKind } from './AudioNode';
 import { usePublisher } from '@mdxeditor/gurx';
 import { IconButton, Tooltip } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -14,6 +15,8 @@ export interface EditAudioToolbarProps {
   rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   autoplay?: boolean;
   captionSrc?: string;
+  captionKind?: CaptionKind;
+  captionText?: string;
 }
 
 export function EditAudioToolbar({
@@ -24,6 +27,8 @@ export function EditAudioToolbar({
   rest,
   autoplay,
   captionSrc,
+  captionKind,
+  captionText,
 }: EditAudioToolbarProps): JSX.Element {
   const openEditAudioDialog = usePublisher(openEditAudioDialog$);
 
@@ -53,6 +58,8 @@ export function EditAudioToolbar({
                 rest,
                 autoplay,
                 captionSrc,
+                captionKind,
+                captionText,
               },
             });
           }}

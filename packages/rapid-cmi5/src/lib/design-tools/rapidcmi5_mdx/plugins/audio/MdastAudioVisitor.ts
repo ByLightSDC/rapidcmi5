@@ -35,6 +35,13 @@ export const MdastHtmlAudioVisitor: MdastImportVisitor<Mdast.Html> = {
     const id = audio.getAttribute('data-audio-id') || undefined;
     const autoplay = audio.hasAttribute('autoplay');
     const captionSrc = audio.getAttribute('data-caption-src') || undefined;
+    const captionText = audio.getAttribute('data-caption-text') || undefined;
+    const captionKind =
+      audio.getAttribute('data-caption-kind') === 'text' || captionText
+        ? 'text'
+        : captionSrc
+          ? 'vtt'
+          : undefined;
 
     const audioNode = $createAudioNode({
       src: src || '',
@@ -42,6 +49,8 @@ export const MdastHtmlAudioVisitor: MdastImportVisitor<Mdast.Html> = {
       id,
       autoplay,
       captionSrc,
+      captionKind,
+      captionText,
     });
 
     if (lexicalParent.getType() === 'root') {
@@ -75,11 +84,28 @@ export const MdastJsxAudioVisitor: MdastImportVisitor<
     const autoplayAttr = getAttributeValue(mdastNode, 'autoplay');
     const autoplay = autoplayAttr !== undefined;
     const captionSrc = getAttributeValue(mdastNode, 'data-caption-src');
+    const captionText = getAttributeValue(mdastNode, 'data-caption-text');
+    const captionKind =
+      getAttributeValue(mdastNode, 'data-caption-kind') === 'text' || captionText
+        ? 'text'
+        : captionSrc
+          ? 'vtt'
+          : undefined;
 
     const rest = mdastNode.attributes.filter((a) => {
       return (
         a.type === 'mdxJsxAttribute' &&
-        !['src', 'title', 'controls', 'data-audio-id', 'data-caption-src', 'autoplay', 'muted'].includes(a.name)
+        ![
+          'src',
+          'title',
+          'controls',
+          'data-audio-id',
+          'data-caption-src',
+          'data-caption-kind',
+          'data-caption-text',
+          'autoplay',
+          'muted',
+        ].includes(a.name)
       );
     });
 
@@ -90,6 +116,8 @@ export const MdastJsxAudioVisitor: MdastImportVisitor<
       id,
       autoplay,
       captionSrc: captionSrc || undefined,
+      captionKind,
+      captionText: captionText || undefined,
     });
 
     if (lexicalParent.getType() === 'root') {
