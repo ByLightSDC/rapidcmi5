@@ -3,7 +3,7 @@ set -e
 
 # ===== CONFIG =====
 # please put the location of your testing repo
-PACK_OUTPUT_DIR="/Users/michellegabele/Documents/Work/rangeos-nx"   # 👈 change this
+PACK_OUTPUT_DIR="$HOME/Documents/rangeos-nx-rc5-migration"   # 👈 change this
 # ==================
 
 mkdir -p "$PACK_OUTPUT_DIR"
