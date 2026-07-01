@@ -1,4 +1,4 @@
-import { debuglog } from 'util';
+
 import { cmi5Instance } from '../session/cmi5';
 
 const dev_mode_message =
@@ -6,11 +6,11 @@ const dev_mode_message =
 
 export function checkForDevMode(): boolean {
   if (!cmi5Instance) {
-    debuglog('Missing Cmi5 Instance, Dev Mode True');
+    console.log('Missing Cmi5 Instance, Dev Mode True');
     return true;
   }
   if (cmi5Instance.getLaunchParameters().fetch === 'test') {
-    debuglog(dev_mode_message);
+    console.log(dev_mode_message);
     return true;
   }
 

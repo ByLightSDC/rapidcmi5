@@ -25,7 +25,6 @@ import {
 } from './methods';
 import { CONTENT_UPDATED_COMMAND, fnRefOrder$, fnRefs$ } from './vars';
 import { debugLog } from '../../../../utility/logger';
-import { debuglog } from 'util';
 import { useSelector } from 'react-redux';
 import { modal } from '@rapid-cmi5/ui';
 
@@ -284,7 +283,7 @@ export default function FootnoteRegistry() {
               ) {
                 const refnode = d.props.lexicalNode as FootnoteReferenceNode;
                 if (!refnode.getIsDefInit()) {
-                  debuglog('create matching def');
+                  debugLog('create matching def');
                   // determine reference ordering
                   updateAddToReferenceOrders(refnode);
                   // add definition node
