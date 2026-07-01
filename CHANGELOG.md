@@ -1,3 +1,13 @@
+## 0.18.1 (2026-07-01)
+
+### 🩹 Fixes
+
+- Moodle-launched scenario header never updates to Ready ([#204](https://github.com/ByLightSDC/rapidcmi5/pull/204))
+
+### ❤️ Thank You
+
+- mattkeele-bylight
+
 ## 0.18.0 (2026-06-26)
 
 ### 🚀 Features

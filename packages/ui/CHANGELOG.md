@@ -1,3 +1,7 @@
+## 0.18.1 (2026-07-01)
+
+This was a version bump only for rapid-cmi5-ui to align it with other projects, there were no code changes.
+
 ## 0.18.0 (2026-06-26)
 
 ### 🚀 Features
