@@ -3,14 +3,14 @@ set -e
 
 # ===== CONFIG =====
 # please put the location of your testing repo
-PACK_OUTPUT_DIR="$HOME/Documents/rangeos-nx-rc5-migration"   # 👈 change this
+PACK_OUTPUT_DIR="/Users/michellegabele/Documents/Work/rangeos-nx"   # 👈 change this
 # ==================
 
 mkdir -p "$PACK_OUTPUT_DIR"
 
-npx nx build cmi5-build-common
-npx nx build rapid-cmi5-ui
-npx nx build rapid-cmi5-editor
+npx nx build cmi5-build-common --skip-nx-cache
+npx nx build rapid-cmi5-ui --skip-nx-cache
+npx nx build rapid-cmi5-editor --skip-nx-cache
 
 cd ./dist/packages
 

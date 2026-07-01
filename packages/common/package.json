@@ -17,6 +17,8 @@
   "author": {
     "name": "Aaron Crawford"
   },
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
   "peerDependencies": {
     "react": "^18",
     "react-dom": "^18"
