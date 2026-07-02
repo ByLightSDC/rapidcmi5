@@ -4,7 +4,7 @@ import {
   useCellValues,
   useMdastNodeUpdater,
 } from '@mdxeditor/editor';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { TabsContext } from './TabsContext';
 import { ContainerDirective } from 'mdast-util-directive';
 import { TabContentDirectiveNode } from './types';
@@ -18,6 +18,7 @@ import {
 import { useFocusWithin } from '../shared/useFocusWithin';
 import { TAB_CONTENT_MIN_HEIGHT } from '../../constants/directiveLayout';
 import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
+import { usePlaybackDecoratorFix } from '../shared/usePlaybackDecoratorFix';
 
 /**
  * Tab Content Editor for tabs plugin
@@ -35,6 +36,9 @@ export const TabContentEditor: React.FC<
   const [contentIsVisible, setContentIsVisible] = useState(false);
   const [tabIndex, setTabIndex] = useState(-1);
   const { isFocused, ref: contentRef } = useFocusWithin<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  // Fix NVDA announcing the Lexical decorator portal as clickable.
+  usePlaybackDecoratorFix(containerRef);
   const rawTextAlign = mdastNode.attributes?.textAlign;
   const textAlign: TextAlign =
     rawTextAlign === 'center' || rawTextAlign === 'right'
@@ -98,6 +102,7 @@ export const TabContentEditor: React.FC<
       id={`tabpanel-${tabIndex}`}
       aria-labelledby={`tab-${tabIndex}`}
     >
+      <div ref={containerRef} style={{ display: 'none' }} />
       {alignmentStyles}
 
       {isFocused && !isPlayback && (

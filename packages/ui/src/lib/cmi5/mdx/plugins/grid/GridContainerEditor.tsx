@@ -56,6 +56,7 @@ import {
   resolveBlockMaxWidth,
 } from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
+import { usePlaybackDecoratorFix } from '../shared/usePlaybackDecoratorFix';
 import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
@@ -87,6 +88,8 @@ export const GridContainerEditor: React.FC<
     resolvedThemeCSS,
     blockMaxWidth,
   );
+  // Fix NVDA announcing the Lexical decorator portal as clickable.
+  usePlaybackDecoratorFix(containerRef);
 
   const [sxProps, setSxProps] = useState<SxProps>({});
   const [formData, setFormData] = useState<Array<GridCellDirectiveNode>>(

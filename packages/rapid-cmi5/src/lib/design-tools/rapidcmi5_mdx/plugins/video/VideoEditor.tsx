@@ -31,7 +31,7 @@ import styles from './styles/video-plugin.module.css';
 import { useCellValues, usePublisher } from '@mdxeditor/gurx';
 import VideoResizer from './VideoResizer';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
-import { editorInPlayback$ } from '@rapid-cmi5/ui';
+import { usePlaybackDecoratorFix } from '@rapid-cmi5/ui';
 
 const imageCache = new Set();
 
@@ -347,7 +347,6 @@ export function VideoEditor({
   const [EditVideoToolbar] = useCellValues(editVideoToolbarComponent$);
   const [disableSettingsButton] = useCellValues(disableVideoSettingsButton$);
   const [videoPreviewHandler] = useCellValues(videoPreviewHandler$);
-  const [isPlayback] = useCellValues(editorInPlayback$);
   const [previewSrc, setPreviewSrc] = React.useState(src);
   const [previewCaptionSrc, setPreviewCaptionSrc] = React.useState<
     string | undefined
@@ -379,18 +378,9 @@ export function VideoEditor({
   const initialVideoPath = isLocal ? src : null;
   const videoSource = isLocal ? `${videoFilePath}${src.slice(1)}` : src;
 
-  // The video's parent is the Lexical decorator span which NVDA announces as 'clickable'.
-  // Set role=presentation to hide it from NVDA.
   const containerRef = React.useRef<HTMLDivElement | null>(null);
-
-  React.useEffect(() => {
-    if (isPlayback && containerRef.current) {
-      const decoratorSpan = containerRef.current.parentElement;
-      if (decoratorSpan) {
-        decoratorSpan.setAttribute('role', 'presentation');
-      }
-    }
-  }, [isPlayback]);
+  // Fix NVDA announcing the Lexical decorator portal as clickable.
+  usePlaybackDecoratorFix(containerRef);
 
   return (
     <React.Suspense fallback={Placeholder ? <Placeholder /> : null}>

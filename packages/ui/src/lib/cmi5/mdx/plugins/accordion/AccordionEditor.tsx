@@ -66,6 +66,7 @@ import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { useGutterRight } from '../shared/useGutterRight';
+import { usePlaybackDecoratorFix } from '../shared/usePlaybackDecoratorFix';
 import { BackgroundColorTrigger, useBackgroundColors } from '@rapid-cmi5/ui';
 
 /**
@@ -115,6 +116,8 @@ export const AccordionEditor: React.FC<
     resolvedThemeCSS,
     blockMaxWidth,
   );
+  // Fix NVDA announcing the Lexical decorator portal as clickable.
+  usePlaybackDecoratorFix(containerRef);
 
   const [isPlayback, readOnly, syntaxExtensions] = useCellValues(
     editorInPlayback$,

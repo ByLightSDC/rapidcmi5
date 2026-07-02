@@ -83,6 +83,7 @@ export * from './plugins/tabs/constants';
 export * from './plugins/tabs/TabContentDirectiveDescriptor';
 export * from './plugins/tabs/TabsDirectiveDescriptor';
 export * from './plugins/toolbar/vars';
+export * from './plugins/shared/usePlaybackDecoratorFix';
 
 export * from './state/vars';
 

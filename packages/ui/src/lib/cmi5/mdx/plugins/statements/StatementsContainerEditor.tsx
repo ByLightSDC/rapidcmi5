@@ -25,6 +25,7 @@ import * as Mdast from 'mdast';
 import { useCoursePresentation } from '../../contexts/PresentationContext';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
+import { usePlaybackDecoratorFix } from '../shared/usePlaybackDecoratorFix';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { findMatchingStatementPreset } from './methods';
@@ -184,7 +185,9 @@ export const StatementsContainerEditor: React.FC<
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';
-  const { menuRight } = useGutterRight(resolvedThemeCSS);
+  const { containerRef, menuRight } = useGutterRight(resolvedThemeCSS);
+  // Fix NVDA announcing the Lexical decorator portal as clickable.
+  usePlaybackDecoratorFix(containerRef);
   const {
     backgroundColor,
     colorPickerAnchor,
@@ -317,6 +320,7 @@ export const StatementsContainerEditor: React.FC<
   return (
     <>
       <Box
+        ref={containerRef}
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         sx={{
           position: 'relative',

@@ -62,6 +62,7 @@ import {
   resolveBlockMaxWidth,
 } from '../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../plugins/shared/useGutterRight';
+import { usePlaybackDecoratorFix } from '../plugins/shared/usePlaybackDecoratorFix';
 import { BlockAppearanceForm } from '../plugins/shared/BlockAppearanceForm';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../colors/ColorSelectionPopover';
@@ -154,6 +155,8 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
     resolvedThemeCSS,
     blockMaxWidth,
   );
+  // Fix NVDA announcing the Lexical decorator portal as clickable.
+  usePlaybackDecoratorFix(containerRef);
 
   const [syntaxExtensions] = useCellValues(syntaxExtensions$);
   const [adColor, setAdColor] = useState<

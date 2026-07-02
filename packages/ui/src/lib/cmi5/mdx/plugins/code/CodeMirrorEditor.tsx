@@ -19,6 +19,7 @@ import { languageOptions } from './vars';
 import DeleteIconButton from '../../components/DeleteIconButton';
 import RightMenuContainer from '../../components/RightMenuContainer';
 import { editorInPlayback$ } from '../../state/vars';
+import { usePlaybackDecoratorFix } from '../shared/usePlaybackDecoratorFix';
 import { Box, useTheme } from '@mui/material';
 import { codeMirrorExtensions$ } from '.';
 const themeCompartment = new Compartment();
@@ -51,6 +52,9 @@ export const CodeMirrorEditor = ({
   const { setCode } = useCodeBlockEditorContext();
   const editorViewRef = React.useRef<EditorView | null>(null);
   const elRef = React.useRef<HTMLDivElement | null>(null);
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  // Fix NVDA announcing the Lexical decorator portal as clickable.
+  usePlaybackDecoratorFix(containerRef);
 
   const setCodeRef = React.useRef(setCode);
   setCodeRef.current = setCode;
@@ -145,6 +149,7 @@ export const CodeMirrorEditor = ({
 
   return (
     <Box
+      ref={containerRef}
       className="codeMirrorWrapper"
       sx={{
         position: 'relative',

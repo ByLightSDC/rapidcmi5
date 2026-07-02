@@ -5,7 +5,7 @@ import {
   useCellValues,
   useMdastNodeUpdater,
 } from '@mdxeditor/editor';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { ContainerDirective } from 'mdast-util-directive';
 import { GridCellDirectiveNode } from './types';
 import { Box, useTheme } from '@mui/material';
@@ -17,6 +17,7 @@ import {
 } from '../shared/useScopedAlignmentStyles';
 import { useFocusWithin } from '../shared/useFocusWithin';
 import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
+import { usePlaybackDecoratorFix } from '../shared/usePlaybackDecoratorFix';
 
 /**
  * Grid Cell Editor for the Grid Layout plugin.
@@ -28,6 +29,9 @@ export const GridCellEditor: React.FC<
 > = ({ lexicalNode, mdastNode, parentEditor }) => {
   const [cellIndex, setCellIndex] = useState(-1);
   const { isFocused, ref: contentRef } = useFocusWithin<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  // Fix NVDA announcing the Lexical decorator portal as clickable.
+  usePlaybackDecoratorFix(containerRef);
   const muiTheme = useTheme();
   const updateMdastNode = useMdastNodeUpdater();
   const [isPlayback, readOnly] = useCellValues(editorInPlayback$, readOnly$);
@@ -83,6 +87,7 @@ export const GridCellEditor: React.FC<
       role="gridcell"
       aria-label={`Grid cell ${cellIndex + 1}`}
     >
+      <div ref={containerRef} style={{ display: 'none' }} />
       {/* Scoped flex layout CSS (only when alignment is non-default) */}
       {alignmentStyles}
 

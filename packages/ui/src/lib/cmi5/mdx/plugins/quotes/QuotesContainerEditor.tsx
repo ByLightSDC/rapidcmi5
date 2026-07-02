@@ -42,6 +42,7 @@ import { QUOTE_PRESETS } from './constants';
 import { useCoursePresentation } from '../../contexts/PresentationContext';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
+import { usePlaybackDecoratorFix } from '../shared/usePlaybackDecoratorFix';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { findMatchingQuotePreset } from './methods';
@@ -132,7 +133,9 @@ export const QuotesContainerEditor: React.FC<
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';
-  const { menuRight } = useGutterRight(resolvedThemeCSS);
+  const { containerRef, menuRight } = useGutterRight(resolvedThemeCSS);
+  // Fix NVDA announcing the Lexical decorator portal as clickable.
+  usePlaybackDecoratorFix(containerRef);
   const {
     backgroundColor,
     colorPickerAnchor,
@@ -271,6 +274,7 @@ export const QuotesContainerEditor: React.FC<
   if (isPlayback) {
     return (
       <Box
+        ref={containerRef}
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         sx={{
           position: 'relative',
@@ -321,6 +325,7 @@ export const QuotesContainerEditor: React.FC<
   return (
     <>
       <Box
+        ref={containerRef}
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         sx={{
           position: 'relative',

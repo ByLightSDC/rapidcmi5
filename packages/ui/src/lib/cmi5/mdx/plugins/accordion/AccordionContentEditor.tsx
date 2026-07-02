@@ -5,7 +5,7 @@ import {
   useCellValues,
   useMdastNodeUpdater,
 } from '@mdxeditor/editor';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { ContainerDirective } from 'mdast-util-directive';
 import { AccordionContentDirectiveNode } from './types';
@@ -27,6 +27,7 @@ import {
 } from '../shared/useScopedAlignmentStyles';
 import { useFocusWithin } from '../shared/useFocusWithin';
 import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
+import { usePlaybackDecoratorFix } from '../shared/usePlaybackDecoratorFix';
 
 /**
  * Accordion Content Editor for accordion plugin
@@ -38,6 +39,9 @@ export const AccordionContentEditor: React.FC<
 > = ({ lexicalNode, mdastNode, parentEditor }) => {
   const [accordionIndex, setAccordionIndex] = useState(-1);
   const { isFocused, ref: contentRef } = useFocusWithin<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  // Fix NVDA announcing the Lexical decorator portal as clickable.
+  usePlaybackDecoratorFix(containerRef);
   const muiTheme = useTheme();
   const updateMdastNode = useMdastNodeUpdater();
   const [isPlayback, readOnly] = useCellValues(editorInPlayback$, readOnly$);
@@ -116,6 +120,7 @@ export const AccordionContentEditor: React.FC<
         sx={{ backgroundColor: basePageBg, position: 'relative' }}
         ref={contentRef}
       >
+        <div ref={containerRef} style={{ display: 'none' }} />
         {alignmentStyles}
 
         {isFocused && !isPlayback && (

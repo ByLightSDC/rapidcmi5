@@ -7,6 +7,7 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import PaletteIcon from '@mui/icons-material/Palette';
 import { Box, Divider, IconButton, Tooltip, useTheme } from '@mui/material';
 import { useGutterRight } from '../shared/useGutterRight';
+import { usePlaybackDecoratorFix } from '../shared/usePlaybackDecoratorFix';
 import { useFocusWithin } from '../shared/useFocusWithin';
 import {
   useScopedAlignmentStyles,
@@ -203,10 +204,12 @@ export const TableEditor: React.FC<TableEditorProps> = ({
       | undefined,
   );
   const blockMaxWidth = resolveBlockMaxWidth(contentWidth);
-  const { gutterRef, gutterRight } = useGutterRight(
+  const { containerRef, gutterRef, gutterRight } = useGutterRight(
     resolvedThemeCSS,
     blockMaxWidth,
   );
+  // Fix NVDA announcing the Lexical decorator portal as clickable.
+  usePlaybackDecoratorFix(containerRef);
 
   useEffect(() => {
     setContentWidth(
@@ -461,6 +464,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({
   return (
     <>
       <div
+        ref={containerRef}
         {...(contentWidth !== undefined
           ? { 'data-block-override': 'true' }
           : {})}

@@ -58,6 +58,7 @@ import {
   resolveBlockMaxWidth,
 } from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
+import { usePlaybackDecoratorFix } from '../shared/usePlaybackDecoratorFix';
 import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { getDirectiveBlockShadow } from '../../../../styles/directiveStyles';
@@ -116,6 +117,8 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
     resolvedThemeCSS,
     blockMaxWidth,
   );
+  // Fix NVDA announcing the Lexical decorator portal as clickable.
+  usePlaybackDecoratorFix(containerRef);
   // Set to true when handleClearColor already rebuilt, so onClose skips its rebuild.
   const skipNextCloseRebuildRef = useRef(false);
   const [isPlayback, readOnly, syntaxExtensions] = useCellValues(

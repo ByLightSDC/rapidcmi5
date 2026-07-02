@@ -1,8 +1,8 @@
 import {
   NestedEditorsContext,
-  NestedLexicalEditor,
   useCellValue,
 } from '@mdxeditor/editor';
+import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 
 import * as Mdast from 'mdast';
 import { fnRefOrder$, fnRefs$ } from './vars';
@@ -67,7 +67,7 @@ export const FootnoteDefinitionEditor: React.FC<FootnoteDefEditorProps> = ({
             lexicalNode: lexicalNode,
           }}
         >
-          <NestedLexicalEditor<Mdast.FootnoteDefinition>
+          <RC5NestedLexicalEditor<Mdast.FootnoteDefinition>
             block={false}
             getContent={(node) => node.children}
             getUpdatedMdastNode={(mdastNode, children) => {

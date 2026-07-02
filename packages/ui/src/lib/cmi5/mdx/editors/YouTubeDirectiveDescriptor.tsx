@@ -1,13 +1,13 @@
-import { DirectiveDescriptor, insertMarkdown$, useCellValues } from '@mdxeditor/editor';
+import { DirectiveDescriptor, insertMarkdown$ } from '@mdxeditor/editor';
 import { LeafDirective } from 'mdast-util-directive';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Box, IconButton, Stack, TextField, Tooltip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { usePublisher } from '@mdxeditor/gurx';
-import { editorInPlayback$ } from '../state/vars';
+import { usePlaybackDecoratorFix } from '../plugins/shared/usePlaybackDecoratorFix';
 
 /**
  * Example
@@ -50,19 +50,9 @@ const YoutubeEditor = ({
     id ? `https://www.youtube.com/watch?v=${id}` : '',
   );
   const insertMarkdown = usePublisher(insertMarkdown$);
-  const [isPlayback] = useCellValues(editorInPlayback$);
-  // The iframe's parent is the Lexical decorator span which NVDA announces as 'clickable'.
-  // Set role=presentation to hide it from NVDA.
   const containerRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (isPlayback && containerRef.current) {
-      const decoratorSpan = containerRef.current.parentElement;
-      if (decoratorSpan) {
-        decoratorSpan.setAttribute('role', 'presentation');
-      }
-    }
-  }, [isPlayback]);
+  // Fix NVDA announcing the Lexical decorator portal as clickable.
+  usePlaybackDecoratorFix(containerRef);
 
   const handleDelete = () => {
     parentEditor.update(() => {
