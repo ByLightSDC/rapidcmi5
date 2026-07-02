@@ -1,7 +1,6 @@
 import {
   DirectiveEditorProps,
   insertMarkdown$,
-  NestedLexicalEditor,
   readOnly$,
   syntaxExtensions$,
   useCellValues,
@@ -50,7 +49,6 @@ import ModalDialog from '../../../../modals/ModalDialog';
 import { ButtonMinorUi, ButtonOptions } from '../../../../utility/buttons';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
 import { editorInPlayback$ } from '../../state/vars';
-import { renderMdastBlock } from '../../util/renderMdastStatic';
 import { convertMdastToMarkdown } from '../../util/conversion';
 import { useCoursePresentation } from '../../contexts/PresentationContext';
 import {
@@ -66,6 +64,8 @@ import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover'
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { DIRECTIVE_INNER_BOX_SHADOW } from '../../constants/directiveLayout';
 import { BackgroundColorTrigger, useBackgroundColors } from '@rapid-cmi5/ui';
+
+import { RC5NestedLexicalEditor } from '../../plugins/shared/RC5NestedLexicalEditor';
 
 /**
  * Tabs Editor for tabs directive
@@ -450,40 +450,22 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
             })}
           </Tabs>
 
-          {/* In playback, render static HTML — NestedLexicalEditor's contenteditable announces as 'clickable' to NVDA. */}
-          {isPlayback ? (
-            <>
-              {mdastNode.children.map((child, i) => (
-                <div
-                  key={i}
-                  role="tabpanel"
-                  id={`tabpanel-${i}`}
-                  aria-labelledby={`tab-${i}`}
-                  style={{ display: i === tab ? undefined : 'none' }}
-                >
-                  {(child.children as unknown as Mdast.RootContent[]).map(
-                    (node, j) => renderMdastBlock(node, j),
-                  )}
-                </div>
-              ))}
-            </>
-          ) : (
-            <TabsContext.Provider value={{ tab }}>
-              <NestedLexicalEditor<ContainerDirective>
-                block={true}
-                getContent={(node) => {
-                  return node.children;
-                }}
-                getUpdatedMdastNode={(node, children: any) => ({
-                  ...node,
-                  children,
-                })}
-                contentEditableProps={{
-                  'aria-label': 'Tabs content',
-                }}
-              />
-            </TabsContext.Provider>
-          )}
+          <TabsContext.Provider value={{ tab }}>
+            <RC5NestedLexicalEditor<ContainerDirective>
+              block={true}
+              activeChildIndex={tab}
+              getContent={(node) => {
+                return node.children;
+              }}
+              getUpdatedMdastNode={(node, children: any) => ({
+                ...node,
+                children,
+              })}
+              contentEditableProps={{
+                'aria-label': 'Tabs content',
+              }}
+            />
+          </TabsContext.Provider>
         </Box>
 
         {/* Gutter buttons — absolutely positioned to the right of the decorator */}

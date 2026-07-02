@@ -88,12 +88,22 @@ export const RC5NestedLexicalEditor = function <
    * Whether or not the editor edits blocks (multiple paragraphs)
    */
   block?: boolean;
+
+  /**
+   * When set (block mode only), each top-level content item is treated as a panel
+   * (e.g. a tabContent directive) and rendered as its own tabpanel during playback,
+   * with only the panel at this index visible — the rest get display: none. Descends
+   * into each panel's own `.children` rather than rendering the panel node itself,
+   * since directive nodes like tabContent aren't otherwise renderable by renderMdastBlock.
+   */
+  activeChildIndex?: number;
 }) {
   const {
     getContent,
     getUpdatedMdastNode,
     contentEditableProps,
     block = false,
+    activeChildIndex,
   } = props;
   const { mdastNode, lexicalNode, focusEmitter } = useNestedEditorContext<T>();
   const updateMdastNode = useMdastNodeUpdater<T>();
@@ -293,8 +303,28 @@ export const RC5NestedLexicalEditor = function <
   // Lexical's contenteditable registers click handlers that NVDA announces as 'clickable'.
   if (isPlayback) {
     if (block) {
+      if (activeChildIndex !== undefined) {
+        return (
+          <>
+            {content.map((node, i) => (
+              <div
+                key={i}
+                role="tabpanel"
+                id={`tabpanel-${i}`}
+                aria-labelledby={`tab-${i}`}
+                style={{ display: i === activeChildIndex ? undefined : 'none' }}
+              >
+                {((node as unknown as Mdast.Parent).children as Mdast.RootContent[]).map(
+                  (child, j) => renderMdastBlock(child, j),
+                )}
+              </div>
+            ))}
+          </>
+        );
+      }
       return <div>{content.map((node, i) => renderMdastBlock(node, i))}</div>;
     }
+
     const inlineNodes: Mdast.PhrasingContent[] = content.flatMap((node) =>
       node.type === 'paragraph'
         ? (node as Mdast.Paragraph).children
