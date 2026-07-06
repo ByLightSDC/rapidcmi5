@@ -389,14 +389,17 @@ function RC5Player() {
         {thePlugins && thePlugins.length > 0 && (
           <div role="tabpanel" aria-label="Slide content" ref={slideContentRef}>
             <div id="toc-portal-target" />
-            <MDXEditor
-              className={mdxTheme}
-              ref={ref}
-              markdown={''}
-              plugins={thePlugins}
-              readOnly={true}
-              key={activeTab}
-            />
+            {/* Add main landmark for ease of nav and skip link to use */}
+            <main id="main-content" tabIndex={-1}>
+              <MDXEditor
+                className={mdxTheme}
+                ref={ref}
+                markdown={''}
+                plugins={thePlugins}
+                readOnly={true}
+                key={activeTab}
+              />
+            </main>
           </div>
         )}
       </Box>
