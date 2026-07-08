@@ -43,6 +43,11 @@ import { exportLexicalTreeToMdast } from '../../util/exportMarkdownFromLexical';
 import { importMdastTreeToLexical } from '../../util/importMarkdownToLexical';
 import { RC5SharedHistoryPlugin } from '../history/RC5SharedHistoryPlugin';
 import { useEffect, useState } from 'react';
+import { editorInPlayback$ } from '../../state/vars';
+import {
+  renderMdastBlock,
+  renderMdastInline,
+} from '../../util/renderMdastStatic';
 
 /**
  * A nested editor React component that allows editing of the contents of complex markdown nodes that have nested markdown content (for example, custom directives or JSX elements).
@@ -83,12 +88,22 @@ export const RC5NestedLexicalEditor = function <
    * Whether or not the editor edits blocks (multiple paragraphs)
    */
   block?: boolean;
+
+  /**
+   * When set (block mode only), each top-level content item is treated as a panel
+   * (e.g. a tabContent directive) and rendered as its own tabpanel during playback,
+   * with only the panel at this index visible — the rest get display: none. Descends
+   * into each panel's own `.children` rather than rendering the panel node itself,
+   * since directive nodes like tabContent aren't otherwise renderable by renderMdastBlock.
+   */
+  activeChildIndex?: number;
 }) {
   const {
     getContent,
     getUpdatedMdastNode,
     contentEditableProps,
     block = false,
+    activeChildIndex,
   } = props;
   const { mdastNode, lexicalNode, focusEmitter } = useNestedEditorContext<T>();
   const updateMdastNode = useMdastNodeUpdater<T>();
@@ -107,6 +122,7 @@ export const RC5NestedLexicalEditor = function <
     jsxIsAvailable,
     nestedEditorChildren,
     lexicalTheme,
+    isPlayback,
   ] = useCellValues(
     rootEditor$,
     importVisitors$,
@@ -118,6 +134,7 @@ export const RC5NestedLexicalEditor = function <
     jsxIsAvailable$,
     nestedEditorChildren$,
     lexicalTheme$,
+    editorInPlayback$,
   );
 
   const setEditorInFocus = usePublisher(editorInFocus$);
@@ -281,6 +298,40 @@ export const RC5NestedLexicalEditor = function <
     updateMdastNode,
     rootEditor,
   ]);
+
+  // In playback, render static HTML instead of a live editor.
+  // Lexical's contenteditable registers click handlers that NVDA announces as 'clickable'.
+  if (isPlayback) {
+    if (block) {
+      if (activeChildIndex !== undefined) {
+        return (
+          <>
+            {content.map((node, i) => (
+              <div
+                key={i}
+                role="tabpanel"
+                id={`tabpanel-${i}`}
+                aria-labelledby={`tab-${i}`}
+                style={{ display: i === activeChildIndex ? undefined : 'none' }}
+              >
+                {((node as unknown as Mdast.Parent).children as Mdast.RootContent[]).map(
+                  (child, j) => renderMdastBlock(child, j),
+                )}
+              </div>
+            ))}
+          </>
+        );
+      }
+      return <div>{content.map((node, i) => renderMdastBlock(node, i))}</div>;
+    }
+
+    const inlineNodes: Mdast.PhrasingContent[] = content.flatMap((node) =>
+      node.type === 'paragraph'
+        ? (node as Mdast.Paragraph).children
+        : [node as Mdast.PhrasingContent],
+    );
+    return <span>{renderMdastInline(inlineNodes)}</span>;
+  }
 
   return (
     <LexicalNestedComposer initialEditor={editor} initialTheme={lexicalTheme}>
