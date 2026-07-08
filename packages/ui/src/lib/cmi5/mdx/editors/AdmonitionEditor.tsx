@@ -385,6 +385,7 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
           expanded={isCollapsible ? isOpen : true}
           onChange={onAccordionChange}
           variant="outlined"
+          slots={{ heading: 'div' }}
           sx={{
             borderColor: 'transparent',
             margin: 0,
