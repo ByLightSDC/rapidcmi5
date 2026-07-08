@@ -157,7 +157,7 @@ function RC5Player() {
           QuotesContainerDirectiveDescriptor,
           QuotesContentDirectiveDescriptor,
           withPlaybackDecoratorFix(StatementsContainerDirectiveDescriptor),
-          StatementDirectiveDescriptor,
+          withPlaybackDecoratorFix(StatementDirectiveDescriptor),
         ],
       }),
       codeMirrorPlugin({
