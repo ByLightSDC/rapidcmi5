@@ -59,6 +59,7 @@ import {
   StatementsContainerDirectiveDescriptor,
   StatementDirectiveDescriptor,
   useCoursePresentation,
+  withPlaybackDecoratorFix,
 } from '@rapid-cmi5/ui';
 
 import { audioPlugin, videoPlugin } from '@rapid-cmi5/react-editor';
@@ -138,7 +139,7 @@ function RC5Player() {
         directiveDescriptors: [
           AccordionDirectiveDescriptor,
           AccordionContentDirectiveDescriptor,
-          AdmonitionDirectiveDescriptor,
+          withPlaybackDecoratorFix(AdmonitionDirectiveDescriptor),
           ActivityDirectiveDescriptor,
           FxDirectiveDescriptor,
           AnimDirectiveDescriptor,
@@ -155,7 +156,7 @@ function RC5Player() {
           ImageTextDirectiveDescriptor,
           QuotesContainerDirectiveDescriptor,
           QuotesContentDirectiveDescriptor,
-          StatementsContainerDirectiveDescriptor,
+          withPlaybackDecoratorFix(StatementsContainerDirectiveDescriptor),
           StatementDirectiveDescriptor,
         ],
       }),
