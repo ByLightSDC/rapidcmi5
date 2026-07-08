@@ -147,7 +147,7 @@ function RC5Player() {
         directiveDescriptors: [
           AccordionDirectiveDescriptor,
           AccordionContentDirectiveDescriptor,
-          AdmonitionDirectiveDescriptor,
+          withPlaybackDecoratorFix(AdmonitionDirectiveDescriptor),
           ActivityDirectiveDescriptor,
           FxDirectiveDescriptor,
           AnimDirectiveDescriptor,

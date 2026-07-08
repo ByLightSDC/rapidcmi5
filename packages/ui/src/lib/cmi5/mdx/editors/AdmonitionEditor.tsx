@@ -62,7 +62,6 @@ import {
   resolveBlockMaxWidth,
 } from '../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../plugins/shared/useGutterRight';
-import { MdxDecorator } from '../plugins/shared/MdxDecorator';
 import { BlockAppearanceForm } from '../plugins/shared/BlockAppearanceForm';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { ColorSelectionPopover } from '../../../colors/ColorSelectionPopover';
@@ -353,278 +352,276 @@ export const AdmonitionEditor: React.FC<DirectiveEditorProps> = ({
   const isConfigureOpen = Boolean(configureAnchor);
 
   return (
-    <MdxDecorator existingRef={containerRef}>
+    <Box
+      ref={containerRef}
+      {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
+      {...(contentWidth !== undefined
+        ? { 'data-block-override': 'true' }
+        : {})}
+      {...(contentWidth !== undefined
+        ? {
+            style: {
+              '--block-max-width': blockMaxWidth ?? 'none',
+            } as React.CSSProperties,
+          }
+        : {})}
+      sx={{
+        margin: 0,
+        padding: 0,
+        position: 'relative',
+        ...outerSx,
+      }}
+    >
       <Box
-        ref={containerRef}
-        {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
-        {...(contentWidth !== undefined
-          ? { 'data-block-override': 'true' }
-          : {})}
-        {...(contentWidth !== undefined
-          ? {
-              style: {
-                '--block-max-width': blockMaxWidth ?? 'none',
-              } as React.CSSProperties,
-            }
-          : {})}
         sx={{
-          margin: 0,
-          padding: 0,
-          position: 'relative',
-          ...outerSx,
+          width: '100%',
+          ...(blockMaxWidth
+            ? {
+                maxWidth: blockMaxWidth,
+                marginLeft: 'auto',
+                marginRight: 'auto',
+              }
+            : {}),
         }}
       >
-        <Box
+        <Accordion
+          expanded={isCollapsible ? isOpen : true}
+          onChange={onAccordionChange}
+          variant="outlined"
           sx={{
-            width: '100%',
-            ...(blockMaxWidth
-              ? {
-                  maxWidth: blockMaxWidth,
-                  marginLeft: 'auto',
-                  marginRight: 'auto',
-                }
-              : {}),
+            borderColor: 'transparent',
+            margin: 0,
+            '&.MuiPaper-rounded': { borderRadius: '8px' },
           }}
         >
-          <Accordion
-            expanded={isCollapsible ? isOpen : true}
-            onChange={onAccordionChange}
-            variant="outlined"
+          <AccordionSummary
+            expandIcon={expandIcon}
+            className="admonition-header"
             sx={{
-              borderColor: 'transparent',
-              margin: 0,
-              '&.MuiPaper-rounded': { borderRadius: '8px' },
-            }}
-          >
-            <AccordionSummary
-              expandIcon={expandIcon}
-              className="admonition-header"
-              sx={{
-                fontSize: '18px',
-                backgroundColor: adSeverityHexColor || adHexColor || adColor,
-                borderRadius: isOpen ? '8px 8px 0 0' : '8px',
-                borderColor: adSeverityHexBorderColor,
-                borderStyle: 'solid',
-                borderWidth: '1px',
-                zIndex: 100,
-              }}
-            >
-              {getAdmonitionIcon(adType)}
-              <div
-                style={{
-                  // @ts-ignore
-                  '--basePageBg': 'transparent',
-                }}
-              >
-                <RC5NestedLexicalEditor<Paragraph>
-                  getContent={(node) => {
-                    const theNode = convertMarkdownToMdast(
-                      getTitle(mdastNode.attributes),
-                      syntaxExtensions,
-                    );
-                    return theNode.children;
-                  }}
-                  getUpdatedMdastNode={(
-                    mdastParagraphNode,
-                    paragraphChildren: any,
-                  ) => {
-                    if (paragraphChildren.length > 0) {
-                      const titleStr = toMarkdown(paragraphChildren[0]);
-                      if (titleStr === title) {
-                        return mdastParagraphNode;
-                      }
-
-                      setTitle(titleStr);
-
-                      return {
-                        ...mdastParagraphNode,
-                        attributes: {
-                          collapse: attCollapse,
-                          title: titleStr,
-                        },
-                      };
-                    }
-
-                    return mdastParagraphNode;
-                  }}
-                  contentEditableProps={{ 'aria-label': 'Admonition Title' }}
-                />
-              </div>
-            </AccordionSummary>
-
-            <AccordionDetails
-              sx={{
-                backgroundColor: 'background.paper',
-                borderColor: adSeverityHexBorderColor,
-                borderRadius: '0 0 8px 8px',
-                borderStyle: 'solid',
-                borderWidth: '1px',
-              }}
-            >
-              <RC5NestedLexicalEditor<ContainerDirective>
-                block={true}
-                getContent={(node) => {
-                  return node.children;
-                }}
-                getUpdatedMdastNode={(mdastNode, containerChildren: any) => {
-                  return { ...mdastNode, children: containerChildren };
-                }}
-                contentEditableProps={{ 'aria-label': 'Admonition Content' }}
-              />
-            </AccordionDetails>
-          </Accordion>
-        </Box>
-
-        {/* Gutter buttons — absolutely positioned outside decorator at S/M, inside at L/None */}
-        {!isPlayback && (
-          <Box
-            sx={{
-              backgroundColor:
-                muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
-              display: 'flex',
-              position: 'absolute',
-              top: backgroundColor ? blockPadding : 0,
-              right: menuRight,
+              fontSize: '18px',
+              backgroundColor: adSeverityHexColor || adHexColor || adColor,
+              borderRadius: isOpen ? '8px 8px 0 0' : '8px',
+              borderColor: adSeverityHexBorderColor,
+              borderStyle: 'solid',
+              borderWidth: '1px',
               zIndex: 100,
             }}
           >
-            <Tooltip title="Edit Settings">
-              <IconButton
-                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  e.stopPropagation();
-                  setConfigureAnchor(e.currentTarget);
+            {getAdmonitionIcon(adType)}
+            <div
+              style={{
+                // @ts-ignore
+                '--basePageBg': 'transparent',
+              }}
+            >
+              <RC5NestedLexicalEditor<Paragraph>
+                getContent={(node) => {
+                  const theNode = convertMarkdownToMdast(
+                    getTitle(mdastNode.attributes),
+                    syntaxExtensions,
+                  );
+                  return theNode.children;
                 }}
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Block Appearance">
-              <IconButton
-                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  e.stopPropagation();
-                  setBlockAppearanceOpen(true);
-                }}
-                size="small"
-              >
-                <PaletteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <BackgroundColorTrigger
-              currentColor={
-                backgroundColor ? { color: pendingColor } : undefined
-              }
-              onTrigger={openPicker}
-            />
-            <InsertLineReturnButton
-              parentEditor={parentEditor}
-              lexicalNode={lexicalNode}
-            />
-            <DeleteIconButton onDelete={onDelete} />
-          </Box>
-        )}
+                getUpdatedMdastNode={(
+                  mdastParagraphNode,
+                  paragraphChildren: any,
+                ) => {
+                  if (paragraphChildren.length > 0) {
+                    const titleStr = toMarkdown(paragraphChildren[0]);
+                    if (titleStr === title) {
+                      return mdastParagraphNode;
+                    }
 
-        {/* Options Popover */}
-        <Popover
-          open={isConfigureOpen}
-          anchorEl={configureAnchor}
-          onClose={() => {
-            setConfigureAnchor(null);
-          }}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-        >
-          <SelectorMainUi
-            defaultValue={defaultCollapseSel}
-            key="select-collapse"
-            isTransient={false}
-            listItemProps={{
-              color: 'primary',
-              fontSize: 'small',
-              fontWeight: 'lighter',
-            }}
-            options={[
-              'Collapse Start Open',
-              'Collapse Start Closed',
-              'No Collapse',
-            ]}
-            sxProps={{ minWidth: '120px', height: '30px' }}
-            isFormStyle={false}
-            onSelect={onSelectCollapsible}
-          />
-        </Popover>
-        {/* Background Color Popover */}
-        <ColorSelectionPopover
-          anchorEl={colorPickerAnchor}
-          onClose={() => {
-            setColorPickerAnchor(null);
-            if (skipNextCloseRebuildRef.current) {
-              skipNextCloseRebuildRef.current = false;
-              return;
-            }
-            const latest = pendingColorRef.current;
-            if (latest !== backgroundColor) {
-              setBackgroundColor(latest);
-              parentEditor.update(
-                () => {
-                  const attrs = {
-                    ...(mdastNode.attributes as Record<string, string>),
-                  };
-                  if (latest) {
-                    attrs['backgroundColor'] = latest;
-                  } else {
-                    delete attrs['backgroundColor'];
+                    setTitle(titleStr);
+
+                    return {
+                      ...mdastParagraphNode,
+                      attributes: {
+                        collapse: attCollapse,
+                        title: titleStr,
+                      },
+                    };
                   }
-                  lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-                },
-                { discrete: true },
-              );
-            }
-          }}
-          lastColor={pendingColor}
-          palette={SHAPE_PRESET_COLORS}
-          onPickColor={(color) => {
-            setPendingColorAndRef(color);
-          }}
-          onClear={() => {
-            setColorPickerAnchor(null);
-            skipNextCloseRebuildRef.current = true;
-            setOverrideColor('');
-            parentEditor.update(
-              () => {
-                const attrs = {
-                  ...(mdastNode.attributes as Record<string, string>),
-                };
-                delete attrs['backgroundColor'];
-                lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
-              },
-              { discrete: true },
-            );
-          }}
-          noneLabel="No background"
-        />
 
-        <BlockAppearanceForm
-          open={blockAppearanceOpen}
-          currentContentWidth={contentWidth}
-          onClose={() => setBlockAppearanceOpen(false)}
-          onSave={(newContentWidth) => {
-            setContentWidth(newContentWidth);
+                  return mdastParagraphNode;
+                }}
+                contentEditableProps={{ 'aria-label': 'Admonition Title' }}
+              />
+            </div>
+          </AccordionSummary>
+
+          <AccordionDetails
+            sx={{
+              backgroundColor: 'background.paper',
+              borderColor: adSeverityHexBorderColor,
+              borderRadius: '0 0 8px 8px',
+              borderStyle: 'solid',
+              borderWidth: '1px',
+            }}
+          >
+            <RC5NestedLexicalEditor<ContainerDirective>
+              block={true}
+              getContent={(node) => {
+                return node.children;
+              }}
+              getUpdatedMdastNode={(mdastNode, containerChildren: any) => {
+                return { ...mdastNode, children: containerChildren };
+              }}
+              contentEditableProps={{ 'aria-label': 'Admonition Content' }}
+            />
+          </AccordionDetails>
+        </Accordion>
+      </Box>
+
+      {/* Gutter buttons — absolutely positioned outside decorator at S/M, inside at L/None */}
+      {!isPlayback && (
+        <Box
+          sx={{
+            backgroundColor:
+              muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
+            display: 'flex',
+            position: 'absolute',
+            top: backgroundColor ? blockPadding : 0,
+            right: menuRight,
+            zIndex: 100,
+          }}
+        >
+          <Tooltip title="Edit Settings">
+            <IconButton
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.stopPropagation();
+                setConfigureAnchor(e.currentTarget);
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Block Appearance">
+            <IconButton
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.stopPropagation();
+                setBlockAppearanceOpen(true);
+              }}
+              size="small"
+            >
+              <PaletteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <BackgroundColorTrigger
+            currentColor={
+              backgroundColor ? { color: pendingColor } : undefined
+            }
+            onTrigger={openPicker}
+          />
+          <InsertLineReturnButton
+            parentEditor={parentEditor}
+            lexicalNode={lexicalNode}
+          />
+          <DeleteIconButton onDelete={onDelete} />
+        </Box>
+      )}
+
+      {/* Options Popover */}
+      <Popover
+        open={isConfigureOpen}
+        anchorEl={configureAnchor}
+        onClose={() => {
+          setConfigureAnchor(null);
+        }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      >
+        <SelectorMainUi
+          defaultValue={defaultCollapseSel}
+          key="select-collapse"
+          isTransient={false}
+          listItemProps={{
+            color: 'primary',
+            fontSize: 'small',
+            fontWeight: 'lighter',
+          }}
+          options={[
+            'Collapse Start Open',
+            'Collapse Start Closed',
+            'No Collapse',
+          ]}
+          sxProps={{ minWidth: '120px', height: '30px' }}
+          isFormStyle={false}
+          onSelect={onSelectCollapsible}
+        />
+      </Popover>
+      {/* Background Color Popover */}
+      <ColorSelectionPopover
+        anchorEl={colorPickerAnchor}
+        onClose={() => {
+          setColorPickerAnchor(null);
+          if (skipNextCloseRebuildRef.current) {
+            skipNextCloseRebuildRef.current = false;
+            return;
+          }
+          const latest = pendingColorRef.current;
+          if (latest !== backgroundColor) {
+            setBackgroundColor(latest);
             parentEditor.update(
               () => {
                 const attrs = {
                   ...(mdastNode.attributes as Record<string, string>),
                 };
-                if (newContentWidth) {
-                  attrs['contentWidth'] = newContentWidth;
+                if (latest) {
+                  attrs['backgroundColor'] = latest;
                 } else {
-                  delete attrs['contentWidth'];
+                  delete attrs['backgroundColor'];
                 }
                 lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
               },
               { discrete: true },
             );
-          }}
-        />
-      </Box>
-    </MdxDecorator>
+          }
+        }}
+        lastColor={pendingColor}
+        palette={SHAPE_PRESET_COLORS}
+        onPickColor={(color) => {
+          setPendingColorAndRef(color);
+        }}
+        onClear={() => {
+          setColorPickerAnchor(null);
+          skipNextCloseRebuildRef.current = true;
+          setOverrideColor('');
+          parentEditor.update(
+            () => {
+              const attrs = {
+                ...(mdastNode.attributes as Record<string, string>),
+              };
+              delete attrs['backgroundColor'];
+              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+            },
+            { discrete: true },
+          );
+        }}
+        noneLabel="No background"
+      />
+
+      <BlockAppearanceForm
+        open={blockAppearanceOpen}
+        currentContentWidth={contentWidth}
+        onClose={() => setBlockAppearanceOpen(false)}
+        onSave={(newContentWidth) => {
+          setContentWidth(newContentWidth);
+          parentEditor.update(
+            () => {
+              const attrs = {
+                ...(mdastNode.attributes as Record<string, string>),
+              };
+              if (newContentWidth) {
+                attrs['contentWidth'] = newContentWidth;
+              } else {
+                delete attrs['contentWidth'];
+              }
+              lexicalNode.setMdastNode({ ...mdastNode, attributes: attrs });
+            },
+            { discrete: true },
+          );
+        }}
+      />
+    </Box>
   );
 };

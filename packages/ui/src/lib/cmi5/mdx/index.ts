@@ -85,6 +85,7 @@ export * from './plugins/tabs/TabsDirectiveDescriptor';
 export * from './plugins/toolbar/vars';
 export * from './plugins/shared/MdxDecorator';
 export * from './plugins/shared/usePlaybackDecoratorFix';
+export * from './plugins/shared/withPlaybackDecoratorFix';
 
 export * from './state/vars';
 
