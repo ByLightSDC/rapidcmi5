@@ -25,7 +25,6 @@ import * as Mdast from 'mdast';
 import { useCoursePresentation } from '../../contexts/PresentationContext';
 import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
-import { usePlaybackDecoratorFix } from '../shared/usePlaybackDecoratorFix';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { findMatchingStatementPreset } from './methods';
@@ -186,8 +185,6 @@ export const StatementsContainerEditor: React.FC<
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';
   const { containerRef, menuRight } = useGutterRight(resolvedThemeCSS);
-  // Fix NVDA announcing the Lexical decorator portal as clickable.
-  usePlaybackDecoratorFix(containerRef);
   const {
     backgroundColor,
     colorPickerAnchor,
