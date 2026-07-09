@@ -1,4 +1,4 @@
-import { alpha, Box, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import { MouseEvent } from 'react';
 import { CustomTheme } from '../../styles/createPalette';
 
@@ -9,10 +9,10 @@ import { CustomTheme } from '../../styles/createPalette';
  */
 export default function SkipLink() {
   const theme: CustomTheme = useTheme();
-  const { palette } = theme;
 
   // Click handler because browser will scroll to target with just href, but we also
-  //want to move the keyboard focus
+  // want to move the keyboard focus. #main-content has tabIndex={-1} specifically
+  // so this manual focus call works.
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     // Prevent native fragment navigation so it can't fight our explicit
     // focus call, otherwise it loops back.
@@ -21,33 +21,17 @@ export default function SkipLink() {
   };
 
   return (
-    <Box
-      component="a"
+    <a
       href="#main-content"
+      className="skip-link"
       onClick={handleClick}
-      sx={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        transform: 'translateY(-100%)',
-        zIndex: (theme) => theme.zIndex.tooltip + 1,
-        padding: '8px 16px',
-        borderRadius: '6px',
-        backgroundColor: alpha(palette.background.paper, 0.9),
-        border: `1px solid ${theme.input.outlineColor}`,
-        transition: 'transform 0.2s ease-in-out',
-        // a:visited/a:hover in styles.css out-specificity a plain sx class
-        // (element + pseudo-class beats a single class), and the contrast on visited
-        // was very poor. So override.
-        '&, &:link, &:visited, &:hover, &:active': {
-          color: palette.text.primary,
-        },
-        '&:focus': {
-          transform: 'translateY(0)',
-        },
-      }}
+      style={
+        {
+          '--skip-link-outline-color': theme?.header?.selColor,
+        } as React.CSSProperties
+      }
     >
       Skip to main content
-    </Box>
+    </a>
   );
 }
