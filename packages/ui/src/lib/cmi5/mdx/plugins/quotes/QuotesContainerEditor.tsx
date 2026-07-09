@@ -1,12 +1,12 @@
 import {
   DirectiveEditorProps,
+  NestedLexicalEditor,
   useCellValues,
   useMdastNodeUpdater,
 } from '@mdxeditor/editor';
-import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 
 import { ContainerDirective } from 'mdast-util-directive';
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { editorInPlayback$ } from '../../state/vars';
 import { parseStyleString } from '../../../markdown/MarkDownParser';
@@ -15,7 +15,6 @@ import {
   alpha,
   Box,
   IconButton,
-  Stack,
   SxProps,
   Tooltip,
   useTheme,
@@ -25,11 +24,7 @@ import DeleteIconButton from '../../components/DeleteIconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import InsertLineReturnButton from '../../components/InsertLineReturnButton';
 
-import {
-  QuoteContentDirectiveNode,
-  QuotePreset,
-  QuotesContainerDirectiveNode,
-} from './types';
+import { QuotePreset, QuotesContainerDirectiveNode } from './types';
 import { QUOTE_PRESETS } from './constants';
 
 import { useCoursePresentation } from '../../contexts/PresentationContext';
@@ -37,126 +32,12 @@ import { resolveLessonThemeCSS } from '../../../../styles/lessonThemeStyles';
 import { useGutterRight } from '../shared/useGutterRight';
 import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover';
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
-import { findMatchingQuotePreset, getQuotePresetLayout } from './methods';
+import { findMatchingQuotePreset } from './methods';
 
-import { QuotesContext, QuotesContextProvider } from './QuotesContext';
-import { renderMdastBlock } from '../../util/renderMdastStatic';
-import * as Mdast from 'mdast';
+import { QuotesContextProvider } from './QuotesContext';
 import { useFocusWithin } from '../shared/useFocusWithin';
 import QuotesSettings from './QuotesSettings';
 import { BackgroundColorTrigger, useBackgroundColors } from '@rapid-cmi5/ui';
-
-// Static quote item for playback — RC5NestedLexicalEditor's contenteditable announces as 'clickable' to NVDA.
-function StaticQuoteItem({
-  mdastNode,
-  preset,
-  blockPadding,
-}: {
-  mdastNode: QuoteContentDirectiveNode;
-  preset: string;
-  blockPadding: string;
-}) {
-  const { imageSource } = useContext(QuotesContext);
-  const { direction, imgSize, imgRadius, paddingTop } =
-    getQuotePresetLayout(preset);
-
-  return (
-    <Box
-      sx={{
-        position: 'relative',
-        minHeight: '60px',
-        marginLeft: blockPadding,
-        marginRight: blockPadding,
-      }}
-    >
-      <Stack
-        direction={direction}
-        spacing={2}
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: 2,
-          paddingBottom: 0,
-          paddingTop,
-        }}
-      >
-        {imageSource && (
-          <img
-            src={imageSource}
-            alt="Author Headshot"
-            style={{
-              width: imgSize,
-              height: imgSize,
-              borderRadius: imgRadius,
-              objectFit: 'cover',
-            }}
-          />
-        )}
-        <div>
-          {(mdastNode.children as unknown as Mdast.RootContent[]).map(
-            (node, i) => renderMdastBlock(node, i),
-          )}
-        </div>
-        {mdastNode.attributes?.author && <p>{mdastNode.attributes.author}</p>}
-      </Stack>
-    </Box>
-  );
-}
-
-// Outer decorator shell — identical in the playback and live-editing render
-// paths (same background-color band, role, and gutter-positioning ref), so
-// it's shared here rather than duplicated in both.
-function QuotesShell({
-  containerRef,
-  backgroundColor,
-  outerSx,
-  sxProps,
-  children,
-}: {
-  containerRef: React.Ref<HTMLDivElement>;
-  backgroundColor: string;
-  outerSx: SxProps;
-  sxProps: SxProps;
-  children: React.ReactNode;
-}) {
-  return (
-    <Box
-      ref={containerRef}
-      {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
-      sx={{
-        position: 'relative',
-        padding: 0,
-        // outerSx/sxProps are always plain style objects in this file (never
-        // MUI's array-of-sx form); cast away SxProps' array variant so the
-        // spread below doesn't confuse the Box sx overload resolution.
-        ...(outerSx as Record<string, unknown>),
-        ...(sxProps as Record<string, unknown>),
-        margin: 0,
-      }}
-      role="quotes"
-      aria-label="Quotes Container"
-    >
-      {children}
-    </Box>
-  );
-}
-
-// Faint background-vs-default overlay behind the quote content, identical in
-// both render paths.
-function QuotesOverlay({ children }: { children: React.ReactNode }) {
-  const muiTheme = useTheme();
-  return (
-    <Box
-      sx={{
-        backgroundColor: (theme) =>
-          `${alpha(theme.palette.background.default, muiTheme.palette.mode === 'light' ? 0 : 0.5)}`,
-      }}
-    >
-      {children}
-    </Box>
-  );
-}
 
 /**
  * Quotes Container Editor for grid layout directive.
@@ -178,7 +59,7 @@ export const QuotesContainerEditor: React.FC<
   const blockPadding = resolvedThemeCSS
     ? (resolvedThemeCSS.blockPadding ?? '0px')
     : '32px';
-  const { containerRef, menuRight } = useGutterRight(resolvedThemeCSS);
+  const { menuRight } = useGutterRight(resolvedThemeCSS);
   const {
     backgroundColor,
     colorPickerAnchor,
@@ -313,53 +194,19 @@ export const QuotesContainerEditor: React.FC<
     setOverrideColor(bgColor);
   }, [mdastNode]);
 
-  // Render statically without editor controls or gutter buttons.
-  if (isPlayback) {
-    return (
-      <QuotesShell
-        containerRef={containerRef}
-        backgroundColor={backgroundColor}
-        outerSx={outerSx}
-        sxProps={sxProps}
-      >
-        <Box
-          sx={{
-            width: '100%',
-            borderRadius: 1,
-            boxShadow: 2,
-            backgroundColor: (theme) => theme.palette.background.paper,
-            paddingTop: blockPadding,
-            paddingBottom: blockPadding,
-          }}
-        >
-          <QuotesOverlay>
-            {mdastNode.children.map((child, i) => (
-              <QuotesContextProvider
-                key={i}
-                preset={currentPreset.id}
-                avatar={child.attributes?.avatar}
-                carouselIndex={i}
-              >
-                <StaticQuoteItem
-                  mdastNode={child}
-                  preset={currentPreset.id}
-                  blockPadding={blockPadding}
-                />
-              </QuotesContextProvider>
-            ))}
-          </QuotesOverlay>
-        </Box>
-      </QuotesShell>
-    );
-  }
-
   return (
     <>
-      <QuotesShell
-        containerRef={containerRef}
-        backgroundColor={backgroundColor}
-        outerSx={outerSx}
-        sxProps={sxProps}
+      <Box
+        {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
+        sx={{
+          position: 'relative',
+          padding: 0,
+          ...outerSx,
+          ...sxProps,
+          margin: 0,
+        }}
+        role="quotes"
+        aria-label="Quotes Container"
       >
         {/* Inner content box */}
         <Box
@@ -375,13 +222,18 @@ export const QuotesContainerEditor: React.FC<
             paddingBottom: blockPadding,
           }}
         >
-          <QuotesOverlay>
+          <Box
+            sx={{
+              backgroundColor: (theme) =>
+                `${alpha(theme.palette.background.default, muiTheme.palette.mode === 'light' ? 0 : 0.5)}`,
+            }}
+          >
             <QuotesContextProvider
               carouselIndex={carouselIndex}
               preset={currentPreset.id}
               avatar={selectedAvatar}
             >
-              <RC5NestedLexicalEditor<ContainerDirective>
+              <NestedLexicalEditor<ContainerDirective>
                 block={true}
                 getContent={(node) => node.children}
                 getUpdatedMdastNode={(node, children: any) => ({
@@ -391,7 +243,7 @@ export const QuotesContainerEditor: React.FC<
                 contentEditableProps={{ 'aria-label': 'Quote layout sections' }}
               />
             </QuotesContextProvider>
-          </QuotesOverlay>
+          </Box>
         </Box>
 
         {/* Gutter buttons — absolutely positioned outside decorator at S/M, inside at L/None */}
@@ -435,7 +287,7 @@ export const QuotesContainerEditor: React.FC<
             />
           </Box>
         )}
-      </QuotesShell>
+      </Box>
 
       {/* Background Color Popover */}
       <ColorSelectionPopover
