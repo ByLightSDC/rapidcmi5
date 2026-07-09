@@ -52,6 +52,11 @@ export const StatementEditor: React.FC<
   const statementBlock = (
     <RC5NestedLexicalEditor<ContainerDirective>
       block={true}
+      // The generic playback static-render path drops contentEditableProps,
+      // which breaks the scoped font styling below (fontStyles targets
+      // .scopedClass). Statements needs its own bespoke static renderer
+      // (tracked separately) rather than this generic one, so skip it for now.
+      skipPlaybackStatic
       getContent={(node) => node.children}
       getUpdatedMdastNode={(node, children: any) => ({
         ...node,
