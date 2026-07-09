@@ -15,6 +15,7 @@ import { toMarkdown } from 'mdast-util-to-markdown';
 import { imgCache } from '../image/constants';
 import { useCoursePresentation } from '../../contexts/PresentationContext';
 import { fontPresets } from './constants';
+import { getQuotePresetLayout } from './methods';
 import { useLessonThemeStyles } from '@rapid-cmi5/ui';
 
 /**
@@ -66,21 +67,17 @@ export const QuoteContentEditor: React.FC<
 
   //#endregion
 
+  const { imgSize, imgRadius, paddingTop } = getQuotePresetLayout(preset);
+
   const avatarImage = useMemo(() => {
-    let imageDim = '72px';
-    let borderRadius = '50%';
-    if (preset === '3') {
-      imageDim = '160px';
-      borderRadius = '';
-    }
     return (
       <>
         {imageSource && (
           <img
             style={{
-              width: imageDim,
-              height: imageDim,
-              borderRadius: borderRadius,
+              width: imgSize,
+              height: imgSize,
+              borderRadius: imgRadius,
               objectFit: 'cover',
             }}
             src={imgCache.read(imageSource)}
@@ -89,7 +86,7 @@ export const QuoteContentEditor: React.FC<
         )}
       </>
     );
-  }, [imageSource, preset]);
+  }, [imageSource, imgSize, imgRadius]);
 
   const quoteBlock = (
     <RC5NestedLexicalEditor<ContainerDirective>
@@ -171,7 +168,7 @@ export const QuoteContentEditor: React.FC<
 
       {preset === '1' && (
         <Stack
-          direction="column"
+          direction={direction}
           spacing={2}
           sx={{
             display: 'flex',
@@ -179,7 +176,7 @@ export const QuoteContentEditor: React.FC<
             alignItems: 'center',
             padding: 2,
             paddingBottom: 0, //controlled by parent, lesson setting
-            paddingTop: 0,
+            paddingTop,
           }}
         >
           {avatarImage}
@@ -189,7 +186,7 @@ export const QuoteContentEditor: React.FC<
       )}
       {preset === '2' && (
         <Stack
-          direction="column"
+          direction={direction}
           spacing={2}
           sx={{
             display: 'flex',
@@ -197,7 +194,7 @@ export const QuoteContentEditor: React.FC<
             alignItems: 'center',
             padding: 2,
             paddingBottom: 0, //controlled by parent, lesson setting
-            //REF paddingTop: 0, NestedLexicalEditor has overly fat padding, trying to balance top padding against it
+            paddingTop, // undefined here — see getQuotePresetLayout's comment on preset '2'
           }}
         >
           {avatarImage}
@@ -207,7 +204,7 @@ export const QuoteContentEditor: React.FC<
       )}
       {preset === '3' && (
         <Stack
-          direction="row"
+          direction={direction}
           spacing={2}
           sx={{
             display: 'flex',
@@ -215,7 +212,7 @@ export const QuoteContentEditor: React.FC<
             alignItems: 'center',
             padding: 2,
             paddingBottom: 0, //controlled by parent, lesson setting
-            paddingTop: 0,
+            paddingTop,
           }}
         >
           {avatarImage}
@@ -227,7 +224,7 @@ export const QuoteContentEditor: React.FC<
       )}
       {preset === '4' && (
         <Stack
-          direction="row"
+          direction={direction}
           spacing={2}
           sx={{
             display: 'flex',
@@ -235,7 +232,7 @@ export const QuoteContentEditor: React.FC<
             alignItems: 'center',
             padding: 2,
             paddingBottom: 0, //controlled by parent, lesson setting
-            paddingTop: 0,
+            paddingTop,
           }}
         >
           {avatarImage}
