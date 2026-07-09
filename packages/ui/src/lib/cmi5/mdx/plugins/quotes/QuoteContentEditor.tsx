@@ -94,6 +94,11 @@ export const QuoteContentEditor: React.FC<
   const quoteBlock = (
     <RC5NestedLexicalEditor<ContainerDirective>
       block={true}
+      // The generic playback static-render path drops contentEditableProps,
+      // which breaks the scoped font styling below (fontStyles targets
+      // .scopedClass). Quotes needs its own bespoke static renderer (tracked
+      // separately) rather than this generic one, so skip it for now.
+      skipPlaybackStatic
       getContent={(node) => node.children}
       getUpdatedMdastNode={(node, children: any) => ({
         ...node,
@@ -108,6 +113,7 @@ export const QuoteContentEditor: React.FC<
 
   const authorEl = (
     <RC5NestedLexicalEditor<Paragraph>
+      skipPlaybackStatic
       getContent={(node) => {
         const theNode = convertMarkdownToMdast(
           mdastNode.attributes.author || '',

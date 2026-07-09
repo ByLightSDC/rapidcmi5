@@ -97,6 +97,17 @@ export const RC5NestedLexicalEditor = function <
    * since directive nodes like tabContent aren't otherwise renderable by renderMdastBlock.
    */
   activeChildIndex?: number;
+
+  /**
+   * Opts out of the playback static-render branch below, keeping the live
+   * Lexical editor even when editorInPlayback$ is true. The static branch
+   * drops contentEditableProps entirely (no className, no aria-label), which
+   * breaks consumers that rely on contentEditableProps.className for scoped
+   * styling (e.g. Quotes' per-preset font rules). Quotes needs a bespoke
+   * static renderer of its own (tracked separately) rather than this generic
+   * one, so it opts out here until that's built.
+   */
+  skipPlaybackStatic?: boolean;
 }) {
   const {
     getContent,
@@ -104,6 +115,7 @@ export const RC5NestedLexicalEditor = function <
     contentEditableProps,
     block = false,
     activeChildIndex,
+    skipPlaybackStatic = false,
   } = props;
   const { mdastNode, lexicalNode, focusEmitter } = useNestedEditorContext<T>();
   const updateMdastNode = useMdastNodeUpdater<T>();
@@ -301,7 +313,7 @@ export const RC5NestedLexicalEditor = function <
 
   // In playback, render static HTML instead of a live editor.
   // Lexical's contenteditable registers click handlers that NVDA announces as 'clickable'.
-  if (isPlayback) {
+  if (isPlayback && !skipPlaybackStatic) {
     if (block) {
       if (activeChildIndex !== undefined) {
         return (

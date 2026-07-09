@@ -161,7 +161,7 @@ function RC5Player() {
           withPlaybackDecoratorFix(TabContentDirectiveDescriptor),
           ImageLabelDirectiveDescriptor,
           ImageTextDirectiveDescriptor,
-          withPlaybackDecoratorFix(QuotesContainerDirectiveDescriptor),
+          QuotesContainerDirectiveDescriptor,
           QuotesContentDirectiveDescriptor,
           withPlaybackDecoratorFix(StatementsContainerDirectiveDescriptor),
           withPlaybackDecoratorFix(StatementDirectiveDescriptor),
