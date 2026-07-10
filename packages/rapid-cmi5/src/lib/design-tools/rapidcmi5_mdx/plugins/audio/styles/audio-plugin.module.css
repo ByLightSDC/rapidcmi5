@@ -24,6 +24,9 @@
 }
 
 .transcriptToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   background: none;
   border: none;
   padding: 4px 0;
@@ -35,6 +38,11 @@
 
 .transcriptToggle:hover {
   text-decoration: underline;
+}
+
+.transcriptToggleIcon {
+  /* Match the icon to the label's cap height rather than the MUI default. */
+  font-size: 1.15rem;
 }
 
 .transcriptList {

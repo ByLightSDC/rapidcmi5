@@ -164,7 +164,10 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
           req.on('end', () => {
             try {
               JSON.parse(body); // validate
-              fs.mkdirSync(TEST_DIR, { recursive: true });
+              // Create the config's parent (src/test/au), not just src/test —
+              // otherwise writeFileSync throws ENOENT when au/ is absent
+              // (e.g. fresh clone or after a clean).
+              fs.mkdirSync(path.dirname(TEST_CONFIG_PATH), { recursive: true });
               fs.writeFileSync(TEST_CONFIG_PATH, body, 'utf-8');
               res.json({ success: true });
             } catch (err) {
@@ -210,7 +213,8 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
                   error: `config.json not found at ${lessonDirPath}/config.json in zip`,
                 });
               }
-              fs.mkdirSync(TEST_DIR, { recursive: true });
+              // Create the config's parent (src/test/au), not just src/test.
+              fs.mkdirSync(path.dirname(TEST_CONFIG_PATH), { recursive: true });
               fs.writeFileSync(
                 TEST_CONFIG_PATH,
                 configEntry.getData().toString('utf-8'),
@@ -323,7 +327,8 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
                   error: `config.json not found at ${lessonDirPath}/config.json in zip`,
                 });
               }
-              fs.mkdirSync(TEST_DIR, { recursive: true });
+              // Create the config's parent (src/test/au), not just src/test.
+              fs.mkdirSync(path.dirname(TEST_CONFIG_PATH), { recursive: true });
               fs.writeFileSync(
                 TEST_CONFIG_PATH,
                 configEntry.getData().toString('utf-8'),

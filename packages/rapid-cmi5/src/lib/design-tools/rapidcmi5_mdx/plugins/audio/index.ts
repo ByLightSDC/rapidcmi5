@@ -72,6 +72,7 @@ export interface SrcAudioParameters extends BaseAudioParameters {
   src: string;
   rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   autoplay?: boolean;
+  /** Caption file path (`.vtt` or `.txt`); content decides how it renders. */
   captionSrc?: string;
 }
 
@@ -88,7 +89,9 @@ export interface SaveAudioParameters extends BaseAudioParameters {
   file?: FileList;
   rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   autoplay?: boolean;
+  /** Existing caption file path (`.vtt` or `.txt`) chosen from the picker. */
   captionSrc?: string;
+  /** Newly uploaded caption file to persist before saving. */
   captionFile?: FileList;
 }
 
@@ -200,6 +203,8 @@ export const audioDialogState$ = Cell<
       withLatestFrom(activeEditor$, audioUploadHandler$, audioDialogState$),
     ),
     ([values, theEditor, audioUploadHandler, dialogState]) => {
+      // The transcript is a single caption file (`.vtt` or `.txt`), referenced
+      // by captionSrc. Its content decides timed-vs-plain at render time.
       const applyAudioNode = (src: string, captionSrc: string | undefined) => {
         if (dialogState.type === 'editing') {
           theEditor?.update(() => {
@@ -214,17 +219,27 @@ export const audioDialogState$ = Cell<
           });
           r.pub(audioDialogState$, { type: 'inactive' });
         } else {
-          r.pub(internalInsertAudio$, { ...values, src, captionSrc });
+          r.pub(internalInsertAudio$, {
+            ...values,
+            src,
+            captionSrc,
+          });
           r.pub(audioDialogState$, { type: 'inactive' });
         }
       };
 
       const resolveCaption = async (src: string) => {
-        if (values.captionFile && values.captionFile.length > 0 && audioUploadHandler) {
+        // A newly uploaded caption file must be persisted first; otherwise use
+        // the path already chosen in the picker (which may be empty).
+        if (
+          values.captionFile &&
+          values.captionFile.length > 0 &&
+          audioUploadHandler
+        ) {
           const captionSrc = await audioUploadHandler(values.captionFile.item(0)!);
           applyAudioNode(src, captionSrc);
         } else {
-          applyAudioNode(src, values.captionSrc);
+          applyAudioNode(src, values.captionSrc || undefined);
         }
       };
 

@@ -38,6 +38,8 @@ interface AudioComponentProps {
   captionSrc?: string;
   /** Fetchable caption URL (blob in the builder, relative path in the player). */
   resolvedCaptionSrc?: string;
+  /** Back-compat: legacy inline transcript text, rendered read-only. */
+  captionText?: string;
 }
 
 function AudioComponent({
@@ -47,6 +49,7 @@ function AudioComponent({
   id,
   captionSrc,
   resolvedCaptionSrc,
+  captionText,
 }: AudioComponentProps): JSX.Element {
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   const [isSelected, setSelected, clearSelection] =
@@ -218,6 +221,7 @@ function AudioComponent({
           muted={false}
           data-audio-id={id}
           data-caption-src={captionSrc}
+          data-caption-text={!captionSrc ? captionText : undefined}
           style={{
             display: 'block',
             maxWidth: '100%',
@@ -226,12 +230,11 @@ function AudioComponent({
             pointerEvents: 'auto',
           }}
         />
-        {resolvedCaptionSrc && (
-          <AudioTranscript
-            captionSrc={resolvedCaptionSrc}
-            audioRef={audioRef}
-          />
-        )}
+        <AudioTranscript
+          captionSrc={resolvedCaptionSrc}
+          fallbackText={captionText}
+          audioRef={audioRef}
+        />
       </div>
     </React.Suspense>
   );
@@ -245,6 +248,8 @@ export interface AudioEditorProps {
   id: string;
   autoplay: boolean;
   captionSrc?: string;
+  /** Back-compat: legacy inline transcript text, rendered read-only. */
+  captionText?: string;
 }
 
 export function AudioEditor({
@@ -255,6 +260,7 @@ export function AudioEditor({
   id,
   autoplay,
   captionSrc,
+  captionText,
 }: AudioEditorProps): JSX.Element {
   const [audioFilePath] = useCellValues(audioFilePath$);
   const [Placeholder] = useCellValues(audioPlaceholder$);
@@ -322,6 +328,7 @@ export function AudioEditor({
           id={id}
           captionSrc={captionSrc}
           resolvedCaptionSrc={previewCaptionSrc}
+          captionText={captionText}
         />
         {shouldShowToolbar && (
           <EditAudioToolbar
