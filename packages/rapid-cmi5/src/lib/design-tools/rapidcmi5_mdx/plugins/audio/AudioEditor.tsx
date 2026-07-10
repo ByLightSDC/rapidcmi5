@@ -23,7 +23,7 @@ import {
   editAudioToolbarComponent$,
   disableAudioSettingsButton$,
 } from './index';
-import { $isAudioNode, CaptionKind } from './AudioNode';
+import { $isAudioNode } from './AudioNode';
 import styles from './styles/audio-plugin.module.css';
 import { AudioTranscript } from './AudioTranscript';
 import { useCellValues } from '@mdxeditor/gurx';
@@ -38,7 +38,7 @@ interface AudioComponentProps {
   captionSrc?: string;
   /** Fetchable caption URL (blob in the builder, relative path in the player). */
   resolvedCaptionSrc?: string;
-  /** Plain-text transcript (when captionKind === 'text'). */
+  /** Back-compat: legacy inline transcript text, rendered read-only. */
   captionText?: string;
 }
 
@@ -221,8 +221,7 @@ function AudioComponent({
           muted={false}
           data-audio-id={id}
           data-caption-src={captionSrc}
-          data-caption-kind={captionText ? 'text' : undefined}
-          data-caption-text={captionText}
+          data-caption-text={!captionSrc ? captionText : undefined}
           style={{
             display: 'block',
             maxWidth: '100%',
@@ -231,16 +230,11 @@ function AudioComponent({
             pointerEvents: 'auto',
           }}
         />
-        {captionText ? (
-          <AudioTranscript text={captionText} audioRef={audioRef} />
-        ) : (
-          resolvedCaptionSrc && (
-            <AudioTranscript
-              captionSrc={resolvedCaptionSrc}
-              audioRef={audioRef}
-            />
-          )
-        )}
+        <AudioTranscript
+          captionSrc={resolvedCaptionSrc}
+          fallbackText={captionText}
+          audioRef={audioRef}
+        />
       </div>
     </React.Suspense>
   );
@@ -254,7 +248,7 @@ export interface AudioEditorProps {
   id: string;
   autoplay: boolean;
   captionSrc?: string;
-  captionKind?: CaptionKind;
+  /** Back-compat: legacy inline transcript text, rendered read-only. */
   captionText?: string;
 }
 
@@ -266,7 +260,6 @@ export function AudioEditor({
   id,
   autoplay,
   captionSrc,
-  captionKind,
   captionText,
 }: AudioEditorProps): JSX.Element {
   const [audioFilePath] = useCellValues(audioFilePath$);
@@ -335,7 +328,7 @@ export function AudioEditor({
           id={id}
           captionSrc={captionSrc}
           resolvedCaptionSrc={previewCaptionSrc}
-          captionText={captionKind === 'text' ? captionText : undefined}
+          captionText={captionText}
         />
         {shouldShowToolbar && (
           <EditAudioToolbar
@@ -346,8 +339,6 @@ export function AudioEditor({
             rest={rest}
             autoplay={autoplay}
             captionSrc={captionSrc}
-            captionKind={captionKind}
-            captionText={captionText}
           />
         )}
       </div>

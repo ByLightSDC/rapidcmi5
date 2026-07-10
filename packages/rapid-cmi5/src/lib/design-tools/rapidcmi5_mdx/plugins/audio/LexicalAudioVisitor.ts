@@ -38,18 +38,19 @@ export const LexicalAudioVisitor: LexicalExportVisitor<AudioNode, Mdast.Html> =
         }
       }
 
-      // Transcript: either a timed VTT file (data-caption-src) or a block of
-      // plain text (data-caption-text). Emit exactly one. `setAttribute`
-      // handles escaping of quotes/newlines in the text value.
-      const captionKind = lexicalNode.getCaptionKind();
-      const captionText = lexicalNode.getCaptionText();
+      // Transcript is a caption file (`.vtt` or `.txt`) referenced by
+      // data-caption-src; its content decides timed-vs-plain at render time.
       const captionSrc = lexicalNode.getCaptionSrc();
-      if (captionKind === 'text' && captionText) {
-        audio.setAttribute('data-caption-kind', 'text');
-        audio.setAttribute('data-caption-text', captionText);
-      } else if (captionSrc) {
-        // Default / 'vtt': preserve the existing data-caption-src contract.
+      if (captionSrc) {
         audio.setAttribute('data-caption-src', captionSrc);
+      }
+
+      // Back-compat: legacy content authored with inline text (no file) is
+      // round-tripped so re-saving never drops an existing transcript. The
+      // editor no longer produces this attribute for new content.
+      const captionText = lexicalNode.getCaptionText();
+      if (!captionSrc && captionText) {
+        audio.setAttribute('data-caption-text', captionText);
       }
 
       actions.appendToParent(mdastParent, {

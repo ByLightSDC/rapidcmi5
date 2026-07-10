@@ -87,3 +87,32 @@ export function parseVtt(vtt: string): VttCue[] {
 
   return cues;
 }
+
+/**
+ * The result of interpreting a caption file, regardless of extension. A caption
+ * file is timed VTT if it parses into at least one cue; otherwise it is treated
+ * as a plain-text transcript. This lets a single file picker accept `.vtt` or
+ * `.txt` (or a mislabeled file) and do the right thing by content, not name.
+ */
+export type ParsedTranscript =
+  | { kind: 'vtt'; cues: VttCue[] }
+  | { kind: 'text'; text: string };
+
+/**
+ * Interprets raw caption file contents as either timed VTT or plain text.
+ *
+ * The rule is content-based, not extension-based: we attempt a VTT parse and,
+ * if it yields at least one cue, treat the file as timed VTT. Anything that
+ * produces no cues — a `.txt` transcript, a mislabeled file, or a `.vtt` with
+ * no valid timing — falls back to plain text so its content is never dropped.
+ */
+export function parseTranscript(raw: string): ParsedTranscript {
+  const cues = parseVtt(raw);
+  if (cues.length > 0) {
+    return { kind: 'vtt', cues };
+  }
+  // Strip a leading `WEBVTT` header line if present, so a header-only or
+  // cue-less VTT doesn't show its boilerplate as transcript text.
+  const text = raw.replace(/^﻿?WEBVTT[^\n]*\n?/, '').trim();
+  return { kind: 'text', text };
+}

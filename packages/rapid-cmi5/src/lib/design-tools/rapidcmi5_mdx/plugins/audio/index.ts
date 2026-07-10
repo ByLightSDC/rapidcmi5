@@ -33,7 +33,6 @@ import {
   $createAudioNode,
   CreateAudioNodeParameters,
   AudioNode,
-  CaptionKind,
 } from './AudioNode';
 import { LexicalAudioVisitor } from './LexicalAudioVisitor';
 import {
@@ -73,9 +72,8 @@ export interface SrcAudioParameters extends BaseAudioParameters {
   src: string;
   rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   autoplay?: boolean;
+  /** Caption file path (`.vtt` or `.txt`); content decides how it renders. */
   captionSrc?: string;
-  captionKind?: CaptionKind;
-  captionText?: string;
 }
 
 /**
@@ -91,10 +89,10 @@ export interface SaveAudioParameters extends BaseAudioParameters {
   file?: FileList;
   rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   autoplay?: boolean;
+  /** Existing caption file path (`.vtt` or `.txt`) chosen from the picker. */
   captionSrc?: string;
+  /** Newly uploaded caption file to persist before saving. */
   captionFile?: FileList;
-  captionKind?: CaptionKind;
-  captionText?: string;
 }
 
 /**
@@ -134,8 +132,6 @@ const internalInsertAudio$ = Signal<SrcAudioParameters>((r) => {
           rest: values.rest ?? [],
           autoplay: values.autoplay,
           captionSrc: values.captionSrc,
-          captionKind: values.captionKind,
-          captionText: values.captionText,
         });
         $insertNodes([audioNode]);
         if ($isRootOrShadowRoot(audioNode.getParentOrThrow())) {
@@ -207,19 +203,9 @@ export const audioDialogState$ = Cell<
       withLatestFrom(activeEditor$, audioUploadHandler$, audioDialogState$),
     ),
     ([values, theEditor, audioUploadHandler, dialogState]) => {
-      // The transcript is one of two mutually exclusive kinds. Normalize here so
-      // exactly one of captionSrc / captionText is ever stored on the node.
-      const isText = values.captionKind === 'text';
-
+      // The transcript is a single caption file (`.vtt` or `.txt`), referenced
+      // by captionSrc. Its content decides timed-vs-plain at render time.
       const applyAudioNode = (src: string, captionSrc: string | undefined) => {
-        const captionKind: CaptionKind | undefined = isText
-          ? 'text'
-          : captionSrc
-            ? 'vtt'
-            : undefined;
-        const captionText = isText ? values.captionText : undefined;
-        const resolvedCaptionSrc = isText ? undefined : captionSrc;
-
         if (dialogState.type === 'editing') {
           theEditor?.update(() => {
             const { nodeKey } = dialogState;
@@ -229,28 +215,23 @@ export const audioDialogState$ = Cell<
             audioNode.setSrc(src);
             audioNode.setRest(values.rest);
             audioNode.setAutoplay(values.autoplay ?? false);
-            audioNode.setCaptionSrc(resolvedCaptionSrc);
-            audioNode.setCaptionKind(captionKind);
-            audioNode.setCaptionText(captionText);
+            audioNode.setCaptionSrc(captionSrc);
           });
           r.pub(audioDialogState$, { type: 'inactive' });
         } else {
           r.pub(internalInsertAudio$, {
             ...values,
             src,
-            captionSrc: resolvedCaptionSrc,
-            captionKind,
-            captionText,
+            captionSrc,
           });
           r.pub(audioDialogState$, { type: 'inactive' });
         }
       };
 
       const resolveCaption = async (src: string) => {
-        // Plain-text transcripts have no file to upload.
-        if (isText) {
-          applyAudioNode(src, undefined);
-        } else if (
+        // A newly uploaded caption file must be persisted first; otherwise use
+        // the path already chosen in the picker (which may be empty).
+        if (
           values.captionFile &&
           values.captionFile.length > 0 &&
           audioUploadHandler
@@ -258,7 +239,7 @@ export const audioDialogState$ = Cell<
           const captionSrc = await audioUploadHandler(values.captionFile.item(0)!);
           applyAudioNode(src, captionSrc);
         } else {
-          applyAudioNode(src, values.captionSrc);
+          applyAudioNode(src, values.captionSrc || undefined);
         }
       };
 

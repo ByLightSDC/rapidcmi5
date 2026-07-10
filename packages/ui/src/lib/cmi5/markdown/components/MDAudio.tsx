@@ -1,4 +1,5 @@
 import React from 'react';
+import ClosedCaptionIcon from '@mui/icons-material/ClosedCaption';
 import { AuContextProps } from '@rapid-cmi5/cmi5-build-common';
 
 /**
@@ -74,6 +75,30 @@ function parseVtt(vtt: string): VttCue[] {
 }
 
 /**
+ * The result of interpreting a caption file, regardless of extension: timed VTT
+ * cues, or a block of plain text.
+ */
+type ParsedTranscript =
+  | { kind: 'vtt'; cues: VttCue[] }
+  | { kind: 'text'; text: string };
+
+/**
+ * Interprets raw caption file contents as either timed VTT or plain text. The
+ * rule is content-based, not extension-based: attempt a VTT parse and, if it
+ * yields at least one cue, treat the file as timed VTT; otherwise fall back to
+ * plain text so a `.txt`, mislabeled, or cue-less file is never dropped.
+ */
+function parseTranscript(raw: string): ParsedTranscript {
+  const cues = parseVtt(raw);
+  if (cues.length > 0) {
+    return { kind: 'vtt', cues };
+  }
+  // Strip a leading `WEBVTT` header line so header-only files don't leak it.
+  const text = raw.replace(/^﻿?WEBVTT[^\n]*\n?/, '').trim();
+  return { kind: 'text', text };
+}
+
+/**
  * Formats seconds as `M:SS`.
  */
 function formatTime(seconds: number): string {
@@ -125,13 +150,16 @@ export default function MDAudio(
   const title = prop(node, 'title');
   const audioId = prop(node, 'dataAudioId', 'data-audio-id');
   const rawCaptionSrc = prop(node, 'dataCaptionSrc', 'data-caption-src');
-  const captionText = prop(node, 'dataCaptionText', 'data-caption-text');
+  // Back-compat: legacy inline transcript text (content authored before the
+  // file-only model). Rendered read-only when no caption file is present.
+  const legacyText = prop(node, 'dataCaptionText', 'data-caption-text') ?? '';
   const autoplay =
     node?.properties?.autoplay !== undefined &&
     node?.properties?.autoplay !== false;
 
   const audioRef = React.useRef<HTMLAudioElement>(null);
   const [cues, setCues] = React.useState<VttCue[]>([]);
+  const [text, setText] = React.useState<string>(legacyText);
   const [activeIndex, setActiveIndex] = React.useState<number>(-1);
   const [expanded, setExpanded] = React.useState<boolean>(false);
   // Resolved (fetchable) URLs. Relative course paths must be turned into blob
@@ -140,8 +168,6 @@ export default function MDAudio(
   const [captionSrc, setCaptionSrc] = React.useState<string | undefined>(
     rawCaptionSrc,
   );
-
-  const isText = typeof captionText === 'string' && captionText.trim() !== '';
 
   // Resolve relative course paths to blob URLs (mirrors MarkdownImage).
   React.useEffect(() => {
@@ -156,18 +182,20 @@ export default function MDAudio(
         if (blob) setSrc(blob);
       });
     }
-    if (!isText && isRelative(rawCaptionSrc)) {
+    if (isRelative(rawCaptionSrc)) {
       auProps.getLocalImage(rawCaptionSrc as string, auPath).then((blob) => {
         if (blob) setCaptionSrc(blob);
       });
     }
-  }, [rawSrc, rawCaptionSrc, isText, auProps]);
+  }, [rawSrc, rawCaptionSrc, auProps]);
 
-  // Fetch + parse VTT (skipped in text mode).
+  // Fetch the caption file and interpret it as timed VTT or plain text. Falls
+  // back to any legacy inline text if there is no file or it cannot be loaded.
   React.useEffect(() => {
     let cancelled = false;
     setCues([]);
-    if (isText || !captionSrc) {
+    setText(legacyText);
+    if (!captionSrc) {
       return;
     }
     fetch(captionSrc)
@@ -177,18 +205,26 @@ export default function MDAudio(
         }
         return res.text();
       })
-      .then((text) => {
-        if (!cancelled) {
-          setCues(parseVtt(text));
+      .then((raw) => {
+        if (cancelled) {
+          return;
+        }
+        const parsed = parseTranscript(raw);
+        if (parsed.kind === 'vtt') {
+          setCues(parsed.cues);
+          setText('');
+        } else {
+          setCues([]);
+          setText(parsed.text);
         }
       })
       .catch(() => {
-        /* no transcript panel if it cannot be loaded */
+        /* keep the legacy-text fallback if the file cannot be loaded */
       });
     return () => {
       cancelled = true;
     };
-  }, [captionSrc, isText]);
+  }, [captionSrc, legacyText]);
 
   // Highlight the active cue as the audio plays.
   React.useEffect(() => {
@@ -204,7 +240,13 @@ export default function MDAudio(
     return () => audio.removeEventListener('timeupdate', onTimeUpdate);
   }, [cues]);
 
-  const hasTranscript = isText || cues.length > 0;
+  const hasCues = cues.length > 0;
+  const hasText = text.trim() !== '';
+  const hasTranscript = hasCues || hasText;
+  // Stable id linking the toggle button to the transcript panel it controls, so
+  // assistive tech can associate the two (WCAG 1.2.1 / 1.2.3: the transcript is
+  // the text alternative for this audio-only content and must be discoverable).
+  const panelId = React.useId();
 
   return (
     <span style={{ display: 'block' }}>
@@ -212,6 +254,7 @@ export default function MDAudio(
         ref={audioRef}
         src={src}
         title={title}
+        aria-label={title || 'Audio'}
         controls
         autoPlay={autoplay}
         data-audio-id={audioId}
@@ -222,8 +265,12 @@ export default function MDAudio(
           <button
             type="button"
             aria-expanded={expanded}
+            aria-controls={panelId}
             onClick={() => setExpanded((prev) => !prev)}
             style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
               background: 'none',
               border: 'none',
               padding: 0,
@@ -232,18 +279,22 @@ export default function MDAudio(
               font: 'inherit',
             }}
           >
+            {/* Decorative CC glyph — hidden from assistive tech so the button's
+                accessible name stays "Show/Hide transcript" and NVDA announces
+                it as a button, not "CC Show transcript". */}
+            <ClosedCaptionIcon aria-hidden="true" style={{ fontSize: '1.1em' }} />
             {expanded ? 'Hide transcript' : 'Show transcript'}
           </button>
-          {expanded &&
-            (isText ? (
-              <span
-                style={{ display: 'block', whiteSpace: 'pre-wrap', marginTop: 4 }}
-              >
-                {captionText}
-              </span>
-            ) : (
-              <ol style={{ listStyle: 'none', padding: 0, marginTop: 4 }}>
-                {cues.map((cue, index) => (
+          {expanded && (
+            <span
+              id={panelId}
+              role="region"
+              aria-label="Transcript"
+              style={{ display: 'block' }}
+            >
+              {hasCues ? (
+                <ol style={{ listStyle: 'none', padding: 0, marginTop: 4 }}>
+                  {cues.map((cue, index) => (
                   <li key={`${cue.start}-${index}`}>
                     <button
                       type="button"
@@ -273,9 +324,21 @@ export default function MDAudio(
                       <span>{cue.text}</span>
                     </button>
                   </li>
-                ))}
-              </ol>
-            ))}
+                  ))}
+                </ol>
+              ) : (
+                <span
+                  style={{
+                    display: 'block',
+                    whiteSpace: 'pre-wrap',
+                    marginTop: 4,
+                  }}
+                >
+                  {text}
+                </span>
+              )}
+            </span>
+          )}
         </span>
       )}
     </span>
