@@ -197,6 +197,7 @@ export const QuotesContainerEditor: React.FC<
   return (
     <>
       <Box
+        data-testid="directive-quotes"
         {...(backgroundColor ? { 'data-bgcolor': 'true' } : {})}
         sx={{
           position: 'relative',

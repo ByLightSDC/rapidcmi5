@@ -220,6 +220,7 @@ export const ImageTextEditor: React.FC<
     return createPortal(
       <>
         <Stack
+          data-testid="directive-image-text"
           ref={boxRef}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}

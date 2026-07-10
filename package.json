@@ -11,6 +11,7 @@
     "build-and-test-player": "bash scripts/buildAndTestPlayer.sh",
     "cmi5-builder": "nx run cmi5-builder:build",
     "cmi5-player": "nx run cc-cmi5-player:build",
+    "upload:moodle": "node apps/cc-cmi5-moodle-e2e/scripts/upload-zip-to-moodle.js",
     "postinstall": "electron-builder install-app-deps",
     "nxe:build:frontend": "nx build rapid-cmi5-electron-frontend --configuration=production",
     "nxe:build:backend": "nx build rapid-cmi5-electron --configuration=production",

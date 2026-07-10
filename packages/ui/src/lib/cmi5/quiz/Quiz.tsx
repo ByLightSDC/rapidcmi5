@@ -367,6 +367,7 @@ export function AuQuiz({
 
   return (
     <Box
+      data-testid="activity-quiz"
       className="paper-activity"
       sx={{
         //REF Background backgroundColor: 'background.default',

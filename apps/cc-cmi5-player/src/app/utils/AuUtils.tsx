@@ -145,9 +145,27 @@ export async function resumeAU(
       // Priority: 1) First incomplete slide, 2) Legacy bookmark, 3) First slide
       // Get the updated CourseAUProgress from store (now that it has both contentStructure and initialized progress data)
       const updatedCourseAUProgress = courseAUProgressSel(store.getState());
-      const resumeSlideIndex = updatedCourseAUProgress
+      let resumeSlideIndex = updatedCourseAUProgress
         ? getFirstIncompleteSlideIndex(updatedCourseAUProgress)
         : 0;
+
+      // E2E override: force fresh launch to always land on slide 0 regardless
+      // of restored progress. Used by the Moodle e2e suite so scenario/quiz
+      // AUs that were completed on a prior run don't auto-resume past the
+      // slide under test. Leaves the progress data itself in the store so
+      // downstream consumers (ProgressBar, TabPanel, gradeActivity, etc.)
+      // still see the truthy state they expect.
+      const forceFreshLaunch =
+        window._env_?.NX_PUBLIC_E2E_FORCE_FRESH_LAUNCH === true ||
+        process.env['NX_PUBLIC_E2E_FORCE_FRESH_LAUNCH'] === 'true';
+      if (forceFreshLaunch && resumeSlideIndex !== 0) {
+        logger.info(
+          '[E2E] NX_PUBLIC_E2E_FORCE_FRESH_LAUNCH set — overriding resume slide',
+          { originalResumeSlide: resumeSlideIndex, overriddenTo: 0 },
+          'auManager',
+        );
+        resumeSlideIndex = 0;
+      }
 
       logger.info(
         'Determined resume slide',
