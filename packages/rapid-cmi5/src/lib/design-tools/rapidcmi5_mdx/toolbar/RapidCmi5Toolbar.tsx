@@ -66,6 +66,7 @@ import { InsertThematicBreak } from './components/InsertThematicBreak';
 import { InsertTable } from './components/InsertTable';
 import { ColorTextSplitButton } from './components/ColorTextSplitButton';
 import { HighlightSplitButton } from './components/HighlightSplitButton';
+import { LanguageSpanButton } from './components/LanguageSpanButton';
 import { TextFxButton } from './components/TextFxButton';
 
 import { MUIButtonWithTooltip } from './components/MUIButtonWithTooltip';
@@ -219,6 +220,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                 <BoldItalicUnderlineToggles />
                 <ColorTextSplitButton />
                 <HighlightSplitButton />
+                <LanguageSpanButton />
                 <TextFxButton />
                 <Stack
                   direction="row"
