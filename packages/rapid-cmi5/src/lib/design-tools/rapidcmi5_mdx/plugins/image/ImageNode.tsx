@@ -20,8 +20,11 @@ const { generateId } = useTimeStampUUID();
 
 function convertImageElement(domNode: Node): null | DOMConversionOutput {
   if (domNode instanceof HTMLImageElement) {
-    const { alt: altText, id, src, title, width, height } = domNode;
-    const node = $createImageNode({ altText, id, src, title, width, height });
+    const { alt: altText, src, title, width, height } = domNode;
+    // `id` is deliberately not carried over: this DOM conversion runs on paste,
+    // where reusing the source id would produce two images sharing a GUID.
+    // Document load restores ids through the Mdast import visitors instead.
+    const node = $createImageNode({ altText, src, title, width, height });
     return { node };
   }
   return null;
@@ -93,8 +96,11 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
 
   /** @internal */
   static override importJSON(serializedNode: SerializedImageNode): ImageNode {
-    const { altText, title, src, width, rest, height, href, id } =
-      serializedNode;
+    const { altText, title, src, width, rest, height, href } = serializedNode;
+    // `id` is deliberately dropped: importJSON is the clipboard path, so a
+    // pasted copy must mint its own GUID rather than clone the source's.
+    // Document load goes through the Mdast import visitors, which pass the
+    // saved id explicitly, so persisted ids survive a round trip.
     const node = $createImageNode({
       altText,
       title,
@@ -103,7 +109,6 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       width,
       rest,
       href,
-      id,
     });
     return node;
   }

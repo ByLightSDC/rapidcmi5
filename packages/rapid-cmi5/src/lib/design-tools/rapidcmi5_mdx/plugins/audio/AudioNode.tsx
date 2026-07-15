@@ -95,13 +95,16 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
 
   /** @internal */
   static override importJSON(serializedNode: SerializedAudioNode): AudioNode {
-    const { title, src, rest, id, autoplay, captionSrc, captionText } =
+    const { title, src, rest, autoplay, captionSrc, captionText } =
       serializedNode;
+    // `id` is deliberately dropped: importJSON is the clipboard path, so a
+    // pasted copy must mint its own GUID rather than clone the source's,
+    // which would collide in animation targeting. Document load goes through
+    // the Mdast import visitors, which pass the saved id explicitly.
     const node = $createAudioNode({
       title,
       src,
       rest,
-      id,
       autoplay,
       captionSrc,
       captionText,
