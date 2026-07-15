@@ -119,6 +119,22 @@ function AuManager() {
   const { isOverridesLoaded, loadOverrides } = useOverrideConfigs();
   const { isContentLoaded, contentErrorMessage, loadContent } = useAuContent();
 
+  /**
+   * 2.4.2 Page Titled (Level A): reflect the AU's own title in the tab title.
+   * Only runs once real content has loaded, so the "Loading..." placeholder
+   * (defaultCourseAuData) never leaks into the title. Falls back to auName
+   * since title is an optional field and may not be authored.
+   * A later org-configured theme.playerTitle (useOverrideConfig) intentionally
+   * overrides this — that's the customer's explicit branding choice.
+   */
+  useEffect(() => {
+    if (!isContentLoaded) return;
+    const displayTitle = auJson?.title || auJson?.auName;
+    if (displayTitle) {
+      document.title = `${displayTitle} | RapidCMI5`;
+    }
+  }, [isContentLoaded, auJson?.title, auJson?.auName]);
+
   //#region Session Methods
 
   const handleSetActivityCache = (
