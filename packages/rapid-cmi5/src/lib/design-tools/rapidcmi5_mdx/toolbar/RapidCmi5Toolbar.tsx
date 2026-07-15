@@ -220,7 +220,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                 <BoldItalicUnderlineToggles />
                 <ColorTextSplitButton />
                 <HighlightSplitButton />
-                <LanguageSpanButton />
+
                 <TextFxButton />
                 <Stack
                   direction="row"
@@ -249,9 +249,10 @@ export const RapidCmi5Toolbar: React.FC = () => {
                     )}
                   </MUIButtonWithTooltip>
                   {isMoreTextTools && (
-                    <Box sx={{ marginLeft: -1 }}>
+                    <Stack direction="row" sx={{ marginLeft: -1, }}>
                       <StrikeThroughSupSubToggles />
-                    </Box>
+                      <LanguageSpanButton />
+                    </Stack>
                   )}
                 </Stack>
                 <Separator />

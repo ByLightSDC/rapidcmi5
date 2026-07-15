@@ -195,8 +195,8 @@ export function LanguageSpanButton() {
   return (
     <>
       <MUIButtonWithTooltip
-        title="Set Language of Selection"
-        aria-label="Set Language of Selection"
+        title="Apply Language"
+        aria-label="Apply Language"
         onClick={openPicker}
         disabled={disabled}
         sx={{ marginRight: '-6px' }}
