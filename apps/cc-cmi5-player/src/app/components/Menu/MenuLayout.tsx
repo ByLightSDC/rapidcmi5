@@ -22,6 +22,7 @@ import {
 } from '@rapid-cmi5/ui';
 import { CustomTheme } from '../../styles/createPalette';
 import LessonToolbar from './LessonToolbar';
+import SkipLink from './SkipLink';
 import { cmi5Instance } from '../../session/cmi5';
 
 export default function MenuLayout() {
@@ -85,6 +86,7 @@ export default function MenuLayout() {
       codeRunnerUrl={config.DEVOPS_API_URL}
       cmi5Enabled={true}
     >
+      <SkipLink />
       <Drawer
         sx={{
           width: isMenuDrawerOpen ? DRAWER_WIDTH : 0,

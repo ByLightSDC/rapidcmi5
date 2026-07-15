@@ -116,21 +116,22 @@ div#horizontalgap {
   top: -100%;
   left: 0;
   z-index: 10000;
-  padding: 12px 24px;
+  min-height: 40px;
+  padding: 8px 24px;
+  display: flex;
+  align-items: center;
   background: #000000;
   color: #ffffff !important;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   text-decoration: none;
-  border: 2px solid #ffffff;
-  border-radius: 0 0 4px 0;
   white-space: nowrap;
 }
 
 .skip-link:focus {
   top: 0;
-  outline: 3px solid #6f96ff;
-  outline-offset: 2px;
+  outline: 2px solid transparent;
+  box-shadow: 0 0 0 3px var(--skip-link-outline-color, #6f96ff);
 }
 
 /* REF  Scrollbar Styles
