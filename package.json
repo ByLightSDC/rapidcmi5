@@ -51,6 +51,7 @@
     "@mui/material": "^6.5.0",
     "@mui/system": "^6.4.8",
     "@mui/x-charts": "^7.22.3",
+    "@mui/x-data-grid": "^7.29.12",
     "@mui/x-date-pickers": "7.29.4",
     "@openapitools/openapi-generator-cli": "^2.26.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
