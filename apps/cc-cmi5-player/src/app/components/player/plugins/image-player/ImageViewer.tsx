@@ -7,6 +7,7 @@ import { imagePlaceholder$ as imagePlaceholderComponent$ } from './index';
 import styles from './styles/image-plugin.module.css';
 import { imagePreviewHandler$, imgCache, parseCssString } from '@rapid-cmi5/ui';
 
+import Tooltip from '@mui/material/Tooltip';
 export interface ImageViewerProps {
   nodeKey: string;
   src: string;
@@ -29,6 +30,8 @@ function LazyImage({
   rest,
   style,
   id,
+  isLinked,
+  onFullscreenHintVisibilityChange,
 }: {
   title: string;
   alt: string;
@@ -39,6 +42,8 @@ function LazyImage({
   rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
   style?: React.CSSProperties;
   id?: string;
+  isLinked: boolean;
+  onFullscreenHintVisibilityChange: (visible: boolean) => void;
 }) {
   const [url] = useState<string>(src);
 
@@ -53,6 +58,24 @@ function LazyImage({
       width={width}
       height={height}
       style={style}
+      // linked images already navigate via the surrounding <a> on click/enter,
+      // so only non-linked images get the full-screen keyboard trigger + warning
+      tabIndex={isLinked ? undefined : 0}
+      aria-describedby={isLinked ? undefined : `image-fullscreen-hint-${id}`}
+      onKeyDown={
+        isLinked
+          ? undefined
+          : (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                document.getElementById(`image-labels-${id}`)?.click();
+              }
+            }
+      }
+      // keyboard focus lands on the image itself (it sits under the overlay),
+      // so the overlay's tooltip is shown/hidden in sync with focus here too
+      onFocus={isLinked ? undefined : () => onFullscreenHintVisibilityChange(true)}
+      onBlur={isLinked ? undefined : () => onFullscreenHintVisibilityChange(false)}
     />
   );
 }
@@ -72,8 +95,22 @@ export function ImageViewer({
     imagePlaceholderComponent$,
     imagePreviewHandler$,
   );
-  const labelsRef = React.useRef<null | HTMLImageElement>(null);
   const [imageSource, setImageSource] = React.useState<string | null>(null);
+  // images inside a link already navigate on click/enter and get their
+  // accessible name from the alt text, so they don't need the full-screen
+  // button/tooltip treatment. The overlay div is only rendered once
+  // imageSource resolves, so a callback ref is used instead of a mount
+  // effect, which would run before the div exists and never fire again.
+  const [isLinked, setIsLinked] = React.useState(false);
+  const labelsRef = React.useCallback((node: HTMLDivElement | null) => {
+    if (node) {
+      setIsLinked(node.closest('a') != null);
+    }
+  }, []);
+  // the tooltip's child (the overlay) only ever gets mouse hover, since
+  // keyboard focus lands on the <img> underneath it - control the tooltip's
+  // open state directly so both trigger it
+  const [showFullscreenHint, setShowFullscreenHint] = React.useState(false);
 
   // determine styles
   let styleAttribute: MdxJsxAttribute | undefined;
@@ -139,16 +176,42 @@ export function ImageViewer({
           className={styles['imageWrapper']}
           data-editor-block-type="image"
         >
-          <div
-            id={`image-labels-${id}`}
-            ref={labelsRef}
-            style={{
-              position: 'absolute',
-              left: 0,
-              width: '100%',
-              height: '100%',
-            }}
-          />
+          {isLinked ? (
+            <div
+              id={`image-labels-${id}`}
+              ref={labelsRef}
+              style={{
+                position: 'absolute',
+                left: 0,
+                width: '100%',
+                height: '100%',
+              }}
+            />
+          ) : (
+            <>
+              <Tooltip title="Click to view full screen" open={showFullscreenHint}>
+                <div
+                  id={`image-labels-${id}`}
+                  ref={labelsRef}
+                  aria-hidden="true"
+                  onMouseEnter={() => setShowFullscreenHint(true)}
+                  onMouseLeave={() => setShowFullscreenHint(false)}
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                  }}
+                />
+              </Tooltip>
+              <span
+                id={`image-fullscreen-hint-${id}`}
+                className={styles['imageFullscreenHint']}
+              >
+                Click to view full screen
+              </span>
+            </>
+          )}
           <LazyImage
             id={id}
             width={width}
@@ -157,6 +220,8 @@ export function ImageViewer({
             src={imageSource}
             title={title ?? ''}
             alt={alt ?? ''}
+            isLinked={isLinked}
+            onFullscreenHintVisibilityChange={setShowFullscreenHint}
             rest={rest}
             style={style}
           />
