@@ -10,6 +10,7 @@ export * from './components/RightMenuContainer';
 export * from './components/SettingsIconButton';
 
 export * from './constants/colors';
+export * from './constants/languages';
 export * from './constants/defaultData';
 
 export * from './editors/AdmonitionDirectiveDescriptor';
