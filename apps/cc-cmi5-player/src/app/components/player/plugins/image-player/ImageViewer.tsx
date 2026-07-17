@@ -52,6 +52,7 @@ function LazyImage({
       id={id}
       className={className ?? undefined}
       alt={alt}
+      aria-label={isLinked ? undefined : `${alt}. Click to view full screen.`}
       src={imgCache.read(url)}
       title={title}
       draggable="false"
@@ -61,7 +62,6 @@ function LazyImage({
       // linked images already navigate via the surrounding <a> on click/enter,
       // so only non-linked images get the full-screen keyboard trigger + warning
       tabIndex={isLinked ? undefined : 0}
-      aria-describedby={isLinked ? undefined : `image-fullscreen-hint-${id}`}
       onKeyDown={
         isLinked
           ? undefined
@@ -74,8 +74,12 @@ function LazyImage({
       }
       // keyboard focus lands on the image itself (it sits under the overlay),
       // so the overlay's tooltip is shown/hidden in sync with focus here too
-      onFocus={isLinked ? undefined : () => onFullscreenHintVisibilityChange(true)}
-      onBlur={isLinked ? undefined : () => onFullscreenHintVisibilityChange(false)}
+      onFocus={
+        isLinked ? undefined : () => onFullscreenHintVisibilityChange(true)
+      }
+      onBlur={
+        isLinked ? undefined : () => onFullscreenHintVisibilityChange(false)
+      }
     />
   );
 }
@@ -188,29 +192,21 @@ export function ImageViewer({
               }}
             />
           ) : (
-            <>
-              <Tooltip title="Click to view full screen" open={showFullscreenHint}>
-                <div
-                  id={`image-labels-${id}`}
-                  ref={labelsRef}
-                  aria-hidden="true"
-                  onMouseEnter={() => setShowFullscreenHint(true)}
-                  onMouseLeave={() => setShowFullscreenHint(false)}
-                  style={{
-                    position: 'absolute',
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                  }}
-                />
-              </Tooltip>
-              <span
-                id={`image-fullscreen-hint-${id}`}
-                className={styles['imageFullscreenHint']}
-              >
-                Click to view full screen
-              </span>
-            </>
+            <Tooltip title="Click to view full screen" open={showFullscreenHint}>
+              <div
+                id={`image-labels-${id}`}
+                ref={labelsRef}
+                aria-hidden="true"
+                onMouseEnter={() => setShowFullscreenHint(true)}
+                onMouseLeave={() => setShowFullscreenHint(false)}
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                }}
+              />
+            </Tooltip>
           )}
           <LazyImage
             id={id}
