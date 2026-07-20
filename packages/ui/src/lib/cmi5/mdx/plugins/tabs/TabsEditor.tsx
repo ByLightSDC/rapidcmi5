@@ -1,7 +1,6 @@
 import {
   DirectiveEditorProps,
   insertMarkdown$,
-  NestedLexicalEditor,
   readOnly$,
   syntaxExtensions$,
   useCellValues,
@@ -64,6 +63,7 @@ import { ColorSelectionPopover } from '../../../../colors/ColorSelectionPopover'
 import { SHAPE_PRESET_COLORS } from '../../constants/colors';
 import { DIRECTIVE_INNER_BOX_SHADOW } from '../../constants/directiveLayout';
 import { BackgroundColorTrigger, useBackgroundColors } from '@rapid-cmi5/ui';
+import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 
 /**
  * Tabs Editor for tabs directive
@@ -448,8 +448,9 @@ export const TabsEditor: React.FC<DirectiveEditorProps<TabDirectiveNode>> = ({
           </Tabs>
 
           <TabsContext.Provider value={{ tab }}>
-            <NestedLexicalEditor<ContainerDirective>
+            <RC5NestedLexicalEditor<ContainerDirective>
               block={true}
+              activeChildIndex={tab}
               getContent={(node) => {
                 return node.children;
               }}

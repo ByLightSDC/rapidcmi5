@@ -1,7 +1,6 @@
 import {
   DirectiveEditorProps,
   insertMarkdown$,
-  NestedLexicalEditor,
   readOnly$,
   useCellValues,
   usePublisher,
@@ -65,6 +64,7 @@ import { BlockAppearanceForm } from '../shared/BlockAppearanceForm';
 import { useGutterRight } from '../shared/useGutterRight';
 import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { BackgroundColorTrigger, useBackgroundColors } from '@rapid-cmi5/ui';
+import { RC5NestedLexicalEditor } from '../shared/RC5NestedLexicalEditor';
 
 /**
  * Steps Editor for steps directive
@@ -560,8 +560,9 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                   </Typography>
                 </Box>
 
-                <NestedLexicalEditor<ContainerDirective>
+                <RC5NestedLexicalEditor<ContainerDirective>
                   block={true}
+                  activeChildIndex={step}
                   getContent={(node) => {
                     return node.children;
                   }}
