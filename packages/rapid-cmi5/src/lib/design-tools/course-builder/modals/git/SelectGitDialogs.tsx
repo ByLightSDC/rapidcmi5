@@ -64,7 +64,7 @@ export function SelectGitDialogs() {
     (state: RootState) => state.repoManager,
   );
 
-  const { handleCreateLesson } = useCourseData();
+  const { handleCreateLesson, courseData } = useCourseData();
   const {
     currentCourse,
     availableCourses,
@@ -441,6 +441,12 @@ export function SelectGitDialogs() {
             courseName: modalObj.meta.courseName,
             blockName: modalObj.meta.blockName,
             coursePath: modalObj.meta.coursePath,
+            existingAuNames:
+              courseData?.blocks
+                ?.find(
+                  (block) => block.blockName === modalObj.meta.blockName,
+                )
+                ?.aus?.map((au) => au.auName) ?? [],
           }}
           modalObj={modalObj}
           handleCloseModal={handleCloseModal}
