@@ -83,8 +83,16 @@ export const VideoDialog: React.FC = () => {
       setTitle(state.initialValues.title ? state.initialValues.title : '');
 
       setVideoStyle('');
-      setWidth(state.initialValues.width?.toString() ?? '');
-      setHeight(state.initialValues.height?.toString() ?? '');
+      setWidth(
+        state.initialValues.width && state.initialValues.width > 0
+          ? state.initialValues.width.toString()
+          : '',
+      );
+      setHeight(
+        state.initialValues.height && state.initialValues.height > 0
+          ? state.initialValues.height.toString()
+          : '',
+      );
       setAutoplay(state.initialValues.autoplay ?? false);
       setCaptionSrc(state.initialValues.captionSrc ?? '');
       setDialogOpenCount((c) => c + 1);
@@ -227,6 +235,7 @@ export const VideoDialog: React.FC = () => {
         buttons={['Cancel', state.type === 'editing' ? 'apply' : 'insert']}
         dialogProps={{
           open: true,
+          fullWidth: true,
         }}
         handleAction={(index: number) => {
           if (index === 0) {
@@ -340,8 +349,13 @@ export const VideoDialog: React.FC = () => {
                 label="Width (px)"
                 name="video-width"
                 type="number"
+                inputProps={{ min: 0 }}
                 value={width}
-                onChange={(textValue: string) => setWidth(textValue)}
+                onChange={(textValue: string) => {
+                  if (textValue === '' || Number(textValue) >= 0) {
+                    setWidth(textValue);
+                  }
+                }}
                 infoText={'Optional video width in pixels'}
               />
             </Grid>
@@ -351,8 +365,13 @@ export const VideoDialog: React.FC = () => {
                 label="Height (px)"
                 name="video-height"
                 type="number"
+                inputProps={{ min: 0 }}
                 value={height}
-                onChange={(textValue: string) => setHeight(textValue)}
+                onChange={(textValue: string) => {
+                  if (textValue === '' || Number(textValue) >= 0) {
+                    setHeight(textValue);
+                  }
+                }}
                 infoText={'Optional video height in pixels'}
               />
             </Grid>
