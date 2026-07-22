@@ -592,6 +592,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                       name="reset-step"
                       tooltip={`Step ${index + 1}`}
                       props={{
+                        'aria-label': `Step ${index + 1}`,
                         onClick: () => handleStepChange(index),
                       }}
                       sxProps={{ minWidth: '32px' }}
