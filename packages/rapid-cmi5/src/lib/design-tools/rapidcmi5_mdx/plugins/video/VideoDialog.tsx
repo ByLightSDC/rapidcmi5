@@ -60,6 +60,8 @@ export const VideoDialog: React.FC = () => {
   const [fileOptions, setFileOptions] = useState<string[]>([]);
   const [width, setWidth] = useState<string>('');
   const [height, setHeight] = useState<string>('');
+  const [widthError, setWidthError] = useState<boolean>(false);
+  const [heightError, setHeightError] = useState<boolean>(false);
   const [autoplay, setAutoplay] = useState<boolean>(false);
   const { getAllAssets } = useLessonAssets();
   const [captionSrc, setCaptionSrc] = useState<string>('');
@@ -78,6 +80,9 @@ export const VideoDialog: React.FC = () => {
   // set the initial values based on if the user is inserting a new video or
   // editing an existing video
   useEffect(() => {
+    setWidthError(false);
+    setHeightError(false);
+
     if (state.type === 'editing') {
       setSrc(state.initialValues.src ? state.initialValues.src : '');
       setTitle(state.initialValues.title ? state.initialValues.title : '');
@@ -351,9 +356,14 @@ export const VideoDialog: React.FC = () => {
                 type="number"
                 inputProps={{ min: 0 }}
                 value={width}
+                error={widthError}
+                helperText={widthError ? 'Negative values are not allowed' : undefined}
                 onChange={(textValue: string) => {
                   if (textValue === '' || Number(textValue) >= 0) {
                     setWidth(textValue);
+                    setWidthError(false);
+                  } else {
+                    setWidthError(true);
                   }
                 }}
                 infoText={'Optional video width in pixels'}
@@ -367,9 +377,14 @@ export const VideoDialog: React.FC = () => {
                 type="number"
                 inputProps={{ min: 0 }}
                 value={height}
+                error={heightError}
+                helperText={heightError ? 'Negative values are not allowed' : undefined}
                 onChange={(textValue: string) => {
                   if (textValue === '' || Number(textValue) >= 0) {
                     setHeight(textValue);
+                    setHeightError(false);
+                  } else {
+                    setHeightError(true);
                   }
                 }}
                 infoText={'Optional video height in pixels'}
