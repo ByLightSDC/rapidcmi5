@@ -49,6 +49,27 @@ const VIDEO_DIR = './Assets/Videos/';
 
 const NEGATIVE_VALUE_ERROR_TEXT = 'Negative values are not allowed';
 
+// The width/height fields sit in a center-aligned Grid row, so anything that
+// changes their height shifts the neighbouring field. Take the helper text out
+// of flow and pin it below the input: the error message can then appear (and
+// wrap) without altering the field's box. `align-items: center` fixes the info
+// `?` button, which otherwise stretches to the row height instead of centering
+// on the input.
+const dimensionFieldProps = {
+  sxProps: {
+    position: 'relative',
+    '& .MuiFormHelperText-root': {
+      position: 'absolute',
+      top: '100%',
+      left: 0,
+      right: 0,
+      marginTop: 0,
+      marginLeft: '14px',
+    },
+  },
+  containerSxProps: { alignItems: 'center' },
+} as const;
+
 // shared onChange handler for the width/height fields: rejects negative
 // values (surfacing the error state) and otherwise applies the new value
 const createNonNegativeChangeHandler =
@@ -375,6 +396,7 @@ export const VideoDialog: React.FC = () => {
                 helperText={widthError ? NEGATIVE_VALUE_ERROR_TEXT : undefined}
                 onChange={createNonNegativeChangeHandler(setWidth, setWidthError)}
                 infoText={'Optional video width in pixels'}
+                {...dimensionFieldProps}
               />
             </Grid>
             <Grid size={4.5}>
@@ -389,6 +411,7 @@ export const VideoDialog: React.FC = () => {
                 helperText={heightError ? NEGATIVE_VALUE_ERROR_TEXT : undefined}
                 onChange={createNonNegativeChangeHandler(setHeight, setHeightError)}
                 infoText={'Optional video height in pixels'}
+                {...dimensionFieldProps}
               />
             </Grid>
 
