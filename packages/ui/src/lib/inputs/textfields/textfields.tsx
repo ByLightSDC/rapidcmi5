@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 /* MUI */
 import TextField, { StandardTextFieldProps } from '@mui/material/TextField';
-import { InputAdornment } from '@mui/material';
+import { Box, InputAdornment } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { ButtonIcon, ButtonInfoField } from '../../utility/buttons';
 
@@ -20,6 +20,7 @@ const leadingZeroRegex = /^([0][0-9]+)$|^([-][0][0-9]+)$/; // don't allow -0n or
  * @property {boolean} [forceNumberAsInteger=true] Force textField with type "number" entry to be an integer (no decimal)
  * @property {*} [sxProps] sx props passed to MUI Textfield
  * @property {*} [sxInputProps] sx props passed to internal input field
+ * @property {*} [containerSxProps] sx props passed to the row wrapping the field and its info button
  * @property {(val?: any) => void} [onChange] Callback for text change
  * @property {(val?: any) => void} [onEnter] Callback for enter pressed
  */
@@ -35,6 +36,7 @@ interface BrandedTextfieldProps extends StandardTextFieldProps {
   forceNumberAsInteger?: boolean;
   sxProps?: any;
   sxInputProps?: any;
+  containerSxProps?: any;
   onChange?: (val?: any) => void;
   onEnter?: (val?: any) => void;
 }
@@ -53,6 +55,7 @@ export function TextFieldMainUi(props: BrandedTextfieldProps) {
     forceNumberAsInteger = true,
     sxProps,
     sxInputProps,
+    containerSxProps,
     onChange,
     onEnter,
     ...textFieldProps
@@ -91,7 +94,7 @@ export function TextFieldMainUi(props: BrandedTextfieldProps) {
   ) : null;
 
   return (
-    <div className="content-row">
+    <Box className="content-row" sx={containerSxProps}>
       <TextField
         autoComplete="off"
         inputRef={inputRef}
@@ -168,6 +171,6 @@ export function TextFieldMainUi(props: BrandedTextfieldProps) {
         }}
       />
       {infoText && <ButtonInfoField message={infoText} />}
-    </div>
+    </Box>
   );
 }

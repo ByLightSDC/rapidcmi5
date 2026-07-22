@@ -47,6 +47,42 @@ const VisuallyHiddenInput = styled('input')({
 
 const VIDEO_DIR = './Assets/Videos/';
 
+const NEGATIVE_VALUE_ERROR_TEXT = 'Negative values are not allowed';
+
+// The width/height fields sit in a center-aligned Grid row, so anything that
+// changes their height shifts the neighbouring field. Take the helper text out
+// of flow and pin it below the input: the error message can then appear (and
+// wrap) without altering the field's box. `align-items: center` fixes the info
+// `?` button, which otherwise stretches to the row height instead of centering
+// on the input.
+const dimensionFieldProps = {
+  sxProps: {
+    position: 'relative',
+    '& .MuiFormHelperText-root': {
+      position: 'absolute',
+      top: '100%',
+      left: 0,
+      right: 0,
+      marginTop: 0,
+      marginLeft: '14px',
+    },
+  },
+  containerSxProps: { alignItems: 'center' },
+} as const;
+
+// shared onChange handler for the width/height fields: rejects negative
+// values (surfacing the error state) and otherwise applies the new value
+const createNonNegativeChangeHandler =
+  (setValue: (value: string) => void, setError: (hasError: boolean) => void) =>
+  (textValue: string) => {
+    if (textValue === '' || Number(textValue) >= 0) {
+      setValue(textValue);
+      setError(false);
+    } else {
+      setError(true);
+    }
+  };
+
 /**
  * A custom Video Dialog for video settings.
  * @constructor
@@ -60,6 +96,8 @@ export const VideoDialog: React.FC = () => {
   const [fileOptions, setFileOptions] = useState<string[]>([]);
   const [width, setWidth] = useState<string>('');
   const [height, setHeight] = useState<string>('');
+  const [widthError, setWidthError] = useState<boolean>(false);
+  const [heightError, setHeightError] = useState<boolean>(false);
   const [autoplay, setAutoplay] = useState<boolean>(false);
   const { getAllAssets } = useLessonAssets();
   const [captionSrc, setCaptionSrc] = useState<string>('');
@@ -78,13 +116,24 @@ export const VideoDialog: React.FC = () => {
   // set the initial values based on if the user is inserting a new video or
   // editing an existing video
   useEffect(() => {
+    setWidthError(false);
+    setHeightError(false);
+
     if (state.type === 'editing') {
       setSrc(state.initialValues.src ? state.initialValues.src : '');
       setTitle(state.initialValues.title ? state.initialValues.title : '');
 
       setVideoStyle('');
-      setWidth(state.initialValues.width?.toString() ?? '');
-      setHeight(state.initialValues.height?.toString() ?? '');
+      setWidth(
+        state.initialValues.width && state.initialValues.width > 0
+          ? state.initialValues.width.toString()
+          : '',
+      );
+      setHeight(
+        state.initialValues.height && state.initialValues.height > 0
+          ? state.initialValues.height.toString()
+          : '',
+      );
       setAutoplay(state.initialValues.autoplay ?? false);
       setCaptionSrc(state.initialValues.captionSrc ?? '');
       setDialogOpenCount((c) => c + 1);
@@ -227,6 +276,7 @@ export const VideoDialog: React.FC = () => {
         buttons={['Cancel', state.type === 'editing' ? 'apply' : 'insert']}
         dialogProps={{
           open: true,
+          fullWidth: true,
         }}
         handleAction={(index: number) => {
           if (index === 0) {
@@ -340,9 +390,13 @@ export const VideoDialog: React.FC = () => {
                 label="Width (px)"
                 name="video-width"
                 type="number"
+                inputProps={{ min: 0 }}
                 value={width}
-                onChange={(textValue: string) => setWidth(textValue)}
+                error={widthError}
+                helperText={widthError ? NEGATIVE_VALUE_ERROR_TEXT : undefined}
+                onChange={createNonNegativeChangeHandler(setWidth, setWidthError)}
                 infoText={'Optional video width in pixels'}
+                {...dimensionFieldProps}
               />
             </Grid>
             <Grid size={4.5}>
@@ -351,9 +405,13 @@ export const VideoDialog: React.FC = () => {
                 label="Height (px)"
                 name="video-height"
                 type="number"
+                inputProps={{ min: 0 }}
                 value={height}
-                onChange={(textValue: string) => setHeight(textValue)}
+                error={heightError}
+                helperText={heightError ? NEGATIVE_VALUE_ERROR_TEXT : undefined}
+                onChange={createNonNegativeChangeHandler(setHeight, setHeightError)}
                 infoText={'Optional video height in pixels'}
+                {...dimensionFieldProps}
               />
             </Grid>
 
