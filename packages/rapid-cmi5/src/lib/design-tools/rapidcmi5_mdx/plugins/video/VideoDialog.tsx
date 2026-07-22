@@ -47,6 +47,21 @@ const VisuallyHiddenInput = styled('input')({
 
 const VIDEO_DIR = './Assets/Videos/';
 
+const NEGATIVE_VALUE_ERROR_TEXT = 'Negative values are not allowed';
+
+// shared onChange handler for the width/height fields: rejects negative
+// values (surfacing the error state) and otherwise applies the new value
+const createNonNegativeChangeHandler =
+  (setValue: (value: string) => void, setError: (hasError: boolean) => void) =>
+  (textValue: string) => {
+    if (textValue === '' || Number(textValue) >= 0) {
+      setValue(textValue);
+      setError(false);
+    } else {
+      setError(true);
+    }
+  };
+
 /**
  * A custom Video Dialog for video settings.
  * @constructor
@@ -357,15 +372,8 @@ export const VideoDialog: React.FC = () => {
                 inputProps={{ min: 0 }}
                 value={width}
                 error={widthError}
-                helperText={widthError ? 'Negative values are not allowed' : undefined}
-                onChange={(textValue: string) => {
-                  if (textValue === '' || Number(textValue) >= 0) {
-                    setWidth(textValue);
-                    setWidthError(false);
-                  } else {
-                    setWidthError(true);
-                  }
-                }}
+                helperText={widthError ? NEGATIVE_VALUE_ERROR_TEXT : undefined}
+                onChange={createNonNegativeChangeHandler(setWidth, setWidthError)}
                 infoText={'Optional video width in pixels'}
               />
             </Grid>
@@ -378,15 +386,8 @@ export const VideoDialog: React.FC = () => {
                 inputProps={{ min: 0 }}
                 value={height}
                 error={heightError}
-                helperText={heightError ? 'Negative values are not allowed' : undefined}
-                onChange={(textValue: string) => {
-                  if (textValue === '' || Number(textValue) >= 0) {
-                    setHeight(textValue);
-                    setHeightError(false);
-                  } else {
-                    setHeightError(true);
-                  }
-                }}
+                helperText={heightError ? NEGATIVE_VALUE_ERROR_TEXT : undefined}
+                onChange={createNonNegativeChangeHandler(setHeight, setHeightError)}
                 infoText={'Optional video height in pixels'}
               />
             </Grid>
