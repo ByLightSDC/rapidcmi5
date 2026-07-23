@@ -124,7 +124,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
 
   const a11yStepProps = (index: number) => ({
     id: `step-${index}`,
-    'aria-controls': `step-panel-${index}`,
+    'aria-controls': `tabpanel-${index}`,
   });
 
   /**
@@ -592,6 +592,8 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                       name="reset-step"
                       tooltip={`Step ${index + 1}`}
                       props={{
+                        id: `step-${index}`,
+                        'aria-controls': `tabpanel-${index}`,
                         'aria-label': `Step ${index + 1}`,
                         onClick: () => handleStepChange(index),
                         'aria-current': index === step ? 'step' : undefined,
