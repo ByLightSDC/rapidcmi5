@@ -594,6 +594,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                       props={{
                         'aria-label': `Step ${index + 1}`,
                         onClick: () => handleStepChange(index),
+                        'aria-current': index === step ? 'step' : undefined,
                       }}
                       sxProps={{ minWidth: '32px' }}
                     >
