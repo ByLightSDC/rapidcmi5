@@ -47,21 +47,6 @@ const VisuallyHiddenInput = styled('input')({
 
 const VIDEO_DIR = './Assets/Videos/';
 
-const INVALID_VALUE_ERROR_TEXT = 'Value must be greater than 0';
-
-// shared onChange handler for the width/height fields: rejects zero and
-// negative values (surfacing the error state) and otherwise applies the new value
-const createPositiveValueChangeHandler =
-  (setValue: (value: string) => void, setError: (hasError: boolean) => void) =>
-  (textValue: string) => {
-    if (textValue === '' || Number(textValue) > 0) {
-      setValue(textValue);
-      setError(false);
-    } else {
-      setError(true);
-    }
-  };
-
 /**
  * A custom Video Dialog for video settings.
  * @constructor
@@ -75,8 +60,6 @@ export const VideoDialog: React.FC = () => {
   const [fileOptions, setFileOptions] = useState<string[]>([]);
   const [width, setWidth] = useState<string>('');
   const [height, setHeight] = useState<string>('');
-  const [widthError, setWidthError] = useState<boolean>(false);
-  const [heightError, setHeightError] = useState<boolean>(false);
   const [autoplay, setAutoplay] = useState<boolean>(false);
   const { getAllAssets } = useLessonAssets();
   const [captionSrc, setCaptionSrc] = useState<string>('');
@@ -95,9 +78,6 @@ export const VideoDialog: React.FC = () => {
   // set the initial values based on if the user is inserting a new video or
   // editing an existing video
   useEffect(() => {
-    setWidthError(false);
-    setHeightError(false);
-
     if (state.type === 'editing') {
       setSrc(state.initialValues.src ? state.initialValues.src : '');
       setTitle(state.initialValues.title ? state.initialValues.title : '');
@@ -150,6 +130,15 @@ export const VideoDialog: React.FC = () => {
   const handleCancel = () => {
     closeVideoDialog();
   };
+
+  // silently ignores zero and negative width/height entries (the field
+  // keeps its last valid value) instead of storing the bad value
+  const ensurePositiveValueChangeHandler =
+    (setValue: (value: string) => void) => (textValue: string) => {
+      if (textValue === '' || Number(textValue) > 0) {
+        setValue(textValue);
+      }
+    };
 
   // the user is submitting the video, so insert it
   const handleSubmit = () => {
@@ -371,9 +360,7 @@ export const VideoDialog: React.FC = () => {
                 type="number"
                 inputProps={{ min: 1 }}
                 value={width}
-                error={widthError}
-                helperText={widthError ? INVALID_VALUE_ERROR_TEXT : undefined}
-                onChange={createPositiveValueChangeHandler(setWidth, setWidthError)}
+                onChange={ensurePositiveValueChangeHandler(setWidth)}
                 infoText={'Optional video width in pixels'}
               />
             </Grid>
@@ -385,9 +372,7 @@ export const VideoDialog: React.FC = () => {
                 type="number"
                 inputProps={{ min: 1 }}
                 value={height}
-                error={heightError}
-                helperText={heightError ? INVALID_VALUE_ERROR_TEXT : undefined}
-                onChange={createPositiveValueChangeHandler(setHeight, setHeightError)}
+                onChange={ensurePositiveValueChangeHandler(setHeight)}
                 infoText={'Optional video height in pixels'}
               />
             </Grid>
