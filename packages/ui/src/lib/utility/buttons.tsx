@@ -167,7 +167,14 @@ export function ButtonInfoField({
         style={{ zIndex: zOrderAboveDialog }}
       >
         <ClickAwayListener onClickAway={handleCloseAlert}>
-          <Box sx={{ backgroundColor: 'black', margin: '4px' }}>
+          <Box
+            sx={{
+              backgroundColor:
+                theme.palette.mode === 'dark' ? 'black' : 'white',
+              borderRadius: '6px',
+              margin: '4px',
+            }}
+          >
             <Alert
               severity="info"
               sx={{
