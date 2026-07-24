@@ -121,6 +121,8 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   } = useBackgroundColors(mdastNode?.attributes?.['backgroundColor'] ?? '');
 
   const skipNextCloseRebuildRef = useRef(false);
+  const headingRef = useRef<HTMLElement>(null);
+  const isFirstTitleRenderRef = useRef(true);
 
   const a11yStepProps = (index: number) => ({
     id: `step-${index}`,
@@ -378,6 +380,22 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   }, [step, mdastNode]);
 
   /**
+   * Moves focus to the step heading once its text reflects the new step,
+   * so NVDA announces the change. Player only - skips the first render so
+   * the initially-active step doesn't steal focus on page load.
+   */
+  useEffect(() => {
+    const isFirstRender = isFirstTitleRenderRef.current;
+    isFirstTitleRenderRef.current = false;
+
+    if (isFirstRender || !isPlayback) {
+      return;
+    }
+
+    headingRef.current?.focus();
+  }, [title, isPlayback]);
+
+  /**
    * UE calculates step count
    */
   useEffect(() => {
@@ -555,7 +573,12 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                     justifyContent: 'center',
                   }}
                 >
-                  <Typography sx={{ padding: 2 }} variant="h2">
+                  <Typography
+                    ref={headingRef}
+                    tabIndex={-1}
+                    sx={{ padding: 2 }}
+                    variant="h2"
+                  >
                     {title}
                   </Typography>
                 </Box>
