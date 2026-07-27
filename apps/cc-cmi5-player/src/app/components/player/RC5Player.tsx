@@ -20,7 +20,14 @@ import {
   useAnimationPlayback,
 } from './plugins/animation-player';
 import '@mdxeditor/editor/style.css';
-import { useContext, useEffect, useMemo, useState, useRef } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from 'react';
 
 import { Box, Typography } from '@mui/material';
 import {
@@ -71,8 +78,10 @@ import { GridContainerDirectiveDescriptor } from './editors/directives/GridConta
 import { GridCellDirectiveDescriptor } from './editors/directives/GridCellDirectiveDescriptor';
 import { mediaEventManager } from '../../utils/MediaEventManager';
 import { logger } from '../../debug';
-import { useSelector } from 'react-redux';
-import { slideWidth } from '../../redux/auReducer';
+import { useDispatch, useSelector } from 'react-redux';
+import { auJsonSel, slideWidth } from '../../redux/auReducer';
+import { setActiveTab } from '../../redux/navigationReducer';
+import SlideControlBar from './SlideControlBar';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -89,6 +98,8 @@ function RC5Player() {
   );
   const [slideAnimations, setSlideAnimations] = useState<AnimationConfig[]>([]);
   const slideWidthSel = useSelector(slideWidth);
+  const auJson = useSelector(auJsonSel);
+  const dispatch = useDispatch();
 
   const { rc5Theme } = useCoursePresentation();
 
@@ -375,7 +386,22 @@ function RC5Player() {
   }, [themeSel]);
 
   // Use the animation playback hook with parsed animations
-  useAnimationPlayback(slideAnimations, activeTab, true);
+  const { hasAnimations, isPaused, isComplete, toggle, replay } =
+    useAnimationPlayback(slideAnimations, activeTab, true);
+
+  // Slide bounds. `slides.length` is the Exit slide's index, so it is a valid
+  // forward target but not a content slide.
+  const slideCount = auJson?.slides?.length ?? 0;
+  const canGoPrevious = activeTab > 0;
+  const canGoNext = activeTab < slideCount;
+
+  const goToPrevious = useCallback(() => {
+    if (activeTab > 0) dispatch(setActiveTab(activeTab - 1));
+  }, [activeTab, dispatch]);
+
+  const goToNext = useCallback(() => {
+    if (activeTab < slideCount) dispatch(setActiveTab(activeTab + 1));
+  }, [activeTab, slideCount, dispatch]);
 
   return (
     <>
@@ -400,6 +426,17 @@ function RC5Player() {
                 key={activeTab}
               />
             </main>
+            <SlideControlBar
+              canGoPrevious={canGoPrevious}
+              canGoNext={canGoNext}
+              onPrevious={goToPrevious}
+              onNext={goToNext}
+              hasAnimations={hasAnimations}
+              isPaused={isPaused}
+              isComplete={isComplete}
+              onTogglePause={toggle}
+              onReplay={replay}
+            />
           </div>
         )}
       </Box>

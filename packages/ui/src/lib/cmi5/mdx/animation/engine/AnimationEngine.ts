@@ -42,9 +42,37 @@ export class AnimationEngine {
   private animations: AnimationConfig[];
   private options: AnimationEngineOptions;
   private playbackState: PlaybackState = PlaybackState.IDLE;
+
+  /**
+   * Compare the playback state opaquely.
+   *
+   * `playbackState` is mutated by `stop()`/`pause()` while a sequence is parked
+   * on an `await`. TypeScript's control-flow analysis cannot see those external
+   * mutations and narrows the field to whatever it was before the await, making
+   * later `=== STOPPED` checks look impossible (TS2367). Comparing behind a
+   * method call keeps those checks honest.
+   */
+  private currentStateIs(state: PlaybackState): boolean {
+    return this.playbackState === state;
+  }
+
   private currentAnimationIndex = 0;
   private animationTimeouts: Map<string, number> = new Map();
   private animationElements: Map<string, HTMLElement> = new Map();
+
+  /**
+   * Bookkeeping for pause/resume (WCAG 2.2.2).
+   *
+   * Freezing the CSS via `animation-play-state: paused` stops the visuals, but the
+   * `setTimeout`s that drive sequencing keep running — on resume the sequence would
+   * be ahead of what the user sees. So for every in-flight completion timeout we
+   * record when it was armed and for how long, cancel it on pause, and re-arm it
+   * with only the remaining time on resume.
+   */
+  private pendingTimeouts: Map<
+    string,
+    { callback: () => void; armedAt: number; remaining: number }
+  > = new Map();
 
   constructor(
     animations: AnimationConfig[],
@@ -75,6 +103,11 @@ export class AnimationEngine {
     // Play animations based on their triggers
     await this.playAnimationSequence();
 
+    // A pause (or stop) may have landed while the sequence was in flight —
+    // don't clobber that state, and don't report completion for a run the
+    // user deliberately halted.
+    if (this.playbackState !== PlaybackState.PLAYING) return;
+
     this.playbackState = PlaybackState.IDLE;
     this.options.onAllComplete?.();
   }
@@ -103,19 +136,128 @@ export class AnimationEngine {
   }
 
   /**
+   * Resolvers for sequence steps parked by `waitWhilePaused()`.
+   * Drained by `resume()` and by `stop()` (so a stop can't strand the sequence).
+   */
+  private pauseWaiters: Array<() => void> = [];
+
+  /**
+   * Block a sequential step for as long as playback is paused. Returns
+   * immediately when not paused, so the un-paused path is unchanged.
+   */
+  private waitWhilePaused(): Promise<void> {
+    if (this.playbackState !== PlaybackState.PAUSED) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      this.pauseWaiters.push(resolve);
+    });
+  }
+
+  /** Release every step parked in `waitWhilePaused()`. */
+  private releasePauseWaiters(): void {
+    const waiters = this.pauseWaiters;
+    this.pauseWaiters = [];
+    waiters.forEach((resolve) => resolve());
+  }
+
+  /**
+   * Arm a completion timeout, recording enough to re-arm it after a pause.
+   */
+  private armTimeout(
+    id: string,
+    callback: () => void,
+    remaining: number,
+  ): void {
+    const timeoutId = window.setTimeout(callback, remaining);
+    this.animationTimeouts.set(id, timeoutId);
+    this.pendingTimeouts.set(id, {
+      callback,
+      armedAt: Date.now(),
+      remaining,
+    });
+  }
+
+  /**
+   * Cancel a pending timeout but keep the time it had left, so `resume()` can
+   * re-arm it for exactly the remainder.
+   */
+  private suspendTimeout(id: string): void {
+    const pending = this.pendingTimeouts.get(id);
+    const timeoutId = this.animationTimeouts.get(id);
+    if (!pending || timeoutId === undefined) return;
+
+    clearTimeout(timeoutId);
+    this.animationTimeouts.delete(id);
+
+    const elapsed = Date.now() - pending.armedAt;
+    pending.remaining = Math.max(0, pending.remaining - elapsed);
+  }
+
+  /**
+   * Pause all in-flight animations (WCAG 2.2.2 — Pause, Stop, Hide).
+   *
+   * Freezes the CSS animations where they are and suspends the sequencing
+   * timeouts so nothing advances while paused. Safe to call when idle.
+   */
+  public pause(): void {
+    if (this.playbackState !== PlaybackState.PLAYING) return;
+
+    this.playbackState = PlaybackState.PAUSED;
+
+    this.animationElements.forEach((element) => {
+      element.style.animationPlayState = 'paused';
+    });
+
+    this.pendingTimeouts.forEach((_pending, id) => {
+      this.suspendTimeout(id);
+    });
+
+    debugLog('⏸️ Paused animations', undefined, undefined, 'engine');
+  }
+
+  /**
+   * Resume animations previously halted by `pause()`, picking up from exactly
+   * where they were frozen.
+   */
+  public resume(): void {
+    if (this.playbackState !== PlaybackState.PAUSED) return;
+
+    this.playbackState = PlaybackState.PLAYING;
+
+    this.animationElements.forEach((element) => {
+      element.style.animationPlayState = '';
+    });
+
+    // Re-arm on a copied list: each callback mutates pendingTimeouts on fire.
+    Array.from(this.pendingTimeouts.entries()).forEach(([id, pending]) => {
+      this.armTimeout(id, pending.callback, pending.remaining);
+    });
+
+    this.releasePauseWaiters();
+
+    debugLog('▶️ Resumed animations', undefined, undefined, 'engine');
+  }
+
+  /**
    * Stop all playing animations
    */
   public stop(): void {
     this.playbackState = PlaybackState.STOPPED;
+
+    // Let any step parked by a pause fall through to its STOPPED check,
+    // otherwise stopping while paused would leave the sequence hanging.
+    this.releasePauseWaiters();
 
     // Clear all timeouts
     this.animationTimeouts.forEach((timeoutId) => {
       clearTimeout(timeoutId);
     });
     this.animationTimeouts.clear();
+    this.pendingTimeouts.clear();
 
     // Remove animation classes from all elements
     this.animationElements.forEach((element) => {
+      // Clear any frozen play-state so a pause cannot leak into the next slide
+      element.style.animationPlayState = '';
       this.removeAnimationClasses(element);
     });
     this.animationElements.clear();
@@ -257,7 +399,9 @@ export class AnimationEngine {
         'engine',
       );
       for (const anim of afterDelayAnims) {
-        if (this.playbackState === PlaybackState.STOPPED) break;
+        if (this.currentStateIs(PlaybackState.STOPPED)) break;
+        await this.waitWhilePaused();
+        if (this.currentStateIs(PlaybackState.STOPPED)) break;
         await this.applyAnimation(anim);
       }
     }
@@ -271,7 +415,9 @@ export class AnimationEngine {
         'engine',
       );
       for (const anim of onPreviousCompleteAnims) {
-        if (this.playbackState === PlaybackState.STOPPED) break;
+        if (this.currentStateIs(PlaybackState.STOPPED)) break;
+        await this.waitWhilePaused();
+        if (this.currentStateIs(PlaybackState.STOPPED)) break;
         await this.applyAnimation(anim);
       }
     }
@@ -325,7 +471,7 @@ export class AnimationEngine {
       const totalDuration = (animation.delay + animation.duration) * 1000;
 
       // Handle animation complete
-      const timeoutId = window.setTimeout(() => {
+      const onComplete = () => {
         // Apply exit effect if specified
         if (animation.exitEffect && animation.exitEffect !== ExitEffect.NONE) {
           if (this.options.enableDiagnostics) {
@@ -344,10 +490,19 @@ export class AnimationEngine {
 
         this.options.onAnimationComplete?.(animation.id);
         this.animationTimeouts.delete(animation.id);
+        this.pendingTimeouts.delete(animation.id);
         resolve();
-      }, totalDuration);
+      };
 
-      this.animationTimeouts.set(animation.id, timeoutId);
+      this.armTimeout(animation.id, onComplete, totalDuration);
+
+      // If the user paused before this animation began, start it frozen so it
+      // does not play behind a "paused" control.
+      if (this.playbackState === PlaybackState.PAUSED) {
+        element.style.animationPlayState = 'paused';
+        this.suspendTimeout(animation.id);
+      }
+
       this.options.onAnimationStart?.(animation.id);
     });
   }
