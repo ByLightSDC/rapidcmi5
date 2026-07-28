@@ -114,14 +114,15 @@ function RC5Player() {
   useEffect(() => {
     // Wait for the new slide's editor to finish mounting before focusing
     const id = setTimeout(() => {
-      // Find the root Lexical editor element (first match = outermost = root editor)
+      // Focus the <main> landmark rather than the Lexical editor element inside
+      // it. Both make NVDA read from the top of the slide, but <main> sits
+      // BEFORE the editor's focusables, so a single Shift+Tab from here reaches
+      // the slide controls. Focusing the editor itself put the controls behind
+      // the user's position, effectively burying the WCAG 2.2.2 pause control.
       const el = slideContentRef.current?.querySelector<HTMLElement>(
-        '[data-lexical-editor="true"]',
+        '#main-content',
       );
       if (el) {
-        // tabindex="-1" is required to programmatically focus contenteditable="false"
-        el.setAttribute('tabindex', '-1');
-        // Focus so NVDA reads from the top of the new slide.
         // preventScroll stops the page from jumping visually when focus moves.
         el.focus({ preventScroll: true });
       }
@@ -415,6 +416,13 @@ function RC5Player() {
         {thePlugins && thePlugins.length > 0 && (
           <div role="tabpanel" aria-label="Slide content" ref={slideContentRef}>
             <div id="toc-portal-target" />
+            {/*
+              Slide controls come immediately AFTER the <main> landmark.
+              On slide change focus is placed on <main> (see the effect above),
+              so this ordering makes the controls the very next forward Tab stop
+              — the pause control required by WCAG 2.2.2 is reachable with one
+              Tab instead of being buried behind the slide's content.
+            */}
             {/* Add main landmark for ease of nav and skip link to use */}
             <main id="main-content" tabIndex={-1}>
               <MDXEditor

@@ -95,10 +95,21 @@ export default function SlideControlBar({
     },
   ];
 
-  // Keep the roving tab stop on a button that still exists.
+  // The roving tab stop must sit on an ENABLED button. A disabled button is not
+  // focusable and is dropped from the accessibility tree, so parking the group's
+  // only tabIndex={0} on one (e.g. "Previous" while on the first slide) would
+  // leave the whole toolbar unreachable by keyboard.
+  const firstEnabledIndex = buttons.findIndex((b) => !b.disabled);
+  const activeIndex =
+    !buttons[focusedIndex] || buttons[focusedIndex].disabled
+      ? firstEnabledIndex
+      : focusedIndex;
+
   useEffect(() => {
-    if (focusedIndex > buttons.length - 1) setFocusedIndex(0);
-  }, [buttons.length, focusedIndex]);
+    if (activeIndex !== focusedIndex && activeIndex >= 0) {
+      setFocusedIndex(activeIndex);
+    }
+  }, [activeIndex, focusedIndex]);
 
   const focusButtonAt = useCallback((index: number) => {
     const el = containerRef.current?.querySelectorAll<HTMLButtonElement>(
@@ -110,20 +121,40 @@ export default function SlideControlBar({
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       const lastIndex = buttons.length - 1;
+
+      // Step over disabled buttons — they can't take focus, so landing on one
+      // would strand the user mid-group.
+      const nextEnabled = (from: number, step: number): number => {
+        for (let i = 1; i <= buttons.length; i++) {
+          const candidate =
+            (from + step * i + buttons.length * i) % buttons.length;
+          if (!buttons[candidate].disabled) return candidate;
+        }
+        return from;
+      };
+      const firstEnabled = (from: number, step: number): number => {
+        for (let i = 0; i < buttons.length; i++) {
+          const candidate = from + step * i;
+          if (candidate < 0 || candidate > lastIndex) break;
+          if (!buttons[candidate].disabled) return candidate;
+        }
+        return activeIndex;
+      };
+
       let nextIndex: number | null = null;
 
       switch (event.key) {
         case 'ArrowRight':
-          nextIndex = focusedIndex >= lastIndex ? 0 : focusedIndex + 1;
+          nextIndex = nextEnabled(activeIndex, 1);
           break;
         case 'ArrowLeft':
-          nextIndex = focusedIndex <= 0 ? lastIndex : focusedIndex - 1;
+          nextIndex = nextEnabled(activeIndex, -1);
           break;
         case 'Home':
-          nextIndex = 0;
+          nextIndex = firstEnabled(0, 1);
           break;
         case 'End':
-          nextIndex = lastIndex;
+          nextIndex = firstEnabled(lastIndex, -1);
           break;
         case 'Escape': {
           // Hand focus back to the slide content, per the ticket's
@@ -142,7 +173,7 @@ export default function SlideControlBar({
       setFocusedIndex(nextIndex);
       focusButtonAt(nextIndex);
     },
-    [buttons.length, focusedIndex, focusButtonAt],
+    [buttons, activeIndex, focusButtonAt],
   );
 
   return (
@@ -186,8 +217,8 @@ export default function SlideControlBar({
               aria-label={btn.label}
               size="small"
               disabled={btn.disabled}
-              // Roving tabindex: exactly one button is tabbable at a time.
-              tabIndex={index === focusedIndex ? 0 : -1}
+              // Roving tabindex: exactly one ENABLED button is tabbable.
+              tabIndex={index === activeIndex ? 0 : -1}
               onFocus={() => setFocusedIndex(index)}
               onClick={btn.onClick}
               sx={{ color: button.iconColor }}
