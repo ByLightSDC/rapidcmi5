@@ -30,6 +30,7 @@ import Fade from '@mui/material/Fade';
 
 /** Icons */
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 import { ImageLabelDirectiveNode } from './types';
@@ -203,19 +204,27 @@ export const ImageLabelEditor: React.FC<
   };
 
   /**
-   * Open Label Content
+   * Toggle Label Content open/closed
    * @param event
    */
-  const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (imageId) {
-      checkLabelPlacement();
-      setAnchorEl(event?.currentTarget);
-      imageLabelKeys$.value = {
-        ...imageLabelKeys$.value,
-        [imageId]: transientId,
-      };
-      document.removeEventListener('mousedown', handleMouseDown);
-      document.addEventListener('mousedown', handleMouseDown);
+      if (isOpen) {
+        document.removeEventListener('mousedown', handleMouseDown);
+        imageLabelKeys$.value = {
+          ...imageLabelKeys$.value,
+          [imageId]: null,
+        };
+      } else {
+        checkLabelPlacement();
+        setAnchorEl(event?.currentTarget);
+        imageLabelKeys$.value = {
+          ...imageLabelKeys$.value,
+          [imageId]: transientId,
+        };
+        document.removeEventListener('mousedown', handleMouseDown);
+        document.addEventListener('mousedown', handleMouseDown);
+      }
     } else {
       debugLog('no imageId found for label');
     }
@@ -275,13 +284,19 @@ export const ImageLabelEditor: React.FC<
           <ButtonIcon
             name="Image Marker"
             props={{
+              'aria-expanded': isOpen,
+              'aria-label': isOpen ? 'Hide label content' : 'Show label content',
               onClick: (event) => {
                 event.stopPropagation();
-                handleOpen(event);
+                handleToggle(event);
               },
             }}
           >
-            <AddCircleIcon color="warning" />
+            {isOpen ? (
+              <RemoveCircleIcon color="warning" />
+            ) : (
+              <AddCircleIcon color="warning" />
+            )}
           </ButtonIcon>
           {!readOnly && !isPlayback && isHovered && (
             <IconButton
