@@ -131,13 +131,35 @@ export const VideoDialog: React.FC = () => {
     closeVideoDialog();
   };
 
-  // silently ignores zero and negative width/height entries (the field
-  // keeps its last valid value) instead of storing the bad value
-  const ensurePositiveValueChangeHandler =
+  // while typing, allow decimals through (rounded on blur below) but
+  // silently ignore negative/non-numeric entries - the field keeps its
+  // last valid value instead of storing a bad one
+  const ensureNonNegativeValueChangeHandler =
     (setValue: (value: string) => void) => (textValue: string) => {
-      if (textValue === '' || Number(textValue) > 0) {
+      if (textValue === '' || Number(textValue) >= 0) {
         setValue(textValue);
       }
+    };
+
+  // rounds to the nearest whole number (0.5 -> 1, 6.8 -> 7) since
+  // width/height are pixel values; returns undefined if it rounds to <= 0
+  const roundToPositiveInteger = (value: string): number | undefined => {
+    if (value === '') {
+      return undefined;
+    }
+    const rounded = Math.round(Number(value));
+    return rounded > 0 ? rounded : undefined;
+  };
+
+  // on blur, snap the field itself to the rounded value so the user sees
+  // what will actually be submitted
+  const roundToPositiveIntegerOnBlur =
+    (currentValue: string, setValue: (value: string) => void) => () => {
+      if (currentValue === '') {
+        return;
+      }
+      const rounded = roundToPositiveInteger(currentValue);
+      setValue(rounded !== undefined ? String(rounded) : '');
     };
 
   // the user is submitting the video, so insert it
@@ -158,8 +180,8 @@ export const VideoDialog: React.FC = () => {
       src: src,
       title: title,
       rest: restParams,
-      width: width ? parseInt(width, 10) : undefined,
-      height: height ? parseInt(height, 10) : undefined,
+      width: roundToPositiveInteger(width),
+      height: roundToPositiveInteger(height),
       autoplay: autoplay,
       captionSrc: captionSrc || undefined,
       captionFile: selectedCaptionFiles,
@@ -359,8 +381,10 @@ export const VideoDialog: React.FC = () => {
                 name="video-width"
                 type="number"
                 inputProps={{ min: 1 }}
+                forceNumberAsInteger={false}
                 value={width}
-                onChange={ensurePositiveValueChangeHandler(setWidth)}
+                onChange={ensureNonNegativeValueChangeHandler(setWidth)}
+                onBlur={roundToPositiveIntegerOnBlur(width, setWidth)}
                 infoText={'Optional video width in pixels'}
               />
             </Grid>
@@ -371,8 +395,10 @@ export const VideoDialog: React.FC = () => {
                 name="video-height"
                 type="number"
                 inputProps={{ min: 1 }}
+                forceNumberAsInteger={false}
                 value={height}
-                onChange={ensurePositiveValueChangeHandler(setHeight)}
+                onChange={ensureNonNegativeValueChangeHandler(setHeight)}
+                onBlur={roundToPositiveIntegerOnBlur(height, setHeight)}
                 infoText={'Optional video height in pixels'}
               />
             </Grid>
