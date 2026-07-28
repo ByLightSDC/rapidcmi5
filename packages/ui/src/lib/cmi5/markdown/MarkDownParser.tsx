@@ -21,6 +21,7 @@ import MarkdownImage from './MarkdownImage';
 import { SlideEvent } from './constants/SlideEvents';
 import MDTextEffects from './components/MDTextEffects';
 import MDAnimation from './components/MDAnimation';
+import MDAudio from './components/MDAudio';
 import { AuContextProps } from '@rapid-cmi5/cmi5-build-common';
 
 /**
@@ -269,6 +270,10 @@ export const customMarkdownParser = (
 
     a: (props: any) => {
       return parseYoutubeLinks(props);
+    },
+
+    audio: (props: any) => {
+      return <MDAudio {...props} auProps={auProps} />;
     },
 
     table: (props: any) => {

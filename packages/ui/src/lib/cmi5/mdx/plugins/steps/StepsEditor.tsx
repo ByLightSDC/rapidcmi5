@@ -9,7 +9,14 @@ import * as Mdast from 'mdast';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { BlockContent, DefinitionContent } from 'mdast';
 import { ContainerDirective } from 'mdast-util-directive';
-import { CSSProperties, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  CSSProperties,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import {
   Box,
@@ -88,7 +95,6 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   const [step, setStep] = useState(0);
   const [stepCount, setStepCount] = useState(0);
   const [sxProps, setSxProps] = useState<SxProps>({});
-  const [title, setTitle] = useState('');
 
   const [isPlayback, readOnly] = useCellValues(editorInPlayback$, readOnly$);
 
@@ -121,10 +127,29 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   } = useBackgroundColors(mdastNode?.attributes?.['backgroundColor'] ?? '');
 
   const skipNextCloseRebuildRef = useRef(false);
+  const headingRef = useRef<HTMLElement>(null);
+  const isFirstStepRenderRef = useRef(true);
+
+  /**
+   * Title for the current step, derived directly from the mdast so it
+   * updates in the same render as `step` (no state round-trip that could
+   * lag behind or fail to change when titles repeat).
+   */
+  const title = useMemo(() => {
+    if (
+      Object.prototype.hasOwnProperty.call(
+        mdastNode.children[step].attributes,
+        'title',
+      )
+    ) {
+      return mdastNode.children[step].attributes['title'] || '';
+    }
+    return '';
+  }, [step, mdastNode]);
 
   const a11yStepProps = (index: number) => ({
     id: `step-${index}`,
-    'aria-controls': `step-panel-${index}`,
+    'aria-controls': `tabpanel-${index}`,
   });
 
   /**
@@ -351,7 +376,7 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
   }, [isConfiguring]);
 
   /**
-   * UE Sets title for current step
+   * UE Applies block style overrides
    */
   useEffect(() => {
     if (mdastNode.attributes.style) {
@@ -362,20 +387,23 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
         // no styles applied
       }
     }
+  }, [mdastNode]);
 
-    if (
-      Object.prototype.hasOwnProperty.call(
-        mdastNode.children[step].attributes,
-        'title',
-      )
-    ) {
-      setTitle(mdastNode.children[step].attributes['title'] || '');
-    } else {
-      setTitle('');
+  /**
+   * Moves focus to the step heading on step change so NVDA announces it.
+   * Player only - skips the first render so the initially-active step
+   * doesn't steal focus on page load.
+   */
+  useEffect(() => {
+    const isFirstRender = isFirstStepRenderRef.current;
+    isFirstStepRenderRef.current = false;
+
+    if (isFirstRender || !isPlayback) {
+      return;
     }
 
-    // setTitle
-  }, [step, mdastNode]);
+    headingRef.current?.focus();
+  }, [step, isPlayback]);
 
   /**
    * UE calculates step count
@@ -555,7 +583,12 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                     justifyContent: 'center',
                   }}
                 >
-                  <Typography sx={{ padding: 2 }} variant="h2">
+                  <Typography
+                    ref={headingRef}
+                    tabIndex={-1}
+                    sx={{ padding: 2 }}
+                    variant="h2"
+                  >
                     {title}
                   </Typography>
                 </Box>
@@ -593,7 +626,11 @@ export const StepsEditor: React.FC<DirectiveEditorProps<StepDirectiveNode>> = ({
                       name="reset-step"
                       tooltip={`Step ${index + 1}`}
                       props={{
+                        id: `step-${index}`,
+                        'aria-controls': `tabpanel-${index}`,
+                        'aria-label': `Step ${index + 1}`,
                         onClick: () => handleStepChange(index),
+                        'aria-current': index === step ? 'step' : undefined,
                       }}
                       sxProps={{ minWidth: '32px' }}
                     >

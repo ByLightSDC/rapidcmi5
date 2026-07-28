@@ -66,7 +66,8 @@ export class MoodleUploadService {
       headers: formData.getHeaders(),
     });
 
-    console.log('update response: ', response.data);
+    console.log('create response: ', response.data);
+    this.assertNoMoodleError(response.data, 'createCourse');
 
     return response.data;
   }
@@ -86,7 +87,7 @@ export class MoodleUploadService {
     } else {
       throw Error('No course id or course name was provided');
     }
-    formData.append('sectionid', '1');
+    formData.append('sectionid', String(course.sectionid ?? 1));
     formData.append('filename', path.basename(zipPath));
     formData.append('cmid', course.cmi5id);
     formData.append('modulename', course.modulename);
@@ -95,9 +96,90 @@ export class MoodleUploadService {
       headers: formData.getHeaders(),
     });
 
-    console.log('upload response: ', response.data);
+    console.log('update response: ', response.data);
+    this.assertNoMoodleError(response.data, 'updateCourse');
 
     return response.data;
+  }
+
+  /**
+   * Moodle web services return HTTP 200 even on failure, with the error in
+   * the JSON body (`{ exception, errorcode, message }`). Surface it as a
+   * thrown error so callers (CI, test provisioning) fail loudly instead of
+   * silently proceeding against a course that was never updated.
+   */
+  private assertNoMoodleError(data: any, op: string): void {
+    if (data && typeof data === 'object' && data.exception) {
+      throw new Error(
+        `Moodle ${op} failed: ${data.errorcode ?? 'error'} — ${data.message ?? JSON.stringify(data)}`,
+      );
+    }
+  }
+
+  /**
+   * Upload an ALREADY-BUILT cmi5 zip (e.g. one exported from the editor),
+   * skipping the build step. Updates the matching activity in place if one
+   * exists (preserving its cmid / mod/cmi5/view.php?id=), otherwise creates
+   * a new activity in the given course/section.
+   *
+   * `modulename` MUST match how the activity is named in Moodle for the
+   * in-place update lookup to find it (e.g. "E2E Tests", not the zip's
+   * internal lowercase courseTitle). Returns the WS response so the caller
+   * can read back the resulting cmid.
+   */
+  public async uploadPrebuiltZip(args: {
+    zipPath: string;
+    modulename: string;
+    moodleCourseId?: string;
+    moodleCourseName?: string;
+    moodleSectionId?: number;
+  }) {
+    const {
+      zipPath,
+      modulename,
+      moodleCourseId,
+      moodleCourseName,
+      moodleSectionId = 0,
+    } = args;
+
+    let existingCourse: MoodleCourse | null = null;
+    try {
+      const possibleCourses = await this.getCourse(modulename);
+      if (Array.isArray(possibleCourses) && possibleCourses.length > 0) {
+        existingCourse = possibleCourses[0];
+      } else {
+        this.assertNoMoodleError(possibleCourses, 'getCourse');
+      }
+    } catch (error: any) {
+      if (error.response && error.response.status === 404) {
+        console.log('Could not find cmi5 course on moodle');
+      } else {
+        throw error;
+      }
+    }
+
+    if (existingCourse) {
+      existingCourse.courseid = moodleCourseId;
+      existingCourse.courseName = moodleCourseName;
+      existingCourse.modulename = modulename;
+      existingCourse.sectionid = moodleSectionId;
+      console.log(
+        `Updating existing cmi5 activity in place (cmid=${existingCourse.cmi5id})`,
+      );
+      return this.updateCourse(existingCourse, zipPath);
+    }
+
+    console.log('No existing activity found — creating a new one');
+    return this.createCourse(
+      {
+        cmi5id: '',
+        sectionid: moodleSectionId,
+        courseName: moodleCourseName,
+        courseid: moodleCourseId,
+        modulename,
+      },
+      zipPath,
+    );
   }
 
   public async uploadCourse(
@@ -131,15 +213,23 @@ export class MoodleUploadService {
     }
 
     if (existingCourse) {
-      // Update existing moodle course
-      console.log('Course already exists:', existingCourse.cmi5id);
-      console.log(
-        'Course update currently not supported, please delete from moodle and rerurn',
-        existingCourse.cmi5id,
-      );
+      // Update the existing cmi5 activity IN PLACE (preserves its cmid /
+      // mod/cmi5/view.php?id=<cmid>) by re-uploading the zip. This is what
+      // makes repeatable test runs possible without manual delete/recreate.
+      //
+      // getCourse returns the cmi5 module record (cmi5id == cmid, modulename)
+      // but NOT the Moodle course-container id that update needs, so carry
+      // the caller-provided container id/name onto it here. Without this the
+      // courseid guard in updateCourse throws.
+      existingCourse.courseid = moodleCourseId;
+      existingCourse.courseName = moodleCourseName;
+      existingCourse.modulename = courseData.courseTitle;
+      existingCourse.sectionid = moodleSectionId;
 
-      // existingCourse.modulename = courseData.courseTitle;
-      // this.updateCourse(existingCourse, zipPath);
+      console.log(
+        `Updating existing cmi5 activity in place (cmid=${existingCourse.cmi5id})`,
+      );
+      await this.updateCourse(existingCourse, zipPath);
     } else {
       console.log('Creating a new course');
 
@@ -151,7 +241,7 @@ export class MoodleUploadService {
         courseid: moodleCourseId,
         modulename: courseData.courseTitle,
       };
-      this.createCourse(newCourse, zipPath);
+      await this.createCourse(newCourse, zipPath);
     }
 
     if (applyAuMappings) {

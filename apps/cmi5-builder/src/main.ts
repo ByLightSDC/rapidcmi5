@@ -263,6 +263,61 @@ program
       );
     }
   });
+
+program
+  .command('upload-moodle-zip')
+  .description(
+    'Upload an ALREADY-BUILT cmi5 zip to Moodle (no rebuild). Updates the ' +
+      'activity in place if --modulename matches an existing one (preserving ' +
+      'its cmid), else creates a new activity. Needs MOODLE_WS_TOKEN.',
+  )
+  .argument('<zipPath>', 'Path to the prebuilt cmi5 .zip')
+  .argument('<endpoint>', 'moodle endpoint')
+  .requiredOption(
+    '--modulename <name>',
+    'Activity name AS IT APPEARS IN MOODLE (e.g. "E2E Tests") — must match ' +
+      'for in-place update to find the existing activity',
+  )
+  .option('--moodle-course-id <id>', 'The Moodle course (container) id')
+  .option('--moodle-course-name <name>', 'The Moodle course fullname')
+  .option('--moodle-section-id <id>', 'The Moodle course section id', '0')
+  .action(async (zipPath, endpoint, options) => {
+    const moodleWsToken = process.env['MOODLE_WS_TOKEN'];
+    if (!moodleWsToken) {
+      console.error('❌ MOODLE_WS_TOKEN env var is required.');
+      process.exit(1);
+    }
+
+    const resolvedZip = path.resolve(zipPath);
+    try {
+      await fs.access(resolvedZip);
+    } catch {
+      console.error(`❌ Zip not found: ${resolvedZip}`);
+      process.exit(1);
+    }
+
+    console.log(`Uploading ${resolvedZip} to moodle at ${endpoint}...`);
+
+    const uploader = new MoodleUploadService({
+      baseUrl: endpoint,
+      wstoken: moodleWsToken,
+    });
+
+    try {
+      const result = await uploader.uploadPrebuiltZip({
+        zipPath: resolvedZip,
+        modulename: options.modulename,
+        moodleCourseId: options.moodleCourseId,
+        moodleCourseName: options.moodleCourseName,
+        moodleSectionId: Number(options.moodleSectionId),
+      });
+      console.log('✅ Upload finished. Response:', result);
+    } catch (err: any) {
+      console.error('❌ Upload failed:', err?.message ?? err);
+      process.exit(1);
+    }
+  });
+
 program
   .command('build-moodle')
   .description(

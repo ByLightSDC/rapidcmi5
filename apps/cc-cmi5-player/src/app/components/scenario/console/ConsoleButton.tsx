@@ -120,6 +120,7 @@ export function ConsoleButton(props: tProps) {
   return (
     <ButtonMinorUi
       id={`console-button`}
+      data-testid="scenario-console-button"
       startIcon={
         <TerminalIcon
           sx={{

@@ -83,8 +83,16 @@ export const VideoDialog: React.FC = () => {
       setTitle(state.initialValues.title ? state.initialValues.title : '');
 
       setVideoStyle('');
-      setWidth(state.initialValues.width?.toString() ?? '');
-      setHeight(state.initialValues.height?.toString() ?? '');
+      setWidth(
+        state.initialValues.width && state.initialValues.width > 0
+          ? state.initialValues.width.toString()
+          : '',
+      );
+      setHeight(
+        state.initialValues.height && state.initialValues.height > 0
+          ? state.initialValues.height.toString()
+          : '',
+      );
       setAutoplay(state.initialValues.autoplay ?? false);
       setCaptionSrc(state.initialValues.captionSrc ?? '');
       setDialogOpenCount((c) => c + 1);
@@ -123,6 +131,37 @@ export const VideoDialog: React.FC = () => {
     closeVideoDialog();
   };
 
+  // while typing, allow decimals through (rounded on blur below) but
+  // silently ignore negative/non-numeric entries - the field keeps its
+  // last valid value instead of storing a bad one
+  const ensureNonNegativeValueChangeHandler =
+    (setValue: (value: string) => void) => (textValue: string) => {
+      if (textValue === '' || Number(textValue) >= 0) {
+        setValue(textValue);
+      }
+    };
+
+  // rounds to the nearest whole number (0.5 -> 1, 6.8 -> 7) since
+  // width/height are pixel values; returns undefined if it rounds to <= 0
+  const roundToPositiveInteger = (value: string): number | undefined => {
+    if (value === '') {
+      return undefined;
+    }
+    const rounded = Math.round(Number(value));
+    return rounded > 0 ? rounded : undefined;
+  };
+
+  // on blur, snap the field itself to the rounded value so the user sees
+  // what will actually be submitted
+  const roundToPositiveIntegerOnBlur =
+    (currentValue: string, setValue: (value: string) => void) => () => {
+      if (currentValue === '') {
+        return;
+      }
+      const rounded = roundToPositiveInteger(currentValue);
+      setValue(rounded !== undefined ? String(rounded) : '');
+    };
+
   // the user is submitting the video, so insert it
   const handleSubmit = () => {
     let restParams: any = [];
@@ -141,8 +180,8 @@ export const VideoDialog: React.FC = () => {
       src: src,
       title: title,
       rest: restParams,
-      width: width ? parseInt(width, 10) : undefined,
-      height: height ? parseInt(height, 10) : undefined,
+      width: roundToPositiveInteger(width),
+      height: roundToPositiveInteger(height),
       autoplay: autoplay,
       captionSrc: captionSrc || undefined,
       captionFile: selectedCaptionFiles,
@@ -227,6 +266,7 @@ export const VideoDialog: React.FC = () => {
         buttons={['Cancel', state.type === 'editing' ? 'apply' : 'insert']}
         dialogProps={{
           open: true,
+          fullWidth: true,
         }}
         handleAction={(index: number) => {
           if (index === 0) {
@@ -340,8 +380,11 @@ export const VideoDialog: React.FC = () => {
                 label="Width (px)"
                 name="video-width"
                 type="number"
+                inputProps={{ min: 1 }}
+                forceNumberAsInteger={false}
                 value={width}
-                onChange={(textValue: string) => setWidth(textValue)}
+                onChange={ensureNonNegativeValueChangeHandler(setWidth)}
+                onBlur={roundToPositiveIntegerOnBlur(width, setWidth)}
                 infoText={'Optional video width in pixels'}
               />
             </Grid>
@@ -351,8 +394,11 @@ export const VideoDialog: React.FC = () => {
                 label="Height (px)"
                 name="video-height"
                 type="number"
+                inputProps={{ min: 1 }}
+                forceNumberAsInteger={false}
                 value={height}
-                onChange={(textValue: string) => setHeight(textValue)}
+                onChange={ensureNonNegativeValueChangeHandler(setHeight)}
+                onBlur={roundToPositiveIntegerOnBlur(height, setHeight)}
                 infoText={'Optional video height in pixels'}
               />
             </Grid>

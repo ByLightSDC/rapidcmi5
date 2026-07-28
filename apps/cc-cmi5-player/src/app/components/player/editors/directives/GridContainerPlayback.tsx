@@ -46,6 +46,7 @@ export const GridContainerPlayback: React.FC<
 
   return (
     <div
+      data-testid="directive-grid"
       className={containerClass}
       style={containerStyles}
       role="grid"

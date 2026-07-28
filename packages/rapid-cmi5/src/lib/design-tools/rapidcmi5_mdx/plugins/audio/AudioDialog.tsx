@@ -133,6 +133,8 @@ export const AudioDialog: React.FC = () => {
       title: title,
       rest: restParams,
       autoplay: autoplay,
+      // Single caption file (`.vtt` or `.txt`); newly uploaded file takes
+      // precedence over an existing path in the save handler.
       captionSrc: captionSrc || undefined,
       captionFile: selectedCaptionFiles,
     };
@@ -168,9 +170,9 @@ export const AudioDialog: React.FC = () => {
     });
   }, [audioFilePath, src, state.type]);
 
-  // fetch available .vtt files from the audio directory
+  // fetch available caption files (.vtt or .txt) from the audio directory
   useEffect(() => {
-    async function fetchVttFiles() {
+    async function fetchCaptionFiles() {
       try {
         const files = await getAllAssets('audio');
 
@@ -178,17 +180,22 @@ export const AudioDialog: React.FC = () => {
           files.push(state.initialValues.captionSrc.replace(AUDIO_DIR, ''));
         }
 
-        const vttOptions = [
-          ...new Set(files.filter((fileName) => fileName.endsWith('.vtt'))),
+        const captionOptions = [
+          ...new Set(
+            files.filter(
+              (fileName) =>
+                fileName.endsWith('.vtt') || fileName.endsWith('.txt'),
+            ),
+          ),
         ];
 
-        setCaptionFileOptions(vttOptions);
+        setCaptionFileOptions(captionOptions);
       } catch {
         setCaptionFileOptions([]);
       }
     }
 
-    void fetchVttFiles();
+    void fetchCaptionFiles();
   }, [audioFilePath, state.type]);
 
   // handle file selection
@@ -334,10 +341,13 @@ export const AudioDialog: React.FC = () => {
               infoText="Inline styles Ex. border-radius:8px;"
             />
 
-            {/* Caption / Transcript (VTT) section */}
+            {/* Transcript section — a single caption file, either a timed
+                WebVTT (.vtt) or a plain-text (.txt) transcript. The file's
+                content decides how it renders in the player, so authors just
+                pick a file without choosing a mode. */}
             <Paper variant="outlined" sx={{ p: 2 }}>
               <Stack spacing={2}>
-                <Typography variant="subtitle2">Transcript / Captions (VTT)</Typography>
+                <Typography variant="subtitle2">Transcript / Captions</Typography>
                 <Stack direction="row" spacing={2}>
                   <ButtonModalMainUi
                     component="label"
@@ -345,10 +355,10 @@ export const AudioDialog: React.FC = () => {
                     tabIndex={-1}
                     startIcon={<UploadFileIcon />}
                   >
-                    Upload VTT
+                    Upload Transcript
                     <VisuallyHiddenInput
                       type="file"
-                      accept=".vtt"
+                      accept=".vtt,.txt"
                       onChange={handleCaptionFileSelected}
                     />
                   </ButtonModalMainUi>
@@ -356,12 +366,12 @@ export const AudioDialog: React.FC = () => {
                     <Typography variant="caption">
                       {selectedCaptionFiles && selectedCaptionFiles.length > 0
                         ? selectedCaptionFiles[0].name
-                        : 'No VTT file chosen'}
+                        : 'No transcript file chosen'}
                     </Typography>
                   </Box>
                 </Stack>
                 <ComboBoxSelectorUi
-                  label="Caption File"
+                  label="Transcript File"
                   id="audio-caption"
                   options={captionFileOptions}
                   defaultValue={captionSrc.replace(AUDIO_DIR, '')}
@@ -376,7 +386,7 @@ export const AudioDialog: React.FC = () => {
                       setCaptionSrc(`${AUDIO_DIR}${selectionValue}`);
                     }
                   }}
-                  infoText="Associate a WebVTT (.vtt) transcript file with this audio. The transcript will be displayed below the audio player."
+                  infoText="Associate a transcript file with this audio. A timed WebVTT (.vtt) file shows a clickable, highlighted transcript; a plain-text (.txt) file shows a static transcript. Either way it appears below the audio player."
                 />
               </Stack>
             </Paper>

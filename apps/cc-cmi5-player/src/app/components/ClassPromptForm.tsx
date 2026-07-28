@@ -86,7 +86,7 @@ export default function ClassPromptForm(props: tFormProps) {
     const { errors } = formState;
 
     return (
-      <Grid size={12}>
+      <Grid size={12} data-testid="class-prompt-form">
         <FormControlTextField
           control={control}
           error={Boolean(errors?.name)}

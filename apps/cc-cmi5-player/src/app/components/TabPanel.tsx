@@ -192,6 +192,7 @@ export default function TabPanel() {
       >
         <Divider />
         <Tabs
+          data-testid="player-slide-nav"
           orientation="vertical"
           variant="scrollable"
           value={activeTab}
@@ -203,6 +204,7 @@ export default function TabPanel() {
         >
           {auJson?.slides?.map((slide, index) => (
             <Tab
+              data-testid={`player-slide-tab-${index}`}
               sx={baseTabStyle}
               key={index}
               label={
@@ -240,6 +242,7 @@ export default function TabPanel() {
           ))}
           {/* Exit tab in its natural position at the end of the list */}
           <Tab
+            data-testid="player-exit-tab"
             ref={exitTabRef}
             value={auJson?.slides?.length ?? 0}
             sx={baseTabStyle}

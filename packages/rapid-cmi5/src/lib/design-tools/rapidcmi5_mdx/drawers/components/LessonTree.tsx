@@ -110,6 +110,25 @@ function LessonTree({
     if (element.type === LessonTreeNodeType.Slide) {
       changeSlideName(newName, element);
     } else if (element.type === LessonTreeNodeType.Lesson) {
+      // Prevent renaming a lesson to a name already used by another lesson in
+      // the same block (case-insensitive). Duplicate AU names break navigation
+      // because lessons are resolved by name. See changeLesson() in useCourseData.
+      const blockIndex =
+        typeof element.block === 'number' ? element.block : currentBlockIndex;
+      const lessonIndex = element.id as number;
+      const normalized = newName.trim().toLowerCase();
+      const isDuplicate = courseData?.blocks?.[blockIndex]?.aus?.some(
+        (au, index) =>
+          index !== lessonIndex &&
+          au.auName?.trim().toLowerCase() === normalized,
+      );
+      if (isDuplicate) {
+        displayToaster({
+          message: 'A lesson with this name already exists',
+          severity: 'error',
+        });
+        return;
+      }
       changeLessonName(newName, element);
     }
   };

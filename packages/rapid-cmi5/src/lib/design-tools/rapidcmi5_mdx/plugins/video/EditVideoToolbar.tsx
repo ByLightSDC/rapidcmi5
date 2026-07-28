@@ -1,10 +1,13 @@
 import React from 'react';
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx';
 import { openEditVideoDialog$ } from './index';
-import { usePublisher } from '@mdxeditor/gurx';
+import { usePublisher, useCellValues } from '@mdxeditor/gurx';
+import { readOnly$ } from '@mdxeditor/editor';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { $getNodeByKey } from 'lexical';
 import { IconButton, Tooltip } from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 export interface EditVideoToolbarProps {
   nodeKey: string;
@@ -30,6 +33,8 @@ export function EditVideoToolbar({
   captionSrc,
 }: EditVideoToolbarProps): JSX.Element {
   const openEditVideoDialog = usePublisher(openEditVideoDialog$);
+  const [editor] = useLexicalComposerContext();
+  const [readOnly] = useCellValues(readOnly$);
 
   return (
     <div
@@ -48,6 +53,7 @@ export function EditVideoToolbar({
       <Tooltip title="Edit Video Settings">
         <IconButton
           size="small"
+          disabled={readOnly}
           onClick={() => {
             openEditVideoDialog({
               nodeKey,
@@ -64,6 +70,21 @@ export function EditVideoToolbar({
           }}
         >
           <EditIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Delete Video">
+        <IconButton
+          size="small"
+          aria-label="delete"
+          disabled={readOnly}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.update(() => {
+              $getNodeByKey(nodeKey)?.remove();
+            });
+          }}
+        >
+          <DeleteForeverIcon fontSize="small" />
         </IconButton>
       </Tooltip>
     </div>

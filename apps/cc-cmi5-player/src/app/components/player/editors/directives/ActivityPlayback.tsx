@@ -110,6 +110,8 @@ export const ActivityPlayback: React.FC<
 
   return (
     <div
+      data-testid="directive-activity"
+      data-activity-type={name}
       style={{
         padding: 0,
         margin: 0,

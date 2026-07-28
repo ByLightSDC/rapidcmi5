@@ -16,6 +16,13 @@ declare global {
       NX_PUBLIC_KEYCLOAK_SCOPE?: string;
       NX_PUBLIC_MSW_MOCK?: boolean;
       NX_PUBLIC_PLAYER_PUBLIC_PATH?: string;
+      /**
+       * E2E-only. When true, the player ignores restored LRS progress when
+       * choosing the resume slide and always starts on slide 0. Progress data
+       * itself is still loaded — only the resume-target choice is overridden.
+       * Read in `AuUtils.tsx` (buildAuProgress). Leave unset in production.
+       */
+      NX_PUBLIC_E2E_FORCE_FRESH_LAUNCH?: boolean;
     };
   }
 }

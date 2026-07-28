@@ -7,6 +7,7 @@ import {
   DNS_RECORD_NAME_GROUP,
   DNS_RECORD_DATA_GROUP,
   ENUM_GROUP,
+  UNIQUE_NAME_GROUP,
   UUID_BASE,
   UUID_GROUP_OPTIONS,
   UUID_ONLY_ONE_FROM_GROUP,
@@ -14,6 +15,52 @@ import {
   getOptIntegerWithUnitsValidation,
   RESOURCE_QUANTITY_WITH_MINIMUM_GROUP,
 } from '@rapid-cmi5/ui';
+
+describe('UNIQUE_NAME_GROUP validates', () => {
+  const schema = yup.object().shape({
+    field: UNIQUE_NAME_GROUP('existingNames'),
+  });
+
+  it('should pass for a name not in the existing list', async () => {
+    const result = await schema.isValid({
+      field: 'Lesson2',
+      existingNames: ['Lesson1'],
+    });
+    expect(result).toEqual(true);
+  });
+  it('should pass when there are no existing names', async () => {
+    const result = await schema.isValid({ field: 'Lesson1' });
+    expect(result).toEqual(true);
+  });
+  it('should fail for an exact duplicate name', async () => {
+    const result = await schema.isValid({
+      field: 'Lesson1',
+      existingNames: ['Lesson1'],
+    });
+    expect(result).toEqual(false);
+  });
+  it('should fail for a case-insensitive duplicate name', async () => {
+    const result = await schema.isValid({
+      field: 'lesson1',
+      existingNames: ['Lesson1'],
+    });
+    expect(result).toEqual(false);
+  });
+  it('should fail for a duplicate name differing only by surrounding whitespace', async () => {
+    const result = await schema.isValid({
+      field: '  Lesson1  ',
+      existingNames: ['Lesson1'],
+    });
+    expect(result).toEqual(false);
+  });
+  it('should still enforce the required rule from NAME_GROUP', async () => {
+    const result = await schema.isValid({
+      field: '',
+      existingNames: ['Lesson1'],
+    });
+    expect(result).toEqual(false);
+  });
+});
 
 describe('CERTIFICATE_SUBJECT_GROUP validates', () => {
   const schema = yup.object().shape({

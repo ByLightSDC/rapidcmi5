@@ -11,6 +11,7 @@
     "build-and-test-player": "bash scripts/buildAndTestPlayer.sh",
     "cmi5-builder": "nx run cmi5-builder:build",
     "cmi5-player": "nx run cc-cmi5-player:build",
+    "upload:moodle": "node apps/cc-cmi5-moodle-e2e/scripts/upload-zip-to-moodle.js",
     "postinstall": "electron-builder install-app-deps",
     "nxe:build:frontend": "nx build rapid-cmi5-electron-frontend --configuration=production",
     "nxe:build:backend": "nx build rapid-cmi5-electron --configuration=production",
@@ -50,6 +51,7 @@
     "@mui/material": "^6.5.0",
     "@mui/system": "^6.4.8",
     "@mui/x-charts": "^7.22.3",
+    "@mui/x-data-grid": "^7.29.12",
     "@mui/x-date-pickers": "7.29.4",
     "@openapitools/openapi-generator-cli": "^2.26.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
@@ -231,6 +233,7 @@
     "tailwindcss": "3.4.3",
     "ts-jest": "29.4.5",
     "ts-json-schema-generator": "^2.4.0",
+    "ts-node": "^10.9.2",
     "typescript": "5.9.3"
   },
   "msw": {

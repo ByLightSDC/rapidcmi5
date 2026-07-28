@@ -3,6 +3,8 @@ export type CreateLessonType = {
   coursePath: string;
   auName: string;
   blockName: string;
+  /** Existing AU names in the target block, used to enforce name uniqueness */
+  existingAuNames?: string[];
 };
 
 export type CreateCloneType = {

@@ -33,7 +33,10 @@ export const GridCellPlayback: React.FC<
   const isPlayback = useCellValue(editorInPlayback$);
 
   return (
-    <div role={isPlayback ? 'cell' : 'gridcell'}>
+    <div
+      data-testid="directive-grid-cell"
+      role={isPlayback ? 'cell' : 'gridcell'}
+    >
       {textAlign !== 'left' && (
         <style>{`
           .${scopedClass} {

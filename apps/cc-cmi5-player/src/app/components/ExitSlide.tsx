@@ -54,6 +54,7 @@ export default function ExitSlide() {
 
   return (
     <Box
+      data-testid="player-exit-slide"
       sx={{
         display: 'flex',
         flexDirection: 'column',

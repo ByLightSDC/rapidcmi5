@@ -34,7 +34,17 @@ export type SerializedAudioNode = Spread<
     rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
     id?: string;
     autoplay?: boolean;
+    /**
+     * URL of the transcript/caption file (`.vtt` or `.txt`). The content decides
+     * whether it renders as timed cues or plain text, not the extension.
+     */
     captionSrc?: string;
+    /**
+     * Back-compat only: inline plain-text transcript from legacy content
+     * (authored before the file-only model). Preserved on round-trip and
+     * rendered read-only, but never produced by the editor anymore.
+     */
+    captionText?: string;
     type: 'audio';
     version: 1;
   },
@@ -56,6 +66,8 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
   __autoplay: boolean;
   /** @internal */
   __captionSrc: string | undefined;
+  /** @internal Back-compat: preserved legacy inline transcript text. */
+  __captionText: string | undefined;
 
   /** @internal */
   __rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[];
@@ -75,6 +87,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
       undefined,
       node.__autoplay,
       node.__captionSrc,
+      node.__captionText,
     );
     cloned.__id = node.__id;
     return cloned;
@@ -82,14 +95,19 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
 
   /** @internal */
   static override importJSON(serializedNode: SerializedAudioNode): AudioNode {
-    const { title, src, rest, id, autoplay, captionSrc } = serializedNode;
+    const { title, src, rest, autoplay, captionSrc, captionText } =
+      serializedNode;
+    // `id` is deliberately dropped: importJSON is the clipboard path, so a
+    // pasted copy must mint its own GUID rather than clone the source's,
+    // which would collide in animation targeting. Document load goes through
+    // the Mdast import visitors, which pass the saved id explicitly.
     const node = $createAudioNode({
       title,
       src,
       rest,
-      id,
       autoplay,
       captionSrc,
+      captionText,
     });
     return node;
   }
@@ -130,6 +148,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
     id?: string,
     autoplay?: boolean,
     captionSrc?: string,
+    captionText?: string,
   ) {
     super(key);
     this.__src = src;
@@ -138,6 +157,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
     this.__id = id || this.generateId();
     this.__autoplay = autoplay ?? false;
     this.__captionSrc = captionSrc;
+    this.__captionText = captionText;
   }
 
   /** @internal */
@@ -159,6 +179,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
       id: this.__id,
       autoplay: this.__autoplay,
       captionSrc: this.__captionSrc,
+      captionText: this.__captionText,
       type: 'audio',
       version: 1,
     };
@@ -226,6 +247,15 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
     this.getWritable().__captionSrc = captionSrc;
   }
 
+  /**
+   * Back-compat: legacy inline transcript text. Read-only — the editor no
+   * longer produces inline text (transcripts are files), but existing content
+   * is preserved and still rendered.
+   */
+  getCaptionText(): string | undefined {
+    return this.__captionText;
+  }
+
   /** @internal */
   shouldBeSerializedAsElement(): boolean {
     // ALWAYS serialize as HTML element to preserve id for animations!
@@ -243,6 +273,7 @@ export class AudioNode extends DecoratorNode<JSX.Element> {
         id={this.__id}
         autoplay={this.__autoplay}
         captionSrc={this.__captionSrc}
+        captionText={this.__captionText}
       />
     );
   }
@@ -260,6 +291,8 @@ export interface CreateAudioNodeParameters {
   id?: string;
   autoplay?: boolean;
   captionSrc?: string;
+  /** Back-compat only: preserved legacy inline transcript text. */
+  captionText?: string;
 }
 
 /**
@@ -268,8 +301,18 @@ export interface CreateAudioNodeParameters {
  * @group Audio
  */
 export function $createAudioNode(params: CreateAudioNodeParameters): AudioNode {
-  const { title, src, key, rest, id, autoplay, captionSrc } = params;
-  return new AudioNode(src, title, rest, key, id, autoplay, captionSrc);
+  const { title, src, key, rest, id, autoplay, captionSrc, captionText } =
+    params;
+  return new AudioNode(
+    src,
+    title,
+    rest,
+    key,
+    id,
+    autoplay,
+    captionSrc,
+    captionText,
+  );
 }
 
 /**

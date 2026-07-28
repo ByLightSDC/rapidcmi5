@@ -50,7 +50,7 @@ export const LayoutBoxPlayback: React.FC<
   ).current;
 
   return (
-    <div style={containerStyles}>
+    <div data-testid="directive-layout-box" style={containerStyles}>
       {/* Scoped CSS: nested LayoutBoxes tile, text blocks new-line and obey text-align */}
       <style>{`
         .${ceClass} {
