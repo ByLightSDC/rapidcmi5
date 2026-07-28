@@ -97,7 +97,7 @@ export const StepContentEditor: React.FC<
       }}
       role="tabpanel"
       id={`tabpanel-${tabIndex}`}
-      aria-labelledby={`tab-${tabIndex}`}
+      aria-labelledby={`step-${tabIndex}`}
     >
       {alignmentStyles}
 
