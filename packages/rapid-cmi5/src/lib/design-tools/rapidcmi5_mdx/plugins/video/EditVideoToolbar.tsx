@@ -6,7 +6,6 @@ import { readOnly$ } from '@mdxeditor/editor';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getNodeByKey } from 'lexical';
 import { IconButton, Tooltip } from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
