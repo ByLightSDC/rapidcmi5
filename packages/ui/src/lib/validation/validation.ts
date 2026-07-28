@@ -142,6 +142,33 @@ export const NAME_GROUP = yup
   .trim(NAME_BASE.spacesError)
   .strict(true);
 
+/** @constant
+ * Required Name Field that must be unique (case-insensitive) among a sibling
+ * list of existing names.
+ *
+ * The list of names to compare against is read from the sibling form field
+ * named by `existingNamesField` (default `existingNames`). This mirrors the
+ * `CONTAINER_TAG_GROUP` pattern where the comparison list is threaded through
+ * the form data rather than baked into the schema.
+ *
+ * @param {string} [existingNamesField='existingNames'] Sibling field holding string[] of taken names
+ * @param {string} [uniquenessError] Error message shown on a duplicate
+ */
+export const UNIQUE_NAME_GROUP = (
+  existingNamesField = 'existingNames',
+  uniquenessError = 'Name must be unique',
+) =>
+  NAME_GROUP.test('is-unique-name', uniquenessError, function (value) {
+    const existingNames: string[] = this.parent[existingNamesField] ?? [];
+    if (!value || existingNames.length === 0) {
+      return true;
+    }
+    const normalized = value.trim().toLowerCase();
+    return !existingNames.some(
+      (name) => name?.trim().toLowerCase() === normalized,
+    );
+  });
+
 export const LONG_NAME_GROUP_OPT = yup
   .string()
   .nullable()

@@ -15,7 +15,7 @@ import Grid from '@mui/material/Grid2';
 import { UseFormReturn } from 'react-hook-form';
 
 import { CreateLessonType } from '../../CourseBuilderApiTypes';
-import { NAME_GROUP } from '@rapid-cmi5/ui';
+import { UNIQUE_NAME_GROUP } from '@rapid-cmi5/ui';
 import { createNewLessonModalId } from '../../../rapidcmi5_mdx/modals/constants';
 
 export function CreateLessonForm({
@@ -36,8 +36,12 @@ export function CreateLessonForm({
   onCreateLesson: (req: CreateLessonType) => void;
 }) {
   const validationSchema = yup.object().shape({
-    auName: NAME_GROUP,
+    auName: UNIQUE_NAME_GROUP(
+      'existingAuNames',
+      'A lesson with this name already exists',
+    ),
     // courseName: auto-filled in - readOnly
+    // existingAuNames: sibling list read by UNIQUE_NAME_GROUP - not validated
   });
 
   const onCancel = () => {
