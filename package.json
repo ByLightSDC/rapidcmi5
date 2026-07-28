@@ -233,6 +233,7 @@
     "tailwindcss": "3.4.3",
     "ts-jest": "29.4.5",
     "ts-json-schema-generator": "^2.4.0",
+    "ts-node": "^10.9.2",
     "typescript": "5.9.3"
   },
   "msw": {
