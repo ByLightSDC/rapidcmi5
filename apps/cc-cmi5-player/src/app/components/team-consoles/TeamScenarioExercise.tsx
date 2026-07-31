@@ -321,7 +321,10 @@ function TeamScenarioExercise({
                   minWidth: '132px',
                 }}
               >
-                <IconButton aria-label="toggle-clock" onClick={toggleClock}>
+                <IconButton
+                  aria-label={isClockShowing ? 'Hide Clock' : 'Show Clock'}
+                  onClick={toggleClock}
+                >
                   <Tooltip
                     arrow
                     enterDelay={500}
