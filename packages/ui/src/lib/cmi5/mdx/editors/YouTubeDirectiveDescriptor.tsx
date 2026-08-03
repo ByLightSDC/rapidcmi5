@@ -1,4 +1,9 @@
-import { DirectiveDescriptor, insertMarkdown$ } from '@mdxeditor/editor';
+import {
+  DirectiveDescriptor,
+  insertMarkdown$,
+  readOnly$,
+  useCellValue,
+} from '@mdxeditor/editor';
 import { LeafDirective } from 'mdast-util-directive';
 import { useState } from 'react';
 import { Box, IconButton, Stack, TextField, Tooltip } from '@mui/material';
@@ -44,6 +49,9 @@ const YoutubeEditor = ({
   parentEditor: any;
 }) => {
   const [editing, setEditing] = useState(false);
+  // In the player the editor is mounted read-only; authoring affordances
+  // (edit video ID / delete) must not be reachable by learners.
+  const isReadOnly = useCellValue(readOnly$);
   const id = mdastNode.attributes.id ?? '';
   const [inputValue, setInputValue] = useState(
     id ? `https://www.youtube.com/watch?v=${id}` : '',
@@ -75,53 +83,55 @@ const YoutubeEditor = ({
 
   return (
     <Box sx={{ position: 'relative', display: 'inline-block' }}>
-      {/* Gutter buttons */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          zIndex: 10,
-          display: 'flex',
-          flexDirection: 'row',
-          gap: 0.5,
-          padding: 0.5,
-          backgroundColor: 'background.paper',
-          borderRadius: 1,
-          boxShadow: 1,
-        }}
-      >
-        {editing ? (
-          <>
-            <Tooltip title="Save">
-              <IconButton size="small" onClick={handleSave} color="primary">
-                <CheckIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Cancel">
-              <IconButton size="small" onClick={handleCancel}>
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </>
-        ) : (
-          <>
-            <Tooltip title="Edit video ID">
-              <IconButton size="small" onClick={() => setEditing(true)}>
-                <EditIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Delete">
-              <IconButton size="small" onClick={handleDelete} color="error">
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </>
-        )}
-      </Box>
+      {/* Gutter buttons — authoring only */}
+      {!isReadOnly && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            zIndex: 10,
+            display: 'flex',
+            flexDirection: 'row',
+            gap: 0.5,
+            padding: 0.5,
+            backgroundColor: 'background.paper',
+            borderRadius: 1,
+            boxShadow: 1,
+          }}
+        >
+          {editing ? (
+            <>
+              <Tooltip title="Save">
+                <IconButton size="small" onClick={handleSave} color="primary">
+                  <CheckIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Cancel">
+                <IconButton size="small" onClick={handleCancel}>
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </>
+          ) : (
+            <>
+              <Tooltip title="Edit video ID">
+                <IconButton size="small" onClick={() => setEditing(true)}>
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Delete">
+                <IconButton size="small" onClick={handleDelete} color="error">
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
+        </Box>
+      )}
 
       {/* Edit input */}
-      {editing && (
+      {!isReadOnly && editing && (
         <Stack direction="row" spacing={1} sx={{ mb: 1, paddingRight: '90px' }}>
           <TextField
             size="small"
