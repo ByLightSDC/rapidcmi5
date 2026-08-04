@@ -529,7 +529,9 @@ export class AnimationEngine {
     // happens at the right moment (delay + duration), then the totalDuration
     // timeout resolves the promise for sequencing.
     const isAppear = animation.entranceEffect === EntranceEffect.APPEAR;
-    const baseDuration = this.options.prefersReducedMotion ? 0 : animation.duration;
+    const baseDuration = this.options.prefersReducedMotion
+      ? 0
+      : animation.duration;
     const baseDelay = this.options.prefersReducedMotion ? 0 : animation.delay;
     const duration = isAppear ? 0.01 : baseDuration;
     const delay = isAppear ? baseDelay + baseDuration : baseDelay;
@@ -619,7 +621,9 @@ export class AnimationEngine {
     if (!directiveElement) {
       console.warn(
         `❌ Could not find element with data-anim-directive-id="${animation.directiveId}"`,
-        'Ensure the :anim{id="' + animation.directiveId + '"} directive exists in the markdown.',
+        'Ensure the :anim{id="' +
+          animation.directiveId +
+          '"} directive exists in the markdown.',
       );
     }
 

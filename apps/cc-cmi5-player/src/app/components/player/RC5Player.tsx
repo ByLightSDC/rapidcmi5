@@ -408,7 +408,13 @@ function RC5Player() {
     <>
       <Box
         className={themeClass}
-        sx={{ height: '100%' }}
+        sx={{
+          height: '100%',
+          // The slide controls are position:fixed, so they no longer occupy
+          // space in the flow. Reserve room at the bottom so the end of a long
+          // slide can still be scrolled clear of the bar.
+          pb: '72px',
+        }}
         onClick={onClickSlide}
         ref={editorContainerRef}
       >

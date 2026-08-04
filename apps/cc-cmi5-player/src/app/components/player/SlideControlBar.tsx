@@ -6,10 +6,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import ReplayIcon from '@mui/icons-material/Replay';
-import {
-  TOOLTIP_ENTER_DELAY,
-  TOOLTIP_ENTER_NEXT_DELAY,
-} from '../Menu/shared';
+import { TOOLTIP_ENTER_DELAY, TOOLTIP_ENTER_NEXT_DELAY } from '../Menu/shared';
 
 interface SlideControlBarProps {
   /** Whether a previous slide exists. */
@@ -88,7 +85,7 @@ export default function SlideControlBar({
         },
     {
       key: 'next',
-      label: 'Next slide',
+      label: 'Next Slide',
       icon: <ArrowForwardIosIcon fontSize="small" color="inherit" />,
       onClick: onNext,
       disabled: !canGoNext,
@@ -186,13 +183,21 @@ export default function SlideControlBar({
       spacing={0.5}
       onKeyDown={handleKeyDown}
       sx={{
-        position: 'sticky',
-        bottom: 16,
+        // Pinned to the viewport rather than the content flow. With `sticky` the
+        // bar only pinned once a slide was tall enough to scroll — on shorter
+        // slides it sat wherever the content happened to end, so the controls
+        // appeared to jump between slides. `fixed` keeps them a constant
+        // distance from the bottom regardless of content height.
+        //
+        // Horizontally centred over the slide panel. Both vars are maintained by
+        // a ResizeObserver in MenuLayout, so the bar tracks the collapsible
+        // drawer and the resizable split panel.
+        position: 'fixed',
+        bottom: 24,
+        left: 'calc(var(--panel-width, 0px) + var(--slide-panel-width, 100vw) / 2)',
+        transform: 'translateX(-50%)',
         zIndex: (theme) => theme.zIndex.appBar + 1,
         width: 'fit-content',
-        mx: 'auto',
-        mt: 2,
-        mb: 2,
         px: 1,
         py: 0.5,
         alignItems: 'center',
