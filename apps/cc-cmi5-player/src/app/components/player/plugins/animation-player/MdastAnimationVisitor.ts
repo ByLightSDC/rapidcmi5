@@ -1,7 +1,7 @@
 import { MdastImportVisitor } from '@mdxeditor/editor';
 import { Yaml } from 'mdast';
 import * as yaml from 'js-yaml';
-import { AnimationConfig } from '@rapid-cmi5/ui';
+import { AnimationConfig, debugLog } from '@rapid-cmi5/ui';
 
 /**
  * Parse animations from markdown frontmatter
@@ -10,18 +10,28 @@ import { AnimationConfig } from '@rapid-cmi5/ui';
 export const MdastAnimationVisitor: MdastImportVisitor<Yaml> = {
   testNode: (node) => {
     const isYaml = node.type === 'yaml';
-    console.log('🔍 Animation visitor testNode:', { type: node.type, isYaml });
+    debugLog(
+      '🔍 Animation visitor testNode:',
+      { type: node.type, isYaml },
+      undefined,
+      'animation',
+    );
     return isYaml;
   },
 
   visitNode({ mdastNode }) {
-    console.log('🎯 Animation visitor visitNode called');
-    console.log('📄 YAML value:', mdastNode.value);
+    debugLog(
+      '🎯 Animation visitor visitNode called',
+      undefined,
+      undefined,
+      'animation',
+    );
+    debugLog('📄 YAML value:', mdastNode.value, undefined, 'animation');
 
     try {
       // Parse frontmatter
       const frontmatter: any = yaml.load(mdastNode.value || '');
-      console.log('✅ Parsed frontmatter:', frontmatter);
+      debugLog('✅ Parsed frontmatter:', frontmatter, undefined, 'animation');
 
       // Extract animations
       if (
@@ -29,10 +39,11 @@ export const MdastAnimationVisitor: MdastImportVisitor<Yaml> = {
         frontmatter.animations &&
         Array.isArray(frontmatter.animations)
       ) {
-        console.log(
-          '📋 Found',
-          frontmatter.animations.length,
-          'animations in frontmatter',
+        debugLog(
+          `📋 Found ${frontmatter.animations.length} animations in frontmatter`,
+          undefined,
+          undefined,
+          'animation',
         );
 
         // Store animations in a global variable or context for the player to access
@@ -62,7 +73,12 @@ export const MdastAnimationVisitor: MdastImportVisitor<Yaml> = {
  */
 export function getSlideAnimations(): AnimationConfig[] {
   const animations = (window as any).__slideAnimations || [];
-  console.log('🎬 Retrieved', animations.length, 'animations from frontmatter');
+  debugLog(
+    `🎬 Retrieved ${animations.length} animations from frontmatter`,
+    undefined,
+    undefined,
+    'animation',
+  );
   return animations;
 }
 
