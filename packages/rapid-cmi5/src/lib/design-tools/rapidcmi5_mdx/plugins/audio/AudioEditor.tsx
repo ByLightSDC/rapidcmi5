@@ -108,27 +108,30 @@ function AudioComponent({
 
   const containerRef = React.useRef<HTMLDivElement | null>(null);
 
-  const onClick = React.useCallback(
-    (payload: MouseEvent) => {
-      const event = payload;
-      // Check if click is within the container or audio element
-      if (
-        (audioRef.current && audioRef.current.contains(event.target as Node)) ||
-        (containerRef.current &&
-          containerRef.current.contains(event.target as Node))
-      ) {
-        if (event.shiftKey) {
-          setSelected(!isSelected);
-        } else {
-          clearSelection();
-          setSelected(true);
-        }
-        return true;
+  const selectAudio = React.useCallback(
+    (shiftKey: boolean) => {
+      if (shiftKey) {
+        setSelected(!isSelected);
+      } else {
+        clearSelection();
+        setSelected(true);
       }
-      return false;
     },
     [isSelected, setSelected, clearSelection],
   );
+
+  const onClick = React.useCallback((payload: MouseEvent) => {
+    const event = payload;
+    // Selection itself happens via handleContainerClick (wrapper clicks) and
+    // onAudioFocus (clicks on the native control bar) below. This handler
+    // just claims clicks within the component so Lexical doesn't apply its
+    // own default click behavior on top.
+    return !!(
+      (audioRef.current && audioRef.current.contains(event.target as Node)) ||
+      (containerRef.current &&
+        containerRef.current.contains(event.target as Node))
+    );
+  }, []);
 
   React.useEffect(() => {
     const unregister = mergeRegister(
@@ -180,15 +183,25 @@ function AudioComponent({
 
   const isFocused = isSelected;
 
-  const handleWrapperClick = (e: React.MouseEvent) => {
-    // Only handle clicks on the wrapper itself, not on the audio controls
-    if (e.target === containerRef.current) {
-      if (e.shiftKey) {
-        setSelected(!isSelected);
-      } else {
-        clearSelection();
-        setSelected(true);
-      }
+  const handleContainerClick = (e: React.MouseEvent) => {
+    // Handles clicks on the wrapper padding around the audio bar. Clicks on
+    // the bar itself are handled by onAudioFocus below, not here — trying to
+    // intercept those would mean racing the browser's own hit-testing for
+    // its native play/seek/volume controls.
+    selectAudio(e.shiftKey);
+  };
+
+  const onAudioFocus = () => {
+    // Clicking any part of native <audio controls> — the play button, the
+    // seek bar, volume — moves DOM focus onto the <audio> element itself,
+    // regardless of which sub-control was clicked. Selecting here (rather
+    // than trying to catch the click before the control does) means seeking
+    // and the rest of the native control behavior stay completely
+    // untouched. Shift-click multi-select isn't available for clicks
+    // directly on the bar since focus events don't carry modifier keys.
+    if (!isSelected) {
+      clearSelection();
+      setSelected(true);
     }
   };
 
@@ -196,7 +209,7 @@ function AudioComponent({
     <React.Suspense fallback={null}>
       <div
         ref={containerRef}
-        onClick={handleWrapperClick}
+        onClick={handleContainerClick}
         style={{
           position: 'relative',
           display: 'block',
@@ -219,6 +232,7 @@ function AudioComponent({
           ref={audioRef}
           controls
           muted={false}
+          onFocus={onAudioFocus}
           data-audio-id={id}
           data-caption-src={captionSrc}
           data-caption-text={!captionSrc ? captionText : undefined}
