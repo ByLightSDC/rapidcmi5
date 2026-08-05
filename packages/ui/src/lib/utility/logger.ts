@@ -55,6 +55,9 @@ const defaultIgnoreNamespaces = new Set<string>([
   'preview',
   'drawer',
   'editor',
+  // Player-side animation playback tracing (frontmatter parsing, element
+  // lookup, per-animation start/complete). Fires on every slide change.
+  'animation',
 ]);
 
 const isNamespaceEnabled = (namespace?: string): boolean => {
