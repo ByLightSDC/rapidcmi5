@@ -20,14 +20,7 @@ import {
   useAnimationPlayback,
 } from './plugins/animation-player';
 import '@mdxeditor/editor/style.css';
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  useRef,
-} from 'react';
+import { useContext, useEffect, useMemo, useState, useRef } from 'react';
 
 import { Box, Typography } from '@mui/material';
 import {
@@ -78,10 +71,10 @@ import { GridContainerDirectiveDescriptor } from './editors/directives/GridConta
 import { GridCellDirectiveDescriptor } from './editors/directives/GridCellDirectiveDescriptor';
 import { mediaEventManager } from '../../utils/MediaEventManager';
 import { logger } from '../../debug';
-import { useDispatch, useSelector } from 'react-redux';
-import { auJsonSel, slideWidth } from '../../redux/auReducer';
-import { setActiveTab } from '../../redux/navigationReducer';
+import { useSelector } from 'react-redux';
+import { slideWidth } from '../../redux/auReducer';
 import SlideControlBar from './SlideControlBar';
+import { useSlideNavigation } from './useSlideNavigation';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -98,8 +91,6 @@ function RC5Player() {
   );
   const [slideAnimations, setSlideAnimations] = useState<AnimationConfig[]>([]);
   const slideWidthSel = useSelector(slideWidth);
-  const auJson = useSelector(auJsonSel);
-  const dispatch = useDispatch();
 
   const { rc5Theme } = useCoursePresentation();
 
@@ -390,19 +381,8 @@ function RC5Player() {
   const { hasAnimations, isPaused, isComplete, toggle, replay } =
     useAnimationPlayback(slideAnimations, activeTab, true);
 
-  // Slide bounds. `slides.length` is the Exit slide's index, so it is a valid
-  // forward target but not a content slide.
-  const slideCount = auJson?.slides?.length ?? 0;
-  const canGoPrevious = activeTab > 0;
-  const canGoNext = activeTab < slideCount;
-
-  const goToPrevious = useCallback(() => {
-    if (activeTab > 0) dispatch(setActiveTab(activeTab - 1));
-  }, [activeTab, dispatch]);
-
-  const goToNext = useCallback(() => {
-    if (activeTab < slideCount) dispatch(setActiveTab(activeTab + 1));
-  }, [activeTab, slideCount, dispatch]);
+  const { canGoPrevious, canGoNext, goToPrevious, goToNext } =
+    useSlideNavigation();
 
   return (
     <>
