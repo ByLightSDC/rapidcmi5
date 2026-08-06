@@ -193,6 +193,9 @@ export default function DocumentationDialog({
               textDecoration: 'underline',
             },
           },
+          '& > *:last-child': {
+            mb: 0,
+          },
         }}
       >
         <ReactMarkdown remarkPlugins={[remarkGfm]}>
