@@ -70,6 +70,13 @@ export default function MenuLayout() {
           '--panel-width',
           `${rect.left}px`,
         );
+        // Published for CSS that needs to centre over the slide panel itself
+        // (the fixed slide-control bar). --panel-width alone is only the left
+        // edge, which isn't enough once the split panel narrows the slide.
+        document.documentElement.style.setProperty(
+          '--slide-panel-width',
+          `${rect.width}px`,
+        );
         maxSlideWidth$.value = rect.width;
       }
     };

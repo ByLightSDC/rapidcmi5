@@ -1,5 +1,5 @@
 import { AnimationConfig, AnimationEngine } from '@rapid-cmi5/ui';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * Hook for playing animations in the CMI5 player
@@ -11,6 +11,19 @@ export function useAnimationPlayback(
   enabled: boolean = true,
 ) {
   const engineRef = useRef<AnimationEngine | null>(null);
+
+  // Drives the play/pause control. `hasAnimations` lets the UI disable the
+  // control on slides with nothing to pause (WCAG 2.2.2 only applies when
+  // there is moving content).
+  const [isPaused, setIsPaused] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+  const hasAnimations = Boolean(enabled && animations && animations.length > 0);
+
+  useEffect(() => {
+    // New slide (or new content): start from a clean, un-paused state.
+    setIsPaused(false);
+    setIsComplete(false);
+  }, [animations, slideIndex]);
 
   useEffect(() => {
     // Skip if animations disabled or no animations
@@ -173,6 +186,8 @@ export function useAnimationPlayback(
       },
       onAllComplete: () => {
         console.log('🎉 All animations completed');
+        // Nothing left to pause — the control switches to "replay".
+        setIsComplete(true);
       },
     });
 
@@ -214,8 +229,49 @@ export function useAnimationPlayback(
     };
   }, [animations, slideIndex, enabled]);
 
+  const pause = useCallback(() => {
+    engineRef.current?.pause();
+    setIsPaused(true);
+  }, []);
+
+  const resume = useCallback(() => {
+    engineRef.current?.resume();
+    setIsPaused(false);
+  }, []);
+
+  const toggle = useCallback(() => {
+    if (isPaused) {
+      resume();
+    } else {
+      pause();
+    }
+  }, [isPaused, pause, resume]);
+
+  /**
+   * Replay the slide's animations from the start. Used once the sequence has
+   * finished, when pausing is no longer meaningful.
+   */
+  const replay = useCallback(() => {
+    const engine = engineRef.current;
+    if (!engine) return;
+
+    engine.reset();
+    setIsPaused(false);
+    setIsComplete(false);
+    engine.playAll().catch((error) => {
+      console.error('❌ Error replaying animations:', error);
+    });
+  }, []);
+
   return {
     engine: engineRef.current,
     isPlaying: engineRef.current?.getPlaybackState() === 'playing',
+    hasAnimations,
+    isPaused,
+    isComplete,
+    pause,
+    resume,
+    toggle,
+    replay,
   };
 }
