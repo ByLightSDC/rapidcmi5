@@ -1,4 +1,4 @@
-import { IconButton, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import { DownloadFileData } from '@rapid-cmi5/cmi5-build-common';
 import { useEffect, useState } from 'react';
 
@@ -28,17 +28,6 @@ export const FileDownloadLink = ({
 }) => {
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
 
-  const handleDownload = () => {
-    if (blobUrl) {
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = fileData.name;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
-
   useEffect(() => {
     const loadFile = async () => {
       if (getLinkUrl) {
@@ -64,10 +53,13 @@ export const FileDownloadLink = ({
     <>
       {blobUrl && (
         <Stack direction="row" sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton onClick={handleDownload}>
-            <FilePresentIcon />
-          </IconButton>
-          <a href={`${blobUrl}`} download={fileData.name}>
+          <a
+            href={`${blobUrl}`}
+            download={fileData.name}
+            aria-label={`Download ${fileData.name}`}
+            style={{ display: 'flex', alignItems: 'center', gap: 4 }}
+          >
+            <FilePresentIcon aria-hidden="true" />
             {fileData.name}
           </a>
         </Stack>
