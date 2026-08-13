@@ -4,6 +4,7 @@ export { config } from './lib/environments/FrontendEnvironment.env';
 
 export * from './lib/navigation/paging/paginationFiltersConstants';
 export * from './lib/accessibility/HiddenHeader';
+export * from './lib/accessibility/LiveStatusRegion';
 export * from './lib/apps/AppLogo';
 export * from './lib/apps/RapidCmi5Icon';
 export * from './lib/apps/RapidCmi5Title';
@@ -26,6 +27,7 @@ export * from './lib/dashboards/constants';
 export * from './lib/data-display/OverflowTypography';
 export * from './lib/data-display/ListView';
 export * from './lib/hooks/useBackgroundColors';
+export * from './lib/hooks/useLiveAnnouncer';
 export * from './lib/hooks/useDisplayDateFormatter';
 export * from './lib/hooks/useDisplayFocus';
 export * from './lib/hooks/useItemVisibleInBounds';

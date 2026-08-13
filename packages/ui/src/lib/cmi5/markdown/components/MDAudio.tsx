@@ -1,6 +1,8 @@
 import React from 'react';
 import ClosedCaptionIcon from '@mui/icons-material/ClosedCaption';
 import { AuContextProps } from '@rapid-cmi5/cmi5-build-common';
+import { useLiveAnnouncer } from '../../../hooks/useLiveAnnouncer';
+import { LiveStatusRegion } from '../../../accessibility/LiveStatusRegion';
 
 /**
  * A single parsed WebVTT cue.
@@ -160,23 +162,8 @@ export default function MDAudio(
   const audioRef = React.useRef<HTMLAudioElement>(null);
   // Announces cue-driven seeks to assistive tech. The native <audio> scrubber
   // is shadow DOM we can't attach ARIA to, so clicking a transcript cue moves
-  // playback silently for a non-sighted user (WCAG 4.1.3). We write directly
-  // to this node (rather than via React state) so re-clicking the same cue —
-  // identical text — still triggers a fresh announcement instead of being
-  // deduped as an unchanged live region.
-  const announceRef = React.useRef<HTMLSpanElement>(null);
-  const announceSeek = React.useCallback((seconds: number) => {
-    const node = announceRef.current;
-    if (!node) {
-      return;
-    }
-    node.textContent = '';
-    requestAnimationFrame(() => {
-      if (announceRef.current) {
-        announceRef.current.textContent = `Jumped to ${formatTime(seconds)}`;
-      }
-    });
-  }, []);
+  // playback silently for a non-sighted user (WCAG 4.1.3).
+  const { ref: announceRef, announce } = useLiveAnnouncer<HTMLSpanElement>();
   const [cues, setCues] = React.useState<VttCue[]>([]);
   const [text, setText] = React.useState<string>(legacyText);
   const [activeIndex, setActiveIndex] = React.useState<number>(-1);
@@ -311,26 +298,7 @@ export default function MDAudio(
               aria-label="Transcript"
               style={{ display: 'block' }}
             >
-              {hasCues && (
-                /* Visually hidden; announces the seek target for screen
-                   reader users when a cue button is activated. */
-                <span
-                  ref={announceRef}
-                  role="status"
-                  aria-live="polite"
-                  style={{
-                    position: 'absolute',
-                    width: 1,
-                    height: 1,
-                    margin: -1,
-                    padding: 0,
-                    overflow: 'hidden',
-                    clip: 'rect(0, 0, 0, 0)',
-                    whiteSpace: 'nowrap',
-                    border: 0,
-                  }}
-                />
-              )}
+              {hasCues && <LiveStatusRegion announceRef={announceRef} />}
               {hasCues ? (
                 <ol style={{ listStyle: 'none', padding: 0, marginTop: 4 }}>
                   {cues.map((cue, index) => (
@@ -341,7 +309,7 @@ export default function MDAudio(
                         if (audioRef.current) {
                           audioRef.current.currentTime = cue.start;
                         }
-                        announceSeek(cue.start);
+                        announce(`Jumped to ${formatTime(cue.start)}`);
                       }}
                       style={{
                         display: 'flex',

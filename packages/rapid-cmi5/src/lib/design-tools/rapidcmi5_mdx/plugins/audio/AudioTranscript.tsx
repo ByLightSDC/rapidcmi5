@@ -1,5 +1,6 @@
 import React from 'react';
 import ClosedCaptionIcon from '@mui/icons-material/ClosedCaption';
+import { useLiveAnnouncer, LiveStatusRegion } from '@rapid-cmi5/ui';
 import { parseTranscript, VttCue } from './parseVtt';
 import styles from './styles/audio-plugin.module.css';
 
@@ -70,23 +71,8 @@ export function AudioTranscript({
   const [expanded, setExpanded] = React.useState<boolean>(false);
   // Announces cue-driven seeks to assistive tech. The native <audio> scrubber
   // is shadow DOM we can't attach ARIA to, so clicking a cue moves playback
-  // silently for a non-sighted user (WCAG 4.1.3). We write directly to this
-  // node (rather than via React state) so re-clicking the same cue —
-  // identical text — still triggers a fresh announcement instead of being
-  // deduped as an unchanged live region.
-  const announceRef = React.useRef<HTMLSpanElement>(null);
-  const announceSeek = React.useCallback((seconds: number) => {
-    const node = announceRef.current;
-    if (!node) {
-      return;
-    }
-    node.textContent = '';
-    requestAnimationFrame(() => {
-      if (announceRef.current) {
-        announceRef.current.textContent = `Jumped to ${formatTime(seconds)}`;
-      }
-    });
-  }, []);
+  // silently for a non-sighted user (WCAG 4.1.3).
+  const { ref: announceRef, announce } = useLiveAnnouncer<HTMLSpanElement>();
 
   const legacyText =
     typeof fallbackText === 'string' && fallbackText.trim() !== ''
@@ -161,7 +147,7 @@ export function AudioTranscript({
     if (audio) {
       audio.currentTime = cue.start;
     }
-    announceSeek(cue.start);
+    announce(`Jumped to ${formatTime(cue.start)}`);
   };
 
   const hasCues = cues.length > 0;
@@ -182,16 +168,7 @@ export function AudioTranscript({
       >
         <ToggleLabel expanded={expanded} />
       </button>
-      {expanded && hasCues && (
-        /* Visually hidden; announces the seek target for screen reader
-           users when a cue button is activated. */
-        <span
-          ref={announceRef}
-          role="status"
-          aria-live="polite"
-          className={styles.visuallyHidden}
-        />
-      )}
+      {expanded && hasCues && <LiveStatusRegion announceRef={announceRef} />}
       {expanded &&
         (hasCues ? (
           <ol className={styles.transcriptList}>
