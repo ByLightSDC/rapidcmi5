@@ -107,7 +107,15 @@ export const CodeMirrorEditor = ({
           // attribute. tabindex keeps the block reachable via Tab since
           // contenteditable="false" elements aren't natively focusable.
           EditorView.editable.of(false),
-          EditorView.contentAttributes.of({ tabindex: '0' }),
+          EditorView.contentAttributes.of({
+            // We don't want the tab to find this in order, it is technically content not an interactable item
+            tabindex: '-1',
+            // CodeMirror hardcodes role="textbox", which is what makes NVDA
+            // say "edit". aria-roledescription overrides the spoken role
+            // without touching the underlying role, turning the announcement
+            // into "code block, read only, multi line".
+            'aria-roledescription': 'code block',
+          }),
         );
       }
       if (language !== '' && autoLoadLanguageSupport) {
