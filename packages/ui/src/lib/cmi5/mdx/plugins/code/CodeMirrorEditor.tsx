@@ -6,7 +6,7 @@ import { EditorState, Extension } from '@codemirror/state';
 import { EditorView, lineNumbers, keymap } from '@codemirror/view';
 import { indentWithTab } from '@codemirror/commands';
 import { githubLight, githubDark } from '@uiw/codemirror-theme-github';
-import { basicSetup, minimalSetup } from 'codemirror';
+import { basicSetup } from 'codemirror';
 import {
   CodeBlockEditorProps,
   useCodeBlockEditorContext,
@@ -86,10 +86,7 @@ export const CodeMirrorEditor = ({
     void (async () => {
       const extensions = [
         ...codeMirrorExtensions,
-        // basicSetup pulls in autocompletion(), which has no place in a
-        // read-only block and is what causes NVDA to announce "has auto
-        // complete" on a field the user can't type into.
-        readOnly ? minimalSetup : basicSetup,
+        basicSetup,
         themeCompartment.of(cmTheme), // Initialize with a theme
         lineNumbers(),
         keymap.of([indentWithTab]),
@@ -99,16 +96,7 @@ export const CodeMirrorEditor = ({
         }),
       ];
       if (readOnly) {
-        extensions.push(
-          EditorState.readOnly.of(true),
-          // EditorState.readOnly only blocks transactions; it leaves
-          // contenteditable="true" in place, so NVDA still announces "edit".
-          // EditorView.editable is the facet that actually drives that DOM
-          // attribute. tabindex keeps the block reachable via Tab since
-          // contenteditable="false" elements aren't natively focusable.
-          EditorView.editable.of(false),
-          EditorView.contentAttributes.of({ tabindex: '0' }),
-        );
+        extensions.push(EditorState.readOnly.of(true));
       }
       if (language !== '' && autoLoadLanguageSupport) {
         const languageData = languages.find((l) => {
