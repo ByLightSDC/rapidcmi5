@@ -120,24 +120,20 @@ function AudioComponent({
     [isSelected, setSelected, clearSelection],
   );
 
-  const onClick = React.useCallback((payload: MouseEvent) => {
-    const event = payload;
-    // Selection itself happens via handleContainerClick (wrapper clicks) and
-    // onAudioFocus (clicks on the native control bar) below. This handler
-    // just claims clicks within the component so Lexical doesn't apply its
-    // own default click behavior on top.
-    return !!(
-      (audioRef.current && audioRef.current.contains(event.target as Node)) ||
-      (containerRef.current &&
-        containerRef.current.contains(event.target as Node))
-    );
-  }, []);
-
   React.useEffect(() => {
     const unregister = mergeRegister(
       editor.registerCommand<MouseEvent>(
         CLICK_COMMAND,
-        onClick,
+        (event) => {
+          // Claims click so Lexical doesn't override selection handled by
+          // handleWrapperClick/onAudioFocus.
+          return !!(
+            (audioRef.current &&
+              audioRef.current.contains(event.target as Node)) ||
+            (containerRef.current &&
+              containerRef.current.contains(event.target as Node))
+          );
+        },
         COMMAND_PRIORITY_LOW,
       ),
       editor.registerCommand(
@@ -179,11 +175,14 @@ function AudioComponent({
     return () => {
       unregister();
     };
-  }, [editor, isSelected, nodeKey, onDelete, onEnter, onEscape, onClick]);
+  }, [editor, isSelected, nodeKey, onDelete, onEnter, onEscape]);
 
   const isFocused = isSelected;
 
-  const handleContainerClick = (e: React.MouseEvent) => {
+  // Clicks were being swallowed by native elements. Focus returning reliably.
+  // The handleWrapperClick and onAudioFocus methods below controls the click
+  // response better fixing focus.
+  const handleWrapperClick = (e: React.MouseEvent) => {
     // Handles clicks on the wrapper padding around the audio bar. Clicks on
     // the bar itself are handled by onAudioFocus below, not here — trying to
     // intercept those would mean racing the browser's own hit-testing for
@@ -200,8 +199,7 @@ function AudioComponent({
     // untouched. Shift-click multi-select isn't available for clicks
     // directly on the bar since focus events don't carry modifier keys.
     if (!isSelected) {
-      clearSelection();
-      setSelected(true);
+      selectAudio(false);
     }
   };
 
@@ -209,7 +207,7 @@ function AudioComponent({
     <React.Suspense fallback={null}>
       <div
         ref={containerRef}
-        onClick={handleContainerClick}
+        onClick={handleWrapperClick}
         style={{
           position: 'relative',
           display: 'block',
