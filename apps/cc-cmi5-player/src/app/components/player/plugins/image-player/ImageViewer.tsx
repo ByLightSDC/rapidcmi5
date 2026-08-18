@@ -192,11 +192,13 @@ export function ImageViewer({
               }}
             />
           ) : (
-            <Tooltip title="Click to view full screen" open={showFullscreenHint}>
+            <Tooltip
+              title="Click to view full screen"
+              open={showFullscreenHint}
+            >
               <div
                 id={`image-labels-${id}`}
                 ref={labelsRef}
-                aria-hidden="true"
                 onMouseEnter={() => setShowFullscreenHint(true)}
                 onMouseLeave={() => setShowFullscreenHint(false)}
                 style={{
