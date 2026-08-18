@@ -113,11 +113,24 @@ function LessonTree({
       // Prevent renaming a lesson to a name already used by another lesson in
       // the same block (case-insensitive). Duplicate AU names break navigation
       // because lessons are resolved by name. See changeLesson() in useCourseData.
-      const blockIndex =
-        typeof element.block === 'number' ? element.block : currentBlockIndex;
+      //
+      // Scope to currentBlockIndex, NOT element.block: onChangeLessonName()
+      // resolves the AU it rewrites via courseData.blocks[currentBlockIndex],
+      // so validating against any other block would check one list and mutate
+      // another. element.id is the AU index within that block (see the tree
+      // build below, `const lessonId = j`), which is the index the write uses.
       const lessonIndex = element.id as number;
+      const aus = courseData?.blocks?.[currentBlockIndex]?.aus;
+      if (!aus) {
+        // Fail closed: without the AU list we cannot prove the name is unique.
+        displayToaster({
+          message: 'Unable to rename lesson: course data unavailable',
+          severity: 'error',
+        });
+        return;
+      }
       const normalized = newName.trim().toLowerCase();
-      const isDuplicate = courseData?.blocks?.[blockIndex]?.aus?.some(
+      const isDuplicate = aus.some(
         (au, index) =>
           index !== lessonIndex &&
           au.auName?.trim().toLowerCase() === normalized,
