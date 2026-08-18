@@ -1,5 +1,6 @@
 import React from 'react';
 import ClosedCaptionIcon from '@mui/icons-material/ClosedCaption';
+import { useLiveAnnouncer, LiveStatusRegion } from '@rapid-cmi5/ui';
 import { parseTranscript, VttCue } from './parseVtt';
 import styles from './styles/audio-plugin.module.css';
 
@@ -68,6 +69,10 @@ export function AudioTranscript({
   const [text, setText] = React.useState<string>('');
   const [activeIndex, setActiveIndex] = React.useState<number>(-1);
   const [expanded, setExpanded] = React.useState<boolean>(false);
+  // Announces cue-driven seeks to assistive tech. The native <audio> scrubber
+  // is shadow DOM we can't attach ARIA to, so clicking a cue moves playback
+  // silently for a non-sighted user (WCAG 4.1.3).
+  const { ref: announceRef, announce } = useLiveAnnouncer();
 
   const legacyText =
     typeof fallbackText === 'string' && fallbackText.trim() !== ''
@@ -142,6 +147,7 @@ export function AudioTranscript({
     if (audio) {
       audio.currentTime = cue.start;
     }
+    announce(`Jumped to ${formatTime(cue.start)}`);
   };
 
   const hasCues = cues.length > 0;
@@ -162,6 +168,7 @@ export function AudioTranscript({
       >
         <ToggleLabel expanded={expanded} />
       </button>
+      {expanded && hasCues && <LiveStatusRegion announceRef={announceRef} />}
       {expanded &&
         (hasCues ? (
           <ol className={styles.transcriptList}>
