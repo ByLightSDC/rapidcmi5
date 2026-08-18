@@ -52,7 +52,10 @@ export const FileDownloadLink = ({
     // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
       {blobUrl && (
-        <Stack direction="row" sx={{ display: 'flex', alignItems: 'center' }}>
+        <Stack
+          direction="row"
+          sx={{ display: 'flex', alignItems: 'center', my: '8px' }}
+        >
           <a
             href={`${blobUrl}`}
             download={fileData.name}
