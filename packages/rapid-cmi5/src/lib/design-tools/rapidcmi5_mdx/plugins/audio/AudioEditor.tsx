@@ -179,25 +179,18 @@ function AudioComponent({
 
   const isFocused = isSelected;
 
-  // Clicks were being swallowed by native elements. Focus returning reliably.
-  // The handleWrapperClick and onAudioFocus methods below controls the click
-  // response better fixing focus.
+  /* The browser's built-in audio controls were catching clicks
+    before our onClick. Two methods to work around this:
+   - handleWrapperClick: handles clicks on the empty space around the bar
+   - onAudioFocus: handles clicks on the bar itself, by watching for focus
+    instead of the click
+    Note: shift-click to multi-select only works through handleWrapperClick,
+*/
   const handleWrapperClick = (e: React.MouseEvent) => {
-    // Handles clicks on the wrapper padding around the audio bar. Clicks on
-    // the bar itself are handled by onAudioFocus below, not here — trying to
-    // intercept those would mean racing the browser's own hit-testing for
-    // its native play/seek/volume controls.
     selectAudio(e.shiftKey);
   };
 
   const onAudioFocus = () => {
-    // Clicking any part of native <audio controls> — the play button, the
-    // seek bar, volume — moves DOM focus onto the <audio> element itself,
-    // regardless of which sub-control was clicked. Selecting here (rather
-    // than trying to catch the click before the control does) means seeking
-    // and the rest of the native control behavior stay completely
-    // untouched. Shift-click multi-select isn't available for clicks
-    // directly on the bar since focus events don't carry modifier keys.
     if (!isSelected) {
       selectAudio(false);
     }
