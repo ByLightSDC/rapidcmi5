@@ -127,7 +127,7 @@ export class AnimationEngine {
         `Animation ${animationId} is disabled, skipping`,
         undefined,
         undefined,
-        'engine',
+        'animations',
       );
       return;
     }
@@ -211,7 +211,7 @@ export class AnimationEngine {
       this.suspendTimeout(id);
     });
 
-    debugLog('⏸️ Paused animations', undefined, undefined, 'engine');
+    debugLog('⏸️ Paused animations', undefined, undefined, 'animations');
   }
 
   /**
@@ -234,7 +234,7 @@ export class AnimationEngine {
 
     this.releasePauseWaiters();
 
-    debugLog('▶️ Resumed animations', undefined, undefined, 'engine');
+    debugLog('▶️ Resumed animations', undefined, undefined, 'animations');
   }
 
   /**
@@ -277,7 +277,7 @@ export class AnimationEngine {
       '🔄 Resetting animations to initial state (preparing for replay)',
       undefined,
       undefined,
-      'engine',
+      'animations',
     );
     this.animations.forEach((anim) => {
       const element = this.findElement(anim.targetNodeKey);
@@ -308,7 +308,7 @@ export class AnimationEngine {
       '🧹 Cleaning up animations and restoring normal state',
       undefined,
       undefined,
-      'engine',
+      'animations',
     );
     this.animations.forEach((anim) => {
       const element = this.findElement(anim.targetNodeKey);
@@ -374,7 +374,7 @@ export class AnimationEngine {
         onPreviousComplete: onPreviousCompleteAnims.length,
       },
       undefined,
-      'engine',
+      'animation',
     );
 
     // Play all "on slide open" animations simultaneously
@@ -383,7 +383,7 @@ export class AnimationEngine {
         '▶️ Playing "on slide open" animations',
         { count: onSlideOpenAnims.length },
         undefined,
-        'engine',
+        'animation',
       );
       await Promise.all(
         onSlideOpenAnims.map((anim) => this.applyAnimation(anim)),
@@ -396,7 +396,7 @@ export class AnimationEngine {
         '▶️ Playing "after delay" animations',
         { count: afterDelayAnims.length },
         undefined,
-        'engine',
+        'animations',
       );
       for (const anim of afterDelayAnims) {
         if (this.currentStateIs(PlaybackState.STOPPED)) break;
@@ -412,7 +412,7 @@ export class AnimationEngine {
         '▶️ Playing "on previous complete" animations',
         { count: onPreviousCompleteAnims.length },
         undefined,
-        'engine',
+        'animations',
       );
       for (const anim of onPreviousCompleteAnims) {
         if (this.currentStateIs(PlaybackState.STOPPED)) break;
@@ -443,7 +443,7 @@ export class AnimationEngine {
           '✅ Found element for animation',
           { id: animation.id, element },
           undefined,
-          'engine',
+          'animations',
         );
       }
       this.animationElements.set(animation.id, element);
@@ -461,7 +461,7 @@ export class AnimationEngine {
             '🎨 Applying entrance effect',
             { effect: animation.entranceEffect, element },
             undefined,
-            'engine',
+            'animations',
           );
         }
         this.applyEntranceEffect(element, animation);
@@ -479,7 +479,7 @@ export class AnimationEngine {
               '🎨 Applying exit effect',
               { effect: animation.exitEffect },
               undefined,
-              'engine',
+              'animations',
             );
           }
           this.applyExitEffect(element, animation);
@@ -578,7 +578,7 @@ export class AnimationEngine {
       `Applied exit effect: ${className} to element`,
       element,
       undefined,
-      'engine',
+      'animations',
     );
   }
 
