@@ -333,7 +333,7 @@ export class AnimationEngine {
       '🎬 Initializing animation states',
       undefined,
       undefined,
-      'engine',
+      'animation',
     );
     this.animations.forEach((anim) => {
       const element = this.findElement(anim.targetNodeKey);
