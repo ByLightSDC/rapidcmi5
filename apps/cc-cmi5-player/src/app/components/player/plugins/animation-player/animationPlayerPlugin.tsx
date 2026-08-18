@@ -1,5 +1,6 @@
 import { realmPlugin } from '@mdxeditor/editor';
 import { addImportVisitor$ } from '@mdxeditor/editor';
+import { debugLog } from '@rapid-cmi5/ui';
 import { MdastAnimationVisitor } from './MdastAnimationVisitor';
 
 /**
@@ -19,7 +20,12 @@ import { MdastAnimationVisitor } from './MdastAnimationVisitor';
  */
 export const animationPlayerPlugin = realmPlugin({
   init(realm) {
-    console.log('🎬 Animation Player Plugin initialized');
+    debugLog(
+      '🎬 Animation Player Plugin initialized',
+      undefined,
+      undefined,
+      'animation',
+    );
 
     // Register the visitor to parse frontmatter
     realm.pubIn({

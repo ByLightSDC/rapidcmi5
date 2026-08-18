@@ -1,4 +1,4 @@
-import { AnimationConfig, AnimationEngine } from '@rapid-cmi5/ui';
+import { AnimationConfig, AnimationEngine, debugLog } from '@rapid-cmi5/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
@@ -31,11 +31,11 @@ export function useAnimationPlayback(
       return;
     }
 
-    console.log(
-      '🎬 Auto-playing',
-      animations.length,
-      'animations for slide',
-      slideIndex,
+    debugLog(
+      `🎬 Auto-playing ${animations.length} animations for slide ${slideIndex}`,
+      undefined,
+      undefined,
+      'animation',
     );
 
     const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
@@ -70,9 +70,11 @@ export function useAnimationPlayback(
       }
 
       if (animation?.stableId) {
-        console.log(
+        debugLog(
           '🔍 Looking for element with stableId:',
           animation.stableId,
+          undefined,
+          'animation',
         );
 
         // Try to find by data attribute (if set by editor)
@@ -93,7 +95,12 @@ export function useAnimationPlayback(
                 ? labelParts[1].trim()
                 : animation.targetLabel;
 
-            console.log('🔍 Searching for text:', searchText);
+            debugLog(
+              '🔍 Searching for text:',
+              searchText,
+              undefined,
+              'animation',
+            );
 
             // Search in headings first
             const headings = Array.from(
@@ -101,7 +108,12 @@ export function useAnimationPlayback(
             );
             for (const heading of headings) {
               if (heading.textContent?.trim() === searchText) {
-                console.log('✅ Found element by heading text:', heading);
+                debugLog(
+                  '✅ Found element by heading text:',
+                  heading,
+                  undefined,
+                  'animation',
+                );
                 element = heading as HTMLElement;
                 break;
               }
@@ -112,7 +124,12 @@ export function useAnimationPlayback(
               const paragraphs = Array.from(editorRoot.querySelectorAll('p'));
               for (const p of paragraphs) {
                 if (p.textContent?.trim().includes(searchText)) {
-                  console.log('✅ Found element by paragraph text:', p);
+                  debugLog(
+                    '✅ Found element by paragraph text:',
+                    p,
+                    undefined,
+                    'animation',
+                  );
                   element = p as HTMLElement;
                   break;
                 }
@@ -127,7 +144,12 @@ export function useAnimationPlayback(
                 const alt = img.getAttribute('alt') || '';
                 // Match by filename in src or alt text
                 if (src.includes(searchText) || alt.includes(searchText)) {
-                  console.log('✅ Found element by image src/alt:', img);
+                  debugLog(
+                    '✅ Found element by image src/alt:',
+                    img,
+                    undefined,
+                    'animation',
+                  );
                   element = img as HTMLElement;
                   break;
                 }
@@ -148,7 +170,12 @@ export function useAnimationPlayback(
                   );
 
                 if (hasMatchingSrc) {
-                  console.log('✅ Found element by video src:', video);
+                  debugLog(
+                    '✅ Found element by video src:',
+                    video,
+                    undefined,
+                    'animation',
+                  );
                   element = video as HTMLElement;
                   break;
                 }
@@ -158,7 +185,12 @@ export function useAnimationPlayback(
         }
 
         if (element) {
-          console.log('✅ Found element for animation:', element);
+          debugLog(
+            '✅ Found element for animation:',
+            element,
+            undefined,
+            'animation',
+          );
           return element;
         }
       }
@@ -179,13 +211,18 @@ export function useAnimationPlayback(
       prefersReducedMotion: AnimationEngine.prefersReducedMotion(),
       findElement: findElementByStableId,
       onAnimationStart: (id) => {
-        console.log('▶️ Animation started:', id);
+        debugLog('▶️ Animation started:', id, undefined, 'animation');
       },
       onAnimationComplete: (id) => {
-        console.log('✅ Animation completed:', id);
+        debugLog('✅ Animation completed:', id, undefined, 'animation');
       },
       onAllComplete: () => {
-        console.log('🎉 All animations completed');
+        debugLog(
+          '🎉 All animations completed',
+          undefined,
+          undefined,
+          'animation',
+        );
         // Nothing left to pause — the control switches to "replay".
         setIsComplete(true);
       },
@@ -221,7 +258,7 @@ export function useAnimationPlayback(
 
     // Cleanup on unmount or slide change
     return () => {
-      console.log('🧹 Cleaning up animations');
+      debugLog('🧹 Cleaning up animations', undefined, undefined, 'animation');
       if (engineRef.current) {
         engineRef.current.cleanup();
         engineRef.current = null;
