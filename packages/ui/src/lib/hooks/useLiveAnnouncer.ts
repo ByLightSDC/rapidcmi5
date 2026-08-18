@@ -7,8 +7,8 @@ import { useCallback, useRef } from 'react';
  * triggers a fresh announcement — screen readers otherwise dedupe live-region
  * content that hasn't changed.
  */
-export const useLiveAnnouncer = <T extends HTMLElement = HTMLSpanElement>() => {
-  const ref = useRef<T>(null);
+export const useLiveAnnouncer = () => {
+  const ref = useRef<HTMLSpanElement>(null);
 
   const announce = useCallback((message: string) => {
     const node = ref.current;

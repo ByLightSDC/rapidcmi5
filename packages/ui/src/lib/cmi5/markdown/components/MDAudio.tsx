@@ -163,7 +163,7 @@ export default function MDAudio(
   // Announces cue-driven seeks to assistive tech. The native <audio> scrubber
   // is shadow DOM we can't attach ARIA to, so clicking a transcript cue moves
   // playback silently for a non-sighted user (WCAG 4.1.3).
-  const { ref: announceRef, announce } = useLiveAnnouncer<HTMLSpanElement>();
+  const { ref: announceRef, announce } = useLiveAnnouncer();
   const [cues, setCues] = React.useState<VttCue[]>([]);
   const [text, setText] = React.useState<string>(legacyText);
   const [activeIndex, setActiveIndex] = React.useState<number>(-1);
