@@ -36,13 +36,17 @@ export function EditAudioToolbar({
     <div
       style={{
         position: 'absolute',
-        top: '8px',
+        // Floats above the box, nudged down to overlap the border/padding a
+        // bit rather than sitting apart from it — but stays clear of the
+        // native audio controls, which start below the container's 8px
+        // top padding.
+        bottom: 'calc(100% - 16px)',
         right: '8px',
         display: 'flex',
         gap: '4px',
         backgroundColor: 'rgba(255, 255, 255, 0.9)',
         borderRadius: '4px',
-        padding: '4px',
+        padding: '2px',
         boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
       }}
     >

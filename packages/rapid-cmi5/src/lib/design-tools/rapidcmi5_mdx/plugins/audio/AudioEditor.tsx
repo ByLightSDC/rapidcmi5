@@ -108,24 +108,14 @@ function AudioComponent({
 
   const containerRef = React.useRef<HTMLDivElement | null>(null);
 
-  const onClick = React.useCallback(
-    (payload: MouseEvent) => {
-      const event = payload;
-      // Check if click is within the container or audio element
-      if (
-        (audioRef.current && audioRef.current.contains(event.target as Node)) ||
-        (containerRef.current &&
-          containerRef.current.contains(event.target as Node))
-      ) {
-        if (event.shiftKey) {
-          setSelected(!isSelected);
-        } else {
-          clearSelection();
-          setSelected(true);
-        }
-        return true;
+  const selectAudio = React.useCallback(
+    (shiftKey: boolean) => {
+      if (shiftKey) {
+        setSelected(!isSelected);
+      } else {
+        clearSelection();
+        setSelected(true);
       }
-      return false;
     },
     [isSelected, setSelected, clearSelection],
   );
@@ -134,7 +124,16 @@ function AudioComponent({
     const unregister = mergeRegister(
       editor.registerCommand<MouseEvent>(
         CLICK_COMMAND,
-        onClick,
+        (event) => {
+          // Claims click so Lexical doesn't override selection handled by
+          // handleWrapperClick/onAudioFocus.
+          return !!(
+            (audioRef.current &&
+              audioRef.current.contains(event.target as Node)) ||
+            (containerRef.current &&
+              containerRef.current.contains(event.target as Node))
+          );
+        },
         COMMAND_PRIORITY_LOW,
       ),
       editor.registerCommand(
@@ -176,19 +175,24 @@ function AudioComponent({
     return () => {
       unregister();
     };
-  }, [editor, isSelected, nodeKey, onDelete, onEnter, onEscape, onClick]);
+  }, [editor, isSelected, nodeKey, onDelete, onEnter, onEscape]);
 
   const isFocused = isSelected;
 
+  /* The browser's built-in audio controls were catching clicks
+    before our onClick. Two methods to work around this:
+   - handleWrapperClick: handles clicks on the empty space around the bar
+   - onAudioFocus: handles clicks on the bar itself, by watching for focus
+    instead of the click
+    Note: shift-click to multi-select only works through handleWrapperClick,
+*/
   const handleWrapperClick = (e: React.MouseEvent) => {
-    // Only handle clicks on the wrapper itself, not on the audio controls
-    if (e.target === containerRef.current) {
-      if (e.shiftKey) {
-        setSelected(!isSelected);
-      } else {
-        clearSelection();
-        setSelected(true);
-      }
+    selectAudio(e.shiftKey);
+  };
+
+  const onAudioFocus = () => {
+    if (!isSelected) {
+      selectAudio(false);
     }
   };
 
@@ -219,6 +223,7 @@ function AudioComponent({
           ref={audioRef}
           controls
           muted={false}
+          onFocus={onAudioFocus}
           data-audio-id={id}
           data-caption-src={captionSrc}
           data-caption-text={!captionSrc ? captionText : undefined}
