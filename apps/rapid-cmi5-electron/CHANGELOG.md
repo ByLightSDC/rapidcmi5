@@ -1,3 +1,13 @@
+## 0.19.0 (2026-08-19)
+
+### 🚀 Features
+
+- NVDA added lang text selection support (CCUI-3036)
+
+### ❤️ Thank You
+
+- mattkeele-bylight
+
 ## 0.18.1 (2026-07-01)
 
 This was a version bump only for rapid-cmi5-electron to align it with other projects, there were no code changes.

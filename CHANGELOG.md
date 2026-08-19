@@ -1,3 +1,46 @@
+## 0.19.0 (2026-08-19)
+
+### 🚀 Features
+
+- Add generic text support to audio component (CCUI-3042)
+- NVDA added lang text selection support (CCUI-3036)
+- make image marker button toggle content on/off
+- initial commit to prevent create/rename duplicate lessons (CCUI-2775)
+- restore focus to video after exiting fullscreen
+- **cmi5-editor:** Youtube directive controls visible in player
+- **cmi5_player:** Filter anim logging to 'anim' namespace
+
+### 🩹 Fixes
+
+- stop video edit dialog from resizing and block negative dimensions
+- show validation error when video width/height goes negative
+- fix stepper buttons announcing wrong step numbers to screen readers
+- align helper icons so centered / fix so no shifting up when validation errors are shown
+- link stepper buttons to their content panels for screen readers
+- reject zero as well as negative video width/height
+- move focus to step heading on step change for screen readers
+- add delete icon to audio/video edit toolbars
+- round decimal width/height entries instead of truncating them
+- announce image label toggle state to screen readers
+- key step-heading focus effect on step, not derived title
+- match toggle-clock aria-label to visible tooltip text
+- select audio component when clicking its native control bar
+- remove false-positive scrollbar in project selection doc modals
+- keep audio edit toolbar clear of native player controls
+- announce transcript cue seeks to screen readers in audio player
+- announce transcript cue seeks to screen readers in audio player
+- stop NVDA announcing read-only code blocks as editable with autocomplete
+- announce read-only code blocks as "code block" to screen readers
+- fall back to title for image alt text and fix stray period in fullscreen aria-label
+- **cmi5-player:** Anim Pause/Play NVDA and slide navigation support (CCUI-3028)
+
+### ❤️ Thank You
+
+- Matt Keele
+- mattkeele-bylight
+- Megan Bohland
+- micodevstar
+
 ## 0.18.1 (2026-07-01)
 
 ### 🩹 Fixes
