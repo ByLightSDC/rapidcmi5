@@ -4,12 +4,11 @@ import {
   useCellValues,
   useMdastNodeUpdater,
 } from '@mdxeditor/editor';
-import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { TabsContext } from './TabsContext';
 import { ContainerDirective } from 'mdast-util-directive';
 import { TabContentDirectiveNode } from './types';
 import { Box, useTheme } from '@mui/material';
-import { visuallyHidden } from '@mui/utils';
 import { editorInPlayback$ } from '../../state/vars';
 import { AlignmentToolbarControls } from '../../components/AlignmentToolbarControls';
 import {
@@ -71,54 +70,6 @@ export const TabContentEditor: React.FC<
     //REF console.log('visible');
   }, [contentIsVisible]);
 
-  /**
-   * Announces this panel's title via a live region rendered inside the
-   * panel itself (WCAG 4.1.3 Status Messages) — living here, rather than
-   * off in a shared spot outside the tabpanel, means it reads immediately
-   * before the panel's own content instead of as a separate stop.
-   *
-   * Deferred rather than fired synchronously with the visibility change:
-   * NVDA's own "selected" state-change announcement fires at the same
-   * moment, and cancels an already-queued polite live-region message to
-   * speak that instead. Delaying gives our announcement its own turn.
-   */
-  const [announcement, setAnnouncement] = useState('');
-  const hasMountedRef = useRef(false);
-
-  useEffect(() => {
-    if (!hasMountedRef.current) {
-      // Skip on initial mount — nothing has "changed" yet.
-      hasMountedRef.current = true;
-      return;
-    }
-
-    if (!contentIsVisible) {
-      return;
-    }
-
-    const title = mdastNode.attributes?.title;
-    const timeoutId = setTimeout(() => {
-      setAnnouncement(title ? `Now showing ${title} panel` : '');
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [contentIsVisible, mdastNode.attributes?.title]);
-
-  /**
-   * Clears the announcement a few seconds after it's set so it behaves as a
-   * one-shot status message rather than permanent page text — otherwise a
-   * user who later browses back over this spot (without re-activating the
-   * tab) would hear "Now showing X panel" read again as if it were part of
-   * the actual content.
-   */
-  useEffect(() => {
-    if (!announcement) {
-      return;
-    }
-    const clearTimeoutId = setTimeout(() => setAnnouncement(''), 3000);
-    return () => clearTimeout(clearTimeoutId);
-  }, [announcement]);
-
   const handleAlignmentChange = (value: 'left' | 'center' | 'right') => {
     updateMdastNode({
       ...mdastNode,
@@ -149,10 +100,6 @@ export const TabContentEditor: React.FC<
       tabIndex={contentIsVisible ? 0 : -1}
     >
       {alignmentStyles}
-
-      <Box aria-live="polite" aria-atomic="true" sx={visuallyHidden}>
-        {announcement}
-      </Box>
 
       {isFocused && !isPlayback && (
         <Box
