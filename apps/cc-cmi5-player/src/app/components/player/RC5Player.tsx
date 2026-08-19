@@ -461,7 +461,7 @@ function RC5Player() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Full screen image"
+          aria-label="Full screen image. Press Escape to exit."
           ref={fullScreenDialogRef}
           tabIndex={-1}
           onClick={(e: React.MouseEvent<HTMLDivElement>) => {
@@ -508,7 +508,7 @@ function RC5Player() {
             color="common.white"
             sx={{ padding: '6px', position: 'absolute', left: 0, bottom: 0 }}
           >
-            Click Anywhere to Close
+            Click Anywhere or Press Escape to Close
           </Typography>
         </div>
       )}

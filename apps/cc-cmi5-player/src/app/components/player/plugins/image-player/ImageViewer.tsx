@@ -116,6 +116,13 @@ export function ImageViewer({
   // open state directly so both trigger it
   const [showFullscreenHint, setShowFullscreenHint] = React.useState(false);
 
+  // the overlay sits on top of the <img>, so its native title-attribute
+  // tooltip can never be reached by hover - fold it into this tooltip
+  // instead, since that's the one that actually receives hover/focus
+  const fullscreenTooltipText = title
+    ? `${title} — Click to view full screen`
+    : 'Click to view full screen';
+
   // determine styles
   let styleAttribute: MdxJsxAttribute | undefined;
   let style: React.CSSProperties = {};
@@ -192,13 +199,16 @@ export function ImageViewer({
               }}
             />
           ) : (
-            <Tooltip
-              title="Click to view full screen"
-              open={showFullscreenHint}
-            >
+            <Tooltip title={fullscreenTooltipText} open={showFullscreenHint}>
               <div
                 id={`image-labels-${id}`}
                 ref={labelsRef}
+                role="presentation"
+                // Tooltip clones its title onto aria-label unconditionally
+                // (@mui/material/Tooltip.js) - overriding it here to undefined
+                // stops this div from duplicating the image's own accessible
+                // name and being announced as an unlabeled grouping.
+                aria-label={undefined}
                 onMouseEnter={() => setShowFullscreenHint(true)}
                 onMouseLeave={() => setShowFullscreenHint(false)}
                 style={{
