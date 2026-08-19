@@ -97,6 +97,7 @@ export const TabContentEditor: React.FC<
       role="tabpanel"
       id={`tabpanel-${tabIndex}`}
       aria-labelledby={`tab-${tabIndex}`}
+      tabIndex={0}
     >
       {alignmentStyles}
 
