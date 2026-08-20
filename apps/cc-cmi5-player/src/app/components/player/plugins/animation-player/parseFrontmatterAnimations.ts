@@ -1,4 +1,4 @@
-import { AnimationConfig } from '@rapid-cmi5/ui';
+import { AnimationConfig, debugLog } from '@rapid-cmi5/ui';
 import * as yaml from 'js-yaml';
 
 /**
@@ -9,43 +9,70 @@ export function parseFrontmatterAnimations(
   markdown: string,
 ): AnimationConfig[] {
   if (!markdown || typeof markdown !== 'string') {
-    console.log('⚠️ No markdown content to parse');
+    debugLog(
+      '⚠️ No markdown content to parse',
+      undefined,
+      undefined,
+      'animation',
+    );
     return [];
   }
 
-  console.log('🔍 Parsing frontmatter from markdown...');
+  debugLog(
+    '🔍 Parsing frontmatter from markdown...',
+    undefined,
+    undefined,
+    'animation',
+  );
 
   // Extract frontmatter between --- markers
   const frontmatterMatch = markdown.match(/^---\n([\s\S]*?)\n---/);
 
   if (!frontmatterMatch) {
-    console.log('📄 No frontmatter found in markdown');
+    debugLog(
+      '📄 No frontmatter found in markdown',
+      undefined,
+      undefined,
+      'animation',
+    );
     return [];
   }
 
   const frontmatterYaml = frontmatterMatch[1];
-  console.log(
+  debugLog(
     '📋 Found frontmatter YAML:',
     frontmatterYaml.substring(0, 100) + '...',
+    undefined,
+    'animation',
   );
 
   try {
     const frontmatter: any = yaml.load(frontmatterYaml);
-    console.log('✅ Parsed frontmatter:', frontmatter);
+    debugLog('✅ Parsed frontmatter:', frontmatter, undefined, 'animation');
 
     if (
       frontmatter &&
       frontmatter.animations &&
       Array.isArray(frontmatter.animations)
     ) {
-      console.log('🎬 Found', frontmatter.animations.length, 'animations!');
+      debugLog(
+        `🎬 Found ${frontmatter.animations.length} animations!`,
+        undefined,
+        undefined,
+        'animation',
+      );
 
       // Store in window for backward compatibility with getSlideAnimations()
       (window as any).__slideAnimations = frontmatter.animations;
 
       return frontmatter.animations as AnimationConfig[];
     } else {
-      console.log('📭 No animations array in frontmatter');
+      debugLog(
+        '📭 No animations array in frontmatter',
+        undefined,
+        undefined,
+        'animation',
+      );
       return [];
     }
   } catch (error) {

@@ -406,6 +406,13 @@ export class MediaEventManager {
         : 'video_fullscreen_exit';
 
       sendSlideEventVerb(slideNumber, eventType, slideName);
+
+      // Restore focus to the video on exit (Esc, native exit-fullscreen
+      // button, F11, etc. all land here via fullscreenElement going null),
+      // otherwise NVDA loses its place after fullscreen closes.
+      if (!isFullscreen) {
+        video.focus();
+      }
     });
   }
 

@@ -52,7 +52,7 @@ function LazyImage({
       id={id}
       className={className ?? undefined}
       alt={alt}
-      aria-label={isLinked ? undefined : `${alt}. Click to view full screen.`}
+      aria-label={isLinked ? undefined : `${alt} Click to view full screen.`}
       src={imgCache.read(url)}
       title={title}
       draggable="false"
@@ -199,7 +199,10 @@ export function ImageViewer({
               }}
             />
           ) : (
-            <Tooltip title={fullscreenTooltipText} open={showFullscreenHint}>
+            <Tooltip
+              title="Click to view full screen"
+              open={showFullscreenHint}
+            >
               <div
                 id={`image-labels-${id}`}
                 ref={labelsRef}
@@ -227,7 +230,7 @@ export function ImageViewer({
             className={classNames(passedClassName)}
             src={imageSource}
             title={title ?? ''}
-            alt={alt ?? ''}
+            alt={alt || title || ''}
             isLinked={isLinked}
             onFullscreenHintVisibilityChange={setShowFullscreenHint}
             rest={rest}

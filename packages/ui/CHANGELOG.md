@@ -1,3 +1,34 @@
+## 0.19.0 (2026-08-19)
+
+### 🚀 Features
+
+- **cmi5_player:** Filter anim logging to 'anim' namespace
+- **cmi5-editor:** Youtube directive controls visible in player
+- initial commit to prevent create/rename duplicate lessons (CCUI-2775)
+- make image marker button toggle content on/off
+- NVDA added lang text selection support (CCUI-3036)
+- Add generic text support to audio component (CCUI-3042)
+
+### 🩹 Fixes
+
+- announce read-only code blocks as "code block" to screen readers
+- stop NVDA announcing read-only code blocks as editable with autocomplete
+- announce transcript cue seeks to screen readers in audio player
+- announce transcript cue seeks to screen readers in audio player
+- **cmi5-player:** Anim Pause/Play NVDA and slide navigation support (CCUI-3028)
+- key step-heading focus effect on step, not derived title
+- announce image label toggle state to screen readers
+- move focus to step heading on step change for screen readers
+- link stepper buttons to their content panels for screen readers
+- align helper icons so centered / fix so no shifting up when validation errors are shown
+- fix stepper buttons announcing wrong step numbers to screen readers
+
+### ❤️ Thank You
+
+- Matt Keele
+- mattkeele-bylight
+- Megan Bohland
+
 ## 0.18.1 (2026-07-01)
 
 This was a version bump only for rapid-cmi5-ui to align it with other projects, there were no code changes.

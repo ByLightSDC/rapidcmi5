@@ -1,3 +1,31 @@
+## 0.19.0 (2026-08-19)
+
+### 🚀 Features
+
+- initial commit to prevent create/rename duplicate lessons (CCUI-2775)
+- NVDA added lang text selection support (CCUI-3036)
+- Add generic text support to audio component (CCUI-3042)
+
+### 🩹 Fixes
+
+- announce transcript cue seeks to screen readers in audio player
+- announce transcript cue seeks to screen readers in audio player
+- keep audio edit toolbar clear of native player controls
+- remove false-positive scrollbar in project selection doc modals
+- select audio component when clicking its native control bar
+- round decimal width/height entries instead of truncating them
+- add delete icon to audio/video edit toolbars
+- reject zero as well as negative video width/height
+- align helper icons so centered / fix so no shifting up when validation errors are shown
+- show validation error when video width/height goes negative
+- stop video edit dialog from resizing and block negative dimensions
+
+### ❤️ Thank You
+
+- Matt Keele
+- mattkeele-bylight
+- Megan Bohland
+
 ## 0.18.1 (2026-07-01)
 
 This was a version bump only for rapid-cmi5-editor to align it with other projects, there were no code changes.

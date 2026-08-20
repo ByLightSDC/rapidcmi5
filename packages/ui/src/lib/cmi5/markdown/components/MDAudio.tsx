@@ -1,6 +1,8 @@
 import React from 'react';
 import ClosedCaptionIcon from '@mui/icons-material/ClosedCaption';
 import { AuContextProps } from '@rapid-cmi5/cmi5-build-common';
+import { useLiveAnnouncer } from '../../../hooks/useLiveAnnouncer';
+import { LiveStatusRegion } from '../../../accessibility/LiveStatusRegion';
 
 /**
  * A single parsed WebVTT cue.
@@ -158,6 +160,10 @@ export default function MDAudio(
     node?.properties?.autoplay !== false;
 
   const audioRef = React.useRef<HTMLAudioElement>(null);
+  // Announces cue-driven seeks to assistive tech. The native <audio> scrubber
+  // is shadow DOM we can't attach ARIA to, so clicking a transcript cue moves
+  // playback silently for a non-sighted user (WCAG 4.1.3).
+  const { ref: announceRef, announce } = useLiveAnnouncer();
   const [cues, setCues] = React.useState<VttCue[]>([]);
   const [text, setText] = React.useState<string>(legacyText);
   const [activeIndex, setActiveIndex] = React.useState<number>(-1);
@@ -292,6 +298,7 @@ export default function MDAudio(
               aria-label="Transcript"
               style={{ display: 'block' }}
             >
+              {hasCues && <LiveStatusRegion announceRef={announceRef} />}
               {hasCues ? (
                 <ol style={{ listStyle: 'none', padding: 0, marginTop: 4 }}>
                   {cues.map((cue, index) => (
@@ -302,6 +309,7 @@ export default function MDAudio(
                         if (audioRef.current) {
                           audioRef.current.currentTime = cue.start;
                         }
+                        announce(`Jumped to ${formatTime(cue.start)}`);
                       }}
                       style={{
                         display: 'flex',
