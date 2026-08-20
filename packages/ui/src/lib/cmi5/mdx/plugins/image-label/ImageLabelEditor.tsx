@@ -204,17 +204,24 @@ export const ImageLabelEditor: React.FC<
   };
 
   /**
+   * Close the label content, if open
+   */
+  const closeLabel = () => {
+    document.removeEventListener('mousedown', handleMouseDown);
+    imageLabelKeys$.value = {
+      ...imageLabelKeys$.value,
+      [imageId]: null,
+    };
+  };
+
+  /**
    * Toggle Label Content open/closed
    * @param event
    */
   const handleToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (imageId) {
       if (isOpen) {
-        document.removeEventListener('mousedown', handleMouseDown);
-        imageLabelKeys$.value = {
-          ...imageLabelKeys$.value,
-          [imageId]: null,
-        };
+        closeLabel();
       } else {
         checkLabelPlacement();
         setAnchorEl(event?.currentTarget);
@@ -229,6 +236,22 @@ export const ImageLabelEditor: React.FC<
       debugLog('no imageId found for label');
     }
   };
+
+  // Escape closes the label without requiring the toggle button to be
+  // reactivated - NVDA can lose track of a control right after it caused a
+  // DOM change (confirmed live: its browse-mode position can fully desync
+  // from the real page), so this gives keyboard/AT users a reliable second
+  // path that doesn't depend on that same element again.
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeLabel();
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isOpen]);
 
   /**
    * Listen for image label open change
