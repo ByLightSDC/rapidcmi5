@@ -260,7 +260,6 @@ function RC5Player() {
             setFullScreenImageStyle({});
           }
 
-          // remember what had focus so it can be restored when the dialog closes
           fullScreenTriggerRef.current =
             document.activeElement as HTMLElement | null;
 

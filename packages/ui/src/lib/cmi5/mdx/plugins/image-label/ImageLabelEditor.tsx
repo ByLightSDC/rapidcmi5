@@ -237,11 +237,8 @@ export const ImageLabelEditor: React.FC<
     }
   };
 
-  // Escape closes the label without requiring the toggle button to be
-  // reactivated - NVDA can lose track of a control right after it caused a
-  // DOM change (confirmed live: its browse-mode position can fully desync
-  // from the real page), so this gives keyboard/AT users a reliable second
-  // path that doesn't depend on that same element again.
+  // Escape closes the label independent of the toggle button, which NVDA can
+  // lose track of right after it causes a DOM change (confirmed live).
   useEffect(() => {
     if (!isOpen) return;
     const handleEscape = (event: KeyboardEvent) => {
