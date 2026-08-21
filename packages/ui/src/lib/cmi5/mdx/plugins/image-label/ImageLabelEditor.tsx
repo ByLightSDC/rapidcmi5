@@ -204,17 +204,24 @@ export const ImageLabelEditor: React.FC<
   };
 
   /**
+   * Close the label content, if open
+   */
+  const closeLabel = () => {
+    document.removeEventListener('mousedown', handleMouseDown);
+    imageLabelKeys$.value = {
+      ...imageLabelKeys$.value,
+      [imageId]: null,
+    };
+  };
+
+  /**
    * Toggle Label Content open/closed
    * @param event
    */
   const handleToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (imageId) {
       if (isOpen) {
-        document.removeEventListener('mousedown', handleMouseDown);
-        imageLabelKeys$.value = {
-          ...imageLabelKeys$.value,
-          [imageId]: null,
-        };
+        closeLabel();
       } else {
         checkLabelPlacement();
         setAnchorEl(event?.currentTarget);
@@ -229,6 +236,19 @@ export const ImageLabelEditor: React.FC<
       debugLog('no imageId found for label');
     }
   };
+
+  // Escape closes the label independent of the toggle button, which NVDA can
+  // lose track of right after it causes a DOM change (confirmed live).
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeLabel();
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isOpen]);
 
   /**
    * Listen for image label open change
@@ -285,7 +305,7 @@ export const ImageLabelEditor: React.FC<
             name="Image Marker"
             props={{
               'aria-expanded': isOpen,
-              'aria-label': isOpen ? 'Hide label content' : 'Show label content',
+              'aria-label': 'Toggle label content',
               onClick: (event) => {
                 event.stopPropagation();
                 handleToggle(event);

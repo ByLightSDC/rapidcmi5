@@ -99,6 +99,10 @@ function RC5Player() {
   ).current;
 
   const slideContentRef = useRef<HTMLDivElement>(null);
+  const fullScreenDialogRef = useRef<HTMLDivElement>(null);
+  // remembers whatever had focus (usually the image) so it can be restored
+  // when the full screen dialog closes
+  const fullScreenTriggerRef = useRef<HTMLElement | null>(null);
 
   // Move focus into the slide region so NVDA starts reading from the top when a slide changes.
   // useEffect listens for activeTab, only fires when the active slide changes.
@@ -256,6 +260,9 @@ function RC5Player() {
             setFullScreenImageStyle({});
           }
 
+          fullScreenTriggerRef.current =
+            document.activeElement as HTMLElement | null;
+
           // set the full screen image
           setFullScreenImage(src);
         }
@@ -296,6 +303,21 @@ function RC5Player() {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
+
+  /**
+   * Move focus into the full screen dialog when it opens, and restore focus
+   * to whatever triggered it (usually the image) when it closes. Without
+   * this, focus silently stays on the (now hidden) slide image the whole
+   * time, which is what left screen readers unable to tell the dialog had
+   * opened or closed.
+   */
+  useEffect(() => {
+    if (fullScreenImage) {
+      fullScreenDialogRef.current?.focus();
+    } else {
+      fullScreenTriggerRef.current?.focus();
+    }
+  }, [fullScreenImage]);
 
   const editorContainerRef = useRef<HTMLDivElement>(null);
 
@@ -437,9 +459,21 @@ function RC5Player() {
       {fullScreenImage && (
         <div
           role="dialog"
+          aria-modal="true"
+          aria-label="Full screen image. Press Escape to exit."
+          ref={fullScreenDialogRef}
+          tabIndex={-1}
           onClick={(e: React.MouseEvent<HTMLDivElement>) => {
             e.stopPropagation();
             setFullScreenImage('');
+          }}
+          onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+            // there's nothing else to tab to in here, so keep focus in the
+            // dialog rather than letting it wander into the hidden slide behind it
+            if (e.key === 'Tab') {
+              e.preventDefault();
+              fullScreenDialogRef.current?.focus();
+            }
           }}
           id="full screen"
           style={{
@@ -473,7 +507,7 @@ function RC5Player() {
             color="common.white"
             sx={{ padding: '6px', position: 'absolute', left: 0, bottom: 0 }}
           >
-            Click Anywhere to Close
+            Click Anywhere or Press Escape to Close
           </Typography>
         </div>
       )}
