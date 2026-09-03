@@ -16,7 +16,7 @@ loadEnv({ path: join(workspaceRoot, '.env') });
  * point Playwright at it via `MOODLE_BASE_URL` and authenticate as the
  * e2e bot account inside the browser session.
  *
- * See docs/moodle-player-e2e-strategy.md.
+ * See apps/cc-cmi5-moodle-e2e/README.md.
  */
 const baseURL =
   process.env['MOODLE_BASE_URL'] ||
@@ -43,7 +43,7 @@ export default defineConfig({
   // path — present on main, unrelated to these tests). That blanks the
   // player iframe and fails whatever test ran during that launch. Retry so a
   // transient crash re-launches instead of red-flagging the suite. See the
-  // known-issue note in docs/moodle-player-e2e-strategy.md.
+  // known-issue note in apps/cc-cmi5-moodle-e2e/README.md.
   retries: 2,
   use: {
     baseURL,

@@ -16,7 +16,7 @@ import { moodleEnv } from '../moodle/env';
  *   - Components:Basic     (tabs / accordion / grid / statements)
  *   - Quiz:Basic           (one :::quiz slide)
  * (Individual and Class scenarios can't live in the same cmi5 lesson, hence
- *  the split — see docs/moodle-player-e2e-strategy.md.)
+ *  the split — see apps/cc-cmi5-moodle-e2e/README.md.)
  *
  * A spec declares which AU it exercises via the `auName` option:
  *
