@@ -28,9 +28,13 @@
           "project": ["chromium"],
           "ui": true
         },
-        "launch": {
+        "content": {
           "project": ["chromium"],
-          "grep": "@launch"
+          "grep": "@content"
+        },
+        "quizzes": {
+          "project": ["chromium"],
+          "grep": "@quizzes"
         },
         "scenario": {
           "project": ["chromium"],

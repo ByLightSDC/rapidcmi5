@@ -15,7 +15,7 @@ function required(name: string): string {
     throw new Error(
       `Missing required env var ${name}. ` +
         `Set it in a gitignored .env at the repo root or as a CI secret. ` +
-        `See docs/moodle-player-e2e-strategy.md.`,
+        `See apps/cc-cmi5-moodle-e2e/README.md.`,
     );
   }
   return value.trim();
@@ -40,14 +40,16 @@ export const moodleEnv = {
   },
   /**
    * cmi5 activity id — the `id` in `mod/cmi5/view.php?id=<id>`.
-   * Points at the manually-uploaded e2e course (744, in course container 75)
-   * which carries a PRODUCTION player build (with the player-* / directive-*
-   * test-ids; a dev build 404s its vendor.js → blank player). Re-uploading
-   * manually changes this id — override via MOODLE_ACTIVITY_ID in .env.local.
-   * Programmatic update-in-place (phase 3) will keep it stable.
+   * Points at the e2e course activity (in course container 75) which carries a
+   * PRODUCTION player build (with the player-* / directive-* test-ids; a dev
+   * build 404s its vendor.js → blank player).
+   *
+   * `npm run upload:moodle` upserts IN PLACE, so this id is now stable across
+   * re-uploads. Set MOODLE_ACTIVITY_ID in .env.local; the fallback below is
+   * only a last resort and may be stale.
    */
   get activityId(): string {
-    return optional('MOODLE_ACTIVITY_ID', '744');
+    return optional('MOODLE_ACTIVITY_ID', '784');
   },
 
   // --- Moodle web service (course upsert + registration reset) ---
