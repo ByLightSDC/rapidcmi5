@@ -1,3 +1,18 @@
+## 0.20.0 (2026-09-04)
+
+### 🚀 Features
+
+- make tab panel keyboard-reachable and announce content changes
+
+### 🩹 Fixes
+
+- give file download links a single accessible control
+- add vertical spacing between file download links
+
+### ❤️ Thank You
+
+- Megan Bohland
+
 ## 0.19.0 (2026-08-19)
 
 ### 🚀 Features

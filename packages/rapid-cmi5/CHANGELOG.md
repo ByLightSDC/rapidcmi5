@@ -1,3 +1,7 @@
+## 0.20.0 (2026-09-04)
+
+This was a version bump only for rapid-cmi5-editor to align it with other projects, there were no code changes.
+
 ## 0.19.0 (2026-08-19)
 
 ### 🚀 Features
