@@ -100,11 +100,9 @@ export function ImageViewer({
     imagePreviewHandler$,
   );
   const [imageSource, setImageSource] = React.useState<string | null>(null);
-  // images inside a link already navigate on click/enter and get their
-  // accessible name from the alt text, so they don't need the full-screen
-  // button/tooltip treatment. The overlay div is only rendered once
-  // imageSource resolves, so a callback ref is used instead of a mount
-  // effect, which would run before the div exists and never fire again.
+  // Linked images already navigate/announce via the <a>, so no fullscreen
+  // treatment needed. Uses a callback ref (not a mount effect) since this
+  // div isn't rendered until imageSource resolves, which an effect could miss.
   const [isLinked, setIsLinked] = React.useState(false);
   const labelsRef = React.useCallback((node: HTMLDivElement | null) => {
     if (node) {
@@ -115,6 +113,13 @@ export function ImageViewer({
   // keyboard focus lands on the <img> underneath it - control the tooltip's
   // open state directly so both trigger it
   const [showFullscreenHint, setShowFullscreenHint] = React.useState(false);
+
+  // the overlay sits on top of the <img>, so its native title-attribute
+  // tooltip can never be reached by hover - fold it into this tooltip
+  // instead, since that's the one that actually receives hover/focus
+  const fullscreenTooltipText = title
+    ? `${title} — Click to view full screen`
+    : 'Click to view full screen';
 
   // determine styles
   let styleAttribute: MdxJsxAttribute | undefined;
@@ -192,14 +197,14 @@ export function ImageViewer({
               }}
             />
           ) : (
-            <Tooltip
-              title="Click to view full screen"
-              open={showFullscreenHint}
-            >
+            <Tooltip title={fullscreenTooltipText} open={showFullscreenHint}>
               <div
                 id={`image-labels-${id}`}
                 ref={labelsRef}
-                aria-hidden="true"
+                role="presentation"
+                // Overrides Tooltip's auto-injected aria-label (MUI always clones
+                // title onto it), which duplicated the image's name as an unlabeled grouping.
+                aria-label={undefined}
                 onMouseEnter={() => setShowFullscreenHint(true)}
                 onMouseLeave={() => setShowFullscreenHint(false)}
                 style={{
