@@ -305,7 +305,7 @@ export const ImageLabelEditor: React.FC<
             name="Image Marker"
             props={{
               'aria-expanded': isOpen,
-              'aria-label': 'Toggle label content',
+              'aria-label': isOpen ? 'Hide label content' : 'Show label content',
               onClick: (event) => {
                 event.stopPropagation();
                 handleToggle(event);
