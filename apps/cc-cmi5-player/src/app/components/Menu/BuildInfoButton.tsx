@@ -47,7 +47,7 @@ export default function BuildInfoButton({ color }: { color?: string }) {
       >
         <IconButton
           sx={{ width: '32px', height: '32px' }}
-          aria-label="Build Information"
+          aria-label="About RapidCMI5"
           color="primary"
           onClick={(e) => setAnchor(e.currentTarget)}
         >
