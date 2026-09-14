@@ -40,7 +40,13 @@ export function rewriteLaunchHost(
 ): string {
   const remote = new URL(launchUrl);
   const local = new URL(playerUrl);
-  return `${local.origin}/index.html${remote.search}${remote.hash}`;
+  // Keep the player URL's path (e.g. /course/blocks/<name>/<au>/index.html)
+  // and layer the LMS launch params on top of any params it already has.
+  remote.searchParams.forEach((value, key) => {
+    local.searchParams.set(key, value);
+  });
+  local.hash = remote.hash || local.hash;
+  return local.toString();
 }
 
 export async function fetchLaunchUrl(args: {
