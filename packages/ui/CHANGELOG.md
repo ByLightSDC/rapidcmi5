@@ -1,3 +1,21 @@
+## 0.20.1 (2026-09-17)
+
+### 🚀 Features
+
+- make tab panel keyboard-reachable and announce content changes ([92314501](https://github.com/ByLightSDC/rapidcmi5/commit/92314501))
+
+### 🩹 Fixes
+
+- **cc-cmi5-player:** restore image title tooltip fusion dropped by merge ([92cb590f](https://github.com/ByLightSDC/rapidcmi5/commit/92cb590f))
+- **rapid-cmi5-ui:** add Escape as a reliable close path for image labels ([146c93d2](https://github.com/ByLightSDC/rapidcmi5/commit/146c93d2))
+- correct ARIA issues on image label marker button ([5adbb98a](https://github.com/ByLightSDC/rapidcmi5/commit/5adbb98a))
+- add vertical spacing between file download links ([67da8c4e](https://github.com/ByLightSDC/rapidcmi5/commit/67da8c4e))
+- give file download links a single accessible control ([c2289fbe](https://github.com/ByLightSDC/rapidcmi5/commit/c2289fbe))
+
+### ❤️ Thank You
+
+- Megan Bohland
+
 ## 0.20.0 (2026-09-04)
 
 ### 🚀 Features
