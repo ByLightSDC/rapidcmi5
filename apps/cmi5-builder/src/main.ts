@@ -26,7 +26,6 @@ import {
 import YAML from 'yaml';
 import 'dotenv/config';
 import { OpendashUploadService } from './services/openDash/opendashUploadService';
-import { MoodleUploadService } from './services/moodle/moodleUploadService';
 import {
   cleanMkdocs,
   flattenFolders,
@@ -34,6 +33,7 @@ import {
   generateCourseJson,
 } from '@rapid-cmi5/cmi5-build-common';
 import { getFolderStructureBackend } from './fileSystem/fileSystem';
+import { MoodleUploadServiceV2 } from './services/moodle/moodleUploadServiceV2';
 
 export interface CourseMeta {
   courseName?: string;
@@ -263,61 +263,6 @@ program
       );
     }
   });
-
-program
-  .command('upload-moodle-zip')
-  .description(
-    'Upload an ALREADY-BUILT cmi5 zip to Moodle (no rebuild). Updates the ' +
-      'activity in place if --modulename matches an existing one (preserving ' +
-      'its cmid), else creates a new activity. Needs MOODLE_WS_TOKEN.',
-  )
-  .argument('<zipPath>', 'Path to the prebuilt cmi5 .zip')
-  .argument('<endpoint>', 'moodle endpoint')
-  .requiredOption(
-    '--modulename <name>',
-    'Activity name AS IT APPEARS IN MOODLE (e.g. "E2E Tests") — must match ' +
-      'for in-place update to find the existing activity',
-  )
-  .option('--moodle-course-id <id>', 'The Moodle course (container) id')
-  .option('--moodle-course-name <name>', 'The Moodle course fullname')
-  .option('--moodle-section-id <id>', 'The Moodle course section id', '0')
-  .action(async (zipPath, endpoint, options) => {
-    const moodleWsToken = process.env['MOODLE_WS_TOKEN'];
-    if (!moodleWsToken) {
-      console.error('❌ MOODLE_WS_TOKEN env var is required.');
-      process.exit(1);
-    }
-
-    const resolvedZip = path.resolve(zipPath);
-    try {
-      await fs.access(resolvedZip);
-    } catch {
-      console.error(`❌ Zip not found: ${resolvedZip}`);
-      process.exit(1);
-    }
-
-    console.log(`Uploading ${resolvedZip} to moodle at ${endpoint}...`);
-
-    const uploader = new MoodleUploadService({
-      baseUrl: endpoint,
-      wstoken: moodleWsToken,
-    });
-
-    try {
-      const result = await uploader.uploadPrebuiltZip({
-        zipPath: resolvedZip,
-        modulename: options.modulename,
-        moodleCourseId: options.moodleCourseId,
-        moodleCourseName: options.moodleCourseName,
-        moodleSectionId: Number(options.moodleSectionId),
-      });
-      console.log('✅ Upload finished. Response:', result);
-    } catch (err: any) {
-      console.error('❌ Upload failed:', err?.message ?? err);
-      process.exit(1);
-    }
-  });
-
 program
   .command('build-moodle')
   .description(
@@ -330,35 +275,9 @@ program
     '--apply-au-mappings <endpoint>',
     'Create AU mappings Specific to Opendash Format (AU ID -> Scenario) at endpoint',
   )
-  .option(
-    '--course-meta <yamlPath>',
-    'Path to optional YAML file to override course metadata',
-  )
   .option('--zip <path>', 'Create a ZIP of the output directory')
-  .option('--moodle-course-name <name>', 'The Moodle course fullname')
-  .option('--moodle-course-id <id>', 'The Moodle course id')
-  .option('--moodle-section-id <id>', 'The Moodle course section id')
-  .option('--convert', 'convert from mkdocs')
-
   .action(async (coursePath, distPath, endpoint, options) => {
     console.log(`Uploading to moodle at ${endpoint}...`);
-
-    const hasName = !!options.moodleCourseName;
-    const hasId = !!options.moodleCourseId;
-
-    if (hasName && hasId) {
-      console.error(
-        '❌ Please provide either --moodle-course-name or --moodle-course-id, not both.',
-      );
-      process.exit(1);
-    }
-
-    if (!hasName && !hasId) {
-      console.error(
-        '❌ You must provide either --moodle-course-name or --moodle-course-id.',
-      );
-      process.exit(1);
-    }
 
     const inputPath = path.resolve(coursePath);
     const outputPath = path.resolve(distPath);
@@ -392,35 +311,23 @@ program
 
     zipCmi5(outputPath, zipPath);
 
-    const jwtDevopsApi = process.env['JWT_DEVOPS_API'];
     const moodleWsToken = process.env['MOODLE_WS_TOKEN'];
 
-    if (jwtDevopsApi && moodleWsToken) {
+    if (moodleWsToken) {
       console.log('📊  Uploading zip to moodle...');
-      const mappingEndpoint = options.applyAuMappings;
-
-      const auMappingService = new AuMappingService({
-        baseUrl: mappingEndpoint,
-        jwt: jwtDevopsApi,
-      });
-
-      const uploader = new MoodleUploadService({
+      const uploader = new MoodleUploadServiceV2({
         baseUrl: endpoint,
         wstoken: moodleWsToken,
       });
 
-      await uploader.uploadCourse(
-        courseData,
-        auMappingService,
+      await uploader.uploadCourse({
+        projectIdentifier: courseData.courseId,
+        projectName: courseData.courseTitle,
         zipPath,
-        options.applyAuMappings,
-        options.moodleSectionId,
-        options.moodleCourseId,
-        options.moodleCourseName,
-      );
+      });
     } else {
       console.log(
-        `❌  No TOKEN was provided for moodleWsToken ${moodleWsToken ? 'true' : 'false'} or ros ${jwtDevopsApi ? 'true' : 'false'}`,
+        `❌  No TOKEN was provided for moodleWsToken ${moodleWsToken}`,
       );
     }
   });
@@ -608,10 +515,11 @@ function makeScenarioSlide(args: {
   };
 }
 
-function isScenarioSlide(slide: SlideType): boolean {
-  return (
-    typeof slide.content === 'string' && slide.content.includes(':::scenario')
-  );
+function isScenarioSlide(slide?: SlideType): boolean {
+  if (slide?.content) {
+    return slide?.content.includes(':::scenario');
+  }
+  return false;
 }
 
 function ensureScenarioFirst(

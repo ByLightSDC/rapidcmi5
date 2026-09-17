@@ -22,6 +22,11 @@
             "glob": "**/*.json",
             "input": "libs/types/cmi5/src/schemas",
             "output": "libs/types/cmi5/src/schemas"
+          },
+          {
+            "glob": "package.json",
+            "input": "packages/common",
+            "output": "packages/common"
           }
         ],
         "generatePackageJson": true,
