@@ -1,3 +1,13 @@
+## 0.21.0 (2026-09-17)
+
+### 🩹 Fixes
+
+- launch url for local testing was not using the correct url ([db91d537](https://github.com/ByLightSDC/rapidcmi5/commit/db91d537))
+
+### ❤️ Thank You
+
+- Aaron Crawford @aaiirr123
+
 ## 0.20.0 (2026-09-04)
 
 This was a version bump only for rapid-cmi5-editor to align it with other projects, there were no code changes.

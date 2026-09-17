@@ -1,3 +1,7 @@
+## 0.21.0 (2026-09-17)
+
+This was a version bump only for cmi5-build-common to align it with other projects, there were no code changes.
+
 ## 0.20.0 (2026-09-04)
 
 This was a version bump only for cmi5-build-common to align it with other projects, there were no code changes.

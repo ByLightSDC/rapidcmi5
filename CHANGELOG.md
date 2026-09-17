@@ -1,3 +1,27 @@
+## 0.21.0 (2026-09-17)
+
+### 🚀 Features
+
+- make tab panel keyboard-reachable and announce content changes ([92314501](https://github.com/ByLightSDC/rapidcmi5/commit/92314501))
+
+### 🩹 Fixes
+
+- give file download links a single accessible control ([c2289fbe](https://github.com/ByLightSDC/rapidcmi5/commit/c2289fbe))
+- manage focus for full screen image dialog ([9a4fca47](https://github.com/ByLightSDC/rapidcmi5/commit/9a4fca47))
+- add vertical spacing between file download links ([67da8c4e](https://github.com/ByLightSDC/rapidcmi5/commit/67da8c4e))
+- correct ARIA issues on image label marker button ([5adbb98a](https://github.com/ByLightSDC/rapidcmi5/commit/5adbb98a))
+- launch url for local testing was not using the correct url ([db91d537](https://github.com/ByLightSDC/rapidcmi5/commit/db91d537))
+- progress bar ([#240](https://github.com/ByLightSDC/rapidcmi5/pull/240))
+- **cc-cmi5-player:** announce fullscreen image dialog state and title on hover ([a9fa600a](https://github.com/ByLightSDC/rapidcmi5/commit/a9fa600a))
+- **cc-cmi5-player:** restore image title tooltip fusion dropped by merge ([92cb590f](https://github.com/ByLightSDC/rapidcmi5/commit/92cb590f))
+- **cc-cmi5-player:** match Build Info button aria-label to its visible tooltip ([e548f09d](https://github.com/ByLightSDC/rapidcmi5/commit/e548f09d))
+- **rapid-cmi5-ui:** add Escape as a reliable close path for image labels ([146c93d2](https://github.com/ByLightSDC/rapidcmi5/commit/146c93d2))
+
+### ❤️ Thank You
+
+- Aaron Crawford @aaiirr123
+- Megan Bohland
+
 ## 0.20.0 (2026-09-04)
 
 ### 🚀 Features
