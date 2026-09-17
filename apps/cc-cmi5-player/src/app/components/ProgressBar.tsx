@@ -89,7 +89,7 @@ export default function ProgressBar({
         completeFillColor={completeFillColor}
         sxProps={sxProps}
         textProps={textProps}
-        value={80} //{auProgress}
+        value={auProgress}
       />
     </Box>
   );
