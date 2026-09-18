@@ -2,6 +2,7 @@ import { test as base, type FrameLocator, type Page } from '@playwright/test';
 import { login, gotoActivity, launchAu } from '../moodle/moodleSession';
 import { loginToKeycloak } from '../lms/keycloakLogin';
 import { moodleEnv } from '../moodle/env';
+import { collectPageErrors, type ErrorCollector } from '../support/pageErrors';
 
 /**
  * Playwright fixture that logs in as the e2e bot, launches a SPECIFIC AU of
@@ -64,6 +65,12 @@ interface MoodleOptions {
 interface MoodleFixtures {
   /** The launched player's query scope (the launch.php iframe FrameLocator). */
   player: FrameLocator | Page;
+  /**
+   * Uncaught exceptions + console errors captured from the launch onward.
+   * Attached automatically by the `player` fixture, so any spec can assert
+   * `playerErrors.assertClean()` without extra wiring.
+   */
+  playerErrors: ErrorCollector;
 }
 
 export const test = base.extend<MoodleOptions & MoodleFixtures>({
@@ -72,7 +79,14 @@ export const test = base.extend<MoodleOptions & MoodleFixtures>({
   requireKeycloakSso: [false, { option: true }],
   preLaunch: [undefined, { option: true }],
 
-  player: async ({ page, auName, requireKeycloakSso, preLaunch }, use) => {
+  playerErrors: async ({ page }, use) => {
+    // Attach before anything navigates so boot-time crashes are caught.
+    await use(collectPageErrors(page));
+  },
+
+  player: async ({ page, auName, requireKeycloakSso, preLaunch, playerErrors }, use) => {
+    // Referenced so the error collector is instantiated BEFORE the launch.
+    void playerErrors;
     // The full real flow (login → activity → launch → iframe player boot
     // against a live LRS) comfortably exceeds Playwright's 30s default.
     test.setTimeout(90_000);

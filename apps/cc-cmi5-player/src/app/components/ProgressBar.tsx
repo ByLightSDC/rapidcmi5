@@ -18,6 +18,8 @@ function LinearProgressWithLabel(
 ) {
   return (
     <Box
+      data-testid="player-progress-bar"
+      data-progress={String(Math.round(props.value))}
       sx={{
         display: 'flex',
         alignItems: 'center',
@@ -48,6 +50,7 @@ function LinearProgressWithLabel(
       </Box>
       <Box sx={{ minWidth: 35 }}>
         <Typography
+          data-testid="player-progress-label"
           aria-hidden="true"
           variant="body2"
           sx={{ fontWeight: 700, color: 'text.primary', ...props.textProps }}
