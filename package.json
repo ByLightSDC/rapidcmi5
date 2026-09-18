@@ -21,7 +21,8 @@
     "nxe:test:frontend": "nx test rapid-cmi5-electron-frontend",
     "nxe:test:backend": "nx test rapid-cmi5-electron",
     "nxe:package:app": "nx run rapid-cmi5-electron:make --prepackageOnly",
-    "nxe:make:app": "nx run rapid-cmi5-electron:make"
+    "nxe:make:app": "nx run rapid-cmi5-electron:make",
+    "reset:moodle": "node apps/cc-cmi5-moodle-e2e/scripts/reset-progress.js"
   },
   "browserslist": [
     "last 2 chrome versions",
