@@ -54,7 +54,15 @@ export const FileDownloadLink = ({
       {blobUrl && (
         <Stack
           direction="row"
-          sx={{ display: 'flex', alignItems: 'center', my: '8px' }}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            my: '8px',
+            // Theme primary meets WCAG 1.4.3 (4.5:1) in both light and dark modes;
+            // the global link color (#6f96ff) fails on light backgrounds
+            '& a, & a:visited, & a:hover': { color: 'primary.main' },
+            '& a:hover': { textDecoration: 'underline' },
+          }}
         >
           <a
             href={`${blobUrl}`}
