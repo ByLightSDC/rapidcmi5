@@ -7,13 +7,15 @@ set -e  # Exit immediately if a command exits with a non-zero status
 
 # CONFIGURATION
 IMAGE_NAME="${IMAGE_NAME:-registry.global.rangeos.engineering/components/cmi5/cmi5-builder}"
-# Defaults to the tag pointing at HEAD; override for a revision build:
+# Defaults to the tag pointing at HEAD, falling back to the most recent tag
+# reachable from HEAD; override for a revision build:
 #   VERSION=v0.20.0-r3 ./scripts/create_cmi5_builder_release.sh
-VERSION="${VERSION:-$(git describe --tags --exact-match 2>/dev/null || true)}"
+VERSION="${VERSION:-$(git describe --tags --exact-match 2>/dev/null || git describe --tags --abbrev=0 2>/dev/null || true)}"
 if [ -z "$VERSION" ]; then
-  echo "❌ No VERSION set and HEAD is not tagged. Set VERSION=vX.Y.Z and retry." >&2
+  echo "❌ No VERSION set and no tags found. Set VERSION=vX.Y.Z and retry." >&2
   exit 1
 fi
+echo "🏷️  Using version: ${VERSION}"
 DIST_DIR="dist"
 BUILD_DIR="apps/cmi5-builder"
 IS_DEVELOP=false
