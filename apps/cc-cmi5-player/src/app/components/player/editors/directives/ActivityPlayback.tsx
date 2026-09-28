@@ -177,20 +177,22 @@ export const ActivityPlayback: React.FC<
           /> */}
           </>
         )}
-        {name === 'download' && fromJson && (
-          <Box>
-            {fromJson.files.map((fileData: DownloadFileData) => {
-              return (
-                <FileDownloadLink
-                  fileData={fileData}
-                  auDir=""
-                  filePath={`./Assets/Downloads/${fileData.path}`}
-                />
-              );
-            })}
-          </Box>
-        )}
       </ThemeProvider>
+      {/* Downloads render on the slide background, not a dark activity panel,
+          so they use the page theme rather than activityTheme */}
+      {name === 'download' && fromJson && (
+        <Box>
+          {fromJson.files.map((fileData: DownloadFileData) => {
+            return (
+              <FileDownloadLink
+                fileData={fileData}
+                auDir=""
+                filePath={`./Assets/Downloads/${fileData.path}`}
+              />
+            );
+          })}
+        </Box>
+      )}
     </div>
   );
 };
