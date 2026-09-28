@@ -7,13 +7,12 @@ import { fromMarkdown } from 'mdast-util-from-markdown';
 import { directive } from 'micromark-extension-directive';
 import { visit } from 'unist-util-visit';
 import {
-  validateCTFContent,
-  validateDownloadFilesContent,
-  validateCodeRunnerContent,
-  validateQuizContent,
-  validateScenarioContent,
+  DirectiveContentMap,
+  isSupportedDirectiveName,
+  supportedDirectiveNames,
+  validateDirectiveContent,
 } from './directiveValidators';
-import { ScenarioContent } from '../types/activities';
+import { DirectiveName, ScenarioContent } from '../types/activities';
 
 // We create our own version from monaco editor, no reason to be tied up with theres
 export enum MarkerSeverity {
@@ -41,40 +40,106 @@ export interface IMarkerData {
   tags?: any[];
 }
 
-// We could get data that is completly malformed, therefore we use type unknown
-type ValidatorFn = (
-  data: unknown,
-) => { valid: true; data: any } | { valid: false; errors: string[] };
-
-const directiveValidators: Record<string, ValidatorFn> = {
-  consoles: validateScenarioContent,
-  quiz: validateQuizContent,
-  scenario: validateScenarioContent,
-  ctf: validateCTFContent,
-  download: validateDownloadFilesContent,
-  codeRunner: validateCodeRunnerContent,
-};
-
-const directiveKeys = Object.keys(directiveValidators);
-
 // An intermediary data structure should be considered instead of the monaco type
 // For now it holds all the data we need and is a good fit for transforming into code mirror format (mdxEditor)
 export function validateMarkdownDirectives(content: string): IMarkerData[] {
   const errorMarkers: IMarkerData[] = [];
 
-  const tree = fromMarkdown(content, {
-    extensions: [directive()],
-    mdastExtensions: [directiveFromMarkdown()],
-  });
-  visit(tree, (node) => {
+  visit(parseMarkdown(content), (node) => {
     if (node.type === 'containerDirective') {
-      if (directiveKeys.includes(node.name)) {
+      if (isSupportedDirectiveName(node.name)) {
         errorMarkers.push(...validateDirective(node));
       }
     }
   });
 
   return errorMarkers;
+}
+
+function parseMarkdown(content: string) {
+  return fromMarkdown(content, {
+    extensions: [directive()],
+    mdastExtensions: [directiveFromMarkdown()],
+  });
+}
+
+/**
+ * A directive body is a fenced code block (or, for legacy content, a bare
+ * paragraph) holding JSON. `ok: false` means there was nothing parseable.
+ */
+function getDirectiveJson(
+  node: ContainerDirective,
+): { ok: true; value: unknown } | { ok: false } {
+  const firstChild = node.children[0];
+  let content: string | undefined;
+
+  if (firstChild?.type === 'code') {
+    content = firstChild.value;
+  } else if (firstChild?.type === 'paragraph') {
+    const textChild = firstChild.children[0];
+    if (textChild?.type === 'text') content = textChild.value;
+  }
+
+  if (!content) return { ok: false };
+
+  try {
+    return { ok: true, value: JSON.parse(content) };
+  } catch {
+    return { ok: false };
+  }
+}
+
+/** Return all schema-valid directives of one type from a markdown document. */
+export function getValidDirectives<Name extends DirectiveName>(
+  content: string,
+  directiveName: Name,
+): DirectiveContentMap[Name][] {
+  const directives: DirectiveContentMap[Name][] = [];
+
+  visit(parseMarkdown(content), (node) => {
+    if (node.type !== 'containerDirective' || node.name !== directiveName) {
+      return;
+    }
+
+    const json = getDirectiveJson(node);
+    if (!json.ok) return;
+
+    const result = validateDirectiveContent(directiveName, json.value);
+    if (result.valid) directives.push(result.data);
+  });
+
+  return directives;
+}
+
+export type ValidDirectiveMap = {
+  [Name in DirectiveName]: DirectiveContentMap[Name][];
+};
+
+/** Parse a markdown document once and group all schema-valid directives. */
+export function getValidDirectiveMap(content: string): ValidDirectiveMap {
+  // fromEntries cannot see that the keys cover every DirectiveName
+  const directives = Object.fromEntries(
+    supportedDirectiveNames.map((name) => [name, []]),
+  ) as unknown as ValidDirectiveMap;
+
+  visit(parseMarkdown(content), (node) => {
+    if (
+      node.type !== 'containerDirective' ||
+      !isSupportedDirectiveName(node.name)
+    ) {
+      return;
+    }
+
+    const json = getDirectiveJson(node);
+    if (!json.ok) return;
+
+    const result = validateDirectiveContent(node.name, json.value);
+    if (result.valid) {
+      (directives[node.name] as unknown[]).push(result.data);
+    }
+  });
+
+  return directives;
 }
 
 /**
@@ -87,87 +152,23 @@ export function getScenarioDirectives(
   content: string,
   directiveFilter?: string,
 ): ScenarioContent[] {
-  const tree = fromMarkdown(content, {
-    extensions: [directive()],
-    mdastExtensions: [directiveFromMarkdown()],
-  });
-
   const filter = directiveFilter || 'scenario';
-
-  const directives: any[] = [];
-
-  visit(tree, (node) => {
-    if (node.type !== 'containerDirective' || node.name !== filter) return;
-
-    const pchild = node.children[0];
-    // We need to allow for legacy validation as well
-    let content;
-
-    if (pchild?.type === 'code') {
-      content = pchild.value;
-    } else if (pchild?.type === 'paragraph') {
-      const tchild = pchild.children[0];
-      if (tchild?.type === 'text') {
-        content = tchild.value;
-      }
-    } else {
-      return;
-    }
-
-    if (!content) return;
-    let directiveContent;
-
-    try {
-      directiveContent = JSON.parse(content);
-    } catch (e) {
-      console.log('Error parsing json in directive', e);
-      return;
-    }
-    const validator = directiveValidators[node.name];
-
-    if (!validator) {
-      console.log('No Validator Found', node.name);
-      return;
-    }
-
-    const result = validator(directiveContent);
-    if (!result.valid) return;
-    directives.push(result.data);
-  });
-
-  return directives;
+  if (filter !== 'scenario' && filter !== 'consoles') return [];
+  return getValidDirectives(content, filter);
 }
 
 export function validateDirective(node: ContainerDirective): IMarkerData[] {
-  const pchild = node.children[0];
-
-  // We need to allow for legacy validation as well
-  let content;
-  if (pchild?.type === 'code') {
-    content = pchild.value;
-  } else if (pchild?.type === 'paragraph') {
-    const tchild = pchild.children[0];
-    if (tchild?.type === 'text') {
-      content = tchild.value;
-    }
-  } else {
+  if (!isSupportedDirectiveName(node.name)) {
     return [invalidJsonResponse(node.position)];
   }
-  if (!content) return [invalidJsonResponse(node.position)];
-  try {
-    const directiveContent = JSON.parse(content);
 
-    const validator = directiveValidators[node.name];
-    if (!validator) return [invalidJsonResponse(node.position)];
+  const json = getDirectiveJson(node);
+  if (!json.ok) return [invalidJsonResponse(node.position)];
 
-    const result = validator(directiveContent);
-
-    if (result.valid) return [];
-
-    return result.errors.map((msg) => toMarker(msg, node.position));
-  } catch (e) {
-    return [invalidJsonResponse(node.position)];
-  }
+  const result = validateDirectiveContent(node.name, json.value);
+  return result.valid
+    ? []
+    : result.errors.map((message) => toMarker(message, node.position));
 }
 
 function toMarker(message: string, pos: Position | undefined): IMarkerData {
