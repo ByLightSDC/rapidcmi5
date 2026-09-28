@@ -1,715 +1,400 @@
-import XAPI, { InteractionComponent, LanguageMap, Statement } from '@xapi/xapi';
-import { cmi5Instance } from '../session/cmi5';
+import type { AxiosPromise } from 'axios';
+import XAPI from '@xapi/xapi';
+import type { InteractionComponent, LanguageMap } from '@xapi/xapi';
 import { v4 as uuidv4 } from 'uuid';
 
 import {
-  State,
+  CTFResponse,
+  QuestionGrading,
+  QuestionResponse,
+  RC5ActivityTypeEnum,
+  SlideActivityType,
+} from '@rapid-cmi5/cmi5-build-common';
+import type {
+  ActivityScore,
+  AnswerType,
+  CTFContent,
+  CTFQuestion,
+  QuizContent,
+  QuizQuestion,
+  QuizScore,
+  QuizState,
+  SlideActivityScore,
+} from '@rapid-cmi5/cmi5-build-common';
+import { logger } from '../debug';
+import { cmi5Instance } from '../session/cmi5';
+import {
   stateQuizCurrentAnswers,
   stateQuizCurrentQuestion,
   stateViewedSlides,
 } from '../types/SlideState';
-import { AxiosPromise } from 'axios';
+import type { State } from '../types/SlideState';
 import { checkForDevMode } from './DevMode';
-import { logger } from '../debug';
-
 import { sendActivityCompletedVerb } from './LmsStatementManager';
-import {
-  ActivityScore,
-  AnswerType,
-  RC5ActivityTypeEnum,
-  CTFContent,
-  CTFQuestion,
-  QuizScore,
-  QuizContent,
-  QuizOption,
-  QuestionResponse,
-  CTFResponse,
-  QuizQuestion,
-  QuizState,
-  SlideActivityScore,
-  SlideActivityType,
-} from '@rapid-cmi5/cmi5-build-common';
 
-/**
- * Extract activity ID from activity content based on content type
- */
-function getActivityId(activityContent: any): string {
-  if ('cmi5QuizId' in activityContent && activityContent.cmi5QuizId) {
-    return activityContent.cmi5QuizId;
-  } else if ('uuid' in activityContent && activityContent.uuid) {
-    return activityContent.uuid;
-  } else if (
-    'scenarioUUID' in activityContent &&
-    activityContent.scenarioUUID
-  ) {
-    return activityContent.scenarioUUID;
-  } else if ('name' in activityContent && activityContent.name) {
-    return activityContent.name;
-  } else if (
-    'scenarioName' in activityContent &&
-    activityContent.scenarioName
-  ) {
-    return activityContent.scenarioName;
+type ActivityQuestion = QuizQuestion | CTFQuestion;
+type InteractionContent = {
+  cmi5QuizId: string;
+  questions: ActivityQuestion[];
+};
+type InteractionScoreData = { allAnswers: AnswerType[] };
+type Cmi5Statement = Parameters<
+  NonNullable<typeof cmi5Instance.xapi>['sendStatement']
+>[0]['statement'];
+
+const AUTO_GRADER_STATE_ID = 'rangeos.autograder.completed';
+
+export type AutoGraderState = {
+  autoGraders: string[];
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function getActivityId(activityContent: unknown): string {
+  if (!isRecord(activityContent)) return SlideActivityType.UNKNOWN;
+
+  for (const key of [
+    'cmi5QuizId',
+    'uuid',
+    'scenarioUUID',
+    'name',
+    'scenarioName',
+  ]) {
+    const value = activityContent[key];
+    if (typeof value === 'string' && value) return value;
   }
+
   return SlideActivityType.UNKNOWN;
 }
 
-export async function submitCmi5ScoreLegacy(data: ActivityScore) {
-  logger.debug('[CMI5 Helpers] Submit Score (Legacy)', undefined, 'auManager');
-  if (!data.activityType || !data.scoreData) return;
-
-  // Send activityCompleted verb for all activity types
-  try {
-    const activityId = getActivityId(data.activityContent);
-    const activityType =
-      data.activityType === RC5ActivityTypeEnum.ctf
-        ? SlideActivityType.CTF
-        : SlideActivityType.QUIZ;
-    sendActivityCompletedVerb(activityId, activityType).catch((error) => {
-      logger.error('error sending activityCompleted verb ', error);
-    });
-  } catch (error) {
-    logger.error(
-      'Error sending activityCompleted verb to LRS:',
-      { error },
-      'auManager',
-    );
+function getInteractionData(
+  activityContent: unknown,
+  scoreData: unknown,
+): { content: InteractionContent; score: InteractionScoreData } | null {
+  if (!isRecord(activityContent) || !isRecord(scoreData)) return null;
+  if (
+    typeof activityContent.cmi5QuizId !== 'string' ||
+    !Array.isArray(activityContent.questions) ||
+    !Array.isArray(scoreData.allAnswers)
+  ) {
+    return null;
   }
 
-  switch (data.activityType) {
-    case RC5ActivityTypeEnum.ctf:
-      submitCmi5CtfLRS(
-        data.activityContent as CTFContent,
-        data.scoreData as QuizScore,
+  return {
+    content: activityContent as InteractionContent,
+    score: scoreData as InteractionScoreData,
+  };
+}
+
+function isAnswerCorrect(
+  question: ActivityQuestion,
+  studentAnswer: AnswerType | undefined,
+): boolean {
+  if (studentAnswer === null || studentAnswer === undefined) return false;
+
+  const options = question.typeAttributes.options ?? [];
+
+  switch (question.type) {
+    case QuestionResponse.MultipleChoice: {
+      const selectedIndex = Number(studentAnswer);
+      return (
+        Number.isInteger(selectedIndex) &&
+        options[selectedIndex]?.correct === true
       );
-      break;
-    case RC5ActivityTypeEnum.quiz:
-      submitCmi5QuizLRS(
-        data.activityContent as QuizContent,
-        data.scoreData as QuizScore,
+    }
+    case QuestionResponse.SelectAll: {
+      if (!Array.isArray(studentAnswer)) return false;
+
+      const selected = new Set(studentAnswer.map(Number));
+      const correct = new Set(
+        options.flatMap((option, index) => (option.correct ? [index] : [])),
       );
-      break;
-    case RC5ActivityTypeEnum.codeRunner:
-      // Code Runner activities are handled by LmsStatementManager.handleActivityScoring
-      // No additional LRS submission needed here
-      logger.debug(
-        'Code Runner activity LRS handling delegated to LmsStatementManager',
-        { content: data.activityContent, response: data.scoreData },
-        'auManager',
+
+      return (
+        selected.size === correct.size &&
+        [...selected].every((index) => correct.has(index))
       );
-      break;
-    case RC5ActivityTypeEnum.scenario:
-      // Scenario activities are handled by LmsStatementManager.handleActivityScoring
-      // No additional LRS submission needed here
-      logger.debug(
-        'Scenario activity LRS handling delegated to LmsStatementManager',
-        { content: data.activityContent, response: data.scoreData },
-        'auManager',
+    }
+    case QuestionResponse.TrueFalse:
+      return (
+        String(studentAnswer).trim().toLowerCase() ===
+        String(question.typeAttributes.correctAnswer).trim().toLowerCase()
       );
-      break;
+    case QuestionResponse.Number: {
+      const answer = Number(studentAnswer);
+      const correctAnswer = Number(question.typeAttributes.correctAnswer);
+      return (
+        Number.isFinite(answer) &&
+        Number.isFinite(correctAnswer) &&
+        answer === correctAnswer
+      );
+    }
+    case QuestionResponse.FreeResponse:
+    case CTFResponse.FreeResponse:
+      return (
+        String(studentAnswer) === String(question.typeAttributes.correctAnswer)
+      );
     default:
-      break;
+      return false;
   }
 }
 
-/**
- * Calculate quiz score from allAnswers and quiz content
- */
+function isGradedQuestion(question: ActivityQuestion): boolean {
+  return question.typeAttributes.grading !== QuestionGrading.None;
+}
+
 export function calculateQuizScore(
-  activityContent: any,
-  scoreData: any,
+  activityContent: unknown,
+  scoreData: unknown,
 ): SlideActivityScore {
-  console.log('in CMI5Helpers.calculateQuizScore');
+  const data = getInteractionData(activityContent, scoreData);
+  if (!data) return { raw: 0, min: 0, max: 100 };
 
   try {
-    const logScoreCalc = false;
-
-    if (!activityContent?.questions || !scoreData?.allAnswers) {
-      if (logScoreCalc) {
-        logger.debug(
-          'calculateQuizScore: Missing questions or allAnswers',
-          {
-            hasQuestions: !!activityContent?.questions,
-            hasAllAnswers: !!scoreData?.allAnswers,
-          },
-          'auManager',
-        );
-      }
-      return { raw: 0, min: 0, max: 100 };
+    const gradedQuestions = data.content.questions.filter(isGradedQuestion);
+    if (gradedQuestions.length === 0) {
+      return { raw: 100, min: 0, max: 100 };
     }
 
-    const questions = activityContent.questions;
-    const allAnswers = scoreData.allAnswers;
-
-    if (logScoreCalc) {
-      logger.debug(
-        'calculateQuizScore: Starting calculation',
-        {
-          totalQuestions: questions.length,
-          allAnswers: allAnswers,
-          questions: questions.map((q: any) => ({
-            question: q.question,
-            type: q.type,
-            options: q.typeAttributes?.options?.map((opt: any) => ({
-              text: opt.text,
-              correct: opt.correct,
-            })),
-            correctAnswer: q.typeAttributes?.correctAnswer,
-          })),
-        },
-        'auManager',
-      );
-    }
-
-    let correctAnswers = 0;
-    const totalQuestions = questions.length;
-
-    questions.forEach((question: any, index: number) => {
-      const studentAnswer = allAnswers[index];
-      const isCorrect = isAnswerCorrect(question, studentAnswer);
-
-      if (logScoreCalc) {
-        logger.debug(
-          `calculateQuizScore: Question ${index + 1}`,
-          {
-            question: question.question,
-            type: question.type,
-            studentAnswer: studentAnswer,
-            isCorrect: isCorrect,
-            options: question.typeAttributes?.options?.map(
-              (opt: any, optIndex: number) => ({
-                index: optIndex,
-                text: opt.text,
-                correct: opt.correct,
-                selected: Array.isArray(studentAnswer)
-                  ? studentAnswer.includes(optIndex)
-                  : studentAnswer === optIndex,
-              }),
-            ),
-          },
-          'auManager',
-        );
-      }
-
-      if (isCorrect) {
-        correctAnswers++;
-      }
-    });
-
-    const rawScore =
-      totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
-
-    if (logScoreCalc) {
-      logger.debug(
-        'calculateQuizScore: Final calculation',
-        {
-          correctAnswers,
-          totalQuestions,
-          rawScore,
-          roundedScore: Math.round(rawScore),
-        },
-        'auManager',
-      );
-    }
+    const correctAnswers = data.content.questions.reduce(
+      (total, question, index) =>
+        isGradedQuestion(question) &&
+        isAnswerCorrect(question, data.score.allAnswers[index])
+          ? total + 1
+          : total,
+      0,
+    );
 
     return {
-      raw: Math.round(rawScore),
+      raw: Math.round((correctAnswers / gradedQuestions.length) * 100),
       min: 0,
       max: 100,
     };
   } catch (error) {
     logger.error(
       'Error calculating quiz score, returning default score',
-      { error, activityContent, scoreData },
+      { error },
       'auManager',
     );
     return { raw: 0, min: 0, max: 100 };
   }
 }
 
-/**
- * Check if a student's answer is correct for a given question
- */
-function isAnswerCorrect(question: any, studentAnswer: any): boolean {
-  const logAnswers = false;
-  if (!question || studentAnswer === null || studentAnswer === undefined) {
-    if (logAnswers) {
-      logger.debug(
-        'isAnswerCorrect: Invalid input',
-        { question, studentAnswer },
-        'auManager',
-      );
-    }
-    return false;
+function choiceAnswerIds(
+  question: QuizQuestion,
+  answer: AnswerType | undefined,
+): string[] {
+  if (Array.isArray(answer)) return answer.map((index) => `q-${index}`);
+  if (answer === null || answer === undefined) return [];
+  if (question.type === QuestionResponse.TrueFalse) {
+    return [`q-${String(answer).toLowerCase()}`];
   }
-
-  const questionType = question.type;
-  const options = question.typeAttributes?.options || [];
-
-  if (logAnswers) {
-    logger.debug(
-      'isAnswerCorrect: Starting evaluation',
-      {
-        question: question.question,
-        type: questionType,
-        studentAnswer: studentAnswer,
-        options: options.map((opt: any, index: number) => ({
-          index,
-          text: opt.text,
-          correct: opt.correct,
-        })),
-        correctAnswer: question.typeAttributes?.correctAnswer,
-      },
-      'auManager',
-    );
-  }
-
-  let result = false;
-
-  switch (questionType) {
-    case 'multipleChoice': {
-      // For multiple choice, check if selected option is correct
-      const selectedOption = options[studentAnswer];
-      result = selectedOption?.correct === true;
-      if (logAnswers) {
-        logger.debug(
-          'isAnswerCorrect: multipleChoice result',
-          {
-            selectedIndex: studentAnswer,
-            selectedOption: selectedOption,
-            result,
-          },
-          'auManager',
-        );
-      }
-      break;
-    }
-
-    case 'selectAll': {
-      // For select all, check if all selected options are correct and all correct options are selected
-      if (!Array.isArray(studentAnswer)) {
-        if (logAnswers) {
-          logger.debug(
-            'isAnswerCorrect: selectAll - studentAnswer is not array',
-            {
-              studentAnswer,
-            },
-            'auManager',
-          );
-        }
-        result = false;
-        break;
-      }
-
-      const correctOptions = options.map((opt: any, index: number) => ({
-        index,
-        correct: opt.correct,
-      }));
-      const selectedIndices = studentAnswer;
-
-      // Check if all selected options are correct
-      const allSelectedCorrect = selectedIndices.every(
-        (index: number) =>
-          correctOptions.find((opt: any) => opt.index === index)?.correct ===
-          true,
-      );
-
-      // Check if all correct options are selected
-      const allCorrectSelected = correctOptions
-        .filter((opt: any) => opt.correct === true)
-        .every((opt: any) => selectedIndices.includes(opt.index));
-
-      result = allSelectedCorrect && allCorrectSelected;
-
-      if (logAnswers) {
-        logger.debug(
-          'isAnswerCorrect: selectAll result',
-          {
-            selectedIndices,
-            correctOptions: correctOptions.filter((opt: any) => opt.correct),
-            allSelectedCorrect,
-            allCorrectSelected,
-            result,
-          },
-          'auManager',
-        );
-      }
-      break;
-    }
-
-    case 'trueFalse': {
-      // For true/false, check if answer matches correct answer (case-insensitive)
-      const studentAnswerLower = String(studentAnswer).toLowerCase();
-      const correctAnswerLower = String(
-        question.typeAttributes?.correctAnswer,
-      ).toLowerCase();
-      result = studentAnswerLower === correctAnswerLower;
-      if (logAnswers) {
-        logger.debug(
-          'isAnswerCorrect: trueFalse result',
-          {
-            studentAnswer,
-            correctAnswer: question.typeAttributes?.correctAnswer,
-            studentAnswerLower,
-            correctAnswerLower,
-            studentAnswerType: typeof studentAnswer,
-            correctAnswerType: typeof question.typeAttributes?.correctAnswer,
-            result,
-            questionData: question.typeAttributes,
-          },
-          'auManager',
-        );
-      }
-      break;
-    }
-
-    case 'number':
-      // For number, check if answer matches correct answer
-      result = studentAnswer === question.typeAttributes?.correctAnswer;
-      if (logAnswers) {
-        logger.debug(
-          'isAnswerCorrect: number result',
-          {
-            studentAnswer,
-            correctAnswer: question.typeAttributes?.correctAnswer,
-            result,
-          },
-          'auManager',
-        );
-      }
-      break;
-
-    case 'freeResponse':
-      // For free response, check if answer matches correct answer
-      result = studentAnswer === question.typeAttributes?.correctAnswer;
-      if (logAnswers) {
-        logger.debug(
-          'isAnswerCorrect: freeResponse result',
-          {
-            studentAnswer,
-            correctAnswer: question.typeAttributes?.correctAnswer,
-            result,
-          },
-          'auManager',
-        );
-      }
-      break;
-
-    default:
-      if (logAnswers) {
-        logger.debug(
-          'isAnswerCorrect: Unknown question type',
-          { questionType },
-          'auManager',
-        );
-      }
-      result = false;
-  }
-
-  if (logAnswers) {
-    logger.debug(
-      'isAnswerCorrect: Final result',
-      {
-        question: question.question,
-        result,
-      },
-      'auManager',
-    );
-  }
-  return result;
+  return [`q-${answer}`];
 }
 
-/**
- * Send detailed interaction statements for each question (like legacy system)
- */
-export async function sendDetailedInteractionStatements(
-  activityContent: any,
-  scoreData: any,
-) {
-  logger.debug(
-    'sendDetailedInteractionStatements: Starting',
-    undefined,
-    'auManager',
+function correctChoiceIds(question: QuizQuestion): string[] {
+  if (question.type === QuestionResponse.TrueFalse) {
+    return [`q-${String(question.typeAttributes.correctAnswer).toLowerCase()}`];
+  }
+  return (question.typeAttributes.options ?? []).flatMap((option, index) =>
+    option.correct ? [`q-${index}`] : [],
   );
+}
 
-  if (!activityContent?.questions || !scoreData?.allAnswers) {
-    logger.debug(
-      'sendDetailedInteractionStatements: Missing data',
-      {
-        hasQuestions: !!activityContent?.questions,
-        hasAllAnswers: !!scoreData?.allAnswers,
-      },
+function interactionChoices(question: QuizQuestion): InteractionComponent[] {
+  if (question.type === QuestionResponse.TrueFalse) {
+    return ['true', 'false'].map((value) => ({
+      id: `q-${value}`,
+      description: { 'en-US': value },
+    }));
+  }
+  return (question.typeAttributes.options ?? []).map((option, index) => ({
+    id: `q-${index}`,
+    description: { 'en-US': option.text },
+  }));
+}
+
+function questionLanguageMap(question: ActivityQuestion): LanguageMap {
+  return { 'en-US': question.question };
+}
+
+async function sendChoiceInteraction(
+  question: QuizQuestion,
+  answer: AnswerType | undefined,
+  testId: string,
+): Promise<void> {
+  if (
+    question.type !== QuestionResponse.TrueFalse &&
+    !question.typeAttributes.options
+  ) {
+    logger.warn(
+      'Cannot submit choice question without options',
+      { questionId: question.cmi5QuestionId },
       'auManager',
     );
-
     return;
   }
 
-  const questions = activityContent.questions;
-  const allAnswers = scoreData.allAnswers;
-  const testId = activityContent.cmi5QuizId;
-
-  logger.debug(
-    'sendDetailedInteractionStatements: Processing questions',
-    {
-      testId,
-      questionCount: questions.length,
-      allAnswers,
-    },
-    'auManager',
+  const language = questionLanguageMap(question);
+  await cmi5Instance.interactionChoice(
+    testId,
+    question.cmi5QuestionId,
+    choiceAnswerIds(question, answer),
+    correctChoiceIds(question),
+    interactionChoices(question),
+    language,
+    language,
+    isAnswerCorrect(question, answer),
   );
+}
 
-  // Send interaction statement for each question
-  const interactionPromises = questions.map((question: any, index: number) => {
-    const studentAnswer = allAnswers[index];
-
-    logger.debug(
-      `sendDetailedInteractionStatements: Processing question ${index + 1}`,
-      {
-        question: question.question,
-        type: question.type,
-        studentAnswer,
-      },
-      'auManager',
-    );
-
-    if (question.type === 'multipleChoice' || question.type === 'selectAll') {
-      logger.debug(
-        `sendDetailedInteractionStatements: Sending choice statement for question ${index + 1}`,
-        undefined,
-        'auManager',
-      );
-
-      return sendInteractionChoiceStatement(question, studentAnswer, testId);
-    } else if (question.type === 'freeResponse' || question.type === 'number') {
-      logger.debug(
-        `sendDetailedInteractionStatements: Sending fill-in statement for question ${index + 1}`,
-        undefined,
-        'auManager',
-      );
-
-      return sendInteractionFillInStatement(question, studentAnswer, testId);
-    } else if (question.type === 'trueFalse') {
-      logger.debug(
-        `sendDetailedInteractionStatements: Sending choice statement for trueFalse question ${index + 1}`,
-        undefined,
-        'auManager',
-      );
-
-      return sendInteractionChoiceStatement(question, studentAnswer, testId);
-    }
-
-    logger.debug(
-      `sendDetailedInteractionStatements: Unknown question type for question ${index + 1}`,
-      {
-        type: question.type,
-      },
-      'auManager',
-    );
-
-    return Promise.resolve();
-  });
-
-  logger.debug(
-    'sendDetailedInteractionStatements: Waiting for all statements to complete',
-    undefined,
-    'auManager',
+async function sendFillInInteraction(
+  question: ActivityQuestion,
+  answer: AnswerType | undefined,
+  testId: string,
+): Promise<void> {
+  const language = questionLanguageMap(question);
+  await cmi5Instance.interactionFillIn(
+    testId,
+    question.cmi5QuestionId,
+    [answer === null || answer === undefined ? '' : String(answer)],
+    [String(question.typeAttributes.correctAnswer)],
+    language,
+    language,
+    isAnswerCorrect(question, answer),
   );
+}
 
-  const results = await Promise.allSettled(interactionPromises);
+function sendQuestionInteraction(
+  question: ActivityQuestion,
+  answer: AnswerType | undefined,
+  testId: string,
+): Promise<void> {
+  switch (question.type) {
+    case QuestionResponse.MultipleChoice:
+    case QuestionResponse.SelectAll:
+    case QuestionResponse.TrueFalse:
+      return sendChoiceInteraction(question as QuizQuestion, answer, testId);
+    case QuestionResponse.FreeResponse:
+    case QuestionResponse.Number:
+    case CTFResponse.FreeResponse:
+      return sendFillInInteraction(question, answer, testId);
+    default:
+      logger.warn(
+        'Unsupported question type; interaction statement skipped',
+        { questionId: question.cmi5QuestionId, type: question.type },
+        'auManager',
+      );
+      return Promise.resolve();
+  }
+}
+
+async function sendInteractions(
+  activityContent: unknown,
+  scoreData: unknown,
+): Promise<void> {
+  const data = getInteractionData(activityContent, scoreData);
+  if (!data) return;
+
+  const results = await Promise.allSettled(
+    data.content.questions.map((question, index) =>
+      sendQuestionInteraction(
+        question,
+        data.score.allAnswers[index],
+        data.content.cmi5QuizId,
+      ),
+    ),
+  );
 
   results.forEach((result, index) => {
     if (result.status === 'rejected') {
       logger.error(
-        `sendDetailedInteractionStatements: Error sending statement for question ${index + 1}`,
+        `Error sending interaction statement for question ${index + 1}`,
         { error: result.reason },
-        'auManager',
-      );
-    } else {
-      logger.debug(
-        `sendDetailedInteractionStatements: Successfully sent statement for question ${index + 1}`,
-        undefined,
         'auManager',
       );
     }
   });
-
-  logger.debug(
-    'sendDetailedInteractionStatements: Completed',
-    undefined,
-    'auManager',
-  );
 }
 
-/**
- * Send interaction choice statement for multiple choice/select all questions
- */
-async function sendInteractionChoiceStatement(
-  question: any,
-  studentAnswer: any,
-  testId: string,
-) {
-  const questionId = question.cmi5QuestionId;
-  const options = question.typeAttributes?.options || [];
+export function sendDetailedInteractionStatements(
+  activityContent: unknown,
+  scoreData: unknown,
+): Promise<void> {
+  return sendInteractions(activityContent, scoreData);
+}
 
-  // Convert student answer to answer IDs
-  let answerIds: string[] = [];
-  if (Array.isArray(studentAnswer)) {
-    // Select all - multiple answers
-    answerIds = studentAnswer.map((index: number) => `q-${index}`);
-  } else {
-    // Single choice
-    answerIds = [`q-${studentAnswer}`];
-  }
+export async function submitCmi5QuizLRS(
+  quiz: QuizContent,
+  scoreData: QuizScore,
+): Promise<void> {
+  if (checkForDevMode()) return;
+  await sendInteractions(quiz, scoreData);
+}
 
-  // Get correct answer IDs
-  const correctAnswerIds = options
-    .map((opt: any, index: number) => ({ index, correct: opt.correct }))
-    .filter((opt: any) => opt.correct)
-    .map((opt: any) => `q-${opt.index}`);
+export async function submitCmi5CtfLRS(
+  quiz: CTFContent,
+  scoreData: QuizScore,
+): Promise<void> {
+  if (checkForDevMode()) return;
+  await sendInteractions(quiz, scoreData);
+}
 
-  // Create choices array
-  const choices = options.map((opt: any, index: number) => ({
-    id: `q-${index}`,
-    description: { 'en-US': opt.text },
-  }));
+export async function submitCmi5ScoreLegacy(
+  data: ActivityScore,
+): Promise<void> {
+  if (!data.activityType || !data.scoreData) return;
 
-  // Determine success
-  const isCorrect = isAnswerCorrect(question, studentAnswer);
-
-  const name = { 'en-US': question.question };
-  const description = { 'en-US': question.question };
+  const activityTypes: Record<RC5ActivityTypeEnum, SlideActivityType> = {
+    [RC5ActivityTypeEnum.consoles]: SlideActivityType.CONSOLES,
+    [RC5ActivityTypeEnum.ctf]: SlideActivityType.CTF,
+    [RC5ActivityTypeEnum.download]: SlideActivityType.DOWNLOAD,
+    [RC5ActivityTypeEnum.codeRunner]: SlideActivityType.CODE_RUNNER,
+    [RC5ActivityTypeEnum.quiz]: SlideActivityType.QUIZ,
+    [RC5ActivityTypeEnum.scenario]: SlideActivityType.SCENARIO,
+  };
+  const activityType = activityTypes[data.activityType];
 
   try {
-    // debugLog(`sendInteractionChoiceStatement: Sending interaction choice`, {
-    //   testId,
-    //   questionId,
-    //   answerIds,
-    //   correctAnswerIds,
-    //   isCorrect,
-    // });
-
-    await cmi5Instance.interactionChoice(
-      testId,
-      questionId,
-      answerIds,
-      correctAnswerIds,
-      choices,
-      name,
-      description,
-      isCorrect,
+    await sendActivityCompletedVerb(
+      getActivityId(data.activityContent),
+      activityType,
     );
-
-    // debugLog(
-    //   `sendInteractionChoiceStatement: Successfully sent interaction choice for ${questionId}`,
-    // );
   } catch (error) {
     logger.error(
-      `Error sending interaction choice for question ${questionId}:`,
+      'Error sending activityCompleted verb to LRS',
       { error },
       'auManager',
     );
   }
-}
 
-/**
- * Send interaction fill-in statement for free response/number questions
- */
-async function sendInteractionFillInStatement(
-  question: any,
-  studentAnswer: any,
-  testId: string,
-) {
-  const questionId = question.cmi5QuestionId;
-  const answers = [studentAnswer?.toString() || ''];
-  const correctAnswers = [
-    question.typeAttributes?.correctAnswer?.toString() || '',
-  ];
-  const isCorrect = isAnswerCorrect(question, studentAnswer);
-
-  const name = { 'en-US': question.question };
-  const description = { 'en-US': question.question };
-
-  try {
-    // debugLog(`sendInteractionFillInStatement: Sending interaction fill-in`, {
-    //   testId,
-    //   questionId,
-    //   answers,
-    //   correctAnswers,
-    //   isCorrect,
-    // });
-
-    await cmi5Instance.interactionFillIn(
-      testId,
-      questionId,
-      answers,
-      correctAnswers,
-      name,
-      description,
-      isCorrect,
+  if (data.activityType === RC5ActivityTypeEnum.ctf) {
+    await submitCmi5CtfLRS(
+      data.activityContent as CTFContent,
+      data.scoreData as QuizScore,
     );
-
-    // debugLog(
-    //   `sendInteractionFillInStatement: Successfully sent interaction fill-in for ${questionId}`,
-    // );
-  } catch (error) {
-    logger.error(
-      `Error sending interaction fill-in for question ${questionId}:`,
-      { error },
-      'auManager',
+  } else if (data.activityType === RC5ActivityTypeEnum.quiz) {
+    await submitCmi5QuizLRS(
+      data.activityContent as QuizContent,
+      data.scoreData as QuizScore,
     );
   }
 }
-
-const AUTO_GRADER_STATE_ID = 'rangeos.autograder.completed';
-export type AutoGraderState = {
-  autoGraders: string[];
-};
 
 export async function getAutoGradersProgress(): Promise<Set<string>> {
   const xapi = cmi5Instance.xapi;
-
   if (!xapi) {
-    console.warn('XAPI is null');
+    logger.warn(
+      'Cannot load AutoGrader progress without XAPI',
+      undefined,
+      'lms',
+    );
     return new Set();
   }
 
-  const actor = cmi5Instance.getLaunchParameters().actor;
-  const activityId = cmi5Instance.getLaunchParameters().activityId;
-
-  let result;
-  try {
-    result = await (xapi.getState({
-      agent: actor,
-      activityId,
-      stateId: AUTO_GRADER_STATE_ID,
-    }) as AxiosPromise<AutoGraderState>);
-  } catch (err) {
-    console.warn('AutoGrader progress state not found or failed to load:', err);
-    return new Set();
-  }
-
-  // Parse and convert to Set
-
-  const uuids: string[] = Array.isArray(result?.data.autoGraders)
-    ? result.data.autoGraders
-    : [];
-  return new Set(uuids);
-}
-
-export async function setAutoGradersProgress(uuid: string): Promise<void> {
-  const xapi = cmi5Instance.xapi;
-
-  if (!xapi) {
-    throw new Error('XAPI is null');
-  }
-
-  const actor = cmi5Instance.getLaunchParameters().actor;
-  const activityId = cmi5Instance.getLaunchParameters().activityId;
-  const registration = cmi5Instance.getLaunchParameters().registration;
-
-  // 1. Get existing UUIDs from LRS state
-  let existingUUIDs = new Set<string>();
+  const { actor, activityId } = cmi5Instance.getLaunchParameters();
 
   try {
     const result = await (xapi.getState({
@@ -717,36 +402,23 @@ export async function setAutoGradersProgress(uuid: string): Promise<void> {
       activityId,
       stateId: AUTO_GRADER_STATE_ID,
     }) as AxiosPromise<AutoGraderState>);
-
-    const list: string[] = Array.isArray(result?.data.autoGraders)
-      ? result.data.autoGraders
-      : [];
-    existingUUIDs = new Set(list);
-  } catch (err) {
-    // It's okay if there's no existing state yet
-  }
-
-  if (existingUUIDs.has(uuid)) {
-    console.log(`UUID ${uuid} already recorded`);
-    return;
-  }
-
-  // 2. Add UUID and persist updated state
-  existingUUIDs.add(uuid);
-  try {
-    await xapi.createState({
-      agent: actor,
-      activityId,
-      stateId: AUTO_GRADER_STATE_ID,
-      state: { autoGraders: Array.from(existingUUIDs) } as AutoGraderState, // serialize Set,
-    });
-    console.log(`UUID ${uuid} added to LRS state`);
+    return new Set(
+      Array.isArray(result?.data.autoGraders) ? result.data.autoGraders : [],
+    );
   } catch (error) {
-    console.error('Failed to update LRS state with UUID:', error);
+    logger.warn('AutoGrader progress state was unavailable', { error }, 'lms');
+    return new Set();
   }
+}
 
-  // 3. Send ANSWERED statement for audit/tracking
-  const statement: Statement = {
+function createAutoGraderStatement(
+  uuid: string,
+  actor: ReturnType<typeof cmi5Instance.getLaunchParameters>['actor'],
+  activityId: string,
+  registration: string,
+): Cmi5Statement {
+  const contextTemplate = cmi5Instance.getLaunchData().contextTemplate;
+  return {
     id: uuidv4(),
     actor,
     verb: XAPI.Verbs.ANSWERED,
@@ -761,241 +433,103 @@ export async function setAutoGradersProgress(uuid: string): Promise<void> {
     },
     context: {
       registration,
-      extensions: cmi5Instance.getLaunchData().contextTemplate.extensions,
-      contextActivities:
-        cmi5Instance.getLaunchData().contextTemplate.contextActivities,
+      extensions: contextTemplate.extensions,
+      contextActivities: contextTemplate.contextActivities,
     },
     timestamp: new Date().toISOString(),
   };
+}
+
+export async function setAutoGradersProgress(uuid: string): Promise<void> {
+  const xapi = cmi5Instance.xapi;
+  if (!xapi) throw new Error('XAPI is null');
+
+  const { actor, activityId, registration } =
+    cmi5Instance.getLaunchParameters();
+  let completed = new Set<string>();
 
   try {
-    await xapi.sendStatement({ statement: statement as any });
-    console.log(`Sent statement for UUID ${uuid}`);
-  } catch (error) {
-    console.error('Failed to send statement for AutoGrader UUID:', error);
-  }
-}
-
-/**
- * Submit Quiz Slide Activity
- * @param quiz
- * @param allAnswers
- * @returns
- */
-export async function submitCmi5QuizLRS(
-  quiz: QuizContent,
-  scoreData: QuizScore,
-) {
-  const { allAnswers } = scoreData;
-  if (checkForDevMode()) {
-    return;
+    const result = await (xapi.getState({
+      agent: actor,
+      activityId,
+      stateId: AUTO_GRADER_STATE_ID,
+    }) as AxiosPromise<AutoGraderState>);
+    completed = new Set(
+      Array.isArray(result?.data.autoGraders) ? result.data.autoGraders : [],
+    );
+  } catch {
+    // A missing state document is expected on the first completion.
   }
 
-  const testId = quiz.cmi5QuizId;
+  if (completed.has(uuid)) return;
+  completed.add(uuid);
 
-  // eslint-disable-next-line array-callback-return
-  const submissionPromises = quiz.questions.map((question, qindex) => {
-    if (question.type === QuestionResponse.MultipleChoice) {
-      return submitInteractionChoice(
-        question,
-        allAnswers[qindex] as number,
-        testId,
-      );
-    } else if (question.type === QuestionResponse.FreeResponse) {
-      return submitFreeResponse(question, allAnswers[qindex] as string, testId);
-    } else if (question.type === QuestionResponse.Number) {
-      return submitFreeResponse(question, allAnswers[qindex] as string, testId);
-    } else {
-      console.log('Submitted a non valid quiz question type');
-      return Promise.resolve();
-    }
-  });
-
-  const results = await Promise.allSettled(submissionPromises);
-  results.forEach((result, index) => {
-    if (result.status === 'rejected') {
-      logger.error(
-        `Error submitting question ${index}:`,
-        { error: result.reason },
-        'auManager',
-      );
-    }
-  });
-}
-
-/**
- * Submit CTF Slide Activity
- * @param quiz
- * @param allAnswers
- * @returns
- */
-export async function submitCmi5CtfLRS(quiz: CTFContent, scoreData: QuizScore) {
-  if (checkForDevMode()) {
-    return;
-  }
-  const { allAnswers } = scoreData;
-  const testId = quiz.cmi5QuizId;
-
-  // eslint-disable-next-line array-callback-return
-  const submissionPromises = quiz.questions.map((question, qindex) => {
-    if (question.type === CTFResponse.FreeResponse) {
-      return submitFreeResponse(question, allAnswers[qindex] as string, testId);
-    } else {
-      console.log('Submitted a non valid ctf question type');
-      return Promise.resolve();
-    }
-  });
-
-  const results = await Promise.allSettled(submissionPromises);
-  results.forEach((result, index) => {
-    if (result.status === 'rejected') {
-      logger.error(
-        `Error submitting question ${index}:`,
-        { error: result.reason },
-        'auManager',
-      );
-    }
-  });
-}
-
-async function submitFreeResponse(
-  question: QuizQuestion | CTFQuestion,
-  answer: string,
-  testId: string,
-) {
-  const questionId = question.cmi5QuestionId;
-  const answers: string[] = [answer];
-
-  const correctAnswer = String(question.typeAttributes.correctAnswer);
-  const correctAnswers: string[] = [correctAnswer];
-
-  const success = answer === correctAnswer;
-
-  const name: LanguageMap = {
-    'en-US': question.question,
-  };
-  const description: LanguageMap = {
-    'en-US': question.question,
-  };
-
-  return cmi5Instance.interactionFillIn(
-    testId,
-    questionId,
-    answers,
-    correctAnswers,
-    name,
-    description,
-    success,
-  );
-}
-
-async function submitInteractionChoice(
-  question: QuizQuestion,
-  answer: AnswerType,
-  testId: string,
-) {
-  const questionId = question.cmi5QuestionId;
-  const answerIds: string[] = [`q-${answer}`];
-
-  const correctOptions = question.typeAttributes.options?.filter(
-    (option) => option.correct,
-  ) as QuizOption[];
-
-  const correctAnswerIds: string[] = correctOptions.map(
-    (option, index) => `q-${index}`,
-  );
-  if (question.typeAttributes.options === undefined) {
-    console.error('Select all type question should have options');
-    return;
-  }
-  const options = question.typeAttributes.options;
-
-  let success = true;
-  if (question.type === QuestionResponse.SelectAll) {
-    const answers = answer as number[];
-    answers.forEach((answerIndex) => {
-      if (options[answerIndex].correct === false) {
-        success = false;
-      }
+  try {
+    await xapi.createState({
+      agent: actor,
+      activityId,
+      stateId: AUTO_GRADER_STATE_ID,
+      state: { autoGraders: [...completed] } satisfies AutoGraderState,
     });
-  } else if (question.type === QuestionResponse.MultipleChoice) {
-    if (options[answer as number].correct === false) {
-      success = false;
-    }
+  } catch (error) {
+    logger.error(
+      'Failed to update AutoGrader progress state',
+      { error },
+      'lms',
+    );
   }
 
-  const choices: InteractionComponent[] = [];
-
-  const name: LanguageMap = {
-    'en-US': question.question,
-  };
-  const description: LanguageMap = {
-    'en-US': question.question,
-  };
-  // eslint-disable-next-line array-callback-return
-  question.typeAttributes.options?.map((option, aindex) => {
-    const choice: InteractionComponent = {
-      id: `q-${aindex}`,
-      description: {
-        'en-US': option.text,
-      },
-    };
-    choices.push(choice);
-  });
-  return cmi5Instance.interactionChoice(
-    testId,
-    questionId,
-    answerIds,
-    correctAnswerIds,
-    choices,
-    name,
-    description,
-    success,
-  );
+  try {
+    await xapi.sendStatement({
+      statement: createAutoGraderStatement(
+        uuid,
+        actor,
+        activityId,
+        registration,
+      ),
+    });
+  } catch (error) {
+    logger.error(
+      'Failed to send AutoGrader completion statement',
+      { error },
+      'lms',
+    );
+  }
 }
 
-export async function getSlideState() {
+export async function getSlideState(): Promise<State> {
   const xapi = cmi5Instance.xapi;
-
-  if (xapi === null) {
-    console.error(
-      'Error getting XAPI when attempting to resume AU, fatal error',
+  if (!xapi) {
+    logger.error(
+      'Cannot load slide state without XAPI',
+      undefined,
+      'auManager',
     );
     throw new Error('An error occurred, XAPI null after authentication');
   }
 
-  const actor = cmi5Instance.getLaunchParameters().actor;
-  const activityId = cmi5Instance.getLaunchParameters().activityId;
-  const stateId: string = activityId + stateViewedSlides;
+  const { actor, activityId } = cmi5Instance.getLaunchParameters();
+  const initialState: State = { currentSlide: 0, slides: [] };
 
-  const initState: State = {
-    currentSlide: 0,
-    slides: [],
-  };
-
-  let result;
   try {
-    logger.debug('getting slides state', undefined, 'auManager');
-
-    result = await (xapi.getState({
+    const result = await (xapi.getState({
       agent: actor,
-      activityId: activityId,
-      stateId: stateId,
+      activityId,
+      stateId: activityId + stateViewedSlides,
     }) as AxiosPromise<State>);
+    return result?.data ?? initialState;
   } catch (error) {
     logger.error('Could not get AU state', { error }, 'auManager');
+    return initialState;
   }
+}
 
-  if (result === undefined) {
-    logger.debug(
-      'Result undefined after get state for slides',
-      undefined,
-      'auManager',
-    );
-    return initState;
-  }
-
-  return result.data;
+function quizProgressStateIds(activityId: string, state: QuizState) {
+  const suffix = `/${state.slideNumber}/${state.quizId}`;
+  return {
+    currentQuestionId: activityId + stateQuizCurrentQuestion + suffix,
+    currentAnswersId: activityId + stateQuizCurrentAnswers + suffix,
+  };
 }
 
 export async function getQuizProgress(
@@ -1004,31 +538,26 @@ export async function getQuizProgress(
   const xapi = cmi5Instance.xapi;
   if (!xapi) {
     logger.error(
-      'Error getting XAPI when attempting to resume AU, fatal error',
+      'Cannot load quiz progress without XAPI',
       undefined,
       'auManager',
     );
     throw new Error('An error occurred, XAPI null after authentication');
   }
-  const actor = cmi5Instance.getLaunchParameters().actor;
-  const activityId = cmi5Instance.getLaunchParameters().activityId;
-  const currentQuestionId: string =
-    activityId +
-    stateQuizCurrentQuestion +
-    `/${quizState.slideNumber}/${quizState.quizId}`;
-  const currentAnswersId: string =
-    activityId +
-    stateQuizCurrentAnswers +
-    `/${quizState.slideNumber}/${quizState.quizId}`;
+
+  const { actor, activityId } = cmi5Instance.getLaunchParameters();
+  const { currentQuestionId, currentAnswersId } = quizProgressStateIds(
+    activityId,
+    quizState,
+  );
 
   try {
-    const [resultCurrentQuestion, resultCurrentAnswers] = await Promise.all([
+    const [questionResult, answersResult] = await Promise.all([
       xapi.getState({
         agent: actor,
         activityId,
         stateId: currentQuestionId,
       }) as AxiosPromise<{ currentQuestion: number }>,
-
       xapi.getState({
         agent: actor,
         activityId,
@@ -1038,107 +567,56 @@ export async function getQuizProgress(
 
     return {
       ...quizState,
-      answers: resultCurrentAnswers.data.answers,
-      currentQuestion: resultCurrentQuestion.data.currentQuestion,
+      currentQuestion: questionResult.data.currentQuestion,
+      answers: answersResult.data.answers,
     };
-  } catch (err) {
-    logger.error(
-      `Quiz progress state not found or failed to load: ${err}`,
-      undefined,
-      'auManager',
-    );
-    return {
-      ...quizState,
-      answers: [],
-      currentQuestion: 0,
-    };
+  } catch (error) {
+    logger.warn('Quiz progress state was unavailable', { error }, 'auManager');
+    return { ...quizState, currentQuestion: 0, answers: [] };
   }
 }
 
 export async function setQuizProgress(newState: QuizState): Promise<void> {
   const xapi = cmi5Instance.xapi;
-  if (xapi === null) {
+  if (!xapi) {
     logger.error(
-      'Error getting XAPI when attempting to resume AU, fatal error',
+      'Cannot save quiz progress without XAPI',
       undefined,
       'auManager',
     );
     throw new Error('An error occurred, XAPI null after authentication');
   }
-  const actor = cmi5Instance.getLaunchParameters().actor;
-  const activityId = cmi5Instance.getLaunchParameters().activityId;
-  const currentQuestionId: string =
-    activityId +
-    stateQuizCurrentQuestion +
-    `/${newState.slideNumber}/${newState.quizId}`;
-  const currentAnswersId: string =
-    activityId +
-    stateQuizCurrentAnswers +
-    `/${newState.slideNumber}/${newState.quizId}`;
+
+  const { actor, activityId } = cmi5Instance.getLaunchParameters();
+  const { currentQuestionId, currentAnswersId } = quizProgressStateIds(
+    activityId,
+    newState,
+  );
 
   try {
+    const updates: Promise<unknown>[] = [];
     if (newState.currentQuestion !== undefined) {
-      await xapi.createState({
-        agent: actor,
-        activityId: activityId,
-        stateId: currentQuestionId,
-        state: { currentQuestion: newState.currentQuestion },
-      });
+      updates.push(
+        xapi.createState({
+          agent: actor,
+          activityId,
+          stateId: currentQuestionId,
+          state: { currentQuestion: newState.currentQuestion },
+        }),
+      );
     }
-
-    if (newState.answers) {
-      await xapi.createState({
-        agent: actor,
-        activityId: activityId,
-        stateId: currentAnswersId,
-        state: { answers: newState.answers },
-      });
+    if (newState.answers !== undefined) {
+      updates.push(
+        xapi.createState({
+          agent: actor,
+          activityId,
+          stateId: currentAnswersId,
+          state: { answers: newState.answers },
+        }),
+      );
     }
+    await Promise.all(updates);
   } catch (error) {
-    logger.error(
-      `Quiz progress could not be set: ${error}`,
-      undefined,
-      'auManager',
-    );
+    logger.error('Quiz progress could not be saved', { error }, 'auManager');
   }
 }
-
-// REF export async function setSlides(newState: State) {
-//   const xapi = cmi5Instance.xapi;
-//   if (xapi === null) {
-//     console.error(
-//       'Error getting XAPI when attempting to resume AU, fatal error',
-//     );
-//     throw new Error('An error occurred, XAPI null after authentication');
-//   }
-//   const actor = cmi5Instance.getLaunchParameters().actor;
-//   const activityId = cmi5Instance.getLaunchParameters().activityId;
-//   const stateId: string = activityId + stateViewedSlides;
-//   try {
-//     await xapi.createState({
-//       agent: actor,
-//       activityId: activityId,
-//       stateId: stateId,
-//       state: newState,
-//     });
-//   } catch (error) {
-//     console.log('Error setting slides state', error);
-//   }
-//   console.log('attempted to create state in set slides');
-// }
-
-// export async function sendSlideViewedLRS(
-//   slideNumber: number,
-//   slideName: string,
-//   slideGuid: string,
-//   eventType: SlideEventType = 'navigation',
-// ) {
-//   try {
-//     // Send legacy SlideViewed verb for backward compatibility
-//     await sendLegacySlideViewed(slideNumber, slideName);
-//     // Send new SlideEvent verb for enhanced analytics
-//     await sendSlideEventVerb(slideNumber, eventType, slideName);
-//   } catch (error) {
-//     logger.error('Error sending slideEvent to LRS', { error }, 'auManager');
-//   }
-// }
