@@ -1,3 +1,14 @@
+## 0.22.0 (2026-09-28)
+
+### 🚀 Features
+
+- add in activity and au completion notifications ([1cb08d01](https://github.com/ByLightSDC/rapidcmi5/commit/1cb08d01))
+- **cmi5-player:** added in CTF answer cache ([7eb58d3b](https://github.com/ByLightSDC/rapidcmi5/commit/7eb58d3b))
+
+### ❤️ Thank You
+
+- Aaron Crawford @aaiirr123
+
 ## 0.21.0 (2026-09-17)
 
 ### 🚀 Features
