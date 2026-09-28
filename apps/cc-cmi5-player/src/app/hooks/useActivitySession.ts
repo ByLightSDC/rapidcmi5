@@ -1,16 +1,27 @@
-
-import { QuizState } from '@rapid-cmi5/cmi5-build-common';
+import {
+  CTFState,
+  CTFStateKey,
+  QuizState,
+} from '@rapid-cmi5/cmi5-build-common';
 import { debugLogError } from '../debug';
 import { useDispatch } from 'react-redux';
 import { RootState, store } from '../redux/store';
 import {
   addAutoGraderUUID,
   setAllAutoGraderUUIDs,
+  setEntireCTFState,
   setEntireQuizState,
   setQuizAnswers,
   setQuizCurrentQuestion,
 } from '../redux/activitySessionReducer';
-import { getQuizProgress, setQuizProgress, getAutoGradersProgress, setAutoGradersProgress } from '../utils/Cmi5Helpers';
+import {
+  getAutoGradersProgress,
+  getCTFProgress,
+  getQuizProgress,
+  setAutoGradersProgress,
+  setCTFProgress,
+  setQuizProgress,
+} from '../utils/Cmi5Helpers';
 
 /**
  * Allows the caching of activity related information
@@ -19,6 +30,34 @@ import { getQuizProgress, setQuizProgress, getAutoGradersProgress, setAutoGrader
 
 export const useActivitySession = () => {
   const dispatch = useDispatch();
+
+  const handleGetCTFProgress = async (state: CTFStateKey) => {
+    const cacheKey = `${state.slideNumber}/${state.ctfId}`;
+    const cachedResult = (store.getState() as RootState).activitySession
+      .ctfCache[cacheKey];
+
+    if (cachedResult) return cachedResult;
+
+    try {
+      const response = await getCTFProgress(state);
+      dispatch(setEntireCTFState({ key: cacheKey, value: response }));
+      return response;
+    } catch (error) {
+      debugLogError(`Could not get CTF progress: ${error}`);
+      return null;
+    }
+  };
+
+  const handleSetCTFProgress = async (state: CTFState) => {
+    const cacheKey = `${state.slideNumber}/${state.ctfId}`;
+    dispatch(setEntireCTFState({ key: cacheKey, value: state }));
+
+    try {
+      await setCTFProgress(state);
+    } catch (error) {
+      debugLogError(`Could not set CTF progress: ${error}`);
+    }
+  };
 
   // This allows us to retrieve quiz state from either redux or through
   // network call if not yet cached
@@ -98,6 +137,8 @@ export const useActivitySession = () => {
   };
 
   return {
+    handleGetCTFProgress,
+    handleSetCTFProgress,
     handleGetQuizProgress,
     handleSetQuizProgress,
     handleGetAutoGraderProgress,

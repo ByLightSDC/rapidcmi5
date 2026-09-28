@@ -15,6 +15,8 @@ import type {
   AnswerType,
   CTFContent,
   CTFQuestion,
+  CTFState,
+  CTFStateKey,
   QuizContent,
   QuizQuestion,
   QuizScore,
@@ -43,6 +45,7 @@ type Cmi5Statement = Parameters<
 >[0]['statement'];
 
 const AUTO_GRADER_STATE_ID = 'rangeos.autograder.completed';
+const CTF_PROGRESS_STATE_PATH = '/states/ctfProgress';
 
 export type AutoGraderState = {
   autoGraders: string[];
@@ -530,6 +533,68 @@ function quizProgressStateIds(activityId: string, state: QuizState) {
     currentQuestionId: activityId + stateQuizCurrentQuestion + suffix,
     currentAnswersId: activityId + stateQuizCurrentAnswers + suffix,
   };
+}
+
+function ctfProgressStateId(activityId: string, state: CTFStateKey): string {
+  return `${activityId}${CTF_PROGRESS_STATE_PATH}/${state.slideNumber}/${encodeURIComponent(state.ctfId)}`;
+}
+
+export async function getCTFProgress(state: CTFStateKey): Promise<CTFState> {
+  const xapi = cmi5Instance.xapi;
+  if (!xapi) {
+    logger.error(
+      'Cannot load CTF progress without XAPI',
+      undefined,
+      'auManager',
+    );
+    throw new Error('An error occurred, XAPI null after authentication');
+  }
+
+  const { actor, activityId } = cmi5Instance.getLaunchParameters();
+  const initialState: CTFState = {
+    ...state,
+    currentQuestion: 0,
+    answers: {},
+    grades: {},
+    score: 0,
+    submitted: false,
+  };
+
+  try {
+    const result = await (xapi.getState({
+      agent: actor,
+      activityId,
+      stateId: ctfProgressStateId(activityId, state),
+    }) as AxiosPromise<CTFState>);
+    return result?.data ?? initialState;
+  } catch (error) {
+    logger.warn('CTF progress state was unavailable', { error }, 'auManager');
+    return initialState;
+  }
+}
+
+export async function setCTFProgress(state: CTFState): Promise<void> {
+  const xapi = cmi5Instance.xapi;
+  if (!xapi) {
+    logger.error(
+      'Cannot save CTF progress without XAPI',
+      undefined,
+      'auManager',
+    );
+    throw new Error('An error occurred, XAPI null after authentication');
+  }
+
+  const { actor, activityId } = cmi5Instance.getLaunchParameters();
+  try {
+    await xapi.createState({
+      agent: actor,
+      activityId,
+      stateId: ctfProgressStateId(activityId, state),
+      state,
+    });
+  } catch (error) {
+    logger.error('CTF progress could not be saved', { error }, 'auManager');
+  }
 }
 
 export async function getQuizProgress(

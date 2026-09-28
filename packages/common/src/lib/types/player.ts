@@ -1,5 +1,6 @@
 import { RC5ActivityTypeEnum } from './activities/activity';
 import { QuizState } from './activities/quiz';
+import { CTFState, CTFStateKey } from './activities/ctf';
 import { CourseData } from './courseStructure/course';
 import { ActivityScore } from './activities/score';
 import { CourseAU, SlideType } from './courseStructure';
@@ -22,9 +23,13 @@ export type SetActivityCacheHandler = (
   atype: RC5ActivityTypeEnum,
   state?: ActivityCacheSetState,
 ) => void;
-export type ActivityCacheSetState = QuizState | string;
-export type ActivityCacheGetState = QuizState;
-export type ActivityCacheGetReturnType = QuizState | Set<string> | null;
+export type ActivityCacheSetState = QuizState | CTFState | string;
+export type ActivityCacheGetState = QuizState | CTFStateKey;
+export type ActivityCacheGetReturnType =
+  | QuizState
+  | CTFState
+  | Set<string>
+  | null;
 
 export interface AuContextProps {
   activeTab: number;

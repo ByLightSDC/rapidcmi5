@@ -38,6 +38,8 @@ import {
   ActivityScore,
   AuContextProps,
   AuManagerState,
+  CTFState,
+  CTFStateKey,
   QuizState,
   RC5ActivityTypeEnum,
 } from '@rapid-cmi5/cmi5-build-common';
@@ -110,6 +112,8 @@ function AuManager() {
   } = useCMI5Session();
 
   const {
+    handleGetCTFProgress,
+    handleSetCTFProgress,
     handleGetQuizProgress,
     handleSetQuizProgress,
     handleGetAutoGraderProgress,
@@ -146,11 +150,7 @@ function AuManager() {
     } else if (atype === RC5ActivityTypeEnum.scenario) {
       handleSetSetAuoGraderProgress(state as string);
     } else if (atype === RC5ActivityTypeEnum.ctf) {
-      logger.debug(
-        'CTF Cache has not been implemented yet',
-        undefined,
-        'auManager',
-      );
+      handleSetCTFProgress(state as CTFState);
     } else if (atype === RC5ActivityTypeEnum.codeRunner) {
       logger.debug(
         'Code Runner Cache has not been implemented yet',
@@ -169,11 +169,7 @@ function AuManager() {
     } else if (atype === RC5ActivityTypeEnum.scenario) {
       return await handleGetAutoGraderProgress();
     } else if (atype === RC5ActivityTypeEnum.ctf) {
-      logger.debug(
-        'CTF Cache has not been implemented yet',
-        undefined,
-        'auManager',
-      );
+      return await handleGetCTFProgress(state as CTFStateKey);
     } else if (atype === RC5ActivityTypeEnum.codeRunner) {
       logger.debug(
         'Code Runner Cache has not been implemented yet',

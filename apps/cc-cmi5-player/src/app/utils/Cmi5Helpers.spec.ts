@@ -48,6 +48,7 @@ import {
 } from '@rapid-cmi5/cmi5-build-common';
 import type {
   ActivityScore,
+  CTFState,
   QuizContent,
   QuizScore,
   QuizState,
@@ -58,10 +59,12 @@ import { checkForDevMode } from './DevMode';
 import {
   calculateQuizScore,
   getAutoGradersProgress,
+  getCTFProgress,
   getQuizProgress,
   getSlideState,
   sendDetailedInteractionStatements,
   setAutoGradersProgress,
+  setCTFProgress,
   setQuizProgress,
   submitCmi5QuizLRS,
   submitCmi5ScoreLegacy,
@@ -377,6 +380,15 @@ describe('LRS state helpers', () => {
     quizId: 'quiz-id',
     slideNumber: 2,
   };
+  const ctfState: CTFState = {
+    ctfId: 'ctf/id',
+    slideNumber: 3,
+    currentQuestion: 1,
+    answers: { 0: 'flag' },
+    grades: { 0: 1 },
+    score: 50,
+    submitted: false,
+  };
 
   it('returns initial slide state when the saved state cannot be loaded', async () => {
     mockGetState.mockRejectedValue(new Error('not found'));
@@ -424,6 +436,47 @@ describe('LRS state helpers', () => {
     );
     expect(mockCreateState).toHaveBeenCalledWith(
       expect.objectContaining({ state: { answers: [] } }),
+    );
+  });
+
+  it('loads CTF progress from its activity and slide-specific state document', async () => {
+    mockGetState.mockResolvedValue({ data: ctfState });
+
+    await expect(
+      getCTFProgress({ ctfId: 'ctf/id', slideNumber: 3 }),
+    ).resolves.toEqual(ctfState);
+    expect(mockGetState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        stateId: 'https://example.com/course/states/ctfProgress/3/ctf%2Fid',
+      }),
+    );
+  });
+
+  it('returns fresh CTF progress when no saved state exists', async () => {
+    mockGetState.mockRejectedValue(new Error('not found'));
+
+    await expect(
+      getCTFProgress({ ctfId: 'ctf-id', slideNumber: 3 }),
+    ).resolves.toEqual({
+      ctfId: 'ctf-id',
+      slideNumber: 3,
+      currentQuestion: 0,
+      answers: {},
+      grades: {},
+      score: 0,
+      submitted: false,
+    });
+    expect(mockLogger.warn).toHaveBeenCalled();
+  });
+
+  it('saves complete CTF progress in one state document', async () => {
+    await setCTFProgress(ctfState);
+
+    expect(mockCreateState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        stateId: 'https://example.com/course/states/ctfProgress/3/ctf%2Fid',
+        state: ctfState,
+      }),
     );
   });
 });
