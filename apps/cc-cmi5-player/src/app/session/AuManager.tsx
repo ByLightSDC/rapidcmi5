@@ -196,14 +196,7 @@ function AuManager() {
       { activeTab, makeProgress },
       'auManager',
     );
-    progressAU(
-      activeTab,
-      makeProgress,
-      auJson,
-      viewedSlides,
-      dispatch,
-      store.getState,
-    );
+    progressAU(activeTab, makeProgress, auJson, dispatch, store.getState);
   };
 
   const [slideData, setSlideData] = useState<string>('Loading...');
@@ -497,14 +490,7 @@ function AuManager() {
         // 1. We haven initialized progress data yet, OR
         // 2. This is a fresh start (not resuming)
         if (isInitializedProgressData.current) {
-          progressAU(
-            activeTab,
-            makeProgress,
-            auJson,
-            viewedSlides,
-            dispatch,
-            store.getState,
-          );
+          progressAU(activeTab, makeProgress, auJson, dispatch, store.getState);
         }
       }
     }
