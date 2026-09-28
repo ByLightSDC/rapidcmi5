@@ -16,32 +16,29 @@ import {
   sendSlidePassingVerb,
 } from './LmsStatementManager';
 
-jest.mock(
-  '@rapid-cmi5/cmi5-build-common',
-  () => ({
-    getValidDirectiveMap: (content: string) => {
-      const directives = {
-        quiz: [] as any[],
-        ctf: [] as any[],
-        codeRunner: [] as any[],
-        scenario: [] as any[],
-        consoles: [] as any[],
-        download: [] as any[],
-      };
-      const pattern =
-        /:::(quiz|ctf|codeRunner|scenario|consoles)(?:\{[^}]*\})?\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
-      let match: RegExpExecArray | null;
+jest.mock('@rapid-cmi5/cmi5-build-common', () => ({
+  ...jest.requireActual('@rapid-cmi5/cmi5-build-common'),
+  getValidDirectiveMap: (content: string) => {
+    const directives = {
+      quiz: [] as any[],
+      ctf: [] as any[],
+      codeRunner: [] as any[],
+      scenario: [] as any[],
+      consoles: [] as any[],
+      download: [] as any[],
+    };
+    const pattern =
+      /:::(quiz|ctf|codeRunner|scenario|consoles)(?:\{[^}]*\})?\s*```json\s*({[\s\S]*?})\s*```\s*:::/g;
+    let match: RegExpExecArray | null;
 
-      while ((match = pattern.exec(content)) !== null) {
-        directives[match[1] as keyof typeof directives].push(
-          JSON.parse(match[2]),
-        );
-      }
-      return directives;
-    },
-  }),
-  { virtual: true },
-);
+    while ((match = pattern.exec(content)) !== null) {
+      directives[match[1] as keyof typeof directives].push(
+        JSON.parse(match[2]),
+      );
+    }
+    return directives;
+  },
+}));
 
 jest.mock('../session/cmi5', () => ({
   cmi5Instance: {

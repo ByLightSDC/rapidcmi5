@@ -1,4 +1,9 @@
-import { CourseAU, getValidDirectiveMap } from '@rapid-cmi5/cmi5-build-common';
+import {
+  CourseAU,
+  getValidDirectiveMap,
+  SlideActivityStatus,
+  SlideActivityType,
+} from '@rapid-cmi5/cmi5-build-common';
 import { logger } from '../debug';
 import { cmi5Instance } from '../session/cmi5';
 import {
@@ -9,10 +14,6 @@ import {
   SlideIdentifier,
   SlideStatus,
 } from '../types/CourseAUProgress';
-import {
-  SlideActivityStatus,
-  SlideActivityType,
-} from '../types/SlideActivityStatusState';
 import { SlideChangedStatus } from '../types/SlideState';
 import { getActivityStatus, getActivityStatusKey } from './ActivityStatusKey';
 

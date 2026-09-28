@@ -1,19 +1,19 @@
 import {
   AnswerType,
-  QuestionGradingType,
-  QuestionResponseType,
-  QuizQuestionType,
-} from '../types/QuizState';
+  QuestionGrading,
+  QuestionResponse,
+  QuizQuestion,
+} from '@rapid-cmi5/cmi5-build-common';
 
 export default function gradeQuiz(
-  questions: QuizQuestionType[],
+  questions: QuizQuestion[],
   allAnswers: AnswerType[],
 ) {
   let correct = 0;
   let gradedQuestions = 0;
 
   questions.forEach((question, index) => {
-    if (question.typeAttributes.grading === QuestionGradingType.None) return;
+    if (question.typeAttributes.grading === QuestionGrading.None) return;
     gradedQuestions++;
     const isCorrect = gradeQuestion(question, allAnswers[index]);
     if (isCorrect) correct++;
@@ -27,10 +27,10 @@ export default function gradeQuiz(
   return score;
 }
 
-function gradeQuestion(question: QuizQuestionType, answer: AnswerType) {
-  if (question.type === QuestionResponseType.MultipleChoice) {
+function gradeQuestion(question: QuizQuestion, answer: AnswerType) {
+  if (question.type === QuestionResponse.MultipleChoice) {
     return gradeOption(answer as number, question);
-  } else if (question.type === QuestionResponseType.SelectAll) {
+  } else if (question.type === QuestionResponse.SelectAll) {
     const answers = answer as number[];
     let isCorrect = true;
     answers.forEach((answer) => {
@@ -41,9 +41,9 @@ function gradeQuestion(question: QuizQuestionType, answer: AnswerType) {
 
     return isCorrect;
   } else if (
-    question.type === QuestionResponseType.FreeResponse ||
-    question.type === QuestionResponseType.Number ||
-    question.type === QuestionResponseType.TrueFalse
+    question.type === QuestionResponse.FreeResponse ||
+    question.type === QuestionResponse.Number ||
+    question.type === QuestionResponse.TrueFalse
   ) {
     if (
       (question.typeAttributes.correctAnswer as string).toLowerCase() !==
@@ -55,7 +55,7 @@ function gradeQuestion(question: QuizQuestionType, answer: AnswerType) {
   return true;
 }
 
-function gradeOption(optionIndex: number, question: QuizQuestionType) {
+function gradeOption(optionIndex: number, question: QuizQuestion) {
   if (
     question.typeAttributes.options &&
     question.typeAttributes.options[optionIndex].correct
@@ -67,21 +67,21 @@ function gradeOption(optionIndex: number, question: QuizQuestionType) {
 }
 
 export function getReviewIndication(
-  question: QuizQuestionType,
+  question: QuizQuestion,
   answer: AnswerType,
   optionIndex?: number,
 ) {
   let isCorrect = false;
 
-  if (question.typeAttributes.grading === QuestionGradingType.None) return '';
+  if (question.typeAttributes.grading === QuestionGrading.None) return '';
 
   if (optionIndex !== undefined) {
-    if (question.type === QuestionResponseType.SelectAll) {
+    if (question.type === QuestionResponse.SelectAll) {
       const answers = answer as number[];
       if (!answers.includes(optionIndex)) {
         return '';
       }
-    } else if (question.type === QuestionResponseType.MultipleChoice) {
+    } else if (question.type === QuestionResponse.MultipleChoice) {
       if ((answer as number) !== optionIndex) {
         return '';
       }

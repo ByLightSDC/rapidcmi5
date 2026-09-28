@@ -6,7 +6,6 @@ import TeamScenarioExercise from '../../../team-consoles/TeamScenarioExercise';
 import { useSelector } from 'react-redux';
 import { activeTabSel } from '../../../../redux/navigationReducer';
 import { useCMI5Session } from '../../../../hooks/useCMI5Session';
-import { SlideActivityType } from '../../../../../app/types/SlideActivityStatusState';
 import { Box, ThemeProvider, useTheme } from '@mui/material';
 import {
   AuContextProps,
@@ -15,6 +14,7 @@ import {
   CTFContent,
   DownloadFileData,
   CodeRunnerContent,
+  SlideActivityType,
 } from '@rapid-cmi5/cmi5-build-common';
 import {
   setProgress$,

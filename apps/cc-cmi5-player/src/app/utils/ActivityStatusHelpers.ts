@@ -3,7 +3,7 @@ import { store } from '../redux/store';
 import {
   ActivityCompletionPayload,
   SlideActivityStatus,
-} from '../types/SlideActivityStatusState';
+} from '@rapid-cmi5/cmi5-build-common';
 import { getActivityStatusKey } from './ActivityStatusKey';
 
 export async function updateActivityStatus(

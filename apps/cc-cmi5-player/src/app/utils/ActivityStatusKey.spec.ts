@@ -1,5 +1,5 @@
 import { getActivityStatus, getActivityStatusKey } from './ActivityStatusKey';
-import { SlideActivityType } from '../types/SlideActivityStatusState';
+import { SlideActivityType } from '@rapid-cmi5/cmi5-build-common';
 
 const status = (slideGuid: string, slideIndex: number, passed = false) => ({
   type: SlideActivityType.QUIZ,

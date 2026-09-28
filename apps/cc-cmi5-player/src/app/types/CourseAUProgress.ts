@@ -5,8 +5,12 @@
  * that serves as the global source of truth for all progress data.
  */
 
-import { CourseAU } from '@rapid-cmi5/cmi5-build-common';
-import { ActivityType, SlideActivityStatus } from './SlideActivityStatusState';
+import {
+  ActivityType,
+  CourseAU,
+  KSATElementType,
+  SlideActivityStatus,
+} from '@rapid-cmi5/cmi5-build-common';
 
 // Slide identification using filepath as GUID
 export interface SlideIdentifier {
@@ -15,22 +19,13 @@ export interface SlideIdentifier {
   slideTitle: string; // Human readable title
 }
 
-// KSAT element structure (from markdown content)
-export interface KSATElement {
-  element_type: 'task' | 'knowledge' | 'skill';
-  element_identifier: string;
-  title: string;
-  text: string;
-  doc_identifier: string;
-}
-
 // Activity metadata (parsed from markdown content)
 export interface SlideActivityMetadata {
   type: ActivityType;
   completionRequired: string; // "passed" or other criteria
   passingScore?: number; // e.g., 80
   questions?: unknown[]; // Question data from markdown
-  ksats?: Array<KSATElement>; // Array of KSAT elements
+  ksats?: Array<KSATElementType>; // Array of KSAT elements
 }
 
 // Slide status tracking
