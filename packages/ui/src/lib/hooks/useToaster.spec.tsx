@@ -177,3 +177,19 @@ xdescribe('useToaster hook', () => {
     expect(asFragment()).toMatchSnapshot();
   });
 });
+
+describe('useToaster Unicode messages', () => {
+  it('shows authored copy containing Unicode characters', async () => {
+    const message = 'Quiz passed — Don’t Panic, you scored 92%';
+
+    const { getByText, findByText } = render(
+      <NotificationsProvider>
+        <UseToasterHookWrapper message={message} severity="success" />
+      </NotificationsProvider>,
+    );
+
+    fireEvent.click(getByText('toaster'));
+
+    expect(await findByText(message)).toBeTruthy();
+  });
+});

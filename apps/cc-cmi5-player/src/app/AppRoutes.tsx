@@ -1,6 +1,8 @@
 import AuManager from './session/AuManager';
 import CourseModals from './components/CourseModals';
 import NoAuManager from './session/NoAuManager';
+import ProgressToaster from './components/ProgressToaster';
+import UnitResultDialog from './components/UnitResultDialog';
 import { BrowserRouter as Router } from 'react-router';
 import { config } from '@rapid-cmi5/ui';
 
@@ -23,6 +25,8 @@ export default function AppRoutes() {
         {hasConsoleTab ? <NoAuManager /> : <AuManager />}
 
         <CourseModals />
+        <UnitResultDialog />
+        <ProgressToaster />
       </div>
     </Router>
   );

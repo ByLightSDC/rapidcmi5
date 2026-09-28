@@ -3,7 +3,6 @@ import { combineReducers } from 'redux';
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import activitySessionReducer from './activitySessionReducer';
 
-
 //Persist
 import storage from 'redux-persist/lib/storage';
 import {
@@ -18,6 +17,7 @@ import {
 } from 'redux-persist';
 import auReducer from './auReducer';
 import navigationReducer from './navigationReducer';
+import progressNotificationReducer from './progressNotificationReducer';
 import { keycloakUiReducer } from '@rapid-cmi5/keycloak';
 import { commonAppReducer, ctfReducer } from '@rapid-cmi5/ui';
 
@@ -35,6 +35,7 @@ const rootReducer = combineReducers({
   au: auReducer,
   auCTF: ctfReducer,
   navigation: navigationReducer,
+  progressNotification: progressNotificationReducer,
   commonApp: commonAppReducer,
   activitySession: activitySessionReducer,
   keycloakUi: keycloakUiReducer, //this app does not use keycloak login, but we store authToken here for branded components (TODO decouple)
