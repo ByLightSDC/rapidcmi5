@@ -1,21 +1,42 @@
-import {
-  QuizContent,
+import { useEffect } from 'react';
+import { RC5ActivityTypeEnum } from '@rapid-cmi5/cmi5-build-common';
+import type {
   AnswerType,
-  GetCmi5QuizProgressHandler,
   GetActivityCacheHandler,
-  RC5ActivityTypeEnum,
   QuizState,
 } from '@rapid-cmi5/cmi5-build-common';
-import { useEffect } from 'react';
+import type { MutableRefObject } from 'react';
 import { debugLogError } from '../../../utility/logger';
 
-/*
-  This hook will allow a quiz to have a local cache of redux data which is very fast that
-  is seeded from a remote LRS state. Once the LRS connection is ready, we will call the get method and have 
-  the remote state returned to us and fill out the redux state. 
-  After the inital call we only need to use the redux state and no longer need to 
-  make get requests to the remote state in the LRS.
-*/
+type UseHydrateQuizOptions = {
+  readyToHydrate: boolean;
+  getActivityCache?: GetActivityCacheHandler | null;
+  quizId: string;
+  activeTab?: number;
+  setAllAnswers: (answers: AnswerType[]) => void;
+  setCurrentQuestion: (question: number) => void;
+  readyToPersist: MutableRefObject<boolean>;
+  setIsLoading: (loading: boolean) => void;
+  allAnswers: AnswerType[];
+};
+
+function isValidProgress(
+  progress: QuizState | null,
+  answerCount: number,
+): progress is Required<Pick<QuizState, 'currentQuestion' | 'answers'>> &
+  QuizState {
+  if (!progress || !Array.isArray(progress.answers)) return false;
+
+  const currentQuestion = progress.currentQuestion;
+  const currentQuestionIsValid =
+    Number.isInteger(currentQuestion) &&
+    currentQuestion !== undefined &&
+    currentQuestion >= 0 &&
+    (answerCount === 0 ? currentQuestion === 0 : currentQuestion < answerCount);
+
+  return progress.answers.length === answerCount && currentQuestionIsValid;
+}
+
 export function useHydrateQuiz({
   readyToHydrate,
   getActivityCache,
@@ -26,56 +47,51 @@ export function useHydrateQuiz({
   readyToPersist,
   setIsLoading,
   allAnswers,
-}: {
-  readyToHydrate: boolean;
-  getActivityCache?: GetActivityCacheHandler | null | undefined;
-  quizId: string;
-  activeTab?: number;
-  setAllAnswers: (a: AnswerType[]) => void;
-  setCurrentQuestion: (q: number) => void;
-  readyToPersist: React.MutableRefObject<boolean>;
-  setIsLoading: (v: boolean) => void;
-  allAnswers: AnswerType[];
-}) {
+}: UseHydrateQuizOptions): void {
   useEffect(() => {
-    // Because of legacy setup, should remove this in the future.
-    // Legacy build does not get persistance.
     if (!getActivityCache) {
       readyToPersist.current = true;
       setIsLoading(false);
       return;
     }
-    if (!readyToHydrate || activeTab === undefined) {
-      return;
-    }
+    if (!readyToHydrate || activeTab === undefined) return;
 
-    const resetQuizFromLrs = async () => {
+    let cancelled = false;
+
+    const hydrate = async () => {
       try {
-        const { currentQuestion, answers } = (await getActivityCache(
-          RC5ActivityTypeEnum.quiz,
-          {
-            quizId,
-            slideNumber: activeTab,
-          },
-        )) as QuizState;
+        const progress = (await getActivityCache(RC5ActivityTypeEnum.quiz, {
+          quizId,
+          slideNumber: activeTab,
+        })) as QuizState | null;
 
-        // If the current number of questions and the returned number of questions do not match
-        // abort the operation and startfrom scratch.
-        if (
-          currentQuestion !== undefined &&
-          answers !== undefined &&
-          answers.length === allAnswers.length
-        ) {
-          setAllAnswers(answers);
-          setCurrentQuestion(currentQuestion);
+        if (!cancelled && isValidProgress(progress, allAnswers.length)) {
+          setAllAnswers(progress.answers);
+          setCurrentQuestion(progress.currentQuestion);
         }
       } catch (error) {
-        debugLogError(`Could not get from LRS ${error}`);
+        if (!cancelled) debugLogError(`Could not get quiz state: ${error}`);
+      } finally {
+        if (!cancelled) {
+          readyToPersist.current = true;
+          setIsLoading(false);
+        }
       }
-      readyToPersist.current = true;
-      setIsLoading(false);
     };
 
-    resetQuizFromLrs();
-  }, [readyToHydrate, activeTab, quizId]);
+    void hydrate();
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    activeTab,
+    allAnswers.length,
+    getActivityCache,
+    quizId,
+    readyToHydrate,
+    readyToPersist,
+    setAllAnswers,
+    setCurrentQuestion,
+    setIsLoading,
+  ]);
 }
