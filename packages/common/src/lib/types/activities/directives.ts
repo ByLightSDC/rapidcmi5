@@ -14,7 +14,6 @@ export interface ActivityDirectiveNode extends ContainerDirective {
     | 'ctf'
     | 'quiz'
     | 'codeRunner'
-    | 'quiz'
     | 'scenario';
 
   /**
