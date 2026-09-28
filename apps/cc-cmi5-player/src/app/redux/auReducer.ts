@@ -188,21 +188,22 @@ export const auSlice = createSlice({
 
     // New action for updating activity status (completion and passing)
     updateActivityStatus: (state, action) => {
-      const { activityId, activityStatus } = action.payload;
+      const { activityId, activityStatusKey, activityStatus } = action.payload;
 
       logger.debug(
         'Redux: Updating activity status',
         {
           activityId,
+          activityStatusKey,
           previousStatus:
-            state.courseAUProgress?.progress.activityStatus[activityId],
+            state.courseAUProgress?.progress.activityStatus[activityStatusKey],
           newStatus: activityStatus,
         },
         'auManager',
       );
 
       if (state.courseAUProgress?.progress.activityStatus) {
-        state.courseAUProgress.progress.activityStatus[activityId] =
+        state.courseAUProgress.progress.activityStatus[activityStatusKey] =
           activityStatus;
         state.courseAUProgress.lastUpdated = new Date().toISOString();
       }
