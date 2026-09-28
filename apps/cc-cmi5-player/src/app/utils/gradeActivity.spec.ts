@@ -19,17 +19,13 @@ jest.mock('../debug', () => ({
 import { SlideActivityType } from '@rapid-cmi5/cmi5-build-common';
 import { logger } from '../debug';
 import { updateActivityStatus } from './ActivityStatusHelpers';
-import {
-  calculateScorePercentage,
-  createSlideActivityScore,
-  doesScorePass,
-  gradeActivity,
-} from './gradeActivity';
+import { createSlideActivityScore, gradeActivity } from './gradeActivity';
 import {
   sendActivityCompletedVerb,
   sendActivityFailedVerb,
   sendActivityPassedVerb,
 } from './LmsStatementManager';
+import { calculateScorePercentage, doesScorePass } from './ScoreUtils';
 
 const mockUpdateActivityStatus = updateActivityStatus as jest.Mock;
 const mockSendCompleted = sendActivityCompletedVerb as jest.Mock;

@@ -8,6 +8,7 @@ import { SlideActivityType } from '@rapid-cmi5/cmi5-build-common';
 import { logger } from '../debug';
 import type { CourseAUProgress } from '../types/CourseAUProgress';
 import { updateActivityStatus } from './ActivityStatusHelpers';
+import { doesScorePass } from './ScoreUtils';
 import {
   sendActivityCompletedVerb,
   sendActivityFailedVerb,
@@ -27,23 +28,6 @@ export type GradeActivityResult = {
   passed: boolean;
   score?: SlideActivityScore;
 };
-
-/**
- * Calculates the percentage represented by a score.
- */
-export function calculateScorePercentage(score: SlideActivityScore): number {
-  return (score.raw / score.max) * 100;
-}
-
-/**
- * Determines whether a score reaches a percentage-based passing threshold.
- */
-export function doesScorePass(
-  score: SlideActivityScore,
-  passingScore: number,
-): boolean {
-  return calculateScorePercentage(score) >= passingScore;
-}
 
 /**
  * Creates the normalized score shape used by activity status and statements.

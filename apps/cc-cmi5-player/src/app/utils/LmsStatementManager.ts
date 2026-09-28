@@ -12,6 +12,10 @@ import sha256 from 'crypto-js/sha256';
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from '../debug';
 import { setAuProgress, setCourseAUProgress } from '../redux/auReducer';
+import {
+  queueProgressToast,
+  setUnitResult,
+} from '../redux/progressNotificationReducer';
 import { RootState } from '../redux/store';
 import { cmi5Instance } from '../session/cmi5';
 import { CourseAUProgress, SlideStatus } from '../types/CourseAUProgress';
@@ -31,6 +35,11 @@ import {
 } from './CourseAUProgressHelpers';
 import { checkForDevMode } from './DevMode';
 import { createSlideActivityScore, gradeActivity } from './gradeActivity';
+import {
+  buildActivityToast,
+  buildUnitResult,
+  getActivityTitle,
+} from './ProgressNotifications';
 
 export type SlideEventType =
   | 'navigation'
@@ -505,6 +514,32 @@ async function handleAuLMSProgress(
   }
 }
 
+/**
+ * Notifies the learner when the AU has just completed or passed. Both callers
+ * already gate on shouldReportAuProgress, which is what keeps a resumed AU -
+ * whose restored progress already says passed - from showing this again.
+ */
+function reportUnitResult(
+  previousAu: AuSnapshot,
+  currentAu: AuSnapshot,
+  courseAUProgress: CourseAUProgress,
+  dispatch: Dispatch,
+): void {
+  try {
+    const unitResult = buildUnitResult({
+      previous: previousAu,
+      current: currentAu,
+      courseAUProgress,
+      averageScores: calculateAverageScores(courseAUProgress),
+    });
+
+    if (unitResult) dispatch(setUnitResult(unitResult));
+  } catch (error) {
+    // Learner-facing feedback must never prevent the AU verbs from going out.
+    logger.error('Error building the unit result notification', error, 'lms');
+  }
+}
+
 function cloneForSlideUpdate(
   courseAUProgress: CourseAUProgress,
 ): CourseAUProgress {
@@ -601,6 +636,7 @@ export async function handleSlideViewed(
 
     const currentAu = getAuSnapshot(updatedProgress);
     if (shouldReportAuProgress(previousAu, currentAu)) {
+      reportUnitResult(previousAu, currentAu, updatedProgress, dispatch);
       logAsyncError(
         handleAuLMSProgress(
           makeProgress,
@@ -675,9 +711,7 @@ function calculateActivityScore(
     }
 
     const percentage =
-      totalTasks > 0
-        ? Math.min(100, (completedTasks / totalTasks) * 100)
-        : 0;
+      totalTasks > 0 ? Math.min(100, (completedTasks / totalTasks) * 100) : 0;
     return {
       score: createSlideActivityScore(percentage, 0, 100),
       passingScore: 100,
@@ -789,7 +823,7 @@ export async function handleActivityScoring(
       activityType,
     );
 
-    await gradeActivity(
+    const gradeResult = await gradeActivity(
       activityId,
       slideIndex,
       slideGuid,
@@ -834,8 +868,29 @@ export async function handleActivityScoring(
     updateAuStatus(updatedProgress);
     saveUpdatedProgress(updatedProgress, dispatch);
 
+    try {
+      dispatch(
+        queueProgressToast(
+          buildActivityToast({
+            activityTypeLabel: activityData.activityType,
+            activityTitle: getActivityTitle(
+              activityData.activityContent,
+              activityData.activityType,
+            ),
+            result: gradeResult,
+            metadata:
+              updatedProgress.slideActivitiesMeta[slideGuid][activityId],
+          }),
+        ),
+      );
+    } catch (error) {
+      // A missing toast is recoverable; a missing statement is not.
+      logger.error('Error building the activity toast', error, 'lms');
+    }
+
     const currentAu = getAuSnapshot(updatedProgress);
     if (shouldReportAuProgress(previousAu, currentAu)) {
+      reportUnitResult(previousAu, currentAu, updatedProgress, dispatch);
       await handleAuLMSProgress(
         true,
         currentAu.progress,

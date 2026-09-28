@@ -1,5 +1,6 @@
 import Typography from '@mui/material/Typography';
 import { useNotifications } from '@toolpad/core';
+import { useCallback } from 'react';
 
 export type ToasterProps = {
   message: string;
@@ -11,35 +12,23 @@ export type ToasterProps = {
 export const useToaster = () => {
   const notifications = useNotifications();
 
-  const displayToaster = ({
-    message,
-    severity,
-    autoHideDuration = 5000,
-    preventDuplicate = true,
-  }: ToasterProps) => {
-    let key = undefined;
-    if (preventDuplicate) {
-      // Prevent duplicate messages by providing a key.
-      // useNotifications will automatically deduplicate any notifications with
-      // the same key.
-      // Create the key by Base64 encoding the message. This will ensure that
-      // unique messages have unique keys and duplicate messages have duplicate
-      // keys.
-      // Note: once a notification closes by any method, the same message can
-      // then be correctly displayed again because there is no active duplicate.
-      key = btoa(message);
-    }
+  return useCallback(
+    ({
+      message,
+      severity,
+      autoHideDuration = 5000,
+      preventDuplicate = true,
+    }: ToasterProps) => {
+      const formattedMessage = (
+        <Typography sx={{ whiteSpace: 'pre-line' }}>{message}</Typography>
+      );
 
-    const messageFormatted = (
-      <Typography sx={{ whiteSpace: 'pre-line' }}>{message}</Typography>
-    );
-
-    notifications.show(messageFormatted, {
-      key: key,
-      severity: severity,
-      autoHideDuration: autoHideDuration,
-    });
-  };
-
-  return displayToaster;
+      notifications.show(formattedMessage, {
+        key: preventDuplicate ? message : undefined,
+        severity,
+        autoHideDuration,
+      });
+    },
+    [notifications],
+  );
 };
