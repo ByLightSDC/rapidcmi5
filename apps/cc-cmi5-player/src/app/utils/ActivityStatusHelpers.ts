@@ -4,6 +4,7 @@ import {
   ActivityCompletionPayload,
   SlideActivityStatus,
 } from '../types/SlideActivityStatusState';
+import { getActivityStatusKey } from './ActivityStatusKey';
 
 export async function updateActivityStatus(
   payload: ActivityCompletionPayload,
@@ -16,7 +17,8 @@ export async function updateActivityStatus(
   const { courseAUProgress } = currentState.au;
 
   if (courseAUProgress?.progress?.activityStatus) {
-    const { activityId } = payload;
+    const { activityId, slideGuid } = payload;
+    const activityStatusKey = getActivityStatusKey(slideGuid, activityId);
     const activityStatus: SlideActivityStatus = {
       type: payload.type,
       slideIndex: payload.slideIndex,
@@ -34,7 +36,7 @@ export async function updateActivityStatus(
     // Update the Redux state
     store.dispatch({
       type: 'au/updateActivityStatus',
-      payload: { activityId, activityStatus },
+      payload: { activityId, activityStatusKey, activityStatus },
     });
   }
 }
