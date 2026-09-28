@@ -66,11 +66,10 @@ jest.mock('./gradeActivity', () => ({
   gradeActivity: jest.fn().mockResolvedValue({ completed: true, passed: true }),
 }));
 
-jest.mock(
-  '@rapid-cmi5/cmi5-build-common',
-  () => ({ getActivityTypeFromDisplayName: jest.fn() }),
-  { virtual: true },
-);
+jest.mock('@rapid-cmi5/cmi5-build-common', () => ({
+  ...jest.requireActual('@rapid-cmi5/cmi5-build-common'),
+  getActivityTypeFromDisplayName: jest.fn(),
+}));
 
 jest.mock(
   '@rapid-cmi5/ui',

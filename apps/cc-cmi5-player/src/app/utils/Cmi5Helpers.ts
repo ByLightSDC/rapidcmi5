@@ -2,7 +2,6 @@ import XAPI, { InteractionComponent, LanguageMap, Statement } from '@xapi/xapi';
 import { cmi5Instance } from '../session/cmi5';
 import { v4 as uuidv4 } from 'uuid';
 
-import { AnswerType, IQuestionType, QuizOption } from '../types/QuizState';
 import {
   State,
   stateQuizCurrentAnswers,
@@ -14,22 +13,21 @@ import { checkForDevMode } from './DevMode';
 import { logger } from '../debug';
 
 import { sendActivityCompletedVerb } from './LmsStatementManager';
-import { gradeActivity, createSlideActivityScore } from './gradeActivity';
-import {
-  ActivityType,
-  SlideActivityScore,
-  SlideActivityType,
-} from '../types/SlideActivityStatusState';
 import {
   ActivityScore,
+  AnswerType,
   RC5ActivityTypeEnum,
   CTFContent,
+  CTFQuestion,
   QuizScore,
   QuizContent,
+  QuizOption,
   QuestionResponse,
   CTFResponse,
   QuizQuestion,
   QuizState,
+  SlideActivityScore,
+  SlideActivityType,
 } from '@rapid-cmi5/cmi5-build-common';
 
 /**
@@ -771,7 +769,7 @@ export async function setAutoGradersProgress(uuid: string): Promise<void> {
   };
 
   try {
-    await xapi.sendStatement({statement: statement as any});
+    await xapi.sendStatement({ statement: statement as any });
     console.log(`Sent statement for UUID ${uuid}`);
   } catch (error) {
     console.error('Failed to send statement for AutoGrader UUID:', error);
@@ -861,16 +859,17 @@ export async function submitCmi5CtfLRS(quiz: CTFContent, scoreData: QuizScore) {
 }
 
 async function submitFreeResponse(
-  question: IQuestionType,
+  question: QuizQuestion | CTFQuestion,
   answer: string,
   testId: string,
 ) {
   const questionId = question.cmi5QuestionId;
   const answers: string[] = [answer];
 
-  const correctAnswers: string[] = [question.typeAttributes.correctAnswer];
+  const correctAnswer = String(question.typeAttributes.correctAnswer);
+  const correctAnswers: string[] = [correctAnswer];
 
-  const success = answer === question.typeAttributes.correctAnswer;
+  const success = answer === correctAnswer;
 
   const name: LanguageMap = {
     'en-US': question.question,

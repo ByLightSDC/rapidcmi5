@@ -3,7 +3,7 @@ import {
   SlideActivityScore,
   ActivityType,
   SlideActivityType,
-} from '../types/SlideActivityStatusState';
+} from '@rapid-cmi5/cmi5-build-common';
 
 import {
   sendActivityCompletedVerb,

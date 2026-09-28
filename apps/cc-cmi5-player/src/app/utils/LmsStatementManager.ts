@@ -1,7 +1,10 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import {
   ActivityScore,
+  ActivityType,
   getActivityTypeFromDisplayName,
+  SlideActivityScore,
+  SlideActivityType,
 } from '@rapid-cmi5/cmi5-build-common';
 import { config } from '@rapid-cmi5/ui';
 import { ResultScore, Statement } from '@xapi/xapi';
@@ -12,11 +15,6 @@ import { setAuProgress, setCourseAUProgress } from '../redux/auReducer';
 import { RootState } from '../redux/store';
 import { cmi5Instance } from '../session/cmi5';
 import { CourseAUProgress, SlideStatus } from '../types/CourseAUProgress';
-import {
-  ActivityType,
-  SlideActivityScore,
-  SlideActivityType,
-} from '../types/SlideActivityStatusState';
 import { SlideChangedStatus } from '../types/SlideState';
 import { shouldReportAuProgress } from './AuProgressTransition';
 import {

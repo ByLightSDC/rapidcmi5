@@ -1,4 +1,4 @@
-import { SlideActivityStatus } from '../types/SlideActivityStatusState';
+import { SlideActivityStatus } from '@rapid-cmi5/cmi5-build-common';
 
 /**
  * Activity IDs only have to be unique within a slide. Prefix them with the
