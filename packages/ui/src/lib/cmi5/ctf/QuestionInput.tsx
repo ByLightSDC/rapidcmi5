@@ -7,11 +7,7 @@ import { TextField } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
-import {
-  currentAnswers,
-  getCurrentQuestion,
-  getCTFGrades as getGrades,
-} from './ctfReducer';
+import { getCurrentQuestion, getCTFGrades as getGrades } from './ctfReducer';
 
 import { Stack } from '@mui/material';
 import { ButtonIcon } from '../../utility/buttons';
@@ -28,35 +24,22 @@ export function QuestionInput({
   display,
   handleNextQuestion,
   handlePreviousQuestion,
+  handleAnswerChange,
   handleSubmitAnswer,
   numQuestions = -1,
 }: {
   answer?: AnswerType;
   handleNextQuestion: () => void;
   handlePreviousQuestion: () => void;
+  handleAnswerChange: (input: AnswerType) => void;
   handleSubmitAnswer: (input: AnswerType) => void;
   display?: CTFDisplay;
   numQuestions: number;
 }) {
-  const [theAnswer, setTheAnswer] = useState<AnswerType>(answer);
   const [isInputEnabled, setIsInputEnabled] = useState(false);
   const currentGrades = useSelector(getGrades);
   const questionIndex = useSelector(getCurrentQuestion);
-  const currentAnswersSel = useSelector(currentAnswers);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  /**
-   * Set answer text
-   */
-  const updateAnswer = useCallback(() => {
-    if (
-      Object.prototype.hasOwnProperty.call(currentAnswersSel, questionIndex)
-    ) {
-      setTheAnswer(currentAnswersSel[questionIndex]);
-    } else {
-      setTheAnswer('');
-    }
-  }, [currentAnswersSel, questionIndex]);
 
   /**
    * Update grades
@@ -78,20 +61,19 @@ export function QuestionInput({
    */
   useEffect(() => {
     updateGrades();
-  }, [questionIndex, currentGrades]);
+  }, [updateGrades]);
 
   /**
-   * Update answer text
-   * and select it
+   * Select the answer when the active question changes.
    */
   useEffect(() => {
-    updateAnswer();
-
-    setTimeout(() => {
+    const selectTimer = setTimeout(() => {
       if (inputRef.current) {
         inputRef.current.select();
       }
     }, 100);
+
+    return () => clearTimeout(selectTimer);
   }, [questionIndex]);
 
   /**
@@ -99,7 +81,7 @@ export function QuestionInput({
    */
   useSignalEffect(() => {
     if (shouldCheckAnswer$.value) {
-      handleSubmitAnswer(theAnswer);
+      handleSubmitAnswer(answer);
       shouldCheckAnswer$.value = false;
     }
   });
@@ -143,7 +125,7 @@ export function QuestionInput({
         rows={2}
         multiline={true}
         placeholder="Type Here"
-        value={theAnswer}
+        value={answer ?? ''}
         size="small"
         disabled={!isInputEnabled}
         slotProps={{
@@ -153,10 +135,10 @@ export function QuestionInput({
           },
         }}
         onChange={(event) => {
-          setTheAnswer(event.target.value);
+          handleAnswerChange(event.target.value);
         }}
-        onFocus={(event) => {
-          if (inputRef.current && theAnswer) {
+        onFocus={() => {
+          if (inputRef.current && answer) {
             inputRef.current.select();
           }
         }}
@@ -170,7 +152,7 @@ export function QuestionInput({
           if (event.key === 'Enter') {
             event.stopPropagation();
             event.preventDefault();
-            handleSubmitAnswer(theAnswer);
+            handleSubmitAnswer(answer);
           } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
             if (
               questionIndex === numQuestions - 1 ||

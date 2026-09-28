@@ -4,6 +4,7 @@ import {
   AuContextProps,
   CTFContent,
   CTFQuestion,
+  CTFState,
   OuterStyle,
   QuizCompletionEnum,
   RC5ActivityTypeEnum,
@@ -39,6 +40,8 @@ import ReportIcon from '@mui/icons-material/Report';
 import {
   getCTFGrades as getGrades,
   getCTFSubmitted as getSubmitted,
+  getCTFScore as getScore,
+  hydrateCTFActivity,
   setCurrentCTFQuestion as setCurrentQuestion,
   resetCTFActivity as resetActivity,
   setCTFScore as setScore,
@@ -47,6 +50,7 @@ import {
   currentAnswers,
   getCurrentQuestion,
 } from './ctfReducer';
+import { useCTFCache } from './useCTFCache';
 import { Box, Stack } from '@mui/material';
 import { ButtonInfoField, ButtonMainUi } from '../../utility/buttons';
 import {
@@ -93,7 +97,13 @@ export function AuCTF({
   outerSx?: SxProps;
   outerStyle?: OuterStyle;
 }) {
-  const { setProgress, submitScore } = auProps;
+  const {
+    activeTab,
+    getActivityCache,
+    setActivityCache,
+    setProgress,
+    submitScore,
+  } = auProps;
   const ctfContent = content;
   const dispatch = useDispatch();
   const currentAnswersSel = useSelector(currentAnswers);
@@ -103,6 +113,28 @@ export function AuCTF({
   const currentQuestionIndex = useSelector(getCurrentQuestion);
   const allAnswers = useSelector(getAllAnswers);
   const hasSubmitted = useSelector(getSubmitted);
+  const savedScore = useSelector(getScore);
+
+  const hydrateCache = useCallback(
+    (state: CTFState) => {
+      dispatch(hydrateCTFActivity(state));
+    },
+    [dispatch],
+  );
+
+  useCTFCache({
+    activeTab,
+    answers: currentAnswersSel,
+    ctfId: ctfContent.cmi5QuizId,
+    currentQuestion: currentQuestionIndex,
+    grades: currentGrades,
+    questionCount: ctfContent.questions.length,
+    score: savedScore,
+    submitted: hasSubmitted,
+    getActivityCache,
+    setActivityCache,
+    hydrate: hydrateCache,
+  });
 
   const {
     accuracy,
@@ -185,7 +217,6 @@ export function AuCTF({
     if (startQuestionIndex > 0) {
       for (let i = 0; i < startQuestionIndex; i++) {
         jumpTo = i;
-        console.log('jj', jumpTo);
         if (isAvailable(jumpTo)) {
           return;
         }
@@ -249,6 +280,10 @@ export function AuCTF({
   const handleSelectQuestion = (index: number) => {
     dispatch(setCurrentQuestion(index));
     setIsFocused(true);
+  };
+
+  const handleAnswerChange = (input: AnswerType) => {
+    dispatch(setCurrentAnswer(input));
   };
 
   /**
@@ -465,6 +500,7 @@ export function AuCTF({
               <QuestionInput
                 display={ctfContent.display}
                 answer={currentAnswersSel[currentQuestionIndex] || ''}
+                handleAnswerChange={handleAnswerChange}
                 handleNextQuestion={handleNextQuestion}
                 handlePreviousQuestion={handlePreviousQuestion}
                 handleSubmitAnswer={handleSubmitAnswer}

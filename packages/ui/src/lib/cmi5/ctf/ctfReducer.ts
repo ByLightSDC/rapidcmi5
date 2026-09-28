@@ -3,25 +3,26 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   AnswerType,
   CTFContent,
+  CTFState,
   QuizCompletionEnum,
 } from '@rapid-cmi5/cmi5-build-common';
 
-type tCTFState = {
+export type CTFActivityState = {
   currentQuestion: number;
-  currentAnswers: { [key: number]: AnswerType };
-  currentGrades: { [key: number]: undefined | 0 | 1 };
+  currentAnswers: Record<string, AnswerType>;
+  currentGrades: Record<string, 0 | 1>;
   score: number;
   submitted: boolean;
 };
 
 interface State {
-  auCTF: tCTFState;
+  auCTF: CTFActivityState;
 }
 
-const initialState: tCTFState = {
+const initialState: CTFActivityState = {
   currentQuestion: 0,
-  currentAnswers: {} as { [key: number]: AnswerType },
-  currentGrades: {} as { [key: number]: undefined | 0 | 1 },
+  currentAnswers: {},
+  currentGrades: {},
   score: 0,
   submitted: false,
 };
@@ -30,6 +31,13 @@ export const ctfSlice = createSlice({
   name: 'auCTF',
   initialState,
   reducers: {
+    hydrateCTFActivity: (state, action: PayloadAction<CTFState>) => {
+      state.currentQuestion = action.payload.currentQuestion;
+      state.currentAnswers = action.payload.answers;
+      state.currentGrades = action.payload.grades;
+      state.score = action.payload.score;
+      state.submitted = action.payload.submitted;
+    },
     setCurrentCTFQuestion: (state, action: PayloadAction<number>) => {
       state.currentQuestion = action.payload;
     },
@@ -59,7 +67,6 @@ export const ctfSlice = createSlice({
       state.submitted = true;
     },
     resetCTFActivity: (state) => {
-      state.currentAnswers = [];
       state.currentQuestion = 0;
       state.currentGrades = {};
       state.currentAnswers = {};
@@ -68,7 +75,6 @@ export const ctfSlice = createSlice({
     },
   },
 });
-
 
 export function getCurrentCTFAnswer(state: State): AnswerType {
   const questionIndex = state.auCTF.currentQuestion;
@@ -84,11 +90,16 @@ export function getCurrentCTFAnswers(state: State): AnswerType {
 }
 
 export function getAllCTFAnswers(state: State): AnswerType[] {
-  return Object.values(state.auCTF.currentAnswers);
-  //return state.auCTF.currentAnswers;
+  return Object.entries(state.auCTF.currentAnswers).reduce<AnswerType[]>(
+    (answers, [index, answer]) => {
+      answers[Number(index)] = answer;
+      return answers;
+    },
+    [],
+  );
 }
 
-export function getCTFGrades(state: any): { [key: number]: undefined | 0 | 1 } {
+export function getCTFGrades(state: State): Record<string, 0 | 1> {
   return state.auCTF.currentGrades;
 }
 
@@ -102,6 +113,7 @@ export function getCTFSubmitted(state: State): boolean {
 
 // Action creators are generated for each case reducer function
 export const {
+  hydrateCTFActivity,
   setCurrentCTFQuestion,
   setSelectAllCTFAnswer,
   setCurrentCTFAnswer,
@@ -111,7 +123,7 @@ export const {
 } = ctfSlice.actions;
 
 export const currentAnswers = (state: State) => state.auCTF.currentAnswers;
-export const getCurrentQuestion = (state: State): number => state.auCTF.currentQuestion;
-
+export const getCurrentQuestion = (state: State): number =>
+  state.auCTF.currentQuestion;
 
 export const ctfReducer = ctfSlice.reducer;

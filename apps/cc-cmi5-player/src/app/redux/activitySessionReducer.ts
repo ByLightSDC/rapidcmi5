@@ -1,21 +1,28 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { QuizState } from '@rapid-cmi5/cmi5-build-common';
+import { CTFState, QuizState } from '@rapid-cmi5/cmi5-build-common';
 
 interface ActivitySessionState {
   quizCache: Record<string, QuizState>;
+  ctfCache: Record<string, CTFState>;
   autoGraderCache: string[] | null;
 }
 
 const initialActivityState = {
   quizCache: {},
+  ctfCache: {},
   autoGraderCache: null,
 } as ActivitySessionState;
-
 
 const activitySessionSlice = createSlice({
   name: 'activitySession',
   initialState: initialActivityState,
   reducers: {
+    setEntireCTFState(
+      state,
+      action: PayloadAction<{ key: string; value: CTFState }>,
+    ) {
+      state.ctfCache[action.payload.key] = action.payload.value;
+    },
     setEntireQuizState(
       state,
       action: PayloadAction<{ key: string; value: QuizState }>,
@@ -69,6 +76,7 @@ const activitySessionSlice = createSlice({
 });
 
 export const {
+  setEntireCTFState,
   setEntireQuizState,
   setQuizAnswers,
   setQuizCurrentQuestion,

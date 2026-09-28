@@ -2,7 +2,7 @@
 
 import z from 'zod/v4';
 
-import { QuestionGrading, QuizCompletionEnum } from './quiz';
+import { AnswerSchema, QuestionGrading, QuizCompletionEnum } from './quiz';
 import { BaseActivitySchema } from './baseActivity';
 
 export enum CTFResponse {
@@ -50,3 +50,19 @@ export const CTFContentSchema = BaseActivitySchema.extend({
 });
 
 export type CTFContent = z.infer<typeof CTFContentSchema>;
+
+export const CTFStateKeySchema = z.object({
+  ctfId: z.string(),
+  slideNumber: z.number(),
+});
+
+export const CTFStateSchema = CTFStateKeySchema.extend({
+  currentQuestion: z.number(),
+  answers: z.record(z.string(), AnswerSchema),
+  grades: z.record(z.string(), z.union([z.literal(0), z.literal(1)])),
+  score: z.number(),
+  submitted: z.boolean(),
+});
+
+export type CTFStateKey = z.infer<typeof CTFStateKeySchema>;
+export type CTFState = z.infer<typeof CTFStateSchema>;
