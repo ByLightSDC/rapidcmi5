@@ -1,3 +1,13 @@
+## 0.22.1 (2026-10-01)
+
+### 🩹 Fixes
+
+- **cc-cmi5-player:** fix low contrast on download file links ([bfd64170](https://github.com/ByLightSDC/rapidcmi5/commit/bfd64170))
+
+### ❤️ Thank You
+
+- Megan Bohland
+
 ## 0.22.0 (2026-09-28)
 
 ### 🚀 Features
