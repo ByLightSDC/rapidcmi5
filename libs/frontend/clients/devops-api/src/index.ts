@@ -7,6 +7,7 @@ import {
   AssetsVolumesApiFactory,
   AssetsVMImagesApiFactory,
   BackgroundJobsApiFactory,
+  Cmi5ClassesApiFactory,
   Cmi5AUMappingApiFactory,
   Cmi5RegistrationApiFactory,
   Cmi5ScenariosApiFactory,
@@ -99,7 +100,6 @@ import {
   BootDetailsCreate,
   VersionApiFactory,
   ChartIconTypeEnum,
-  Cmi5BuildApiFactory,
 } from './lib';
 import type { ScenarioGroup } from './lib';
 
@@ -483,11 +483,12 @@ export const initializeDevOpsApiClient = (apiUrl?: string) => {
 
   //#region Assessments
   const Cmi5AUMappingApi = Cmi5AUMappingApiFactory(undefined, DEVOPS_API_URL);
+  const Cmi5ClassesApi = Cmi5ClassesApiFactory(undefined, DEVOPS_API_URL);
   const Cmi5RegistrationApi = Cmi5RegistrationApiFactory(
     undefined,
     DEVOPS_API_URL,
   );
-  const Cmi5BuildApi = Cmi5BuildApiFactory(undefined, DEVOPS_API_URL);
+
   const Cmi5ScenariosApi = Cmi5ScenariosApiFactory(undefined, DEVOPS_API_URL);
   const LtiCourseMappingApi = LTICourseMappingApiFactory(
     undefined,
@@ -501,8 +502,8 @@ export const initializeDevOpsApiClient = (apiUrl?: string) => {
     ...AwsRangeSpecificationApi,
     ...BackgroundJobsApi,
     ...BuildVersionApi,
-    ...Cmi5BuildApi,
     ...Cmi5AUMappingApi,
+    ...Cmi5ClassesApi,
     ...Cmi5RegistrationApi,
     ...Cmi5ScenariosApi,
     ...ContainersApi,
@@ -960,6 +961,10 @@ export {
   BackgroundJobStateEnum,
   BackgroundJobHistoryStatusEnum,
   ChartIconTypeEnum,
+  ClassesListSortByEnum,
+  ClassesListSortEnum,
+  ClassesListScenariosSortEnum,
+  ClassesListScenariosSortByEnum,
   CloudInitDataSourceType,
   CpeCreatePartEnum,
   DeployedPackageDetailStatusEnum,
@@ -986,9 +991,7 @@ export {
   RangeRouterInterfaceType,
   RangeRouterProtocolsEnum,
   RangeSpecificationAwsCniEnum,
-  RangeSpecificationAwsKubernetesVersionEnum,
   RangeSpecificationVsphereCniEnum,
-  RangeSpecificationVsphereKubernetesVersionEnum,
   RangeStatusEnum,
   RangeVMStatusEnum,
   RangeTypeEnum,
