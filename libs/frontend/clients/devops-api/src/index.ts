@@ -7,6 +7,7 @@ import {
   AssetsVolumesApiFactory,
   AssetsVMImagesApiFactory,
   BackgroundJobsApiFactory,
+  Cmi5ClassesApiFactory,
   Cmi5AUMappingApiFactory,
   Cmi5RegistrationApiFactory,
   Cmi5ScenariosApiFactory,
@@ -483,6 +484,7 @@ export const initializeDevOpsApiClient = (apiUrl?: string) => {
 
   //#region Assessments
   const Cmi5AUMappingApi = Cmi5AUMappingApiFactory(undefined, DEVOPS_API_URL);
+  const Cmi5ClassesApi = Cmi5ClassesApiFactory(undefined, DEVOPS_API_URL);
   const Cmi5RegistrationApi = Cmi5RegistrationApiFactory(
     undefined,
     DEVOPS_API_URL,
@@ -503,6 +505,7 @@ export const initializeDevOpsApiClient = (apiUrl?: string) => {
     ...BuildVersionApi,
     ...Cmi5BuildApi,
     ...Cmi5AUMappingApi,
+    ...Cmi5ClassesApi,
     ...Cmi5RegistrationApi,
     ...Cmi5ScenariosApi,
     ...ContainersApi,
@@ -960,6 +963,8 @@ export {
   BackgroundJobStateEnum,
   BackgroundJobHistoryStatusEnum,
   ChartIconTypeEnum,
+  ClassesListSortByEnum,
+  ClassesListSortEnum,
   CloudInitDataSourceType,
   CpeCreatePartEnum,
   DeployedPackageDetailStatusEnum,
