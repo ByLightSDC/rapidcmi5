@@ -100,7 +100,6 @@ import {
   BootDetailsCreate,
   VersionApiFactory,
   ChartIconTypeEnum,
-  Cmi5BuildApiFactory,
 } from './lib';
 import type { ScenarioGroup } from './lib';
 
@@ -489,7 +488,7 @@ export const initializeDevOpsApiClient = (apiUrl?: string) => {
     undefined,
     DEVOPS_API_URL,
   );
-  const Cmi5BuildApi = Cmi5BuildApiFactory(undefined, DEVOPS_API_URL);
+
   const Cmi5ScenariosApi = Cmi5ScenariosApiFactory(undefined, DEVOPS_API_URL);
   const LtiCourseMappingApi = LTICourseMappingApiFactory(
     undefined,
@@ -503,7 +502,6 @@ export const initializeDevOpsApiClient = (apiUrl?: string) => {
     ...AwsRangeSpecificationApi,
     ...BackgroundJobsApi,
     ...BuildVersionApi,
-    ...Cmi5BuildApi,
     ...Cmi5AUMappingApi,
     ...Cmi5ClassesApi,
     ...Cmi5RegistrationApi,
@@ -965,6 +963,8 @@ export {
   ChartIconTypeEnum,
   ClassesListSortByEnum,
   ClassesListSortEnum,
+  ClassesListScenariosSortEnum,
+  ClassesListScenariosSortByEnum,
   CloudInitDataSourceType,
   CpeCreatePartEnum,
   DeployedPackageDetailStatusEnum,
@@ -991,9 +991,7 @@ export {
   RangeRouterInterfaceType,
   RangeRouterProtocolsEnum,
   RangeSpecificationAwsCniEnum,
-  RangeSpecificationAwsKubernetesVersionEnum,
   RangeSpecificationVsphereCniEnum,
-  RangeSpecificationVsphereKubernetesVersionEnum,
   RangeStatusEnum,
   RangeVMStatusEnum,
   RangeTypeEnum,

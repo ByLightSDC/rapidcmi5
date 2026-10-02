@@ -1,14 +1,64 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useMutation } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 
-import {
-  queryHooksConfig,
-} from './config';
+import { defaultQueryConfig, queryHooksConfig } from './config';
 import { getErrorMessage } from './errorMessages';
 
-import { DevopsApiClient, ScenariosCreate1Request } from '@rangeos-nx/frontend/clients/devops-api';
+import {
+  ClassesListScenariosSortEnum,
+  DevopsApiClient,
+  ScenariosCreate1Request,
+  ClassesListScenariosSortByEnum,
+} from '@rangeos-nx/frontend/clients/devops-api';
 export const queryKeyCMI5Scenarios = 'cmi5-scenarios';
+
+export const useGetCMI5Scenarios = (reqOptions?: any) => {
+  const getResult = async (reqOptions?: any) => {
+    try {
+      const options = {
+        ...queryHooksConfig,
+        authToken: reqOptions?.authToken,
+      };
+
+      const response = await DevopsApiClient.classesListScenarios(
+        reqOptions?.classId,
+        reqOptions?.uuid,
+        reqOptions?.name,
+        reqOptions?.description,
+        reqOptions?.author,
+        reqOptions?.metadata,
+        reqOptions?.tag,
+        reqOptions?.deployedBy,
+        reqOptions?.studentId,
+        reqOptions?.studentUsername,
+        reqOptions?.scenarioId,
+        reqOptions?.offset,
+        reqOptions?.limit,
+        reqOptions?.search,
+        reqOptions?.sortBy || ClassesListScenariosSortByEnum.Name,
+        reqOptions?.sort || ClassesListScenariosSortEnum.Asc,
+        undefined, // includes
+        options,
+      );
+      return response.data;
+    } catch (error: any) {
+      throw getErrorMessage(
+        error,
+        'An error occurred retrieving CMI5 Scenarios',
+      );
+    }
+  };
+
+  return useQuery(
+    [queryKeyCMI5Scenarios, reqOptions],
+    () => getResult(reqOptions),
+    {
+      ...defaultQueryConfig,
+      keepPreviousData: true,
+    },
+  );
+};
 
 export const usePostInitializeCMI5Scenarios = () => {
   const postResult = async (formData: any) => {
@@ -40,4 +90,3 @@ export const usePostInitializeCMI5Scenarios = () => {
 
   return useMutation((formData: any) => postResult(formData), {});
 };
-
