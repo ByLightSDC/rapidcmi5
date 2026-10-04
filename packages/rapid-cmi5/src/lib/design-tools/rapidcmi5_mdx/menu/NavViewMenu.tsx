@@ -58,6 +58,10 @@ export const NavViewMenu = ({
     height: '36px',
     borderRadius: '3px',
     position: 'relative' as const,
+    '&.Mui-focusVisible': {
+      outline: `2px solid ${palette.primary.main}`,
+      outlineOffset: '1px',
+    },
     backgroundColor: active
       ? alpha(palette.secondary.main, 0.15)
       : 'transparent',
