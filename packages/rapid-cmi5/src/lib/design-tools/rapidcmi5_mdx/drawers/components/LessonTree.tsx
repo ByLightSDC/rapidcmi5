@@ -445,51 +445,61 @@ function LessonTree({
                 height: 'auto',
               }}
             >
-              <TreeView
-                data={treeData}
-                aria-label="directory tree"
-                data-testid="course-tree"
-                onNodeSelect={handleNodeSelect}
-                onExpand={handleNodeExpand}
-                defaultExpandedIds={currentExpandedNodes.current}
-                selectedIds={[]}
-                nodeRenderer={({
-                  element,
-                  isBranch,
-                  isExpanded,
-                  getNodeProps,
-                  level,
-                }) => (
-                  <div
-                    {...getNodeProps()}
-                    style={{
-                      marginTop: '2px',
-                      paddingLeft: paddingBase * (level - 1),
-                    }}
-                  >
-                    <LessonTreeNode
-                      key={
-                        element.id.toString() +
-                        '/' +
-                        (element.parent || 0).toString()
-                      }
-                      data-testid={
-                        'slide-node-' +
-                        element.id.toString() +
-                        '/' +
-                        (element.parent || 0).toString()
-                      }
-                      isOpen={isExpanded}
-                      element={element}
-                      isReadOnly={isReadOnly}
-                      currentLesson={currentAuIndex}
-                      currentSlide={currentSlideIndex}
-                      onAction={handleNodeAction}
-                      moveNode={moveNode}
-                    />
-                  </div>
-                )}
-              />
+              <Box
+                sx={(theme) => ({
+                  '& li[role="treeitem"]:focus-visible, & .tree-node[role="treeitem"]:focus-visible': {
+                    outline: `2px solid ${theme.palette.primary.main}`,
+                    outlineOffset: '-2px',
+                    borderRadius: '3px',
+                  },
+                })}
+              >
+                <TreeView
+                  data={treeData}
+                  aria-label="directory tree"
+                  data-testid="course-tree"
+                  onNodeSelect={handleNodeSelect}
+                  onExpand={handleNodeExpand}
+                  defaultExpandedIds={currentExpandedNodes.current}
+                  selectedIds={[]}
+                  nodeRenderer={({
+                    element,
+                    isBranch,
+                    isExpanded,
+                    getNodeProps,
+                    level,
+                  }) => (
+                    <Box
+                      {...getNodeProps()}
+                      sx={{
+                        marginTop: '2px',
+                        paddingLeft: `${paddingBase * (level - 1)}px`,
+                      }}
+                    >
+                      <LessonTreeNode
+                        key={
+                          element.id.toString() +
+                          '/' +
+                          (element.parent || 0).toString()
+                        }
+                        data-testid={
+                          'slide-node-' +
+                          element.id.toString() +
+                          '/' +
+                          (element.parent || 0).toString()
+                        }
+                        isOpen={isExpanded}
+                        element={element}
+                        isReadOnly={isReadOnly}
+                        currentLesson={currentAuIndex}
+                        currentSlide={currentSlideIndex}
+                        onAction={handleNodeAction}
+                        moveNode={moveNode}
+                      />
+                    </Box>
+                  )}
+                />
+              </Box>
               {menuAnchor && (
                 <Renamer
                   anchor={menuAnchor}

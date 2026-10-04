@@ -384,6 +384,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                 <IconButton
                   aria-label="slide options"
                   className="nodrag"
+                  tabIndex={-1}
                   sx={{
                     color: 'primary',
                   }}
@@ -461,6 +462,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                 <IconButton
                   aria-label="add slide"
                   className="nodrag"
+                  tabIndex={-1}
                   sx={{
                     color: 'primary',
                     marginRight: -1,
@@ -484,6 +486,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                       <IconButton
                         aria-label="lesson options"
                         className="nodrag"
+                        tabIndex={-1}
                         sx={{
                           color: 'primary',
                         }}
