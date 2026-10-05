@@ -468,6 +468,7 @@ function LessonTree({
                     isExpanded,
                     getNodeProps,
                     level,
+                    treeState,
                   }) => (
                     <Box
                       {...getNodeProps()}
@@ -489,6 +490,7 @@ function LessonTree({
                           (element.parent || 0).toString()
                         }
                         isOpen={isExpanded}
+                        isActiveRow={treeState.tabbableId === element.id}
                         element={element}
                         isReadOnly={isReadOnly}
                         currentLesson={currentAuIndex}

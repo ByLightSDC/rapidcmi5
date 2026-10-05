@@ -36,6 +36,7 @@ import { LessonTreeNodeType } from './LessonTree';
 
 interface NodeProps {
   isOpen: boolean;
+  isActiveRow: boolean;
   isReadOnly?: boolean;
   element: ILessonNode; //INode<IFlatMetadata>;
   currentCourse?: string;
@@ -140,6 +141,7 @@ export const ItemTypes = {
  */
 export const LessonTreeNode: React.FC<NodeProps> = ({
   isOpen,
+  isActiveRow,
   isReadOnly,
   element,
   currentCourse,
@@ -304,6 +306,10 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
     <Box
       ref={ref}
       data-handler-id={handlerId}
+      onKeyDown={(event) => {
+        // Keep button and menu keys from also triggering tree navigation.
+        event.stopPropagation();
+      }}
       sx={{
         position: 'relative',
         opacity: opacity,
@@ -384,7 +390,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                 <IconButton
                   aria-label="slide options"
                   className="nodrag"
-                  tabIndex={-1}
+                  tabIndex={isActiveRow ? 0 : -1}
                   sx={{
                     color: 'primary',
                   }}
@@ -486,7 +492,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                       <IconButton
                         aria-label="lesson options"
                         className="nodrag"
-                        tabIndex={-1}
+                        tabIndex={isActiveRow ? 0 : -1}
                         sx={{
                           color: 'primary',
                         }}
