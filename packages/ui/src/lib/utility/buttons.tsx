@@ -5,7 +5,8 @@ import Button, { ButtonProps } from '@mui/material/Button';
 import Chip, { ChipProps } from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
+import MenuItem, { type MenuItemProps } from '@mui/material/MenuItem';
+import type { MenuListProps } from '@mui/material/MenuList';
 import Tooltip, { TooltipProps } from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
@@ -28,7 +29,13 @@ import {
   IconButtonProps,
   Popper,
 } from '@mui/material';
-import { useMemo, useState } from 'react';
+import {
+  Children,
+  cloneElement,
+  isValidElement,
+  useMemo,
+  useState,
+} from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { copyTextToClipboard } from './copy';
@@ -725,6 +732,7 @@ export function ButtonTooltip({
  * @param {string} [id] Id for ButtonOptions
  * @param {string} [tooltip] The tooltip to display for button
  * @param {string[]} [menuOptions] The options for the menu
+ * @param {Partial<MenuListProps>} [menuListProps] Props for the custom menu's list
  * @param {boolean} [closeOnClick=false] Whether to close menu on any click
  * @param {boolean} [disabled] Whether to disable the button which brings up menu
  * @param {(optionIndex: number) => void} onOptionSelect Function to call when an option is selected
@@ -737,16 +745,18 @@ export function ButtonOptions({
   id = 'options',
   tooltip = '',
   menuOptions = [],
+  menuListProps,
   closeOnClick = false,
   disabled = false,
   onOptionSelect,
   onTrigger,
 }: {
-  children?: JSX.Element;
+  children?: React.ReactNode;
   optionButton?: any;
   id?: string;
   tooltip?: string;
   menuOptions?: string[];
+  menuListProps?: Partial<MenuListProps>;
   closeOnClick?: boolean;
   disabled?: boolean;
   onOptionSelect?: (optionIndex: number) => void;
@@ -787,10 +797,30 @@ export function ButtonOptions({
 
   const open = Boolean(anchorEl);
 
+  const menuChildren = Children.map(children, (child) => {
+    if (
+      !closeOnClick ||
+      !isValidElement<MenuItemProps>(child) ||
+      child.type !== MenuItem
+    ) {
+      return child;
+    }
+
+    // MenuItem handles Enter/Space by calling its own onClick handler.
+    // Close here as well, because that activation does not bubble as a click.
+    return cloneElement(child, {
+      onClick: (event) => {
+        child.props.onClick?.(event);
+        event.stopPropagation();
+        handleClose();
+      },
+    });
+  });
+
   return (
     <>
       {styledOptionButton()}
-      {menuOptions && (
+      {!children && menuOptions.length > 0 && (
         <Menu
           MenuListProps={{
             'aria-labelledby': 'options-button',
@@ -812,6 +842,12 @@ export function ButtonOptions({
             <MenuItem
               key={'option-' + index}
               data-testid={id + '-option-' + index}
+              onClick={(event) => {
+                if (closeOnClick) {
+                  event.stopPropagation();
+                  handleClose();
+                }
+              }}
             >
               {option}
             </MenuItem>
@@ -828,6 +864,7 @@ export function ButtonOptions({
               padding: '0px',
               margin: '0px',
             },
+            ...menuListProps,
           }}
           id="options-menu"
           open={open}
@@ -842,7 +879,7 @@ export function ButtonOptions({
           }}
           sx={{ zIndex: 9999 }}
         >
-          {children}
+          {menuChildren}
         </Menu>
       )}
     </>

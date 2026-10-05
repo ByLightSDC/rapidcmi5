@@ -5,10 +5,10 @@ import {
   Box,
   Divider,
   IconButton,
-  List,
-  ListItemButton,
   ListItemIcon,
   ListItemText,
+  ListSubheader,
+  MenuItem,
   Tooltip,
   Typography,
   TypographyOwnProps,
@@ -123,6 +123,23 @@ const slideNodeActions = [
  * styles
  */
 const fontStyle = { fontSize: '15px', padding: 0, lineHeight: 1 }; //fontFamily: 'monaco',
+const menuListSx = {
+  backgroundColor: (theme: any) => theme.nav.fill,
+  color: (theme: any) => theme.nav.icon,
+  padding: '8px 0', // Restore top/bottom padding.
+  margin: 0,
+
+  // Let icons use their natural width.
+  '& .MuiMenuItem-root .MuiListItemIcon-root': {
+    minWidth: 0,
+  },
+
+  // Remove the extra space around dividers after menu items.
+  '& .MuiMenuItem-root + .MuiDivider-root': {
+    marginTop: 0,
+    marginBottom: 0,
+  },
+};
 export const listItemProps: TypographyOwnProps = {
   color: 'primary',
   fontSize: 'small',
@@ -389,6 +406,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
               return (
                 <IconButton
                   aria-label="slide options"
+                  aria-haspopup="menu"
                   className="nodrag"
                   tabIndex={isActiveRow ? 0 : -1}
                   sx={{
@@ -401,63 +419,61 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
               );
             }}
             closeOnClick={true}
+            menuListProps={{
+              'aria-label': `${element.name} slide options`,
+              'aria-labelledby': undefined,
+              sx: menuListSx,
+            }}
             onTrigger={(event?: any) => {
               if (onAction) {
                 onAction(event, element, SlideNodeActionEnum.TriggerRename);
               }
             }}
           >
-            <List
+            <ListSubheader
+              key="title"
+              role="presentation"
+              disableSticky
               sx={{
-                backgroundColor: (theme: any) => `${theme.nav.fill}`,
-                color: (theme: any) => `${theme.nav.icon}`,
-                display: 'flex',
-                flexDirection: 'column',
-                width: '100%',
-                height: 'auto',
+                paddingX: '12px',
+                typography: 'caption',
+                color: 'inherit',
+                backgroundColor: 'inherit',
               }}
-              component="nav"
             >
-              <Typography sx={{ marginLeft: '12px' }} variant="caption">
-                {element.name}
-              </Typography>
-              {slideNodeActions.map((option: RowAction, index: number) => (
-                <>
-                  {!option.hidden && (
-                    <React.Fragment key={option.tooltip}>
-                      <>
-                        {index > 0 && <Divider />}
-                        <ListItemButton
-                          sx={{
-                            height: 30,
-                          }}
-                          onClick={(event) => {
-                            if (onAction) {
-                              onAction(event, element, index);
-                            }
-                          }}
-                        >
-                          <ListItemIcon
-                            sx={{
-                              padding: '0px',
-                              margin: '0px',
-                              marginRight: '2px',
-                              minWidth: '0px',
-                            }}
-                          >
-                            {option.icon}
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={option.tooltip}
-                            slotProps={{ primary: listItemProps }}
-                          />
-                        </ListItemButton>
-                      </>
-                    </React.Fragment>
-                  )}
-                </>
-              ))}
-            </List>
+              {element.name}
+            </ListSubheader>
+            {slideNodeActions.flatMap((option: RowAction, index: number) => {
+              if (option.hidden) return [];
+
+              return [
+                <Divider key={`${option.tooltip}-divider`} />,
+                <MenuItem
+                  key={option.tooltip}
+                  sx={{ height: 30, minHeight: 30 }}
+                  onClick={(event) => {
+                    if (onAction) {
+                      onAction(event, element, index);
+                    }
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      padding: '0px',
+                      margin: '0px',
+                      marginRight: '2px',
+                      minWidth: '0px',
+                    }}
+                  >
+                    {option.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={option.tooltip}
+                    slotProps={{ primary: listItemProps }}
+                  />
+                </MenuItem>,
+              ];
+            })}
           </ButtonOptions>
         )}
 
@@ -491,6 +507,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                     <span>
                       <IconButton
                         aria-label="lesson options"
+                        aria-haspopup="menu"
                         className="nodrag"
                         tabIndex={isActiveRow ? 0 : -1}
                         sx={{
@@ -505,64 +522,62 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
                 );
               }}
               closeOnClick={true}
+              menuListProps={{
+                'aria-label': `${element.name} lesson options`,
+                'aria-labelledby': undefined,
+                sx: menuListSx,
+              }}
               onTrigger={(event?: any) => {
                 if (onAction) {
                   onAction(event, element, LessonNodeActionEnum.TriggerRename);
                 }
               }}
             >
-              <List
+              <ListSubheader
+                key="title"
+                role="presentation"
+                disableSticky
                 sx={{
-                  backgroundColor: (theme: any) => `${theme.nav.fill}`,
-                  color: (theme: any) => `${theme.nav.icon}`,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  width: '100%',
-                  height: 'auto',
+                  paddingX: '12px',
+                  typography: 'caption',
+                  lineHeight: 1.5,
+                  color: 'inherit',
+                  backgroundColor: 'inherit',
                 }}
-                component="nav"
               >
-                <Typography
-                  sx={{ marginLeft: '12px', lineHeight: 1.5, height: 'auto' }}
-                  variant="caption"
-                >
-                  {element.name}
-                </Typography>
+                {element.name}
+              </ListSubheader>
+              {lessonNodeActions.flatMap((option: RowAction, index: number) => {
+                if (option.hidden) return [];
 
-                {lessonNodeActions.map((option: RowAction, index: number) => {
-                  if (option.hidden) return null;
-                  // only allow add slide on current lesson
-
-                  return (
-                    <React.Fragment key={option.tooltip}>
-                      {index > 0 && <Divider />}
-                      <ListItemButton
-                        sx={{ height: 30 }}
-                        onClick={(event) => {
-                          if (onAction) {
-                            onAction(event, element, index);
-                          }
-                        }}
-                      >
-                        <ListItemIcon
-                          sx={{
-                            padding: '0px',
-                            margin: '0px',
-                            marginRight: '2px',
-                            minWidth: '0px',
-                          }}
-                        >
-                          {option.icon}
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={option.tooltip}
-                          slotProps={{ primary: listItemProps }}
-                        />
-                      </ListItemButton>
-                    </React.Fragment>
-                  );
-                })}
-              </List>
+                return [
+                  <Divider key={`${option.tooltip}-divider`} />,
+                  <MenuItem
+                    key={option.tooltip}
+                    sx={{ height: 30, minHeight: 30 }}
+                    onClick={(event) => {
+                      if (onAction) {
+                        onAction(event, element, index);
+                      }
+                    }}
+                  >
+                    <ListItemIcon
+                      sx={{
+                        padding: '0px',
+                        margin: '0px',
+                        marginRight: '2px',
+                        minWidth: '0px',
+                      }}
+                    >
+                      {option.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={option.tooltip}
+                      slotProps={{ primary: listItemProps }}
+                    />
+                  </MenuItem>,
+                ];
+              })}
             </ButtonOptions>
           </>
         )}
