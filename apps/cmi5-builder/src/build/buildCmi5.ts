@@ -63,6 +63,13 @@ export async function buildCmi5(
       courseData = applyOverrides(courseData, overrideData);
     }
 
+    if (stagingPath) {
+      await fs.writeFile(
+        join(stagingPath, 'RC5.yaml'),
+        JSON.stringify(courseData, null, 2),
+      );
+    }
+
     const fsOps: FsOperations = {
       readFile: async (path: string, encoding?: string) => {
         const content = await fs.readFile(path);
