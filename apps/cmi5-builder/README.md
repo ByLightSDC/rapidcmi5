@@ -7,6 +7,7 @@ The **CMI5 Builder** is a CLI tool designed to convert MkDocs-based courses into
 ## Local npm workflow
 
 Run these commands from the repository root. Install dependencies with `npm ci`, then build the player once before packaging a course. The builder writes course files into the player distribution passed as its second path argument.
+For `--convert`, the course folder must contain `mkdocs.yml` or `mkdocs.yaml` and the files referenced by its `nav` section.
 
 ```bash
 npm run cmi5-player
