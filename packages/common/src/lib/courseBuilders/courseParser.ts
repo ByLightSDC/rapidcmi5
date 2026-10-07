@@ -14,6 +14,7 @@ import { directive } from 'micromark-extension-directive';
 import { cleanMkdocsRawText, parseToMdast } from './markdownNormalization';
 import { convertMkdocsAdmonitions } from './mkdocsAdmonitions';
 import { collectQuizDown } from './quizdown';
+import { extractMarkedQuizzes } from './markedQuiz';
 
 export { convertMkdocsAdmonitions } from './mkdocsAdmonitions';
 export { parseQuizdownFile } from './quizdown';
@@ -26,10 +27,14 @@ export function cleanMkdocs(
   slidename = '',
   strictMode = false,
 ) {
-  let md = cleanMkdocsRawText(content);
+  const markedQuizzes = extractMarkedQuizzes(content, slidename);
+  let md = cleanMkdocsRawText(markedQuizzes.markdown);
 
   md = parseToMdast(md);
   md = collectQuizDown(md);
+  for (const { placeholder, directive } of markedQuizzes.replacements) {
+    md = md.replace(placeholder, directive);
+  }
 
   md = convertMkdocsAdmonitions(md);
 

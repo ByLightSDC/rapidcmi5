@@ -12,6 +12,27 @@ import {
   QuizContent,
 } from '../types/activities';
 
+export function renderQuizDirective(quiz: QuizContent): string {
+  const root: Root = {
+    type: 'root',
+    children: [
+      {
+        type: 'containerDirective',
+        name: 'quiz',
+        attributes: {},
+        children: [
+          {
+            type: 'code',
+            lang: 'json',
+            value: JSON.stringify(quiz, null, 2),
+          } as Code,
+        ],
+      } as RootContent,
+    ],
+  };
+  return toMarkdown(root, { extensions: [directiveToMarkdown()] });
+}
+
 export function parseQuizdownFile(quizdownText: string): {
   metadata: string;
   questions: QuizQuestion[];
@@ -109,28 +130,7 @@ export function collectQuizDown(md: string): string {
       title: 'Check on Learning',
     } as QuizContent;
 
-    const rc5QuizJson = JSON.stringify(rc5Quiz, null, 2);
-
-    // This is the AST node for your quiz directive
-    const quizDirective: RootContent = {
-      type: 'containerDirective',
-      name: 'quiz',
-      attributes: {},
-      children: [
-        {
-          type: 'code',
-          lang: 'json',
-          value: rc5QuizJson,
-        } as Code,
-      ],
-    };
-
-    const root: Root = {
-      type: 'root',
-      children: [quizDirective],
-    };
-
-    const markdown = toMarkdown(root, { extensions: [directiveToMarkdown()] });
+    const markdown = renderQuizDirective(rc5Quiz);
 
     replacements.push({
       original: fullMatch,
