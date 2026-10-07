@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useQuery, useMutation } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 
-import {
-  defaultQueryConfig,
-  defaultSortByOptions,
-  defaultSortOrder,
-  queryHooksConfig,
-} from './config';
+import { defaultQueryConfig, queryHooksConfig } from './config';
 import { getErrorMessage } from './errorMessages';
 
-import { DevopsApiClient, ScenariosCreate1Request, ScenariosDeployRequest } from '@rangeos-nx/frontend/clients/devops-api';
+import {
+  ClassesListScenariosSortEnum,
+  DevopsApiClient,
+  ScenariosCreate1Request,
+  ClassesListScenariosSortByEnum,
+} from '@rangeos-nx/frontend/clients/devops-api';
 export const queryKeyCMI5Scenarios = 'cmi5-scenarios';
 
 export const useGetCMI5Scenarios = (reqOptions?: any) => {
@@ -21,7 +21,8 @@ export const useGetCMI5Scenarios = (reqOptions?: any) => {
         authToken: reqOptions?.authToken,
       };
 
-      const response = await DevopsApiClient.scenariosList1(
+      const response = await DevopsApiClient.classesListScenarios(
+        reqOptions?.classId,
         reqOptions?.uuid,
         reqOptions?.name,
         reqOptions?.description,
@@ -29,15 +30,14 @@ export const useGetCMI5Scenarios = (reqOptions?: any) => {
         reqOptions?.metadata,
         reqOptions?.tag,
         reqOptions?.deployedBy,
-        reqOptions?.classId,
         reqOptions?.studentId,
         reqOptions?.studentUsername,
         reqOptions?.scenarioId,
         reqOptions?.offset,
         reqOptions?.limit,
         reqOptions?.search,
-        reqOptions?.sortBy || defaultSortByOptions,
-        reqOptions?.sort || defaultSortOrder,
+        reqOptions?.sortBy || ClassesListScenariosSortByEnum.Name,
+        reqOptions?.sort || ClassesListScenariosSortEnum.Asc,
         undefined, // includes
         options,
       );
@@ -60,30 +60,7 @@ export const useGetCMI5Scenarios = (reqOptions?: any) => {
   );
 };
 
-export const usePostCMI5Scenarios = (formData: any) => {
-  const postResult = async (formData: any) => {
-    const scenarioDeployRequest: ScenariosDeployRequest = {
-      classId: formData.classId,
-      count: formData.count,
-      startDate: formData.startDate,
-      endDate: formData.endDate,
-    };
-    try {
-      const response = await DevopsApiClient.scenariosDeploy(
-        formData.scenarioId,
-        scenarioDeployRequest,
-        queryHooksConfig,
-      );
-      return response.data;
-    } catch (error: any) {
-      throw getErrorMessage(error, 'An error occurred Deploying Scenarios');
-    }
-  };
-
-  return useMutation((formData: any) => postResult(formData), {});
-};
-
-export const usePostInitializeCMI5Scenarios = (formData: any) => {
+export const usePostInitializeCMI5Scenarios = () => {
   const postResult = async (formData: any) => {
     const req: ScenariosCreate1Request = {
       classId: formData.classId,
