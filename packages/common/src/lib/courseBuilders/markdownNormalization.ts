@@ -28,6 +28,7 @@ const allowedHtmlTags = new Set([
   'a',
   'img',
   'br',
+  'hr',
   'sup',
   'u',
 ]);
@@ -114,8 +115,17 @@ export function parseToMdast(input: string) {
 
 export function cleanMkdocsRawText(content: string) {
   let cleaned = content
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/br\s*>/gi, '');
+    .split('\n')
+    .map((line) => {
+      if (/^\s*\|.*\|\s*$/.test(line)) {
+        return line
+          .replace(/<br\s*\/?>/gi, '<br />')
+          .replace(/<hr\s*\/?>/gi, '<hr />')
+          .replace(/<\/(?:br|hr)\s*>/gi, '');
+      }
+      return line.replace(/<br\s*\/?>/gi, '\n').replace(/<\/br\s*>/gi, '');
+    })
+    .join('\n');
 
   cleaned = cleaned.replaceAll('quizdownb.init();', '');
 

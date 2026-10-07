@@ -1,4 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
+import { fromMarkdown } from 'mdast-util-from-markdown';
+import { gfmTableFromMarkdown } from 'mdast-util-gfm-table';
+import { gfmTable } from 'micromark-extension-gfm-table';
 import { QuestionResponse } from '../types/activities';
 import {
   cleanMkdocs,
@@ -11,14 +14,22 @@ describe('cleanMkdocs', () => {
     const input = [
       '| Location | Network |',
       '| --- | --- |',
-      '| Cape Town<BR>AS 36994 | Johannesburg<br>AS 5713 |',
+      '| Cape Town<BR>AS 36994 | Johannesburg<br>AS 5713<hr>Durban |',
     ].join('\n');
 
     const result = cleanMkdocs(input, 'network.md', true);
 
-    expect(result).toContain('Cape Town');
-    expect(result).toContain('AS 36994');
-    expect(result).not.toMatch(/<\/?br\b/i);
+    expect(result).toContain('Cape Town<br />AS 36994');
+    expect(result).toContain('Johannesburg<br />AS 5713<hr />Durban');
+    const tree = fromMarkdown(result, {
+      extensions: [gfmTable()],
+      mdastExtensions: [gfmTableFromMarkdown()],
+    });
+    expect(tree.children[0].type).toBe('table');
+    if (tree.children[0].type === 'table') {
+      expect(tree.children[0].children).toHaveLength(2);
+      expect(tree.children[0].children[1].children).toHaveLength(2);
+    }
   });
 
   it('adds readable titles to links without titles', () => {
