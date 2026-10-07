@@ -9,6 +9,8 @@ The **CMI5 Builder** is a CLI tool designed to convert MkDocs-based courses into
 Run these commands from the repository root. Install dependencies with `npm ci`, then build the player once before packaging a course. The builder writes course files into the player distribution passed as its second path argument.
 For `--convert`, the course folder must contain `mkdocs.yml` or `mkdocs.yaml` and the files referenced by its `nav` section.
 
+MkDocs navigation controls the converted course structure: Markdown leaves become slides, each leaf's immediate parent becomes its AU, and the higher navigation labels identify a block. Because CMI5 blocks are flat, the builder joins multiple higher labels in the block name. A Markdown leaf with no named parent uses the course title as its AU. Block groupings appear in `cmi5.xml`; on disk, each AU sits directly in `compiled_course/blocks/<au>/` so it can load `../RC5.yaml`. Shared MkDocs assets go in `compiled_course/blocks/_assets/`. The builder copies only Markdown pages listed in `nav`.
+
 ```bash
 npm run cmi5-player
 npm run cmi5-builder:run -- --args="build ./courses/my-course ./dist/apps/cc-cmi5-player --zip ./cmi5.zip"

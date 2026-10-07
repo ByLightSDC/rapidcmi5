@@ -134,8 +134,9 @@ export function cleanMkdocsRawText(content: string) {
   );
 
   cleaned = cleaned.replace(
-    /!\[([^\]]*)\]\(\s*([^\s)]+)(?:\s+"([^"]*)")?\s*\)/g,
-    (_match, alt, url) => {
+    /!\[([^\]]*)\]\(\s*([^)]*?)\s*\)/g,
+    (_match, alt, target) => {
+      const url = target.replace(/\s+"[^"]*"$/, '').trim();
       return `<img src="${url}" alt="${alt}" height="500"/>`;
     },
   );

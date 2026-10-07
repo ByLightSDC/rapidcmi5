@@ -31,6 +31,17 @@ describe('cleanMkdocs', () => {
     expect(result).toContain('"example.com"');
   });
 
+  it('keeps image paths containing spaces as image sources', () => {
+    const result = cleanMkdocs(
+      '![Network map](./assets/network map.png)',
+      'images.md',
+      true,
+    );
+
+    expect(result).toContain('src="./assets/network map.png"');
+    expect(result).toContain('alt="Network map"');
+  });
+
   it('throws a slide-specific error in strict mode for invalid MDX', () => {
     expect(() => cleanMkdocs('<img src="a">', 'broken.md', true)).toThrow(
       /Could not parse the markdown provided.*broken\.md/,
