@@ -13,7 +13,7 @@
     "../../node_modules/@nx/react/typings/image.d.ts"
   ],
   "exclude": [
-    "jest.config.ts",
+    "vitest.config.ts",
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
     "src/**/*.spec.tsx",
@@ -28,6 +28,7 @@
     "src/**/*.jsx",
     "src/**/*.ts",
     "src/**/*.tsx",
-    "mock/ReactMarkdownMock.tsx"
-, "../../libs/backend/cmi5/src/lib/fileSystem.ts"  ]
+    "mock/ReactMarkdownMock.tsx",
+    "../../libs/backend/cmi5/src/lib/fileSystem.ts"
+  ]
 }
