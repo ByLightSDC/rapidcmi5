@@ -1,5 +1,6 @@
 import path, { basename, join, relative } from 'path';
 import fs from 'fs/promises';
+import { tmpdir } from 'os';
 import {
   FsOperations,
   generateCmi5Xml,
@@ -36,82 +37,88 @@ export async function buildCmi5(
   let courseData;
   let distFolderName;
   let distFolderPath;
+  let stagingPath: string | undefined;
 
-  if (convert) {
-    const convertedData = await convertFromMkdocs(outputPath, folderStructure);
-    if (!convertedData) {
+  try {
+    if (convert) {
+      stagingPath = await fs.mkdtemp(join(tmpdir(), 'cmi5-mkdocs-'));
+      courseData = await convertFromMkdocs(
+        inputPath,
+        folderStructure,
+        stagingPath,
+      );
+      distFolderPath = stagingPath;
+    } else {
+      distFolderName = basename(inputPath);
+      distFolderPath = inputPath;
+      courseData = generateCourseJson(folderStructure);
+    }
+
+    if (!courseData) {
       console.error('❌ Course data was null');
       return null;
     }
-    distFolderName = convertedData.docsDir;
-    distFolderPath = join(inputPath, distFolderName);
-    courseData = convertedData.courseData;
-  } else {
-    distFolderName = basename(inputPath);
-    distFolderPath = inputPath;
-    courseData = generateCourseJson(folderStructure);
+
+    if (overrideData) {
+      courseData = applyOverrides(courseData, overrideData);
+    }
+
+    const fsOps: FsOperations = {
+      readFile: async (path: string, encoding?: string) => {
+        const content = await fs.readFile(path);
+        if (encoding === 'utf-8') {
+          return new TextDecoder().decode(content as Uint8Array);
+        }
+        return content;
+      },
+      writeFile: async (
+        path: string,
+        content: string | Uint8Array,
+        encoding?: string,
+      ) => {
+        await fs.writeFile(path, content);
+      },
+      deleteFolder: async (
+        path: string,
+        options: { recursive: boolean; force: boolean },
+      ) => {
+        try {
+          await fs.rm(path, options);
+        } catch (err) {
+          if (!options.force) throw err;
+        }
+      },
+      copy: async (
+        src: string,
+        dest: string,
+        options: { recursive: boolean },
+      ) => {
+        await fs.cp(src, dest, { recursive: true });
+      },
+      mkdir: async (path: string, options: { recursive: boolean }) => {
+        await fs.mkdir(path, options);
+      },
+    };
+    await generateCourseDist(
+      distFolderPath,
+      outputPath,
+      courseData,
+      fsOps,
+      join,
+      relative,
+      distFolderName,
+    );
+
+    const cmi5Xml = generateCmi5Xml(courseData);
+    const cmi5Path = path.join(outputPath, 'cmi5.xml');
+    await fs.writeFile(cmi5Path, cmi5Xml.trim());
+
+    console.log('✅ cmi5.xml generated at:', cmi5Path);
+
+    return courseData;
+  } finally {
+    if (stagingPath) {
+      await fs.rm(stagingPath, { recursive: true, force: true });
+    }
   }
-
-  if (!courseData) {
-    console.error('❌ Course data was null');
-    return null;
-  }
-
-  if (overrideData) {
-    courseData = applyOverrides(courseData, overrideData);
-  }
-
-  const fsOps: FsOperations = {
-    readFile: async (path: string, encoding?: string) => {
-      const content = await fs.readFile(path);
-      if (encoding === 'utf-8') {
-        return new TextDecoder().decode(content as Uint8Array);
-      }
-      return content;
-    },
-    writeFile: async (
-      path: string,
-      content: string | Uint8Array,
-      encoding?: string,
-    ) => {
-      await fs.writeFile(path, content);
-    },
-    deleteFolder: async (
-      path: string,
-      options: { recursive: boolean; force: boolean },
-    ) => {
-      try {
-        await fs.rm(path, options);
-      } catch (err) {
-        if (!options.force) throw err;
-      }
-    },
-    copy: async (
-      src: string,
-      dest: string,
-      options: { recursive: boolean },
-    ) => {
-      await fs.cp(src, dest, { recursive: true });
-    },
-    mkdir: async (path: string, options: { recursive: boolean }) => {
-      await fs.mkdir(path, options);
-    },
-  };
-  await generateCourseDist(
-    distFolderPath,
-    outputPath,
-    courseData,
-    fsOps,
-    join,
-    relative,
-    distFolderName,
-  );
-
-  const cmi5Xml = generateCmi5Xml(courseData);
-  const cmi5Path = path.join(outputPath, 'cmi5.xml');
-  await fs.writeFile(cmi5Path, cmi5Xml.trim());
-
-  console.log('✅ cmi5.xml generated at:', cmi5Path);
-
-  return courseData;
 }

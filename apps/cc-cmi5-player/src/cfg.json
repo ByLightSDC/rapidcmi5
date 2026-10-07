@@ -488,10 +488,10 @@
         "THEME": {
           "logo": {
             "light": {
-              "relativePath": "./assets/bylight/RangeOS_Logo_Light.png"
+              "relativePath": "./assets/bylight/RapidCMI5_Logo_Dark.png"
             },
             "dark": {
-              "relativePath": "./assets/bylight/RangeOS_Logo_Dark.png"
+              "relativePath": "./assets/bylight/RapidCMI5_Logo_Dark.png"
             }
           }
         }
