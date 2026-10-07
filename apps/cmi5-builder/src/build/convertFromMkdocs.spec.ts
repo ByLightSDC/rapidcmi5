@@ -66,7 +66,15 @@ describe('MkDocs course conversion', () => {
     await fs.writeFile(path.join(playerPath, 'cfg.json'), '{}');
     await fs.writeFile(path.join(playerPath, 'favicon.ico'), 'icon');
 
-    const course = await buildCmi5(coursePath, playerPath, undefined, true);
+    const course = await buildCmi5(
+      coursePath,
+      playerPath,
+      {
+        courseBaseId: 'https://example.test/courses/sample',
+        courseDescription: 'Sample course description',
+      },
+      true,
+    );
 
     expect(course?.blocks.map((block) => block.blockName)).toEqual([
       'Sample Course',
@@ -85,6 +93,14 @@ describe('MkDocs course conversion', () => {
     ).toEqual(['Overview', 'Practice']);
 
     const blocksPath = path.join(playerPath, 'compiled_course', 'blocks');
+    const rc5 = JSON.parse(
+      await fs.readFile(path.join(blocksPath, 'RC5.yaml'), 'utf8'),
+    );
+    expect(rc5.courseId).toBe('https://example.test/courses/sample');
+    expect(rc5.courseDescription).toBe('Sample course description');
+    expect(
+      rc5.blocks.map((block: { blockName: string }) => block.blockName),
+    ).toEqual(['Sample Course', 'Program / Classroom', 'Program / Workshop']);
     const moduleOne = course!.blocks[1].aus[0];
     expect(moduleOne.dirPath).toBe('module-1');
     expect(moduleOne.slides[0].filepath).toBe('module-1/first.md');
@@ -137,8 +153,11 @@ describe('MkDocs course conversion', () => {
     await expect(fs.stat(path.join(blocksPath, 'docs'))).rejects.toMatchObject({
       code: 'ENOENT',
     });
-    expect(
-      await fs.readFile(path.join(playerPath, 'cmi5.xml'), 'utf8'),
-    ).toContain('compiled_course/blocks/module-1/index.html');
+    const cmi5Xml = await fs.readFile(
+      path.join(playerPath, 'cmi5.xml'),
+      'utf8',
+    );
+    expect(cmi5Xml).toContain('compiled_course/blocks/module-1/index.html');
+    expect(cmi5Xml).toContain('https://example.test/courses/sample');
   });
 });

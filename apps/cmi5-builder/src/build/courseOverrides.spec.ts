@@ -3,6 +3,42 @@ import { CourseData } from '@rapid-cmi5/cmi5-build-common';
 import { applyOverrides } from './courseOverrides';
 
 describe('applyOverrides', () => {
+  it('updates descriptive metadata without inserting scenario slides or changing block names', () => {
+    const course = {
+      courseId: 'original-id',
+      courseTitle: 'Original course',
+      blocks: [
+        {
+          blockName: 'Module block',
+          aus: [
+            {
+              auName: 'Lesson',
+              slides: [
+                {
+                  slideTitle: 'Content',
+                  content: 'Lesson text',
+                  filepath: 'lesson.md',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    } as CourseData;
+
+    const result = applyOverrides(course, {
+      courseBaseId: 'https://example.test/course',
+      courseDescription: 'A course description',
+    });
+
+    expect(result.courseId).toBe('https://example.test/course');
+    expect(result.courseDescription).toBe('A course description');
+    expect(result.blocks[0].blockName).toBe('Module block');
+    expect(
+      result.blocks[0].aus[0].slides.map((slide) => slide.slideTitle),
+    ).toEqual(['Content']);
+  });
+
   it('adds one scenario slide and one completion exam when applied twice', () => {
     const course = {
       courseId: 'course-id',

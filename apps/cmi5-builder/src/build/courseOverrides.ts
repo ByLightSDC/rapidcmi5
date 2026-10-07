@@ -41,14 +41,16 @@ export function applyOverrides(course: CourseData, o: CourseMeta): CourseData {
       const promptClassId =
         o.scenarioOverride?.promptClassId ?? au.promptClassId;
 
-      const scenarioSlide = makeScenarioSlide({
-        uuid: rangeosScenarioUUID,
-        name: rangeosScenarioName,
-        promptClassId,
-      });
-
-      // Idempotently ensure the scenario slide is first
-      const slides = ensureScenarioFirst(au.slides ?? [], scenarioSlide);
+      const slides = o.scenarioOverride
+        ? ensureScenarioFirst(
+            au.slides ?? [],
+            makeScenarioSlide({
+              uuid: rangeosScenarioUUID,
+              name: rangeosScenarioName,
+              promptClassId,
+            }),
+          )
+        : (au.slides ?? []);
 
       return {
         ...au,
