@@ -40,7 +40,7 @@ function getLeafNodes(parentNode: Array<Record<string, any>>, prevKey = '') {
 async function getMkdocsFile(mkdocsFile: FolderStruct) {
   let mkdocsConfig: any;
   if (!mkdocsFile.content) {
-    throw Error('No mkdocs.yaml file content');
+    throw Error(`${mkdocsFile.name} has no content`);
   }
   try {
     // This is not yaml parasable, needs to be removed
@@ -52,7 +52,7 @@ async function getMkdocsFile(mkdocsFile: FolderStruct) {
       );
     mkdocsConfig = yaml.load(cleanedContent);
   } catch (err) {
-    console.error('Failed to parse mkdocs.yaml:', err);
+    console.error(`Failed to parse ${mkdocsFile.name}:`, err);
     throw err;
   }
 
@@ -213,12 +213,11 @@ export async function convertFromMkdocs(
   outputPath: string,
   folderStructure: FolderStruct[],
 ): Promise<{ courseData: CourseData; docsDir: string }> {
-  folderStructure.find((node) => node.name === 'mkdocs.yaml');
   const mkdocsFile = folderStructure.find(
-    (node) => node.name === 'mkdocs.yaml',
+    (node) => node.name === 'mkdocs.yaml' || node.name === 'mkdocs.yml',
   );
   if (!mkdocsFile) {
-    throw new Error('mkdocs.yaml not found or missing content');
+    throw new Error('mkdocs.yaml or mkdocs.yml not found in the course folder');
   }
 
   const mkdocsConfig = await getMkdocsFile(mkdocsFile);

@@ -20,6 +20,7 @@ migration.json/
 audit.json
 .env
 .claude
+cmi5.zip
 
 apps/cc-cmi5-player/src/test/*
 !apps/cc-cmi5-player/src/test/.gitkeep

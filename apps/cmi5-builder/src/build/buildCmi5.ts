@@ -19,6 +19,19 @@ export async function buildCmi5(
   console.log('📁  Course path:', inputPath);
   console.log('▶️  Dist path (Built CMI5 Player):', outputPath);
 
+  let inputStats;
+  try {
+    inputStats = await fs.stat(inputPath);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      throw new Error(`Course directory does not exist: ${inputPath}`);
+    }
+    throw error;
+  }
+  if (!inputStats.isDirectory()) {
+    throw new Error(`Course path is not a directory: ${inputPath}`);
+  }
+
   const folderStructure = await getFolderStructureBackend(inputPath);
   let courseData;
   let distFolderName;
