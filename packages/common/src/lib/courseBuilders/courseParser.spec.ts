@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { gfmTableFromMarkdown } from 'mdast-util-gfm-table';
 import { gfmTable } from 'micromark-extension-gfm-table';
+import { directive } from 'micromark-extension-directive';
+import { directiveFromMarkdown } from 'mdast-util-directive';
 import { QuestionResponse } from '../types/activities';
 import {
   cleanMkdocs,
@@ -51,6 +53,59 @@ describe('cleanMkdocs', () => {
 
     expect(result).toContain('src="./assets/network map.png"');
     expect(result).toContain('alt="Network map"');
+  });
+
+  it('converts MkDocs command tabs into Rapid CMI5 tab directives', () => {
+    const input = [
+      'Choose a DNS tool:',
+      '',
+      '=== "dig (Linux)"',
+      '    ```bash',
+      '    dig @8.8.8.8 example.com A',
+      '    ```',
+      '',
+      '=== "PowerShell (Windows)"',
+      '    ```powershell',
+      '    Resolve-DnsName example.com',
+      '    ```',
+      '',
+      'Record the result.',
+    ].join('\n');
+
+    const result = cleanMkdocs(input, 'dns-lab.md', true);
+    const tree = fromMarkdown(result, {
+      extensions: [directive()],
+      mdastExtensions: [directiveFromMarkdown()],
+    });
+    const tabs = tree.children.find(
+      (node) => node.type === 'containerDirective' && node.name === 'tabs',
+    );
+    expect(tabs?.type).toBe('containerDirective');
+    if (tabs?.type === 'containerDirective') {
+      expect(tabs.children).toHaveLength(2);
+      expect(tabs.children[0]).toMatchObject({
+        type: 'containerDirective',
+        name: 'tabContent',
+        attributes: { title: 'dig (Linux)' },
+      });
+      expect(tabs.children[1]).toMatchObject({
+        type: 'containerDirective',
+        name: 'tabContent',
+        attributes: { title: 'PowerShell (Windows)' },
+      });
+    }
+    expect(result).toContain('```bash\ndig @8.8.8.8 example.com A\n```');
+    expect(result).toContain('```powershell\nResolve-DnsName example.com\n```');
+    expect(result).toContain('Record the result.');
+    expect(result).not.toContain('=== "dig');
+  });
+
+  it('leaves tab-like text inside a code fence alone', () => {
+    const input = ['```text', '=== "example"', '```'].join('\n');
+    const result = cleanMkdocs(input, 'example.md', true);
+
+    expect(result).toContain('=== "example"');
+    expect(result).not.toContain('::::tabs');
   });
 
   it('throws a slide-specific error in strict mode for invalid MDX', () => {

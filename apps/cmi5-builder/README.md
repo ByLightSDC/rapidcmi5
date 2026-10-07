@@ -31,6 +31,10 @@ Place a quiz marker before the questions, a question marker with the correct opt
 
 MkDocs displays the page normally. During CMI5 conversion, the marked region becomes one interactive quiz; the answer key inside it is omitted from the slide. Question IDs must be unique within the quiz, and each `correct` letter must match an option. The builder stops with a slide-specific error if a marked question is invalid.
 
+### MkDocs content tabs
+
+The converter maps consecutive MkDocs tabs such as `=== "dig (Linux)"` to Rapid CMI5 `tabs` and `tabContent` directives. Each tab keeps its title and Markdown body, including fenced code and its language. The MkDocs source stays as written. To render these tabs in MkDocs itself, enable `pymdownx.tabbed` in the course's `mkdocs.yml`.
+
 ```bash
 npm run cmi5-player
 npm run cmi5-builder:run -- --args="build ./courses/my-course ./dist/apps/cc-cmi5-player --zip ./cmi5.zip"
