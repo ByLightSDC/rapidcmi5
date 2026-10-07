@@ -234,3 +234,21 @@ node ./dist/apps/cmi5-builder/main.js build-opendash ./os/ ./apps/cmi5-builder/d
 - **course.json**: Full course metadata (follows the `CourseData` type). This is used by CMI5 Builder and Rapid CMI5 and contains the config.json data for every AU.
 - **cmi5.xml**: XML file containing CMI5-compliant metadata for the course, this is read by the LMS.
 - **cmi5.zip**: Final package containing the player, AU data, XML, and assets.
+
+---
+
+## Source layout
+
+`src/main.ts` is the CLI entry point. It registers the commands and loads environment variables.
+
+| Location | Responsibility |
+| --- | --- |
+| `src/commands/` | Define CLI arguments and run the build, upload, and Terraform commands. |
+| `src/build/buildCmi5.ts` | Build the course distribution and write `cmi5.xml`. |
+| `src/build/courseOverrides.ts` | Apply optional course metadata, scenario slides, and completion exams. |
+| `src/build/convertFromMkdocs.ts` | Convert MkDocs navigation and content into course data. |
+| `src/build/outputs.ts` | Create ZIP files and Terraform AU mapping files. |
+| `src/fileSystem/` | Read course folders into the shared folder structure. |
+| `src/services/` | Upload courses and create remote AU mappings. |
+
+The command handlers call `buildCmi5` for course generation, then invoke the output or upload helpers requested by the command options.
