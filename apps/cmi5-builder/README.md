@@ -241,6 +241,8 @@ node ./dist/apps/cmi5-builder/main.js build-opendash ./os/ ./apps/cmi5-builder/d
 
 `src/main.ts` is the CLI entry point. It registers the commands and loads environment variables.
 
+Run the builder's unit tests with `npx nx test cmi5-builder`. This target uses Vitest.
+
 | Location | Responsibility |
 | --- | --- |
 | `src/commands/` | Define CLI arguments and run the build, upload, and Terraform commands. |

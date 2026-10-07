@@ -73,10 +73,10 @@
       "executor": "@nx/eslint:lint"
     },
     "test": {
-      "executor": "@nx/jest:jest",
+      "executor": "@nx/vite:test",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/cmi5-builder/jest.config.ts"
+        "configFile": "apps/cmi5-builder/vitest.config.ts"
       }
     }
   }
