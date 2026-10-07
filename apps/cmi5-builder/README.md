@@ -4,28 +4,55 @@ The **CMI5 Builder** is a CLI tool designed to convert MkDocs-based courses into
 
 ---
 
-## 🚀 TL;DR
+## Local npm workflow
 
-### 🏗️ Build the Player and Builder Scripts
+Run these commands from the repository root. Install dependencies with `npm ci`, then build the player once before packaging a course. The builder writes course files into the player distribution passed as its second path argument.
 
 ```bash
-npx nx build cmi5-builder --skip-nx-cache
-npx nx build cc-cmi5-player --skip-nx-cache
+npm run cmi5-player
+npm run cmi5-builder:run -- --args="build ./courses/my-course ./dist/apps/cc-cmi5-player --zip ./cmi5.zip"
 ```
 
-There are three base commands for this cli tool,
-build (local zip without uploading)
-build-opendash (can upload to PCTE if used normally, or upload to v9 opendash with the command --use-real-auid )
-build-moodle (can upload to moodle, needs aditional information such as class id and section id)
+`cmi5-builder:run` is an Nx target that builds the builder and then runs its CLI. npm's first `--` passes the following option to Nx; Nx's `--args` forwards the quoted command and options to the builder. [npm documents the `--` separator](https://docs.npmjs.com/cli/commands/npm-run/), and [Nx documents `--args` forwarding](https://nx.dev/docs/kb/pass-args-to-commands).
+
+To build or test the builder without running a course command:
+
+```bash
+npm run cmi5-builder:build
+npm run cmi5-builder:test
+```
+
+To see the builder's own command options:
+
+```bash
+npm run cmi5-builder:run -- --args="--help"
+npm run cmi5-builder:run -- --args="build --help"
+```
+
+For repeated runs after a build, call the compiled CLI directly and skip the Nx build step:
+
+```bash
+node dist/apps/cmi5-builder/main.js build ./courses/my-course ./dist/apps/cc-cmi5-player --zip ./cmi5.zip
+```
+
+The CLI also provides `build-opendash`, `build-moodle`, and `generate-au-terraform`. For example:
+
+```bash
+npm run cmi5-builder:run -- --args="generate-au-terraform ./courses ./au_mapping.tf.json"
+npm run cmi5-builder:run -- --args="build-opendash ./courses/my-course ./dist/apps/cc-cmi5-player https://dash.example.test --zip ./cmi5.zip"
+npm run cmi5-builder:run -- --args="build-moodle ./courses/my-course ./dist/apps/cc-cmi5-player https://moodle.example.test --zip ./cmi5.zip"
+```
+
+Upload commands require the credentials described below. `build` supports `--course-meta`, `--convert`, `--generate-tf`, and `--apply-au-mappings`; inspect each command's `--help` for its exact options.
 
 # build
 
 ### 🧰 Generate a CMI5 Course Zip and Terraform AU Mappings
 
-This will create cmi5.zip in the cmi5-output directory, the generate-tf is optional and you may instead use the --apply-mappings command create mappings
+This creates a course ZIP and a Terraform AU mapping file at the paths provided. Omit either option if you do not need that output.
 
 ```bash
-node ./dist/apps/cmi5-builder/main.js build <course_path> ./dist/apps/cc-cmi5-player/ --zip --generate-tf
+npm run cmi5-builder:run -- --args="build ./courses/my-course ./dist/apps/cc-cmi5-player --zip ./cmi5.zip --generate-tf ./au_mapping.tf.json"
 ```
 
 # build-opendash
@@ -35,7 +62,7 @@ node ./dist/apps/cmi5-builder/main.js build <course_path> ./dist/apps/cc-cmi5-pl
 You will need to provide a PCTE JWT named JWT_OPENDASH
 
 ```bash
-node ./dist/apps/cmi5-builder/main.js build-opendash <course dir> ./apps/cmi5-builder/dist/ https://dash.ent1.pcte.mil
+npm run cmi5-builder:run -- --args="build-opendash ./courses/my-course ./dist/apps/cc-cmi5-player https://dash.example.test --zip ./cmi5.zip"
 ```
 
 ### ☁️ with AU Mappings
@@ -43,18 +70,18 @@ node ./dist/apps/cmi5-builder/main.js build-opendash <course dir> ./apps/cmi5-bu
 You will need to provide a PCTE JWT named JWT_DEVOPS_API, this will be the same JWT value as the one above, but it needs a seperate name
 
 ```bash
-node ./dist/apps/cmi5-builder/main.js build-opendash <course dir> ./apps/cmi5-builder/dist/ https://dash.ent1.pcte.mil  --apply-au-mappings https://rangeos-api.ent1.pcte.mil
+npm run cmi5-builder:run -- --args="build-opendash ./courses/my-course ./dist/apps/cc-cmi5-player https://dash.example.test --apply-au-mappings https://rangeos-api.example.test --zip ./cmi5.zip"
 ```
 
 ### ☁️ Upload to OpenDash V9 (Develop)
 
 ```bash
-node ./dist/apps/cmi5-builder/main.js build-opendash <course dir> ./apps/cmi5-builder/dist/ https://dash.ent1.pcte.mil --use-real-auid --apply-au-mappings https://rangeos-api.ent1.pcte.mil
+npm run cmi5-builder:run -- --args="build-opendash ./courses/my-course ./dist/apps/cc-cmi5-player https://dash.example.test --use-real-auid --apply-au-mappings https://rangeos-api.example.test --zip ./cmi5.zip"
 ```
 
 # build-moodle
 
-### ☁️ Upload to Moodle (without AU Mappings)
+### ☁️ Upload to Moodle
 
 You will need to provide a ENV called MOODLE_WS_TOKEN that is generated from moodle
 
@@ -76,16 +103,7 @@ Once you have either created or ensured the service exists continue on to get th
 4. Name is whatever, choose admin for user, and choose the cmi5-pipeline service
 
 ```bash
-node ./dist/apps/cmi5-builder/main.js build-moodle <course dir> ./apps/cmi5-builder/dist/ https://moodle.develop-cp.rangeos.engineering --moodle-course-id  <courseid> --moodle-section-id <sectionid>
-
-```
-
-### With Au Mappings
-
-You will need to provide a ROS JWT named JWT_DEVOPS_API
-
-```bash
-node ./dist/apps/cmi5-builder/main.js build-moodle <course dir> ./apps/cmi5-builder/dist/ https://moodle.develop-cp.rangeos.engineering --moodle-course-id  <courseid> --moodle-section-id <sectionid> --apply-au-mappings https://rangeos-api.develop-cp.rangeos.engineering
+npm run cmi5-builder:run -- --args="build-moodle ./courses/my-course ./dist/apps/cc-cmi5-player https://moodle.example.test --zip ./cmi5.zip"
 
 ```
 

@@ -69,6 +69,14 @@
         }
       }
     },
+    "run": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "cache": false,
+      "options": {
+        "command": "node dist/apps/cmi5-builder/main.js"
+      }
+    },
     "lint": {
       "executor": "@nx/eslint:lint"
     },
