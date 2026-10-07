@@ -21,7 +21,7 @@ audit.json
 .env
 .claude
 cmi5.zip
-
+/cmi5
 apps/cc-cmi5-player/src/test/*
 !apps/cc-cmi5-player/src/test/.gitkeep
 
