@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CourseData } from '@rapid-cmi5/cmi5-build-common';
+import { ContentWidthEnum, CourseData } from '@rapid-cmi5/cmi5-build-common';
 import { applyOverrides } from './courseOverrides';
 
 describe('applyOverrides', () => {
@@ -29,10 +29,18 @@ describe('applyOverrides', () => {
     const result = applyOverrides(course, {
       courseBaseId: 'https://example.test/course',
       courseDescription: 'A course description',
+      courseTheme: {
+        contentWidth: ContentWidthEnum.Large,
+        playerTitle: 'Example course',
+      },
     });
 
     expect(result.courseId).toBe('https://example.test/course');
     expect(result.courseDescription).toBe('A course description');
+    expect(result.courseTheme).toEqual({
+      contentWidth: ContentWidthEnum.Large,
+      playerTitle: 'Example course',
+    });
     expect(result.blocks[0].blockName).toBe('Module block');
     expect(
       result.blocks[0].aus[0].slides.map((slide) => slide.slideTitle),
