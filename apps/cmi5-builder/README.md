@@ -11,6 +11,26 @@ For `--convert`, the course folder must contain `mkdocs.yml` or `mkdocs.yaml` an
 
 MkDocs navigation controls the converted course structure: Markdown leaves become slides, each leaf's immediate parent becomes its AU, and the higher navigation labels identify a block. Because CMI5 blocks are flat, the builder joins multiple higher labels in the block name. A Markdown leaf with no named parent uses the course title as its AU. Block groupings appear in `cmi5.xml`; on disk, each AU sits directly in `compiled_course/blocks/<au>/` so it can load `../RC5.yaml`. Shared MkDocs assets go in `compiled_course/blocks/_assets/`. The builder copies only Markdown pages listed in `nav`.
 
+### Quiz comments in MkDocs pages
+
+Place a quiz marker before the questions, a question marker with the correct option letter before each numbered question, and an end marker after the answer key:
+
+```md
+<!-- rapid-cmi5:quiz id=module-01-practice title="Module 01 Practice Quiz" passing-score=80 -->
+
+<!-- rapid-cmi5:question id=q1 correct=B -->
+1. **What is ROS Greyspace?**
+   A. The public Internet
+   B. A synthetic Internet for training
+
+## Answer Key
+1. B
+
+<!-- rapid-cmi5:quiz:end -->
+```
+
+MkDocs displays the page normally. During CMI5 conversion, the marked region becomes one interactive quiz; the answer key inside it is omitted from the slide. Question IDs must be unique within the quiz, and each `correct` letter must match an option. The builder stops with a slide-specific error if a marked question is invalid.
+
 ```bash
 npm run cmi5-player
 npm run cmi5-builder:run -- --args="build ./courses/my-course ./dist/apps/cc-cmi5-player --zip ./cmi5.zip"

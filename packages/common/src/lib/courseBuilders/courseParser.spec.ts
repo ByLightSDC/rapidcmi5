@@ -89,6 +89,75 @@ describe('cleanMkdocs', () => {
     expect(result).toContain('"question": "Check the network?"');
     expect(result).toContain('"cmi5QuizId": "COL"');
   });
+
+  it('converts marked questions into a quiz and omits the answer key', () => {
+    const input = [
+      'Before the quiz.',
+      '<!-- rapid-cmi5:quiz id=module-01-practice title="Module 01 Practice Quiz" passing-score=80 -->',
+      '# Practice Quiz',
+      '<!-- rapid-cmi5:question id=q1 correct=B -->',
+      '1. **What is ROS Greyspace?**',
+      '   A. A public Internet replacement  ',
+      '   B. A synthetic Internet for training  ',
+      '<!-- rapid-cmi5:question id=q2 correct=A -->',
+      '2. **How many regions?**',
+      '   A. Seven  ',
+      '   B. Three  ',
+      '## Answer Key',
+      '1. B',
+      '2. A',
+      '<!-- rapid-cmi5:quiz:end -->',
+      'After the quiz.',
+    ].join('\n');
+
+    const result = cleanMkdocs(input, 'practice.md', true);
+    const quizJson = /:::quiz\s+```json\s+([\s\S]*?)\s+```\s+:::/.exec(
+      result,
+    )?.[1];
+    expect(quizJson).toBeDefined();
+    const quiz = JSON.parse(quizJson!);
+    expect(quiz).toMatchObject({
+      cmi5QuizId: 'module-01-practice',
+      passingScore: 80,
+      questions: [
+        {
+          cmi5QuestionId: 'q1',
+          question: 'What is ROS Greyspace?',
+          typeAttributes: {
+            correctAnswer: 'A synthetic Internet for training',
+            options: [
+              { text: 'A public Internet replacement', correct: false },
+              { text: 'A synthetic Internet for training', correct: true },
+            ],
+          },
+        },
+        {
+          cmi5QuestionId: 'q2',
+          typeAttributes: { correctAnswer: 'Seven' },
+        },
+      ],
+    });
+    expect(result).toContain('Before the quiz.');
+    expect(result).toContain('After the quiz.');
+    expect(result).not.toContain('## Answer Key');
+  });
+
+  it('rejects a marked quiz whose answer does not match an option', () => {
+    expect(() =>
+      cleanMkdocs(
+        [
+          '<!-- rapid-cmi5:quiz id=practice title="Practice" passing-score=80 -->',
+          '<!-- rapid-cmi5:question id=q1 correct=C -->',
+          '1. **Question?**',
+          '   A. One',
+          '   B. Two',
+          '<!-- rapid-cmi5:quiz:end -->',
+        ].join('\n'),
+        'practice.md',
+        true,
+      ),
+    ).toThrow(/Question q1 has no matching answer/);
+  });
 });
 
 describe('convertMkdocsAdmonitions', () => {
