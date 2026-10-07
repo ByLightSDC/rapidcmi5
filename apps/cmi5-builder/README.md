@@ -251,6 +251,9 @@ This file allows you to override course-wide metadata and inject scenario-wide s
 courseName: Test Upload OS Course 2
 courseDescription: The OS course 2
 courseBaseId: https://rangeos/courses/os
+courseTheme:
+  contentWidth: large
+  playerTitle: Test Upload OS Course 2
 completionExam: true
 scenarioOverride:
   introTitle: OS Student Workstations
@@ -261,6 +264,10 @@ scenarioOverride:
 
 The completion exam will allow you to add a quiz question at the last AU of a course which requires the user to enter in "Complete" in order to finish the course.
 The scenario override will add in a scenario slide to every single AU in a course.
+The optional `courseTheme` is copied into `RC5.yaml`. It supports the fields in
+`ThemeSchema`, including `contentWidth` (`none`, `small`, `medium`, or `large`),
+`blockPadding`, `defaultAlignment`, `defaultActivityAlignment`, `playerTitle`,
+logos, and light/dark theme overrides.
 
 ```bash
 node ./dist/apps/cmi5-builder/main.js build-opendash ./os/ ./apps/cmi5-builder/dist/ https://dash.ent1.pcte.mil \

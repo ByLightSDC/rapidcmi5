@@ -4,6 +4,7 @@ import {
   QuestionResponse,
   QuizCompletionEnum,
   QuizContent,
+  Rc5Theme,
   SlideType,
 } from '@rapid-cmi5/cmi5-build-common';
 
@@ -11,6 +12,7 @@ export interface CourseMeta {
   courseName?: string;
   courseDescription?: string;
   courseBaseId?: string;
+  courseTheme?: Rc5Theme;
   // Mostly for opendash, puts a quiz in the last AU that the user must type in "Complete"
   // This prevents a student from finishing a cmi5 course before they are ready.
   completionExam?: boolean;
@@ -74,6 +76,7 @@ export function applyOverrides(course: CourseData, o: CourseMeta): CourseData {
     courseTitle,
     courseId,
     courseDescription,
+    courseTheme: o.courseTheme ?? course.courseTheme,
     blocks: nextBlocks,
   };
 

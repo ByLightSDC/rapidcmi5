@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import fs from 'fs/promises';
 import path from 'path';
 import { tmpdir } from 'os';
+import { ContentWidthEnum } from '@rapid-cmi5/cmi5-build-common';
 import { buildCmi5 } from './buildCmi5';
 
 const temporaryDirectories: string[] = [];
@@ -72,6 +73,10 @@ describe('MkDocs course conversion', () => {
       {
         courseBaseId: 'https://example.test/courses/sample',
         courseDescription: 'Sample course description',
+        courseTheme: {
+          contentWidth: ContentWidthEnum.Large,
+          playerTitle: 'Sample player',
+        },
       },
       true,
     );
@@ -98,6 +103,10 @@ describe('MkDocs course conversion', () => {
     );
     expect(rc5.courseId).toBe('https://example.test/courses/sample');
     expect(rc5.courseDescription).toBe('Sample course description');
+    expect(rc5.courseTheme).toEqual({
+      contentWidth: 'large',
+      playerTitle: 'Sample player',
+    });
     expect(
       rc5.blocks.map((block: { blockName: string }) => block.blockName),
     ).toEqual(['Sample Course', 'Program / Classroom', 'Program / Workshop']);
