@@ -15,6 +15,7 @@ import { cleanMkdocsRawText, parseToMdast } from './markdownNormalization';
 import { convertMkdocsAdmonitions } from './mkdocsAdmonitions';
 import { collectQuizDown } from './quizdown';
 import { extractMarkedQuizzes } from './markedQuiz';
+import { extractMkdocsTabs } from './mkdocsTabs';
 
 export { convertMkdocsAdmonitions } from './mkdocsAdmonitions';
 export { parseQuizdownFile } from './quizdown';
@@ -28,11 +29,15 @@ export function cleanMkdocs(
   strictMode = false,
 ) {
   const markedQuizzes = extractMarkedQuizzes(content, slidename);
-  let md = cleanMkdocsRawText(markedQuizzes.markdown);
+  const mkdocsTabs = extractMkdocsTabs(markedQuizzes.markdown);
+  let md = cleanMkdocsRawText(mkdocsTabs.markdown);
 
   md = parseToMdast(md);
   md = collectQuizDown(md);
   for (const { placeholder, directive } of markedQuizzes.replacements) {
+    md = md.replace(placeholder, directive);
+  }
+  for (const { placeholder, directive } of mkdocsTabs.replacements) {
     md = md.replace(placeholder, directive);
   }
 
