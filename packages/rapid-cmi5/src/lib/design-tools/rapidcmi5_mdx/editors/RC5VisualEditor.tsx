@@ -761,7 +761,11 @@ function RC5VisualEditor() {
     // Visual editor will be able to access Images and Assets from the file system
     thePlugins && thePlugins.length > 0 && currentCourse ? (
       <Box
+        id="lesson-editor-region"
         className={themeClass}
+        role="region"
+        aria-label="Lesson editor"
+        tabIndex={-1}
         sx={{ height: `calc(100vh - ${pixelTop}px)` }}
         ref={editorContainerRef}
       >

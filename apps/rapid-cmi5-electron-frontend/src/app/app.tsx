@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { BrowserRouter as RouterWrapper } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -91,6 +91,7 @@ export default function App() {
 }
 
 function AppWorkspace() {
+  const mainContentRef = useRef<HTMLElement>(null);
   const {
     isElectron,
     aiOpen,
@@ -110,13 +111,30 @@ function AppWorkspace() {
         minHeight: 0,
       }}
     >
-      <a href="#app-routes" className="skip-link">
+      <a
+        href="#app-routes"
+        className="skip-link"
+        onClick={(event) => {
+          event.preventDefault();
+          // Find the main editor region
+          const editable = document.querySelector<HTMLElement>(
+            '#lesson-editor-region .mdxeditor-root-contenteditable [contenteditable="true"]',
+          );
+          const target =
+            editable ??
+            document.getElementById('lesson-editor-region') ??
+            mainContentRef.current;
+          target?.focus();
+        }}
+      >
         Skip to main content
       </a>
       <AppHeader />
 
       <main
         id="app-routes"
+        ref={mainContentRef}
+        tabIndex={-1}
         style={{
           display: 'flex',
           flex: '1 1 auto',
