@@ -1,3 +1,19 @@
+## 0.23.0 (2026-10-08)
+
+### 🚀 Features
+
+- **cmi5-builder:** quiz markers in mkdocs ([0bb4d449](https://github.com/ByLightSDC/rapidcmi5/commit/0bb4d449))
+
+### 🩹 Fixes
+
+- **cmi5-builder:** now excepts mkdocs.yml or mkdocs.yaml ([24cf687a](https://github.com/ByLightSDC/rapidcmi5/commit/24cf687a))
+- **rapid-cmi5-editor:** Fix e2e tests that were broken by recent moodle update ([#246](https://github.com/ByLightSDC/rapidcmi5/pull/246))
+
+### ❤️ Thank You
+
+- Aaron Crawford
+- mattkeele-bylight
+
 ## 0.22.1 (2026-10-01)
 
 ### 🩹 Fixes

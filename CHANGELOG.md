@@ -1,3 +1,25 @@
+## 0.23.0 (2026-10-08)
+
+### 🚀 Features
+
+- **cmi5-builder:** quiz markers in mkdocs ([0bb4d449](https://github.com/ByLightSDC/rapidcmi5/commit/0bb4d449))
+- **cmi5-builder:** mkdocs converts tabs to rc5 tabs ([ff3b0487](https://github.com/ByLightSDC/rapidcmi5/commit/ff3b0487))
+- **cmi5-builder:** added in theme to course meta file ([a41d68b4](https://github.com/ByLightSDC/rapidcmi5/commit/a41d68b4))
+- **cmi5-builder:** moodle upload now allows mkdocs conversion ([cca3a1bb](https://github.com/ByLightSDC/rapidcmi5/commit/cca3a1bb))
+
+### 🩹 Fixes
+
+- **cmi5-builder:** now excepts mkdocs.yml or mkdocs.yaml ([24cf687a](https://github.com/ByLightSDC/rapidcmi5/commit/24cf687a))
+- **cmi5-builder:** mkdocs conversions now correctly creates modules ([d8eca570](https://github.com/ByLightSDC/rapidcmi5/commit/d8eca570))
+- **cmi5-builder:** table parsi ng issue ([a53b9524](https://github.com/ByLightSDC/rapidcmi5/commit/a53b9524))
+- **cmi5-builder:** remove bug which forced scenario with course-meta ([6cbdbe0d](https://github.com/ByLightSDC/rapidcmi5/commit/6cbdbe0d))
+- **rapid-cmi5-editor:** Fix e2e tests that were broken by recent moodle update ([#246](https://github.com/ByLightSDC/rapidcmi5/pull/246))
+
+### ❤️ Thank You
+
+- Aaron Crawford
+- mattkeele-bylight
+
 ## 0.22.1 (2026-10-01)
 
 ### 🩹 Fixes
