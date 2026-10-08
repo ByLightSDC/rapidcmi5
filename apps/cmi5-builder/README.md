@@ -12,6 +12,12 @@ npm run cmi5-builder:run -- --args="build ./my-course ./dist/apps/cc-cmi5-player
 
 `./my-course` must contain `mkdocs.yml` or `mkdocs.yaml`. The builder adds the course to the player distribution and writes `./cmi5.zip`. Add `--course-meta ./my-course/course_meta.yaml` to use course metadata.
 
+To build the same MkDocs course and upload it to Moodle, set `MOODLE_WS_TOKEN` and run:
+
+```bash
+npm run cmi5-builder:run -- --args="build-moodle ./my-course ./dist/apps/cc-cmi5-player https://moodle.example.test --convert --zip ./cmi5.zip"
+```
+
 For command options:
 
 ```bash
