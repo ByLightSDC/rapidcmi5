@@ -138,21 +138,43 @@ npm run cmi5-builder:run -- --args="build-moodle ./courses/my-course ./dist/apps
 
 ## 🐳 Running with Docker
 
-> The Docker container includes a prebuilt version of the CMI5 player.
+Build both Nx targets, then build the image from the repository root. The image
+contains the CLI and the prebuilt CMI5 player. Docker uses Node 22 Alpine and
+runs the CLI as a non-root user.
+
+```bash
+npm run cmi5-builder:build
+npm run cmi5-player
+docker build -f apps/cmi5-builder/Dockerfile -t cmi5-builder:local .
+docker run --rm cmi5-builder:local --help
+```
 
 ### Build a course from a mounted volume
 
+Mount the course read-only and an output directory read-write. The container
+copies the bundled player into `/output/player` on the first build, then writes
+the generated course there. Paths passed to the CLI refer to container paths.
+
 ```bash
-docker run -v ./os:/home/work/course cmi5-builder:0.0.1 build ../course/ ../player/ --zip
+COURSE_DIR="$(cd ../rangeos-gce-training && pwd)"
+mkdir -p ./cmi5-output
+docker run --rm \
+  --mount type=bind,source="$COURSE_DIR",target=/workspace/course,readonly \
+  --mount type=bind,source="$(pwd)/cmi5-output",target=/output \
+  cmi5-builder:local build /workspace/course /output/player \
+  --convert --course-meta /workspace/course/course_meta.yaml \
+  --zip /output/cmi5.zip
 ```
 
-### Access the container to inspect or retrieve output
+Set `COURSE_DIR` to a different absolute path for another course. The compiled
+course will be in `./cmi5-output/player` and the ZIP in
+`./cmi5-output/cmi5.zip`. Use a fresh output directory when
+switching to a different player build.
+
+### Inspect the container
 
 ```bash
-docker run -it \
-  -v ./os:/home/work/course \
-  -v ./cmi5-output:/home/work/builder/cmi5-output \
-  --entrypoint bash cmi5-builder:0.0.1
+docker run --rm -it --entrypoint sh cmi5-builder:local
 ```
 
 ---
@@ -213,9 +235,10 @@ With this you now have a mkdocs course which will have one scenario slide.
 
 ```bash
 docker run -it \
-  -v ./example:/home/work/course \
-  -v ./cmi5-output:/home/work/builder/cmi5-output \
-  cmi5-builder:0.0.1 build ../course/ ../player/ --zip
+  --mount type=bind,source="$(pwd)/example",target=/workspace/course,readonly \
+  --mount type=bind,source="$(pwd)/cmi5-output",target=/output \
+  cmi5-builder:local build /workspace/course /output/player \
+  --zip /output/cmi5.zip
 ```
 
 ---
