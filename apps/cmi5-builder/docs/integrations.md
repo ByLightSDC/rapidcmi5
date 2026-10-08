@@ -14,10 +14,10 @@ Add `--apply-au-mappings https://api.example.test` to create AU mappings. Add `-
 
 ## Moodle
 
-Set `MOODLE_WS_TOKEN` for the Moodle web service used to upload CMI5 courses. The current `build-moodle` command accepts an existing RC5 course; it does not expose `--convert`.
+Set `MOODLE_WS_TOKEN` for the Moodle web service used to upload CMI5 courses. Pass `--convert` to build a MkDocs course and upload the resulting ZIP in one command. Omit it for an existing RC5 course. You can also pass `--course-meta` to override course metadata before upload.
 
 ```bash
-npm run cmi5-builder:run -- --args="build-moodle ./my-rc5-course ./dist/apps/cc-cmi5-player https://moodle.example.test --zip ./cmi5.zip"
+npm run cmi5-builder:run -- --args="build-moodle ./my-course ./dist/apps/cc-cmi5-player https://moodle.example.test --convert --zip ./cmi5.zip"
 ```
 
 ## Terraform AU mapping file

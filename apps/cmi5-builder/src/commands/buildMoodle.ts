@@ -20,7 +20,12 @@ export function registerBuildMoodle(program: Command): void {
       '--apply-au-mappings <endpoint>',
       'Create AU mappings Specific to Opendash Format (AU ID -> Scenario) at endpoint',
     )
+    .option(
+      '--course-meta <yamlPath>',
+      'Path to optional YAML file to override course metadata',
+    )
     .option('--zip <path>', 'Create a ZIP of the output directory')
+    .option('--convert', 'convert from mkdocs')
     .action(async (coursePath, distPath, endpoint, options) => {
       console.log(`Uploading to moodle at ${endpoint}...`);
 
