@@ -329,7 +329,7 @@ export const ActivityEditor: React.FC<
                   contextMenu={contextMenu}
                   crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
                   defaultFormData={fromJson}
-                  innerSx={innerSx}
+                  innerSx={innerActivitySx}
                   outerSx={outerSx}
                   outerStyle={outerStyle}
                   onSave={onSave}
