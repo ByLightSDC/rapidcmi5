@@ -177,6 +177,21 @@ switching to a different player build.
 docker run --rm -it --entrypoint sh cmi5-builder:local
 ```
 
+### Published image
+
+The existing `.github/workflows/release.yml` workflow builds the player and
+builder once, transfers their compiled files between jobs as temporary GitHub
+Actions artifacts, then pushes `ghcr.io/bylightsdc/cmi5-builder:<release-tag>`.
+Stable version tags also update `ghcr.io/bylightsdc/cmi5-builder:latest`. The
+image is pushed when the version-tag release pipeline runs, even while the
+GitHub Release is still a draft. Builder files are not attached to the GitHub
+Release. The temporary artifacts expire after seven days. After the first
+release, set the GHCR package visibility to public if you want anonymous pulls.
+
+The `scripts/create_cmi5_builder_release.sh` script remains available for the
+existing internal registry. Run it from the repository root; it uses the same
+Dockerfile as the GHCR workflow.
+
 ---
 
 ## 📦 Quick Example: Basic Scenario Course

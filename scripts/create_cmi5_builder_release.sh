@@ -16,8 +16,6 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 echo "🏷️  Using version: ${VERSION}"
-DIST_DIR="dist"
-BUILD_DIR="apps/cmi5-builder"
 IS_DEVELOP=false
 PLATFORM="${PLATFORM:-linux/amd64}"
 
@@ -40,14 +38,6 @@ echo "🔨 Building nx projects..."
 npx nx build cc-cmi5-player
 npx nx build cmi5-builder
 
-echo "🧹 Cleaning previous dist..."
-[ -d "$BUILD_DIR/dist" ] && rm -rf "$BUILD_DIR/dist"
-
-echo "📁 Copying dist folder..."
-cp -r "$DIST_DIR" "$BUILD_DIR/"
-
-cd "$BUILD_DIR"
-
 if [ "$IS_DEVELOP" = true ]; then
   TAG_VERSION="develop-${VERSION}"
   MOVING_TAG="develop"
@@ -61,6 +51,7 @@ fi
 # GitLab registry rejects it with "Invalid tag: missing manifest digest".
 echo "🐳 Building and pushing Docker image with tags: ${MOVING_TAG}, ${TAG_VERSION}"
 docker buildx build \
+  -f apps/cmi5-builder/Dockerfile \
   --platform "$PLATFORM" \
   --provenance=false \
   --sbom=false \
