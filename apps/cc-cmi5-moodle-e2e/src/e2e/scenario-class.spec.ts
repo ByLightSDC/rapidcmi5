@@ -11,7 +11,8 @@ import {
 /**
  * Class Scenario tests — the full instructor-deploy → student-launch flow.
  *
- * Scenario:Class authors a `:::scenario` with promptClassId: true. Unlike the
+ * Scenario:Class authors a `:::scenario` with promptClass: true (editor:
+ * Scenario form → Class Deployment; the AU gets promptClassId). Unlike the
  * Individual scenario (which auto-deploys a VM on launch), a Class scenario
  * does NOT auto-deploy: an instructor must first deploy the scenario against a
  * Class Id (dashboard → Classes → Deploy Scenarios), then the student launches

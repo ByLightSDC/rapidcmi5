@@ -60,6 +60,15 @@ interface MoodleOptions {
    * "preLaunch"`. Wrapping it in an object keeps the value non-callable.
    */
   preLaunch: { run: () => Promise<void> } | undefined;
+  /**
+   * If true (default), the "Unit passed" / "Unit complete" modal is dismissed
+   * ("Keep reviewing") whenever it opens. It opens the moment an AU completes
+   * — for a single-slide AU that is right after launch, since viewing the
+   * launch slide completes it — and its backdrop swallows every click, so a
+   * spec's first click times out on a fresh registration and passes on retry.
+   * Set false in a spec that asserts the dialog itself.
+   */
+  autoDismissUnitResultDialog: boolean;
 }
 
 interface MoodleFixtures {
@@ -78,13 +87,24 @@ export const test = base.extend<MoodleOptions & MoodleFixtures>({
   auName: ['Media:Basic', { option: true }],
   requireKeycloakSso: [false, { option: true }],
   preLaunch: [undefined, { option: true }],
+  autoDismissUnitResultDialog: [true, { option: true }],
 
   playerErrors: async ({ page }, use) => {
     // Attach before anything navigates so boot-time crashes are caught.
     await use(collectPageErrors(page));
   },
 
-  player: async ({ page, auName, requireKeycloakSso, preLaunch, playerErrors }, use) => {
+  player: async (
+    {
+      page,
+      auName,
+      requireKeycloakSso,
+      preLaunch,
+      autoDismissUnitResultDialog,
+      playerErrors,
+    },
+    use,
+  ) => {
     // Referenced so the error collector is instantiated BEFORE the launch.
     void playerErrors;
     // The full real flow (login → activity → launch → iframe player boot
@@ -110,8 +130,22 @@ export const test = base.extend<MoodleOptions & MoodleFixtures>({
     await login(page);
     await gotoActivity(page, moodleEnv.activityId);
     const launched = await launchAu(page, auName);
+    const player = launched.content();
 
-    await use(launched.content());
+    // Playwright runs this only when the modal is actually covering the page
+    // (before an action or auto-waiting assertion), so specs that never
+    // complete an AU pay nothing. Explicit dismissUnitResultDialog() calls
+    // still work: they find nothing to dismiss and return false.
+    if (autoDismissUnitResultDialog) {
+      await page.addLocatorHandler(
+        player.getByTestId('unit-result-dialog'),
+        async (dialog) => {
+          await dialog.getByRole('button', { name: 'Keep reviewing' }).click();
+        },
+      );
+    }
+
+    await use(player);
   },
 });
 

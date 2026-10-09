@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   DirectiveEditorProps,
   useCellValue,
@@ -56,8 +62,11 @@ import {
   updateScenario,
   updateTeamScenario,
 } from '../../../../redux/courseBuilderReducer';
-import { ScenarioForm } from '../../../../features/scenarios/components/forms/IndividualScenarioForm';
-import { TeamConsolesForm } from '../../../../features/scenarios/components/forms/TeamScenarioForm';
+import { ScenarioActivityForm } from '../../../../features/scenarios/components/forms/ScenarioActivityForm';
+import {
+  scenarioDirectiveName,
+  teamDirectiveName,
+} from '../../../../features/scenarios/components/forms/scenarioDeploymentType';
 
 /**
  * MDX Editor for Activities
@@ -76,6 +85,12 @@ export const ActivityEditor: React.FC<
   const updateMdastNode = useMdastNodeUpdater();
   const isEditable = parentEditor.isEditable();
   const isPlayback = useCellValue(editorInPlayback$);
+  // scenario activities can be renamed between :::scenario and :::consoles,
+  // so memoized callbacks read the current name from here
+  const directiveNameRef = useRef(name);
+  directiveNameRef.current = name;
+  const isScenarioActivity =
+    name === scenarioDirectiveName || name === teamDirectiveName;
 
   const auProps = useAuContext();
 
@@ -105,13 +120,13 @@ export const ActivityEditor: React.FC<
    * Handle Activity Deletion
    */
   const onDelete = useCallback((payload?: KeyboardEvent) => {
-    if (mdastNode.name === 'scenario') {
+    if (directiveNameRef.current === scenarioDirectiveName) {
       dispatch(
         updateScenario({
           scenario: undefined,
         }),
       );
-    } else if (mdastNode.name === 'consoles') {
+    } else if (directiveNameRef.current === teamDirectiveName) {
       dispatch(
         updateTeamScenario({
           scenario: undefined,
@@ -129,8 +144,12 @@ export const ActivityEditor: React.FC<
   /**
    * Update lexical node with form data
    * @param {*} data Form Data
+   * @param {string} [directiveName] Rename the directive (scenario <-> consoles)
    */
-  const saveFormDataToLexical = (data: any) => {
+  const saveFormDataToLexical = (
+    data: any,
+    directiveName?: ActivityDirectiveNode['name'],
+  ) => {
     if (!mdastNode.children || mdastNode.children.length === 0) {
       debugLogError('Missing children!');
       return;
@@ -154,6 +173,7 @@ export const ActivityEditor: React.FC<
 
     updateMdastNode({
       ...mdastNode,
+      name: directiveName ?? mdastNode.name,
       children: [updatedCodeBlock as any],
     });
   };
@@ -165,21 +185,27 @@ export const ActivityEditor: React.FC<
    */
   const onSave = (activity: RC5ActivityTypeEnum, data: any) => {
     //update scenario in redux & course data if im a scenario activity
+    const scenarioRef = { uuid: data?.uuid || undefined, name: data?.name };
+    const previousName = directiveNameRef.current;
+    let directiveName: ActivityDirectiveNode['name'] | undefined;
     if (activity === RC5ActivityTypeEnum.scenario) {
-      dispatch(
-        updateScenario({
-          scenario: { uuid: data?.uuid || undefined, name: data?.name },
-        }),
-      );
+      directiveName = scenarioDirectiveName;
+      dispatch(updateScenario({ scenario: scenarioRef }));
+      if (previousName === teamDirectiveName) {
+        dispatch(updateTeamScenario({ scenario: undefined }));
+      }
     } else if (activity === RC5ActivityTypeEnum.consoles) {
+      directiveName = teamDirectiveName;
       debugLog('updateTeamScenario (save activity)', data);
-      dispatch(
-        updateTeamScenario({
-          scenario: { uuid: data?.uuid || undefined, name: data?.name },
-        }),
-      );
+      dispatch(updateTeamScenario({ scenario: scenarioRef }));
+      if (previousName === scenarioDirectiveName) {
+        dispatch(updateScenario({ scenario: undefined }));
+      }
     }
-    saveFormDataToLexical(data);
+    if (directiveName) {
+      directiveNameRef.current = directiveName;
+    }
+    saveFormDataToLexical(data, directiveName);
   };
 
   /** Update mdast node when content width changes */
@@ -288,11 +314,15 @@ export const ActivityEditor: React.FC<
         }}
       >
         <ActivityThemeWrapper isPlayback={isPlayback}>
-          {name === 'scenario' && fromJson && (
+          {isScenarioActivity && fromJson && (
             <>
               {isPlayback && (
                 <ScenarioMock
-                  activity={RC5ActivityTypeEnum.scenario}
+                  activity={
+                    name === teamDirectiveName
+                      ? RC5ActivityTypeEnum.consoles
+                      : RC5ActivityTypeEnum.scenario
+                  }
                   scenarioName={fromJson?.name}
                   innerSx={innerActivitySx}
                   outerSx={outerSx}
@@ -300,10 +330,11 @@ export const ActivityEditor: React.FC<
                 />
               )}
               {!isPlayback && (
-                <ScenarioForm
+                <ScenarioActivityForm
                   contextMenu={contextMenu}
                   crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
                   defaultFormData={fromJson}
+                  directiveName={name}
                   innerSx={innerActivitySx}
                   outerSx={outerSx}
                   outerStyle={outerStyle}
@@ -390,30 +421,6 @@ export const ActivityEditor: React.FC<
               )}
               {!isPlayback && (
                 <CodeRunnerForm
-                  contextMenu={contextMenu}
-                  crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
-                  defaultFormData={fromJson}
-                  innerSx={innerActivitySx}
-                  outerSx={outerSx}
-                  outerStyle={outerStyle}
-                  onSave={onSave}
-                />
-              )}
-            </>
-          )}
-          {name === 'consoles' && fromJson && (
-            <>
-              {isPlayback && (
-                <ScenarioMock
-                  activity={RC5ActivityTypeEnum.consoles}
-                  scenarioName={fromJson?.name}
-                  innerSx={innerActivitySx}
-                  outerSx={outerSx}
-                  outerStyle={outerStyle}
-                />
-              )}
-              {!isPlayback && (
-                <TeamConsolesForm
                   contextMenu={contextMenu}
                   crudType={isEditable ? FormCrudType.edit : FormCrudType.view}
                   defaultFormData={fromJson}
