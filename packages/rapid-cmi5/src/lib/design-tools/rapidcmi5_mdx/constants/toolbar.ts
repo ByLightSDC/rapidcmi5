@@ -69,12 +69,8 @@ export const activitiesTable = `<table style="border-collapse: separate; ">
       <td style="${paddingStyle}${borderStyle}">Structured assessment tool used to measure participant understanding of course material.</td>
     </tr>
     <tr>
-      <td style="${borderStyle}${borderRightStyle}">${terminalSvg}RangeOS Scenario</td>
-      <td style="${paddingStyle}${borderStyle}">A fully interactive cybersecurity simulation delivered through a live cyber range environment, providing structured training content alongside direct console access to systems so participants can perform real-world tasks in a controlled setting.</td>
-    </tr>
-    <tr>
-      <td style="${borderRightStyle}">${terminalSvg}Team Exercise</td>
-      <td>A shared interactive cybersecurity simulation where multiple participants share access to deployed resources.</td>
+      <td style="${borderRightStyle}">${terminalSvg}RangeOS Scenario</td>
+      <td style="${paddingStyle}">A fully interactive cybersecurity simulation delivered through a live cyber range environment, providing structured training content alongside direct console access to systems so participants can perform real-world tasks in a controlled setting. Deploy it as Individual Training, a Class Deployment, or a Team Exercise where multiple participants share access to deployed resources.</td>
     </tr>
   </tbody>
 </table>`;

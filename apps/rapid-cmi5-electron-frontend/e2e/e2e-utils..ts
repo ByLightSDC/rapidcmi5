@@ -125,13 +125,20 @@ export const createRepo = async (
   const modal = window.getByRole('dialog');
   await expect(modal).toBeVisible();
 
+  // author + remote fields live in the collapsed "Git Credentials" section
+  const authorNameField = window.getByTestId('field-authorName');
+  if (!(await authorNameField.isVisible())) {
+    await modal.getByTestId('view-expand').click();
+  }
+  await expect(authorNameField).toBeVisible();
+
   if (remoteUrl) {
     await window.getByTestId('field-repoRemoteUrl').fill(remoteUrl);
   }
 
   await window.getByTestId('field-repoDirName').fill(repoName);
   await window.getByTestId('field-repoBranch').fill(branch);
-  await window.getByTestId('field-authorName').fill(authorName);
+  await authorNameField.fill(authorName);
   await window.getByTestId('field-authorEmail').fill(authorEmail);
 
   // Submit form
