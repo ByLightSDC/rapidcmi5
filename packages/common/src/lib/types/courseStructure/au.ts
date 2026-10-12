@@ -31,6 +31,16 @@ export const CourseAuSchema = z.object({
     ),
   ksats: z.array(KSATElementSchema).optional(),
   moveOnCriteria: z.enum(MoveOnCriteriaEnum).optional(),
+  slideDwellSeconds: z
+    .number()
+    .int()
+    .min(0)
+    .optional()
+    .describe(
+      'Seconds a learner must stay on a slide without activities before it is credited, unless they scroll to the bottom first. Defaults to 60; 0 credits a slide as soon as it is viewed.',
+    ),
 });
+
+export const DEFAULT_SLIDE_DWELL_SECONDS = 60;
 
 export type CourseAU = z.infer<typeof CourseAuSchema>;

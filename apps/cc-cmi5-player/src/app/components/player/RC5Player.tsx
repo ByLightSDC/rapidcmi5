@@ -75,6 +75,7 @@ import { useSelector } from 'react-redux';
 import { slideWidth } from '../../redux/auReducer';
 import SlideControlBar from './SlideControlBar';
 import { useSlideNavigation } from './useSlideNavigation';
+import { useSlideEngagement } from './useSlideEngagement';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -99,6 +100,9 @@ function RC5Player() {
   ).current;
 
   const slideContentRef = useRef<HTMLDivElement>(null);
+  // marks the end of the slide; seeing it credits a slide without activities
+  const slideEndRef = useRef<HTMLDivElement>(null);
+  useSlideEngagement(activeTab, slideData, slideEndRef);
   const fullScreenDialogRef = useRef<HTMLDivElement>(null);
   // remembers whatever had focus (usually the image) so it can be restored
   // when the full screen dialog closes
@@ -440,6 +444,12 @@ function RC5Player() {
                 plugins={thePlugins}
                 readOnly={true}
                 key={activeTab}
+              />
+              <div
+                ref={slideEndRef}
+                aria-hidden="true"
+                data-testid="slide-end-sentinel"
+                style={{ height: 1 }}
               />
             </main>
             <SlideControlBar
