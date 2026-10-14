@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BrowserRouter as RouterWrapper } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -92,6 +92,7 @@ export default function App() {
 
 function AppWorkspace() {
   const mainContentRef = useRef<HTMLElement>(null);
+  const [isEditorView, setIsEditorView] = useState(false);
   const {
     isElectron,
     aiOpen,
@@ -111,24 +112,26 @@ function AppWorkspace() {
         minHeight: 0,
       }}
     >
-      <a
-        href="#app-routes"
-        className="skip-link"
-        onClick={(event) => {
-          event.preventDefault();
-          // Find the main editor region
-          const editable = document.querySelector<HTMLElement>(
-            '#lesson-editor-region .mdxeditor-root-contenteditable [contenteditable="true"]',
-          );
-          const target =
-            editable ??
-            document.getElementById('lesson-editor-region') ??
-            mainContentRef.current;
-          target?.focus();
-        }}
-      >
-        Skip to main content
-      </a>
+      {isEditorView && (
+        <a
+          href="#app-routes"
+          className="skip-link"
+          onClick={(event) => {
+            event.preventDefault();
+            // Find the main editor region
+            const editable = document.querySelector<HTMLElement>(
+              '#lesson-editor-region .mdxeditor-root-contenteditable [contenteditable="true"]',
+            );
+            const target =
+              editable ??
+              document.getElementById('lesson-editor-region') ??
+              mainContentRef.current;
+            target?.focus();
+          }}
+        >
+          Skip to main content
+        </a>
+      )}
       <AppHeader />
 
       <main
@@ -167,7 +170,7 @@ function AppWorkspace() {
                     overflow: 'hidden',
                   }}
                 >
-                  <RapidCmi5Wrapper />
+                  <RapidCmi5Wrapper onEditorViewChange={setIsEditorView} />
                 </Box>
               </Panel>
               {isElectron && aiOpen && (
