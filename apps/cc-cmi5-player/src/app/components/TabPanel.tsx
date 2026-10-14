@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
@@ -8,10 +8,98 @@ import { auJsonSel, courseAUProgressSel } from '../redux/auReducer';
 import { activeTabSel, setActiveTab } from '../redux/navigationReducer';
 import ProgressBar from './ProgressBar';
 import { CustomTheme } from '../styles/createPalette';
-import { Box, Divider, Stack, Typography, useTheme } from '@mui/material';
+import {
+  Box,
+  Divider,
+  Stack,
+  Tooltip,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import { useTabStyles } from './useTabStyles';
 import CloseIcon from '@mui/icons-material/Close';
 import { useCoursePresentation } from '@rapid-cmi5/ui';
+import { TOOLTIP_ENTER_DELAY, TOOLTIP_ENTER_NEXT_DELAY } from './Menu/shared';
+
+// Inactive slide titles are clamped to this many lines; the active slide
+// always shows its full title.
+const MAX_INACTIVE_TITLE_LINES = 2;
+
+interface SlideTabLabelProps {
+  title: string;
+  isActive: boolean;
+  color: string;
+  statusIcon: ReactNode;
+}
+
+/**
+ * Slide nav label. Long titles are clamped with an ellipsis (CSS only, so the
+ * full text stays in the DOM for screen readers and tests) and the full title
+ * is offered in a tooltip — but only when it is actually truncated.
+ */
+function SlideTabLabel({
+  title,
+  isActive,
+  color,
+  statusIcon,
+}: SlideTabLabelProps) {
+  const titleRef = useRef<HTMLSpanElement>(null);
+  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
+
+  const handleTooltipOpen = () => {
+    const el = titleRef.current;
+    if (el && el.scrollHeight > el.clientHeight) setIsTooltipOpen(true);
+  };
+
+  return (
+    <Tooltip
+      title={title}
+      placement="right"
+      describeChild
+      open={isTooltipOpen}
+      onOpen={handleTooltipOpen}
+      onClose={() => setIsTooltipOpen(false)}
+      enterDelay={TOOLTIP_ENTER_DELAY}
+      enterNextDelay={TOOLTIP_ENTER_NEXT_DELAY}
+    >
+      <Stack
+        direction="row"
+        sx={{
+          position: 'relative',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          minHeight: '24px',
+          gap: 0.5,
+        }}
+      >
+        <Typography
+          ref={titleRef}
+          component="span"
+          color={color}
+          sx={{
+            flexGrow: 1,
+            minWidth: 0,
+            fontSize: '16px',
+            fontWeight: 'bold',
+            lineHeight: 1.1,
+            overflowWrap: 'anywhere',
+            ...(!isActive && {
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: MAX_INACTIVE_TITLE_LINES,
+              overflow: 'hidden',
+            }),
+          }}
+          align="center"
+        >
+          {title}
+        </Typography>
+        <Box sx={{ flexShrink: 0, display: 'flex' }}>{statusIcon}</Box>
+      </Stack>
+    </Tooltip>
+  );
+}
 
 export default function TabPanel() {
   const auJson = useSelector(auJsonSel);
@@ -208,35 +296,16 @@ export default function TabPanel() {
               sx={baseTabStyle}
               key={index}
               label={
-                <Stack
-                  direction="row"
-                  sx={{
-                    position: 'relative',
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    minHeight: '24px',
-                  }}
-                >
-                  <Typography
-                    component="span"
-                    color={
-                      index === activeTab
-                        ? selectedTextIconColor
-                        : deselectedTextIconColor
-                    }
-                    sx={{
-                      flexGrow: 1,
-                      fontSize: '16px',
-                      fontWeight: 'bold',
-                      lineHeight: 1.1,
-                    }}
-                    align="center"
-                  >
-                    {slide.slideTitle}
-                  </Typography>
-                  {getSlideStatusIcon(index)}
-                </Stack>
+                <SlideTabLabel
+                  title={slide.slideTitle}
+                  isActive={index === activeTab}
+                  color={
+                    index === activeTab
+                      ? selectedTextIconColor
+                      : deselectedTextIconColor
+                  }
+                  statusIcon={getSlideStatusIcon(index)}
+                />
               }
             />
           ))}

@@ -17,6 +17,7 @@ import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
 import CourseSelector from '../../course-builder/selectors/CourseSelector';
 import LessonTree from './components/LessonTree';
+import { ErrorBoundary } from '../editors/ErrorBoundary';
 import {
   courseDataCache,
   currentAu,
@@ -416,9 +417,25 @@ export const LessonDrawer = () => {
         />
       )}
       {courseData?.courseTitle ? (
-        <>
+        // A course the tree can't render (e.g. multi-block courses produce
+        // duplicate TreeView ids) must not take down the whole app, since the
+        // first course is auto-loaded on every launch. Keep the course
+        // selector above usable so the user can pick another course.
+        <ErrorBoundary
+          resetKey={courseData.courseId}
+          fallback={
+            <Typography
+              data-testid="lesson-tree-error"
+              sx={{ color: 'error.main', width: 'auto', marginBottom: '4px' }}
+              variant="caption"
+            >
+              The lessons in this course couldn't be displayed. Select a
+              different course above.
+            </Typography>
+          }
+        >
           <LessonTree courseData={courseData} onCreateLesson={onCreateLesson} />
-        </>
+        </ErrorBoundary>
       ) : (
         <Typography
           sx={{ color: 'text.hint', width: 'auto', marginBottom: '4px' }}
