@@ -1,6 +1,7 @@
 import { Box, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import type { KeyboardEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   changeViewMode,
@@ -46,6 +47,9 @@ export const NavViewMenu = ({
   const { saveSlide } = useContext(RC5Context);
   const { promptNavAway } = useRC5Prompts();
   const [isToggleTooltipShowing, setIsToggleTooltipShowing] = useState(false);
+  // Keeep track of current button with focus in navbar
+  const [rovingIndex, setRovingIndex] = useState(0);
+  const navButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const theme = useTheme();
   const { palette } = theme;
 
@@ -86,6 +90,46 @@ export const NavViewMenu = ({
   });
 
   const iconButtonSize = 'large';
+  // Make the navbar usable with arrow keys for WCAG compliance
+  const navButtonCount = onToggleLeftPanel ? 5 : 4;
+
+  const handleNavButtonKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    index: number,
+  ) => {
+    let nextIndex: number | undefined;
+
+    switch (event.key) {
+      case 'ArrowDown':
+        nextIndex = (index + 1) % navButtonCount;
+        break;
+      case 'ArrowUp':
+        nextIndex = (index - 1 + navButtonCount) % navButtonCount;
+        break;
+      case 'Home':
+        nextIndex = 0;
+        break;
+      case 'End':
+        nextIndex = navButtonCount - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    setRovingIndex(nextIndex);
+    navButtonRefs.current[nextIndex]?.focus();
+  };
+
+  const getNavButtonProps = (index: number) => ({
+    ref: (element: HTMLButtonElement | null) => {
+      navButtonRefs.current[index] = element;
+    },
+    tabIndex: rovingIndex === index ? 0 : -1,
+    onFocus: () => setRovingIndex(index),
+    onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) =>
+      handleNavButtonKeyDown(event, index),
+  });
 
   /**
    * Indicates files changed, files staged, and unpushed commits
@@ -150,6 +194,9 @@ export const NavViewMenu = ({
       <Stack
         direction="column"
         alignItems="center"
+        role="toolbar"
+        aria-label="Editor navigation and panel controls"
+        aria-orientation="vertical"
         sx={{
           width: '48px',
           height: '100%',
@@ -160,6 +207,7 @@ export const NavViewMenu = ({
         spacing={0}
       >
         <IconButton
+          {...getNavButtonProps(0)}
           aria-label="repo-selection-button"
           data-testid="repo-selection-button"
           color="inherit"
@@ -186,6 +234,7 @@ export const NavViewMenu = ({
 
         <Box sx={{ height: '2px' }} />
         <IconButton
+          {...getNavButtonProps(1)}
           aria-label="select-design"
           color="inherit"
           size={iconButtonSize}
@@ -205,6 +254,7 @@ export const NavViewMenu = ({
         </IconButton>
 
         <IconButton
+          {...getNavButtonProps(2)}
           aria-label="select-files"
           data-testid="code-editor-button"
           color="inherit"
@@ -225,6 +275,7 @@ export const NavViewMenu = ({
           </Tooltip>
         </IconButton>
         <IconButton
+          {...getNavButtonProps(3)}
           aria-label="select-git"
           data-testid="git-editor-button"
           color="inherit"
@@ -277,6 +328,7 @@ export const NavViewMenu = ({
         <Box sx={{ flexGrow: 1 }} />
         {onToggleLeftPanel && (
           <IconButton
+            {...getNavButtonProps(4)}
             aria-label="toggle-left-panel"
             data-testid="toggle-left-panel-button"
             color="inherit"
