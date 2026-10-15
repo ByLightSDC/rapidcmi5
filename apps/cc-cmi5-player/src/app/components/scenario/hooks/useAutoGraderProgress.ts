@@ -20,6 +20,12 @@ import {
   DevopsApiClient,
 } from '@rangeos-nx/frontend/clients/devops-api';
 
+/** Attempts before a failed autograder fetch is surfaced to the learner. */
+const AUTOGRADER_FETCH_ATTEMPTS = 3;
+const AUTOGRADER_RETRY_BASE_MS = 1000;
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 type UseAutoGraderProgressArgs = {
   isTestMode?: boolean;
   isAuthenticated?: boolean;
@@ -45,7 +51,12 @@ export function useAutoGraderProgress({
   const { rangeId, scenarioId } = useContext(ScenarioUpdatesContext);
 
   // so we know when we get back auto graders from DevOps API
+  // Only set after a SUCCESSFUL fetch — a failure must never look like
+  // "this scenario has no autograders", which auto-passes the activity.
   const [agsLoaded, setAgsLoaded] = useState(false);
+  const [agsError, setAgsError] = useState<string | null>(null);
+  // bumped by retryAutoGraders to re-run the fetch
+  const [agsFetchKey, setAgsFetchKey] = useState(0);
 
   // The auto graders assciated with a scenario, populated from DevOps API
   const [autoGraders, setAutoGraders] = useState<AuAutoGrader[]>([]);
@@ -124,56 +135,87 @@ export function useAutoGraderProgress({
     if (!rangeId || !scenarioId) return;
     let cancelled = false;
 
-    (async () => {
-      try {
-        const res = await DevopsApiClient.deployedAutoGradersList(
-          rangeId,
-          scenarioId,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          {
-            headers: { Authorization: `Basic ${cmi5Instance.getAuthToken()}` },
-          },
-        );
+    setAgsLoaded(false);
+    setAgsError(null);
 
-        if (cancelled) return;
+    const fetchAutoGraders = async (): Promise<AuAutoGrader[]> => {
+      const res = await DevopsApiClient.deployedAutoGradersList(
+        rangeId,
+        scenarioId,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        {
+          headers: { Authorization: `Basic ${cmi5Instance.getAuthToken()}` },
+        },
+      );
 
-        const ags: AuAutoGrader[] =
-          res.data.data?.map((ag: AutoGrader) => {
-            const metaData: any = ag?.metadata ?? {};
-            const quizQuestion = metaData?.rangeOsUI?.quizQuestion ?? {};
-            return {
-              name: ag?.name || '',
-              uuid: ag?.uuid || '',
-              activityId: quizQuestion['activityId'] || '',
-              question: quizQuestion['question'] || '',
-              questionId: quizQuestion['questionId'] || '',
-              questionType: quizQuestion['questionType'] || '',
-            } as AuAutoGrader;
-          }) ?? [];
-
-        setAutoGraders(ags);
-        setAgsLoaded(true);
-      } catch {
-        debugLogError('Could not fetch autograders');
-        setAutoGraders([]);
-        setAgsLoaded(true);
+      // A missing list is a bad response, not an empty scenario.
+      const list = res?.data?.data;
+      if (!Array.isArray(list)) {
+        throw new Error('Autograder response did not include a list');
       }
+
+      return list.map((ag: AutoGrader) => {
+        const metaData: any = ag?.metadata ?? {};
+        const quizQuestion = metaData?.rangeOsUI?.quizQuestion ?? {};
+        return {
+          name: ag?.name || '',
+          uuid: ag?.uuid || '',
+          activityId: quizQuestion['activityId'] || '',
+          question: quizQuestion['question'] || '',
+          questionId: quizQuestion['questionId'] || '',
+          questionType: quizQuestion['questionType'] || '',
+        } as AuAutoGrader;
+      });
+    };
+
+    (async () => {
+      for (let attempt = 1; attempt <= AUTOGRADER_FETCH_ATTEMPTS; attempt++) {
+        try {
+          const ags = await fetchAutoGraders();
+          if (cancelled) return;
+          setAutoGraders(ags);
+          setAgsLoaded(true);
+          return;
+        } catch (error) {
+          if (cancelled) return;
+          logger.warn(
+            'Could not fetch autograders',
+            { attempt, rangeId, scenarioId, error },
+            'api',
+          );
+          if (attempt < AUTOGRADER_FETCH_ATTEMPTS) {
+            await wait(AUTOGRADER_RETRY_BASE_MS * 2 ** (attempt - 1));
+            if (cancelled) return;
+          }
+        }
+      }
+
+      // Leave agsLoaded false so the "no autograders" auto-pass cannot fire.
+      debugLogError('Could not fetch autograders');
+      setAutoGraders([]);
+      setAgsError(
+        'Could not load the auto graders for this scenario, so progress cannot be recorded yet.',
+      );
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [rangeId, scenarioId]);
+  }, [rangeId, scenarioId, agsFetchKey]);
+
+  const retryAutoGraders = useCallback(() => {
+    setAgsFetchKey((key) => key + 1);
+  }, []);
 
   // Preload the network portion for autograders
   // This first time this is called it will save time by completing the network portion
@@ -247,5 +289,8 @@ export function useAutoGraderProgress({
     labProgress,
     markCompleted,
     autoGraders,
+    agsLoaded,
+    agsError,
+    retryAutoGraders,
   };
 }

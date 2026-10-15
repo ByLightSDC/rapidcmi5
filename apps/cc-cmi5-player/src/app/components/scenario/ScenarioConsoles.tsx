@@ -147,16 +147,23 @@ function ScenarioConsoles({
   // The logic for progress a scenario based on Auto Graders will go here
   // We need to lift the logic outside of the auto graders tab so that we can complete autograder tasks even when
   // we are not in the autograders tab.
-  const { finishedTaskUUIDs, labProgress, autoGraders, markCompleted } =
-    useAutoGraderProgress({
-      isAuthenticated,
-      isTestMode,
-      setProgress,
-      getActivityCache,
-      setActivityCache,
-      submitScore,
-      scenarioContent: content,
-    });
+  const {
+    finishedTaskUUIDs,
+    labProgress,
+    autoGraders,
+    markCompleted,
+    agsLoaded,
+    agsError,
+    retryAutoGraders,
+  } = useAutoGraderProgress({
+    isAuthenticated,
+    isTestMode,
+    setProgress,
+    getActivityCache,
+    setActivityCache,
+    submitScore,
+    scenarioContent: content,
+  });
 
   return (
     <Box
@@ -251,6 +258,20 @@ function ScenarioConsoles({
               slideContent={content}
             />
             <Divider sx={{ margin: 1, marginLeft: 0 }} />
+            {agsError && (
+              <Alert
+                sx={{ backgroundColor: 'transparent', borderStyle: 'none' }}
+                severity="error"
+              >
+                <AlertTitle>{agsError}</AlertTitle>
+                <ButtonMinorUi
+                  startIcon={<ReplayIcon />}
+                  onClick={retryAutoGraders}
+                >
+                  Try Again
+                </ButtonMinorUi>
+              </Alert>
+            )}
             {currentTab === 0 && (
               <>
                 <RangeResources />
@@ -268,7 +289,7 @@ function ScenarioConsoles({
                 finishedTasks={finishedTaskUUIDs}
               />
             )}
-            {currentTab === 1 && autoGraders.length === 0 && (
+            {currentTab === 1 && agsLoaded && autoGraders.length === 0 && (
               <Alert
                 severity="info"
                 sx={{
