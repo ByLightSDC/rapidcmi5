@@ -110,7 +110,12 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
   const theConfig = merge(config, {
     ignoreWarnings: [/Failed to parse source map/],
     output: {
-      publicPath: PUBLIC_PATH,
+      // 'auto' resolves lazy chunks relative to the runtime script's own URL.
+      // A fixed PUBLIC_PATH only exists on the dev server — in Moodle (and any
+      // LMS) the player lives elsewhere, so every lazy chunk (e.g. mermaid)
+      // 404'd with "Loading chunk N failed". The dev server still serves under
+      // PUBLIC_PATH via devMiddleware below.
+      publicPath: 'auto',
     },
     devServer: {
       devMiddleware: { publicPath: PUBLIC_PATH },

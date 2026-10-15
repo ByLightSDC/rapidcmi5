@@ -43,6 +43,7 @@ import {
   FootnoteDefinitionDescriptor,
   FootnoteReferenceDescriptor,
   MathCodeBlockDescriptor,
+  MermaidCodeBlockDescriptor,
   MathDescriptor,
   mathPlugin,
   languageList,
@@ -343,6 +344,7 @@ function RC5VisualEditor() {
         defaultCodeBlockLanguage: 'js',
         codeBlockEditorDescriptors: [
           MathCodeBlockDescriptor,
+          MermaidCodeBlockDescriptor,
           {
             priority: -10,
             match: (_) => true,

@@ -15,6 +15,7 @@ import { collectPageErrors, type ErrorCollector } from '../support/pageErrors';
  *   - Scenario:Individual (one :::scenario slide)
  *   - Scenario:Class      (one :::scenario slide)
  *   - Components:Basic     (tabs / accordion / grid / statements)
+ *   - Components:Mermaid   (```mermaid diagrams)
  *   - Quiz:Basic           (one :::quiz slide)
  * (Individual and Class scenarios can't live in the same cmi5 lesson, hence
  *  the split — see apps/cc-cmi5-moodle-e2e/README.md.)
