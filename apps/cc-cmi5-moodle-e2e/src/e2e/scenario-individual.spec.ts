@@ -9,8 +9,10 @@ import {
  *
  * The course has two scenario AUs (they can't share a cmi5 lesson):
  *   - Scenario:Individual — a `:::scenario` that AUTO-DEPLOYS a VM on launch
- *     (promptClass: false). This file covers it end to end.
- *   - Scenario:Class — a `:::scenario` with promptClass: true (prompts for a
+ *     (promptClass: false; editor: Scenario form → Individual Training).
+ *     This file covers it end to end.
+ *   - Scenario:Class — a `:::scenario` with promptClass: true (editor:
+ *     Scenario form → Class Deployment; prompts for a
  *     Class ID / expects a pre-deployed scenario). Covered separately in
  *     scenario-class.spec.ts (different flow).
  *
