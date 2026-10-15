@@ -21,7 +21,8 @@ import { dismissUnitResultDialog } from '../support/unitResultDialog';
  * `:::ctf`, `:::codeRunner`, `:::consoles` or `:::scenario` is launched with
  * `makeProgress = false` and stays incomplete until the ACTIVITY reports to
  * the LRS. Only activity-free content slides complete on view. So:
- *   - Components:Basic / Media:Basic → navigation alone reaches 100%
+ *   - Components:Basic / Media:Basic → engaging each slide (scroll to its
+ *     end, or dwell) reaches 100% — clicking straight through does NOT
  *   - Quiz:Basic / Scenario:* → 100% requires completing the activity
  * Any progress test must pick its AU accordingly.
  *
@@ -102,10 +103,13 @@ test.describe('player progress bar @chrome', () => {
    *   auProgress = (passedSlides + activitiesMeetingCriteria)
    *                / totalProgressSteps * 100
    *   totalProgressSteps = slides.length + gradableActivities
-   * and for a slide with NO activities (getSlideChangedStatus):
-   *   slideStatus.passed = slideStatus.viewed   ← viewing IS completing
+   * and a slide with NO activities is credited on ENGAGEMENT, not on view
+   * (useSlideEngagement, #250): its bottom sentinel (`slide-end-sentinel`)
+   * stays visible ~750ms (armed 500ms after render), OR the AU's
+   * `slideDwellSeconds` (default 60) elapses. Leaving the slide first cancels
+   * both — so clicking straight through the nav credits nothing.
    *
-   * So on a content-only AU, viewing every slide must reach exactly 100%.
+   * So on a content-only AU, engaging every slide must reach exactly 100%.
    *
    * NOTE ON AU CHOICE: this walks the slide NAV, which contains a trailing
    * "Exit" tab that is NOT a slide (Components:Basic logs totalSlides:1 but
@@ -114,11 +118,11 @@ test.describe('player progress bar @chrome', () => {
    * out, or a 1-slide AU looks like a 2-slide AU stuck at 0%.
    */
   /**
-   * Mirrors the manual flow that is known-good: visit every content slide,
-   * then navigate to Exit. Exit records nothing itself, but landing on it
-   * means every content slide has been left and flushed.
+   * Mirrors a learner: on every content slide, scroll to the bottom and stay
+   * until it is credited, then navigate to Exit. Exit records nothing itself,
+   * but landing on it means every content slide has been left and flushed.
    *
-   * Components:Basic is activity-free, so navigation alone must reach 100%.
+   * Components:Basic is activity-free, so engaging every slide must reach 100%.
    */
   test('reaches 100% after viewing every content slide', async ({ player }) => {
     await expect(player.getByTestId('player-progress-bar')).toBeVisible({
@@ -141,13 +145,23 @@ test.describe('player progress bar @chrome', () => {
       0,
     );
 
-    // Visit each content slide. The slide the player LAUNCHED on is already
-    // active, so clicking it dispatches an unchanged activeTab and does not
-    // re-run the progress effect — that slide is credited by the launch
-    // itself, once AuManager's readiness flags flip true.
-    for (const i of contentIdx) {
+    // Engage each content slide: scroll its bottom sentinel into view and WAIT
+    // for the credit before moving on (leaving early cancels it). Each slide is
+    // worth 100/n, so after the k-th slide progress is at least floor(k/n*100).
+    // A lower bound, not equality: progress restored from earlier runs may
+    // already be higher (see the sticky-progress note at the top).
+    for (const [visited, i] of contentIdx.entries()) {
       await tabs.nth(i).click();
       await expect(player.getByTestId('player-slide-content')).toBeVisible();
+      await player.getByTestId('slide-end-sentinel').scrollIntoViewIfNeeded();
+
+      const atLeast = Math.floor(((visited + 1) / contentIdx.length) * 100);
+      await expect
+        .poll(() => readProgress(player), {
+          message: `slide ${i} was not credited after scrolling to its end`,
+          timeout: 15_000,
+        })
+        .toBeGreaterThanOrEqual(atLeast);
     }
 
     // Completing the AU can raise the modal unit-result dialog, which covers

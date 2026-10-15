@@ -31,6 +31,8 @@ export * from './plugins/animation-directive';
 export * from './plugins/code';
 export * from './plugins/code/CodeMirrorEditor';
 export * from './plugins/code/MathCodeBlockDescriptor';
+export * from './plugins/code/MermaidCodeBlockDescriptor';
+export * from './plugins/code/MermaidDiagram';
 export * from './plugins/code/vars';
 export * from './plugins/diff-source';
 export * from './plugins/footnote';
