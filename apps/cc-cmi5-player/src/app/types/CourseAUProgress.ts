@@ -32,7 +32,8 @@ export interface SlideActivityMetadata {
 export interface SlideStatus {
   viewed: boolean;
   audioCompleted?: boolean;
-  scrolledToBottom?: boolean;
+  scrolledToBottom?: boolean; // Learner saw the end of the slide
+  dwellCompleted?: boolean; // Learner stayed on the slide for the AU's dwell time
   completed: boolean; // Slide is completed (either no activities + viewed, or all activities completed)
   passed: boolean; // Slide is passed (either no activities + viewed, or all activities passed)
   failed: boolean; // Slide has failed (at least one activity has failed)
