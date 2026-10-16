@@ -8,7 +8,7 @@ import React, {
 import {
   Stack,
   Typography,
-  IconButton,
+  ButtonBase,
   Paper,
   TextField,
   Collapse,
@@ -26,7 +26,6 @@ import {
   SelectorMainUi,
   animDeletePortalTargets$,
 } from '@rapid-cmi5/ui';
-
 
 interface Props {
   animation: AnimationConfig;
@@ -236,28 +235,34 @@ export function AnimationItem({ animation }: Props) {
     >
       <Stack direction="column">
         {/* Compact Header - Always Visible */}
-        <Box
+        {/* ButtonBase instead of Box as ButtonBase supports stabdard keyboard interaction */}
+        <ButtonBase
+          data-animation-selected={isSelected ? 'true' : undefined}
+          aria-label={`${animation.order}. ${displayLabel}, ${primaryEffect}, ${animation.trigger}`}
+          aria-pressed={isSelected}
+          aria-expanded={isExpanded}
           onClick={handleToggleExpand}
           sx={{
             padding: 1.5,
-            cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             gap: 1,
+            width: '100%',
+            justifyContent: 'flex-start',
+            textAlign: 'left',
             '&:hover': {
               backgroundColor: 'action.hover',
             },
           }}
         >
-          <IconButton
-            size="small"
+          {/* Remove nested button for clickable control */}
+          <ExpandMoreIcon
+            fontSize="small"
             sx={{
               transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
               transition: 'transform 0.2s ease',
             }}
-          >
-            <ExpandMoreIcon fontSize="small" />
-          </IconButton>
+          />
 
           <Box sx={{ flex: 1 }}>
             <Typography variant="body2" fontWeight="bold">
@@ -267,7 +272,7 @@ export function AnimationItem({ animation }: Props) {
               {primaryEffect} • {animation.trigger}
             </Typography>
           </Box>
-        </Box>
+        </ButtonBase>
 
         {/* Expandable Controls */}
         <Collapse in={isExpanded}>

@@ -39,6 +39,7 @@ import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 
 import { useDrawerAutoHide } from '../../../toolbar/components/useDrawerAutoHide';
+import { useDrawerFocus } from '../../../toolbar/components/useDrawerFocus';
 import { animationShowSeq$ } from '../../../toolbar/components/drawers';
 import { drawerHeaderStyles, drawerHeaderVariant } from '@rapid-cmi5/ui';
 
@@ -55,6 +56,9 @@ export function AnimationDrawer() {
   const moveUp = usePublisher(moveAnimationUp$);
   const moveDown = usePublisher(moveAnimationDown$);
   const theme = useTheme();
+  const handleClose = useCallback(() => {
+    toggleDrawer();
+  }, [toggleDrawer]);
 
   const showSeq = useCellValue(animationShowSeq$);
 
@@ -63,9 +67,19 @@ export function AnimationDrawer() {
     toggleAutoHide,
     handleMouseEnter,
     handleMouseLeave,
+    handleFocusCapture,
+    handleBlurCapture,
     effectiveOpen,
     getDrawerSx,
   } = useDrawerAutoHide('animation', isOpen, showSeq);
+  // Check if draweris open and sequence so it knows fresh open requests/where to put focus
+  const drawerFocus = useDrawerFocus({
+    open: isOpen,
+    openSequence: showSeq,
+    initialFocusSelector:
+      '[data-animation-selected="true"], [data-animation-initial-focus="true"]',
+    onClose: handleClose,
+  });
 
   // Hook into Lexical selection
   const { selectedInfo, isAnimatable, notAnimatableReason } =
@@ -81,10 +95,6 @@ export function AnimationDrawer() {
     selectedAnimationId &&
     selectedAnimIndex >= 0 &&
     selectedAnimIndex < animations.length - 1;
-
-  const handleClose = useCallback(() => {
-    toggleDrawer();
-  }, [toggleDrawer]);
 
   // Keep the active animation badge in sync with the currently expanded item
   useEffect(() => {
@@ -134,7 +144,18 @@ export function AnimationDrawer() {
         sx: { width: 360, maxWidth: '90vw', zIndex: 1400 },
       }}
     >
-      <Stack id="animation-library" direction="column" sx={{ height: '100%' }}>
+      <Stack
+        id="animation-library"
+        ref={drawerFocus.rootRef}
+        onFocusCapture={(event) => {
+          handleFocusCapture();
+          drawerFocus.onFocusCapture(event);
+        }}
+        onBlurCapture={handleBlurCapture}
+        onKeyDown={drawerFocus.onKeyDown}
+        direction="column"
+        sx={{ height: '100%' }}
+      >
         {/* Header */}
         <Stack
           direction="row"
@@ -158,6 +179,8 @@ export function AnimationDrawer() {
             }
           >
             <IconButton
+              // Make utility so focus hook skips them when remembering last used control.
+              data-drawer-utility="true"
               onClick={toggleAutoHide}
               aria-label={autoHide ? 'Disable auto-hide' : 'Enable auto-hide'}
               size="small"
@@ -171,6 +194,8 @@ export function AnimationDrawer() {
             </IconButton>
           </Tooltip>
           <IconButton
+            // Make utility so focus hook skips them when remembering last used control.
+            data-drawer-utility="true"
             onClick={handleClose}
             aria-label="Close Animation Library"
           >

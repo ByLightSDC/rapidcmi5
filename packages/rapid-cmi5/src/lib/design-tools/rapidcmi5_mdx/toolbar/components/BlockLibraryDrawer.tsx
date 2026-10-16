@@ -15,6 +15,7 @@ import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 
 import { useDrawerAutoHide } from './useDrawerAutoHide';
+import { useDrawerFocus } from './useDrawerFocus';
 
 import Markdown from 'react-markdown';
 import rehypeKatex from 'rehype-katex';
@@ -102,9 +103,18 @@ export function BlockLibraryDrawer() {
     toggleAutoHide,
     handleMouseEnter,
     handleMouseLeave,
+    handleFocusCapture,
+    handleBlurCapture,
     effectiveOpen,
     getDrawerSx,
   } = useDrawerAutoHide('block', isOpen, showSeq);
+  // Check focus, if request to open is new
+  const drawerFocus = useDrawerFocus({
+    open: isOpen,
+    openSequence: showSeq,
+    initialFocusSelector: '[data-drawer-initial-focus="true"]',
+    onClose: handleClose,
+  });
 
   /**
    * Listen for selection changes to determine if block insertion is allowed and to set appropriate messages.
@@ -171,6 +181,15 @@ export function BlockLibraryDrawer() {
     >
       <Stack
         id="block-library"
+        ref={drawerFocus.rootRef}
+        //The auto-hide focus tracking matters because a keyboard user may move the pointer away while navigating the drawer.
+        // The drawer stays visible while it contains focus.
+        onFocusCapture={(event) => {
+          handleFocusCapture();
+          drawerFocus.onFocusCapture(event);
+        }}
+        onBlurCapture={handleBlurCapture}
+        onKeyDown={drawerFocus.onKeyDown}
         direction="column"
         sx={{ height: '100%' }}
         spacing={0}
@@ -199,6 +218,8 @@ export function BlockLibraryDrawer() {
             }
           >
             <IconButton
+              // Make utility so focus hook skips them when remembering last used control.
+              data-drawer-utility="true"
               onClick={toggleAutoHide}
               aria-label={autoHide ? 'Disable auto-hide' : 'Enable auto-hide'}
               size="small"
@@ -211,7 +232,12 @@ export function BlockLibraryDrawer() {
               )}
             </IconButton>
           </Tooltip>
-          <IconButton onClick={handleClose} aria-label="Close Block Library">
+          <IconButton
+            // Make utility so focus hook skips them when remembering last used control.
+            data-drawer-utility="true"
+            onClick={handleClose}
+            aria-label="Close Block Library"
+          >
             <CloseIcon />
           </IconButton>
         </Stack>
@@ -238,6 +264,7 @@ export function BlockLibraryDrawer() {
           <Stack direction="column" spacing={2}>
             <ViewExpander
               title="Activities"
+              initialFocus
               titleSxProps={drawerTitleStyles}
               titleVariant={drawerTitleVariant}
               defaultIsExpanded={false}

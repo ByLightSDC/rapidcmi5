@@ -31,6 +31,7 @@ import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 
 import { useDrawerAutoHide } from './useDrawerAutoHide';
+import { useDrawerFocus } from './useDrawerFocus';
 
 import {
   BlockPaddingEnum,
@@ -44,7 +45,12 @@ import {
 } from '../../drawers/constants';
 import { RC5Context } from '../../contexts/RC5Context';
 import { courseDataCache } from '../../../../redux/courseBuilderReducer';
-import { drawerHeaderStyles, drawerHeaderVariant, drawerTitleStyles, drawerTitleVariant } from '@rapid-cmi5/ui';
+import {
+  drawerHeaderStyles,
+  drawerHeaderVariant,
+  drawerTitleStyles,
+  drawerTitleVariant,
+} from '@rapid-cmi5/ui';
 
 /**
  * Apply styles globally
@@ -87,9 +93,18 @@ export function LessonStyleDrawer() {
     toggleAutoHide,
     handleMouseEnter,
     handleMouseLeave,
+    handleFocusCapture,
+    handleBlurCapture,
     effectiveOpen,
     getDrawerSx,
   } = useDrawerAutoHide('styles', isOpen, showSeq);
+  // Check if draweris open and sequence so it knows fresh open requests/where to put focus
+  const drawerFocus = useDrawerFocus({
+    open: isOpen,
+    openSequence: showSeq,
+    initialFocusSelector: '[aria-pressed="true"]',
+    onClose: handleClose,
+  });
 
   const handleSetContentWidth = useCallback(
     (val: ContentWidthEnum) => {
@@ -169,7 +184,16 @@ export function LessonStyleDrawer() {
       }}
     >
       <Stack
+        //The auto-hide focus tracking matters because a keyboard user may move the pointer away while navigating the drawer.
+        // The drawer stays visible while it contains focus.
         id="lesson-styles"
+        ref={drawerFocus.rootRef}
+        onFocusCapture={(event) => {
+          handleFocusCapture();
+          drawerFocus.onFocusCapture(event);
+        }}
+        onBlurCapture={handleBlurCapture}
+        onKeyDown={drawerFocus.onKeyDown}
         direction="column"
         sx={{ height: '100%', zIndex: 200 }}
         spacing={0}
@@ -197,6 +221,8 @@ export function LessonStyleDrawer() {
             }
           >
             <IconButton
+              // Make utility so focus hook skips them when remembering last used control.
+              data-drawer-utility="true"
               onClick={toggleAutoHide}
               aria-label={autoHide ? 'Disable auto-hide' : 'Enable auto-hide'}
               size="small"
@@ -210,6 +236,8 @@ export function LessonStyleDrawer() {
             </IconButton>
           </Tooltip>
           <IconButton
+            // Make utility so focus hook skips them when remembering last used control.
+            data-drawer-utility="true"
             onClick={handleClose}
             aria-label="Close Course Appearance"
           >
@@ -222,7 +250,10 @@ export function LessonStyleDrawer() {
         <Grid container sx={{ margin: 2 }}>
           {/* Content Width */}
           <Grid size={11.5}>
-            <Typography variant={drawerTitleVariant}  sx={{ ...drawerTitleStyles, mb: 1 }}>
+            <Typography
+              variant={drawerTitleVariant}
+              sx={{ ...drawerTitleStyles, mb: 1 }}
+            >
               Content Width
             </Typography>
             <ToggleButtonGroup
@@ -248,7 +279,10 @@ export function LessonStyleDrawer() {
 
           {/* Block Padding */}
           <Grid size={11.5} sx={{ mt: 2.5 }}>
-            <Typography variant={drawerTitleVariant}  sx={{ ...drawerTitleStyles, mb: 1 }}>
+            <Typography
+              variant={drawerTitleVariant}
+              sx={{ ...drawerTitleStyles, mb: 1 }}
+            >
               Block Padding
             </Typography>
             <ToggleButtonGroup
@@ -303,7 +337,10 @@ export function LessonStyleDrawer() {
 
           {/* Default Alignment */}
           <Grid size={11.5} sx={{ mt: 2.5 }}>
-            <Typography variant={drawerTitleVariant}  sx={{ ...drawerTitleStyles, mb: 1 }}>
+            <Typography
+              variant={drawerTitleVariant}
+              sx={{ ...drawerTitleStyles, mb: 1 }}
+            >
               Text Alignment
             </Typography>
             <ToggleButtonGroup
@@ -332,7 +369,10 @@ export function LessonStyleDrawer() {
           </Grid>
           {/* Default Activity Alignment */}
           <Grid size={11.5} sx={{ mt: 2.5 }}>
-            <Typography variant={drawerTitleVariant}  sx={{ ...drawerTitleStyles, mb: 1 }}>
+            <Typography
+              variant={drawerTitleVariant}
+              sx={{ ...drawerTitleStyles, mb: 1 }}
+            >
               Activity Alignment
             </Typography>
             <ToggleButtonGroup
