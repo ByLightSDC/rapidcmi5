@@ -23,6 +23,7 @@ export const LessonStyleButton = () => {
   // Get the new shortcut
   const shortcutLabel = getEditorDrawerShortcutLabel('appearance');
   const handleClick = useCallback(() => {
+    // Animation uses its own animationDrawerOpen$ state. Styles and Blocks use drawerMode$, ensure animation is closed.
     publishAnimationOpen(false);
     changeViewMode(DRAWER_TYPE.STYLES);
     publishShowSeq(showSeq + 1);
