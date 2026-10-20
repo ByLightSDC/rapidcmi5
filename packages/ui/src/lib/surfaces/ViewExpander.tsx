@@ -94,8 +94,7 @@ export function ViewExpander({
           <Divider sx={dividerSxProps} />
         </Grid>
       )}
-      //Change to ButtonBase from div to enable standard eyboard control for
-      WCAG comp.
+      {/* ButtonBase gives the expandable header standard keyboard interaction. */}
       <Grid size={12}>
         <Box
           className="content-row-icons"

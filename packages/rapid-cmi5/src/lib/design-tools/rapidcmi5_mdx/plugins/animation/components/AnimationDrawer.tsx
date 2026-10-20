@@ -43,6 +43,11 @@ import { useDrawerFocus } from '../../../toolbar/components/useDrawerFocus';
 import { animationShowSeq$ } from '../../../toolbar/components/drawers';
 import { drawerHeaderStyles, drawerHeaderVariant } from '@rapid-cmi5/ui';
 
+const animationDrawerInitialFocusSelectors = [
+  '[data-animation-selected="true"]',
+  '[data-animation-initial-focus="true"]',
+];
+
 /**
  * Main animation drawer component
  * Displays animation timeline and configuration
@@ -72,13 +77,14 @@ export function AnimationDrawer() {
     effectiveOpen,
     getDrawerSx,
   } = useDrawerAutoHide('animation', isOpen, showSeq);
-  // Check if draweris open and sequence so it knows fresh open requests/where to put focus
+  // Check if drawerIs open and sequence so it knows fresh open requests/where to put focus
+  // Opt into trapFocus
   const drawerFocus = useDrawerFocus({
-    open: isOpen,
+    open: effectiveOpen,
     openSequence: showSeq,
-    initialFocusSelector:
-      '[data-animation-selected="true"], [data-animation-initial-focus="true"]',
+    initialFocusSelector: animationDrawerInitialFocusSelectors,
     onClose: handleClose,
+    trapFocus: true,
   });
 
   // Hook into Lexical selection

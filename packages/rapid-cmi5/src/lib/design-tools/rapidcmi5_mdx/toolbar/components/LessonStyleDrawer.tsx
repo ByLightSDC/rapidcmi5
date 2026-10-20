@@ -100,9 +100,9 @@ export function LessonStyleDrawer() {
   } = useDrawerAutoHide('styles', isOpen, showSeq);
   // Check if draweris open and sequence so it knows fresh open requests/where to put focus
   const drawerFocus = useDrawerFocus({
-    open: isOpen,
+    open: effectiveOpen,
     openSequence: showSeq,
-    initialFocusSelector: '[aria-pressed="true"]',
+    initialFocusSelector: '[data-drawer-initial-focus="true"]',
     onClose: handleClose,
   });
 
@@ -267,10 +267,38 @@ export function LessonStyleDrawer() {
               size="small"
               fullWidth
             >
-              <ToggleButton value={ContentWidthEnum.None}>None</ToggleButton>
-              <ToggleButton value={ContentWidthEnum.Small}>S</ToggleButton>
-              <ToggleButton value={ContentWidthEnum.Medium}>M</ToggleButton>
-              <ToggleButton value={ContentWidthEnum.Large}>L</ToggleButton>
+              <ToggleButton
+                value={ContentWidthEnum.None}
+                data-drawer-initial-focus={
+                  contentWidth === ContentWidthEnum.None ? 'true' : undefined
+                }
+              >
+                None
+              </ToggleButton>
+              <ToggleButton
+                value={ContentWidthEnum.Small}
+                data-drawer-initial-focus={
+                  contentWidth === ContentWidthEnum.Small ? 'true' : undefined
+                }
+              >
+                S
+              </ToggleButton>
+              <ToggleButton
+                value={ContentWidthEnum.Medium}
+                data-drawer-initial-focus={
+                  contentWidth === ContentWidthEnum.Medium ? 'true' : undefined
+                }
+              >
+                M
+              </ToggleButton>
+              <ToggleButton
+                value={ContentWidthEnum.Large}
+                data-drawer-initial-focus={
+                  contentWidth === ContentWidthEnum.Large ? 'true' : undefined
+                }
+              >
+                L
+              </ToggleButton>
             </ToggleButtonGroup>
             <Typography variant="body2" sx={{ mt: 0.5 }}>
               {contentWidthDescriptions.get(contentWidth)}

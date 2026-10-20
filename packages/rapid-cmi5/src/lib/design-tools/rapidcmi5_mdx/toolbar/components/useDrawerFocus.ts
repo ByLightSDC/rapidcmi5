@@ -18,9 +18,12 @@ interface UseDrawerFocusOptions {
    * Optional selector for the drawer's selected or preferred initial control.
    * This is used when there is no still-visible control to restore focus to.
    */
-  initialFocusSelector?: string;
+  initialFocusSelector?: string | string[];
   /** Called when Escape is pressed while focus is inside the drawer. */
   onClose: () => void;
+  /** Keep Tab navigation inside the drawer while it is open. */
+  /**Animation library drawer opts in */
+  trapFocus?: boolean;
 }
 
 /**
@@ -43,6 +46,7 @@ export function useDrawerFocus({
   openSequence = 0,
   initialFocusSelector,
   onClose,
+  trapFocus = false,
 }: UseDrawerFocusOptions) {
   const rootRef = useRef<HTMLDivElement>(null);
   const drawerFocusId = useRef(Symbol('drawer-focus'));
@@ -88,9 +92,21 @@ export function useDrawerFocus({
         if (!currentRoot) return;
 
         const lastFocused = lastFocusedRef.current;
-        const selected = initialFocusSelector
-          ? currentRoot.querySelector<HTMLElement>(initialFocusSelector)
-          : null;
+        /**Choose the drawer's preferred initial focus target, selector can be string or array of strings */
+        const initialFocusSelectors = initialFocusSelector
+          ? Array.isArray(initialFocusSelector)
+            ? initialFocusSelector
+            : [initialFocusSelector]
+          : [];
+        const selectedTarget = initialFocusSelectors
+          .flatMap((selector) =>
+            Array.from(currentRoot.querySelectorAll<HTMLElement>(selector)),
+          )
+          .find(
+            (target) =>
+              !target.matches(':disabled') &&
+              target.getClientRects().length > 0,
+          );
         const firstControl = Array.from(
           currentRoot.querySelectorAll<HTMLElement>(focusableSelector),
         ).find(
@@ -98,8 +114,6 @@ export function useDrawerFocus({
             !control.matches(':disabled') &&
             !control.closest('[data-drawer-utility="true"]'),
         );
-        const selectedTarget =
-          selected && !selected.matches(':disabled') ? selected : null;
         const target =
           (lastFocused?.isConnected &&
           currentRoot.contains(lastFocused) &&
@@ -142,6 +156,49 @@ export function useDrawerFocus({
       if (restoreFrame !== undefined) cancelAnimationFrame(restoreFrame);
     };
   }, [initialFocusSelector, open, openSequence]);
+  /**Listener while a drawer is open, and has trapFocus. If focus slips a key event won't bubble
+   * up through drawers own onKeyDown. Essentially  a fallback for focus that escapes drawer.
+   */
+  useEffect(() => {
+    // Do nothing unless focus trapping enabled, check drawer is active
+    if (!open || !trapFocus) return;
+
+    const handleDocumentKeyDown = (event: globalThis.KeyboardEvent) => {
+      const root = rootRef.current;
+      if (!root || activeDrawerFocusId !== drawerFocusId.current) return;
+
+      const target = event.target;
+      const focusIsInside = target instanceof Node && root.contains(target);
+      if (event.key === 'Escape' && !event.defaultPrevented && !focusIsInside) {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+      //If Tab was pressed outside the drawer, find its visible, enabled controls.
+      // Tab sends focus to the first one. Shift+Tab sends it to the last one.
+      if (event.key === 'Tab' && !focusIsInside) {
+        const controls = Array.from(
+          root.querySelectorAll<HTMLElement>(focusableSelector),
+        ).filter(
+          (control) =>
+            !control.matches(':disabled') &&
+            control.getClientRects().length > 0 &&
+            !control.closest('[aria-hidden="true"], [inert]'),
+        );
+        const destination = event.shiftKey
+          ? controls[controls.length - 1]
+          : controls[0];
+        if (destination) {
+          event.preventDefault();
+          destination.focus();
+        }
+      }
+    };
+
+    // Bubble phase lets nested menus handle Escape before the drawer does.
+    document.addEventListener('keydown', handleDocumentKeyDown);
+    return () => document.removeEventListener('keydown', handleDocumentKeyDown);
+  }, [onClose, open, trapFocus]);
 
   const onFocusCapture = useCallback((event: FocusEvent<HTMLDivElement>) => {
     const target = event.target;
@@ -159,9 +216,44 @@ export function useDrawerFocus({
       if (event.key === 'Escape' && !event.defaultPrevented) {
         event.preventDefault();
         onClose();
+        return;
+      }
+      // Handle tab and escape in drawers when focus is inside
+      if (event.key !== 'Tab' || !trapFocus) return;
+      // Retrieve container and its visible/enabled controls
+      const root = rootRef.current;
+      if (!root) return;
+      const controls = Array.from(
+        root.querySelectorAll<HTMLElement>(focusableSelector),
+      ).filter(
+        (control) =>
+          !control.matches(':disabled') &&
+          control.getClientRects().length > 0 &&
+          !control.closest('[aria-hidden="true"], [inert]'),
+      );
+      // If no controls, keep focus on drawer. Set it to -1 tab index to focus without adding to tab order
+      if (controls.length === 0) {
+        event.preventDefault();
+        if (!root.hasAttribute('tabindex')) root.tabIndex = -1;
+        root.focus();
+        return;
+      }
+
+      const activeIndex = controls.indexOf(
+        document.activeElement as HTMLElement,
+      );
+      if (
+        (event.shiftKey && activeIndex <= 0) ||
+        (!event.shiftKey && activeIndex === controls.length - 1)
+      ) {
+        event.preventDefault();
+        const destination = event.shiftKey
+          ? controls[controls.length - 1]
+          : controls[0];
+        destination.focus();
       }
     },
-    [onClose],
+    [onClose, trapFocus],
   );
 
   return { rootRef, onFocusCapture, onKeyDown };

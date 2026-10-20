@@ -27,11 +27,15 @@ import {
   animDeletePortalTargets$,
 } from '@rapid-cmi5/ui';
 
+// New props. IsTabStop tells whether the header should be in tab sequence
+// onHeaderFocus tells the timeline when header receives focus, to make a newtab stop
 interface Props {
   animation: AnimationConfig;
+  isTabStop: boolean;
+  onHeaderFocus: () => void;
 }
 
-export function AnimationItem({ animation }: Props) {
+export function AnimationItem({ animation, isTabStop, onHeaderFocus }: Props) {
   const updateAnim = usePublisher(updateAnimation$);
   const selectedId = useCellValue(selectedAnimation$);
   const selectAnimation = usePublisher(selectedAnimation$);
@@ -238,6 +242,9 @@ export function AnimationItem({ animation }: Props) {
         {/* ButtonBase instead of Box as ButtonBase supports stabdard keyboard interaction */}
         <ButtonBase
           data-animation-selected={isSelected ? 'true' : undefined}
+          data-animation-item-header="true"
+          tabIndex={isTabStop ? 0 : -1}
+          onFocus={onHeaderFocus}
           aria-label={`${animation.order}. ${displayLabel}, ${primaryEffect}, ${animation.trigger}`}
           aria-pressed={isSelected}
           aria-expanded={isExpanded}
@@ -250,8 +257,14 @@ export function AnimationItem({ animation }: Props) {
             width: '100%',
             justifyContent: 'flex-start',
             textAlign: 'left',
+            borderRadius: 1,
             '&:hover': {
               backgroundColor: 'action.hover',
+            },
+            '&:focus-visible': {
+              outline: '2px solid',
+              outlineColor: 'primary.main',
+              outlineOffset: 1,
             },
           }}
         >

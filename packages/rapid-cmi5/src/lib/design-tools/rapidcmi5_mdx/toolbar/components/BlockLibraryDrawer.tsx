@@ -110,7 +110,7 @@ export function BlockLibraryDrawer() {
   } = useDrawerAutoHide('block', isOpen, showSeq);
   // Check focus, if request to open is new
   const drawerFocus = useDrawerFocus({
-    open: isOpen,
+    open: effectiveOpen,
     openSequence: showSeq,
     initialFocusSelector: '[data-drawer-initial-focus="true"]',
     onClose: handleClose,
