@@ -141,6 +141,50 @@ function RC5VisualEditor() {
   const courseData = useSelector(courseDataCache);
 
   const editorContainerRef = React.useRef<HTMLDivElement>(null);
+
+  /**This use effect enables  better navigation to and from editor. It holds the element focus should
+   * return to from the editor. So a keyboard user can select a tool, be taken to the editor, use it
+   * then easily return to the toolbar they were in with esc pressed twice.
+   */
+  const focusReturnTargetRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const handleDocumentFocusIn = (event: globalThis.FocusEvent) => {
+      const eventTarget = event.target;
+      const editor = editorContainerRef.current;
+      if (!(eventTarget instanceof Element) || !editor) return;
+
+      // Listen for focus entering orleaving main editor region
+      const editableContent = editor.querySelector<HTMLElement>(
+        '.mdxeditor-root-contenteditable [contenteditable="true"]',
+      );
+      const focusIsInsideEditable =
+        editableContent?.contains(eventTarget) ?? false;
+      const candidate = focusIsInsideEditable
+        ? event.relatedTarget instanceof Element
+          ? event.relatedTarget.closest<HTMLElement>(
+              'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])',
+            )
+          : null
+        : eventTarget.closest<HTMLElement>(
+            'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])',
+          );
+
+      // Filter out the hidden, diasabled, and separators as previously focused items.
+      if (
+        candidate &&
+        candidate.getClientRects().length > 0 &&
+        !candidate.closest(
+          '[role="separator"], [aria-hidden="true"], [inert]',
+        ) &&
+        !editableContent?.contains(candidate)
+      ) {
+        focusReturnTargetRef.current = candidate;
+      }
+    };
+
+    document.addEventListener('focusin', handleDocumentFocusIn);
+    return () => document.removeEventListener('focusin', handleDocumentFocusIn);
+  }, []);
   const isEditing = true;
   const pixelTop = (isAppHeaderShowing ? 40 : 0) + (isEditing ? 87 : 0);
 
@@ -745,9 +789,48 @@ function RC5VisualEditor() {
         }
       }
 
+      // Keep the focused navigation control so Escape can return there after
+      // loading a slide moves focus into the editor.
+      const activeElement = document.activeElement;
+      const editableContent =
+        editorContainerRef.current?.querySelector<HTMLElement>(
+          '.mdxeditor-root-contenteditable [contenteditable="true"]',
+        );
+      if (
+        activeElement instanceof HTMLElement &&
+        activeElement !== document.body &&
+        !editableContent?.contains(activeElement)
+      ) {
+        focusReturnTargetRef.current = activeElement;
+      }
+
       ref.current?.focus();
     }
   }, [content, currentSlideIndex, currentCourse]); //DO NOT REMOVE currentSlideIndex
+
+  // Escape enables a user to leave the main editor region / prevent focus trap.
+  const handleEditorKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return;
+
+      const eventTarget = event.target;
+      const editor = editorContainerRef.current;
+      if (!(eventTarget instanceof Node) || !editor?.contains(eventTarget)) {
+        return;
+      }
+
+      const returnTarget = focusReturnTargetRef.current;
+      if (!returnTarget?.isConnected) {
+        focusReturnTargetRef.current = null;
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      returnTarget.focus();
+    },
+    [],
+  );
 
   /**
    * Note: Animation indicators are now updated by AnimationResolver
@@ -766,6 +849,7 @@ function RC5VisualEditor() {
         role="region"
         aria-label="Lesson editor"
         tabIndex={-1}
+        onKeyDown={handleEditorKeyDown}
         sx={{ height: `calc(100vh - ${pixelTop}px)` }}
         ref={editorContainerRef}
       >
