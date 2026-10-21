@@ -9,9 +9,10 @@ const STORAGE_KEY_PREFIX = 'rc5_drawer_autohide_';
  * When autoHide is OFF (default): the panel is fully controlled by `isActivated` —
  * the user must press X to close it.
  *
- * When autoHide is ON: the panel slides closed on mouse-leave and re-opens on
- * mouse-enter. Whenever `isActivated` goes true OR `showSeq` increments (toolbar
- * button clicked again while already active), the panel always shows immediately.
+ * When autoHide is ON: the panel slides closed when both the pointer and keyboard
+ * focus leave it, and re-opens on mouse-enter. Whenever `isActivated` goes true
+ * OR `showSeq` increments (toolbar button clicked again while already active),
+ * the panel always shows immediately.
  *
  * @param panelKey     Short unique key used for localStorage (e.g. "animation")
  * @param isActivated  Whether the panel is currently activated (open) by the caller
@@ -93,15 +94,21 @@ export function useDrawerAutoHide(
     setFocusWithin(true);
   }, []);
   //Turn off focus when it leaves, checks 'relatedTarget' so moving inside drawer doesn't count as leaving.
-  const handleBlurCapture = useCallback((event: FocusEvent<HTMLDivElement>) => {
-    const nextTarget = event.relatedTarget;
-    if (
-      !(nextTarget instanceof Node) ||
-      !event.currentTarget.contains(nextTarget)
-    ) {
-      setFocusWithin(false);
-    }
-  }, []);
+  const handleBlurCapture = useCallback(
+    (event: FocusEvent<HTMLDivElement>) => {
+      const nextTarget = event.relatedTarget;
+      if (
+        !(nextTarget instanceof Node) ||
+        !event.currentTarget.contains(nextTarget)
+      ) {
+        setFocusWithin(false);
+        // Focus may move to inserted editor content while the pointer remains
+        // over the drawer. Hide it in that case when auto-hide is enabled.
+        if (autoHide) setHoverVisible(false);
+      }
+    },
+    [autoHide],
+  );
 
   // Keep keyboard focus usable even if the pointer leaves an auto-hiding drawer.
   const effectiveOpen =

@@ -141,7 +141,10 @@ export function useDrawerFocus({
           ? activeDrawerOpener
           : opener;
         activeDrawerOpener = null;
-        if (restoreTarget?.isConnected) {
+        const focusAlreadyMovedOutside =
+          document.activeElement instanceof HTMLElement &&
+          !rootRef.current?.contains(document.activeElement);
+        if (restoreTarget?.isConnected && !focusAlreadyMovedOutside) {
           restoreFrame = requestAnimationFrame(() => {
             if (activeDrawerFocusId === null) restoreTarget.focus();
           });
