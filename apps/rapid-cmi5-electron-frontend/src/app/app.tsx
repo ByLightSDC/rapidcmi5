@@ -92,6 +92,7 @@ export default function App() {
 
 function AppWorkspace() {
   const mainContentRef = useRef<HTMLElement>(null);
+  const skipLinkRef = useRef<HTMLAnchorElement>(null);
   const [isEditorView, setIsEditorView] = useState(false);
   const {
     isElectron,
@@ -101,6 +102,13 @@ function AppWorkspace() {
     setTerminalOpen,
     setAiThinking,
   } = useAppUi();
+
+  // Skip to main link on first page loads
+  useEffect(() => {
+    if (isEditorView) {
+      skipLinkRef.current?.focus();
+    }
+  }, [isEditorView]);
 
   return (
     <Box
@@ -114,6 +122,7 @@ function AppWorkspace() {
     >
       {isEditorView && (
         <a
+          ref={skipLinkRef}
           href="#app-routes"
           className="skip-link"
           onClick={(event) => {
