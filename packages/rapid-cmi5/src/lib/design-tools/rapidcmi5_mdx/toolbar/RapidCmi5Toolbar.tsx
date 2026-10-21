@@ -16,8 +16,15 @@ import {
   useRealm,
   useCellValues,
   useTranslation,
+  rootEditor$,
 } from '@mdxeditor/editor';
-import { CLEAR_HISTORY_COMMAND } from 'lexical';
+import {
+  $getSelection,
+  $isRangeSelection,
+  CLEAR_HISTORY_COMMAND,
+  COMMAND_PRIORITY_HIGH,
+  KEY_TAB_COMMAND,
+} from 'lexical';
 
 /** Icons */
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
@@ -76,6 +83,15 @@ import { UndoRedo } from './components/UndoRedo';
 import { InsertQuotes } from './components/InsertQuotes';
 import { InsertStatements } from './components/InsertStatements';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
+import { animationDrawerOpen$ } from '../plugins/animation';
+import {
+  animationShowSeq$,
+  blockShowSeq$,
+  drawerMode$,
+  DRAWER_TYPE,
+  stylesShowSeq$,
+} from './components/drawers';
+import { matchEditorDrawerShortcut } from './components/editorDrawerShortcuts';
 
 /**
  * Layout Constants
@@ -90,7 +106,16 @@ const rightToolbarMargin = 25;
  * @group Toolbar Components
  */
 export const RapidCmi5Toolbar: React.FC = () => {
+  const rootEditor = useCellValue(rootEditor$);
   const changeViewMode = usePublisher(viewMode$);
+  const changeDrawerMode = usePublisher(drawerMode$);
+  const publishAnimationOpen = usePublisher(animationDrawerOpen$);
+  const publishStylesShowSeq = usePublisher(stylesShowSeq$);
+  const publishAnimationShowSeq = usePublisher(animationShowSeq$);
+  const publishBlockShowSeq = usePublisher(blockShowSeq$);
+  const stylesShowSeq = useCellValue(stylesShowSeq$);
+  const animationShowSeq = useCellValue(animationShowSeq$);
+  const blockShowSeq = useCellValue(blockShowSeq$);
   const { getMarkdownData } = useContext(RC5Context);
   const { rc5Theme } = useCoursePresentation();
   const realm = useRealm();
@@ -130,6 +155,77 @@ export const RapidCmi5Toolbar: React.FC = () => {
     realm.pub(editorInPlayback$, false);
     changeViewMode('rich-text');
   }, []);
+
+  /**When running NVDA it crashes trying to tab out of editor region - this prevents that error */
+  useEffect(() => {
+    if (!rootEditor) return;
+
+    /**Unregister handler if toolbar unmounts or editor changes */
+    return rootEditor.registerCommand(
+      KEY_TAB_COMMAND,
+      () => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) return false;
+
+        const firstPoint = selection.focus.isBefore(selection.anchor)
+          ? selection.focus
+          : selection.anchor;
+
+        // The lists plugin assumes Tab is inside a block. At the editor root,
+        // let the browser move focus to the next control instead of indenting.
+        if (firstPoint.getNode().getType() === 'root') return true;
+
+        return false;
+      },
+      COMMAND_PRIORITY_HIGH,
+    );
+  }, [rootEditor]);
+
+  /**Checks for shortcuts in rich text mode and if a match prevents default action and updates drawer state */
+  useEffect(() => {
+    const handleDrawerShortcut = (event: globalThis.KeyboardEvent) => {
+      if (viewmode !== 'rich-text' || isPlayback) return;
+
+      const shortcut = matchEditorDrawerShortcut(event);
+      if (!shortcut) return;
+
+      event.preventDefault();
+
+      /** Each 'show equence' is counter to let already open drawer konw it received a fresh request and focus can hook */
+      switch (shortcut) {
+        case 'appearance':
+          publishAnimationOpen(false);
+          changeDrawerMode(DRAWER_TYPE.STYLES);
+          publishStylesShowSeq(stylesShowSeq + 1);
+          break;
+        case 'animation':
+          changeDrawerMode(DRAWER_TYPE.NONE);
+          publishAnimationOpen(true);
+          publishAnimationShowSeq(animationShowSeq + 1);
+          break;
+        case 'blocks':
+          publishAnimationOpen(false);
+          changeDrawerMode(DRAWER_TYPE.BLOCK);
+          publishBlockShowSeq(blockShowSeq + 1);
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handleDrawerShortcut, true);
+    return () =>
+      document.removeEventListener('keydown', handleDrawerShortcut, true);
+  }, [
+    animationShowSeq,
+    blockShowSeq,
+    changeDrawerMode,
+    publishAnimationOpen,
+    publishAnimationShowSeq,
+    publishBlockShowSeq,
+    publishStylesShowSeq,
+    stylesShowSeq,
+    isPlayback,
+    viewmode,
+  ]);
 
   useEffect(() => {
     realm.pub(courseTheme$, rc5Theme);
@@ -249,7 +345,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                     )}
                   </MUIButtonWithTooltip>
                   {isMoreTextTools && (
-                    <Stack direction="row" sx={{ marginLeft: -1, }}>
+                    <Stack direction="row" sx={{ marginLeft: -1 }}>
                       <StrikeThroughSupSubToggles />
                       <LanguageSpanButton />
                     </Stack>
