@@ -173,11 +173,12 @@ export const defaultDownloadFilesContent: DownloadFilesContent = {
 
 /**
  * Scenario activity insertion json
+ * promptClass is left out on purpose: no deployment type is chosen yet,
+ * so the editor shows the Individual / Class / Team chooser
  */
 export const defaultScenarioContentData: ScenarioContent = {
   uuid: '',
   name: '',
-  promptClass: false,
   moveOnCriteria: MoveOnCriteriaEnum.Completed,
 };
 

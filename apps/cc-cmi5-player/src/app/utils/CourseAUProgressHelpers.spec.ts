@@ -281,4 +281,54 @@ describe('CourseAUProgressHelpers', () => {
     expect(sendSlidePassingVerb).toHaveBeenCalledWith(0);
     expect(createState).toHaveBeenCalledTimes(1);
   });
+
+  describe('slides without activities', () => {
+    const contentCourse = () =>
+      ({
+        auName: 'content-au',
+        title: 'Content AU',
+        moveOn: 'CompletedAndPassed',
+        slides: [{ filepath: 'slides/01.md', slideTitle: 'One', content: '# Hi' }],
+      }) as any;
+
+    const withStatus = (status: Record<string, boolean>) => {
+      const progress = initializeCourseAUProgress({ auJson: contentCourse() });
+      Object.assign(progress.progress.slideStatus['slides/01.md'], status);
+      return progress;
+    };
+
+    it('does not credit a slide that was only navigated to', () => {
+      const change = getSlideChangedStatus(
+        withStatus({ viewed: true }),
+        'slides/01.md',
+      );
+
+      expect(change).toMatchObject({ isNowCompleted: false, isNowPassed: false });
+    });
+
+    it.each(['scrolledToBottom', 'dwellCompleted'])(
+      'credits a viewed slide once %s is set',
+      (flag) => {
+        const change = getSlideChangedStatus(
+          withStatus({ viewed: true, [flag]: true }),
+          'slides/01.md',
+        );
+
+        expect(change).toMatchObject({ isNowCompleted: true, isNowPassed: true });
+      },
+    );
+
+    it('keeps credit saved before scroll/dwell gating existed', () => {
+      const change = getSlideChangedStatus(
+        withStatus({ viewed: true, completed: true, passed: true }),
+        'slides/01.md',
+      );
+
+      expect(change).toMatchObject({
+        wasPassed: true,
+        isNowCompleted: true,
+        isNowPassed: true,
+      });
+    });
+  });
 });

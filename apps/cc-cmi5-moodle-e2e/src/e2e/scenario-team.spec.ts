@@ -12,7 +12,7 @@ const TEAM_SCENARIO_NAME = 'e2e-basic-team';
  * Team Scenario tests — one shared instance multiple users connect to.
  *
  * Scenario:Team authors a `:::consoles` directive (ActivityType CONSOLES,
- * teamSSOEnabled). It renders via TeamScenarioExercise — a DIFFERENT player
+ * teamSSOEnabled; editor: Scenario form → Team Exercise). It renders via TeamScenarioExercise — a DIFFERENT player
  * path than the individual/class ScenarioConsoles. Like class, it does NOT
  * auto-deploy: the player scans the launched (SSO) user's ranges for a
  * deployed scenario matching the directive's uuid/name and errors ("No

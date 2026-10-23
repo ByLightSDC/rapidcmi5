@@ -1,4 +1,5 @@
 import { test, expect } from '../fixtures/moodle-course-fixture';
+import { dismissUnitResultDialog } from '../support/unitResultDialog';
 
 /**
  * Quiz activity tests — the Quiz:Basic lesson (one :::quiz slide = tab-0).
@@ -49,6 +50,10 @@ test.describe('test basic quiz  @quizzes', () => {
     await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
+    // Submitting completes the AU, which raises the modal unit-result dialog
+    // over the slide. Dismiss it (staying on the slide) before asserting.
+    await dismissUnitResultDialog(player);
+
     await expect(slideContent.getByText('Your Score: 100%')).toBeVisible({
       timeout: 15_000,
     });
@@ -76,6 +81,10 @@ test.describe('test basic quiz  @quizzes', () => {
     await expect(submitButton).toBeEnabled();
     await submitButton.click();
 
+    // A wrong answer still COMPLETES the unit, so the dialog can appear here
+    // too (titled "Unit complete" rather than "Unit passed").
+    await dismissUnitResultDialog(player);
+
     await expect(slideContent.getByText('Your Score: 0%')).toBeVisible({
       timeout: 15_000,
     });
@@ -92,6 +101,8 @@ test.describe('test basic quiz  @quizzes', () => {
     const slideContent = player.getByTestId('player-slide-content');
     await slideContent.getByPlaceholder('Your Answer...').fill('red');
     await slideContent.getByRole('button', { name: 'Submit' }).click();
+
+    await dismissUnitResultDialog(player);
 
     await expect(slideContent.getByText('Your Score: 0%')).toBeVisible({
       timeout: 15_000,

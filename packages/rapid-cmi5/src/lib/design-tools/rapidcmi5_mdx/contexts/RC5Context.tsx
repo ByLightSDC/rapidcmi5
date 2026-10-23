@@ -71,6 +71,7 @@ interface IRC5Context {
   changeLessonMoveOn: (
     moveOn: MoveOnCriteriaEnum,
     element: ILessonNode,
+    slideDwellSeconds?: number,
   ) => void;
   changeLessonName: (newName: string, element: ILessonNode) => void;
   changeSlideName: (newName: string, element: ILessonNode) => void;
@@ -285,7 +286,11 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
   );
 
   const onChangeLessonMoveOn = useCallback(
-    (moveOnCriteria: MoveOnCriteriaEnum, element: ILessonNode) => {
+    (
+      moveOnCriteria: MoveOnCriteriaEnum,
+      element: ILessonNode,
+      slideDwellSeconds?: number,
+    ) => {
       if (element.id === undefined) {
         return;
       }
@@ -294,6 +299,7 @@ export const RC5ContextProvider: any = (props: tProviderProps) => {
       const au: CourseAU = {
         ...courseData.blocks[currentBlockIndex].aus[lessonIndex],
         moveOnCriteria: moveOnCriteria,
+        ...(slideDwellSeconds !== undefined && { slideDwellSeconds }),
       };
 
       dispatch(

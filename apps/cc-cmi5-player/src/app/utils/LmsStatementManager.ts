@@ -44,6 +44,7 @@ import {
 export type SlideEventType =
   | 'navigation'
   | 'scroll_complete'
+  | 'dwell_complete'
   | 'audio_play'
   | 'audio_pause'
   | 'audio_complete'
@@ -65,6 +66,16 @@ export interface SlideViewedParams {
   slideNumber: number;
   makeProgress?: boolean;
   eventType: SlideEventType;
+}
+
+/** Ways a learner can earn credit for a slide that has no activities. */
+export type SlideEngagementType = 'scroll_complete' | 'dwell_complete';
+
+export interface SlideEngagedParams extends Omit<
+  SlideViewedParams,
+  'eventType'
+> {
+  eventType: SlideEngagementType;
 }
 
 export interface ActivityScoringParams {
@@ -120,6 +131,7 @@ const emptySlideStatus = (): SlideStatus => ({
   viewed: false,
   audioCompleted: false,
   scrolledToBottom: false,
+  dwellCompleted: false,
   completed: false,
   passed: false,
   failed: false,
@@ -591,6 +603,50 @@ export async function handleSlideViewed(
   dispatch: Dispatch,
   getState: () => RootState,
 ): Promise<void> {
+  await updateSlideProgress(params, dispatch, getState, (slideStatus) => {
+    const wasViewed = slideStatus.viewed;
+    slideStatus.viewed = true;
+    if (!wasViewed) sendSlideViewedStatements(params);
+    return true;
+  });
+}
+
+/**
+ * Records that the learner reached the bottom of a slide or stayed on it for
+ * the dwell time — either one credits a slide that has no activities.
+ */
+export async function handleSlideEngaged(
+  params: SlideEngagedParams,
+  dispatch: Dispatch,
+  getState: () => RootState,
+): Promise<void> {
+  const flag =
+    params.eventType === 'scroll_complete'
+      ? 'scrolledToBottom'
+      : 'dwellCompleted';
+
+  await updateSlideProgress(params, dispatch, getState, (slideStatus) => {
+    if (slideStatus[flag]) return false;
+    slideStatus[flag] = true;
+    logAsyncError(
+      sendSlideEventVerb(params.slideNumber, params.eventType, params.slideName),
+      'Error sending slideEvent to LRS',
+    );
+    return true;
+  });
+}
+
+/**
+ * Shared tail for every slide-level event: apply the change, recompute the
+ * slide and AU status, persist, and report any transitions.
+ * `applyChange` returns false when it changed nothing, which skips the rest.
+ */
+async function updateSlideProgress(
+  params: Omit<SlideViewedParams, 'eventType'>,
+  dispatch: Dispatch,
+  getState: () => RootState,
+  applyChange: (slideStatus: SlideStatus) => boolean,
+): Promise<void> {
   const { slideGuid, makeProgress = true } = params;
 
   try {
@@ -608,11 +664,8 @@ export async function handleSlideViewed(
     }
 
     const previousAu = getAuSnapshot(currentProgress);
-    const wasViewed = slideStatus.viewed;
     const wasCompleted = slideStatus.completed;
-    slideStatus.viewed = true;
-
-    if (!wasViewed) sendSlideViewedStatements(params);
+    if (!applyChange(slideStatus)) return;
 
     const changes = getSlideChangedStatus(updatedProgress, slideGuid);
     if (makeProgress || !wasCompleted) updateAuStatus(updatedProgress);
@@ -649,7 +702,7 @@ export async function handleSlideViewed(
       );
     }
   } catch (error) {
-    logger.error('Error in handleSlideViewed', error, 'lms');
+    logger.error('Error updating slide progress', error, 'lms');
   }
 }
 

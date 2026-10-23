@@ -15,6 +15,8 @@ import { moodleEnv } from './env';
  * `launchAu`, which handles both and reports which it found.
  */
 
+const LAUNCH_LINK = 'a[href*="/mod/cmi5/launch.php"]';
+
 /** Logs in via Moodle's standard `/login/index.php` form. */
 export async function login(page: Page): Promise<void> {
   await page.goto('/login/index.php');
@@ -53,14 +55,13 @@ export async function gotoActivity(
   await page.goto(`/mod/cmi5/view.php?id=${encodeURIComponent(activityId)}`);
   await page.waitForLoadState('domcontentloaded');
 
-  // The Assignable Units table renders each AU's launch as a *link*
-  // (role=link, text "Launch", href=.../mod/cmi5/launch.php?id=..&auid=..),
-  // not a button. Its presence confirms a real cmi5 activity page.
-  // NOTE: `exact: true` is essential — without it, getByRole name-matches
-  // by substring and also picks up the nav's "Toggle workplace launcher"
-  // link (contains "launch"), which steals the click and opens the apps grid.
-  await expect(page.getByRole('link', { name: 'Launch', exact: true }).first())
-    .toBeVisible({ timeout: 15_000 });
+  // The Assignable Units table renders each AU's launch as a *link* whose
+  // href is .../mod/cmi5/launch.php?id=..&auid=.. . Its presence confirms a
+  // real cmi5 activity page.
+  //
+  await expect(page.locator(LAUNCH_LINK).first()).toBeVisible({
+    timeout: 15_000,
+  });
 }
 
 /**
@@ -94,11 +95,11 @@ export async function launchAu(
   page: Page,
   auName: string,
 ): Promise<LaunchedPlayer> {
-  // Scope to the table row containing the AU name, then its Launch link.
-  // `exact: true` on "Launch" — a substring match would also hit the nav's
-  // "Toggle workplace launcher" link and open the apps grid instead.
+  // Scope to the table row containing the AU name, then take its launch.php
+  // `.first()` because the row can expose the same launch href more than once
+  // (the live page renders a duplicate for the first AU).
   const row = page.getByRole('row', { name: new RegExp(escapeRegExp(auName)) });
-  const launchButton = row.getByRole('link', { name: 'Launch', exact: true });
+  const launchButton = row.locator(LAUNCH_LINK).first();
   await expect(launchButton).toBeVisible({ timeout: 15_000 });
 
   return clickAndResolvePlayer(page, launchButton);

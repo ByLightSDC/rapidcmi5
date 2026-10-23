@@ -10,6 +10,9 @@
     "load:course-for-test": "bash scripts/loadCourseForPlayerTest.sh",
     "build-and-test-player": "bash scripts/buildAndTestPlayer.sh",
     "cmi5-builder": "nx run cmi5-builder:build",
+    "cmi5-builder:build": "nx build cmi5-builder",
+    "cmi5-builder:run": "nx run cmi5-builder:run",
+    "cmi5-builder:test": "nx test cmi5-builder",
     "cmi5-player": "nx run cc-cmi5-player:build",
     "upload:moodle": "node apps/cc-cmi5-moodle-e2e/scripts/upload-zip-to-moodle.js",
     "e2e": "node apps/cc-cmi5-moodle-e2e/scripts/e2e-run.js",
@@ -168,6 +171,7 @@
     "@nx/react": "21.6.8",
     "@nx/rollup": "21.6.8",
     "@nx/storybook": "21.6.8",
+    "@nx/vite": "21.6.8",
     "@nx/web": "21.6.8",
     "@nx/webpack": "21.6.8",
     "@nx/workspace": "21.6.8",
@@ -200,6 +204,7 @@
     "@typescript-eslint/eslint-plugin": "7.18.0",
     "@typescript-eslint/parser": "7.18.0",
     "@vitejs/plugin-react": "^4.2.0",
+    "@vitest/coverage-v8": "^3.2.4",
     "autoprefixer": "10.4.13",
     "babel-jest": "30.0.5",
     "babel-loader": "^9.1.2",
@@ -236,7 +241,8 @@
     "ts-jest": "29.4.5",
     "ts-json-schema-generator": "^2.4.0",
     "ts-node": "^10.9.2",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "3.2.4"
   },
   "msw": {
     "workerDirectory": [

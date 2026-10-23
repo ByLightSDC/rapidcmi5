@@ -136,6 +136,7 @@ function createSlideStatuses(
         viewed: false,
         audioCompleted: false,
         scrolledToBottom: false,
+        dwellCompleted: false,
         completed: false,
         passed: false,
         failed: false,
@@ -379,6 +380,37 @@ function summarizeSlideActivities(
   };
 }
 
+/**
+ * A slide without activities is credited once the learner has viewed it AND
+ * either reached the bottom of it or stayed on it for the dwell time.
+ * Credit is sticky: progress saved before this rule existed has slides marked
+ * passed without either flag, and those must not be taken away on resume.
+ */
+function getContentSlideStatus(slideStatus: SlideStatus): {
+  completed: boolean;
+  passed: boolean;
+  failed: boolean;
+} {
+  const engaged =
+    slideStatus.viewed &&
+    Boolean(slideStatus.scrolledToBottom || slideStatus.dwellCompleted);
+  return {
+    completed: slideStatus.completed || engaged,
+    passed: slideStatus.passed || engaged,
+    failed: false,
+  };
+}
+
+export function hasSlideActivities(
+  courseAUProgress: CourseAUProgress,
+  slideGuid: string,
+): boolean {
+  return (
+    Object.keys(courseAUProgress.slideActivitiesMeta[slideGuid] || {}).length >
+    0
+  );
+}
+
 export function getSlideChangedStatus(
   courseAUProgress: CourseAUProgress,
   slideGuid: string,
@@ -399,11 +431,7 @@ export function getSlideChangedStatus(
   const activities = courseAUProgress.slideActivitiesMeta[slideGuid] || {};
   const nextStatus = Object.keys(activities).length
     ? summarizeSlideActivities(courseAUProgress, slideGuid, activities)
-    : {
-        completed: slideStatus.viewed,
-        passed: slideStatus.viewed,
-        failed: false,
-      };
+    : getContentSlideStatus(slideStatus);
 
   Object.assign(slideStatus, nextStatus);
 

@@ -1,5 +1,6 @@
 import type { FrameLocator, Page } from '@playwright/test';
 import { test, expect } from '../fixtures/moodle-course-fixture';
+import { dismissUnitResultDialog } from '../support/unitResultDialog';
 
 /**
  * Progress bar tests — the player chrome, not slide content.
@@ -148,6 +149,10 @@ test.describe('player progress bar @chrome', () => {
       await tabs.nth(i).click();
       await expect(player.getByTestId('player-slide-content')).toBeVisible();
     }
+
+    // Completing the AU can raise the modal unit-result dialog, which covers
+    // the nav and would swallow the Exit click. Dismiss it first.
+    await dismissUnitResultDialog(player);
 
     // Land on Exit to settle, exactly as the manual repro does.
     if (exitIdx !== -1) {

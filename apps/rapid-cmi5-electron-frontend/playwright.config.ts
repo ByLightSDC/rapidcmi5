@@ -25,6 +25,9 @@ export default defineConfig({
       cwd: workspaceRoot,
     },
   ],
+  // Electron instances share one userData dir and every test clears storage
+  // on launch, so spec files must not run in parallel
+  workers: 1,
   projects: [
     {
       name: 'electron',

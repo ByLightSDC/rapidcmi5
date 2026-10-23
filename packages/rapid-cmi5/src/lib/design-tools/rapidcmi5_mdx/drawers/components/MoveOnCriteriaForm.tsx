@@ -5,11 +5,16 @@ import { UseFormReturn } from 'react-hook-form';
 /* MUI */
 import Grid from '@mui/material/Grid2';
 import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
 
 import * as yup from 'yup';
 import { useSelector } from 'react-redux';
 import React from 'react';
-import { MoveOnCriteriaEnum, moveOnCriteriaOptions } from '@rapid-cmi5/cmi5-build-common';
+import {
+  DEFAULT_SLIDE_DWELL_SECONDS,
+  MoveOnCriteriaEnum,
+  moveOnCriteriaOptions,
+} from '@rapid-cmi5/cmi5-build-common';
 import { modal, FormStateType, SelectorMainUi, ModalDialog, FormControlUIProvider, MiniForm } from '@rapid-cmi5/ui';
 
 const moveOnOptionDescriptions = new Map<string, string>([
@@ -32,16 +37,29 @@ export function MoveOnCriteriaForm({
   handleCloseModal,
   handleModalAction,
   currentMoveOn,
+  currentSlideDwellSeconds,
 }: {
   handleCloseModal: () => void;
-  handleModalAction: (moveOn: MoveOnCriteriaEnum) => void;
+  handleModalAction: (
+    moveOn: MoveOnCriteriaEnum,
+    slideDwellSeconds: number,
+  ) => void;
   currentMoveOn?: MoveOnCriteriaEnum;
+  currentSlideDwellSeconds?: number;
 }) {
   const modalObj = useSelector(modal);
 
   const [moveOnCriteria, setMoveOnCriteria] = React.useState(
     currentMoveOn || MoveOnCriteriaEnum.CompletedAndPassed,
   );
+  const [slideDwellSeconds, setSlideDwellSeconds] = React.useState(
+    String(currentSlideDwellSeconds ?? DEFAULT_SLIDE_DWELL_SECONDS),
+  );
+  const parsedDwellSeconds = Number(slideDwellSeconds);
+  const isDwellValid =
+    slideDwellSeconds.trim() !== '' &&
+    Number.isInteger(parsedDwellSeconds) &&
+    parsedDwellSeconds >= 0;
 
   const validationSchema = yup.object().shape({
     //
@@ -56,8 +74,8 @@ export function MoveOnCriteriaForm({
   };
 
   const onResponse = (isSuccess: boolean, data: any, message: string) => {
-    if (isSuccess) {
-      handleModalAction(moveOnCriteria);
+    if (isSuccess && isDwellValid) {
+      handleModalAction(moveOnCriteria, parsedDwellSeconds);
     }
   };
 
@@ -81,6 +99,23 @@ export function MoveOnCriteriaForm({
           <Typography variant="body2">
             {moveOnOptionDescriptions.get(moveOnCriteria)}
           </Typography>
+        </Grid>
+        <Grid size={11.5}>
+          <TextField
+            label="Slide dwell time (seconds)"
+            type="number"
+            size="small"
+            fullWidth
+            value={slideDwellSeconds}
+            onChange={(e) => setSlideDwellSeconds(e.target.value)}
+            error={!isDwellValid}
+            helperText={
+              isDwellValid
+                ? 'A slide without activities is credited when the learner scrolls to its bottom or stays on it this long. 0 credits it as soon as it is viewed.'
+                : 'Enter a whole number of seconds, 0 or more.'
+            }
+            slotProps={{ htmlInput: { min: 0, step: 1 } }}
+          />
         </Grid>
       </>
     );

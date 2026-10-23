@@ -20,7 +20,8 @@ migration.json/
 audit.json
 .env
 .claude
-
+cmi5.zip
+/cmi5
 apps/cc-cmi5-player/src/test/*
 !apps/cc-cmi5-player/src/test/.gitkeep
 
@@ -36,3 +37,5 @@ temp.project
 allpackages.json
 apps/rapid-cmi5-electron-frontend/src/assets/cmi5-player.zip
 apps/rapid-cmi5-electron-frontend/src/assets/cc-cmi5-player.zip
+
+.DS_store

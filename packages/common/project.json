@@ -7,16 +7,12 @@
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/packages/common",
         "main": "packages/common/src/index.ts",
         "tsConfig": "packages/common/tsconfig.lib.json",
-        "assets": [
-          "packages/common/*.md"
-        ],
+        "assets": ["packages/common/*.md"],
         "updateBuildableProjectDepsInPackageJson": true
       }
     },
@@ -24,12 +20,10 @@
       "executor": "@nx/eslint:lint"
     },
     "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "executor": "@nx/vite:test",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "packages/common/jest.config.ts"
+        "configFile": "packages/common/vitest.config.ts"
       }
     }
   }

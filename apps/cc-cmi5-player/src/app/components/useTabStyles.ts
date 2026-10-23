@@ -88,6 +88,9 @@ export const useTabStyles = (
   const baseTabStyle = {
     width: '100%',
     position: 'relative',
+    // The shared MUI theme pins MuiTab to a fixed height; let slide tabs grow
+    // with their (clamped) title instead of clipping it.
+    height: 'auto',
     minHeight: '48px',
     alignItems: 'center',
     justifyContent: 'center',

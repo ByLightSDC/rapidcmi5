@@ -1,0 +1,10 @@
+**
+!apps/
+!apps/cmi5-builder/
+!apps/cmi5-builder/docker-entrypoint.sh
+!dist/
+!dist/apps/
+!dist/apps/cmi5-builder/
+!dist/apps/cmi5-builder/**
+!dist/apps/cc-cmi5-player/
+!dist/apps/cc-cmi5-player/**

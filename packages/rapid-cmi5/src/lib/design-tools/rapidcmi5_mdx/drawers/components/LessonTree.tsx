@@ -95,9 +95,12 @@ function LessonTree({
   const [menuAnchorPos, setMenuAnchorPos] = useState<number[]>([0, 0]);
   const [moveOnCriteriaForm, setMoveOnCriteriaForm] =
     useState<ILessonNode | null>(null);
-  const handleMoveOn = (moveOn: MoveOnCriteriaEnum) => {
+  const handleMoveOn = (
+    moveOn: MoveOnCriteriaEnum,
+    slideDwellSeconds: number,
+  ) => {
     if (moveOnCriteriaForm) {
-      changeLessonMoveOn(moveOn, moveOnCriteriaForm);
+      changeLessonMoveOn(moveOn, moveOnCriteriaForm, slideDwellSeconds);
     }
     setMoveOnCriteriaForm(null);
     displayToaster({
@@ -530,6 +533,14 @@ function LessonTree({
                       ? courseData?.blocks?.[moveOnCriteriaForm.block]?.aus?.[
                           moveOnCriteriaForm.id as number
                         ]?.moveOnCriteria
+                      : undefined
+                  }
+                  currentSlideDwellSeconds={
+                    moveOnCriteriaForm.id !== undefined &&
+                    moveOnCriteriaForm.block !== undefined
+                      ? courseData?.blocks?.[moveOnCriteriaForm.block]?.aus?.[
+                          moveOnCriteriaForm.id as number
+                        ]?.slideDwellSeconds
                       : undefined
                   }
                 />

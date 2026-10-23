@@ -14,10 +14,15 @@ import { getSlideState } from './Cmi5Helpers';
 import {
   getCourseAUProgressFromLRS,
   getFirstIncompleteSlideIndex,
+  hasSlideActivities,
   initializeCourseAUProgress,
 } from './CourseAUProgressHelpers';
 import { checkForDevMode } from './DevMode';
-import { handleSlideViewed } from './LmsStatementManager';
+import {
+  handleSlideEngaged,
+  handleSlideViewed,
+  SlideEngagementType,
+} from './LmsStatementManager';
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -194,5 +199,42 @@ export async function progressAU(
     getState,
   ).catch((error) => {
     logger.error('Error in handleSlideViewed', error, 'auManager');
+  });
+}
+
+/**
+ * Records that the learner scrolled to the bottom of a slide or stayed on it
+ * for the dwell time. Only slides without activities need this — slides with
+ * activities are credited by their activities instead.
+ */
+export function recordSlideEngagement(
+  slideIdx: number,
+  eventType: SlideEngagementType,
+  auJson: CourseAU,
+  dispatch: Dispatch,
+  getState: () => RootState,
+): void {
+  if (checkForDevMode()) return;
+
+  // The trailing Exit tab has an index but no slide.
+  const slide = auJson.slides[slideIdx];
+  if (!slide) return;
+
+  const slideGuid = slide.filepath || `slide-${slideIdx}`;
+  const progress = getState().au.courseAUProgress;
+  if (!progress || hasSlideActivities(progress, slideGuid)) return;
+  if (progress.progress.slideStatus[slideGuid]?.passed) return;
+
+  void handleSlideEngaged(
+    {
+      slideGuid,
+      slideName: slide.slideTitle,
+      slideNumber: slideIdx,
+      eventType,
+    },
+    dispatch,
+    getState,
+  ).catch((error) => {
+    logger.error('Error in handleSlideEngaged', error, 'auManager');
   });
 }

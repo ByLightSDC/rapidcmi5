@@ -98,6 +98,7 @@ import {
   CMI5_VERBS,
   RANGEOS_VERBS,
   handleActivityScoring,
+  handleSlideEngaged,
   handleSlideViewed,
   sendActivityCompletedVerb,
   sendActivityFailedVerb,
@@ -1447,5 +1448,70 @@ describe('statement transport failures', () => {
     mockSendStatement.mockRejectedValueOnce(new Error('418 teapot'));
 
     await expect(sendInitializedVerb()).rejects.toThrow('418 teapot');
+  });
+});
+
+describe('handleSlideEngaged', () => {
+  const engage = (eventType: 'scroll_complete' | 'dwell_complete', status: any) => {
+    const progress = makeCourseAUProgress({ slideStatus: { 'slide.md': status } });
+    const dispatch = jest.fn();
+    return handleSlideEngaged(
+      { slideGuid: 'slide.md', slideName: 'Slide', slideNumber: 2, eventType },
+      dispatch,
+      () => ({ au: { courseAUProgress: progress } }) as any,
+    ).then(() => ({ dispatch }));
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockCheckForDevMode.mockReturnValue(false);
+    (calculateProgressPercentage as jest.Mock).mockReturnValue(0);
+    (isAUCompletedCheck as jest.Mock).mockReturnValue(false);
+    (isAUPassed as jest.Mock).mockReturnValue(false);
+    (getSlideChangedStatus as jest.Mock).mockReturnValue({
+      wasCompleted: false,
+      wasPassed: false,
+      isNowCompleted: true,
+      isNowPassed: true,
+    });
+  });
+
+  it.each([
+    ['scroll_complete', 'scrolledToBottom'],
+    ['dwell_complete', 'dwellCompleted'],
+  ] as const)('records %s and reports the slide transition', async (eventType, flag) => {
+    const { dispatch } = await engage(eventType, {
+      viewed: true,
+      completed: false,
+      passed: false,
+      failed: false,
+    });
+
+    expect(statementForVerb(RANGEOS_VERBS.SLIDE_EVENT)).toMatchObject({
+      result: {
+        extensions: { 'https://rangeos/extensions/slideEvent/type': eventType },
+      },
+    });
+    expect(sentVerbIds()).toEqual([
+      RANGEOS_VERBS.SLIDE_EVENT,
+      RANGEOS_VERBS.SLIDE_COMPLETED,
+      RANGEOS_VERBS.SLIDE_PASSING,
+    ]);
+    const saved = (saveCourseAUProgressToLRS as jest.Mock).mock.calls[0][0];
+    expect(saved.progress.slideStatus['slide.md'][flag]).toBe(true);
+    expect(dispatch).toHaveBeenCalled();
+  });
+
+  it('does nothing when the slide was already engaged that way', async () => {
+    const { dispatch } = await engage('scroll_complete', {
+      viewed: true,
+      scrolledToBottom: true,
+      completed: true,
+      passed: true,
+      failed: false,
+    });
+
+    expect(mockSendStatement).not.toHaveBeenCalled();
+    expect(dispatch).not.toHaveBeenCalled();
   });
 });

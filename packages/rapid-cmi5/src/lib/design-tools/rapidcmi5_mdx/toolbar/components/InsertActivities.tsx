@@ -56,15 +56,14 @@ export const InsertActivities = () => {
   };
 
   /**
-   * Disable Scenario activity option if there is already a scenario in the lesson
+   * Disable Scenario activity option if there is already a scenario in the lesson.
+   * Individual / Class (Basic Auth) and Team Exercise (SSO) cannot be mixed,
+   * so either kind blocks inserting another.
    */
   const disabledActivities = useMemo(() => {
     const disabled: RC5ActivityTypeEnum[] = [];
-    if (scenarioSel) {
+    if (scenarioSel || teamScenarioSel) {
       disabled.push(RC5ActivityTypeEnum.scenario);
-    }
-    if (teamScenarioSel) {
-      disabled.push(RC5ActivityTypeEnum.consoles);
     }
     return disabled;
   }, [scenarioSel, teamScenarioSel]);
@@ -77,13 +76,23 @@ export const InsertActivities = () => {
           if (option.indexOf('Download') >= 0) {
             return null;
           }
+          //team exercise is a deployment type inside the scenario form
+          if (option === RC5ActivityTypeEnum.consoles) {
+            return null;
+          }
 
           const isDisabled = disabledActivities.includes(option);
 
           return (
             <ButtonMinorUi
               key={`activity_${index}`}
+              id={`insert-activity-${getActivityTypeFromDisplayName(option)}`}
               disabled={isDisabled}
+              tooltip={
+                isDisabled && option === RC5ActivityTypeEnum.scenario
+                  ? 'This lesson already has a scenario'
+                  : undefined
+              }
               sx={{
                 display: 'flex',
                 justifyContent: 'flex-start',
