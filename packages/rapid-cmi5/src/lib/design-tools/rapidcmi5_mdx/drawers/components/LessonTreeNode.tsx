@@ -35,6 +35,7 @@ import { ITreeViewOnNodeSelectProps } from 'react-accessible-treeview';
 import { LessonTreeNodeType } from './LessonTree';
 
 interface NodeProps {
+  labelId: string;
   isOpen: boolean;
   isActiveRow: boolean;
   isReadOnly?: boolean;
@@ -157,6 +158,7 @@ export const ItemTypes = {
  * @returns
  */
 export const LessonTreeNode: React.FC<NodeProps> = ({
+  labelId,
   isOpen,
   isActiveRow,
   isReadOnly,
@@ -389,6 +391,7 @@ export const LessonTreeNode: React.FC<NodeProps> = ({
           />
         )}
         <Typography
+          id={labelId}
           sx={{
             ...fontStyle,
             lineHeight: 1.2,

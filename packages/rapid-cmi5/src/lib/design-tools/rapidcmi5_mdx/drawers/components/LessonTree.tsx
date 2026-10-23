@@ -447,11 +447,12 @@ function LessonTree({
             >
               <Box
                 sx={(theme) => ({
-                  '& li[role="treeitem"]:focus-visible, & .tree-node[role="treeitem"]:focus-visible': {
-                    outline: `2px solid ${theme.palette.primary.main}`,
-                    outlineOffset: '-2px',
-                    borderRadius: '3px',
-                  },
+                  '& li[role="treeitem"]:focus-visible, & .tree-node[role="treeitem"]:focus-visible':
+                    {
+                      outline: `2px solid ${theme.palette.primary.main}`,
+                      outlineOffset: '-2px',
+                      borderRadius: '3px',
+                    },
                 })}
               >
                 <TreeView
@@ -469,37 +470,43 @@ function LessonTree({
                     getNodeProps,
                     level,
                     treeState,
-                  }) => (
-                    <Box
-                      {...getNodeProps()}
-                      sx={{
-                        marginTop: '2px',
-                        paddingLeft: `${paddingBase * (level - 1)}px`,
-                      }}
-                    >
-                      <LessonTreeNode
-                        key={
-                          element.id.toString() +
-                          '/' +
-                          (element.parent || 0).toString()
-                        }
-                        data-testid={
-                          'slide-node-' +
-                          element.id.toString() +
-                          '/' +
-                          (element.parent || 0).toString()
-                        }
-                        isOpen={isExpanded}
-                        isActiveRow={treeState.tabbableId === element.id}
-                        element={element}
-                        isReadOnly={isReadOnly}
-                        currentLesson={currentAuIndex}
-                        currentSlide={currentSlideIndex}
-                        onAction={handleNodeAction}
-                        moveNode={moveNode}
-                      />
-                    </Box>
-                  )}
+                  }) => {
+                    // Create an ID for the visible label so the tree item can reference it with aria-labelledby.
+                    const labelId = `lesson-tree-item-label-${String(element.id)}`;
+                    return (
+                      <Box
+                        {...getNodeProps()}
+                        aria-labelledby={labelId}
+                        sx={{
+                          marginTop: '2px',
+                          paddingLeft: `${paddingBase * (level - 1)}px`,
+                        }}
+                      >
+                        <LessonTreeNode
+                          key={
+                            element.id.toString() +
+                            '/' +
+                            (element.parent || 0).toString()
+                          }
+                          data-testid={
+                            'slide-node-' +
+                            element.id.toString() +
+                            '/' +
+                            (element.parent || 0).toString()
+                          }
+                          labelId={labelId}
+                          isOpen={isExpanded}
+                          isActiveRow={treeState.tabbableId === element.id}
+                          element={element}
+                          isReadOnly={isReadOnly}
+                          currentLesson={currentAuIndex}
+                          currentSlide={currentSlideIndex}
+                          onAction={handleNodeAction}
+                          moveNode={moveNode}
+                        />
+                      </Box>
+                    );
+                  }}
                 />
               </Box>
               {menuAnchor && (
