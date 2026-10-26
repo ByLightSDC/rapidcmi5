@@ -145,13 +145,16 @@ export function AnimationDrawer() {
         '& .MuiDrawer-paper': { pointerEvents: 'auto' },
       })}
       PaperProps={{
+        // The panel is the dialog controlled by the Animation Library button.
+        id: 'animation-library',
+        role: 'dialog',
+        'aria-labelledby': 'animation-library-title',
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
         sx: { width: 360, maxWidth: '90vw', zIndex: 1400 },
       }}
     >
       <Stack
-        id="animation-library"
         ref={drawerFocus.rootRef}
         onFocusCapture={(event) => {
           handleFocusCapture();
@@ -174,7 +177,12 @@ export function AnimationDrawer() {
           }}
         >
           <MotionPhotosAutoIcon color="primary" />
-          <Typography variant={drawerHeaderVariant} sx={drawerHeaderStyles}>
+          {/* Use the visible title as the dialog's accessible name. */}
+          <Typography
+            id="animation-library-title"
+            variant={drawerHeaderVariant}
+            sx={drawerHeaderStyles}
+          >
             Animation Library
           </Typography>
           <Tooltip

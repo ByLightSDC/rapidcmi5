@@ -16,6 +16,7 @@ import {
  */
 export const InsertBlockMenu = () => {
   const changeViewMode = usePublisher(drawerMode$);
+  const drawerMode = useCellValue(drawerMode$);
   const publishAnimationOpen = usePublisher(animationDrawerOpen$);
   const publishShowSeq = usePublisher(blockShowSeq$);
   const showSeq = useCellValue(blockShowSeq$);
@@ -37,6 +38,9 @@ export const InsertBlockMenu = () => {
       onClick={handleClick}
       aria-label="Open Block Library"
       aria-keyshortcuts={getEditorDrawerShortcutAria('blocks')}
+      aria-haspopup="dialog"
+      aria-expanded={drawerMode === DRAWER_TYPE.BLOCK}
+      aria-controls="block-library"
       style={{ color: theme.palette.primary.main }}
     >
       <WidgetsIcon style={{ color: 'inherit' }} fontSize="medium" />

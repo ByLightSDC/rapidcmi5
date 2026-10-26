@@ -17,6 +17,7 @@ import {
  */
 export const LessonStyleButton = () => {
   const changeViewMode = usePublisher(drawerMode$);
+  const drawerMode = useCellValue(drawerMode$);
   const publishAnimationOpen = usePublisher(animationDrawerOpen$);
   const publishShowSeq = usePublisher(stylesShowSeq$);
   const showSeq = useCellValue(stylesShowSeq$);
@@ -35,6 +36,9 @@ export const LessonStyleButton = () => {
       onClick={handleClick}
       aria-label="Course Appearance"
       aria-keyshortcuts={getEditorDrawerShortcutAria('appearance')}
+      aria-haspopup="dialog"
+      aria-expanded={drawerMode === DRAWER_TYPE.STYLES}
+      aria-controls="lesson-styles"
     >
       <PaletteIcon fontSize="medium" />
     </MUIButtonWithTooltip>

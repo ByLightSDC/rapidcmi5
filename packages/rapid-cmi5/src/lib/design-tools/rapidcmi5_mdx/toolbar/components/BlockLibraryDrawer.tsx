@@ -175,12 +175,15 @@ export function BlockLibraryDrawer() {
         },
       })}
       PaperProps={{
+        // The panel is the dialog controlled by the Block Library button.
+        id: 'block-library',
+        role: 'dialog',
+        'aria-labelledby': 'block-library-title',
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
       }}
     >
       <Stack
-        id="block-library"
         ref={drawerFocus.rootRef}
         //The auto-hide focus tracking matters because a keyboard user may move the pointer away while navigating the drawer.
         // The drawer stays visible while it contains focus.
@@ -207,7 +210,12 @@ export function BlockLibraryDrawer() {
         >
           <WidgetsIcon color="primary" />
 
-          <Typography variant={drawerHeaderVariant} sx={drawerHeaderStyles}>
+          {/* Use the visible title as the dialog's accessible name. */}
+          <Typography
+            id="block-library-title"
+            variant={drawerHeaderVariant}
+            sx={drawerHeaderStyles}
+          >
             Block Library
           </Typography>
           <Tooltip

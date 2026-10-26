@@ -19,6 +19,7 @@ export const InsertAnimation = () => {
   const changeDrawerMode = usePublisher(drawerMode$);
   const publishShowSeq = usePublisher(animationShowSeq$);
   const showSeq = useCellValue(animationShowSeq$);
+  const isOpen = useCellValue(animationDrawerOpen$);
   const theme = useTheme();
   const shortcutLabel = getEditorDrawerShortcutLabel('animation');
 
@@ -35,6 +36,9 @@ export const InsertAnimation = () => {
       onClick={handleClick}
       aria-label="Open Animation Library"
       aria-keyshortcuts={getEditorDrawerShortcutAria('animation')}
+      aria-haspopup="dialog"
+      aria-expanded={isOpen}
+      aria-controls="animation-library"
     >
       <MotionPhotosAutoIcon fontSize="medium" />
     </MUIButtonWithTooltip>

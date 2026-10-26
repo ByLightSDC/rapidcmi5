@@ -178,6 +178,10 @@ export function LessonStyleDrawer() {
         },
       })}
       PaperProps={{
+        // The panel is the dialog controlled by the Course Appearance button.
+        id: 'lesson-styles',
+        role: 'dialog',
+        'aria-labelledby': 'lesson-styles-title',
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
         sx: { zIndex: 1400 },
@@ -186,7 +190,6 @@ export function LessonStyleDrawer() {
       <Stack
         //The auto-hide focus tracking matters because a keyboard user may move the pointer away while navigating the drawer.
         // The drawer stays visible while it contains focus.
-        id="lesson-styles"
         ref={drawerFocus.rootRef}
         onFocusCapture={(event) => {
           handleFocusCapture();
@@ -210,7 +213,12 @@ export function LessonStyleDrawer() {
         >
           <PaletteIcon color="primary" />
 
-          <Typography variant={drawerHeaderVariant} sx={drawerHeaderStyles}>
+          {/* Use the visible title as the dialog's accessible name. */}
+          <Typography
+            id="lesson-styles-title"
+            variant={drawerHeaderVariant}
+            sx={drawerHeaderStyles}
+          >
             Course Appearance
           </Typography>
           <Tooltip
@@ -300,7 +308,12 @@ export function LessonStyleDrawer() {
                 L
               </ToggleButton>
             </ToggleButtonGroup>
-            <Typography variant="body2" sx={{ mt: 0.5 }}>
+            <Typography
+              variant="body2"
+              aria-live="polite"
+              aria-atomic="true"
+              sx={{ mt: 0.5 }}
+            >
               {contentWidthDescriptions.get(contentWidth)}
             </Typography>
           </Grid>
@@ -333,7 +346,13 @@ export function LessonStyleDrawer() {
                 <MoreHorizIcon fontSize="small" />
               </ToggleButton>
             </ToggleButtonGroup>
-            <Typography variant="body2" sx={{ mt: 0.5 }}>
+            {/* Announce the complete updated helper text politely. */}
+            <Typography
+              variant="body2"
+              aria-live="polite"
+              aria-atomic="true"
+              sx={{ mt: 0.5 }}
+            >
               {blockPaddingDescriptions.get(blockPadding)}
             </Typography>
             {blockPadding === BlockPaddingEnum.Custom && (
@@ -375,7 +394,10 @@ export function LessonStyleDrawer() {
               value={defaultAlignment}
               exclusive
               onChange={(_, val) => {
-                handleSetDefaultAlignment(val as DefaultAlignmentEnum);
+                // Ignore null so clicking the selected option keeps the current value.
+                if (val !== null) {
+                  handleSetDefaultAlignment(val as DefaultAlignmentEnum);
+                }
               }}
               size="small"
               fullWidth
@@ -390,7 +412,13 @@ export function LessonStyleDrawer() {
                 Right
               </ToggleButton>
             </ToggleButtonGroup>
-            <Typography variant="body2" sx={{ mt: 0.5 }}>
+            {/* Announce the complete updated helper text politely. */}
+            <Typography
+              variant="body2"
+              aria-live="polite"
+              aria-atomic="true"
+              sx={{ mt: 0.5 }}
+            >
               {defaultAlignmentLabels.get(defaultAlignment) ?? 'Left'} align
               text
             </Typography>
@@ -407,7 +435,12 @@ export function LessonStyleDrawer() {
               value={defaultActivityAlignment}
               exclusive
               onChange={(_, val) => {
-                handleSetDefaultActivityAlignment(val as DefaultAlignmentEnum);
+                // Ignore null so clicking the selected option keeps the current value.
+                if (val !== null) {
+                  handleSetDefaultActivityAlignment(
+                    val as DefaultAlignmentEnum,
+                  );
+                }
               }}
               size="small"
               fullWidth
@@ -422,7 +455,13 @@ export function LessonStyleDrawer() {
                 Right
               </ToggleButton>
             </ToggleButtonGroup>
-            <Typography variant="body2" sx={{ mt: 0.5 }}>
+            {/* Announce the complete updated helper text politely. */}
+            <Typography
+              variant="body2"
+              aria-live="polite"
+              aria-atomic="true"
+              sx={{ mt: 0.5 }}
+            >
               {defaultAlignmentLabels.get(defaultActivityAlignment) ?? 'Center'}{' '}
               align activities
             </Typography>
