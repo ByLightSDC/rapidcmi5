@@ -1,3 +1,15 @@
+## 0.24.0 (2026-10-26)
+
+### 🩹 Fixes
+
+- **rapid-cmi5-player:** cmi5 player slide titles that are too long should have tooltips and ellipses ([#251](https://github.com/ByLightSDC/rapidcmi5/pull/251))
+- **rapid-cmi5-player:** slide progress adjustment to view only progress ([#250](https://github.com/ByLightSDC/rapidcmi5/pull/250))
+- **rapidcmi5-editor:** scenario selection improvement ([#248](https://github.com/ByLightSDC/rapidcmi5/pull/248))
+
+### ❤️ Thank You
+
+- mattkeele-bylight
+
 ## 0.23.0 (2026-10-08)
 
 ### 🚀 Features

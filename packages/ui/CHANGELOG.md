@@ -1,3 +1,13 @@
+## 0.24.0 (2026-10-26)
+
+### 🩹 Fixes
+
+- **rapidcmi5-editor:** scenario selection improvement ([#248](https://github.com/ByLightSDC/rapidcmi5/pull/248))
+
+### ❤️ Thank You
+
+- mattkeele-bylight
+
 ## 0.23.0 (2026-10-08)
 
 ### 🚀 Features

@@ -1,3 +1,7 @@
+## 0.24.0 (2026-10-26)
+
+This was a version bump only for rapid-cmi5-electron to align it with other projects, there were no code changes.
+
 ## 0.23.0 (2026-10-08)
 
 ### 🚀 Features
