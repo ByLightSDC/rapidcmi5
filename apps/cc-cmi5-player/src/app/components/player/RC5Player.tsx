@@ -35,6 +35,7 @@ import {
   mathPlugin,
   MathDescriptor,
   MathCodeBlockDescriptor,
+  MermaidCodeBlockDescriptor,
   languageList,
   htmlPlugin,
   CodeMirrorEditor,
@@ -138,6 +139,7 @@ function RC5Player() {
         defaultCodeBlockLanguage: 'js',
         codeBlockEditorDescriptors: [
           MathCodeBlockDescriptor,
+          MermaidCodeBlockDescriptor,
           {
             priority: -10,
             match: (_) => true,

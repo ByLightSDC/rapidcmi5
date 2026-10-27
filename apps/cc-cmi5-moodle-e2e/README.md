@@ -124,11 +124,11 @@ Or drive Nx directly if you prefer:
 npx nx e2e cc-cmi5-moodle-e2e --configuration=chromium
 ```
 
-That is the whole loop. ~17 tests, ~3 minutes, no infra beyond Moodle itself.
+That is the whole loop. ~27 tests, ~3 minutes, no infra beyond Moodle itself.
 A browser window opens locally so you can watch the real launch flow (headless
 in CI).
 
-**Expected result:** `17 passed`. If you get `Missing required env var …`, go
+**Expected result:** `27 passed`. If you get `Missing required env var …`, go
 back to Step 2. For anything else, see §6 Troubleshooting.
 
 > **If you changed the player or the course, stop.** A green run here proves
@@ -170,6 +170,7 @@ a launchable row in Moodle's Assignable Units table. A spec picks its AU with
 | --- | --- | --- | --- |
 | `Media:Basic` | `media-basic.spec.ts` | `@content` | Image `<img>`, Video `<video>`, Audio `<audio>` slides render |
 | `Components:Basic` | `components-basic.spec.ts` | `@content` | tabs, accordion, layout grid, statements, quote admonition, table — render + expected content |
+| `Components:Mermaid` | `components-mermaid.spec.ts` | `@content` | `mermaid` code blocks render as SVG (flowchart + accTitle, grey space DNS sequence), lazy render in an inactive tab, error card for invalid syntax |
 | `Quiz:Basic` | `quiz-basic.spec.ts` | `@quizzes` | quiz renders; submit → 100% / 0% scored via the real LRS; Review Answers hint |
 | `Scenario:Individual` | `scenario-individual.spec.ts` | `@scenario` | auto-deploys a VM on launch → reaches Ready → HYPERVISOR console connects (Guacamole) |
 | `Scenario:Class` | `scenario-class.spec.ts` | `@scenario` | deploy a class scenario via API → "Enter Class" prompt → console connects |
@@ -215,6 +216,7 @@ apps/cc-cmi5-moodle-e2e/
     e2e/                        # The specs
       media-basic.spec.ts
       components-basic.spec.ts
+      components-mermaid.spec.ts
       quiz-basic.spec.ts
       scenario-individual.spec.ts
       scenario-class.spec.ts
