@@ -1,3 +1,13 @@
+## 0.25.0 (2026-11-04)
+
+### 🚀 Features
+
+- **rapid-cmi5:** add support for mermaid diagrams ([#252](https://github.com/ByLightSDC/rapidcmi5/pull/252))
+
+### ❤️ Thank You
+
+- mattkeele-bylight
+
 ## 0.24.0 (2026-10-26)
 
 ### 🩹 Fixes

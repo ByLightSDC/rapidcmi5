@@ -1,3 +1,20 @@
+## 0.25.0 (2026-11-04)
+
+### 🚀 Features
+
+- **rapid-cmi5:** add support for mermaid diagrams ([#252](https://github.com/ByLightSDC/rapidcmi5/pull/252))
+
+### 🩹 Fixes
+
+- chrome no longer blocks edits to the git config file ([10d594ba](https://github.com/ByLightSDC/rapidcmi5/commit/10d594ba))
+- **rapid-cmi5-editor:** match quiz editor card styling to other activities ([fe53c45b](https://github.com/ByLightSDC/rapidcmi5/commit/fe53c45b))
+
+### ❤️ Thank You
+
+- Aaron Crawford @aaiirr123
+- mattkeele-bylight
+- Megan Bohland
+
 ## 0.24.0 (2026-10-26)
 
 ### 🩹 Fixes
