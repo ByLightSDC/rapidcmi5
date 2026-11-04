@@ -1,6 +1,7 @@
 import { CourseAU, CourseData } from '@rapid-cmi5/cmi5-build-common';
 import { INode } from 'react-accessible-treeview';
 import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
+import { isGitMetadataPath } from '../../utils/gitMetadata';
 
 /**
  * Use this to return only nodes within a particular dir path
@@ -22,7 +23,6 @@ export const filterTreePath = (
   return filteredTree;
 };
 
-
 // Currently unused, saved for later filtering enhancements
 
 // Only return folders
@@ -32,7 +32,8 @@ export const filterTreeHelper = (
   return tree
     .filter(
       (node) =>
-        (node.isBranch || node.name.endsWith('.json')) && node.name !== '.git',
+        (node.isBranch || node.name.endsWith('.json')) &&
+        !isGitMetadataPath(node.name),
     )
     .map((node) => {
       const children = tree.filter((childNode) =>
@@ -45,7 +46,6 @@ export const filterTreeHelper = (
       return node.isBranch ? { ...node, children: childIds } : node;
     });
 };
-
 
 // sorts the au and returns only nodes within the au
 export const auFilterCourseTreeHelper = (

@@ -1,5 +1,6 @@
 import { FileStatus, getFileStatus, mapGitStatus } from './StatusMatrix';
 import { GitFS } from './fileSystem';
+import { getGitDirectory, isGitMetadataPath } from './gitMetadata';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import * as git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
@@ -91,7 +92,8 @@ export class GitOperations {
         );
       } else {
         await git.clone({
-          fs: this.gitFs.fs,
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
           http: this.http,
           dir,
           url: repoRemoteUrl,
@@ -104,7 +106,11 @@ export class GitOperations {
       }
     } catch (err: any) {
       // If there was an error lets clean up anything that was created
-      await this.gitFs.deleteRepo(r);
+      try {
+        await this.gitFs.deleteRepo(r);
+      } catch (cleanupError) {
+        debugLogError(String(cleanupError));
+      }
       throw err;
     }
 
@@ -112,7 +118,7 @@ export class GitOperations {
   };
   initGitRepo = async (
     r: RepoAccessObject,
-    defaultBranch: string = 'main',
+    defaultBranch = 'main',
   ): Promise<void> => {
     const dir = getRepoPath(r);
 
@@ -120,7 +126,12 @@ export class GitOperations {
       if (this.gitFs?.isElectron) {
         await window.fsApi.gitInitRepo(dir, defaultBranch);
       } else {
-        await git.init({ fs: this.gitFs.fs, dir, defaultBranch });
+        await git.init({
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
+          dir,
+          defaultBranch,
+        });
       }
     } catch (err: any) {
       debugLogError(
@@ -138,7 +149,11 @@ export class GitOperations {
       if (this.gitFs.isElectron) {
         return await window.fsApi.listRepoRemotes(dir);
       } else {
-        return await git.listRemotes({ fs: this.gitFs.fs, dir });
+        return await git.listRemotes({
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
+          dir,
+        });
       }
     } catch (error: any) {
       debugLogError(`Could not list remote repos ${error}`);
@@ -153,10 +168,11 @@ export class GitOperations {
     const dir = getRepoPath(r);
     try {
       if (this.gitFs.isElectron) {
-        window.fsApi.gitAddRemote(dir, remoteUrl);
+        await window.fsApi.gitAddRemote(dir, remoteUrl);
       } else {
         await git.addRemote({
-          fs: this.gitFs.fs,
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
           dir,
           remote: 'origin',
           url: remoteUrl,
@@ -176,7 +192,8 @@ export class GitOperations {
         return await window.fsApi.gitLog(dir);
       } else {
         return await git.log({
-          fs: this.gitFs.fs,
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
           dir,
           cache: this.cache,
         });
@@ -196,7 +213,8 @@ export class GitOperations {
     const dir = getRepoPath(r);
     try {
       await git.fetch({
-        fs: this.gitFs.fs,
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
         http,
         dir,
         ref: branch,
@@ -206,7 +224,8 @@ export class GitOperations {
       });
 
       await git.merge({
-        fs: this.gitFs.fs,
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
         ours: branch,
         dir,
         cache: this.cache,
@@ -234,20 +253,18 @@ export class GitOperations {
     branch: string,
   ) => {
     const dir = getRepoPath(r);
-    try {
-      await git.commit({
-        fs: this.gitFs.fs,
-        dir,
-        author: { name: authorName, email: authorEmail },
-        message: `Merge '${branch}' into origin ${branch}`,
-        parent: [branch, '/remotes/origin/' + branch],
-        cache: this.cache,
-      });
 
-      await this.gitFs.deleteFile(r, failedMergePath);
-    } catch (error: any) {
-      throw error;
-    }
+    await git.commit({
+      fs: this.gitFs.getFs(),
+      gitdir: getGitDirectory(dir),
+      dir,
+      author: { name: authorName, email: authorEmail },
+      message: `Merge '${branch}' into origin ${branch}`,
+      parent: [branch, '/remotes/origin/' + branch],
+      cache: this.cache,
+    });
+
+    await this.gitFs.deleteFile(r, failedMergePath);
   };
 
   gitPull = async (
@@ -264,7 +281,8 @@ export class GitOperations {
         await window.fsApi.pullRepo(dir, branch, username, password);
       } else {
         await git.pull({
-          fs: this.gitFs.fs,
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
           http: this.http,
           dir,
 
@@ -315,14 +333,16 @@ export class GitOperations {
         status = await window.fsApi.getStatus(dir);
       } else {
         status = await git.statusMatrix({
-          fs: this.gitFs.fs,
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
           dir,
           filepaths: changedFiles,
           // This is super needed, please do not remove
           // The file system access api does not allow the . operator
           // when it is the base mounted directory
           cache: this.cache,
-          filter: (filepath) => filepath !== '.',
+          filter: (filepath) =>
+            filepath !== '.' && !isGitMetadataPath(filepath),
         });
       }
 
@@ -349,11 +369,11 @@ export class GitOperations {
         return await window.fsApi.getStashStatus(dir);
       } else {
         const raw = await git.walk({
-          fs: this.gitFs.fs,
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
           dir,
           cache: this.cache,
 
-          // gitdir: this.gitFs.isElectron ? undefined : gitCache,
           trees: [git.TREE({ ref: 'HEAD' }), git.TREE({ ref: 'refs/stash' })],
 
           map: async (filepath, [left, right]) => {
@@ -405,7 +425,8 @@ export class GitOperations {
         status = await window.fsApi.gitResolveFile(dir, filepath);
       } else {
         status = await git.status({
-          fs: this.gitFs.fs,
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
           dir,
           filepath,
           cache: this.cache,
@@ -442,11 +463,13 @@ export class GitOperations {
       'added_then_deleted',
     ];
 
-    const filesToRemove = files.filter((f) =>
-      removeStatuses.includes(f.status),
+    const filesToRemove = files.filter(
+      (f) => !isGitMetadataPath(f.name) && removeStatuses.includes(f.status),
     );
 
-    const filesToAdd = files.filter((f) => !skipStatuses.includes(f.status));
+    const filesToAdd = files.filter(
+      (f) => !isGitMetadataPath(f.name) && !skipStatuses.includes(f.status),
+    );
 
     try {
       if (this.gitFs.isElectron) {
@@ -470,7 +493,8 @@ export class GitOperations {
         // Add all files at once (isomorphic-git supports array)
         if (filesToAdd.length > 0) {
           await git.add({
-            fs: this.gitFs.fs,
+            fs: this.gitFs.getFs(),
+            gitdir: getGitDirectory(dir),
             dir,
             cache: this.cache,
             filepath: filesToAdd.map((file) => file.name),
@@ -483,7 +507,8 @@ export class GitOperations {
         for (const file of filesToRemove) {
           await git
             .remove({
-              fs: this.gitFs.fs,
+              fs: this.gitFs.getFs(),
+              gitdir: getGitDirectory(dir),
               dir,
               cache: this.cache,
               filepath: file.name,
@@ -527,7 +552,8 @@ export class GitOperations {
         for (const file of files) {
           await git
             .resetIndex({
-              fs: this.gitFs.fs,
+              fs: this.gitFs.getFs(),
+              gitdir: getGitDirectory(dir),
               dir,
               cache: this.cache,
               filepath: file.name,
@@ -559,14 +585,16 @@ export class GitOperations {
         await window.fsApi.setGitConfig(dir, 'user.email', req.authorEmail);
       } else {
         await git.setConfig({
-          fs: this.gitFs.fs,
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
           dir,
           path: 'user.name',
           value: req.authorName,
         });
 
         await git.setConfig({
-          fs: this.gitFs.fs,
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
           dir,
           path: 'user.email',
           value: req.authorEmail,
@@ -593,12 +621,14 @@ export class GitOperations {
       remoteRepoUrls = await window.fsApi.listRepoRemotes(dir);
     } else {
       authorName = await git.getConfig({
-        fs: this.gitFs.fs,
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
         dir,
         path: 'user.name',
       });
       authorEmail = await git.getConfig({
-        fs: this.gitFs.fs,
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
         dir,
         path: 'user.email',
       });
@@ -619,7 +649,8 @@ export class GitOperations {
       await window.fsApi.gitStash(dir, 'push');
     } else {
       await git.stash({
-        fs: this.gitFs.fs,
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
         dir,
         message: 'Stash changes',
       });
@@ -633,7 +664,8 @@ export class GitOperations {
       stash = await window.fsApi.gitStash(dir, 'list');
     } else {
       stash = await git.stash({
-        fs: this.gitFs.fs,
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
         dir,
         op: 'list',
       });
@@ -656,7 +688,12 @@ export class GitOperations {
       if (this.gitFs.isElectron) {
         await window.fsApi.gitStash(dir, 'pop');
       } else {
-        await git.stash({ fs: this.gitFs.fs, dir, op: 'pop' });
+        await git.stash({
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
+          dir,
+          op: 'pop',
+        });
         // await this.gitFs.copyGit(r);
       }
 
@@ -671,7 +708,12 @@ export class GitOperations {
 
   gitStashDelete = async (r: RepoAccessObject): Promise<void> => {
     const dir = getRepoPath(r);
-    await git.stash({ fs: this.gitFs.fs, dir, op: 'drop' });
+    await git.stash({
+      fs: this.gitFs.getFs(),
+      gitdir: getGitDirectory(dir),
+      dir,
+      op: 'drop',
+    });
     // await this.gitFs.copyGit(r);
   };
 
@@ -692,7 +734,8 @@ export class GitOperations {
         );
       } else {
         await git.commit({
-          fs: this.gitFs.fs,
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
           dir,
           message,
           author: { name: committerName, email: committerEmail },
@@ -716,7 +759,8 @@ export class GitOperations {
         await window.fsApi.pushRepo(dir, username, password);
       } else {
         await git.push({
-          fs: this.gitFs.fs,
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
           http: this.http,
           dir,
           force,
@@ -756,10 +800,11 @@ export class GitOperations {
   gitCheckout = async (r: RepoAccessObject, branch: string) => {
     const dir = getRepoPath(r);
     if (this.gitFs.isElectron) {
-      window.fsApi.gitCheckout(dir, branch);
+      await window.fsApi.gitCheckout(dir, branch);
     } else {
       await git.checkout({
-        fs: this.gitFs.fs,
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
         dir,
         ref: branch,
         cache: this.cache,
@@ -775,7 +820,8 @@ export class GitOperations {
         return await window.fsApi.getCurrentBranch(dir);
       } else {
         return await git.currentBranch({
-          fs: this.gitFs.fs,
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
           dir,
         });
       }
@@ -792,7 +838,11 @@ export class GitOperations {
       if (this.gitFs.isElectron) {
         return window.fsApi.getAllGitBranches(dir);
       } else {
-        return await git.listBranches({ fs: this.gitFs.fs, dir });
+        return await git.listBranches({
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
+          dir,
+        });
       }
     } catch {
       return [];
@@ -809,7 +859,8 @@ export class GitOperations {
         remoteRef = await window.fsApi.gitResolveRef(dir, branch);
       } else {
         remoteRef = await git.resolveRef({
-          fs: this.gitFs.fs,
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
           dir,
           ref: `refs/remotes/origin/${branch}`,
         });
@@ -820,7 +871,8 @@ export class GitOperations {
       } else {
         return await git
           .log({
-            fs: this.gitFs.fs,
+            fs: this.gitFs.getFs(),
+            gitdir: getGitDirectory(dir),
             dir,
             ref: branch,
             cache: this.cache,
@@ -834,7 +886,8 @@ export class GitOperations {
       localCommits = await window.fsApi.gitLog(dir);
     } else {
       localCommits = await git.log({
-        fs: this.gitFs.fs,
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
         dir,
         ref: 'HEAD',
         cache: this.cache,
@@ -851,6 +904,7 @@ export class GitOperations {
   }
 
   async gitStageFile(r: RepoAccessObject, filepath: string) {
+    if (isGitMetadataPath(filepath)) return;
     const dir = getRepoPath(r);
 
     const absPath = join(dir, filepath);
@@ -867,7 +921,8 @@ export class GitOperations {
           await window.fsApi.gitAdd(dir, filepath);
         } else {
           await git.add({
-            fs: this.gitFs.fs,
+            fs: this.gitFs.getFs(),
+            gitdir: getGitDirectory(dir),
             dir,
             filepath,
             cache: this.cache,
@@ -878,7 +933,8 @@ export class GitOperations {
           await window.fsApi.gitRemove(dir, filepath);
         } else {
           await git.remove({
-            fs: this.gitFs.fs,
+            fs: this.gitFs.getFs(),
+            gitdir: getGitDirectory(dir),
             dir,
             filepath,
             cache: this.cache,
@@ -899,7 +955,8 @@ export class GitOperations {
         await window.fsApi.gitResetIndex(dir, filepath);
       } else {
         await git.resetIndex({
-          fs: this.gitFs.fs,
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
           dir,
           filepath,
           cache: this.cache,
@@ -924,7 +981,8 @@ export class GitOperations {
         await window.fsApi.gitCheckout(dir, currentBranch);
       } else {
         await git.writeRef({
-          fs: this.gitFs.fs,
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
           dir,
           ref: `refs/heads/${currentBranch}`,
           value: commitHash,
@@ -932,7 +990,8 @@ export class GitOperations {
         });
 
         await git.checkout({
-          fs: this.gitFs.fs,
+          fs: this.gitFs.getFs(),
+          gitdir: getGitDirectory(dir),
           dir,
           ref: currentBranch,
           force: true,
@@ -948,17 +1007,19 @@ export class GitOperations {
   revertFileToHEAD = async (r: RepoAccessObject, filepath: string) => {
     const dir = getRepoPath(r);
     if (this.gitFs.isElectron) {
-      window.fsApi.revertFileToHEAD(dir, filepath);
+      await window.fsApi.revertFileToHEAD(dir, filepath);
     } else {
       const headOid = await git.resolveRef({
-        fs: this.gitFs.fs,
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
         dir,
         ref: 'HEAD',
       });
 
       // Read the file's blob from HEAD
       const { blob } = await git.readBlob({
-        fs: this.gitFs.fs,
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
         dir,
         oid: headOid,
         filepath,
@@ -966,7 +1027,13 @@ export class GitOperations {
       });
 
       await this.gitFs.createFile(r, filepath, blob);
-      await git.add({ fs: this.gitFs.fs, dir, filepath, cache: this.cache });
+      await git.add({
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
+        dir,
+        filepath,
+        cache: this.cache,
+      });
     }
   };
   /**
@@ -979,7 +1046,8 @@ export class GitOperations {
     try {
       // Get the most recent commit
       const log = await git.log({
-        fs: this.gitFs.fs,
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
         dir,
         cache: this.cache,
         depth: 1, // Only get the last commit
@@ -1010,7 +1078,8 @@ export class GitOperations {
     const files: string[] = [];
 
     const { tree } = await git.readTree({
-      fs: this.gitFs.fs,
+      fs: this.gitFs.getFs(),
+      gitdir: getGitDirectory(dir),
       dir,
       oid: treeOid,
     });
@@ -1041,26 +1110,30 @@ export class GitOperations {
     try {
       // Get all files that are tracked in the current commit
       const headOid = await git.resolveRef({
-        fs: this.gitFs.fs,
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
         dir,
         ref: 'HEAD',
       });
 
       // Read commit object
       const { commit } = await git.readCommit({
-        fs: this.gitFs.fs,
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
         dir,
         oid: headOid,
       });
 
       // Walk the tree to get all files
       const commitFiles = await this.walkTree(dir, commit.tree);
+      allFiles = allFiles.filter((file) => !isGitMetadataPath(file));
       const workingSet = new Set(allFiles);
 
       const deleted = commitFiles.filter((file) => !workingSet.has(file));
 
       const trackedFiles = await git.listFiles({
-        fs: this.gitFs.fs,
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
         dir,
       });
       const trackedSet = new Set(trackedFiles);
@@ -1079,14 +1152,16 @@ export class GitOperations {
 
     try {
       const headOid = await git.resolveRef({
-        fs: this.gitFs.fs,
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
         dir,
         ref: 'HEAD',
       });
 
       // Read the file's blob from HEAD
       const { blob } = await git.readBlob({
-        fs: this.gitFs.fs,
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir),
         dir,
         oid: headOid,
         filepath,
