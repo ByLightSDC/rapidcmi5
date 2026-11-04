@@ -12,12 +12,23 @@ import JSZip from 'jszip';
 import path, { basename, dirname, join, relative } from 'path-browserify';
 import { configure, fs as zenFs } from '@zenfs/core';
 import { IndexedDB, WebAccess } from '@zenfs/dom';
+import { serializeDirectoryCreation } from './serializeDirectoryCreation';
+import { wrapBrowserGitFs } from './browserGitFs';
 import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { set, get, keys, getMany, del } from 'idb-keyval';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import { electronFs } from './ElectronFsApi';
 import { IFs } from 'memfs';
 import saveAs from 'file-saver';
+import {
+  getLocalGitDirectory,
+  getLocalGitConfig,
+  isGitMetadataPath,
+  RAPID_GIT_CONFIG,
+  STANDARD_GIT_DIRECTORY,
+  usesRapidGitConfig,
+  prepareLocalGitDirectory,
+} from './gitMetadata';
 import {
   getRc5Content,
   isExcludedAuFile,
@@ -42,11 +53,12 @@ export type FolderStructWithMtime = FolderStruct & {
   mtimeDate?: string; // ISO string
 };
 
-const noGitInProjectError =
-  'The selected directory does not contain a .git folder. Please choose a valid rapid cmi5 project';
-
 export class GitFS {
   public fs: FileSystemObject;
+
+  getFs(): FileSystemObject {
+    return this.isElectron ? this.fs : wrapBrowserGitFs(this.fs);
+  }
 
   public isBrowserFsLoaded: boolean = false;
   public isLocalFsLoaded: boolean = false;
@@ -361,7 +373,9 @@ export class GitFS {
     dirHandle: FileSystemDirectoryHandle,
     forClone = false,
   ) => {
-    const webacess = await WebAccess.create({ handle: dirHandle });
+    const webacess = serializeDirectoryCreation(
+      await WebAccess.create({ handle: dirHandle }),
+    );
 
     if (forClone) {
       zenFs.umount('/localFileSystem');
@@ -405,22 +419,17 @@ export class GitFS {
           throw Error(
             'There was an error when selecting the project directory, please try again',
           );
-
-        // We do not want to add to recent projects if this is not a git project
-        try {
-          const gitFolder = await dirHandle.getDirectoryHandle('.git');
-          if (!gitFolder) {
-            this.currentProjectRecentsId = undefined;
-            throw Error(noGitInProjectError);
-          }
-
-          await this.setDirHandle(dirHandle);
-        } catch (error: any) {
-          this.currentProjectRecentsId = undefined;
-          throw Error(noGitInProjectError);
-        }
       }
 
+      // Seed rapid-config using read-only access to the desktop config.
+      // Validate saved handles too when reopening a project.
+      try {
+        await prepareLocalGitDirectory(dirHandle);
+        await this.setDirHandle(dirHandle);
+      } catch (error) {
+        this.currentProjectRecentsId = undefined;
+        throw error;
+      }
       await this.openLocalDirectory(dirHandle);
       return dirHandle.name;
     }
@@ -482,13 +491,10 @@ export class GitFS {
     dirHandle: FileSystemDirectoryHandle,
   ): Promise<string | undefined> {
     try {
-      const gitDir = await dirHandle.getDirectoryHandle('.git', {
-        create: false,
-      });
+      const gitDir = await getLocalGitDirectory(dirHandle);
+      if (!gitDir) return undefined;
 
-      const configFile = await gitDir.getFileHandle('config', {
-        create: false,
-      });
+      const configFile = await getLocalGitConfig(gitDir);
 
       const file = await configFile.getFile();
       const text = await file.text();
@@ -785,24 +791,43 @@ export class GitFS {
    */
   importGitRepoZip = async (zip: JSZip, r: RepoAccessObject) => {
     const repoPath = getRepoPath(r);
+    const local = usesRapidGitConfig(repoPath, this.isElectron);
+    const paths = Object.keys(zip.files);
+    const hasRapidConfig = paths.some((filepath) => {
+      const parts = filepath.split('/');
+      return (
+        parts[1] === STANDARD_GIT_DIRECTORY && parts[2] === RAPID_GIT_CONFIG
+      );
+    });
 
-    await Promise.all(
-      Object.keys(zip.files).map(async (relativePath) => {
-        const index = relativePath.indexOf('/');
-        if (index === -1) return;
-        const cleanedPath = relativePath.slice(index);
-        const entry = zip.files[relativePath];
-
-        if (entry.dir) {
-          // Create directory
-          await this.createDirRecursive(`${repoPath}/${cleanedPath}`);
-        } else {
-          // Create file
-          const content = await entry.async('uint8array');
-          await this.createFile(r, cleanedPath, content);
+    // Write sequentially: WebAccess can expose a directory inode before its
+    // native handle is ready, so parallel file writes may miss their parent.
+    for (const relativePath of paths) {
+      const index = relativePath.indexOf('/');
+      if (index === -1) continue;
+      const parts = relativePath.slice(index + 1).split('/');
+      if (parts[0] === STANDARD_GIT_DIRECTORY) {
+        if (local && (parts[1] === 'hooks' || parts[1] === 'modules')) continue;
+        if (parts.length === 2) {
+          if (parts[1] === 'config' && hasRapidConfig) continue;
+          if (parts[1] === 'config' || parts[1] === RAPID_GIT_CONFIG) {
+            parts[1] = local ? RAPID_GIT_CONFIG : 'config';
+          }
         }
-      }),
-    );
+      }
+      const cleanedPath = parts.join('/');
+      const entry = zip.files[relativePath];
+      const fullPath = join(repoPath, cleanedPath);
+      if (entry.dir) {
+        await this.createDirRecursive(fullPath);
+      } else {
+        await this.createDirRecursive(dirname(fullPath));
+        await this.fs.promises.writeFile(
+          fullPath,
+          await entry.async('uint8array'),
+        );
+      }
+    }
   };
 
   /**
@@ -933,6 +958,7 @@ export class GitFS {
       const items = (await this.fs.promises.readdir(dir)).sort();
 
       for (const item of items) {
+        if (isGitMetadataPath(item.toString())) continue;
         const itemPath = `${dir}/${item}`;
         const stat = await this.fs.promises.stat(itemPath);
 
@@ -965,8 +991,6 @@ export class GitFS {
             }
           }
         } else if (stat.isDirectory()) {
-          if (name === '.git') continue;
-
           node.isBranch = true;
           node.children = await this.getFolderStructureRecWithMtime(
             itemPath,
@@ -1049,6 +1073,7 @@ export class GitFS {
       const items = (await this.fs.promises.readdir(dir)).sort();
 
       for (const item of items) {
+        if (isGitMetadataPath(item.toString())) continue;
         const itemPath = `${dir}/${item}`;
         const stat = await this.fs.promises.stat(itemPath);
 
@@ -1070,7 +1095,6 @@ export class GitFS {
             }
           }
         } else if (stat.isDirectory()) {
-          if (name === '.git') continue;
           node.isBranch = true;
 
           node.children = await this.getFolderStructureRec(

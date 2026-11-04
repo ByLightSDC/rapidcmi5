@@ -43,7 +43,7 @@ const documentation: Record<string, OptionDocumentation> = {
 - You've cloned using another Git client
 - You want to work with an existing local repository
 
-The application will verify the \`.git\` folder exists before opening`,
+In the browser, Git uses the standard \`.git\` directory for commits, branches, and staging. Configuration is stored in \`.git/rapid-config\`, copied once from \`.git/config\` when opening an existing repository. Browser configuration changes do not update desktop Git settings. Browser-created repositories need their remote and upstream configured in a desktop Git client before desktop push or pull. Hooks and submodules are not supported in browser mode.`,
   },
   create: {
     title: 'Create New Repository',
