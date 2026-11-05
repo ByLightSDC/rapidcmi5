@@ -37,6 +37,7 @@ export interface RapidCmi5Opts {
   apiUrls?: ApiUrls;
   onAiClick?: (mode: AiPanelMode) => void;
   aiThinking?: boolean;
+  onEditorViewChange?: (isEditorView: boolean) => void;
 }
 
 const RapidCmi5OptsContext = createContext<RapidCmi5Opts>({});

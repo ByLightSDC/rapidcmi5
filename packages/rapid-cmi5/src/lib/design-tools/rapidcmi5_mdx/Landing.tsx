@@ -54,6 +54,7 @@ import React, {
   useState,
 } from 'react';
 import { GitContext } from '../course-builder/GitViewer/session/GitContext';
+import { useRapidCmi5Opts } from '../course-builder/GitViewer/session/RapidCmi5OptsContext';
 
 /**
  * Icons
@@ -80,12 +81,23 @@ enum RepoActionEnum {
  */
 export function Landing() {
   const viewMode = useSelector(currentViewMode);
+  const { onEditorViewChange } = useRapidCmi5Opts();
   const themedDividerColor = useSelector(dividerColor);
 
   const dispatch = useDispatch();
+  const hasInitializedView = useRef(false);
+  // When view changes, see if we are still on landing page
+  // Track landing page so skip link is available on correct page (same URL, different pages)
   useEffect(() => {
-    dispatch(changeViewMode(ViewModeEnum.RepoSelector));
-  }, []);
+    if (!hasInitializedView.current) {
+      hasInitializedView.current = true;
+      onEditorViewChange?.(false);
+      dispatch(changeViewMode(ViewModeEnum.RepoSelector));
+      return;
+    }
+
+    onEditorViewChange?.(viewMode !== ViewModeEnum.RepoSelector);
+  }, [dispatch, onEditorViewChange, viewMode]);
   const { currentRepo } = useContext(GitContext);
   const { promptDeleteRepo, promptGitConfig } = useRC5Prompts();
 

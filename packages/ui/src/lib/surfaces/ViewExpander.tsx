@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 /* MUI */
 import Divider, { DividerProps } from '@mui/material/Divider';
 import Grid from '@mui/material/Grid2';
+import ButtonBase from '@mui/material/ButtonBase';
+import Box from '@mui/material/Box';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Typography from '@mui/material/Typography';
 import { Variant } from '@mui/material/styles/createTypography';
@@ -9,7 +11,10 @@ import { Variant } from '@mui/material/styles/createTypography';
 /* Icons */
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { SxProps } from '@mui/system';
-import { ButtonInfoField, ButtonInfoFormHeaderLayout } from '../utility/buttons';
+import {
+  ButtonInfoField,
+  ButtonInfoFormHeaderLayout,
+} from '../utility/buttons';
 
 /**
  * @interface tViewExpanderProps
@@ -36,6 +41,7 @@ export type tViewExpanderProps = {
   shouldEndWithDivider?: boolean;
   shouldIndicateMore?: boolean;
   shouldStartWithDivider?: boolean;
+  initialFocus?: boolean;
   title: string;
   titleIcon?: JSX.Element;
   titleVariant?: Variant;
@@ -59,6 +65,7 @@ export function ViewExpander({
   shouldEndWithDivider = false,
   shouldIndicateMore = true,
   shouldStartWithDivider = false,
+  initialFocus = false,
   title = '',
   titleIcon,
   titleSxProps = {},
@@ -87,29 +94,54 @@ export function ViewExpander({
           <Divider sx={dividerSxProps} />
         </Grid>
       )}
+      {/* ButtonBase gives the expandable header standard keyboard interaction. */}
       <Grid size={12}>
-        <div
+        <Box
           className="content-row-icons"
           style={headerSxProps}
-          onClick={toggleExpanded}
+          sx={{ gap: 0.5 }}
         >
-          <ListItemIcon data-testid={expandTestId}>
-            <ExpandLessIcon
-              color="primary"
-              sx={{ transform: iconTransform, ...iconSxProps }}
-            />
-          </ListItemIcon>
-          {titleIcon}
-          <Typography
-            variant={titleVariant}
+          <ButtonBase
+            onClick={toggleExpanded}
+            aria-expanded={isExpanded}
+            data-testid={expandTestId}
+            data-drawer-initial-focus={initialFocus ? 'true' : undefined}
+            // Keep old look after witching to button, add visible keyboard focus
             sx={{
-              height: '24px',
-              paddingRight: '4px',
-              ...titleSxProps,
+              flexGrow: 1,
+              minWidth: 0,
+              justifyContent: 'flex-start',
+              textAlign: 'left',
+              borderRadius: 1,
+              '&:focus-visible': {
+                outline: '2px solid',
+                outlineColor: 'primary.main',
+                outlineOffset: 1,
+              },
             }}
           >
-            {shouldIndicateMore ? (isExpanded ? title : title + '...') : title}
-          </Typography>
+            <ListItemIcon>
+              <ExpandLessIcon
+                color="primary"
+                sx={{ transform: iconTransform, ...iconSxProps }}
+              />
+            </ListItemIcon>
+            {titleIcon}
+            <Typography
+              variant={titleVariant}
+              sx={{
+                height: '24px',
+                paddingRight: '4px',
+                ...titleSxProps,
+              }}
+            >
+              {shouldIndicateMore
+                ? isExpanded
+                  ? title
+                  : title + '...'
+                : title}
+            </Typography>
+          </ButtonBase>
           {infoTextTitle && (
             <ButtonInfoField
               message={infoTextTitle}
@@ -117,9 +149,8 @@ export function ViewExpander({
             />
           )}
           {rightMenuChildren}
-        </div>
+        </Box>
       </Grid>
-
       {isExpanded && children}
       {shouldEndWithDivider && (
         <Grid size={12}>

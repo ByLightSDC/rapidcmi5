@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { FocusEvent } from 'react';
 
 const STORAGE_KEY_PREFIX = 'rc5_drawer_autohide_';
 
@@ -8,9 +9,10 @@ const STORAGE_KEY_PREFIX = 'rc5_drawer_autohide_';
  * When autoHide is OFF (default): the panel is fully controlled by `isActivated` —
  * the user must press X to close it.
  *
- * When autoHide is ON: the panel slides closed on mouse-leave and re-opens on
- * mouse-enter. Whenever `isActivated` goes true OR `showSeq` increments (toolbar
- * button clicked again while already active), the panel always shows immediately.
+ * When autoHide is ON: the panel slides closed when both the pointer and keyboard
+ * focus leave it, and re-opens on mouse-enter. Whenever `isActivated` goes true
+ * OR `showSeq` increments (toolbar button clicked again while already active),
+ * the panel always shows immediately.
  *
  * @param panelKey     Short unique key used for localStorage (e.g. "animation")
  * @param isActivated  Whether the panel is currently activated (open) by the caller
@@ -34,6 +36,8 @@ export function useDrawerAutoHide(
 
   // Tracks whether the mouse is currently inside the drawer area.
   const [hoverVisible, setHoverVisible] = useState(false);
+  // Tracks whether keyboard focus is still inside the drawer for WCAG comp.
+  const [focusWithin, setFocusWithin] = useState(false);
 
   // Track previous values to detect genuine changes
   const prevActivatedRef = useRef(isActivated);
@@ -85,8 +89,30 @@ export function useDrawerAutoHide(
     }, 300);
   }, []);
 
-  // The effective open state: activated + (autohide off OR mouse inside)
-  const effectiveOpen = isActivated && (!autoHide || hoverVisible);
+  // Turn on focus when it enters drawer
+  const handleFocusCapture = useCallback(() => {
+    setFocusWithin(true);
+  }, []);
+  //Turn off focus when it leaves, checks 'relatedTarget' so moving inside drawer doesn't count as leaving.
+  const handleBlurCapture = useCallback(
+    (event: FocusEvent<HTMLDivElement>) => {
+      const nextTarget = event.relatedTarget;
+      if (
+        !(nextTarget instanceof Node) ||
+        !event.currentTarget.contains(nextTarget)
+      ) {
+        setFocusWithin(false);
+        // Focus may move to inserted editor content while the pointer remains
+        // over the drawer. Hide it in that case when auto-hide is enabled.
+        if (autoHide) setHoverVisible(false);
+      }
+    },
+    [autoHide],
+  );
+
+  // Keep keyboard focus usable even if the pointer leaves an auto-hiding drawer.
+  const effectiveOpen =
+    isActivated && (!autoHide || hoverVisible || focusWithin);
 
   /**
    * sx props to spread onto the Drawer `sx` prop.
@@ -114,6 +140,8 @@ export function useDrawerAutoHide(
     effectiveOpen,
     handleMouseEnter,
     handleMouseLeave,
+    handleFocusCapture,
+    handleBlurCapture,
     getDrawerSx,
   };
 }
