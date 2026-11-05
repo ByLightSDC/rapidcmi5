@@ -17,6 +17,7 @@ import { highlightAnimatedElement } from './utils/updateAnimationIndicators';
 import { debugLog, onAnimDirectiveClick$ } from '@rapid-cmi5/ui';
 import { BlockLibraryDrawer } from '../../toolbar/components/BlockLibraryDrawer';
 import { LessonStyleDrawer } from '../../toolbar/components/LessonStyleDrawer';
+import { DRAWER_TYPE, drawerMode$ } from '../../toolbar/components/drawers';
 
 export interface AnimationPluginParams {
   initialAnimations?: AnimationConfig[];
@@ -119,7 +120,8 @@ export const animationPlugin = realmPlugin<AnimationPluginParams>({
           undefined,
           'plugin',
         );
-        // Open drawer
+        // Open drawer -drawermode ensures others (like blocks) close before this opens
+        realm.pub(drawerMode$, DRAWER_TYPE.NONE);
         realm.pub(animationDrawerOpen$, true);
         // Select animation
         realm.pub(selectedAnimation$, matchingAnim.id);
@@ -128,6 +130,7 @@ export const animationPlugin = realmPlugin<AnimationPluginParams>({
       } else {
         console.warn('⚠️ No animation found for directiveId:', directiveId);
         // Still open drawer so user can see what animations exist
+        realm.pub(drawerMode$, DRAWER_TYPE.NONE);
         realm.pub(animationDrawerOpen$, true);
         // Still highlight the directive element even if no animation config found
         highlightAnimatedElement(directiveId);
