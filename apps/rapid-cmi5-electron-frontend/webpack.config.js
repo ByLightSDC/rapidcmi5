@@ -1,20 +1,23 @@
 const { merge } = require('webpack-merge');
 const { composePlugins, withNx } = require('@nx/webpack');
 const { withReact } = require('@nx/react');
+const { resolve } = require('path');
+
+const fontStylesheet = resolve(__dirname, 'src/assets/fonts/stylesheet.css');
 
 module.exports = composePlugins(withNx(), withReact(), (config) => {
-  // Find and modify existing CSS rules to exclude monaco-editor
+  // These stylesheets use css-loader directly instead of Nx's PostCSS pipeline.
   config.module.rules.forEach((rule) => {
     if (rule.oneOf) {
       rule.oneOf.forEach((oneOfRule) => {
         if (oneOfRule.test && oneOfRule.test.toString().includes('css')) {
-          // Add monaco-editor to exclude
+          // Nx's asset processor loses drive letters in Windows font paths.
           if (Array.isArray(oneOfRule.exclude)) {
-            oneOfRule.exclude.push(/monaco-editor/);
+            oneOfRule.exclude.push(/monaco-editor/, fontStylesheet);
           } else if (oneOfRule.exclude) {
-            oneOfRule.exclude = [oneOfRule.exclude, /monaco-editor/];
+            oneOfRule.exclude = [oneOfRule.exclude, /monaco-editor/, fontStylesheet];
           } else {
-            oneOfRule.exclude = /monaco-editor/;
+            oneOfRule.exclude = [/monaco-editor/, fontStylesheet];
           }
         }
       });
@@ -26,6 +29,13 @@ module.exports = composePlugins(withNx(), withReact(), (config) => {
   config.module.rules.unshift({
     test: /\.css$/,
     include: /monaco-editor/,
+    use: ['style-loader', 'css-loader'],
+  });
+
+  // Let css-loader resolve font URLs and the asset/resource rule emit the fonts.
+  config.module.rules.unshift({
+    test: /\.css$/,
+    include: fontStylesheet,
     use: ['style-loader', 'css-loader'],
   });
 
