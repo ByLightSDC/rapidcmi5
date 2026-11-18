@@ -49,7 +49,7 @@
     "@emotion/styled": "^11.14.1",
     "@hookform/resolvers": "^5.2.1",
     "@mdx-js/react": "^2.3.0",
-    "@mdxeditor/editor": "^3.48.0",
+    "@mdxeditor/editor": "^4.5.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@monaco-editor/react": "^4.7.0",
     "@mui/icons-material": "^6.4.8",

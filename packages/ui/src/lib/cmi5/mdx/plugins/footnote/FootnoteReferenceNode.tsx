@@ -3,11 +3,25 @@ import { useCellValue, voidEmitter } from '@mdxeditor/editor';
 
 import { DecoratorNode, EditorConfig, LexicalEditor, NodeKey } from 'lexical';
 import React from 'react';
+import { z } from 'zod/v4';
 
 import FootnoteReferenceEditorContextProvider from './FootnoteReferenceEditorContext';
 import { footnoteReferenceEditorDescriptors$ } from './vars';
 import { FootnoteRefEditorProps, SerializedFootnoteRefNode } from './types';
 import { $createFootnoteReferenceNode } from './methods';
+
+const footnoteReferenceSchema = z.object({
+  type: z.literal('fnref'),
+  version: z.literal(1),
+  label: z.string(),
+  mdastNode: z
+    .object({
+      type: z.literal('footnoteReference'),
+      identifier: z.string(),
+      label: z.string().nullable().optional(),
+    })
+    .passthrough(),
+});
 
 /**
  * Lexical node that represents a Footnote Reference.
@@ -54,9 +68,15 @@ export class FootnoteReferenceNode extends DecoratorNode<JSX.Element> {
   }
 
   static override importJSON(
-    serializedNode: SerializedFootnoteRefNode,
+    serializedNode: Parameters<typeof DecoratorNode.importJSON>[0],
   ): FootnoteReferenceNode {
-    const { label, mdastNode } = serializedNode;
+    const result = footnoteReferenceSchema.safeParse(serializedNode);
+    if (!result.success) {
+      throw new Error(
+        `Invalid serialized footnote reference: ${result.error.message}`,
+      );
+    }
+    const { label, mdastNode } = result.data;
     return $createFootnoteReferenceNode({
       label,
       mdastNode,

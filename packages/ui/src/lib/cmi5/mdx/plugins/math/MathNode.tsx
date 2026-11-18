@@ -11,8 +11,18 @@ import {
   Spread,
 } from 'lexical';
 import React from 'react';
+import { z } from 'zod/v4';
 import MathEditorContextProvider from './MathEditorContext';
 import { mathEditorDescriptors$ } from '.';
+
+const mathNodeSchema = z.object({
+  type: z.literal('math'),
+  version: z.literal(1),
+  isInline: z.boolean(),
+  code: z.string(),
+  language: z.string(),
+  meta: z.string(),
+});
 
 /**
  * @interface CreateMathNodeOptions
@@ -84,8 +94,14 @@ export class MathNode extends DecoratorNode<JSX.Element> {
     );
   }
 
-  static override importJSON(serializedNode: SerializedMathNode): MathNode {
-    const { isInline, code, meta, language } = serializedNode;
+  static override importJSON(
+    serializedNode: Parameters<typeof DecoratorNode.importJSON>[0],
+  ): MathNode {
+    const result = mathNodeSchema.safeParse(serializedNode);
+    if (!result.success) {
+      throw new Error(`Invalid serialized math node: ${result.error.message}`);
+    }
+    const { isInline, code, meta, language } = result.data;
     return $createMathNode({
       isInline,
       code,

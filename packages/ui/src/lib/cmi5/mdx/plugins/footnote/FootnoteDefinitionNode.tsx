@@ -9,11 +9,43 @@ import {
   NodeKey,
 } from 'lexical';
 import React from 'react';
+import { z } from 'zod/v4';
 
 import FootnoteDefinitionEditorContextProvider from './FootnoteDefinitionEditorContext';
 import { footnoteDefinitionEditorDescriptors$ } from './vars';
 import { FootnoteDefEditorProps, SerializedFootnoteDefNode } from './types';
 import { $createFootnoteDefinitionNode } from './methods';
+
+// Validate the tree structure while preserving Markdown/MDX extension fields.
+// This checks the serialization envelope, not every MDAST node's grammar.
+function isMdastContent(value: unknown): boolean {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return false;
+  }
+  const node = value as Record<string, unknown>;
+  return (
+    typeof node['type'] === 'string' &&
+    (node['value'] === undefined || typeof node['value'] === 'string') &&
+    (node['children'] === undefined ||
+      (Array.isArray(node['children']) && node['children'].every(isMdastContent)))
+  );
+}
+
+const footnoteDefinitionSchema = z.object({
+  type: z.literal('fndef'),
+  version: z.literal(1),
+  label: z.string(),
+  mdastNode: z
+    .object({
+      type: z.literal('footnoteDefinition'),
+      identifier: z.string(),
+      label: z.string().nullable().optional(),
+      children: z.array(
+        z.custom<Mdast.BlockContent | Mdast.DefinitionContent>(isMdastContent),
+      ),
+    })
+    .passthrough(),
+});
 
 /**
  * Lexical node that represents a Footnote Definition.
@@ -80,9 +112,15 @@ export class FootnoteDefinitionNode extends DecoratorNode<JSX.Element> {
    * @returns
    */
   static override importJSON(
-    serializedNode: SerializedFootnoteDefNode,
+    serializedNode: Parameters<typeof DecoratorNode.importJSON>[0],
   ): FootnoteDefinitionNode {
-    const { label, mdastNode } = serializedNode;
+    const result = footnoteDefinitionSchema.safeParse(serializedNode);
+    if (!result.success) {
+      throw new Error(
+        `Invalid serialized footnote definition: ${result.error.message}`,
+      );
+    }
+    const { label, mdastNode } = result.data;
     return $createFootnoteDefinitionNode({
       label,
       mdastNode,
