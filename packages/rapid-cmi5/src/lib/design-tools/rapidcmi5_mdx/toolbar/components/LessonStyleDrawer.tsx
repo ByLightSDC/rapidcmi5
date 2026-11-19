@@ -31,6 +31,7 @@ import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 
 import { useDrawerAutoHide } from './useDrawerAutoHide';
+import { useDrawerFocus } from './useDrawerFocus';
 
 import {
   BlockPaddingEnum,
@@ -44,7 +45,12 @@ import {
 } from '../../drawers/constants';
 import { RC5Context } from '../../contexts/RC5Context';
 import { courseDataCache } from '../../../../redux/courseBuilderReducer';
-import { drawerHeaderStyles, drawerHeaderVariant, drawerTitleStyles, drawerTitleVariant } from '@rapid-cmi5/ui';
+import {
+  drawerHeaderStyles,
+  drawerHeaderVariant,
+  drawerTitleStyles,
+  drawerTitleVariant,
+} from '@rapid-cmi5/ui';
 
 /**
  * Apply styles globally
@@ -87,9 +93,18 @@ export function LessonStyleDrawer() {
     toggleAutoHide,
     handleMouseEnter,
     handleMouseLeave,
+    handleFocusCapture,
+    handleBlurCapture,
     effectiveOpen,
     getDrawerSx,
   } = useDrawerAutoHide('styles', isOpen, showSeq);
+  // Check if draweris open and sequence so it knows fresh open requests/where to put focus
+  const drawerFocus = useDrawerFocus({
+    open: effectiveOpen,
+    openSequence: showSeq,
+    initialFocusSelector: '[data-drawer-initial-focus="true"]',
+    onClose: handleClose,
+  });
 
   const handleSetContentWidth = useCallback(
     (val: ContentWidthEnum) => {
@@ -163,13 +178,25 @@ export function LessonStyleDrawer() {
         },
       })}
       PaperProps={{
+        // The panel is the dialog controlled by the Course Appearance button.
+        id: 'lesson-styles',
+        role: 'dialog',
+        'aria-labelledby': 'lesson-styles-title',
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
         sx: { zIndex: 1400 },
       }}
     >
       <Stack
-        id="lesson-styles"
+        //The auto-hide focus tracking matters because a keyboard user may move the pointer away while navigating the drawer.
+        // The drawer stays visible while it contains focus.
+        ref={drawerFocus.rootRef}
+        onFocusCapture={(event) => {
+          handleFocusCapture();
+          drawerFocus.onFocusCapture(event);
+        }}
+        onBlurCapture={handleBlurCapture}
+        onKeyDown={drawerFocus.onKeyDown}
         direction="column"
         sx={{ height: '100%', zIndex: 200 }}
         spacing={0}
@@ -186,7 +213,12 @@ export function LessonStyleDrawer() {
         >
           <PaletteIcon color="primary" />
 
-          <Typography variant={drawerHeaderVariant} sx={drawerHeaderStyles}>
+          {/* Use the visible title as the dialog's accessible name. */}
+          <Typography
+            id="lesson-styles-title"
+            variant={drawerHeaderVariant}
+            sx={drawerHeaderStyles}
+          >
             Course Appearance
           </Typography>
           <Tooltip
@@ -197,6 +229,8 @@ export function LessonStyleDrawer() {
             }
           >
             <IconButton
+              // Make utility so focus hook skips them when remembering last used control.
+              data-drawer-utility="true"
               onClick={toggleAutoHide}
               aria-label={autoHide ? 'Disable auto-hide' : 'Enable auto-hide'}
               size="small"
@@ -210,6 +244,8 @@ export function LessonStyleDrawer() {
             </IconButton>
           </Tooltip>
           <IconButton
+            // Make utility so focus hook skips them when remembering last used control.
+            data-drawer-utility="true"
             onClick={handleClose}
             aria-label="Close Course Appearance"
           >
@@ -222,7 +258,10 @@ export function LessonStyleDrawer() {
         <Grid container sx={{ margin: 2 }}>
           {/* Content Width */}
           <Grid size={11.5}>
-            <Typography variant={drawerTitleVariant}  sx={{ ...drawerTitleStyles, mb: 1 }}>
+            <Typography
+              variant={drawerTitleVariant}
+              sx={{ ...drawerTitleStyles, mb: 1 }}
+            >
               Content Width
             </Typography>
             <ToggleButtonGroup
@@ -236,19 +275,55 @@ export function LessonStyleDrawer() {
               size="small"
               fullWidth
             >
-              <ToggleButton value={ContentWidthEnum.None}>None</ToggleButton>
-              <ToggleButton value={ContentWidthEnum.Small}>S</ToggleButton>
-              <ToggleButton value={ContentWidthEnum.Medium}>M</ToggleButton>
-              <ToggleButton value={ContentWidthEnum.Large}>L</ToggleButton>
+              <ToggleButton
+                value={ContentWidthEnum.None}
+                data-drawer-initial-focus={
+                  contentWidth === ContentWidthEnum.None ? 'true' : undefined
+                }
+              >
+                None
+              </ToggleButton>
+              <ToggleButton
+                value={ContentWidthEnum.Small}
+                data-drawer-initial-focus={
+                  contentWidth === ContentWidthEnum.Small ? 'true' : undefined
+                }
+              >
+                S
+              </ToggleButton>
+              <ToggleButton
+                value={ContentWidthEnum.Medium}
+                data-drawer-initial-focus={
+                  contentWidth === ContentWidthEnum.Medium ? 'true' : undefined
+                }
+              >
+                M
+              </ToggleButton>
+              <ToggleButton
+                value={ContentWidthEnum.Large}
+                data-drawer-initial-focus={
+                  contentWidth === ContentWidthEnum.Large ? 'true' : undefined
+                }
+              >
+                L
+              </ToggleButton>
             </ToggleButtonGroup>
-            <Typography variant="body2" sx={{ mt: 0.5 }}>
+            <Typography
+              variant="body2"
+              aria-live="polite"
+              aria-atomic="true"
+              sx={{ mt: 0.5 }}
+            >
               {contentWidthDescriptions.get(contentWidth)}
             </Typography>
           </Grid>
 
           {/* Block Padding */}
           <Grid size={11.5} sx={{ mt: 2.5 }}>
-            <Typography variant={drawerTitleVariant}  sx={{ ...drawerTitleStyles, mb: 1 }}>
+            <Typography
+              variant={drawerTitleVariant}
+              sx={{ ...drawerTitleStyles, mb: 1 }}
+            >
               Block Padding
             </Typography>
             <ToggleButtonGroup
@@ -271,7 +346,13 @@ export function LessonStyleDrawer() {
                 <MoreHorizIcon fontSize="small" />
               </ToggleButton>
             </ToggleButtonGroup>
-            <Typography variant="body2" sx={{ mt: 0.5 }}>
+            {/* Announce the complete updated helper text politely. */}
+            <Typography
+              variant="body2"
+              aria-live="polite"
+              aria-atomic="true"
+              sx={{ mt: 0.5 }}
+            >
               {blockPaddingDescriptions.get(blockPadding)}
             </Typography>
             {blockPadding === BlockPaddingEnum.Custom && (
@@ -303,14 +384,20 @@ export function LessonStyleDrawer() {
 
           {/* Default Alignment */}
           <Grid size={11.5} sx={{ mt: 2.5 }}>
-            <Typography variant={drawerTitleVariant}  sx={{ ...drawerTitleStyles, mb: 1 }}>
+            <Typography
+              variant={drawerTitleVariant}
+              sx={{ ...drawerTitleStyles, mb: 1 }}
+            >
               Text Alignment
             </Typography>
             <ToggleButtonGroup
               value={defaultAlignment}
               exclusive
               onChange={(_, val) => {
-                handleSetDefaultAlignment(val as DefaultAlignmentEnum);
+                // Ignore null so clicking the selected option keeps the current value.
+                if (val !== null) {
+                  handleSetDefaultAlignment(val as DefaultAlignmentEnum);
+                }
               }}
               size="small"
               fullWidth
@@ -325,21 +412,35 @@ export function LessonStyleDrawer() {
                 Right
               </ToggleButton>
             </ToggleButtonGroup>
-            <Typography variant="body2" sx={{ mt: 0.5 }}>
+            {/* Announce the complete updated helper text politely. */}
+            <Typography
+              variant="body2"
+              aria-live="polite"
+              aria-atomic="true"
+              sx={{ mt: 0.5 }}
+            >
               {defaultAlignmentLabels.get(defaultAlignment) ?? 'Left'} align
               text
             </Typography>
           </Grid>
           {/* Default Activity Alignment */}
           <Grid size={11.5} sx={{ mt: 2.5 }}>
-            <Typography variant={drawerTitleVariant}  sx={{ ...drawerTitleStyles, mb: 1 }}>
+            <Typography
+              variant={drawerTitleVariant}
+              sx={{ ...drawerTitleStyles, mb: 1 }}
+            >
               Activity Alignment
             </Typography>
             <ToggleButtonGroup
               value={defaultActivityAlignment}
               exclusive
               onChange={(_, val) => {
-                handleSetDefaultActivityAlignment(val as DefaultAlignmentEnum);
+                // Ignore null so clicking the selected option keeps the current value.
+                if (val !== null) {
+                  handleSetDefaultActivityAlignment(
+                    val as DefaultAlignmentEnum,
+                  );
+                }
               }}
               size="small"
               fullWidth
@@ -354,7 +455,13 @@ export function LessonStyleDrawer() {
                 Right
               </ToggleButton>
             </ToggleButtonGroup>
-            <Typography variant="body2" sx={{ mt: 0.5 }}>
+            {/* Announce the complete updated helper text politely. */}
+            <Typography
+              variant="body2"
+              aria-live="polite"
+              aria-atomic="true"
+              sx={{ mt: 0.5 }}
+            >
               {defaultAlignmentLabels.get(defaultActivityAlignment) ?? 'Center'}{' '}
               align activities
             </Typography>

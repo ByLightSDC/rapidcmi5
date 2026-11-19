@@ -216,6 +216,8 @@ export function WrapWithAnimDirective() {
 
   return (
     <Button
+      // mark the Add Animation button as the fallback focus target.
+      data-animation-initial-focus="true"
       variant="outlined"
       startIcon={<AddCircleOutlineIcon />}
       onClick={handleWrap}

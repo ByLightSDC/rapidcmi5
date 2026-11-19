@@ -6,7 +6,11 @@ import { AuthContext } from './contexts/AuthContext';
 import { detectIsElectron } from './utils/appType';
 import { useAppUi } from './contexts/AppUiContext';
 
-export function RapidCmi5Wrapper() {
+export function RapidCmi5Wrapper({
+  onEditorViewChange,
+}: {
+  onEditorViewChange: (isEditorView: boolean) => void;
+}) {
   const isElectron = detectIsElectron();
 
   const { token, parsedUserToken } = useContext(AuthContext);
@@ -56,6 +60,7 @@ export function RapidCmi5Wrapper() {
       }}
       onAiClick={isElectron ? openAiPanel : undefined}
       aiThinking={isElectron ? aiThinking : false}
+      onEditorViewChange={onEditorViewChange}
     />
   );
 }
