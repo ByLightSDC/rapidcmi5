@@ -43,7 +43,6 @@ import {
   FootnoteDefinitionDescriptor,
   FootnoteReferenceDescriptor,
   MathCodeBlockDescriptor,
-  MermaidCodeBlockDescriptor,
   MathDescriptor,
   mathPlugin,
   languageList,
@@ -87,6 +86,7 @@ import {
 import { imagePlugin } from '../plugins/image';
 import { videoPlugin } from '../plugins/video';
 import { audioPlugin } from '../plugins/audio';
+import { EditableMermaidCodeBlockDescriptor } from '../plugins/mermaid';
 import { RC5LinkDialog } from '../plugins/link/RC5LinkDialog';
 
 import {
@@ -344,7 +344,7 @@ function RC5VisualEditor() {
         defaultCodeBlockLanguage: 'js',
         codeBlockEditorDescriptors: [
           MathCodeBlockDescriptor,
-          MermaidCodeBlockDescriptor,
+          EditableMermaidCodeBlockDescriptor,
           {
             priority: -10,
             match: (_) => true,
