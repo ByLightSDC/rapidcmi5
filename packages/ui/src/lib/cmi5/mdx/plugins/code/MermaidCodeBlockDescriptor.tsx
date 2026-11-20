@@ -133,8 +133,9 @@ const matchMermaid = (language: string | null | undefined) =>
 /**
  * Renders ```mermaid fenced code blocks as diagrams with no edit dialog
  * (player, or any editor that doesn't supply one).
- * Priority must beat the codeMirrorPlugin descriptor (priority 1), which also
- * matches 'mermaid' since it is in the codemirror language list.
+ * Priority 2 keeps it ahead of the codeMirrorPlugin descriptor (priority 1)
+ * should 'mermaid' ever be added to codeBlockLanguages. It is currently only
+ * in the picker's languageOptions (vars.ts), so authors can switch back.
  */
 export const MermaidCodeBlockDescriptor: CodeBlockEditorDescriptor = {
   priority: 2,
