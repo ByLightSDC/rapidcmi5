@@ -21,12 +21,29 @@ export const MUIButtonWithTooltip = ({
   title,
   onClick,
   sx,
+  style,
   styles,
+  ...buttonProps
 }: ButtonProps & { styles?: any; testId?: string }) => {
   const theme = useTheme();
   return (
-    <Tooltip title={title} {...tooltipStyle}>
+    // Prevent overflow causing scroll bars to appear
+    <Tooltip
+      title={title}
+      PopperProps={{
+        popperOptions: {
+          modifiers: [
+            {
+              name: 'preventOverflow',
+              options: { altAxis: true, padding: 8 },
+            },
+          ],
+        },
+      }}
+      {...tooltipStyle}
+    >
       <IconButton
+        {...buttonProps}
         className={className}
         data-testid={testId}
         sx={{
@@ -47,6 +64,7 @@ export const MUIButtonWithTooltip = ({
           },
         }}
         style={{
+          ...style,
           ...styles,
           '&.disabled': {
             color: theme.palette.action.disabled,
