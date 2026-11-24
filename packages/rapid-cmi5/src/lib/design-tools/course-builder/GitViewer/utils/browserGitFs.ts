@@ -1,8 +1,22 @@
 import { normalize } from 'path-browserify';
 import type { FileSystemObject } from './fileSystem';
 import { RAPID_GIT_CONFIG, usesRapidGitConfig } from './gitMetadata';
+import { withTimeout } from './withTimeout';
 
 const adapters = new WeakMap<object, FileSystemObject>();
+
+const FS_OP_WARN_MS = 5_000;
+const FS_OP_TIMEOUT_MS = 60_000;
+
+function watchFsOp<T>(label: string, op: Promise<T>): Promise<T> {
+  const warn = setTimeout(
+    () => console.warn(`[rc5] git fs op still pending after 5s: ${label}`),
+    FS_OP_WARN_MS,
+  );
+  return withTimeout(`git fs op: ${label}`, op, FS_OP_TIMEOUT_MS).finally(() =>
+    clearTimeout(warn),
+  );
+}
 
 /**
  * isomorphic-git hardcodes .git/config. Redirect only browser local config
@@ -39,7 +53,13 @@ export function wrapBrowserGitFs(fs: FileSystemObject): FileSystemObject {
         if (method === 'rename' || method === 'copyFile' || method === 'link') {
           args[1] = mapPath(args[1]);
         }
-        return Reflect.apply(original, target, args);
+        const result = Reflect.apply(original, target, args);
+        // Chrome restricts File System Access under .git, and some restricted
+        // operations hang instead of rejecting. Watch local-folder ops so a
+        // stall names the exact op/path and fails instead of spinning forever.
+        return usesRapidGitConfig(filepath) && result instanceof Promise
+          ? watchFsOp(`${String(method)} ${String(args[0])}`, result)
+          : result;
       };
     },
   });

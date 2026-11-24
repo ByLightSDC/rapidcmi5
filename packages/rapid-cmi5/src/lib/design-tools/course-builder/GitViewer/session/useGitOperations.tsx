@@ -59,7 +59,8 @@ export const useGitOperations = (
   };
 
   const cloneRemoteRepo = async (req: CreateCloneType) => {
-    debugLog('clone repo', req);
+    // Redact: req carries the git password/token
+    debugLog('clone repo', { ...req, repoPassword: '[redacted]' });
     const currentRepos = await gitOperator.listRepos(fileSystemType);
 
     if (currentRepos.includes(req.repoDirName)) {

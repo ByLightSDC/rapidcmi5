@@ -1,6 +1,7 @@
 import { FileStatus, getFileStatus, mapGitStatus } from './StatusMatrix';
 import { GitFS } from './fileSystem';
 import { getGitDirectory, isGitMetadataPath } from './gitMetadata';
+import { withTimeout } from './withTimeout';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import * as git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
@@ -107,7 +108,12 @@ export class GitOperations {
     } catch (err: any) {
       // If there was an error lets clean up anything that was created
       try {
-        await this.gitFs.deleteRepo(r);
+        // Bounded so a stalled cleanup can't swallow the original clone error
+        await withTimeout(
+          'cleaning up the failed clone',
+          this.gitFs.deleteRepo(r),
+          30_000,
+        );
       } catch (cleanupError) {
         debugLogError(String(cleanupError));
       }

@@ -141,14 +141,13 @@ export function SaveCourseForm({
           //Commit
           if (superSaveData.shouldAutoCommit) {
             setSaveProgressMessage('Committing Changes...');
-            console.log('superSaveData.commit', superSaveData.commit);
             await handleCommit(superSaveData.commit);
           }
 
           //Push
           if (superSaveData.shouldAutoPush && isRepoConnectedToRemote) {
             setSaveProgressMessage('Pushing to Remote...');
-            console.log('superSaveData.push', superSaveData.push);
+            // Never log superSaveData.push: it carries the git password/token
             await handlePushRepo(superSaveData.push);
           }
 

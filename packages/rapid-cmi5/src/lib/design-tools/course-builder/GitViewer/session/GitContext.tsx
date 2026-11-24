@@ -43,6 +43,9 @@ import { IFlatMetadata } from 'react-accessible-treeview/dist/TreeView/utils';
 import { INode } from 'react-accessible-treeview';
 import { FileContent, getRepoPath } from '../utils/fileSystem';
 import { GitOperations } from '../utils/gitOperations';
+import { withTimeout } from '../utils/withTimeout';
+
+const RESOLVE_STEP_TIMEOUT_MS = 90_000;
 import {
   updateCourseData,
   setIsLessonMounted,
@@ -1115,29 +1118,40 @@ export const GitContextProvider = (props: tProviderProps) => {
   };
 
   const resolveCurrentRepo = async (r: RepoAccessObject) => {
-    await resolveGitConfig(r);
+    // Bounded so a stalled storage call surfaces as a named error instead of
+    // an endless "Opening repository" overlay. Generous: these do real git work.
+    const step = <T,>(label: string, p: Promise<T>) =>
+      withTimeout(label, p, RESOLVE_STEP_TIMEOUT_MS);
+
+    await step('reading git config', resolveGitConfig(r));
 
     dispatch(recalculateFileTree(r));
 
-    await handleAutoSelectCourse(r);
+    await step('loading course', handleAutoSelectCourse(r));
 
-    const branch = await gitOperator.getCurrentGitBranch(r);
+    const branch = await step(
+      'reading current branch',
+      gitOperator.getCurrentGitBranch(r),
+    );
     if (branch) {
       dispatch(setCurrentBranch(branch));
     } else {
       dispatch(setCurrentBranch(null));
     }
-    const allBranches = await gitOperator.getAllGitBranches(r);
+    const allBranches = await step(
+      'listing branches',
+      gitOperator.getAllGitBranches(r),
+    );
     if (allBranches) {
       dispatch(setAllBranches(allBranches));
     }
-    await resolveGitRepoStatus(r);
+    await step('computing git status', resolveGitRepoStatus(r));
 
     setIsGitLoaded(true);
 
-    await resolveRemoteRepoStatus(r);
+    await step('checking remote status', resolveRemoteRepoStatus(r));
 
-    await resolvePushStatus(r);
+    await step('checking push status', resolvePushStatus(r));
     await handleNavToDesigner();
   };
 

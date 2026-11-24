@@ -35,6 +35,23 @@ import {
   resolveCourseZipPaths,
   updateCourseData,
 } from './courseImport';
+import { StepTimeoutError, withTimeout, withTimeoutOr } from './withTimeout';
+
+// Bounds for browser storage calls that have been seen to stall indefinitely.
+const IDB_TIMEOUT_MS = 10_000;
+const FS_STEP_TIMEOUT_MS = 15_000;
+// A healthy saved handle answers in milliseconds. Since Chrome 158, handles
+// restored from IndexedDB can hang forever on every call (queryPermission,
+// isSameEntry, getDirectoryHandle) instead of rejecting.
+const HANDLE_PROBE_MS = 2_000;
+
+/** A saved FileSystemDirectoryHandle that no longer responds. */
+export class StaleHandleError extends Error {
+  constructor(public readonly projectName: string) {
+    super(`Saved folder handle for "${projectName}" is not responding`);
+    this.name = 'StaleHandleError';
+  }
+}
 
 export const getRepoPath = (r: RepoAccessObject) =>
   `/${r.fileSystemType}/${r.repoName}`;
@@ -404,16 +421,38 @@ export class GitFS {
     } else {
       let dirHandle: FileSystemDirectoryHandle | undefined;
 
+      let staleName: string | undefined;
       if (id) {
-        dirHandle = await this.getDirHandle(id);
-        this.currentProjectRecentsId = id;
+        try {
+          dirHandle = await this.getDirHandle(id);
+          this.currentProjectRecentsId = id;
+        } catch (error) {
+          if (!(error instanceof StaleHandleError)) throw error;
+          // The saved handle no longer responds; have the user re-pick the
+          // folder (setDirHandle then repairs the recents entry in place).
+          staleName = error.projectName;
+        }
       }
       if (!dirHandle) {
-        // @ts-ignore
-        dirHandle = await window.showDirectoryPicker({
-          mode: 'readwrite',
-          startIn: 'documents',
-        });
+        try {
+          // @ts-ignore
+          dirHandle = await window.showDirectoryPicker({
+            mode: 'readwrite',
+            startIn: 'documents',
+          });
+        } catch (error) {
+          // The click's user activation can lapse while probing a stale handle
+          if (
+            staleName &&
+            error instanceof DOMException &&
+            error.name === 'SecurityError'
+          ) {
+            throw new Error(
+              `Chrome lost access to the saved folder "${staleName}". Use Open Existing Project and select it again.`,
+            );
+          }
+          throw error;
+        }
 
         if (!dirHandle)
           throw Error(
@@ -424,13 +463,21 @@ export class GitFS {
       // Seed rapid-config using read-only access to the desktop config.
       // Validate saved handles too when reopening a project.
       try {
-        await prepareLocalGitDirectory(dirHandle);
+        await withTimeout(
+          'reading the project .git directory',
+          prepareLocalGitDirectory(dirHandle),
+          FS_STEP_TIMEOUT_MS,
+        );
         await this.setDirHandle(dirHandle);
       } catch (error) {
         this.currentProjectRecentsId = undefined;
         throw error;
       }
-      await this.openLocalDirectory(dirHandle);
+      await withTimeout(
+        'mounting the project folder',
+        this.openLocalDirectory(dirHandle),
+        FS_STEP_TIMEOUT_MS,
+      );
       return dirHandle.name;
     }
   }
@@ -460,7 +507,11 @@ export class GitFS {
 
       if (!dirHandle) throw Error('No directory selected for clone');
 
-      await this.openLocalDirectory(dirHandle, true);
+      await withTimeout(
+        'mounting the selected parent folder',
+        this.openLocalDirectory(dirHandle, true),
+        FS_STEP_TIMEOUT_MS,
+      );
 
       // Unmount any stale sub-mount for this repo name so initGitRepo writes
       // to the new parent directory, not a leftover WebAccess handle.
@@ -468,15 +519,25 @@ export class GitFS {
         zenFs.umount('/localFileSystem/' + parentDir);
       } catch {}
 
+      // Not bounded here: clone time depends on repo size and network. Its
+      // individual file operations are bounded in wrapBrowserGitFs.
       await createFunction();
 
       // verify repo dir actually exits
       try {
-        const repoDir = await dirHandle.getDirectoryHandle(parentDir);
+        const repoDir = await withTimeout(
+          `finding the new "${parentDir}" folder`,
+          dirHandle.getDirectoryHandle(parentDir),
+          FS_STEP_TIMEOUT_MS,
+        );
 
         await this.setDirHandle(repoDir);
 
-        await this.openLocalDirectory(repoDir);
+        await withTimeout(
+          'mounting the new project folder',
+          this.openLocalDirectory(repoDir),
+          FS_STEP_TIMEOUT_MS,
+        );
       } catch (error: any) {
         console.error(error);
         this.currentProjectRecentsId = undefined;
@@ -511,29 +572,53 @@ export class GitFS {
 
   // save the local file access directory handle so we dont have to ask for it each time
   setDirHandle = async (dirHandle: FileSystemDirectoryHandle) => {
-    // Check if this directory is already in recents using isSameEntry
-    const allKeys = await keys();
-    const matchingKeys = allKeys.filter(
-      (key): key is string =>
-        typeof key === 'string' && key.startsWith('courses/'),
+    // Check if this directory is already in recents using isSameEntry.
+    // Probed in parallel with a short bound: saved handles can go stale (they
+    // hang rather than reject), and must not stall opening a freshly picked one.
+    const dirMetas = (await this.readRecentMetas()).filter(
+      (m): m is DirMeta & { dirHandle: FileSystemDirectoryHandle } =>
+        !!m?.dirHandle,
     );
-    const dirMetas = await getMany<DirMeta>(matchingKeys);
-
-    for (const meta of dirMetas) {
-      if (!meta?.dirHandle) continue;
-      try {
-        const isSame = await meta.dirHandle.isSameEntry(dirHandle);
-        if (isSame) {
-          const updatedMeta: DirMeta = {
-            ...meta,
-            lastAccessed: new Date().toISOString(),
-            dirHandle,
-          };
-          this.currentProjectRecentsId = meta.id;
-          await set('courses/' + meta.id, updatedMeta);
-          return;
+    const probes = await Promise.all(
+      dirMetas.map(async (meta) => {
+        try {
+          const same = await withTimeout(
+            `comparing with recent project "${meta.name}"`,
+            meta.dirHandle.isSameEntry(dirHandle),
+            HANDLE_PROBE_MS,
+          );
+          return { meta, result: same ? 'same' : 'different' } as const;
+        } catch (error) {
+          return {
+            meta,
+            result: error instanceof StepTimeoutError ? 'stale' : 'different',
+          } as const;
         }
-      } catch {}
+      }),
+    );
+
+    // Prefer a live match; otherwise replace a stale entry with the same name
+    // in place, so re-picking a folder repairs its recents entry, not duplicates it.
+    const existing =
+      probes.find((p) => p.result === 'same')?.meta ??
+      probes.find(
+        (p) => p.result === 'stale' && p.meta.name === dirHandle.name,
+      )?.meta;
+
+    if (existing) {
+      const updatedMeta: DirMeta = {
+        ...existing,
+        lastAccessed: new Date().toISOString(),
+        isValid: true,
+        dirHandle,
+      };
+      this.currentProjectRecentsId = existing.id;
+      await withTimeout(
+        'saving recent project (IndexedDB)',
+        set('courses/' + existing.id, updatedMeta),
+        IDB_TIMEOUT_MS,
+      );
+      return;
     }
 
     // No existing entry found — create a new one
@@ -545,14 +630,27 @@ export class GitFS {
       id,
       name: dirHandle.name,
       isValid: true,
-      remoteUrl: await this.getGitRemoteUrl(dirHandle),
+      remoteUrl: await withTimeoutOr(
+        'reading git remote url',
+        this.getGitRemoteUrl(dirHandle),
+        FS_STEP_TIMEOUT_MS,
+        undefined,
+      ),
     };
     this.currentProjectRecentsId = id;
 
-    await set('courses/' + id, dirMeta);
+    await withTimeout(
+      'saving recent project (IndexedDB)',
+      set('courses/' + id, dirMeta),
+      IDB_TIMEOUT_MS,
+    );
 
     // Enforce 10-project limit: remove oldest entries beyond the cap
-    const updatedKeys = await keys();
+    const updatedKeys = await withTimeout(
+      'listing recent projects (IndexedDB)',
+      keys(),
+      IDB_TIMEOUT_MS,
+    );
     const courseKeys = updatedKeys.filter(
       (key): key is string =>
         typeof key === 'string' && key.startsWith('courses/'),
@@ -583,50 +681,90 @@ export class GitFS {
         return [];
       }
     } else {
-      const allKeys = await keys();
+      const dirMetas = await this.readRecentMetas();
 
-      const matchingKeys = allKeys.filter(
-        (key): key is string =>
-          typeof key === 'string' && key.startsWith('courses/'),
+      // Entries are probed in parallel and bounded independently so one stale
+      // handle can't hide (or delay) the rest of the list
+      const resolved = await Promise.all(
+        dirMetas.map(async (meta): Promise<DirMeta | undefined> => {
+          const handle = meta?.dirHandle;
+          if (!meta || !handle) return undefined;
+          const permission = await withTimeoutOr<boolean | 'stale'>(
+            `checking permission for "${meta.name}"`,
+            verifyHandlePermission(handle),
+            HANDLE_PROBE_MS,
+            'stale',
+          );
+          // A stale handle hangs on every call; don't wait on it twice
+          const remoteUrl =
+            permission === 'stale'
+              ? meta.remoteUrl
+              : await withTimeoutOr(
+                  `reading git remote url for "${meta.name}"`,
+                  this.getGitRemoteUrl(handle),
+                  HANDLE_PROBE_MS,
+                  meta.remoteUrl,
+                );
+          return {
+            ...meta,
+            isValid: permission === true,
+            remoteUrl: remoteUrl || 'No remote URL',
+          };
+        }),
       );
-
-      const dirMetas = await getMany<DirMeta>(matchingKeys);
-
-      for (const meta of dirMetas) {
-        if (!meta.dirHandle) continue;
-        const status = await verifyHandlePermission(meta.dirHandle);
-        const newMeta: DirMeta = {
-          ...meta,
-          isValid: status,
-          remoteUrl:
-            (await this.getGitRemoteUrl(meta.dirHandle)) || 'No remote URL',
-        };
-
-        newMetas.push(newMeta);
-        await set('courses/' + meta.id, meta);
-      }
+      newMetas.push(...resolved.filter((m): m is DirMeta => !!m));
     }
     return sortProjectMetas(newMetas);
   };
 
+  private readRecentMetas = async (): Promise<(DirMeta | undefined)[]> => {
+    const allKeys = await withTimeout(
+      'listing recent projects (IndexedDB)',
+      keys(),
+      IDB_TIMEOUT_MS,
+    );
+    const matchingKeys = allKeys.filter(
+      (key): key is string =>
+        typeof key === 'string' && key.startsWith('courses/'),
+    );
+    return withTimeout(
+      'loading recent projects (IndexedDB)',
+      getMany<DirMeta>(matchingKeys),
+      IDB_TIMEOUT_MS,
+    );
+  };
+
   getDirHandle = async (id: string) => {
-    const saved = await get<DirMeta>('courses/' + id || 'rootdir');
+    const saved = await withTimeout(
+      'loading recent project (IndexedDB)',
+      get<DirMeta>('courses/' + id),
+      IDB_TIMEOUT_MS,
+    );
 
     if (saved?.dirHandle) {
-      const valid = await verifyHandlePermission(saved.dirHandle);
+      let valid: boolean;
+      try {
+        // Short bound: the caller may still need this click's user activation
+        // to open the folder picker if the handle turns out to be stale
+        valid = await withTimeout(
+          `checking permission for "${saved.name}"`,
+          verifyHandlePermission(saved.dirHandle),
+          HANDLE_PROBE_MS,
+        );
+      } catch (error) {
+        if (error instanceof StepTimeoutError)
+          throw new StaleHandleError(saved.name);
+        throw error;
+      }
       if (!valid) {
+        // Not bounded: this waits on the user answering Chrome's prompt
         //@ts-ignore
         const permission = await saved.dirHandle.requestPermission({
           mode: 'readwrite',
         });
-        if (!permission) return;
+        if (permission !== 'granted') return;
       }
-
-      const newDirMeta: DirMeta = {
-        ...saved,
-        lastAccessed: new Date().toISOString(),
-      };
-      await set('courses/' + id || 'rootdir', newDirMeta);
+      // lastAccessed is refreshed by setDirHandle once the open succeeds
     }
 
     return saved?.dirHandle;
