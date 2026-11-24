@@ -12,6 +12,7 @@ import CloneLoadingOverlay from './Components/LoadingOverlay';
 import { HiddenHeader, useToaster } from '@rapid-cmi5/ui';
 import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
 import { CustomTheme } from '../styles/createPalette';
+import { StepTimeoutError } from '../../course-builder/GitViewer/utils/withTimeout';
 
 interface OptionDocumentation {
   title: string;
@@ -82,7 +83,16 @@ export default function SelectProjectHomePage({}: {}) {
   );
 
   const populateRecentProjects = async () => {
-    setRecentProjects(await getLocalFolders());
+    try {
+      setRecentProjects(await getLocalFolders());
+    } catch (e: unknown) {
+      console.error('Failed to load recent projects', e);
+      displayToaster({
+        message: `Could not load recent projects: ${e instanceof Error ? e.message : String(e)}`,
+        severity: 'warning',
+        autoHideDuration: 8000,
+      });
+    }
   };
 
   useEffect(() => {
@@ -99,6 +109,17 @@ export default function SelectProjectHomePage({}: {}) {
         autoHideDuration: 3000,
       });
     } catch (e: any) {
+      // A stall says nothing about the folder itself — keep it in recents
+      if (e instanceof StepTimeoutError) {
+        console.error(e);
+        displayToaster({
+          message: `Open repository failed: ${e.message}`,
+          severity: 'error',
+          autoHideDuration: 10000,
+        });
+        return;
+      }
+
       const msg =
         e?.message ||
         e?.name ||
