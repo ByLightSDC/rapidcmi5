@@ -55,6 +55,36 @@ export const parseMermaid = async (code: string): Promise<string | null> => {
   }
 };
 
+export type MermaidAlign = 'left' | 'center' | 'right';
+
+/** Diagrams are centered unless the fence says otherwise. */
+export const DEFAULT_MERMAID_ALIGN: MermaidAlign = 'center';
+
+const ALIGN_META_RE = /(^|\s)align=(left|center|right)(?=\s|$)/;
+const ANY_ALIGN_META_RE = /(^|\s)align=\S*/g;
+
+/**
+ * Alignment is stored in the fence's meta string, e.g. ```mermaid align=right
+ * so it round-trips through markdown and the player reads it for free.
+ */
+export const getMermaidAlign = (meta?: string | null): MermaidAlign =>
+  (meta?.match(ALIGN_META_RE)?.[2] as MermaidAlign | undefined) ??
+  DEFAULT_MERMAID_ALIGN;
+
+/**
+ * Returns `meta` with its align token replaced. The default alignment is
+ * written as no token so untouched diagrams keep a bare ```mermaid fence.
+ * Any other meta tokens are kept as-is.
+ */
+export const withMermaidAlign = (
+  meta: string | null | undefined,
+  align: MermaidAlign,
+): string => {
+  const rest = (meta ?? '').replace(ANY_ALIGN_META_RE, '$1').trim();
+  if (align === DEFAULT_MERMAID_ALIGN) return rest;
+  return rest ? `${rest} align=${align}` : `align=${align}`;
+};
+
 type RenderState =
   | { status: 'loading' }
   | { status: 'rendered'; svg: string }
@@ -69,7 +99,13 @@ type RenderState =
  *
  * `data-mermaid-status` (loading | rendered | error) is exposed for e2e tests.
  */
-export function MermaidDiagram({ code }: { code: string }) {
+export function MermaidDiagram({
+  code,
+  align = DEFAULT_MERMAID_ALIGN,
+}: {
+  code: string;
+  align?: MermaidAlign;
+}) {
   // useId returns ':r0:' style ids — mermaid uses the id in css selectors
   const diagramId = `mermaid-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -178,13 +214,21 @@ export function MermaidDiagram({ code }: { code: string }) {
       ref={containerRef}
       data-testid="mermaid-diagram"
       data-mermaid-status={renderState.status}
+      data-mermaid-align={align}
       sx={{
-        display: 'flex',
-        justifyContent: 'center',
         overflowX: 'auto',
         my: 1,
         minHeight: renderState.status === 'loading' ? '4rem' : undefined,
-        '& svg': { maxWidth: '100%', height: 'auto' },
+        // align with margins on the svg itself rather than flex on the
+        // wrapper: mermaid gives the svg width="100%" plus an inline
+        // max-width of its natural size, so auto margins place it reliably
+        '& > svg': {
+          display: 'block',
+          maxWidth: '100%',
+          height: 'auto',
+          marginLeft: align === 'left' ? 0 : 'auto',
+          marginRight: align === 'right' ? 0 : 'auto',
+        },
       }}
       {...(renderState.status === 'rendered'
         ? { dangerouslySetInnerHTML: { __html: renderState.svg } }

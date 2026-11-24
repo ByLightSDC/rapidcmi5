@@ -9,8 +9,17 @@ import { useCellValues } from '@mdxeditor/gurx';
 import { Box, IconButton, Tooltip, useTheme } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import CodeIcon from '@mui/icons-material/Code';
-import { MermaidDiagram } from './MermaidDiagram';
+import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
+import VerticalAlignCenterIcon from '@mui/icons-material/VerticalAlignCenter';
+import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
+import {
+  MermaidAlign,
+  MermaidDiagram,
+  getMermaidAlign,
+  withMermaidAlign,
+} from './MermaidDiagram';
 import DeleteIconButton from '../../components/DeleteIconButton';
+import { AlignmentToolbarControls } from '../../components/AlignmentToolbarControls';
 import { editorInPlayback$ } from '../../state/vars';
 
 /**
@@ -29,25 +38,46 @@ export interface MermaidEditDialogProps {
  * Controls are hidden in the player and in read-only editors, so learners
  * only ever get the diagram. Edit only appears when a dialog was injected.
  */
+const ALIGN_ICON_SX = { transform: 'rotate(90deg)' };
+
+/** Same icons as AlignmentToolbarControls, for the toggle button. */
+const AlignIcon = ({ align }: { align: MermaidAlign }) =>
+  align === 'right' ? (
+    <VerticalAlignTopIcon fontSize="small" sx={ALIGN_ICON_SX} />
+  ) : align === 'center' ? (
+    <VerticalAlignCenterIcon fontSize="small" sx={ALIGN_ICON_SX} />
+  ) : (
+    <VerticalAlignBottomIcon fontSize="small" sx={ALIGN_ICON_SX} />
+  );
+
 function MermaidBlockEditor({
   code,
+  meta,
   EditDialog,
 }: CodeBlockEditorProps & {
   EditDialog?: ComponentType<MermaidEditDialogProps>;
 }) {
-  const { parentEditor, lexicalNode, setCode } = useCodeBlockEditorContext();
+  const { parentEditor, lexicalNode, setCode, setMeta } =
+    useCodeBlockEditorContext();
   const [readOnly, isPlayback] = useCellValues(readOnly$, editorInPlayback$);
   const muiTheme = useTheme();
   const [isEditing, setIsEditing] = useState(false);
+  const [isAlignOpen, setIsAlignOpen] = useState(false);
 
   const showControls = !isPlayback && !readOnly;
+  const align = getMermaidAlign(meta);
+  const toolbarBg =
+    muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6';
 
   /**
    * Turn the diagram back into a plain code block, keeping its source.
    * Picking "mermaid" in the code block's language list reverses this.
+   * Meta (alignment) is cleared too: the CodeMirror descriptor only matches
+   * code blocks without meta, so a leftover `align=` would block it.
    */
   const onConvertToCode = () => {
     parentEditor.update(() => {
+      lexicalNode.setMeta('');
       lexicalNode.setLanguage('');
       setTimeout(() => {
         parentEditor.update(() => {
@@ -72,7 +102,9 @@ function MermaidBlockEditor({
     <Box
       sx={{
         position: 'relative',
-        paddingRight: showControls ? '100px' : undefined,
+        // wide enough for the 4-button toolbar, so a right-aligned
+        // diagram is never covered by it
+        paddingRight: showControls ? '140px' : undefined,
       }}
     >
       {showControls && (
@@ -83,10 +115,20 @@ function MermaidBlockEditor({
             right: 0,
             zIndex: 9,
             display: 'flex',
-            backgroundColor:
-              muiTheme.palette.mode === 'dark' ? '#282b30e6' : '#EEEEEEe6',
+            backgroundColor: toolbarBg,
           }}
         >
+          <Tooltip title="Alignment">
+            <IconButton
+              aria-label="Toggle diagram alignment"
+              aria-expanded={isAlignOpen}
+              size="small"
+              onClick={() => setIsAlignOpen((open) => !open)}
+              sx={{ opacity: isAlignOpen ? 1 : 0.6 }}
+            >
+              <AlignIcon align={align} />
+            </IconButton>
+          </Tooltip>
           {EditDialog && (
             <Tooltip title="Edit diagram">
               <IconButton
@@ -110,7 +152,25 @@ function MermaidBlockEditor({
           <DeleteIconButton onDelete={onDelete} />
         </Box>
       )}
-      <MermaidDiagram code={code} />
+      {/* second row, like the image toolbar's alignment controls */}
+      {showControls && isAlignOpen && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 34,
+            right: 0,
+            zIndex: 9,
+            display: 'flex',
+            backgroundColor: toolbarBg,
+          }}
+        >
+          <AlignmentToolbarControls
+            currentAlignment={align}
+            onAlignmentChange={(value) => setMeta(withMermaidAlign(meta, value))}
+          />
+        </Box>
+      )}
+      <MermaidDiagram code={code} align={align} />
       {/* mounted only while open so each edit starts from the saved code */}
       {showControls && EditDialog && isEditing && (
         <EditDialog
