@@ -44,6 +44,7 @@ import { InsertAudio } from './InsertAudio';
 import { InsertImage } from './InsertImage';
 import { InsertYoutube } from './InsertYoutube';
 import { InsertCodeBlock } from './InsertCodeBlock';
+import { InsertMermaid } from './InsertMermaid';
 import { InsertThematicBreak } from './InsertThematicBreak';
 import { InsertFile } from './InsertFile';
 import { InsertSteps } from './InsertSteps';
@@ -323,6 +324,7 @@ export function BlockLibraryDrawer() {
                 <InsertCodeBlock isDrawer={true} />
                 <InsertFile isDrawer={true} />
                 <InsertImage isDrawer={true} />
+                <InsertMermaid isDrawer={true} />
                 <InsertVideo isDrawer={true} />
                 <InsertYoutube isDrawer={true} />
               </Stack>
