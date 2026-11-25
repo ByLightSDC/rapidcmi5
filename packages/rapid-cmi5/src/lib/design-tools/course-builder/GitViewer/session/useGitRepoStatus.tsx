@@ -1,5 +1,6 @@
+import { getFailedMergePath } from '../utils/gitMetadata';
 import { ReadCommitResult } from 'isomorphic-git';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 
 import { stagedStatuses } from '../utils/StatusMatrix';
@@ -11,7 +12,7 @@ import {
 } from '../../../../redux/repoManagerReducer';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import { FolderStructWithMtime, getRepoPath, GitFS } from '../utils/fileSystem';
-import { failedMergePath, GitOperations } from '../utils/gitOperations';
+import { GitOperations } from '../utils/gitOperations';
 
 export function useGitRepoStatus(
   repoAccessObject: RepoAccessObject | null,
@@ -21,7 +22,10 @@ export function useGitRepoStatus(
   const { currentBranch }: RepoState = useSelector(
     (state: RootState) => state.repoManager,
   );
-  const gitOperator = new GitOperations(fsInstance);
+  const gitOperator = useMemo(
+    () => new GitOperations(fsInstance),
+    [fsInstance, repoAccessObject],
+  );
 
   const inFlightRef = useRef(false);
   const [isGettingRepoStatus, setIsGettingRepoStatus] = useState(false);
@@ -69,28 +73,27 @@ export function useGitRepoStatus(
     setGitRepoCommits([]);
   };
 
-  const resolveFile = async (r: RepoAccessObject, filepath: string) => {
-    const modifiedFile = await gitOperator.gitResolveFile(r, filepath);
-    let modifiedFilesAfter = [...modifiedFiles];
-    if (
-      modifiedFile.status === 'unknown' ||
-      modifiedFile.status === 'unmodified'
-    ) {
-      modifiedFilesAfter = modifiedFilesAfter.filter(
-        (f) => f.name !== filepath,
-      );
-    } else {
-      if (modifiedFilesAfter.find((f) => f.name === modifiedFile.name)) {
-        modifiedFilesAfter = modifiedFilesAfter.map((f) =>
-          f.name === filepath ? modifiedFile : f,
-        );
-      } else {
-        modifiedFilesAfter = [...modifiedFilesAfter, modifiedFile];
-      }
-    }
-    await resolveStashStatus(r, modifiedFilesAfter);
-
-    setModifiedFiles(modifiedFilesAfter);
+  const resolveFile = async (
+    r: RepoAccessObject,
+    filepath: string | string[],
+    resolvedStatus?: ModifiedFile[],
+  ) => {
+    const paths = Array.isArray(filepath) ? filepath : [filepath];
+    const status =
+      resolvedStatus ??
+      (Array.isArray(filepath)
+        ? await gitOperator.gitRepoStatus(r, paths)
+        : [await gitOperator.gitResolveFile(r, filepath)]);
+    const affected = new Set(paths);
+    const changed = status.filter(
+      (file) => file.status !== 'unknown' && file.status !== 'unmodified',
+    );
+    setModifiedFiles((previous) => [
+      ...previous.filter((file) => !affected.has(file.name)),
+      ...changed,
+    ]);
+    // The modifiedFiles effect refreshes stash actions. Staging only changes
+    // the index; it doesn't require reloading history or scanning the worktree.
   };
 
   const resolveDir = async (r: RepoAccessObject, dirpath: string) => {
@@ -201,7 +204,10 @@ export function useGitRepoStatus(
         await resolveStashStatus(r, status);
 
         try {
-          const res = await fsInstance.getFileContent(r, failedMergePath);
+          const res = await fsInstance.getFileContent(
+            r,
+            getFailedMergePath(fsInstance.isElectron),
+          );
           const mergeFileExists = res != null;
           setIsInMerge(mergeFileExists);
           if (mergeFileExists) {

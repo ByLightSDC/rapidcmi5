@@ -57,3 +57,65 @@ describe('serializeDirectoryCreation', () => {
     expect(mkdir).toHaveBeenLastCalledWith('/next', options);
   });
 });
+
+describe('directory creation concurrency', () => {
+  const options = { mode: 0o777, uid: 0, gid: 0 };
+
+  it('allows independent Git object directories to proceed concurrently', async () => {
+    let finishFirst!: () => void;
+    const firstReady = new Promise<void>((resolve) => {
+      finishFirst = resolve;
+    });
+    const mkdir = jest.fn<
+      ReturnType<FileSystem['mkdir']>,
+      Parameters<FileSystem['mkdir']>
+    >(async (path) => {
+      if (path === '/.rapid-git/objects/aa') await firstReady;
+      return {} as Inode;
+    });
+    const fs = serializeDirectoryCreation({ mkdir });
+    const first = fs.mkdir('/.rapid-git/objects/aa', options);
+    const second = fs.mkdir('/.rapid-git/objects/bb', options);
+    try {
+      await second;
+      expect(mkdir).toHaveBeenCalledWith('/.rapid-git/objects/aa', options);
+      expect(mkdir).toHaveBeenCalledWith('/.rapid-git/objects/bb', options);
+    } finally {
+      finishFirst();
+      await first;
+    }
+  });
+
+  it('serializes duplicate paths while other paths remain independent', async () => {
+    let finishFirst!: () => void;
+    const firstReady = new Promise<void>((resolve) => {
+      finishFirst = resolve;
+    });
+    const mkdir = jest
+      .fn<ReturnType<FileSystem['mkdir']>, Parameters<FileSystem['mkdir']>>()
+      .mockImplementationOnce(async () => {
+        await firstReady;
+        return {} as Inode;
+      })
+      .mockResolvedValue({} as Inode);
+    const fs = serializeDirectoryCreation({ mkdir });
+    const first = fs.mkdir('/objects/aa', options);
+    const duplicate = fs.mkdir('/objects/aa', options);
+    const independent = fs.mkdir('/objects/bb', options);
+    try {
+      await independent;
+      expect(mkdir.mock.calls.map(([path]) => path)).toEqual([
+        '/objects/aa',
+        '/objects/bb',
+      ]);
+    } finally {
+      finishFirst();
+      await Promise.all([first, duplicate]);
+    }
+    expect(mkdir.mock.calls.map(([path]) => path)).toEqual([
+      '/objects/aa',
+      '/objects/bb',
+      '/objects/aa',
+    ]);
+  });
+});
