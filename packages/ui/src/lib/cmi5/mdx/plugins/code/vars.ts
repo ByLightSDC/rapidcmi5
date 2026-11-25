@@ -12,9 +12,16 @@ export const languageList = langNames
     return acc;
   }, {});
 
-export const languageOptions = Object.entries(languageList)
-  .map(([k, v]) => ({
+/**
+ * Picker-only languages: not in languageList because another code block
+ * descriptor renders them (picking one swaps the CodeMirror editor out).
+ * 'mermaid' lets a diagram converted to a code block be turned back.
+ */
+const pickerOnlyLanguages = ['mermaid'];
+
+export const languageOptions = [...Object.keys(languageList), ...pickerOnlyLanguages]
+  .sort()
+  .map((k) => ({
     value: k,
-    label: v,
-  }))
-  .sort();
+    label: k,
+  }));
