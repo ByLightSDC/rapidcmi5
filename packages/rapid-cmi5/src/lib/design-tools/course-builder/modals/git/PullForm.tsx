@@ -84,6 +84,7 @@ export function PullForm({
             error={Boolean(errors?.repoUsername)}
             helperText={errors?.repoUsername?.message}
             name="repoUsername"
+            autoComplete="username"
             required
             label="User Name"
             readOnly={false}

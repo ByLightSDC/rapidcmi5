@@ -109,6 +109,7 @@ export function GitConfigForm({
             error={Boolean(errors?.username)}
             helperText={errors?.username?.message}
             name="username"
+            autoComplete="username"
             label="User Name"
             placeholder="user.name"
             readOnly={false}
