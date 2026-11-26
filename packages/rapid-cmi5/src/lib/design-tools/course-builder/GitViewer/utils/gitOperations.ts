@@ -1,6 +1,10 @@
 import { FileStatus, getFileStatus, mapGitStatus } from './StatusMatrix';
 import { GitFS } from './fileSystem';
-import { getGitDirectory, isGitMetadataPath } from './gitMetadata';
+import {
+  getGitDirectory,
+  getFailedMergePath,
+  isGitMetadataPath,
+} from './gitMetadata';
 import { withTimeout } from './withTimeout';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import * as git from 'isomorphic-git';
@@ -16,8 +20,6 @@ const AuthenticationErrorMessage =
   'The credentials provided are invalid; authentication has failed.';
 const AuthorizationErrorMessage =
   'The credentials provided do not have proper access; authorization has failed. Please give the personal access token proper repository access.';
-
-export const failedMergePath = '.git/failedMerge.txt';
 
 export const getRepoPath = (r: RepoAccessObject) =>
   path.posix.join('/', r.fileSystemType, r.repoName);
@@ -94,7 +96,7 @@ export class GitOperations {
       } else {
         await git.clone({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           http: this.http,
           dir,
           url: repoRemoteUrl,
@@ -134,7 +136,7 @@ export class GitOperations {
       } else {
         await git.init({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
           defaultBranch,
         });
@@ -157,7 +159,7 @@ export class GitOperations {
       } else {
         return await git.listRemotes({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
         });
       }
@@ -178,7 +180,7 @@ export class GitOperations {
       } else {
         await git.addRemote({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
           remote: 'origin',
           url: remoteUrl,
@@ -199,7 +201,7 @@ export class GitOperations {
       } else {
         return await git.log({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
           cache: this.cache,
         });
@@ -220,7 +222,7 @@ export class GitOperations {
     try {
       await git.fetch({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         http,
         dir,
         ref: branch,
@@ -231,7 +233,7 @@ export class GitOperations {
 
       await git.merge({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         ours: branch,
         dir,
         cache: this.cache,
@@ -239,7 +241,11 @@ export class GitOperations {
         abortOnConflict: false,
       });
     } catch (error: any) {
-      await this.gitFs.createFile(r, failedMergePath, error?.message);
+      await this.gitFs.createFile(
+        r,
+        getFailedMergePath(this.gitFs.isElectron),
+        error?.message,
+      );
 
       error.message = [
         error?.message || 'Merge has failed.',
@@ -262,7 +268,7 @@ export class GitOperations {
 
     await git.commit({
       fs: this.gitFs.getFs(),
-      gitdir: getGitDirectory(dir),
+      gitdir: getGitDirectory(dir, this.gitFs.isElectron),
       dir,
       author: { name: authorName, email: authorEmail },
       message: `Merge '${branch}' into origin ${branch}`,
@@ -270,7 +276,7 @@ export class GitOperations {
       cache: this.cache,
     });
 
-    await this.gitFs.deleteFile(r, failedMergePath);
+    await this.gitFs.deleteFile(r, getFailedMergePath(this.gitFs.isElectron));
   };
 
   gitPull = async (
@@ -288,7 +294,7 @@ export class GitOperations {
       } else {
         await git.pull({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           http: this.http,
           dir,
 
@@ -340,7 +346,7 @@ export class GitOperations {
       } else {
         status = await git.statusMatrix({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
           filepaths: changedFiles,
           // This is super needed, please do not remove
@@ -360,7 +366,10 @@ export class GitOperations {
           status: getFileStatus(HEAD, WORKDIR, STAGE),
         }))
         .filter(
-          (file) => file.status !== 'unmodified' && file.status !== 'unknown',
+          (file) =>
+            !isGitMetadataPath(file.name) &&
+            file.status !== 'unmodified' &&
+            file.status !== 'unknown',
         );
     } catch (error: any) {
       return [];
@@ -376,7 +385,7 @@ export class GitOperations {
       } else {
         const raw = await git.walk({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
           cache: this.cache,
 
@@ -432,7 +441,7 @@ export class GitOperations {
       } else {
         status = await git.status({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
           filepath,
           cache: this.cache,
@@ -500,7 +509,7 @@ export class GitOperations {
         if (filesToAdd.length > 0) {
           await git.add({
             fs: this.gitFs.getFs(),
-            gitdir: getGitDirectory(dir),
+            gitdir: getGitDirectory(dir, this.gitFs.isElectron),
             dir,
             cache: this.cache,
             filepath: filesToAdd.map((file) => file.name),
@@ -514,7 +523,7 @@ export class GitOperations {
           await git
             .remove({
               fs: this.gitFs.getFs(),
-              gitdir: getGitDirectory(dir),
+              gitdir: getGitDirectory(dir, this.gitFs.isElectron),
               dir,
               cache: this.cache,
               filepath: file.name,
@@ -559,7 +568,7 @@ export class GitOperations {
           await git
             .resetIndex({
               fs: this.gitFs.getFs(),
-              gitdir: getGitDirectory(dir),
+              gitdir: getGitDirectory(dir, this.gitFs.isElectron),
               dir,
               cache: this.cache,
               filepath: file.name,
@@ -592,7 +601,7 @@ export class GitOperations {
       } else {
         await git.setConfig({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
           path: 'user.name',
           value: req.authorName,
@@ -600,7 +609,7 @@ export class GitOperations {
 
         await git.setConfig({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
           path: 'user.email',
           value: req.authorEmail,
@@ -628,13 +637,13 @@ export class GitOperations {
     } else {
       authorName = await git.getConfig({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         dir,
         path: 'user.name',
       });
       authorEmail = await git.getConfig({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         dir,
         path: 'user.email',
       });
@@ -656,7 +665,7 @@ export class GitOperations {
     } else {
       await git.stash({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         dir,
         message: 'Stash changes',
       });
@@ -671,7 +680,7 @@ export class GitOperations {
     } else {
       stash = await git.stash({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         dir,
         op: 'list',
       });
@@ -696,7 +705,7 @@ export class GitOperations {
       } else {
         await git.stash({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
           op: 'pop',
         });
@@ -716,7 +725,7 @@ export class GitOperations {
     const dir = getRepoPath(r);
     await git.stash({
       fs: this.gitFs.getFs(),
-      gitdir: getGitDirectory(dir),
+      gitdir: getGitDirectory(dir, this.gitFs.isElectron),
       dir,
       op: 'drop',
     });
@@ -741,7 +750,7 @@ export class GitOperations {
       } else {
         await git.commit({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
           message,
           author: { name: committerName, email: committerEmail },
@@ -766,7 +775,7 @@ export class GitOperations {
       } else {
         await git.push({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           http: this.http,
           dir,
           force,
@@ -810,7 +819,7 @@ export class GitOperations {
     } else {
       await git.checkout({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         dir,
         ref: branch,
         cache: this.cache,
@@ -827,7 +836,7 @@ export class GitOperations {
       } else {
         return await git.currentBranch({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
         });
       }
@@ -846,7 +855,7 @@ export class GitOperations {
       } else {
         return await git.listBranches({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
         });
       }
@@ -866,7 +875,7 @@ export class GitOperations {
       } else {
         remoteRef = await git.resolveRef({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
           ref: `refs/remotes/origin/${branch}`,
         });
@@ -878,7 +887,7 @@ export class GitOperations {
         return await git
           .log({
             fs: this.gitFs.getFs(),
-            gitdir: getGitDirectory(dir),
+            gitdir: getGitDirectory(dir, this.gitFs.isElectron),
             dir,
             ref: branch,
             cache: this.cache,
@@ -893,7 +902,7 @@ export class GitOperations {
     } else {
       localCommits = await git.log({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         dir,
         ref: 'HEAD',
         cache: this.cache,
@@ -928,7 +937,7 @@ export class GitOperations {
         } else {
           await git.add({
             fs: this.gitFs.getFs(),
-            gitdir: getGitDirectory(dir),
+            gitdir: getGitDirectory(dir, this.gitFs.isElectron),
             dir,
             filepath,
             cache: this.cache,
@@ -940,7 +949,7 @@ export class GitOperations {
         } else {
           await git.remove({
             fs: this.gitFs.getFs(),
-            gitdir: getGitDirectory(dir),
+            gitdir: getGitDirectory(dir, this.gitFs.isElectron),
             dir,
             filepath,
             cache: this.cache,
@@ -962,7 +971,7 @@ export class GitOperations {
       } else {
         await git.resetIndex({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
           filepath,
           cache: this.cache,
@@ -988,7 +997,7 @@ export class GitOperations {
       } else {
         await git.writeRef({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
           ref: `refs/heads/${currentBranch}`,
           value: commitHash,
@@ -997,7 +1006,7 @@ export class GitOperations {
 
         await git.checkout({
           fs: this.gitFs.getFs(),
-          gitdir: getGitDirectory(dir),
+          gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
           ref: currentBranch,
           force: true,
@@ -1017,7 +1026,7 @@ export class GitOperations {
     } else {
       const headOid = await git.resolveRef({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         dir,
         ref: 'HEAD',
       });
@@ -1025,7 +1034,7 @@ export class GitOperations {
       // Read the file's blob from HEAD
       const { blob } = await git.readBlob({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         dir,
         oid: headOid,
         filepath,
@@ -1035,7 +1044,7 @@ export class GitOperations {
       await this.gitFs.createFile(r, filepath, blob);
       await git.add({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         dir,
         filepath,
         cache: this.cache,
@@ -1053,7 +1062,7 @@ export class GitOperations {
       // Get the most recent commit
       const log = await git.log({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         dir,
         cache: this.cache,
         depth: 1, // Only get the last commit
@@ -1085,7 +1094,7 @@ export class GitOperations {
 
     const { tree } = await git.readTree({
       fs: this.gitFs.getFs(),
-      gitdir: getGitDirectory(dir),
+      gitdir: getGitDirectory(dir, this.gitFs.isElectron),
       dir,
       oid: treeOid,
     });
@@ -1117,7 +1126,7 @@ export class GitOperations {
       // Get all files that are tracked in the current commit
       const headOid = await git.resolveRef({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         dir,
         ref: 'HEAD',
       });
@@ -1125,7 +1134,7 @@ export class GitOperations {
       // Read commit object
       const { commit } = await git.readCommit({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         dir,
         oid: headOid,
       });
@@ -1139,7 +1148,7 @@ export class GitOperations {
 
       const trackedFiles = await git.listFiles({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         dir,
       });
       const trackedSet = new Set(trackedFiles);
@@ -1159,7 +1168,7 @@ export class GitOperations {
     try {
       const headOid = await git.resolveRef({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         dir,
         ref: 'HEAD',
       });
@@ -1167,7 +1176,7 @@ export class GitOperations {
       // Read the file's blob from HEAD
       const { blob } = await git.readBlob({
         fs: this.gitFs.getFs(),
-        gitdir: getGitDirectory(dir),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
         dir,
         oid: headOid,
         filepath,

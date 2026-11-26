@@ -193,6 +193,7 @@ export function CreateLocalRepoForm({
                 error={Boolean(errors?.repoUsername)}
                 helperText={errors?.repoUsername?.message}
                 name="repoUsername"
+                autoComplete="username"
                 label="User Name"
                 placeholder="user.name"
                 readOnly={false}
