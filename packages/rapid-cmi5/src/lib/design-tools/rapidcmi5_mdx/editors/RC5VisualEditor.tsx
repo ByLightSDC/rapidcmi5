@@ -116,6 +116,8 @@ import { linkDialogPlugin } from '../plugins/link-dialog';
 import { draggableBlockPlugin } from '../plugins/draggable-block';
 import { gutterClickPlugin } from '../plugins/gutter-click/GutterClickPlugin';
 import { ScenarioContent } from '@rapid-cmi5/cmi5-build-common';
+import { SlideContentTracker } from './SlideContentTracker';
+import { createSlideContentTrackingPlugin } from './slideContentTrackingPlugin';
 
 /**
  * Rapid CMI5 Visual Editor
@@ -155,7 +157,11 @@ function RC5VisualEditor() {
   //pixelTop = 0;
   //WARNING NOT SURE WHY THIS WORKS-------------------------------------------------------
 
-  const debouncer = useRef<NodeJS.Timeout>();
+  const contentTracker = useRef(new SlideContentTracker());
+  const contentTrackingPlugin = useMemo(
+    () => createSlideContentTrackingPlugin(contentTracker.current),
+    [],
+  );
   const lastFrontmatterRef = useRef<string | null>(null);
 
   // Store animations per slide (keyed by slide index)
@@ -481,7 +487,8 @@ function RC5VisualEditor() {
     animationsVersion,
   ]);
 
-  const onChange = (e: string) => {
+  const onChange = (e: string, initialMarkdownNormalize: boolean) => {
+    if (initialMarkdownNormalize) return;
     // Keep the in-memory animation cache in sync with the markdown.
     //
     // IMPORTANT: Save uses wrappedRef.getMarkdown() which injects animations from slideAnimationsRef.
@@ -528,15 +535,9 @@ function RC5VisualEditor() {
       );
     }
 
-    if (debouncer.current !== undefined) {
-      clearTimeout(debouncer.current);
-    }
-    debouncer.current = setTimeout(() => {
-      debugLog(
-        '💾 Setting dirty flag: slide content edited (debounced after 1s)',
-      );
+    if (contentTracker.current.hasChanges(e)) {
       dispatch(updateDirtyDisplay({ reason: 'slide edited' }));
-    }, 1000);
+    }
   };
 
   /**
@@ -557,6 +558,11 @@ function RC5VisualEditor() {
             ...ref.current,
             getMarkdown: () => {
               const baseMarkdown = ref.current?.getMarkdown() || '';
+              // Imports can normalize whitespace, lists and YAML without user edits.
+              // Preserve the original file when saving an untouched slide.
+              if (!contentTracker.current.hasChanges(baseMarkdown)) {
+                return contentTracker.current.contentToSave(baseMarkdown);
+              }
               const cachedAnims =
                 slideAnimationsRef.current.get(currentSlideIndex) || [];
 
@@ -604,9 +610,6 @@ function RC5VisualEditor() {
     }
     return () => {
       removeEditor();
-      if (debouncer.current !== undefined) {
-        clearTimeout(debouncer.current);
-      }
     };
   }, [ref?.current, wrappedRef]);
 
@@ -669,6 +672,7 @@ function RC5VisualEditor() {
         debugLogError('Attempting to inject non string data into MdxEditor');
         ref.current.setMarkdown('This slide data could not be presented ');
       } else {
+        contentTracker.current.load(content, ref.current.getMarkdown());
         if (content !== ref.current.getMarkdown()) {
           debugLog(
             'sees content !== ref.current.getMarkdown()',
@@ -781,7 +785,7 @@ function RC5VisualEditor() {
               onChange={onChange}
               ref={ref}
               markdown={''}
-              plugins={thePlugins}
+              plugins={[contentTrackingPlugin, ...thePlugins]}
               readOnly={!isEditing}
               onError={onErrorHelper}
             />
