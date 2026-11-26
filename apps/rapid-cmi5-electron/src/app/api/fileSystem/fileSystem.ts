@@ -515,7 +515,7 @@ export class ElectronFsHandler {
       http,
       dir: fullPath,
       url,
-      ref: branch,
+      ref: branch?.trim() || undefined,
       depth: shallowClone ? 1 : undefined,
       singleBranch: false,
       onAuth: () => ({ username, password }),

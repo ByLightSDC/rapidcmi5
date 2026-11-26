@@ -100,7 +100,7 @@ export class GitOperations {
           http: this.http,
           dir,
           url: repoRemoteUrl,
-          ref: branch,
+          ref: branch?.trim() || undefined,
           depth: shallowClone ? 1 : undefined,
           singleBranch: false,
           onAuth: () => ({ username, password }),

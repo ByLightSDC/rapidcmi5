@@ -242,6 +242,7 @@ export function SelectGitDialogs() {
         <CloneRepoForm
           defaultData={{
             ...defaultCloneRepoData,
+            repoBranch: '',
             repoUsername: currentAuth?.gitCredentials?.username || '',
             repoPassword: currentAuth?.gitCredentials?.password || '',
             authorEmail: currentAuth?.userEmail?.toLowerCase() || '',

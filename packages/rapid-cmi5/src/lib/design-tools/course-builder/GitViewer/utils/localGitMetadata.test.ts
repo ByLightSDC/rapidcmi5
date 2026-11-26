@@ -611,13 +611,17 @@ describe('Local Git metadata', () => {
   });
 
   it.each([
-    [fsType.localFileSystem, false],
-    [fsType.inBrowser, false],
-    [fsType.localFileSystem, true],
-    [fsType.inBrowser, true],
+    [fsType.localFileSystem, false, 'trunk'],
+    [fsType.inBrowser, false, 'trunk'],
+    [fsType.localFileSystem, true, 'trunk'],
+    [fsType.inBrowser, true, 'trunk'],
+    [fsType.localFileSystem, false, ''],
+    [fsType.inBrowser, false, ''],
+    [fsType.localFileSystem, true, ''],
+    [fsType.inBrowser, true, ''],
   ] as const)(
-    'discovers and switches branches through authenticated clone and pull with %s metadata (shallow: %s)',
-    async (fileSystemType, shallowClone) => {
+    'discovers and switches branches through authenticated clone and pull with %s metadata (shallow: %s, initial branch: "%s")',
+    async (fileSystemType, shallowClone, initialBranch) => {
       const repo = { ...r, fileSystemType };
       const repoPath = getRepoPath(repo);
       const credentials = {
@@ -695,7 +699,7 @@ describe('Local Git metadata', () => {
         };
       };
       try {
-        nativeGit('init', '-b', 'main');
+        nativeGit('init', '-b', 'trunk');
         writeFileSync(`${fixture}/lesson.md`, 'Remote lesson');
         nativeGit('add', '.');
         nativeGit(
@@ -719,18 +723,19 @@ describe('Local Git metadata', () => {
           '-m',
           'Feature course',
         );
-        nativeGit('checkout', 'main');
+        nativeGit('checkout', 'trunk');
         nativeGit('config', 'receive.denyCurrentBranch', 'ignore');
         ops = new GitOperations(instance, { request });
         await ops.cloneRepo(
           'course',
           fileSystemType,
           'https://fixture.test/course.git',
-          'main',
+          initialBranch,
           credentials.username,
           credentials.password,
           shallowClone,
         );
+        expect(await ops.getCurrentGitBranch(repo)).toBe('trunk');
         expect(await instance.dirExists(getGitDirectory(repoPath))).toBe(true);
         expect(await instance.dirExists(`${repoPath}/.git`)).toBe(false);
         expect(await instance.fileExists(repo, '.rapid-git/config')).toBe(true);
@@ -741,7 +746,7 @@ describe('Local Git metadata', () => {
         });
         expect(await ops.getAllGitBranches(repo)).toEqual([
           'feature/course',
-          'main',
+          'trunk',
         ]);
         await ops.gitCheckout(repo, 'feature/course');
         expect(await ops.getCurrentGitBranch(repo)).toBe('feature/course');
@@ -756,7 +761,7 @@ describe('Local Git metadata', () => {
             path: 'branch.feature/course.remote',
           }),
         ).toBe('origin');
-        await ops.gitCheckout(repo, 'main');
+        await ops.gitCheckout(repo, 'trunk');
         expect(await instance.fileExists(repo, 'feature.md')).toBe(false);
         await commitFile('Local change', repo);
         await ops.gitPush(
@@ -792,10 +797,10 @@ describe('Local Git metadata', () => {
           '-m',
           'New branch',
         );
-        nativeGit('checkout', 'main');
+        nativeGit('checkout', 'trunk');
         await ops.gitPull(
           repo,
-          'main',
+          'trunk',
           credentials.username,
           credentials.password,
           false,
@@ -809,13 +814,13 @@ describe('Local Git metadata', () => {
         expect(await ops.getAllGitBranches(repo)).toEqual([
           'feature/course',
           'feature/new-after-clone',
-          'main',
+          'trunk',
         ]);
         await ops.gitCheckout(repo, 'feature/new-after-clone');
         expect((await instance.getFileContent(repo, 'new.md'))?.content).toBe(
           'Discovered by pull',
         );
-        await ops.gitCheckout(repo, 'main');
+        await ops.gitCheckout(repo, 'trunk');
         expect(await instance.fileExists(repo, 'new.md')).toBe(false);
         expect(challenges).toBe(3);
       } finally {
