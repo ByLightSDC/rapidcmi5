@@ -106,6 +106,7 @@ export class GitOperations {
           onAuth: () => ({ username, password }),
           cache: this.cache,
         });
+        await this.gitFs.ignoreBrowserGitDirectory(dir);
       }
     } catch (err: any) {
       // If there was an error lets clean up anything that was created
@@ -140,6 +141,7 @@ export class GitOperations {
           dir,
           defaultBranch,
         });
+        await this.gitFs.ignoreBrowserGitDirectory(dir);
       }
     } catch (err: any) {
       debugLogError(

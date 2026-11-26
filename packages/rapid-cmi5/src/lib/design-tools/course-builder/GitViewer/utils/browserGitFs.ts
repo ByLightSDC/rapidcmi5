@@ -17,7 +17,11 @@ function watchFsOp<T>(label: string, op: Promise<T>): Promise<T> {
   );
 }
 
-/** Watch browser-local Git operations so stalled handles produce useful errors. */
+/**
+ * Hide Git metadata from working-tree directory listings in browser storage
+ * and local folders. Time out Git operations on browser-mounted local folders
+ * so stalled File System Access handles produce useful errors.
+ */
 export function wrapBrowserGitFs(fs: FileSystemObject): FileSystemObject {
   const cached = adapters.get(fs);
   if (cached) return cached;

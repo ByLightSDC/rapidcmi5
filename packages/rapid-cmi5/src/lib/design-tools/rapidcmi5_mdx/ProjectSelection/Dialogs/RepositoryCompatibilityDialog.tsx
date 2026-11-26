@@ -1,8 +1,9 @@
 import { Box, Typography } from '@mui/material';
 import { ModalDialog } from '@rapid-cmi5/ui';
+import type { RepositoryEnvironment } from '../../../course-builder/GitViewer/utils/repositoryCompatibility';
 
 interface RepositoryCompatibilityDialogProps {
-  environment: 'browser' | 'desktop' | null;
+  environment: RepositoryEnvironment | null;
   onClose: (proceed: boolean) => void;
 }
 

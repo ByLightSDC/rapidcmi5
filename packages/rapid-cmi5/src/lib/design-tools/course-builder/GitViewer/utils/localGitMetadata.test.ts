@@ -10,9 +10,12 @@ import http from 'isomorphic-git/http/web';
 import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { GitFS } from './fileSystem';
 import { getRepoPath, GitOperations } from './gitOperations';
+import { StepTimeoutError } from './withTimeout';
 import {
   getGitDirectory,
   getFailedMergePath,
+  getLocalGitDirectory,
+  GIT_MIGRATION_MARKER,
   RAPID_GIT_CONFIG,
   prepareLocalGitDirectory,
 } from './gitMetadata';
@@ -87,7 +90,10 @@ describe('Local Git metadata', () => {
 
   // File System Access handles backed by a separate volume allow us to exercise
   // migration without granting browser permissions or touching a user's files.
-  function handle(path: string): FileSystemDirectoryHandle {
+  function handle(
+    path: string,
+    onFileClose?: (filepath: string) => Promise<void>,
+  ): FileSystemDirectoryHandle {
     return {
       kind: 'directory',
       name: path.split('/').pop(),
@@ -107,7 +113,7 @@ describe('Local Git metadata', () => {
           }
           throw error;
         }
-        return handle(child);
+        return handle(child, onFileClose);
       },
       async getFileHandle(name: string, options?: { create?: boolean }) {
         const child = `${path}/${name}`;
@@ -125,12 +131,14 @@ describe('Local Git metadata', () => {
           createWritable: async () => {
             rejectProtectedWrite(child);
             return {
-              write: async (file: File) =>
+              write: async (file: File | string) =>
                 fs.promises.writeFile(
                   child,
-                  Buffer.from(await file.arrayBuffer()),
+                  typeof file === 'string'
+                    ? file
+                    : Buffer.from(await file.arrayBuffer()),
                 ),
-              close: async () => undefined,
+              close: async () => onFileClose?.(child),
               abort: async () => undefined,
             };
           },
@@ -141,7 +149,7 @@ describe('Local Git metadata', () => {
       },
       async *values() {
         for (const name of await fs.promises.readdir(path)) {
-          const parent = handle(path);
+          const parent = handle(path, onFileClose);
           yield (await fs.promises.stat(`${path}/${name}`)).isDirectory()
             ? await parent.getDirectoryHandle(name.toString())
             : await parent.getFileHandle(name.toString());
@@ -327,6 +335,35 @@ describe('Local Git metadata', () => {
     );
   });
 
+  it('preserves local exclusions and keeps migrated metadata out of desktop staging', async () => {
+    await git.init({ fs, dir, defaultBranch: 'main' });
+    await fs.promises.mkdir(`${dir}/.git/info`, { recursive: true });
+    await fs.promises.writeFile(`${dir}/.git/info/exclude`, 'private.env\n');
+    await instance.createFile(r, 'private.env', 'TOKEN=example');
+    await instance.createFile(r, 'lesson.md', 'Lesson');
+    // Existing project ignore rules must remain unchanged.
+    await instance.createFile(r, '.gitignore', '!.*\n');
+    await prepareLocalGitDirectory(handle(dir));
+
+    expect(await fs.promises.readFile(`${gitdir}/info/exclude`, 'utf8')).toBe(
+      'private.env\n',
+    );
+    await ops.gitStageFile(r, '.');
+    expect(await git.listFiles({ fs, dir, gitdir })).toEqual([
+      '.gitignore',
+      'lesson.md',
+    ]);
+    // Use the unwrapped filesystem, just like the desktop Git backend.
+    await git.add({ fs, dir, filepath: '.' });
+    expect(await git.listFiles({ fs, dir })).toEqual([
+      '.gitignore',
+      'lesson.md',
+    ]);
+    expect(await fs.promises.readFile(`${dir}/.gitignore`, 'utf8')).toBe(
+      '!.*\n',
+    );
+  });
+
   it.each([fsType.localFileSystem, fsType.inBrowser])(
     'prefers rapid-config over a retained desktop config when importing into %s',
     async (fileSystemType) => {
@@ -362,6 +399,9 @@ describe('Local Git metadata', () => {
       await instance.importGitRepoZip(zip, repo);
       expect(fs.existsSync(`${repoPath}/.rapid-git/HEAD`)).toBe(true);
       expect(fs.existsSync(`${repoPath}/.rapid-git/config`)).toBe(true);
+      expect(
+        await fs.promises.readFile(`${repoPath}/.rapid-git/.gitignore`, 'utf8'),
+      ).toBe('*\n');
       expect(fs.existsSync(`${repoPath}/.git`)).toBe(false);
       expect(await ops.getCurrentGitBranch(repo)).toBe('main');
     },
@@ -389,6 +429,15 @@ describe('Local Git metadata', () => {
       );
       expect(native('diff', '--name-only', 'HEAD')).toBe('');
       expect(native('show', 'HEAD:lesson.md')).toBe('Initial course');
+      // A conventional desktop repo in the same folder must not stage the
+      // browser's metadata, including its self-ignoring .gitignore file.
+      execFileSync('git', ['-C', fixture, 'init'], { stdio: 'pipe' });
+      execFileSync('git', ['-C', fixture, 'add', '--all']);
+      expect(
+        execFileSync('git', ['-C', fixture, 'ls-files'], {
+          encoding: 'utf8',
+        }).trim(),
+      ).toBe('lesson.md');
     } finally {
       rmSync(fixture, { recursive: true, force: true });
     }
@@ -456,6 +505,198 @@ describe('Local Git metadata', () => {
     expect(await ops.getCurrentGitBranch(r)).toBe('main');
   });
 
+  it.each([false, true])(
+    'restarts an interrupted migration with HEAD/config copied=%s',
+    async (hasHeadAndConfig) => {
+      await git.init({ fs, dir, defaultBranch: 'main' });
+      await instance.createFile(r, 'lesson.md', 'Original lesson');
+      await git.add({ fs, dir, filepath: 'lesson.md' });
+      const oid = await git.commit({ fs, dir, author, message: 'Original' });
+      const originalConfig = await fs.promises.readFile(`${dir}/.git/config`);
+      await fs.promises.mkdir(`${gitdir}/objects`, { recursive: true });
+      await fs.promises.writeFile(`${gitdir}/${GIT_MIGRATION_MARKER}`, '');
+      await fs.promises.writeFile(
+        `${gitdir}/objects/partial-copy`,
+        'incomplete',
+      );
+      if (hasHeadAndConfig) {
+        await fs.promises.writeFile(
+          `${gitdir}/HEAD`,
+          'ref: refs/heads/wrong\n',
+        );
+        await fs.promises.writeFile(`${gitdir}/config`, '[core]\n');
+      }
+
+      // Selecting the original source also keeps the migration warning visible.
+      expect((await getLocalGitDirectory(handle(dir)))?.name).toBe('.git');
+      await prepareLocalGitDirectory(handle(dir));
+
+      expect((await ops.gitCommits(r))[0].oid).toBe(oid);
+      expect(fs.existsSync(`${gitdir}/objects/partial-copy`)).toBe(false);
+      expect(fs.existsSync(`${gitdir}/${GIT_MIGRATION_MARKER}`)).toBe(false);
+      expect(await fs.promises.readFile(`${dir}/.git/config`)).toEqual(
+        originalConfig,
+      );
+      expect((await getLocalGitDirectory(handle(dir)))?.name).toBe(
+        '.rapid-git',
+      );
+    },
+  );
+
+  it('keeps the migration marker until the last file has finished copying', async () => {
+    await git.init({ fs, dir, defaultBranch: 'main' });
+    let finishClose!: () => void;
+    const closeAllowed = new Promise<void>((resolve) => {
+      finishClose = resolve;
+    });
+    let notifyClosing!: () => void;
+    const headClosing = new Promise<void>((resolve) => {
+      notifyClosing = resolve;
+    });
+    const parent = handle(dir, async (filepath) => {
+      if (filepath === `${gitdir}/HEAD`) {
+        notifyClosing();
+        await closeAllowed;
+      }
+    });
+
+    const migration = prepareLocalGitDirectory(parent);
+    try {
+      // Surface migration failures rather than waiting indefinitely for close().
+      await Promise.race([headClosing, migration]);
+      expect(fs.existsSync(`${gitdir}/${GIT_MIGRATION_MARKER}`)).toBe(true);
+    } finally {
+      finishClose();
+      await migration;
+    }
+    expect(fs.existsSync(`${gitdir}/${GIT_MIGRATION_MARKER}`)).toBe(false);
+  });
+
+  it('preserves an incomplete migration when the original source is unavailable', async () => {
+    await fs.promises.mkdir(gitdir, { recursive: true });
+    await fs.promises.writeFile(`${gitdir}/${GIT_MIGRATION_MARKER}`, '');
+    await fs.promises.writeFile(`${gitdir}/index`, 'partial index');
+
+    await expect(prepareLocalGitDirectory(handle(dir))).rejects.toThrow(
+      'Git migration is incomplete. Restore the original .git directory to retry the migration.',
+    );
+    expect(await fs.promises.readFile(`${gitdir}/index`, 'utf8')).toBe(
+      'partial index',
+    );
+    expect(fs.existsSync(`${gitdir}/${GIT_MIGRATION_MARKER}`)).toBe(true);
+  });
+
+  it('lets a progressing migration run longer than the idle timeout', async () => {
+    await git.init({ fs, dir, defaultBranch: 'main' });
+    jest.useFakeTimers({
+      doNotFake: ['nextTick', 'setImmediate', 'performance'],
+    });
+    let elapsed = 0;
+    const parent = handle(dir, async () => {
+      elapsed += 10_000;
+      await jest.advanceTimersByTimeAsync(10_000);
+    });
+    try {
+      await prepareLocalGitDirectory(parent);
+      expect(elapsed).toBeGreaterThan(15_000);
+      expect(fs.existsSync(`${gitdir}/${GIT_MIGRATION_MARKER}`)).toBe(false);
+      expect(await ops.getCurrentGitBranch(r)).toBe('main');
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('waits for the cross-tab Web Lock before creating browser metadata', async () => {
+    await git.init({ fs, dir, defaultBranch: 'main' });
+    let releaseLock!: () => void;
+    const lockAvailable = new Promise<void>((resolve) => {
+      releaseLock = resolve;
+    });
+    let notifyRequested!: () => void;
+    const lockRequested = new Promise<void>((resolve) => {
+      notifyRequested = resolve;
+    });
+    const originalLocks = Object.getOwnPropertyDescriptor(navigator, 'locks');
+    const request = jest.fn(
+      async (_name: string, callback: () => Promise<void>) => {
+        notifyRequested();
+        await lockAvailable;
+        await callback();
+      },
+    );
+    Object.defineProperty(navigator, 'locks', {
+      configurable: true,
+      value: { request },
+    });
+    const migration = prepareLocalGitDirectory(handle(dir));
+    try {
+      await lockRequested;
+      expect(request).toHaveBeenCalledWith(
+        'rapid-cmi5:git-metadata-migration',
+        expect.any(Function),
+      );
+      expect(fs.existsSync(gitdir)).toBe(false);
+      releaseLock();
+      await migration;
+      expect(await ops.getCurrentGitBranch(r)).toBe('main');
+    } finally {
+      releaseLock();
+      await migration;
+      if (originalLocks) {
+        Object.defineProperty(navigator, 'locks', originalLocks);
+      } else {
+        Reflect.deleteProperty(navigator, 'locks');
+      }
+    }
+  });
+
+  it('queues retries after an idle timeout until the original copy settles', async () => {
+    await git.init({ fs, dir, defaultBranch: 'main' });
+    let finishClose!: () => void;
+    const closeAllowed = new Promise<void>((resolve) => {
+      finishClose = resolve;
+    });
+    let notifyClosing!: () => void;
+    const headClosing = new Promise<void>((resolve) => {
+      notifyClosing = resolve;
+    });
+    const parent = handle(dir, async (filepath) => {
+      if (filepath === `${gitdir}/HEAD`) {
+        notifyClosing();
+        await closeAllowed;
+      }
+    });
+    jest.useFakeTimers({
+      doNotFake: ['nextTick', 'setImmediate', 'performance'],
+    });
+    let retry: Promise<void> | undefined;
+    try {
+      const migration = prepareLocalGitDirectory(parent);
+      const timedOut =
+        expect(migration).rejects.toBeInstanceOf(StepTimeoutError);
+      await headClosing;
+      await jest.advanceTimersByTimeAsync(15_000);
+      await timedOut;
+
+      // Re-picking the same folder returns another handle object.
+      const retryParent = handle(dir);
+      const removeEntry = jest.spyOn(retryParent, 'removeEntry');
+      retry = prepareLocalGitDirectory(retryParent);
+      await Promise.resolve();
+      expect(removeEntry).not.toHaveBeenCalled();
+      expect(fs.existsSync(`${gitdir}/${GIT_MIGRATION_MARKER}`)).toBe(true);
+      finishClose();
+      await retry;
+      expect(removeEntry).not.toHaveBeenCalled();
+      expect(await ops.getCurrentGitBranch(r)).toBe('main');
+      expect(fs.existsSync(`${gitdir}/${GIT_MIGRATION_MARKER}`)).toBe(false);
+    } finally {
+      finishClose();
+      await retry;
+      jest.useRealTimers();
+    }
+  });
+
   it('migrates existing internal browser repositories once', async () => {
     const repo = { ...r, fileSystemType: fsType.inBrowser };
     const repoPath = getRepoPath(repo);
@@ -465,6 +706,9 @@ describe('Local Git metadata', () => {
     await git.commit({ fs, dir: repoPath, author, message: 'Stored commit' });
     await instance.migrateBrowserStorage();
     expect(await ops.getCurrentGitBranch(repo)).toBe('main');
+    expect(
+      await fs.promises.readFile(`${repoPath}/.rapid-git/.gitignore`, 'utf8'),
+    ).toBe('*\n');
     expect(await ops.gitCommits(repo)).toHaveLength(1);
     expect(fs.existsSync(`${repoPath}/.git`)).toBe(false);
     await instance.migrateBrowserStorage();
@@ -530,6 +774,8 @@ describe('Local Git metadata', () => {
 
   it('reopens current browser projects without a migration warning', async () => {
     await ops.initGitRepo(r);
+    // Reopening also protects projects created before the ignore fix.
+    await fs.promises.unlink(`${gitdir}/.gitignore`);
     const originalPicker = (window as any).showDirectoryPicker;
     (window as any).showDirectoryPicker = jest
       .fn()
@@ -540,6 +786,9 @@ describe('Local Git metadata', () => {
     try {
       await instance.openLocalRepo(undefined, warning);
       expect(warning).not.toHaveBeenCalled();
+      expect(await fs.promises.readFile(`${gitdir}/.gitignore`, 'utf8')).toBe(
+        '*\n',
+      );
     } finally {
       (window as any).showDirectoryPicker = originalPicker;
     }
@@ -716,6 +965,12 @@ describe('Local Git metadata', () => {
         expect(await instance.dirExists(getGitDirectory(repoPath))).toBe(true);
         expect(await instance.dirExists(`${repoPath}/.git`)).toBe(false);
         expect(await instance.fileExists(repo, '.rapid-git/config')).toBe(true);
+        expect(
+          await fs.promises.readFile(
+            `${repoPath}/.rapid-git/.gitignore`,
+            'utf8',
+          ),
+        ).toBe('*\n');
         await ops.setGitConfig(repo, {
           authorName: author.name,
           authorEmail: author.email,

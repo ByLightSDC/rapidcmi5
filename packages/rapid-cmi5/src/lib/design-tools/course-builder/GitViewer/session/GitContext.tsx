@@ -44,6 +44,7 @@ import { INode } from 'react-accessible-treeview';
 import { FileContent, getRepoPath } from '../utils/fileSystem';
 import { GitOperations } from '../utils/gitOperations';
 import { withTimeout } from '../utils/withTimeout';
+import type { RepositoryCompatibilityWarning } from '../utils/repositoryCompatibility';
 
 const RESOLVE_STEP_TIMEOUT_MS = 90_000;
 import {
@@ -174,9 +175,7 @@ interface IGitContext {
   getLocalFolders: () => Promise<DirMeta[]>;
   openLocalRepo: (
     id?: string,
-    onCompatibilityWarning?: (
-      environment: 'browser' | 'desktop',
-    ) => Promise<boolean>,
+    onCompatibilityWarning?: RepositoryCompatibilityWarning,
   ) => Promise<void>;
   deleteRecentProject: (id: string) => Promise<void>;
   getDirHandle: () => Promise<FileSystemDirectoryHandle | null>;
@@ -671,9 +670,7 @@ export const GitContextProvider = (props: tProviderProps) => {
 
   const openLocalRepo = async (
     id?: string,
-    onCompatibilityWarning?: (
-      environment: 'browser' | 'desktop',
-    ) => Promise<boolean>,
+    onCompatibilityWarning?: RepositoryCompatibilityWarning,
   ) => {
     dispatch(setLoadingState(LoadingState.openingRepo));
     try {

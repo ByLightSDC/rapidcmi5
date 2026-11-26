@@ -14,6 +14,7 @@ import { configure, fs as zenFs } from '@zenfs/core';
 import { IndexedDB, WebAccess } from '@zenfs/dom';
 import { serializeDirectoryCreation } from './serializeDirectoryCreation';
 import { wrapBrowserGitFs } from './browserGitFs';
+import type { RepositoryCompatibilityWarning } from './repositoryCompatibility';
 import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { set, get, keys, getMany, del } from 'idb-keyval';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
@@ -27,6 +28,7 @@ import {
   RAPID_GIT_CONFIG,
   STANDARD_GIT_DIRECTORY,
   BROWSER_GIT_DIRECTORY,
+  BROWSER_GIT_IGNORE,
   getGitDirectory,
   prepareLocalGitDirectory,
 } from './gitMetadata';
@@ -153,6 +155,18 @@ export class GitFS {
       if ((await this.dirExists(source)) && !(await this.dirExists(target))) {
         await this.fs.promises.rename(source, target);
       }
+      await this.ignoreBrowserGitDirectory(repoPath);
+    }
+  }
+
+  async ignoreBrowserGitDirectory(repoPath: string) {
+    if (this.isElectron) return;
+    const gitDirectory = getGitDirectory(repoPath);
+    if (await this.dirExists(gitDirectory)) {
+      await this.fs.promises.writeFile(
+        join(gitDirectory, '.gitignore'),
+        BROWSER_GIT_IGNORE,
+      );
     }
   }
 
@@ -422,9 +436,7 @@ export class GitFS {
 
   async openLocalRepo(
     id?: string,
-    onCompatibilityWarning?: (
-      environment: 'browser' | 'desktop',
-    ) => Promise<boolean>,
+    onCompatibilityWarning?: RepositoryCompatibilityWarning,
   ) {
     if (this.isElectron) {
       const dirName = id ? basename(id) : await window.fsApi.chooseProject();
@@ -507,11 +519,7 @@ export class GitFS {
       // Migrate legacy .git metadata using read-only access to the source.
       // Validate saved handles too when reopening a project.
       try {
-        await withTimeout(
-          'preparing the project Git metadata',
-          prepareLocalGitDirectory(dirHandle),
-          FS_STEP_TIMEOUT_MS,
-        );
+        await prepareLocalGitDirectory(dirHandle);
         await this.setDirHandle(dirHandle);
       } catch (error) {
         this.currentProjectRecentsId = undefined;
@@ -1024,6 +1032,7 @@ export class GitFS {
         );
       }
     }
+    await this.ignoreBrowserGitDirectory(repoPath);
   };
 
   /**

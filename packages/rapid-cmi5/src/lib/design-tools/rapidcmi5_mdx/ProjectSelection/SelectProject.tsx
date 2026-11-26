@@ -14,6 +14,10 @@ import { HiddenHeader, useToaster } from '@rapid-cmi5/ui';
 import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
 import { CustomTheme } from '../styles/createPalette';
 import { StepTimeoutError } from '../../course-builder/GitViewer/utils/withTimeout';
+import type {
+  RepositoryCompatibilityWarning,
+  RepositoryEnvironment,
+} from '../../course-builder/GitViewer/utils/repositoryCompatibility';
 
 interface OptionDocumentation {
   title: string;
@@ -44,9 +48,8 @@ export default function SelectProjectHomePage({}: {}) {
     (state: RootState) => state.repoManager,
   );
 
-  const [compatibilityWarning, setCompatibilityWarning] = useState<
-    'browser' | 'desktop' | null
-  >(null);
+  const [compatibilityWarning, setCompatibilityWarning] =
+    useState<RepositoryEnvironment | null>(null);
   const compatibilityResponse = useRef<((proceed: boolean) => void) | null>(
     null,
   );
@@ -57,8 +60,8 @@ export default function SelectProjectHomePage({}: {}) {
   };
   useEffect(() => () => compatibilityResponse.current?.(false), []);
 
-  const warnAboutRepositoryCompatibility = (
-    environment: 'browser' | 'desktop',
+  const warnAboutRepositoryCompatibility: RepositoryCompatibilityWarning = (
+    environment,
   ) =>
     new Promise<boolean>((resolve) => {
       compatibilityResponse.current = resolve;
