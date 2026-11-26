@@ -18,7 +18,7 @@ import Grid from '@mui/material/Grid2';
 
 import { UseFormReturn } from 'react-hook-form';
 
-import { GIT_URL_GROUP, NAME_GROUP } from '@rapid-cmi5/ui';
+import { GIT_URL_GROUP, NAME_GROUP, NAME_GROUP_OPT } from '@rapid-cmi5/ui';
 import { useCallback, useContext, useEffect, useMemo } from 'react';
 
 import CheckIcon from '@mui/icons-material/Check';
@@ -30,7 +30,7 @@ import { GitContext } from '../../GitViewer/session/GitContext';
 const validationSchema = yup.object().shape({
   repoDirName: NAME_GROUP,
   repoRemoteUrl: GIT_URL_GROUP(),
-  repoBranch: NAME_GROUP,
+  repoBranch: NAME_GROUP_OPT,
   repoUsername: NAME_GROUP,
   repoPassword: NAME_GROUP,
   authorName: NAME_GROUP,
@@ -140,10 +140,12 @@ export function CloneRepoForm({
             <FormControlTextField
               control={control}
               error={Boolean(errors?.repoBranch)}
-              helperText={errors?.repoBranch?.message}
+              helperText={
+                errors?.repoBranch?.message ||
+                'Leave blank to use the remote default branch.'
+              }
               name="repoBranch"
-              required
-              label="Remote Branch"
+              label="Initial Branch (optional)"
               readOnly={false}
             />
           </Grid>
@@ -178,6 +180,7 @@ export function CloneRepoForm({
                   error={Boolean(errors?.repoUsername)}
                   helperText={errors?.repoUsername?.message}
                   name="repoUsername"
+                  autoComplete="username"
                   required
                   label="User Name"
                   placeholder="user.name"

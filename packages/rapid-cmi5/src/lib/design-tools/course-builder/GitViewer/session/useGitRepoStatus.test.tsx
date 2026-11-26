@@ -1,0 +1,168 @@
+import { act, renderHook } from '@testing-library/react';
+import { useGitRepoStatus } from './useGitRepoStatus';
+import { GitFS } from '../utils/fileSystem';
+import { GitOperations } from '../utils/gitOperations';
+import { fsType } from '../../../../redux/repoManagerReducer';
+
+jest.mock('react-redux', () => ({
+  useSelector: () => ({ currentBranch: 'main' }),
+}));
+jest.mock('../utils/gitOperations', () => ({
+  GitOperations: jest.fn().mockImplementation(() => mockGitOperator),
+}));
+
+const mockGitOperator = {
+  clearCache: jest.fn(),
+  gitResolveFile: jest.fn(),
+  gitRepoStatus: jest.fn(),
+  gitRepoStatusFast: jest.fn(),
+  gitCommits: jest.fn(),
+  gitListStash: jest.fn().mockResolvedValue([]),
+  getStashStatus: jest.fn().mockResolvedValue(undefined),
+  getCurrentGitBranch: jest.fn(),
+  getCommitsToPushCount: jest.fn(),
+};
+const repo = { repoName: 'course', fileSystemType: fsType.localFileSystem };
+
+describe('staging status updates', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('shows staged and deleted files regardless of timestamps without changing staging', async () => {
+    const status = [
+      { name: 'old-lesson.md', status: 'staged' },
+      { name: 'removed.md', status: 'deleted_staged' },
+    ];
+    mockGitOperator.gitRepoStatusFast.mockResolvedValue(status);
+    mockGitOperator.gitCommits.mockResolvedValue([]);
+    const fs = {
+      isElectron: false,
+      getFolderStructureWithMtime: jest.fn(),
+      getFileContent: jest.fn().mockResolvedValue(null),
+    } as unknown as GitFS;
+    const { result } = renderHook(() => useGitRepoStatus(repo, false, fs));
+    await act(async () => {
+      await result.current.resolveGitRepoStatus(repo);
+    });
+    expect(mockGitOperator.gitRepoStatusFast).toHaveBeenCalledWith(repo);
+    expect(fs.getFolderStructureWithMtime).not.toHaveBeenCalled();
+    expect(result.current.modifiedFiles).toEqual(status);
+    expect(result.current.numStaged).toBe(2);
+  });
+
+  it('replaces the previous branch status with a fresh clean result', async () => {
+    mockGitOperator.gitCommits.mockResolvedValue([]);
+    mockGitOperator.gitRepoStatusFast
+      .mockResolvedValueOnce([{ name: 'old.md', status: 'modified' }])
+      .mockResolvedValueOnce([]);
+    const fs = {
+      getFileContent: jest.fn().mockResolvedValue(null),
+    } as unknown as GitFS;
+    const { result } = renderHook(() => useGitRepoStatus(repo, false, fs));
+    await act(async () => {
+      await result.current.resolveGitRepoStatus(repo);
+    });
+    expect(result.current.modifiedFiles).toHaveLength(1);
+    await act(async () => {
+      await result.current.resolveGitRepoStatus(repo);
+    });
+    expect(result.current.modifiedFiles).toEqual([]);
+    expect(mockGitOperator.gitRepoStatusFast).toHaveBeenCalledTimes(2);
+  });
+
+  it('computes push status from the checked out branch after switching', async () => {
+    mockGitOperator.getCurrentGitBranch.mockResolvedValue('feature/course');
+    mockGitOperator.getCommitsToPushCount.mockResolvedValue(2);
+    const { result } = renderHook(() =>
+      useGitRepoStatus(repo, false, {} as GitFS),
+    );
+    await act(async () => {
+      await result.current.resolvePushStatus(repo);
+    });
+    expect(mockGitOperator.getCommitsToPushCount).toHaveBeenCalledWith(
+      repo,
+      'feature/course',
+    );
+    expect(result.current.unpushedCommits).toBe(2);
+    expect(result.current.canPush).toBe(true);
+  });
+
+  it('reuses bulk staging results without scanning files or reloading history', async () => {
+    const fs = { getFolderStructureWithMtime: jest.fn() } as unknown as GitFS;
+    const { result } = renderHook(() => useGitRepoStatus(repo, false, fs));
+    await act(async () => {
+      await result.current.resolveFile(
+        repo,
+        ['lesson.md', 'other.md'],
+        [
+          { name: 'lesson.md', status: 'untracked' },
+          { name: 'other.md', status: 'modified' },
+        ],
+      );
+    });
+    await act(async () => {
+      await result.current.resolveFile(
+        repo,
+        ['lesson.md'],
+        [{ name: 'lesson.md', status: 'staged' }],
+      );
+    });
+    expect(result.current.modifiedFiles).toEqual([
+      { name: 'other.md', status: 'modified' },
+      { name: 'lesson.md', status: 'staged' },
+    ]);
+    expect(result.current.numStaged).toBe(1);
+    expect(result.current.canCommit).toBe(true);
+    expect(GitOperations).toHaveBeenCalledTimes(1);
+    expect(fs.getFolderStructureWithMtime).not.toHaveBeenCalled();
+    expect(mockGitOperator.gitRepoStatus).not.toHaveBeenCalled();
+    expect(mockGitOperator.gitCommits).not.toHaveBeenCalled();
+    expect(mockGitOperator.gitResolveFile).not.toHaveBeenCalled();
+  });
+
+  it('checks only the selected file and refreshes stash actions once', async () => {
+    mockGitOperator.gitResolveFile.mockResolvedValue({
+      name: 'lesson.md',
+      status: 'staged',
+    });
+    const { result } = renderHook(() =>
+      useGitRepoStatus(repo, true, {} as GitFS),
+    );
+    await act(async () => {});
+    mockGitOperator.gitListStash.mockClear();
+    mockGitOperator.getStashStatus.mockClear();
+    await act(async () => {
+      await result.current.resolveFile(repo, 'lesson.md');
+    });
+    expect(mockGitOperator.gitResolveFile).toHaveBeenCalledWith(
+      repo,
+      'lesson.md',
+    );
+    expect(mockGitOperator.gitListStash).toHaveBeenCalledTimes(1);
+    expect(mockGitOperator.getStashStatus).toHaveBeenCalledTimes(1);
+    expect(mockGitOperator.gitRepoStatus).not.toHaveBeenCalled();
+    expect(result.current.numStaged).toBe(1);
+  });
+
+  it('removes files no longer changed without dropping unrelated changes', async () => {
+    const { result } = renderHook(() =>
+      useGitRepoStatus(repo, false, {} as GitFS),
+    );
+    await act(async () => {
+      await result.current.resolveFile(
+        repo,
+        ['deleted.md', 'other.md'],
+        [
+          { name: 'deleted.md', status: 'added_then_deleted' },
+          { name: 'other.md', status: 'modified' },
+        ],
+      );
+    });
+    await act(async () => {
+      await result.current.resolveFile(repo, ['deleted.md'], []);
+    });
+    expect(result.current.modifiedFiles).toEqual([
+      { name: 'other.md', status: 'modified' },
+    ]);
+    expect(result.current.canCommit).toBe(false);
+  });
+});

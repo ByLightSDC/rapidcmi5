@@ -98,6 +98,7 @@ export function FormControlPassword({
                   aria-label={label}
                   label={label}
                   name={field.name}
+                  inputRef={field.ref}
                   required={required}
                   type={isPassword ? 'password' : 'text'}
                   value={field.value ?? ''}

@@ -317,9 +317,10 @@ export const courseBuilderSlice = createSlice({
       const slide = au.slides[state.currentSlideIndex];
       if (!slide) return;
 
+      // Navigation captures the current editor text even when it is unchanged.
+      // Leave the operation queue alone unless there is a real content change.
+      if (slide.content === action.payload.content) return;
       slide.content = action.payload.content;
-
-      // For now we are just assuming that the file was edited, this must be fixed in the future
       editSlideOperation(slide.filepath, state);
     },
     updateCourseData: (state, action: PayloadAction<CourseData>) => {

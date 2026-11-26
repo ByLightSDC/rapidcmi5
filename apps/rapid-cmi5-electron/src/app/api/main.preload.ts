@@ -72,6 +72,8 @@ export const fsApi = {
     ipcRenderer.invoke('fs:getGitConfig', path, configPath),
   setGitConfig: (path: string, configPath: string, value: string) =>
     ipcRenderer.invoke('fs:setGitConfig', path, configPath, value),
+  gitCreateBranch: (path: string, branch: string) =>
+    ipcRenderer.invoke('fs:gitCreateBranch', path, branch),
   gitCheckout: (path: string, branch: string) =>
     ipcRenderer.invoke('fs:gitCheckout', path, branch),
   gitAdd: (path: string, filePath: string) =>

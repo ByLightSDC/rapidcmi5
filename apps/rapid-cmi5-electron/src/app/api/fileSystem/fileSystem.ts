@@ -396,6 +396,17 @@ export class ElectronFsHandler {
     });
   }
 
+  async gitCreateBranch(p: string, branch: string) {
+    const fullPath = await this.getFullPath(p);
+    if (branch === 'HEAD' || branch.startsWith('-'))
+      throw Error('Invalid branch name.');
+    const branches = await this.getAllGitBranches(p);
+    if (branches.includes(branch))
+      throw Error('A branch with this name already exists.');
+    await git.resolveRef({ fs: fsp, dir: fullPath, ref: 'HEAD' });
+    await git.branch({ fs: fsp, dir: fullPath, ref: branch, checkout: true });
+  }
+
   async gitCheckout(p: string, branch: string) {
     const fullPath = await this.getFullPath(p);
 
@@ -408,7 +419,14 @@ export class ElectronFsHandler {
 
   async getAllGitBranches(p: string): Promise<string[]> {
     const fullPath = await this.getFullPath(p);
-    return await git.listBranches({ fs: fsp, dir: fullPath });
+    const options = { fs: fsp, dir: fullPath };
+    const [local, remote] = await Promise.all([
+      git.listBranches(options),
+      git.listBranches({ ...options, remote: 'origin' }),
+    ]);
+    return [
+      ...new Set([...local, ...remote.filter((name) => name !== 'HEAD')]),
+    ].sort();
   }
   async getGitConfig(p: string, configPath: string): Promise<any> {
     const fullPath = await this.getFullPath(p);
@@ -508,9 +526,9 @@ export class ElectronFsHandler {
       http,
       dir: fullPath,
       url,
-      ref: branch,
+      ref: branch?.trim() || undefined,
       depth: shallowClone ? 1 : undefined,
-      singleBranch: true,
+      singleBranch: false,
       onAuth: () => ({ username, password }),
     });
     addRecentProject(basename(p));
@@ -584,7 +602,7 @@ export class ElectronFsHandler {
       http,
       dir: fullPath,
       ref: branch,
-      singleBranch: true,
+      singleBranch: false,
       fastForward: false,
       onAuth: () => ({ username, password }),
     });

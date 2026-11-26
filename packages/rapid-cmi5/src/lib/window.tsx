@@ -78,6 +78,7 @@ export interface fsApi {
   readFile: (path: string) => Promise<Uint8Array>;
   getCurrentBranch: (path: string) => Promise<string | void>;
   gitCheckout: (path: string, branch: string) => Promise<void>;
+  gitCreateBranch: (path: string, branch: string) => Promise<void>;
   gitAdd: (path: string, filePath: string) => Promise<void>;
   gitRemove: (path: string, filePath: string) => Promise<void>;
   gitAddRemote: (path: string, remoteUrl: string) => Promise<void>;

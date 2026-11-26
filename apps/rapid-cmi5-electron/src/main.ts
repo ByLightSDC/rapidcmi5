@@ -477,6 +477,13 @@ ipcMain.handle(
 );
 
 ipcMain.handle(
+  'fs:gitCreateBranch',
+  async (_e, repoPath: string, branch: string) => {
+    return await getFsHandler().gitCreateBranch(repoPath, branch);
+  },
+);
+
+ipcMain.handle(
   'fs:gitCheckout',
   async (_e, repoPath: string, branch: string) => {
     try {

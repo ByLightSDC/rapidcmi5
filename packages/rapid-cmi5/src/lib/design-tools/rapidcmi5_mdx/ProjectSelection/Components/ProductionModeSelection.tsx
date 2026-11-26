@@ -35,7 +35,7 @@ const documentation: Record<string, OptionDocumentation> = {
     content: `Open a Git repository that already exists on your local computer
 
 ## Requirements:
-- The folder must contain a \`.git\` directory
+- The folder must contain a \`.rapid-git\` directory (browser) or \`.git\` directory (desktop)
 - The repository should be properly initialized with Git
 
 ## This option is ideal when:
@@ -43,7 +43,9 @@ const documentation: Record<string, OptionDocumentation> = {
 - You've cloned using another Git client
 - You want to work with an existing local repository
 
-In the browser, Git uses the standard \`.git\` directory for commits, branches, and staging. Configuration is stored in \`.git/rapid-config\`, copied once from \`.git/config\` when opening an existing repository. Browser configuration changes do not update desktop Git settings. Browser-created repositories need their remote and upstream configured in a desktop Git client before desktop push or pull. Hooks and submodules are not supported in browser mode.`,
+Browser projects use \`.rapid-git\`; the desktop app uses standard \`.git\`. Opening an existing desktop repository in the browser copies its Git history, staging state, and configuration into \`.rapid-git\` once. After that, browser and desktop Git history and settings are independent; use push and pull to share commits through your remote. Chromium now blocks browsers from creating \`.git\` and restricts writes inside it, which is why browser projects use the new folder name. When opening an older \`.git\` project in the browser, review the warning and choose Copy and Open to make the one-time copy, or Cancel to leave it unchanged.
+
+To open a browser-only project on desktop, close it in the browser, back up the entire folder including hidden files, and rename \`.rapid-git\` to \`.git\` in your file manager before reopening it. Only rename when no \`.git\` folder already exists. Alternatively, push your browser commits and clone the remote into a separate desktop folder. Hooks and submodules are not supported in browser mode.`,
   },
   create: {
     title: 'Create New Repository',

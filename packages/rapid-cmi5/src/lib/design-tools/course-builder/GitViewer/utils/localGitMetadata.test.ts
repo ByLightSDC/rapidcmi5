@@ -9,9 +9,11 @@ import * as git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
 import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { GitFS } from './fileSystem';
-import { failedMergePath, getRepoPath, GitOperations } from './gitOperations';
+import { getRepoPath, GitOperations } from './gitOperations';
+import { getCachedGitStatus } from './gitStatusCache';
 import {
   getGitDirectory,
+  getFailedMergePath,
   RAPID_GIT_CONFIG,
   prepareLocalGitDirectory,
 } from './gitMetadata';
@@ -70,9 +72,7 @@ describe('Local Git metadata', () => {
   });
 
   function rejectProtectedWrite(path: string) {
-    if (
-      /\/localFileSystem\/.*\/\.git\/(config|hooks|modules)(\/|$)/.test(path)
-    ) {
+    if (/\/localFileSystem\/.*\/\.git(\/|$)/.test(path)) {
       blockedWrites.push(path);
       throw Object.assign(new Error(`Chrome blocks writing ${path}`), {
         code: 'EACCES',
@@ -151,7 +151,7 @@ describe('Local Git metadata', () => {
     } as unknown as FileSystemDirectoryHandle;
   }
 
-  it('persists rapid-config and shares standard Git metadata across reopening', async () => {
+  it('persists browser metadata across reopening without creating .git', async () => {
     await ops.initGitRepo(r);
     await ops.setGitConfig(r, {
       authorName: author.name,
@@ -173,13 +173,12 @@ describe('Local Git metadata', () => {
     expect(await reopened.gitRepoStatus(r)).toEqual([
       { name: 'lesson.md', status: 'staged' },
     ]);
-    expect(await instance.dirExists(`${dir}/.git`)).toBe(true);
-    expect(await instance.fileExists(r, '.git/index')).toBe(true);
-    expect(await instance.fileExists(r, `.git/${RAPID_GIT_CONFIG}`)).toBe(true);
-    expect(await instance.fileExists(r, '.git/config')).toBe(false);
-    expect(await instance.dirExists(`${dir}/.git/hooks`)).toBe(false);
-    expect(failedMergePath).toBe('.git/failedMerge.txt');
-    expect((await git.log({ fs, dir }))[0].oid).toBe(
+    expect(await instance.dirExists(`${dir}/.rapid-git`)).toBe(true);
+    expect(await instance.fileExists(r, '.rapid-git/index')).toBe(true);
+    expect(await instance.fileExists(r, '.rapid-git/config')).toBe(true);
+    expect(await instance.dirExists(`${dir}/.git`)).toBe(false);
+    expect(getFailedMergePath()).toBe('.rapid-git/failedMerge.txt');
+    expect((await git.log({ fs, dir, gitdir }))[0].oid).toBe(
       (await reopened.gitCommits(r))[0].oid,
     );
   });
@@ -218,7 +217,7 @@ describe('Local Git metadata', () => {
     ]);
   });
 
-  it('uses rapid-config for stash, diff, unstage, revert and branch reset', async () => {
+  it('uses browser metadata for stash, diff, unstage, revert and branch reset', async () => {
     await ops.initGitRepo(r);
     await ops.setGitConfig(r, {
       authorName: author.name,
@@ -253,7 +252,7 @@ describe('Local Git metadata', () => {
     );
   });
 
-  it('copies only desktop config and shares existing staged changes and commits', async () => {
+  it('copies desktop history and staging once without modifying desktop metadata', async () => {
     await git.init({ fs, dir, defaultBranch: 'main' });
     await git.addRemote({
       fs,
@@ -269,10 +268,13 @@ describe('Local Git metadata', () => {
     });
     await instance.createFile(r, 'lesson.md', 'Legacy staged file');
     await git.add({ fs, dir, filepath: 'lesson.md' });
+    await git.commit({ fs, dir, author, message: 'Desktop commit' });
+    await instance.updateFile(r, 'lesson.md', 'Staged edit');
+    await git.add({ fs, dir, filepath: 'lesson.md' });
     const originalIndex = await fs.promises.readFile(`${dir}/.git/index`);
     const originalConfig = await fs.promises.readFile(`${dir}/.git/config`);
     await prepareLocalGitDirectory(handle(dir));
-    expect(await fs.promises.readFile(`${gitdir}/${RAPID_GIT_CONFIG}`)).toEqual(
+    expect(await fs.promises.readFile(`${gitdir}/config`)).toEqual(
       originalConfig,
     );
     expect(
@@ -291,14 +293,14 @@ describe('Local Git metadata', () => {
     );
     await ops.gitCommit(r, 'Migrated commit', author.email, author.name);
     await prepareLocalGitDirectory(handle(dir));
-    expect(await ops.gitCommits(r)).toHaveLength(1);
+    expect(await ops.gitCommits(r)).toHaveLength(2);
     expect(await git.log({ fs, dir })).toHaveLength(1);
     expect(await fs.promises.readFile(`${gitdir}/config`)).toEqual(
       originalConfig,
     );
   });
 
-  it('keeps rapid-config on reopening and reads recent-project remotes from it', async () => {
+  it('keeps browser config on reopening and reads recent-project remotes from it', async () => {
     await git.init({ fs, dir });
     await git.addRemote({
       fs,
@@ -313,6 +315,7 @@ describe('Local Git metadata', () => {
     await git.setConfig({
       fs: instance.getFs(),
       dir,
+      gitdir,
       path: 'remote.origin.url',
       value: 'https://example.com/current.git',
     });
@@ -358,13 +361,9 @@ describe('Local Git metadata', () => {
       zip.file('course/.git/modules/sub/config', 'unused submodule');
       zip.file('course/lesson.md', 'Imported lesson');
       await instance.importGitRepoZip(zip, repo);
-      expect(fs.existsSync(`${repoPath}/.git/HEAD`)).toBe(true);
-      expect(fs.existsSync(`${repoPath}/.git/${RAPID_GIT_CONFIG}`)).toBe(
-        fileSystemType === fsType.localFileSystem,
-      );
-      expect(fs.existsSync(`${repoPath}/.git/config`)).toBe(
-        fileSystemType === fsType.inBrowser,
-      );
+      expect(fs.existsSync(`${repoPath}/.rapid-git/HEAD`)).toBe(true);
+      expect(fs.existsSync(`${repoPath}/.rapid-git/config`)).toBe(true);
+      expect(fs.existsSync(`${repoPath}/.git`)).toBe(false);
       expect(await ops.getCurrentGitBranch(repo)).toBe('main');
     },
   );
@@ -383,16 +382,390 @@ describe('Local Git metadata', () => {
         writeFileSync(destination, fs.readFileSync(filepath) as Buffer);
       }
       const native = (...args: string[]) =>
-        execFileSync('git', ['-C', fixture, ...args], {
+        execFileSync('git', ['-C', fixture, '--git-dir=.rapid-git', ...args], {
           encoding: 'utf8',
         }).trim();
       expect(native('log', '-1', '--format=%H')).toBe(
         (await ops.gitCommits(r))[0].oid,
       );
-      expect(native('status', '--porcelain')).toBe('');
+      expect(native('diff', '--name-only', 'HEAD')).toBe('');
       expect(native('show', 'HEAD:lesson.md')).toBe('Initial course');
     } finally {
       rmSync(fixture, { recursive: true, force: true });
+    }
+  });
+
+  it.each([fsType.localFileSystem, fsType.inBrowser])(
+    'creates a branch at HEAD and keeps the original history in %s',
+    async (fileSystemType) => {
+      const repo = { ...r, fileSystemType };
+      await ops.initGitRepo(repo);
+      await commitFile('Original lesson', repo);
+      const original = (await ops.gitCommits(repo))[0].oid;
+      await ops.gitCreateBranch(repo, 'feature/new-lesson');
+      expect(await ops.getCurrentGitBranch(repo)).toBe('feature/new-lesson');
+      expect((await ops.gitCommits(repo))[0].oid).toBe(original);
+      expect(await ops.getAllGitBranches(repo)).toEqual([
+        'feature/new-lesson',
+        'main',
+      ]);
+      await commitFile('Branch lesson', repo);
+      await ops.gitCheckout(repo, 'main');
+      expect((await instance.getFileContent(repo, 'lesson.md'))?.content).toBe(
+        'Original lesson',
+      );
+      await ops.gitCheckout(repo, 'feature/new-lesson');
+      expect((await instance.getFileContent(repo, 'lesson.md'))?.content).toBe(
+        'Branch lesson',
+      );
+      await expect(ops.gitCreateBranch(repo, 'main')).rejects.toThrow(
+        'already exists',
+      );
+      await expect(ops.gitCreateBranch(repo, 'bad..name')).rejects.toThrow(
+        'valid Git branch name',
+      );
+      expect(await ops.getCurrentGitBranch(repo)).toBe('feature/new-lesson');
+    },
+  );
+
+  it.each([fsType.localFileSystem, fsType.inBrowser])(
+    'keeps repeated checkouts clean and protects untracked files in %s',
+    async (fileSystemType) => {
+      const repo = { ...r, fileSystemType };
+      await ops.initGitRepo(repo);
+      await commitFile('Main lesson', repo);
+      await ops.gitCreateBranch(repo, 'feature/course');
+      await commitFile('Feature lesson', repo);
+      await instance.createFile(repo, 'branch.md', 'Feature-only file');
+      await ops.gitStageFile(repo, 'branch.md');
+      await ops.gitCommit(repo, 'Feature file', author.email, author.name);
+      for (const branch of ['main', 'feature/course', 'main']) {
+        await ops.gitCheckout(repo, branch);
+        ops.clearCache();
+        expect(await ops.gitRepoStatusFast(repo)).toEqual([]);
+      }
+      await instance.createFile(repo, 'notes.txt', 'Local notes');
+      await ops.gitCheckout(repo, 'feature/course');
+      expect((await instance.getFileContent(repo, 'notes.txt'))?.content).toBe(
+        'Local notes',
+      );
+      expect(await ops.gitRepoStatus(repo, undefined, true)).toEqual([
+        { name: 'notes.txt', status: 'untracked' },
+      ]);
+      await ops.gitCheckout(repo, 'main');
+      await instance.createFile(repo, 'branch.md', 'My untracked draft');
+      await expect(ops.gitCheckout(repo, 'feature/course')).rejects.toThrow(
+        'branch.md',
+      );
+      expect(await ops.getCurrentGitBranch(repo)).toBe('main');
+      expect((await instance.getFileContent(repo, 'branch.md'))?.content).toBe(
+        'My untracked draft',
+      );
+    },
+  );
+
+  it('uses timestamps to avoid content scans but detects backdated edits, additions and deletions', async () => {
+    await ops.initGitRepo(r);
+    await commitFile();
+    const oldTime = new Date(1000);
+    await fs.promises.utimes(`${dir}/lesson.md`, oldTime, oldTime);
+    const scan = jest.fn((paths?: string[]) =>
+      ops.gitRepoStatus(r, paths, true),
+    );
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual([]);
+    expect(scan).toHaveBeenLastCalledWith();
+    scan.mockClear();
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual([]);
+    expect(scan).not.toHaveBeenCalled();
+
+    await instance.createFile(
+      r,
+      'lesson.md',
+      'Changed content with an old timestamp',
+    );
+    await fs.promises.utimes(`${dir}/lesson.md`, oldTime, oldTime);
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual([
+      { name: 'lesson.md', status: 'modified' },
+    ]);
+    expect(scan).toHaveBeenLastCalledWith(['lesson.md']);
+    scan.mockClear();
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual([
+      { name: 'lesson.md', status: 'modified' },
+    ]);
+    expect(scan).not.toHaveBeenCalled();
+
+    await instance.createFile(r, 'notes.txt', 'Local notes');
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual(
+      expect.arrayContaining([{ name: 'notes.txt', status: 'untracked' }]),
+    );
+    await fs.promises.unlink(`${dir}/lesson.md`);
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual(
+      expect.arrayContaining([
+        { name: 'lesson.md', status: 'deleted_unstaged' },
+      ]),
+    );
+    await instance.createFile(r, '.gitignore', 'notes.txt\n');
+    const ignoredStatus = await getCachedGitStatus(instance, r, scan);
+    expect(scan).toHaveBeenLastCalledWith();
+    expect(ignoredStatus.some((file) => file.name === 'notes.txt')).toBe(false);
+  });
+
+  it('invalidates timestamp status on staging and checkout without unstaging deletions', async () => {
+    await ops.initGitRepo(r);
+    await commitFile('Main lesson');
+    await ops.gitCreateBranch(r, 'feature/course');
+    await commitFile('Feature lesson');
+    await ops.gitCheckout(r, 'main');
+    const scan = jest.fn((paths?: string[]) =>
+      ops.gitRepoStatus(r, paths, true),
+    );
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual([]);
+    await fs.promises.unlink(`${dir}/lesson.md`);
+    await ops.gitStageFile(r, 'lesson.md');
+    const index = await fs.promises.readFile(`${gitdir}/index`);
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual([
+      { name: 'lesson.md', status: 'deleted_staged' },
+    ]);
+    expect(scan).toHaveBeenLastCalledWith();
+    expect(await fs.promises.readFile(`${gitdir}/index`)).toEqual(index);
+    await ops.revertFileToHEAD(r, 'lesson.md');
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual([]);
+    await ops.gitCheckout(r, 'feature/course');
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual([]);
+    expect(scan).toHaveBeenLastCalledWith();
+    expect((await instance.getFileContent(r, 'lesson.md'))?.content).toBe(
+      'Feature lesson',
+    );
+  });
+
+  it('rejects creating a branch that shadows a remote branch', async () => {
+    await ops.initGitRepo(r);
+    await commitFile();
+    const oid = (await ops.gitCommits(r))[0].oid;
+    await git.writeRef({
+      fs: instance.getFs(),
+      dir,
+      gitdir,
+      ref: 'refs/remotes/origin/feature/remote',
+      value: oid,
+    });
+    await expect(ops.gitCreateBranch(r, 'feature/remote')).rejects.toThrow(
+      'already exists',
+    );
+    expect(await ops.getCurrentGitBranch(r)).toBe('main');
+  });
+
+  it('creates desktop branches through the filesystem bridge', async () => {
+    const gitCreateBranch = jest.fn().mockResolvedValue(undefined);
+    const previous = window.fsApi;
+    (window as any).fsApi = {
+      gitCreateBranch,
+      getAllGitBranches: jest.fn().mockResolvedValue(['main']),
+    };
+    try {
+      await new GitOperations(new GitFS(true)).gitCreateBranch(
+        r,
+        'feature/desktop',
+      );
+      expect(gitCreateBranch).toHaveBeenCalledWith(dir, 'feature/desktop');
+    } finally {
+      (window as any).fsApi = previous;
+    }
+  });
+
+  it('keeps desktop initialization on the native .git flow', async () => {
+    const gitInitRepo = jest.fn().mockResolvedValue(undefined);
+    const previous = window.fsApi;
+    (window as any).fsApi = { gitInitRepo };
+    try {
+      const desktop = new GitFS(true);
+      await new GitOperations(desktop).initGitRepo(r);
+      expect(gitInitRepo).toHaveBeenCalledWith(dir, 'main');
+      expect(getGitDirectory(dir, true)).toBe(`${dir}/.git`);
+      expect(getFailedMergePath(true)).toBe('.git/failedMerge.txt');
+    } finally {
+      (window as any).fsApi = previous;
+    }
+  });
+
+  it.each([false, true])(
+    'imports browser metadata for desktop=%s',
+    async (isElectron) => {
+      // Use the memory filesystem to inspect import paths without native IPC.
+      instance.isElectron = isElectron;
+      if (isElectron) instance.fs = fs;
+      const zip = new JSZip();
+      zip.file('course/.rapid-git/HEAD', 'ref: refs/heads/main\n');
+      zip.file(
+        'course/.rapid-git/config',
+        '[core]\nrepositoryformatversion = 0\n',
+      );
+      zip.file('course/lesson.md', 'Lesson');
+      await instance.importGitRepoZip(zip, r);
+      expect(fs.existsSync(`${getGitDirectory(dir, isElectron)}/HEAD`)).toBe(
+        true,
+      );
+      expect(fs.existsSync(`${getGitDirectory(dir, isElectron)}/config`)).toBe(
+        true,
+      );
+      expect(fs.existsSync(getGitDirectory(dir, !isElectron))).toBe(false);
+    },
+  );
+
+  it('cleans up failed migration and retries without modifying .git', async () => {
+    await git.init({ fs, dir, defaultBranch: 'main' });
+    const original = await fs.promises.readFile(`${dir}/.git/config`);
+    const parent = handle(dir);
+    const getDirectoryHandle = parent.getDirectoryHandle.bind(parent);
+    jest
+      .spyOn(parent, 'getDirectoryHandle')
+      .mockImplementation(async (name, options) => {
+        const result = await getDirectoryHandle(name, options);
+        if (name === '.rapid-git') {
+          jest
+            .spyOn(result, 'getFileHandle')
+            .mockRejectedValueOnce(new Error('Disk full'));
+        }
+        return result;
+      });
+    await expect(prepareLocalGitDirectory(parent)).rejects.toThrow('Disk full');
+    expect(fs.existsSync(`${dir}/.rapid-git`)).toBe(false);
+    expect(await fs.promises.readFile(`${dir}/.git/config`)).toEqual(original);
+    await prepareLocalGitDirectory(handle(dir));
+    expect(await ops.getCurrentGitBranch(r)).toBe('main');
+  });
+
+  it('migrates existing internal browser repositories once', async () => {
+    const repo = { ...r, fileSystemType: fsType.inBrowser };
+    const repoPath = getRepoPath(repo);
+    await git.init({ fs, dir: repoPath, defaultBranch: 'main' });
+    await instance.createFile(repo, 'lesson.md', 'Stored lesson');
+    await git.add({ fs, dir: repoPath, filepath: 'lesson.md' });
+    await git.commit({ fs, dir: repoPath, author, message: 'Stored commit' });
+    await instance.migrateBrowserStorage();
+    expect(await ops.getCurrentGitBranch(repo)).toBe('main');
+    expect(await ops.gitCommits(repo)).toHaveLength(1);
+    expect(fs.existsSync(`${repoPath}/.git`)).toBe(false);
+    await instance.migrateBrowserStorage();
+    expect(await ops.gitCommits(repo)).toHaveLength(1);
+  });
+
+  it.each([false, true])(
+    'keeps archive histories separate for desktop=%s',
+    async (isElectron) => {
+      instance.isElectron = isElectron;
+      if (isElectron) instance.fs = fs;
+      const zip = new JSZip();
+      zip.file('course/.rapid-git/HEAD', 'ref: refs/heads/browser\n');
+      zip.file(
+        'course/.rapid-git/config',
+        '[core]\nrepositoryformatversion = 0\n',
+      );
+      zip.file('course/.git/HEAD', 'ref: refs/heads/desktop\n');
+      zip.file('course/.git/config', '[core]\nrepositoryformatversion = 0\n');
+      await instance.importGitRepoZip(zip, r);
+      const head = await fs.promises.readFile(
+        `${getGitDirectory(dir, isElectron)}/HEAD`,
+        'utf8',
+      );
+      expect(head).toBe(
+        `ref: refs/heads/${isElectron ? 'desktop' : 'browser'}\n`,
+      );
+    },
+  );
+
+  it.each([false, true])(
+    'warns before browser migration, proceed=%s',
+    async (proceed) => {
+      await git.init({ fs, dir, defaultBranch: 'main' });
+      const parent = handle(dir);
+      const originalPicker = (window as any).showDirectoryPicker;
+      (window as any).showDirectoryPicker = jest.fn().mockResolvedValue(parent);
+      jest.spyOn(instance, 'setDirHandle').mockResolvedValue(undefined);
+      jest.spyOn(instance, 'openLocalDirectory').mockResolvedValue(undefined);
+      const warning = jest.fn(async () => {
+        expect(fs.existsSync(`${dir}/.rapid-git`)).toBe(false);
+        return proceed;
+      });
+      try {
+        const result = instance.openLocalRepo(undefined, warning);
+        if (proceed) {
+          await expect(result).resolves.toBe('course');
+          expect(fs.existsSync(`${dir}/.rapid-git/HEAD`)).toBe(true);
+          expect(instance.openLocalDirectory).toHaveBeenCalledWith(parent);
+        } else {
+          await expect(result).rejects.toMatchObject({ name: 'AbortError' });
+          expect(fs.existsSync(`${dir}/.rapid-git`)).toBe(false);
+          expect(instance.setDirHandle).not.toHaveBeenCalled();
+          expect(instance.openLocalDirectory).not.toHaveBeenCalled();
+        }
+        expect(warning).toHaveBeenCalledWith('browser');
+        expect(fs.existsSync(`${dir}/.git/HEAD`)).toBe(true);
+      } finally {
+        (window as any).showDirectoryPicker = originalPicker;
+      }
+    },
+  );
+
+  it('reopens current browser projects without a migration warning', async () => {
+    await ops.initGitRepo(r);
+    const originalPicker = (window as any).showDirectoryPicker;
+    (window as any).showDirectoryPicker = jest
+      .fn()
+      .mockResolvedValue(handle(dir));
+    jest.spyOn(instance, 'setDirHandle').mockResolvedValue(undefined);
+    jest.spyOn(instance, 'openLocalDirectory').mockResolvedValue(undefined);
+    const warning = jest.fn();
+    try {
+      await instance.openLocalRepo(undefined, warning);
+      expect(warning).not.toHaveBeenCalled();
+    } finally {
+      (window as any).showDirectoryPicker = originalPicker;
+    }
+  });
+
+  it.each([undefined, 'course'])(
+    'blocks browser-only desktop opens from picker/recents: %s',
+    async (id) => {
+      await ops.initGitRepo(r);
+      instance.isElectron = true;
+      const previous = window.fsApi;
+      const addRecentProject = jest.fn();
+      (window as any).fsApi = {
+        chooseProject: jest.fn().mockResolvedValue('course'),
+        addRecentProject,
+      };
+      const warning = jest.fn().mockResolvedValue(false);
+      try {
+        await expect(instance.openLocalRepo(id, warning)).rejects.toMatchObject(
+          { name: 'AbortError' },
+        );
+        expect(warning).toHaveBeenCalledWith('desktop');
+        expect(addRecentProject).not.toHaveBeenCalled();
+        expect(fs.existsSync(`${dir}/.git`)).toBe(false);
+        expect(fs.existsSync(`${dir}/.rapid-git/HEAD`)).toBe(true);
+      } finally {
+        (window as any).fsApi = previous;
+      }
+    },
+  );
+
+  it('opens desktop .git projects without warning even when .rapid-git also exists', async () => {
+    await ops.initGitRepo(r);
+    await git.init({ fs, dir, defaultBranch: 'main' });
+    instance.isElectron = true;
+    const previous = window.fsApi;
+    const addRecentProject = jest.fn();
+    (window as any).fsApi = { addRecentProject };
+    const warning = jest.fn();
+    try {
+      await expect(instance.openLocalRepo('course', warning)).resolves.toBe(
+        'course',
+      );
+      expect(warning).not.toHaveBeenCalled();
+      expect(addRecentProject).toHaveBeenCalledWith('course');
+    } finally {
+      (window as any).fsApi = previous;
     }
   });
 
@@ -416,9 +789,18 @@ describe('Local Git metadata', () => {
     ).rejects.toBe(error);
   });
 
-  it.each([fsType.localFileSystem, fsType.inBrowser])(
-    'authenticates clone, push and pull after a 401 challenge with %s metadata',
-    async (fileSystemType) => {
+  it.each([
+    [fsType.localFileSystem, false, 'trunk'],
+    [fsType.inBrowser, false, 'trunk'],
+    [fsType.localFileSystem, true, 'trunk'],
+    [fsType.inBrowser, true, 'trunk'],
+    [fsType.localFileSystem, false, ''],
+    [fsType.inBrowser, false, ''],
+    [fsType.localFileSystem, true, ''],
+    [fsType.inBrowser, true, ''],
+  ] as const)(
+    'discovers and switches branches through authenticated clone and pull with %s metadata (shallow: %s, initial branch: "%s")',
+    async (fileSystemType, shallowClone, initialBranch) => {
       const repo = { ...r, fileSystemType };
       const repoPath = getRepoPath(repo);
       const credentials = {
@@ -496,7 +878,7 @@ describe('Local Git metadata', () => {
         };
       };
       try {
-        nativeGit('init', '-b', 'main');
+        nativeGit('init', '-b', 'trunk');
         writeFileSync(`${fixture}/lesson.md`, 'Remote lesson');
         nativeGit('add', '.');
         nativeGit(
@@ -508,30 +890,58 @@ describe('Local Git metadata', () => {
           '-m',
           'Initial remote',
         );
+        nativeGit('checkout', '-b', 'feature/course');
+        writeFileSync(`${fixture}/feature.md`, 'Feature lesson');
+        nativeGit('add', '.');
+        nativeGit(
+          '-c',
+          `user.name=${author.name}`,
+          '-c',
+          `user.email=${author.email}`,
+          'commit',
+          '-m',
+          'Feature course',
+        );
+        nativeGit('checkout', 'trunk');
         nativeGit('config', 'receive.denyCurrentBranch', 'ignore');
         ops = new GitOperations(instance, { request });
         await ops.cloneRepo(
           'course',
           fileSystemType,
           'https://fixture.test/course.git',
-          'main',
+          initialBranch,
           credentials.username,
           credentials.password,
-          false,
+          shallowClone,
         );
+        expect(await ops.getCurrentGitBranch(repo)).toBe('trunk');
         expect(await instance.dirExists(getGitDirectory(repoPath))).toBe(true);
-        expect(await instance.dirExists(`${repoPath}/.git`)).toBe(true);
-        expect(
-          await instance.fileExists(repo, `.git/${RAPID_GIT_CONFIG}`),
-        ).toBe(fileSystemType === fsType.localFileSystem);
-        expect(await instance.fileExists(repo, '.git/config')).toBe(
-          fileSystemType === fsType.inBrowser,
-        );
+        expect(await instance.dirExists(`${repoPath}/.git`)).toBe(false);
+        expect(await instance.fileExists(repo, '.rapid-git/config')).toBe(true);
         await ops.setGitConfig(repo, {
           authorName: author.name,
           authorEmail: author.email,
           remoteRepoUrl: '',
         });
+        expect(await ops.getAllGitBranches(repo)).toEqual([
+          'feature/course',
+          'trunk',
+        ]);
+        await ops.gitCheckout(repo, 'feature/course');
+        expect(await ops.getCurrentGitBranch(repo)).toBe('feature/course');
+        expect(
+          (await instance.getFileContent(repo, 'feature.md'))?.content,
+        ).toBe('Feature lesson');
+        expect(
+          await git.getConfig({
+            fs: instance.getFs(),
+            dir: repoPath,
+            gitdir: getGitDirectory(repoPath),
+            path: 'branch.feature/course.remote',
+          }),
+        ).toBe('origin');
+        await ops.gitCheckout(repo, 'trunk');
+        expect(await instance.fileExists(repo, 'feature.md')).toBe(false);
         await commitFile('Local change', repo);
         await ops.gitPush(
           repo,
@@ -554,9 +964,22 @@ describe('Local Git metadata', () => {
           '-m',
           'Remote update',
         );
+        nativeGit('checkout', '-b', 'feature/new-after-clone');
+        writeFileSync(`${fixture}/new.md`, 'Discovered by pull');
+        nativeGit('add', '.');
+        nativeGit(
+          '-c',
+          `user.name=${author.name}`,
+          '-c',
+          `user.email=${author.email}`,
+          'commit',
+          '-m',
+          'New branch',
+        );
+        nativeGit('checkout', 'trunk');
         await ops.gitPull(
           repo,
-          'main',
+          'trunk',
           credentials.username,
           credentials.password,
           false,
@@ -567,7 +990,39 @@ describe('Local Git metadata', () => {
         expect(await new GitOperations(instance).gitCommits(repo)).toHaveLength(
           3,
         );
+        expect(await ops.getAllGitBranches(repo)).toEqual([
+          'feature/course',
+          'feature/new-after-clone',
+          'trunk',
+        ]);
+        await ops.gitCheckout(repo, 'feature/new-after-clone');
+        expect((await instance.getFileContent(repo, 'new.md'))?.content).toBe(
+          'Discovered by pull',
+        );
+        await ops.gitCheckout(repo, 'trunk');
+        expect(await instance.fileExists(repo, 'new.md')).toBe(false);
         expect(challenges).toBe(3);
+        // A new local branch must be publishable with the existing Push action.
+        if (
+          fileSystemType === fsType.localFileSystem &&
+          !shallowClone &&
+          !initialBranch
+        ) {
+          await ops.gitCreateBranch(repo, 'feature/published');
+          await commitFile('Published branch lesson', repo);
+          await ops.gitPush(
+            repo,
+            credentials.username,
+            credentials.password,
+            false,
+          );
+          expect(
+            nativeGit('show', 'feature/published:lesson.md').toString(),
+          ).toBe('Published branch lesson');
+          expect(nativeGit('show', 'trunk:lesson.md').toString()).toBe(
+            'New remote change',
+          );
+        }
       } finally {
         rmSync(fixture, { recursive: true, force: true });
       }

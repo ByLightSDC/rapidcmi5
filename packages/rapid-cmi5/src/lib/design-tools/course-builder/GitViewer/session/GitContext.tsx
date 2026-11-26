@@ -5,6 +5,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
@@ -52,6 +53,7 @@ import {
   setRepoViewScrollTop,
   changeViewMode,
   courseOperations,
+  isDisplayDirty,
 } from '../../../../redux/courseBuilderReducer';
 import {
   RepoAccessObject,
@@ -63,9 +65,11 @@ import {
   setFileContent,
   setSelectedFile,
   setLastSelectedPath,
+  setCurrentWorkingDir,
   addRepo,
   setCurrentBranch,
   setAllBranches,
+  unselectCourse,
   Course,
   setLoadingState,
   LoadingState,
@@ -127,6 +131,7 @@ interface IGitContext {
   handleDeleteCourse: (courseName: string) => void;
   handleCommit: (req: CreateCommitType) => Promise<void>;
   handleCheckoutBranch: (branch: string) => Promise<void>;
+  handleCreateBranch: (branch: string) => Promise<void>;
   handleResolveMerge: () => Promise<void>;
   handleGitSetConfig: (req: GitConfigType) => void;
   handleCreateCourse: (req: CreateCourseType) => Promise<void>;
@@ -172,7 +177,12 @@ interface IGitContext {
   handleCreateLocalRepo: (req: CreateLocalRepoType) => Promise<void>;
   openSandbox: () => Promise<void>;
   getLocalFolders: () => Promise<DirMeta[]>;
-  openLocalRepo: (id?: string) => Promise<void>;
+  openLocalRepo: (
+    id?: string,
+    onCompatibilityWarning?: (
+      environment: 'browser' | 'desktop',
+    ) => Promise<boolean>,
+  ) => Promise<void>;
   deleteRecentProject: (id: string) => Promise<void>;
   getDirHandle: () => Promise<FileSystemDirectoryHandle | null>;
   gettingRepoStatus: boolean;
@@ -221,6 +231,7 @@ const defaultGitContext: IGitContext = {
   handleResolveMerge: async () => {},
   handleLoadCourse: async (): Promise<void> => {},
   handleCheckoutBranch: async () => {},
+  handleCreateBranch: async () => {},
   handlePull: async (): Promise<void> => {},
   handleDownloadCmi5Zip: async (): Promise<void> => {},
   handleNavToDesigner: () => {},
@@ -375,6 +386,7 @@ export const GitContextProvider = (props: tProviderProps) => {
   } = useGitRepoStatus(repoAccessObject, isGitLoaded, gitFs);
 
   const courseOperationsSet = useSelector(courseOperations);
+  const hasUnsavedChanges = useSelector(isDisplayDirty);
 
   const {
     loadCourse,
@@ -488,15 +500,18 @@ export const GitContextProvider = (props: tProviderProps) => {
           ? modifiedFiles
           : await gitOperator.gitRepoStatus(r, changedFiles);
 
-        await stageFiles(filesForStaging);
-        await resolveGitRepoStatus(r);
-        setCanCommit(true);
+        const stagedFiles = await stageFiles(filesForStaging);
+        await resolveFile(
+          r,
+          filesForStaging.map((file) => file.name),
+          stagedFiles,
+        );
       } catch (error) {
         debugLogError('Failed to stage all files' + error);
         throw Error('Could not stage all files');
       }
     },
-    [modifiedFiles, resolveGitRepoStatus, stageFiles],
+    [repoAccessObject, modifiedFiles, resolveFile, stageFiles],
   );
 
   const handleUnstageAll = async () => {
@@ -661,10 +676,15 @@ export const GitContextProvider = (props: tProviderProps) => {
     });
   };
 
-  const openLocalRepo = async (id?: string) => {
+  const openLocalRepo = async (
+    id?: string,
+    onCompatibilityWarning?: (
+      environment: 'browser' | 'desktop',
+    ) => Promise<boolean>,
+  ) => {
     dispatch(setLoadingState(LoadingState.openingRepo));
     try {
-      const dirName = await gitFs.openLocalRepo(id);
+      const dirName = await gitFs.openLocalRepo(id, onCompatibilityWarning);
 
       dispatch(setCurrentFileSystemType(fsType.localFileSystem));
 
@@ -791,6 +811,7 @@ export const GitContextProvider = (props: tProviderProps) => {
       }
       await pullRepo(req);
     } finally {
+      dispatch(setAllBranches(await gitOperator.getAllGitBranches(r)));
       await resolveGitRepoStatus(r);
       await resolvePushStatus(r);
     }
@@ -1102,22 +1123,63 @@ export const GitContextProvider = (props: tProviderProps) => {
     }
   };
 
-  const handleCheckoutBranch = async (branch: string) => {
-    const r = getRepoAccess(repoAccessObject);
+  const switchingBranch = useRef(false);
 
-    if (!allBranches.includes(branch)) {
+  const changeBranch = async (branch: string, create = false) => {
+    if (switchingBranch.current || (!create && branch === currentBranch))
       return;
+    const r = getRepoAccess(repoAccessObject);
+    if (!create && !allBranches.includes(branch))
+      throw Error('The selected branch is no longer available.');
+    if (isInMerge) throw Error('Complete the merge before switching branches.');
+    // The operation queue also contains navigation-time slide saves; it does
+    // not indicate unsaved edits. Use the same dirty flag as Save/navigation.
+    if (hasUnsavedChanges) {
+      throw Error('Save your course changes before switching branches.');
     }
+    switchingBranch.current = true;
+    dispatch(setLoadingState(LoadingState.openingRepo));
     try {
-      await gitOperator.gitCheckout(r, branch);
+      const changes = await gitOperator.gitRepoStatusFast(r);
+      // Untracked files can stay in the working tree. Non-forced checkout will
+      // reject them if the destination branch would overwrite them.
+      const trackedChanges = changes.filter(
+        (file) => file.status !== 'untracked',
+      );
+      if (!create && trackedChanges.length > 0) {
+        await resolveGitRepoStatus(r);
+        throw Error(
+          'Commit or stash these changes in File Status before switching branches:\n' +
+            trackedChanges
+              .map((file) => `${file.name} (${file.status})`)
+              .join('\n'),
+        );
+      }
+      if (create) await gitOperator.gitCreateBranch(r, branch);
+      else await gitOperator.gitCheckout(r, branch);
+      gitOperator.clearCache();
       dispatch(setCurrentBranch(branch));
-    } catch (error: any) {
-      console.error('Could not checkout branch ', branch);
-      throw error;
+      dispatch(setSelectedFile(null));
+      dispatch(setFileContent({ content: null, type: null }));
+      dispatch(setLastSelectedPath('/'));
+      dispatch(setCurrentWorkingDir('/'));
+      dispatch(unselectCourse());
+      dispatch(updateCourseData(defaultCourseData));
+      dispatch(setIsLessonMounted(false));
+      await resolveCurrentRepo(r, false);
+    } finally {
+      switchingBranch.current = false;
+      dispatch(setLoadingState(LoadingState.loaded));
     }
   };
 
-  const resolveCurrentRepo = async (r: RepoAccessObject) => {
+  const handleCheckoutBranch = (branch: string) => changeBranch(branch);
+  const handleCreateBranch = (branch: string) => changeBranch(branch, true);
+
+  const resolveCurrentRepo = async (
+    r: RepoAccessObject,
+    navigateToDesigner = true,
+  ) => {
     // Bounded so a stalled storage call surfaces as a named error instead of
     // an endless "Opening repository" overlay. Generous: these do real git work.
     const step = <T,>(label: string, p: Promise<T>) =>
@@ -1152,7 +1214,7 @@ export const GitContextProvider = (props: tProviderProps) => {
     await step('checking remote status', resolveRemoteRepoStatus(r));
 
     await step('checking push status', resolvePushStatus(r));
-    await handleNavToDesigner();
+    if (navigateToDesigner) await handleNavToDesigner();
   };
 
   return (
@@ -1181,6 +1243,7 @@ export const GitContextProvider = (props: tProviderProps) => {
         handleGitStashPopChanges,
         handleStageFile,
         handleCheckoutBranch,
+        handleCreateBranch,
         handleUnStageFile,
         handleRevertFile,
         handleCreateFile,

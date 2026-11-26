@@ -15,6 +15,7 @@ import Grid from '@mui/material/Grid2';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
+import { DrawerAddButton } from './components/DrawerAddButton';
 import CourseSelector from '../../course-builder/selectors/CourseSelector';
 import LessonTree from './components/LessonTree';
 import { ErrorBoundary } from '../editors/ErrorBoundary';
@@ -215,39 +216,15 @@ export const LessonDrawer = () => {
               promptChangeCourse(coursePath);
             }}
           />
-          <Tooltip
-            title={
+          <DrawerAddButton
+            label="create new course"
+            tooltip={
               currentRepo ? 'Create Course' : 'Select a repo to create a course'
             }
-          >
-            <span>
-              <IconButton
-                aria-label="create new course"
-                id="create-course-button"
-                data-testid="create-course-button"
-                disabled={!currentRepo}
-                onClick={promptCreateCourse}
-                size="small"
-                sx={(theme) => ({
-                  backgroundColor: 'primary.main',
-                  color: 'common.white',
-                  borderRadius: 6,
-                  border: `1px solid ${theme.palette.primary.light}`,
-                  marginTop: '6px',
-                  transition:
-                    'transform 120ms ease, background-color 120ms ease',
-                  '&:hover': {
-                    bgcolor: alpha(theme.palette.primary.main, 0.15),
-                    transform: 'translateY(-1px)',
-                    color: 'primary.main',
-                  },
-                  '&.Mui-disabled': { opacity: 0.45 },
-                })}
-              >
-                <AddIcon fontSize="inherit" />
-              </IconButton>
-            </span>
-          </Tooltip>
+            id="create-course-button"
+            disabled={!currentRepo}
+            onClick={promptCreateCourse}
+          />
         </Grid>
         {currentCourse?.basePath && (
           <Grid

@@ -294,6 +294,7 @@ export function SaveCourseForm({
                   error={Boolean(errors?.push?.repoUsername)}
                   helperText={errors?.push?.repoUsername?.message}
                   name="push.repoUsername"
+                  autoComplete="username"
                   placeholder="user.name"
                   required
                   label="User Name"

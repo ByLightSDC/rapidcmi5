@@ -11,6 +11,7 @@ import {
 } from '../../../../redux/repoManagerReducer';
 import { createNewFsInstance } from './gitFsInstance';
 import { join } from 'path-browserify';
+import { getGitDirectory } from './gitMetadata';
 import {
   createAndVerifyLesson,
   createTestCourse,
@@ -128,7 +129,7 @@ describe('GitOperations', () => {
 
       // see if the directory exits
       const repoPath = getRepoPath(ctx.r);
-      const repoDir = await ctx.instance.dirExists(join(repoPath, '.git'));
+      const repoDir = await ctx.instance.dirExists(getGitDirectory(repoPath));
 
       expect(repoDir).toBeTruthy();
     });
@@ -140,7 +141,7 @@ describe('GitOperations', () => {
       // const branches = await ctx.gitOps.getAllGitBranches(ctx.r);
       // expect(branches).toContain('develop');
       const repoPath = getRepoPath(ctx.r);
-      const repoDir = await ctx.instance.dirExists(join(repoPath, '.git'));
+      const repoDir = await ctx.instance.dirExists(getGitDirectory(repoPath));
 
       expect(repoDir).toBeTruthy();
     });
@@ -468,6 +469,7 @@ describe('GitOperations', () => {
 
     it('should checkout to a new branch', async () => {
       await git.branch({
+        gitdir: getGitDirectory(getRepoPath(ctx.r)),
         fs: ctx.instance.fs,
         dir: `/inBrowser/${ctx.r.repoName}`,
         ref: 'develop',
@@ -485,6 +487,7 @@ describe('GitOperations', () => {
 
       // Create new branch
       await git.branch({
+        gitdir: getGitDirectory(getRepoPath(ctx.r)),
         fs: ctx.instance.fs,
         dir: `/inBrowser/${ctx.r.repoName}`,
         ref: 'feature',
@@ -752,7 +755,7 @@ describe('GitOperations', () => {
 
         const repoPath = getRepoPath(r);
         expect(
-          await ctx.instance.dirExists(join(repoPath, '.git')),
+          await ctx.instance.dirExists(getGitDirectory(repoPath)),
         ).toBeTruthy();
         expect(r.repoName).toBe('testrepo');
         expect(r.fileSystemType).toBe(fsType.inBrowser);
@@ -1018,7 +1021,7 @@ describe('GitOperations', () => {
 
         const repoPath = getRepoPath(r);
         const gitDirExists = await ctx.instance.dirExists(
-          join(repoPath, '.git'),
+          getGitDirectory(repoPath),
         );
         expect(gitDirExists).toBeTruthy();
       });
@@ -1312,6 +1315,7 @@ describe('GitOperations', () => {
 
     //   // Create and switch to feature branch
     //   await git.branch({
+    //     gitdir: getGitDirectory(getRepoPath(ctx.r)),
     //     fs: ctx.instance.fs,
     //     dir: `/inBrowser/${ctx.r.repoName}`,
     //     ref: 'feature',
