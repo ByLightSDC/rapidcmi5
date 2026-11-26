@@ -7,6 +7,7 @@ import {
 } from './gitMetadata';
 import { withTimeout } from './withTimeout';
 import { getBranchNameError } from './branchNames';
+import { getCachedGitStatus } from './gitStatusCache';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import * as git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
@@ -334,6 +335,14 @@ export class GitOperations {
       throw error;
     }
   };
+  gitRepoStatusFast = async (r: RepoAccessObject): Promise<ModifiedFile[]> => {
+    this.clearCache();
+    if (this.gitFs.isElectron) return this.gitRepoStatus(r, undefined, true);
+    return getCachedGitStatus(this.gitFs, r, (paths) =>
+      this.gitRepoStatus(r, paths, true),
+    );
+  };
+
   gitRepoStatus = async (
     r: RepoAccessObject,
     changedFiles?: string[],

@@ -1140,10 +1140,19 @@ export const GitContextProvider = (props: tProviderProps) => {
     switchingBranch.current = true;
     dispatch(setLoadingState(LoadingState.openingRepo));
     try {
-      const changes = await gitOperator.gitRepoStatus(r, undefined, true);
-      if (changes.length > 0) {
+      const changes = await gitOperator.gitRepoStatusFast(r);
+      // Untracked files can stay in the working tree. Non-forced checkout will
+      // reject them if the destination branch would overwrite them.
+      const trackedChanges = changes.filter(
+        (file) => file.status !== 'untracked',
+      );
+      if (!create && trackedChanges.length > 0) {
+        await resolveGitRepoStatus(r);
         throw Error(
-          'Commit or stash your changes in File Status before switching branches.',
+          'Commit or stash these changes in File Status before switching branches:\n' +
+            trackedChanges
+              .map((file) => `${file.name} (${file.status})`)
+              .join('\n'),
         );
       }
       if (create) await gitOperator.gitCreateBranch(r, branch);

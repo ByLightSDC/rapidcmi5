@@ -12,8 +12,10 @@ jest.mock('../utils/gitOperations', () => ({
 }));
 
 const mockGitOperator = {
+  clearCache: jest.fn(),
   gitResolveFile: jest.fn(),
   gitRepoStatus: jest.fn(),
+  gitRepoStatusFast: jest.fn(),
   gitCommits: jest.fn(),
   gitListStash: jest.fn().mockResolvedValue([]),
   getStashStatus: jest.fn().mockResolvedValue(undefined),
@@ -24,6 +26,48 @@ const repo = { repoName: 'course', fileSystemType: fsType.localFileSystem };
 
 describe('staging status updates', () => {
   beforeEach(() => jest.clearAllMocks());
+
+  it('shows staged and deleted files regardless of timestamps without changing staging', async () => {
+    const status = [
+      { name: 'old-lesson.md', status: 'staged' },
+      { name: 'removed.md', status: 'deleted_staged' },
+    ];
+    mockGitOperator.gitRepoStatusFast.mockResolvedValue(status);
+    mockGitOperator.gitCommits.mockResolvedValue([]);
+    const fs = {
+      isElectron: false,
+      getFolderStructureWithMtime: jest.fn(),
+      getFileContent: jest.fn().mockResolvedValue(null),
+    } as unknown as GitFS;
+    const { result } = renderHook(() => useGitRepoStatus(repo, false, fs));
+    await act(async () => {
+      await result.current.resolveGitRepoStatus(repo);
+    });
+    expect(mockGitOperator.gitRepoStatusFast).toHaveBeenCalledWith(repo);
+    expect(fs.getFolderStructureWithMtime).not.toHaveBeenCalled();
+    expect(result.current.modifiedFiles).toEqual(status);
+    expect(result.current.numStaged).toBe(2);
+  });
+
+  it('replaces the previous branch status with a fresh clean result', async () => {
+    mockGitOperator.gitCommits.mockResolvedValue([]);
+    mockGitOperator.gitRepoStatusFast
+      .mockResolvedValueOnce([{ name: 'old.md', status: 'modified' }])
+      .mockResolvedValueOnce([]);
+    const fs = {
+      getFileContent: jest.fn().mockResolvedValue(null),
+    } as unknown as GitFS;
+    const { result } = renderHook(() => useGitRepoStatus(repo, false, fs));
+    await act(async () => {
+      await result.current.resolveGitRepoStatus(repo);
+    });
+    expect(result.current.modifiedFiles).toHaveLength(1);
+    await act(async () => {
+      await result.current.resolveGitRepoStatus(repo);
+    });
+    expect(result.current.modifiedFiles).toEqual([]);
+    expect(mockGitOperator.gitRepoStatusFast).toHaveBeenCalledTimes(2);
+  });
 
   it('computes push status from the checked out branch after switching', async () => {
     mockGitOperator.getCurrentGitBranch.mockResolvedValue('feature/course');

@@ -42,6 +42,7 @@ jest.mock('./useGitRepoStatus', () => ({
 const repo = { repoName: 'course', fileSystemType: fsType.localFileSystem };
 const mockGitOperator = {
   gitRepoStatus: jest.fn(),
+  gitRepoStatusFast: jest.fn(),
   gitCheckout: jest.fn(),
   gitCreateBranch: jest.fn(),
   clearCache: jest.fn(),
@@ -53,7 +54,7 @@ let mockState: any;
 describe('branch changes with saved course data', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGitOperator.gitRepoStatus.mockResolvedValue([]);
+    mockGitOperator.gitRepoStatusFast.mockResolvedValue([]);
     mockState = {
       repoManager: {
         ...repoState,
@@ -85,11 +86,7 @@ describe('branch changes with saved course data', () => {
       await act(async () => {
         await result.current[action]('feature/course');
       });
-      expect(mockGitOperator.gitRepoStatus).toHaveBeenCalledWith(
-        repo,
-        undefined,
-        true,
-      );
+      expect(mockGitOperator.gitRepoStatusFast).toHaveBeenCalledWith(repo);
       const operation =
         action === 'handleCheckoutBranch'
           ? mockGitOperator.gitCheckout
@@ -111,14 +108,46 @@ describe('branch changes with saved course data', () => {
     },
   );
 
+  it.each(['handleCheckoutBranch', 'handleCreateBranch'] as const)(
+    'allows %s with unrelated untracked files',
+    async (action) => {
+      mockGitOperator.gitRepoStatusFast.mockResolvedValue([
+        { name: 'notes.txt', status: 'untracked' },
+      ]);
+      const { result } = renderContext();
+      await act(async () => {
+        await result.current[action]('feature/course');
+      });
+      const operation =
+        action === 'handleCheckoutBranch'
+          ? mockGitOperator.gitCheckout
+          : mockGitOperator.gitCreateBranch;
+      expect(operation).toHaveBeenCalledWith(repo, 'feature/course');
+    },
+  );
+
+  it('can create a branch for saved, uncommitted work', async () => {
+    mockGitOperator.gitRepoStatusFast.mockResolvedValue([
+      { name: 'lesson.md', status: 'staged' },
+    ]);
+    const { result } = renderContext();
+    await act(async () => {
+      await result.current.handleCreateBranch('feature/course');
+    });
+    expect(mockGitOperator.gitCreateBranch).toHaveBeenCalledWith(
+      repo,
+      'feature/course',
+    );
+  });
+
   it('still protects uncommitted files after the course has been saved', async () => {
-    mockGitOperator.gitRepoStatus.mockResolvedValue([
+    mockGitOperator.gitRepoStatusFast.mockResolvedValue([
       { name: 'lesson.md', status: 'modified' },
     ]);
     const { result } = renderContext();
     await expect(
       result.current.handleCheckoutBranch('feature/course'),
-    ).rejects.toThrow('Commit or stash');
+    ).rejects.toThrow('lesson.md (modified)');
     expect(mockGitOperator.gitCheckout).not.toHaveBeenCalled();
   });
 });

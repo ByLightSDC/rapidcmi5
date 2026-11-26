@@ -6,7 +6,7 @@ import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import { stagedStatuses } from '../utils/StatusMatrix';
 import { RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
-import { FolderStructWithMtime, getRepoPath, GitFS } from '../utils/fileSystem';
+import { GitFS } from '../utils/fileSystem';
 import { GitOperations } from '../utils/gitOperations';
 
 export function useGitRepoStatus(
@@ -97,24 +97,6 @@ export function useGitRepoStatus(
 
     setModifiedFiles(status);
   };
-  const flattenFolders = (
-    folders: FolderStructWithMtime[],
-  ): FolderStructWithMtime[] => {
-    const result: FolderStructWithMtime[] = [];
-
-    function recurse(folderList: FolderStructWithMtime[]) {
-      for (const folder of folderList) {
-        result.push(folder);
-        if (folder.children) {
-          recurse(folder.children);
-        }
-      }
-    }
-
-    recurse(folders);
-    return result;
-  };
-
   const resolveGitRepoStatus = useCallback(
     async (r: RepoAccessObject) => {
       if (inFlightRef.current) return;
@@ -123,66 +105,9 @@ export function useGitRepoStatus(
       setIsGettingRepoStatus(true);
 
       try {
-        const repoPath = getRepoPath(r);
-        let status: ModifiedFile[];
-
-        if (fsInstance.isElectron) {
-          status = await gitOperator.gitRepoStatus(r);
-        } else {
-          const folderStructure = await fsInstance.getFolderStructureWithMtime(
-            repoPath,
-            '',
-          );
-          const flattenedStruct = flattenFolders(folderStructure).filter(
-            (node) => !node.isBranch,
-          );
-          const lastCommitTime = await gitOperator.gitGetLastCommitTime(r);
-
-          // Get all file paths
-          const allFilePaths = flattenedStruct.map((folder) => folder.id);
-
-          // Get untracked files
-          const { untracked, deleted, needsUnstage } =
-            await gitOperator.gitGetUntrackedAndDeletedFiles(r, allFilePaths);
-
-          const untrackedSet = new Set(untracked);
-          const needsUnstageSet = new Set(needsUnstage);
-
-          // Filter to only tracked files modified after last commit
-          const recentlyModified = flattenedStruct
-            .filter((folder) => {
-              // Only include files (not directories)
-              if (folder.isBranch) return false;
-              if (!folder.mtime) return false;
-
-              // Exclude untracked files
-              if (untrackedSet.has(folder.id)) return false;
-
-              // Include if modified after last commit
-              return folder.mtime > lastCommitTime;
-            })
-            .map((folder) => folder.id);
-
-          const untrackedStatus: ModifiedFile[] = untracked.map((file) => {
-            return { name: file, status: 'untracked' };
-          });
-
-          // unstage these files
-          const unstageFiles = await gitOperator.gitRepoStatus(r, needsUnstage);
-          const removedFiles = await gitOperator.gitRemoveAllModified(
-            r,
-            unstageFiles,
-          );
-
-          // Only check recently modified tracked files
-
-          const combined = [...deleted, ...recentlyModified];
-          status =
-            combined.length > 0
-              ? await gitOperator.gitRepoStatus(r, combined)
-              : [];
-          status = [...status, ...untrackedStatus];
-        }
+        // Reuse timestamp-verified status; HEAD/index changes invalidate it.
+        // This scan never unstages files or writes course content.
+        const status = await gitOperator.gitRepoStatusFast(r);
 
         setModifiedFiles((prev) => {
           const isSame = JSON.stringify(prev) === JSON.stringify(status);

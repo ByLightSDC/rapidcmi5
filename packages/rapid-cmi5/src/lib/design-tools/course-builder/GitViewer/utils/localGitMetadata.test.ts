@@ -10,6 +10,7 @@ import http from 'isomorphic-git/http/web';
 import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { GitFS } from './fileSystem';
 import { getRepoPath, GitOperations } from './gitOperations';
+import { getCachedGitStatus } from './gitStatusCache';
 import {
   getGitDirectory,
   getFailedMergePath,
@@ -426,6 +427,116 @@ describe('Local Git metadata', () => {
       expect(await ops.getCurrentGitBranch(repo)).toBe('feature/new-lesson');
     },
   );
+
+  it.each([fsType.localFileSystem, fsType.inBrowser])(
+    'keeps repeated checkouts clean and protects untracked files in %s',
+    async (fileSystemType) => {
+      const repo = { ...r, fileSystemType };
+      await ops.initGitRepo(repo);
+      await commitFile('Main lesson', repo);
+      await ops.gitCreateBranch(repo, 'feature/course');
+      await commitFile('Feature lesson', repo);
+      await instance.createFile(repo, 'branch.md', 'Feature-only file');
+      await ops.gitStageFile(repo, 'branch.md');
+      await ops.gitCommit(repo, 'Feature file', author.email, author.name);
+      for (const branch of ['main', 'feature/course', 'main']) {
+        await ops.gitCheckout(repo, branch);
+        ops.clearCache();
+        expect(await ops.gitRepoStatusFast(repo)).toEqual([]);
+      }
+      await instance.createFile(repo, 'notes.txt', 'Local notes');
+      await ops.gitCheckout(repo, 'feature/course');
+      expect((await instance.getFileContent(repo, 'notes.txt'))?.content).toBe(
+        'Local notes',
+      );
+      expect(await ops.gitRepoStatus(repo, undefined, true)).toEqual([
+        { name: 'notes.txt', status: 'untracked' },
+      ]);
+      await ops.gitCheckout(repo, 'main');
+      await instance.createFile(repo, 'branch.md', 'My untracked draft');
+      await expect(ops.gitCheckout(repo, 'feature/course')).rejects.toThrow(
+        'branch.md',
+      );
+      expect(await ops.getCurrentGitBranch(repo)).toBe('main');
+      expect((await instance.getFileContent(repo, 'branch.md'))?.content).toBe(
+        'My untracked draft',
+      );
+    },
+  );
+
+  it('uses timestamps to avoid content scans but detects backdated edits, additions and deletions', async () => {
+    await ops.initGitRepo(r);
+    await commitFile();
+    const oldTime = new Date(1000);
+    await fs.promises.utimes(`${dir}/lesson.md`, oldTime, oldTime);
+    const scan = jest.fn((paths?: string[]) =>
+      ops.gitRepoStatus(r, paths, true),
+    );
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual([]);
+    expect(scan).toHaveBeenLastCalledWith();
+    scan.mockClear();
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual([]);
+    expect(scan).not.toHaveBeenCalled();
+
+    await instance.createFile(
+      r,
+      'lesson.md',
+      'Changed content with an old timestamp',
+    );
+    await fs.promises.utimes(`${dir}/lesson.md`, oldTime, oldTime);
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual([
+      { name: 'lesson.md', status: 'modified' },
+    ]);
+    expect(scan).toHaveBeenLastCalledWith(['lesson.md']);
+    scan.mockClear();
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual([
+      { name: 'lesson.md', status: 'modified' },
+    ]);
+    expect(scan).not.toHaveBeenCalled();
+
+    await instance.createFile(r, 'notes.txt', 'Local notes');
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual(
+      expect.arrayContaining([{ name: 'notes.txt', status: 'untracked' }]),
+    );
+    await fs.promises.unlink(`${dir}/lesson.md`);
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual(
+      expect.arrayContaining([
+        { name: 'lesson.md', status: 'deleted_unstaged' },
+      ]),
+    );
+    await instance.createFile(r, '.gitignore', 'notes.txt\n');
+    const ignoredStatus = await getCachedGitStatus(instance, r, scan);
+    expect(scan).toHaveBeenLastCalledWith();
+    expect(ignoredStatus.some((file) => file.name === 'notes.txt')).toBe(false);
+  });
+
+  it('invalidates timestamp status on staging and checkout without unstaging deletions', async () => {
+    await ops.initGitRepo(r);
+    await commitFile('Main lesson');
+    await ops.gitCreateBranch(r, 'feature/course');
+    await commitFile('Feature lesson');
+    await ops.gitCheckout(r, 'main');
+    const scan = jest.fn((paths?: string[]) =>
+      ops.gitRepoStatus(r, paths, true),
+    );
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual([]);
+    await fs.promises.unlink(`${dir}/lesson.md`);
+    await ops.gitStageFile(r, 'lesson.md');
+    const index = await fs.promises.readFile(`${gitdir}/index`);
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual([
+      { name: 'lesson.md', status: 'deleted_staged' },
+    ]);
+    expect(scan).toHaveBeenLastCalledWith();
+    expect(await fs.promises.readFile(`${gitdir}/index`)).toEqual(index);
+    await ops.revertFileToHEAD(r, 'lesson.md');
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual([]);
+    await ops.gitCheckout(r, 'feature/course');
+    expect(await getCachedGitStatus(instance, r, scan)).toEqual([]);
+    expect(scan).toHaveBeenLastCalledWith();
+    expect((await instance.getFileContent(r, 'lesson.md'))?.content).toBe(
+      'Feature lesson',
+    );
+  });
 
   it('rejects creating a branch that shadows a remote branch', async () => {
     await ops.initGitRepo(r);
