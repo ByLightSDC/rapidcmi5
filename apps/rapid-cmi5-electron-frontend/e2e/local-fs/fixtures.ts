@@ -21,7 +21,16 @@ declare global {
   }
   interface Window {
     showDirectoryPicker(options?: {
+      id?: string;
       mode?: 'read' | 'readwrite';
+      startIn?:
+        | 'desktop'
+        | 'documents'
+        | 'downloads'
+        | 'music'
+        | 'pictures'
+        | 'videos'
+        | FileSystemHandle;
     }): Promise<FileSystemDirectoryHandle>;
     __localFolderTest: {
       handle?: FileSystemDirectoryHandle;

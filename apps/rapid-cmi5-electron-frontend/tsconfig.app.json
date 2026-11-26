@@ -11,10 +11,11 @@
   },
   "files": [
     "../../node_modules/@nx/react/typings/cssmodule.d.ts",
-    "../../node_modules/@nx/react/typings/image.d.ts",
-    ""
+    "../../node_modules/@nx/react/typings/image.d.ts"
   ],
   "exclude": [
+    "e2e/**",
+    "playwright*.config.ts",
     "**/*.spec.ts",
     "**/*.test.ts",
     "**/*.spec.tsx",
