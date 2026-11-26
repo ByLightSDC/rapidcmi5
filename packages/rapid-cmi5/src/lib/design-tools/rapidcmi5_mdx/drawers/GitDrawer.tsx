@@ -12,6 +12,7 @@ import {
 } from '../../../redux/courseBuilderReducer';
 import { GitCompareArrows } from 'lucide-react';
 import BranchSelector from '../../course-builder/selectors/BranchSelector';
+import { CreateBranchDialog } from '../../course-builder/modals/git/CreateBranchDialog';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
 /**
@@ -25,10 +26,16 @@ export const GitDrawer = () => {
     (state: RootState) => state.repoManager,
   );
 
-  const { handleCheckoutBranch, gettingRepoStatus, isGitLoaded, isInMerge } =
-    useContext(GitContext);
+  const {
+    handleCheckoutBranch,
+    handleCreateBranch,
+    gettingRepoStatus,
+    isGitLoaded,
+    isInMerge,
+  } = useContext(GitContext);
   const [switching, setSwitching] = useState(false);
   const [branchError, setBranchError] = useState('');
+  const [creatingBranch, setCreatingBranch] = useState(false);
   const selectBranch = async (branch: string) => {
     setSwitching(true);
     setBranchError('');
@@ -84,10 +91,16 @@ export const GitDrawer = () => {
             currentBranch={currentBranch ?? undefined}
             availableBranches={allBranches}
             disabled={
-              switching || gettingRepoStatus || !isGitLoaded || isInMerge
+              switching ||
+              gettingRepoStatus ||
+              !isGitLoaded ||
+              isInMerge ||
+              !currentBranch ||
+              allBranches.length === 0
             }
             styleProps={{ flex: 1, minWidth: 0 }}
             onSelect={selectBranch}
+            onAction={() => setCreatingBranch(true)}
           />
         </Stack>
       </Stack>
@@ -95,6 +108,14 @@ export const GitDrawer = () => {
         <Alert severity="error" onClose={() => setBranchError('')}>
           {branchError}
         </Alert>
+      )}
+      {creatingBranch && currentBranch && (
+        <CreateBranchDialog
+          currentBranch={currentBranch}
+          branches={allBranches}
+          onCreate={handleCreateBranch}
+          onClose={() => setCreatingBranch(false)}
+        />
       )}
       <Tabs
         orientation="vertical"

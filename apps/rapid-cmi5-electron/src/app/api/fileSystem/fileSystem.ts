@@ -396,6 +396,17 @@ export class ElectronFsHandler {
     });
   }
 
+  async gitCreateBranch(p: string, branch: string) {
+    const fullPath = await this.getFullPath(p);
+    if (branch === 'HEAD' || branch.startsWith('-'))
+      throw Error('Invalid branch name.');
+    const branches = await this.getAllGitBranches(p);
+    if (branches.includes(branch))
+      throw Error('A branch with this name already exists.');
+    await git.resolveRef({ fs: fsp, dir: fullPath, ref: 'HEAD' });
+    await git.branch({ fs: fsp, dir: fullPath, ref: branch, checkout: true });
+  }
+
   async gitCheckout(p: string, branch: string) {
     const fullPath = await this.getFullPath(p);
 

@@ -6,6 +6,7 @@ import {
   isGitMetadataPath,
 } from './gitMetadata';
 import { withTimeout } from './withTimeout';
+import { getBranchNameError } from './branchNames';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 import * as git from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
@@ -814,6 +815,27 @@ export class GitOperations {
       throw error;
     }
   };
+  gitCreateBranch = async (r: RepoAccessObject, branch: string) => {
+    const nameError = getBranchNameError(
+      branch,
+      await this.getAllGitBranches(r),
+    );
+    if (nameError) throw Error(nameError);
+    const dir = getRepoPath(r);
+    if (this.gitFs.isElectron) {
+      await window.fsApi.gitCreateBranch(dir, branch);
+    } else {
+      const options = {
+        fs: this.gitFs.getFs(),
+        gitdir: getGitDirectory(dir, this.gitFs.isElectron),
+        dir,
+      };
+      // Require a starting commit instead of creating an invisible unborn branch.
+      await git.resolveRef({ ...options, ref: 'HEAD' });
+      await git.branch({ ...options, ref: branch, checkout: true });
+    }
+  };
+
   gitCheckout = async (r: RepoAccessObject, branch: string) => {
     const dir = getRepoPath(r);
     if (this.gitFs.isElectron) {

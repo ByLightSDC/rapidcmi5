@@ -88,6 +88,7 @@ export default function AnySelector({
       {iconButtonHandler && (
         <IconButton
           disabled={iconButtonDisabled}
+          aria-label={iconButtonTooltip}
           color="inherit"
           onClick={iconButtonHandler}
         >

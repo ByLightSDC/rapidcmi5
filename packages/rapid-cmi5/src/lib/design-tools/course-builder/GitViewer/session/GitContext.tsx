@@ -131,6 +131,7 @@ interface IGitContext {
   handleDeleteCourse: (courseName: string) => void;
   handleCommit: (req: CreateCommitType) => Promise<void>;
   handleCheckoutBranch: (branch: string) => Promise<void>;
+  handleCreateBranch: (branch: string) => Promise<void>;
   handleResolveMerge: () => Promise<void>;
   handleGitSetConfig: (req: GitConfigType) => void;
   handleCreateCourse: (req: CreateCourseType) => Promise<void>;
@@ -230,6 +231,7 @@ const defaultGitContext: IGitContext = {
   handleResolveMerge: async () => {},
   handleLoadCourse: async (): Promise<void> => {},
   handleCheckoutBranch: async () => {},
+  handleCreateBranch: async () => {},
   handlePull: async (): Promise<void> => {},
   handleDownloadCmi5Zip: async (): Promise<void> => {},
   handleNavToDesigner: () => {},
@@ -1123,10 +1125,11 @@ export const GitContextProvider = (props: tProviderProps) => {
 
   const switchingBranch = useRef(false);
 
-  const handleCheckoutBranch = async (branch: string) => {
-    if (switchingBranch.current || branch === currentBranch) return;
+  const changeBranch = async (branch: string, create = false) => {
+    if (switchingBranch.current || (!create && branch === currentBranch))
+      return;
     const r = getRepoAccess(repoAccessObject);
-    if (!allBranches.includes(branch))
+    if (!create && !allBranches.includes(branch))
       throw Error('The selected branch is no longer available.');
     if (isInMerge) throw Error('Complete the merge before switching branches.');
     if (hasUnsavedChanges || Object.keys(courseOperationsSet).length > 0) {
@@ -1141,7 +1144,8 @@ export const GitContextProvider = (props: tProviderProps) => {
           'Commit or stash your changes in File Status before switching branches.',
         );
       }
-      await gitOperator.gitCheckout(r, branch);
+      if (create) await gitOperator.gitCreateBranch(r, branch);
+      else await gitOperator.gitCheckout(r, branch);
       gitOperator.clearCache();
       dispatch(setCurrentBranch(branch));
       dispatch(setSelectedFile(null));
@@ -1157,6 +1161,9 @@ export const GitContextProvider = (props: tProviderProps) => {
       dispatch(setLoadingState(LoadingState.loaded));
     }
   };
+
+  const handleCheckoutBranch = (branch: string) => changeBranch(branch);
+  const handleCreateBranch = (branch: string) => changeBranch(branch, true);
 
   const resolveCurrentRepo = async (
     r: RepoAccessObject,
@@ -1225,6 +1232,7 @@ export const GitContextProvider = (props: tProviderProps) => {
         handleGitStashPopChanges,
         handleStageFile,
         handleCheckoutBranch,
+        handleCreateBranch,
         handleUnStageFile,
         handleRevertFile,
         handleCreateFile,

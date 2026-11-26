@@ -394,6 +394,74 @@ describe('Local Git metadata', () => {
     }
   });
 
+  it.each([fsType.localFileSystem, fsType.inBrowser])(
+    'creates a branch at HEAD and keeps the original history in %s',
+    async (fileSystemType) => {
+      const repo = { ...r, fileSystemType };
+      await ops.initGitRepo(repo);
+      await commitFile('Original lesson', repo);
+      const original = (await ops.gitCommits(repo))[0].oid;
+      await ops.gitCreateBranch(repo, 'feature/new-lesson');
+      expect(await ops.getCurrentGitBranch(repo)).toBe('feature/new-lesson');
+      expect((await ops.gitCommits(repo))[0].oid).toBe(original);
+      expect(await ops.getAllGitBranches(repo)).toEqual([
+        'feature/new-lesson',
+        'main',
+      ]);
+      await commitFile('Branch lesson', repo);
+      await ops.gitCheckout(repo, 'main');
+      expect((await instance.getFileContent(repo, 'lesson.md'))?.content).toBe(
+        'Original lesson',
+      );
+      await ops.gitCheckout(repo, 'feature/new-lesson');
+      expect((await instance.getFileContent(repo, 'lesson.md'))?.content).toBe(
+        'Branch lesson',
+      );
+      await expect(ops.gitCreateBranch(repo, 'main')).rejects.toThrow(
+        'already exists',
+      );
+      await expect(ops.gitCreateBranch(repo, 'bad..name')).rejects.toThrow(
+        'valid Git branch name',
+      );
+      expect(await ops.getCurrentGitBranch(repo)).toBe('feature/new-lesson');
+    },
+  );
+
+  it('rejects creating a branch that shadows a remote branch', async () => {
+    await ops.initGitRepo(r);
+    await commitFile();
+    const oid = (await ops.gitCommits(r))[0].oid;
+    await git.writeRef({
+      fs: instance.getFs(),
+      dir,
+      gitdir,
+      ref: 'refs/remotes/origin/feature/remote',
+      value: oid,
+    });
+    await expect(ops.gitCreateBranch(r, 'feature/remote')).rejects.toThrow(
+      'already exists',
+    );
+    expect(await ops.getCurrentGitBranch(r)).toBe('main');
+  });
+
+  it('creates desktop branches through the filesystem bridge', async () => {
+    const gitCreateBranch = jest.fn().mockResolvedValue(undefined);
+    const previous = window.fsApi;
+    (window as any).fsApi = {
+      gitCreateBranch,
+      getAllGitBranches: jest.fn().mockResolvedValue(['main']),
+    };
+    try {
+      await new GitOperations(new GitFS(true)).gitCreateBranch(
+        r,
+        'feature/desktop',
+      );
+      expect(gitCreateBranch).toHaveBeenCalledWith(dir, 'feature/desktop');
+    } finally {
+      (window as any).fsApi = previous;
+    }
+  });
+
   it('keeps desktop initialization on the native .git flow', async () => {
     const gitInitRepo = jest.fn().mockResolvedValue(undefined);
     const previous = window.fsApi;
@@ -823,6 +891,27 @@ describe('Local Git metadata', () => {
         await ops.gitCheckout(repo, 'trunk');
         expect(await instance.fileExists(repo, 'new.md')).toBe(false);
         expect(challenges).toBe(3);
+        // A new local branch must be publishable with the existing Push action.
+        if (
+          fileSystemType === fsType.localFileSystem &&
+          !shallowClone &&
+          !initialBranch
+        ) {
+          await ops.gitCreateBranch(repo, 'feature/published');
+          await commitFile('Published branch lesson', repo);
+          await ops.gitPush(
+            repo,
+            credentials.username,
+            credentials.password,
+            false,
+          );
+          expect(
+            nativeGit('show', 'feature/published:lesson.md').toString(),
+          ).toBe('Published branch lesson');
+          expect(nativeGit('show', 'trunk:lesson.md').toString()).toBe(
+            'New remote change',
+          );
+        }
       } finally {
         rmSync(fixture, { recursive: true, force: true });
       }

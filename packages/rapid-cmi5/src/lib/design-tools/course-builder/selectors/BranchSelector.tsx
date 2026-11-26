@@ -12,6 +12,7 @@ export default function BranchSelector({
   availableBranches,
   disabled,
   onSelect,
+  onAction,
   styleProps = {},
 }: {
   currentBranch?: string;
@@ -31,6 +32,9 @@ export default function BranchSelector({
       styleProps={styleProps}
       theValue={currentBranch || ''}
       onChange={onSelect}
+      iconButtonHandler={onAction}
+      iconButtonTooltip="Create Branch"
+      iconButtonDisabled={disabled}
       topicLabel="Branch"
       hasNoOptions={hasNoBranches}
       noOptionsPlaceholder={noBranchesFound}
