@@ -274,6 +274,7 @@ export const NavViewMenu = ({
         {onToggleLeftPanel && (
           <IconButton
             aria-label="toggle-left-panel"
+            aria-expanded={!isLeftPanelCollapsed}
             data-testid="toggle-left-panel-button"
             color="inherit"
             size={iconButtonSize}

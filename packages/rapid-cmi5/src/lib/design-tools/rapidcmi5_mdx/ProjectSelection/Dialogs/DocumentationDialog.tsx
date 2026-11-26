@@ -60,10 +60,11 @@ export default function DocumentationDialog({
           flexShrink: 0,
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
           <Box
             sx={{
               width: 40,
+              flexShrink: 0,
               height: 40,
               borderRadius: 2,
               background: (theme) =>
@@ -87,7 +88,8 @@ export default function DocumentationDialog({
           <Typography
             variant="h6"
             sx={{
-              fontFamily: 'monospace',
+              fontFamily: 'inherit',
+              overflowWrap: 'anywhere',
               fontWeight: 600,
               color: 'text.primary',
             }}
@@ -96,6 +98,7 @@ export default function DocumentationDialog({
           </Typography>
         </Box>
         <IconButton
+          aria-label="Close documentation"
           onClick={onClose}
           size="small"
           sx={{
@@ -198,9 +201,7 @@ export default function DocumentationDialog({
           },
         }}
       >
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {content}
-        </ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
       </DialogContent>
     </Dialog>
   );

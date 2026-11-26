@@ -36,17 +36,25 @@ export function GlassCard({
         display: 'flex',
         flexDirection: 'column',
         minHeight: 0,
+        minWidth: 0,
         background: theme.gradients.backgroundPanel,
         backdropFilter: 'blur(10px)',
         border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
         borderRadius: 2,
-        p: 3,
-        animation: 'fadeInUp 0.6s ease-out 0.2s both',
+        p: { xs: 2, sm: 3 },
 
         ...(typeof sx === 'function' ? sx(theme) : sx),
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.5,
+          mb: 2,
+          minWidth: 0,
+        }}
+      >
         <Box
           sx={{
             width: 40,
@@ -56,7 +64,7 @@ export function GlassCard({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            mr: 1,
+            flexShrink: 0,
             boxShadow: boxShadow,
           }}
         >
@@ -64,9 +72,12 @@ export function GlassCard({
         </Box>
         <Typography
           id={ariaLabelId}
-          variant="h2"
+          component="h2"
+          variant="h6"
           sx={{
-            fontFamily: '"Space Mono", monospace',
+            fontFamily: 'inherit',
+            lineHeight: 1.4,
+            overflowWrap: 'anywhere',
             fontWeight: 600,
             fontSize: '18px',
           }}

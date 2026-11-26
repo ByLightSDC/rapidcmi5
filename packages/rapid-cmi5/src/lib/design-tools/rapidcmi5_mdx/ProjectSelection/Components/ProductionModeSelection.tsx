@@ -97,7 +97,7 @@ export default function ProductionModeSelection({
       icon={<CreateNewFolder sx={{ color: 'white' }} />}
     >
       <nav aria-labelledby={ariaLabelId}>
-        <List sx={{ p: 0 }}>
+        <List component="div" sx={{ p: 0, display: 'grid', gap: 1.5 }}>
           {/* Clone Git Repository */}
           <OptionCard
             data-testid="clone-repo-button"

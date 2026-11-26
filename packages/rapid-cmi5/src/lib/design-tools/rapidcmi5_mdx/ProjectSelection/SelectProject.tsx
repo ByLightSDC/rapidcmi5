@@ -148,7 +148,9 @@ export default function SelectProjectHomePage({}: {}) {
   return (
     <Box
       sx={{
-        height: '100vh',
+        height: '100%',
+        minHeight: 0,
+        minWidth: 0,
         width: '100%',
         background: theme.gradients.backgroundGradient,
         position: 'relative',
@@ -158,20 +160,22 @@ export default function SelectProjectHomePage({}: {}) {
       <HiddenHeader header="Projects Dashboard" />
       <Box
         sx={{
-          height: '100vh',
+          minHeight: '100%',
+          minWidth: 0,
           width: '100%',
           background: theme.gradients.backgroundRadial,
           position: 'relative',
-          overflow: 'auto',
+          overflow: 'visible',
         }}
       >
         <Container
           sx={{
-            py: 3,
+            py: { xs: 2, sm: 3 },
+            px: { xs: 2, sm: 3 },
+            minWidth: 0,
             position: 'relative',
             zIndex: 1,
             display: 'flex',
-            mb: 3,
           }}
         >
           {isElectron ? (

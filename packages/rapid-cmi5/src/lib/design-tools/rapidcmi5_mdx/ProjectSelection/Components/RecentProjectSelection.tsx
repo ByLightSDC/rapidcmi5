@@ -51,14 +51,14 @@ export default function RecentProjectSelection({
   return (
     <GlassCard
       ariaLabelId={ariaLabelId}
-      sx={{ height: 'clamp(650px, 80vh, 700px)' }}
+      sx={{ maxHeight: { xs: 'none', md: 'min(700px, 80dvh)' } }}
       title="Recent Projects"
       icon={<History sx={{ color: 'white' }} />}
     >
       <Box
         data-testid="recent-projects-card"
         sx={{
-          height: '100%',
+          minWidth: 0,
           display: 'flex',
           flexDirection: 'column',
           minHeight: 0,
@@ -77,7 +77,8 @@ export default function RecentProjectSelection({
         {/* Scrollable Projects List */}
         <Box
           sx={{
-            flex: 1,
+            flex: '1 1 auto',
+            maxHeight: { xs: 420, md: 'none' },
             overflowY: 'auto',
             minHeight: 0,
             pr: 1,
@@ -118,6 +119,11 @@ export default function RecentProjectSelection({
                           primary={project.name}
                           sx={{
                             margin: 0,
+                            '& .MuiListItemText-primary': {
+                              fontWeight: 600,
+                              textTransform: 'none',
+                              overflowWrap: 'anywhere',
+                            },
                             fontFamily: '"IBM Plex Sans", sans-serif',
                             fontWeight: 500,
                             fontSize: '14px',
@@ -134,7 +140,7 @@ export default function RecentProjectSelection({
                             color: alpha(palette.text.primary, 0.7),
                           }}
                         >
-                          Last Accessed:{' '}
+                          Last opened:{' '}
                           {formatRelativeTime(project.lastAccessed)}
                         </Typography>
                         {project.createdAt && (
@@ -153,7 +159,8 @@ export default function RecentProjectSelection({
                           <Typography
                             variant="caption"
                             sx={{
-                              fontFamily: '"Space Mono", monospace',
+                              overflowWrap: 'anywhere',
+                              fontFamily: 'inherit',
                               fontSize: '0.7rem',
                               color: alpha(palette.text.primary, 0.5),
                             }}
@@ -171,7 +178,7 @@ export default function RecentProjectSelection({
         </Box>
 
         {filteredProjects.length === 0 && recentProjects.length > 0 && (
-          <Box sx={{ py: 6, textAlign: 'center' }}>
+          <Box sx={{ py: 4, textAlign: 'center', overflowWrap: 'anywhere' }}>
             <Typography
               variant="body1"
               sx={{
@@ -185,20 +192,20 @@ export default function RecentProjectSelection({
         )}
 
         {recentProjects.length === 0 && (
-          <Box sx={{ py: 6, textAlign: 'center' }}>
+          <Box sx={{ py: 4, textAlign: 'center', overflowWrap: 'anywhere' }}>
             <Typography
               variant="body1"
               sx={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
             >
-              No recent projects yet
+              No recent projects yet. Open or create a project to get started.
             </Typography>
           </Box>
         )}
 
         {filteredProjects.some((project) => !project.isValid) && (
-          <Alert severity="warning" sx={{ lineHeight: 1, mt: 2 }}>
-            <AlertTitle sx={{ lineHeight: 1, fontWeight: 'bold' }}>
-              Browser Requires Permission to Access Desktop Files
+          <Alert severity="warning" sx={{ mt: 2, flexShrink: 0 }}>
+            <AlertTitle sx={{ fontWeight: 600 }}>
+              Allow access to project files
             </AlertTitle>
             <Stack direction="column">
               You must click allow access when the browser prompts you.

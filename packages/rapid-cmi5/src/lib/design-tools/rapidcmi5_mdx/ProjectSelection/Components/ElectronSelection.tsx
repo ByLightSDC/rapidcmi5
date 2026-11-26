@@ -27,10 +27,12 @@ export default function ElectronAppSelection({
     <Box
       sx={{
         display: 'grid',
-        gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
-        gridAutoRows: { md: '1fr' },
+        gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' },
         gap: 2,
         flex: 1,
+        minWidth: 0,
+        width: '100%',
+        alignItems: 'start',
       }}
     >
       <ProductionModeSelection
