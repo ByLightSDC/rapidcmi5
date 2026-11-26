@@ -12,14 +12,12 @@ export default function BranchSelector({
   availableBranches,
   disabled,
   onSelect,
-  onAction,
   styleProps = {},
 }: {
   currentBranch?: string;
   availableBranches?: string[];
   disabled?: boolean;
   styleProps?: SxProps;
-  onAction?: () => void;
   onSelect?: (branchName: string) => void;
 }) {
   const noBranchesFound = 'No Branches Found';
@@ -32,14 +30,11 @@ export default function BranchSelector({
       styleProps={styleProps}
       theValue={currentBranch || ''}
       onChange={onSelect}
-      iconButtonHandler={onAction}
-      iconButtonTooltip="Create Branch"
-      iconButtonDisabled={disabled}
       topicLabel="Branch"
       hasNoOptions={hasNoBranches}
       noOptionsPlaceholder={noBranchesFound}
       optionsPlaceholder="Select Branch"
-      selectorStyleProps={{ width: '100%', minWidth: 0 }}
+      selectorStyleProps={{ width: '180px', height: 32, minHeight: 32 }}
     >
       {availableBranches &&
         availableBranches.map((name) => (

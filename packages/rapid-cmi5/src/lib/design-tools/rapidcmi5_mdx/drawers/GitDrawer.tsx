@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert, Stack, Tabs, Typography, useTheme } from '@mui/material';
+import { Alert, Stack, Tabs, Typography } from '@mui/material';
 import { RepoState } from '../../../redux/repoManagerReducer';
 import { RootState } from '../../../redux/store';
 
@@ -10,7 +10,7 @@ import {
   gitViewCurrentTab,
   setGitViewCurrentTab,
 } from '../../../redux/courseBuilderReducer';
-import { GitCompareArrows } from 'lucide-react';
+import { DrawerAddButton } from './components/DrawerAddButton';
 import BranchSelector from '../../course-builder/selectors/BranchSelector';
 import { CreateBranchDialog } from '../../course-builder/modals/git/CreateBranchDialog';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
@@ -47,8 +47,14 @@ export const GitDrawer = () => {
       setSwitching(false);
     }
   };
+  const branchControlsDisabled =
+    switching ||
+    gettingRepoStatus ||
+    !isGitLoaded ||
+    isInMerge ||
+    !currentBranch ||
+    allBranches.length === 0;
   const currentTab = useSelector(gitViewCurrentTab);
-  const currentTheme = useTheme();
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     dispatch(setGitViewCurrentTab(newValue));
   };
@@ -74,35 +80,28 @@ export const GitDrawer = () => {
       >
         VERSION CONTROL
       </Typography>
-      <Stack direction="column">
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{
-            marginTop: '4px',
-            marginBottom: 1,
-          }}
-        >
-          <GitCompareArrows
-            color={currentTheme.button.iconColor}
-            strokeWidth={1.15}
-          />
-          <BranchSelector
-            currentBranch={currentBranch ?? undefined}
-            availableBranches={allBranches}
-            disabled={
-              switching ||
-              gettingRepoStatus ||
-              !isGitLoaded ||
-              isInMerge ||
-              !currentBranch ||
-              allBranches.length === 0
-            }
-            styleProps={{ flex: 1, minWidth: 0 }}
-            onSelect={selectBranch}
-            onAction={() => setCreatingBranch(true)}
-          />
-        </Stack>
+      <Stack
+        direction="row"
+        sx={{
+          justifyContent: 'flex-start',
+          minWidth: '100px',
+          marginTop: '4px',
+          marginBottom: 1,
+          gap: 0.5,
+        }}
+      >
+        <BranchSelector
+          currentBranch={currentBranch ?? undefined}
+          availableBranches={allBranches}
+          disabled={branchControlsDisabled}
+          onSelect={selectBranch}
+        />
+        <DrawerAddButton
+          label="Create Branch"
+          id="create-branch-button"
+          disabled={branchControlsDisabled}
+          onClick={() => setCreatingBranch(true)}
+        />
       </Stack>
       {branchError && (
         <Alert severity="error" onClose={() => setBranchError('')}>
