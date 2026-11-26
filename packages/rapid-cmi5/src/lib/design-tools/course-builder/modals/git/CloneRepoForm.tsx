@@ -143,7 +143,7 @@ export function CloneRepoForm({
               helperText={errors?.repoBranch?.message}
               name="repoBranch"
               required
-              label="Remote Branch"
+              label="Initial Branch"
               readOnly={false}
             />
           </Grid>

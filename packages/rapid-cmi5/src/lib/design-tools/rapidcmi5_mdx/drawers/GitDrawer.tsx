@@ -1,17 +1,18 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Stack, Tabs, Typography, useTheme } from '@mui/material';
+import { Alert, Stack, Tabs, Typography, useTheme } from '@mui/material';
 import { RepoState } from '../../../redux/repoManagerReducer';
 import { RootState } from '../../../redux/store';
 
 import { TabMainUi } from '@rapid-cmi5/ui';
-
 
 import {
   gitViewCurrentTab,
   setGitViewCurrentTab,
 } from '../../../redux/courseBuilderReducer';
 import { GitCompareArrows } from 'lucide-react';
+import BranchSelector from '../../course-builder/selectors/BranchSelector';
+import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 
 /**
  * Drawer for GIT view
@@ -20,10 +21,25 @@ import { GitCompareArrows } from 'lucide-react';
  */
 export const GitDrawer = () => {
   const dispatch = useDispatch();
-  const { currentBranch }: RepoState = useSelector(
+  const { currentBranch, allBranches }: RepoState = useSelector(
     (state: RootState) => state.repoManager,
   );
 
+  const { handleCheckoutBranch, gettingRepoStatus, isGitLoaded, isInMerge } =
+    useContext(GitContext);
+  const [switching, setSwitching] = useState(false);
+  const [branchError, setBranchError] = useState('');
+  const selectBranch = async (branch: string) => {
+    setSwitching(true);
+    setBranchError('');
+    try {
+      await handleCheckoutBranch(branch);
+    } catch (error) {
+      setBranchError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSwitching(false);
+    }
+  };
   const currentTab = useSelector(gitViewCurrentTab);
   const currentTheme = useTheme();
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -64,9 +80,22 @@ export const GitDrawer = () => {
             color={currentTheme.button.iconColor}
             strokeWidth={1.15}
           />
-          <Typography>{currentBranch}</Typography>
+          <BranchSelector
+            currentBranch={currentBranch ?? undefined}
+            availableBranches={allBranches}
+            disabled={
+              switching || gettingRepoStatus || !isGitLoaded || isInMerge
+            }
+            styleProps={{ flex: 1, minWidth: 0 }}
+            onSelect={selectBranch}
+          />
         </Stack>
       </Stack>
+      {branchError && (
+        <Alert severity="error" onClose={() => setBranchError('')}>
+          {branchError}
+        </Alert>
+      )}
       <Tabs
         orientation="vertical"
         aria-label="Git Tabs"

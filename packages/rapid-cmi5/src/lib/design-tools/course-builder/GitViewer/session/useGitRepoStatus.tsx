@@ -4,12 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ModifiedFile } from '../Components/GitActions/GitFileStatus';
 
 import { stagedStatuses } from '../utils/StatusMatrix';
-import { RootState } from '../../../../redux/store';
-import { useSelector } from 'react-redux';
-import {
-  RepoAccessObject,
-  RepoState,
-} from '../../../../redux/repoManagerReducer';
+import { RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
 import { FolderStructWithMtime, getRepoPath, GitFS } from '../utils/fileSystem';
 import { GitOperations } from '../utils/gitOperations';
@@ -19,9 +14,6 @@ export function useGitRepoStatus(
   isGitLoaded: boolean,
   fsInstance: GitFS,
 ) {
-  const { currentBranch }: RepoState = useSelector(
-    (state: RootState) => state.repoManager,
-  );
   const gitOperator = useMemo(
     () => new GitOperations(fsInstance),
     [fsInstance, repoAccessObject],
@@ -47,12 +39,11 @@ export function useGitRepoStatus(
 
   const resolvePushStatus = async (r: RepoAccessObject) => {
     try {
-      if (!currentBranch) return;
+      // Read HEAD after checkout; the Redux selector may still hold the previous branch.
+      const branch = await gitOperator.getCurrentGitBranch(r);
+      if (!branch) return;
 
-      const numberCommits = await gitOperator.getCommitsToPushCount(
-        r,
-        currentBranch,
-      );
+      const numberCommits = await gitOperator.getCommitsToPushCount(r, branch);
       setCanPush(numberCommits > 0);
       setUnpushedCommits(numberCommits);
     } catch (error: any) {

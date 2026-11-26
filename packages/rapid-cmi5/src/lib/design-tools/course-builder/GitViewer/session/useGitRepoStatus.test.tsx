@@ -17,11 +17,30 @@ const mockGitOperator = {
   gitCommits: jest.fn(),
   gitListStash: jest.fn().mockResolvedValue([]),
   getStashStatus: jest.fn().mockResolvedValue(undefined),
+  getCurrentGitBranch: jest.fn(),
+  getCommitsToPushCount: jest.fn(),
 };
 const repo = { repoName: 'course', fileSystemType: fsType.localFileSystem };
 
 describe('staging status updates', () => {
   beforeEach(() => jest.clearAllMocks());
+
+  it('computes push status from the checked out branch after switching', async () => {
+    mockGitOperator.getCurrentGitBranch.mockResolvedValue('feature/course');
+    mockGitOperator.getCommitsToPushCount.mockResolvedValue(2);
+    const { result } = renderHook(() =>
+      useGitRepoStatus(repo, false, {} as GitFS),
+    );
+    await act(async () => {
+      await result.current.resolvePushStatus(repo);
+    });
+    expect(mockGitOperator.getCommitsToPushCount).toHaveBeenCalledWith(
+      repo,
+      'feature/course',
+    );
+    expect(result.current.unpushedCommits).toBe(2);
+    expect(result.current.canPush).toBe(true);
+  });
 
   it('reuses bulk staging results without scanning files or reloading history', async () => {
     const fs = { getFolderStructureWithMtime: jest.fn() } as unknown as GitFS;

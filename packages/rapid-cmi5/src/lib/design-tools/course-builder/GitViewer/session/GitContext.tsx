@@ -5,6 +5,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
@@ -52,6 +53,7 @@ import {
   setRepoViewScrollTop,
   changeViewMode,
   courseOperations,
+  isDisplayDirty,
 } from '../../../../redux/courseBuilderReducer';
 import {
   RepoAccessObject,
@@ -63,9 +65,11 @@ import {
   setFileContent,
   setSelectedFile,
   setLastSelectedPath,
+  setCurrentWorkingDir,
   addRepo,
   setCurrentBranch,
   setAllBranches,
+  unselectCourse,
   Course,
   setLoadingState,
   LoadingState,
@@ -380,6 +384,7 @@ export const GitContextProvider = (props: tProviderProps) => {
   } = useGitRepoStatus(repoAccessObject, isGitLoaded, gitFs);
 
   const courseOperationsSet = useSelector(courseOperations);
+  const hasUnsavedChanges = useSelector(isDisplayDirty);
 
   const {
     loadCourse,
@@ -804,6 +809,7 @@ export const GitContextProvider = (props: tProviderProps) => {
       }
       await pullRepo(req);
     } finally {
+      dispatch(setAllBranches(await gitOperator.getAllGitBranches(r)));
       await resolveGitRepoStatus(r);
       await resolvePushStatus(r);
     }
@@ -1115,22 +1121,47 @@ export const GitContextProvider = (props: tProviderProps) => {
     }
   };
 
-  const handleCheckoutBranch = async (branch: string) => {
-    const r = getRepoAccess(repoAccessObject);
+  const switchingBranch = useRef(false);
 
-    if (!allBranches.includes(branch)) {
-      return;
+  const handleCheckoutBranch = async (branch: string) => {
+    if (switchingBranch.current || branch === currentBranch) return;
+    const r = getRepoAccess(repoAccessObject);
+    if (!allBranches.includes(branch))
+      throw Error('The selected branch is no longer available.');
+    if (isInMerge) throw Error('Complete the merge before switching branches.');
+    if (hasUnsavedChanges || Object.keys(courseOperationsSet).length > 0) {
+      throw Error('Save your course changes before switching branches.');
     }
+    switchingBranch.current = true;
+    dispatch(setLoadingState(LoadingState.openingRepo));
     try {
+      const changes = await gitOperator.gitRepoStatus(r, undefined, true);
+      if (changes.length > 0) {
+        throw Error(
+          'Commit or stash your changes in File Status before switching branches.',
+        );
+      }
       await gitOperator.gitCheckout(r, branch);
+      gitOperator.clearCache();
       dispatch(setCurrentBranch(branch));
-    } catch (error: any) {
-      console.error('Could not checkout branch ', branch);
-      throw error;
+      dispatch(setSelectedFile(null));
+      dispatch(setFileContent({ content: null, type: null }));
+      dispatch(setLastSelectedPath('/'));
+      dispatch(setCurrentWorkingDir('/'));
+      dispatch(unselectCourse());
+      dispatch(updateCourseData(defaultCourseData));
+      dispatch(setIsLessonMounted(false));
+      await resolveCurrentRepo(r, false);
+    } finally {
+      switchingBranch.current = false;
+      dispatch(setLoadingState(LoadingState.loaded));
     }
   };
 
-  const resolveCurrentRepo = async (r: RepoAccessObject) => {
+  const resolveCurrentRepo = async (
+    r: RepoAccessObject,
+    navigateToDesigner = true,
+  ) => {
     // Bounded so a stalled storage call surfaces as a named error instead of
     // an endless "Opening repository" overlay. Generous: these do real git work.
     const step = <T,>(label: string, p: Promise<T>) =>
@@ -1165,7 +1196,7 @@ export const GitContextProvider = (props: tProviderProps) => {
     await step('checking remote status', resolveRemoteRepoStatus(r));
 
     await step('checking push status', resolvePushStatus(r));
-    await handleNavToDesigner();
+    if (navigateToDesigner) await handleNavToDesigner();
   };
 
   return (

@@ -102,7 +102,7 @@ export class GitOperations {
           url: repoRemoteUrl,
           ref: branch,
           depth: shallowClone ? 1 : undefined,
-          singleBranch: true,
+          singleBranch: false,
           onAuth: () => ({ username, password }),
           cache: this.cache,
         });
@@ -226,7 +226,7 @@ export class GitOperations {
         http,
         dir,
         ref: branch,
-        singleBranch: true,
+        singleBranch: false,
         cache: this.cache,
         onAuth: () => ({ username, password }),
       });
@@ -299,7 +299,7 @@ export class GitOperations {
           dir,
 
           ref: branch,
-          singleBranch: true,
+          singleBranch: false,
           fastForward: true,
           onAuth: () => ({ username, password }),
         });
@@ -336,6 +336,7 @@ export class GitOperations {
   gitRepoStatus = async (
     r: RepoAccessObject,
     changedFiles?: string[],
+    throwOnError = false,
   ): Promise<ModifiedFile[]> => {
     const dir = getRepoPath(r);
     try {
@@ -372,6 +373,7 @@ export class GitOperations {
             file.status !== 'unknown',
         );
     } catch (error: any) {
+      if (throwOnError) throw error;
       return [];
     }
   };
@@ -853,11 +855,18 @@ export class GitOperations {
       if (this.gitFs.isElectron) {
         return window.fsApi.getAllGitBranches(dir);
       } else {
-        return await git.listBranches({
+        const options = {
           fs: this.gitFs.getFs(),
           gitdir: getGitDirectory(dir, this.gitFs.isElectron),
           dir,
-        });
+        };
+        const [local, remote] = await Promise.all([
+          git.listBranches(options),
+          git.listBranches({ ...options, remote: 'origin' }),
+        ]);
+        return [
+          ...new Set([...local, ...remote.filter((name) => name !== 'HEAD')]),
+        ].sort();
       }
     } catch {
       return [];
