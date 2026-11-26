@@ -1132,7 +1132,9 @@ export const GitContextProvider = (props: tProviderProps) => {
     if (!create && !allBranches.includes(branch))
       throw Error('The selected branch is no longer available.');
     if (isInMerge) throw Error('Complete the merge before switching branches.');
-    if (hasUnsavedChanges || Object.keys(courseOperationsSet).length > 0) {
+    // The operation queue also contains navigation-time slide saves; it does
+    // not indicate unsaved edits. Use the same dirty flag as Save/navigation.
+    if (hasUnsavedChanges) {
       throw Error('Save your course changes before switching branches.');
     }
     switchingBranch.current = true;
