@@ -16,8 +16,8 @@ export default function RepositoryCompatibilityDialog({
       testId="repository-compatibility-dialog"
       title={
         environment === 'browser'
-          ? 'Open an older Git project in the browser'
-          : 'Open a browser project on desktop'
+          ? 'Opening an legacy Git project in the browser'
+          : 'Opening a browser project on desktop'
       }
       titleSeverity="warning"
       alertSeverity="warning"
@@ -38,16 +38,9 @@ export default function RepositoryCompatibilityDialog({
         {environment === 'browser' ? (
           <>
             <Typography paragraph>
-              This project has an older .git folder. Back up the project before
-              continuing. Copy and Open copies its history, staged changes, and
-              Git settings into .rapid-git once. Your files and original .git
-              folder stay in place.
-            </Typography>
-            <Typography paragraph>
-              After the copy, browser and desktop Git histories and settings are
-              independent. Push and pull through your remote repository to share
-              commits. Do not delete or rename the original .git folder to
-              continue using desktop Git.
+              This project has a legacy .git folder. You may attempt to migrate
+              now by proceeding. This migration will copy your existing .git
+              folder to .rapid-git.
             </Typography>
             <Typography>
               Choose Cancel to leave the project unchanged.
