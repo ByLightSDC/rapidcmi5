@@ -314,12 +314,13 @@ export const courseBuilderSlice = createSlice({
       const au = block.aus[state.currentAuIndex];
       if (!au) return;
 
-      const slide = au.slides[state.currentSlideIndex];
+      const slide = au.slides[action.payload.position];
       if (!slide) return;
+
+      if (slide.content === action.payload.content) return;
 
       slide.content = action.payload.content;
 
-      // For now we are just assuming that the file was edited, this must be fixed in the future
       editSlideOperation(slide.filepath, state);
     },
     updateCourseData: (state, action: PayloadAction<CourseData>) => {
