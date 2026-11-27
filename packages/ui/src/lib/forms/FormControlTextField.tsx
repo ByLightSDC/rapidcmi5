@@ -115,6 +115,7 @@ export function FormControlTextField({
                     aria-label={label}
                     label={label}
                     name={field.name}
+                    inputRef={field.ref}
                     value={field.value ?? ''}
                     required={required}
                     error={error}

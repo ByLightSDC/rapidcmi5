@@ -1,8 +1,9 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { alpha, Box, Container, useTheme } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { GitContext } from '../../course-builder/GitViewer/session/GitContext';
 import DocumentationDialog from './Dialogs/DocumentationDialog';
+import RepositoryCompatibilityDialog from './Dialogs/RepositoryCompatibilityDialog';
 import { useRC5Prompts } from '../modals/useRC5Prompts';
 import { RepoState } from '../../../redux/repoManagerReducer';
 import { RootState } from '../../../redux/store';
@@ -13,6 +14,10 @@ import { HiddenHeader, useToaster } from '@rapid-cmi5/ui';
 import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
 import { CustomTheme } from '../styles/createPalette';
 import { StepTimeoutError } from '../../course-builder/GitViewer/utils/withTimeout';
+import type {
+  RepositoryCompatibilityWarning,
+  RepositoryEnvironment,
+} from '../../course-builder/GitViewer/utils/repositoryCompatibility';
 
 interface OptionDocumentation {
   title: string;
@@ -43,9 +48,29 @@ export default function SelectProjectHomePage({}: {}) {
     (state: RootState) => state.repoManager,
   );
 
+  const [compatibilityWarning, setCompatibilityWarning] =
+    useState<RepositoryEnvironment | null>(null);
+  const compatibilityResponse = useRef<((proceed: boolean) => void) | null>(
+    null,
+  );
+  const closeCompatibilityWarning = (proceed = false) => {
+    compatibilityResponse.current?.(proceed);
+    compatibilityResponse.current = null;
+    setCompatibilityWarning(null);
+  };
+  useEffect(() => () => compatibilityResponse.current?.(false), []);
+
+  const warnAboutRepositoryCompatibility: RepositoryCompatibilityWarning = (
+    environment,
+  ) =>
+    new Promise<boolean>((resolve) => {
+      compatibilityResponse.current = resolve;
+      setCompatibilityWarning(environment);
+    });
+
   const handleOpenLocalFolder = async (id?: string) => {
     try {
-      await openLocalRepo(id);
+      await openLocalRepo(id, warnAboutRepositoryCompatibility);
 
       displayToaster({
         message: 'Repository opened successfully.',
@@ -101,7 +126,7 @@ export default function SelectProjectHomePage({}: {}) {
 
   const handleOpenRecentProject = async (id: string) => {
     try {
-      await openLocalRepo(id);
+      await openLocalRepo(id, warnAboutRepositoryCompatibility);
 
       displayToaster({
         message: 'Repository opened successfully.',
@@ -109,6 +134,7 @@ export default function SelectProjectHomePage({}: {}) {
         autoHideDuration: 3000,
       });
     } catch (e: any) {
+      if (e?.name === 'AbortError') return;
       // A stall says nothing about the folder itself — keep it in recents
       if (e instanceof StepTimeoutError) {
         console.error(e);
@@ -156,6 +182,10 @@ export default function SelectProjectHomePage({}: {}) {
       }}
     >
       <HiddenHeader header="Projects Dashboard" />
+      <RepositoryCompatibilityDialog
+        environment={compatibilityWarning}
+        onClose={closeCompatibilityWarning}
+      />
       <Box
         sx={{
           height: '100vh',

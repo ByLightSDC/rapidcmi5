@@ -44,6 +44,7 @@ import { INode } from 'react-accessible-treeview';
 import { FileContent, getRepoPath } from '../utils/fileSystem';
 import { GitOperations } from '../utils/gitOperations';
 import { withTimeout } from '../utils/withTimeout';
+import type { RepositoryCompatibilityWarning } from '../utils/repositoryCompatibility';
 
 const RESOLVE_STEP_TIMEOUT_MS = 90_000;
 import {
@@ -172,7 +173,10 @@ interface IGitContext {
   handleCreateLocalRepo: (req: CreateLocalRepoType) => Promise<void>;
   openSandbox: () => Promise<void>;
   getLocalFolders: () => Promise<DirMeta[]>;
-  openLocalRepo: (id?: string) => Promise<void>;
+  openLocalRepo: (
+    id?: string,
+    onCompatibilityWarning?: RepositoryCompatibilityWarning,
+  ) => Promise<void>;
   deleteRecentProject: (id: string) => Promise<void>;
   getDirHandle: () => Promise<FileSystemDirectoryHandle | null>;
   gettingRepoStatus: boolean;
@@ -488,15 +492,18 @@ export const GitContextProvider = (props: tProviderProps) => {
           ? modifiedFiles
           : await gitOperator.gitRepoStatus(r, changedFiles);
 
-        await stageFiles(filesForStaging);
-        await resolveGitRepoStatus(r);
-        setCanCommit(true);
+        const stagedFiles = await stageFiles(filesForStaging);
+        await resolveFile(
+          r,
+          filesForStaging.map((file) => file.name),
+          stagedFiles,
+        );
       } catch (error) {
         debugLogError('Failed to stage all files' + error);
         throw Error('Could not stage all files');
       }
     },
-    [modifiedFiles, resolveGitRepoStatus, stageFiles],
+    [repoAccessObject, modifiedFiles, resolveFile, stageFiles],
   );
 
   const handleUnstageAll = async () => {
@@ -661,10 +668,13 @@ export const GitContextProvider = (props: tProviderProps) => {
     });
   };
 
-  const openLocalRepo = async (id?: string) => {
+  const openLocalRepo = async (
+    id?: string,
+    onCompatibilityWarning?: RepositoryCompatibilityWarning,
+  ) => {
     dispatch(setLoadingState(LoadingState.openingRepo));
     try {
-      const dirName = await gitFs.openLocalRepo(id);
+      const dirName = await gitFs.openLocalRepo(id, onCompatibilityWarning);
 
       dispatch(setCurrentFileSystemType(fsType.localFileSystem));
 

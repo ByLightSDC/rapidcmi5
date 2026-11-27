@@ -14,6 +14,7 @@ import { configure, fs as zenFs } from '@zenfs/core';
 import { IndexedDB, WebAccess } from '@zenfs/dom';
 import { serializeDirectoryCreation } from './serializeDirectoryCreation';
 import { wrapBrowserGitFs } from './browserGitFs';
+import type { RepositoryCompatibilityWarning } from './repositoryCompatibility';
 import { fsType, RepoAccessObject } from '../../../../redux/repoManagerReducer';
 import { set, get, keys, getMany, del } from 'idb-keyval';
 import { debugLog, debugLogError } from '@rapid-cmi5/ui';
@@ -26,7 +27,9 @@ import {
   isGitMetadataPath,
   RAPID_GIT_CONFIG,
   STANDARD_GIT_DIRECTORY,
-  usesRapidGitConfig,
+  BROWSER_GIT_DIRECTORY,
+  BROWSER_GIT_IGNORE,
+  getGitDirectory,
   prepareLocalGitDirectory,
 } from './gitMetadata';
 import {
@@ -136,9 +139,36 @@ export class GitFS {
       debugLogError(error);
     }
 
+    await this.migrateBrowserStorage();
+
     this.isBrowserFsLoaded = true;
     this.isMountStarted = false;
   };
+
+  /** Internal browser storage has no native .git restrictions; rename in place. */
+  async migrateBrowserStorage() {
+    if (this.isElectron) return;
+    for (const name of await this.fs.promises.readdir('/inBrowser')) {
+      const repoPath = join('/inBrowser', name.toString());
+      const source = join(repoPath, STANDARD_GIT_DIRECTORY);
+      const target = getGitDirectory(repoPath);
+      if ((await this.dirExists(source)) && !(await this.dirExists(target))) {
+        await this.fs.promises.rename(source, target);
+      }
+      await this.ignoreBrowserGitDirectory(repoPath);
+    }
+  }
+
+  async ignoreBrowserGitDirectory(repoPath: string) {
+    if (this.isElectron) return;
+    const gitDirectory = getGitDirectory(repoPath);
+    if (await this.dirExists(gitDirectory)) {
+      await this.fs.promises.writeFile(
+        join(gitDirectory, '.gitignore'),
+        BROWSER_GIT_IGNORE,
+      );
+    }
+  }
 
   buildCmi5Course = async (
     r: RepoAccessObject,
@@ -404,20 +434,34 @@ export class GitFS {
     this.isBrowserFsLoaded = true;
   };
 
-  async openLocalRepo(id?: string) {
+  async openLocalRepo(
+    id?: string,
+    onCompatibilityWarning?: RepositoryCompatibilityWarning,
+  ) {
     if (this.isElectron) {
-      if (id) {
-        if (!(await this.dirExists('/' + fsType.localFileSystem + '/' + id)))
-          throw Error('Could not find dir');
-        // We need to readd to recent projects to update the last opened time
-        await window.fsApi.addRecentProject(id);
-        const dirName = basename(id);
-        return dirName;
-      } else {
-        const dirname = await window.fsApi.chooseProject();
-        if (!dirname) throw new Error('No project selected');
-        return dirname;
+      const dirName = id ? basename(id) : await window.fsApi.chooseProject();
+      if (!dirName) throw new DOMException('No project selected', 'AbortError');
+      const repoPath = join('/', fsType.localFileSystem, dirName);
+      if (id && !(await this.dirExists(repoPath)))
+        throw Error('Could not find dir');
+      if (
+        !(await this.dirExists(join(repoPath, STANDARD_GIT_DIRECTORY))) &&
+        (await this.dirExists(join(repoPath, BROWSER_GIT_DIRECTORY)))
+      ) {
+        if (onCompatibilityWarning) {
+          await onCompatibilityWarning('desktop');
+          throw new DOMException(
+            'Browser repository requires desktop conversion',
+            'AbortError',
+          );
+        }
+        throw new Error(
+          'This browser project uses .rapid-git. Back up the project, rename .rapid-git to .git using your file manager, and open it again in the desktop app.',
+        );
       }
+      // Re-add only after compatibility checks succeed.
+      if (id) await window.fsApi.addRecentProject(id);
+      return dirName;
     } else {
       let dirHandle: FileSystemDirectoryHandle | undefined;
 
@@ -460,14 +504,22 @@ export class GitFS {
           );
       }
 
-      // Seed rapid-config using read-only access to the desktop config.
+      const metadata = await withTimeout(
+        'checking the project Git folder',
+        getLocalGitDirectory(dirHandle),
+        FS_STEP_TIMEOUT_MS,
+      );
+      if (metadata?.name === STANDARD_GIT_DIRECTORY && onCompatibilityWarning) {
+        if (!(await onCompatibilityWarning('browser'))) {
+          this.currentProjectRecentsId = undefined;
+          throw new DOMException('Repository migration canceled', 'AbortError');
+        }
+      }
+
+      // Migrate legacy .git metadata using read-only access to the source.
       // Validate saved handles too when reopening a project.
       try {
-        await withTimeout(
-          'reading the project .git directory',
-          prepareLocalGitDirectory(dirHandle),
-          FS_STEP_TIMEOUT_MS,
-        );
+        await prepareLocalGitDirectory(dirHandle);
         await this.setDirHandle(dirHandle);
       } catch (error) {
         this.currentProjectRecentsId = undefined;
@@ -601,9 +653,8 @@ export class GitFS {
     // in place, so re-picking a folder repairs its recents entry, not duplicates it.
     const existing =
       probes.find((p) => p.result === 'same')?.meta ??
-      probes.find(
-        (p) => p.result === 'stale' && p.meta.name === dirHandle.name,
-      )?.meta;
+      probes.find((p) => p.result === 'stale' && p.meta.name === dirHandle.name)
+        ?.meta;
 
     if (existing) {
       const updatedMeta: DirMeta = {
@@ -929,13 +980,18 @@ export class GitFS {
    */
   importGitRepoZip = async (zip: JSZip, r: RepoAccessObject) => {
     const repoPath = getRepoPath(r);
-    const local = usesRapidGitConfig(repoPath, this.isElectron);
+    const gitDirectory = basename(getGitDirectory(repoPath, this.isElectron));
     const paths = Object.keys(zip.files);
+    const sourceDirectory = paths.some(
+      (filepath) => filepath.split('/')[1] === gitDirectory,
+    )
+      ? gitDirectory
+      : gitDirectory === BROWSER_GIT_DIRECTORY
+        ? STANDARD_GIT_DIRECTORY
+        : BROWSER_GIT_DIRECTORY;
     const hasRapidConfig = paths.some((filepath) => {
       const parts = filepath.split('/');
-      return (
-        parts[1] === STANDARD_GIT_DIRECTORY && parts[2] === RAPID_GIT_CONFIG
-      );
+      return parts[1] === sourceDirectory && parts[2] === RAPID_GIT_CONFIG;
     });
 
     // Write sequentially: WebAccess can expose a directory inode before its
@@ -944,12 +1000,22 @@ export class GitFS {
       const index = relativePath.indexOf('/');
       if (index === -1) continue;
       const parts = relativePath.slice(index + 1).split('/');
-      if (parts[0] === STANDARD_GIT_DIRECTORY) {
-        if (local && (parts[1] === 'hooks' || parts[1] === 'modules')) continue;
+      if (
+        parts[0] === STANDARD_GIT_DIRECTORY ||
+        parts[0] === BROWSER_GIT_DIRECTORY
+      ) {
+        // Archives containing both layouts must not mix independent histories.
+        if (parts[0] !== sourceDirectory) continue;
+        parts[0] = gitDirectory;
+        if (
+          !this.isElectron &&
+          ['hooks', 'modules', 'worktrees'].includes(parts[1])
+        )
+          continue;
         if (parts.length === 2) {
           if (parts[1] === 'config' && hasRapidConfig) continue;
           if (parts[1] === 'config' || parts[1] === RAPID_GIT_CONFIG) {
-            parts[1] = local ? RAPID_GIT_CONFIG : 'config';
+            parts[1] = 'config';
           }
         }
       }
@@ -966,6 +1032,7 @@ export class GitFS {
         );
       }
     }
+    await this.ignoreBrowserGitDirectory(repoPath);
   };
 
   /**

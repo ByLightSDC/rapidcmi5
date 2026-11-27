@@ -157,6 +157,14 @@
         }
       }
     },
+    "e2e-local-fs": {
+      "executor": "@nx/playwright:playwright",
+      "cache": false,
+      "outputs": ["{workspaceRoot}/dist/.playwright/local-fs"],
+      "options": {
+        "config": "apps/rapid-cmi5-electron-frontend/playwright.local-fs.config.ts"
+      }
+    },
     "e2e": {
       "executor": "@nx/playwright:playwright",
       "outputs": [

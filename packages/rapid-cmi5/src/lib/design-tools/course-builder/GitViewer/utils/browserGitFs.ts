@@ -1,6 +1,5 @@
-import { normalize } from 'path-browserify';
 import type { FileSystemObject } from './fileSystem';
-import { RAPID_GIT_CONFIG, usesRapidGitConfig } from './gitMetadata';
+import { isBrowserLocalPath, isGitMetadataPath } from './gitMetadata';
 import { withTimeout } from './withTimeout';
 
 const adapters = new WeakMap<object, FileSystemObject>();
@@ -19,45 +18,30 @@ function watchFsOp<T>(label: string, op: Promise<T>): Promise<T> {
 }
 
 /**
- * isomorphic-git hardcodes .git/config. Redirect only browser local config
- * operations; objects, refs, HEAD and the index stay shared with desktop Git.
- * Use this adapter for Git calls, leaving ordinary filesystem access intact.
+ * Hide Git metadata from working-tree directory listings in browser storage
+ * and local folders. Time out Git operations on browser-mounted local folders
+ * so stalled File System Access handles produce useful errors.
  */
 export function wrapBrowserGitFs(fs: FileSystemObject): FileSystemObject {
   const cached = adapters.get(fs);
   if (cached) return cached;
 
-  const mapPath = (value: unknown): unknown => {
-    if (typeof value !== 'string') return value;
-    const filepath = normalize(value);
-    return usesRapidGitConfig(filepath) && filepath.endsWith('/.git/config')
-      ? `${filepath.slice(0, -'config'.length)}${RAPID_GIT_CONFIG}`
-      : value;
-  };
   const promises = new Proxy(fs.promises, {
     get(target, method) {
       const original = Reflect.get(target, method);
       if (typeof original !== 'function') return original;
       return (...args: unknown[]) => {
-        const filepath = typeof args[0] === 'string' ? normalize(args[0]) : '';
-        // init creates an unused hooks directory, which Chrome blocks. No Git
-        // hook is executed by this app, so no on-disk directory is necessary.
-        if (
-          method === 'mkdir' &&
-          usesRapidGitConfig(filepath) &&
-          filepath.endsWith('/.git/hooks')
-        ) {
-          return Promise.resolve(undefined);
-        }
-        args[0] = mapPath(args[0]);
-        if (method === 'rename' || method === 'copyFile' || method === 'link') {
-          args[1] = mapPath(args[1]);
-        }
-        const result = Reflect.apply(original, target, args);
-        // Chrome restricts File System Access under .git, and some restricted
-        // operations hang instead of rejecting. Watch local-folder ops so a
-        // stall names the exact op/path and fails instead of spinning forever.
-        return usesRapidGitConfig(filepath) && result instanceof Promise
+        const filepath = typeof args[0] === 'string' ? args[0] : '';
+        const operation = Reflect.apply(original, target, args);
+        // Git normally ignores .git itself. Also hide our custom directory
+        // during working-tree walks, including recursive add and stash.
+        const result =
+          method === 'readdir'
+            ? Promise.resolve(operation as Promise<string[]>).then((entries) =>
+                entries.filter((entry) => !isGitMetadataPath(String(entry))),
+              )
+            : operation;
+        return isBrowserLocalPath(filepath) && result instanceof Promise
           ? watchFsOp(`${String(method)} ${String(args[0])}`, result)
           : result;
       };
