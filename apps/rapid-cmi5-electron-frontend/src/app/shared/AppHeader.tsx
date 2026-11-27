@@ -79,7 +79,7 @@ export default function AppHeader() {
   if (!showAppHeader) return null;
 
   return (
-    <header>
+    <header style={{ flexShrink: 0 }}>
       <Box
         sx={{
           height: '40px',
@@ -97,8 +97,8 @@ export default function AppHeader() {
             display: 'flex',
             alignItems: 'center',
             gap: 1,
-            marginLeft: '8px',
-            marginTop: '6px', //this offsets loading bar that appears under the app header box
+            ml: { xs: 0, sm: 1 },
+            minWidth: 0,
           }}
         >
           {logoIcon}

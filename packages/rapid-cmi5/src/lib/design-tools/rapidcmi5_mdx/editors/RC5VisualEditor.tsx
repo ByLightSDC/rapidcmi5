@@ -62,7 +62,6 @@ import {
   ImageLabelDirectiveDescriptor,
   GridContainerDirectiveDescriptor,
   GridCellDirectiveDescriptor,
-  appHeaderVisible,
   ImageTextDirectiveDescriptor,
   generateLessonThemeStyleTag,
   StepsDirectiveDescriptor,
@@ -133,7 +132,6 @@ function RC5VisualEditor() {
   const [mdxTheme, setMdxTheme] = useState(
     `${themeMode}-theme ${themeMode}-editor nested-editable-${themeMode}`,
   );
-  const isAppHeaderShowing = useSelector(appHeaderVisible);
   const content = useSelector(displayData); //CAREFUL here, retrieving from context causes inf rendering loop
   const currentAuPathSel = useSelector(currentAuPath);
   const currentRepoAccessObject = useSelector(currentRepoAccessObjectSel);
@@ -143,7 +141,6 @@ function RC5VisualEditor() {
 
   const editorContainerRef = React.useRef<HTMLDivElement>(null);
   const isEditing = true;
-  const pixelTop = (isAppHeaderShowing ? 40 : 0) + (isEditing ? 87 : 0);
 
   const currentCourseTheme = useMemo(() => {
     return courseData?.courseTheme;
@@ -152,7 +149,6 @@ function RC5VisualEditor() {
   const themeClass = useRef(
     `lesson-theme-${Math.random().toString(36).slice(2, 9)}`,
   ).current;
-  //pixelTop = 0;
   //WARNING NOT SURE WHY THIS WORKS-------------------------------------------------------
 
   const debouncer = useRef<NodeJS.Timeout>();
@@ -764,7 +760,7 @@ function RC5VisualEditor() {
     thePlugins && thePlugins.length > 0 && currentCourse ? (
       <Box
         className={themeClass}
-        sx={{ height: `calc(100vh - ${pixelTop}px)` }}
+        sx={{ height: '100%', minHeight: 0, minWidth: 0, overflow: 'auto' }}
         ref={editorContainerRef}
       >
         {currentCourseTheme && <style>{lessonStyleCss}</style>}
@@ -791,7 +787,10 @@ function RC5VisualEditor() {
     ) : (
       <Box
         sx={{
-          height: `calc(100vh - ${pixelTop}px)`,
+          height: '100%',
+          minHeight: 0,
+          p: 3,
+          textAlign: 'center',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

@@ -62,9 +62,10 @@ export default function App() {
             <RouterWrapper>
               <Paper
                 elevation={0}
-                style={{
+                sx={{
                   width: '100%',
                   height: '100vh',
+                  '@supports (height: 100dvh)': { height: '100dvh' },
                   overflow: 'hidden',
                   display: 'flex',
                   flexDirection: 'column',
@@ -120,6 +121,8 @@ function AppWorkspace() {
         style={{
           display: 'flex',
           flex: '1 1 auto',
+          minHeight: 0,
+          minWidth: 0,
           width: '100%',
           overflow: 'hidden',
         }}

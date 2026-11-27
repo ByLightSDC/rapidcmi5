@@ -4,7 +4,6 @@ import RecentProjectSelection from './RecentProjectSelection';
 import SandBoxSelection from './SandBoxSelection';
 import { DirMeta } from '@rapid-cmi5/cmi5-build-common';
 
-
 interface OptionDocumentation {
   title: string;
   content: string;
@@ -34,7 +33,10 @@ export default function WebAppSelection({
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
+          width: '100%',
+          minWidth: 0,
+          alignItems: 'start',
+          gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' },
           gap: 2,
         }}
       >

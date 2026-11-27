@@ -42,16 +42,16 @@ export default function SandBoxSelection({
           endIcon={!isLaunching ? <ArrowForward sx={{ mt: 0.5 }} /> : undefined}
           sx={{
             background: `linear-gradient(135deg, ${palette.primary.main} 0%, ${alpha(palette.primary.main, 0.9)} 100%)`,
-            fontFamily: '"Space Mono", monospace',
+            fontFamily: 'inherit',
             fontWeight: 600,
             textTransform: 'none',
             fontSize: '1rem',
             borderRadius: 2,
             boxShadow: `0 8px 20px ${alpha(palette.primary.main, 0.01)}`,
-            transition: 'all 0.3s ease',
+            transition: 'background-color 150ms ease',
             '&:hover': {
               background: `linear-gradient(135deg, ${palette.primary.main} 0%, ${alpha(palette.primary.main, 0.9)} 50%)`,
-              transform: 'translateY(-1px)',
+
               boxShadow: `0 12px 28px ${alpha(palette.primary.main, 0.05)}`,
             },
           }}
@@ -76,6 +76,7 @@ export default function SandBoxSelection({
             sx={{
               color: alpha(palette.primary.main, 0.8),
               fontSize: 20,
+              flexShrink: 0,
               mt: 0.2,
             }}
           />

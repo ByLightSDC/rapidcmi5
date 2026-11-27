@@ -6,20 +6,23 @@ const ThemedOptionCard = ({ children }: { children: React.ReactNode }) => {
   const { palette } = theme;
 
   return (
-    <ListItem disablePadding sx={{ mb: 0.75 }}>
+    <ListItem component="div" disablePadding sx={{ minWidth: 0 }}>
       <Box
         sx={{
           width: '100%',
+          minWidth: 0,
           position: 'relative',
           borderRadius: 2,
           background: theme.gradients.background,
           border: `1px solid ${alpha(palette.primary.main, 0.22)}`,
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'background-color 150ms ease, border-color 150ms ease',
+          '&:focus-within': {
+            outline: `2px solid ${palette.primary.main}`,
+            outlineOffset: 2,
+          },
           '&:hover': {
             background: theme.gradients.backgroundHover,
             borderColor: alpha(palette.primary.main, 0.3),
-            transform: 'translateY(-2px)',
-            boxShadow: alpha(palette.primary.main, 0.3),
           },
         }}
       >

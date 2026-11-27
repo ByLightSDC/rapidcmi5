@@ -13,6 +13,7 @@ import {
   Stack,
   Typography,
   useTheme,
+  useMediaQuery,
 } from '@mui/material';
 
 import {
@@ -90,9 +91,15 @@ export function Landing() {
   const { promptDeleteRepo, promptGitConfig } = useRC5Prompts();
 
   const theme: CustomTheme = useTheme();
+  const isCompact = useMediaQuery(theme.breakpoints.down('md'));
+  const isProjectOpen = viewMode !== ViewModeEnum.RepoSelector;
 
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
+
+  useEffect(() => {
+    if (isCompact && isProjectOpen) leftPanelRef.current?.collapse();
+  }, [isCompact, isProjectOpen]);
 
   const toggleLeftPanel = useCallback(() => {
     const panel = leftPanelRef.current;
@@ -158,6 +165,7 @@ export function Landing() {
             width: '100%',
             height: '100%',
             minHeight: 0,
+            minWidth: 0,
           }}
         >
           <Stack
@@ -166,6 +174,7 @@ export function Landing() {
               width: '100%',
               height: '100%',
               minHeight: 0,
+              minWidth: 0,
             }}
           >
             <NavViewMenu
@@ -176,15 +185,17 @@ export function Landing() {
             <PanelGroup direction="horizontal">
               <Panel
                 ref={leftPanelRef}
-                defaultSize={26}
-                minSize={0}
+                defaultSize={isCompact ? 0 : 26}
+                minSize={isCompact ? 60 : 15}
+                maxSize={70}
                 collapsible
                 collapsedSize={0}
                 onCollapse={() => setIsLeftPanelCollapsed(true)}
                 onExpand={() => setIsLeftPanelCollapsed(false)}
                 style={{
                   overflow: 'hidden',
-                  transition: 'flex 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
               >
                 <Stack
@@ -193,6 +204,8 @@ export function Landing() {
                     display: 'flex',
                     justifyContent: 'space-between',
                     width: '100%',
+                    minWidth: 0,
+                    alignItems: 'center',
                     background: theme.palette.background.default,
                     borderBottom: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -206,6 +219,10 @@ export function Landing() {
                       padding: 2,
                       margin: 0,
                       flex: 1,
+                      minWidth: 0,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
                       fontFamily: '"IBM Plex Sans", sans-serif',
                       fontWeight: 'bold',
                       fontSize: '16px',
@@ -303,7 +320,7 @@ export function Landing() {
                   width: 1,
                 }}
               />
-              <Panel>
+              <Panel minSize={30}>
                 {viewMode === ViewModeEnum.Designer && (
                   // Only the visual editor uses current lesson asset context
                   <CurrentLessonAssetsContextProvider>

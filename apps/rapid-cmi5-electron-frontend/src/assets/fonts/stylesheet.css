@@ -4,7 +4,9 @@
   src:
     local('Roboto-Bold'),
     url('./Roboto/Roboto-Bold.ttf') format('truetype');
-  font-weight: normal;
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -12,7 +14,9 @@
   src:
     local('Roboto-Italic'),
     url('./Roboto/Roboto-Italic.ttf') format('truetype');
-  font-weight: normal;
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
@@ -20,7 +24,9 @@
   src:
     local('Roboto-Medium'),
     url('./Roboto/Roboto-Medium.ttf') format('truetype');
-  font-weight: normal;
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -28,7 +34,9 @@
   src:
     local('Roboto-MediumItalic'),
     url('./Roboto/Roboto-MediumItalic.ttf') format('truetype');
-  font-weight: normal;
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
@@ -36,7 +44,9 @@
   src:
     local('Roboto-Regular'),
     url('./Roboto/Roboto-Regular.ttf') format('truetype');
-  font-weight: normal;
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 /* BarlowCondensed */
@@ -45,7 +55,9 @@
   src:
     local('BarlowCondensed-Bold'),
     url('./BarlowCondensed/BarlowCondensed-Bold.ttf') format('truetype');
-  font-weight: normal;
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -53,7 +65,9 @@
   src:
     local('BarlowCondensed-Italic'),
     url('./BarlowCondensed/BarlowCondensed-Italic.ttf') format('truetype');
-  font-weight: normal;
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
@@ -61,7 +75,9 @@
   src:
     local('BarlowCondensed-Medium'),
     url('./BarlowCondensed/BarlowCondensed-Medium.ttf') format('truetype');
-  font-weight: normal;
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -69,7 +85,9 @@
   src:
     local('BarlowCondensed-MediumItalic'),
     url('./BarlowCondensed/BarlowCondensed-MediumItalic.ttf') format('truetype');
-  font-weight: normal;
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
@@ -77,5 +95,7 @@
   src:
     local('BarlowCondensed-Regular'),
     url('./BarlowCondensed/BarlowCondensed-Regular.ttf') format('truetype');
-  font-weight: normal;
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }

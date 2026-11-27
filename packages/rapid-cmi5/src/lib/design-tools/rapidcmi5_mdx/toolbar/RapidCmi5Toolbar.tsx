@@ -201,21 +201,21 @@ export const RapidCmi5Toolbar: React.FC = () => {
         zIndex: 1500, // Above drawer roots (1400) so toolbar buttons are never blocked
       }}
     >
-      {/* Scroll container */}
-      <Box
-        sx={{
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          WebkitOverflowScrolling: 'touch',
-        }}
-      >
+      <Box sx={{ minWidth: 0 }}>
         <Stack direction="column" spacing={1} sx={{ padding: 1 }}>
           {viewmode === 'rich-text' && !isPlayback && (
-            <Stack direction="row" spacing={1}>
+            <Stack
+              direction="row"
+              sx={{
+                overflowX: 'auto',
+                overflowY: 'hidden',
+                WebkitOverflowScrolling: 'touch',
+              }}
+            >
               <Stack
                 direction="row"
                 spacing={0}
-                sx={{ flexGrow: 1, minWidth: 0 }}
+                sx={{ flexGrow: 1, minWidth: 'max-content' }}
               >
                 <BoldItalicUnderlineToggles />
                 <ColorTextSplitButton />
@@ -249,7 +249,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                     )}
                   </MUIButtonWithTooltip>
                   {isMoreTextTools && (
-                    <Stack direction="row" sx={{ marginLeft: -1, }}>
+                    <Stack direction="row" sx={{ marginLeft: -1 }}>
                       <StrikeThroughSupSubToggles />
                       <LanguageSpanButton />
                     </Stack>
@@ -314,10 +314,11 @@ export const RapidCmi5Toolbar: React.FC = () => {
           )}
           <Stack
             direction="row"
-            spacing={1}
             sx={{
               display: 'flex',
-              alignItems: 'flex-end',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: 1,
               width: '100%',
             }}
           >
@@ -330,6 +331,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 maxHeight: '32px',
+                flexShrink: 0,
               }}
             >
               <UndoRedo />
@@ -344,6 +346,7 @@ export const RapidCmi5Toolbar: React.FC = () => {
                 borderRadius: '24px',
                 border: `1px solid ${alpha(theme.palette.primary.main, 0.5)}`,
                 height: '34px',
+                flexShrink: 0,
                 display: 'flex',
                 justifyContent: 'center',
               }}

@@ -41,7 +41,9 @@ const OptionCard = ({
           disabled={disabled}
           sx={{
             borderRadius: 2,
-            p: 1.2,
+            p: 1.5,
+            minWidth: 0,
+            minHeight: 88,
             pr: 5,
             display: 'flex',
             flexDirection: 'column',
@@ -74,6 +76,13 @@ const OptionCard = ({
               primary={title}
               sx={{
                 margin: 0,
+                minWidth: 0,
+                '& .MuiListItemText-primary': {
+                  fontSize: '0.9375rem',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  overflowWrap: 'anywhere',
+                },
                 flex: 1,
                 fontFamily: '"IBM Plex Sans", sans-serif',
                 fontWeight: 500,
@@ -90,7 +99,9 @@ const OptionCard = ({
               fontSize: '0.8rem',
               fontFamily: '"IBM Plex Sans", sans-serif',
               lineHeight: 1.4,
-              pl: 1,
+              pl: 0,
+              color: 'text.secondary',
+              overflowWrap: 'anywhere',
               width: '100%',
             }}
           >
