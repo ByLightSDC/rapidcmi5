@@ -1,3 +1,13 @@
+## 0.27.0 (2026-11-27)
+
+### 🩹 Fixes
+
+- chrome updates blocked creation of .git repo ([58b1c202](https://github.com/ByLightSDC/rapidcmi5/commit/58b1c202))
+
+### ❤️ Thank You
+
+- Aaron Crawford @aaiirr123
+
 ## 0.26.0 (2026-11-18)
 
 This was a version bump only for rapid-cmi5-ui to align it with other projects, there were no code changes.
